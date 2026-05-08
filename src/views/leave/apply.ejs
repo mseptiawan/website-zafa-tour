@@ -1,0 +1,21 @@
+<% layout('layouts/main') -%>
+
+<div class="max-w-3xl bg-white p-8 rounded-2xl shadow">
+  <h1 class="text-2xl font-bold mb-6">Ajukan Cuti</h1>
+
+  <form action="/leave/apply" method="POST" class="space-y-5">
+    <select name="type" class="w-full border p-3 rounded-xl">
+      <option>Tahunan</option>
+      <option>Sakit</option>
+      <option>Keluarga</option>
+    </select>
+
+    <input type="date" name="startDate" class="w-full border p-3 rounded-xl" />
+
+    <input type="date" name="endDate" class="w-full border p-3 rounded-xl" />
+
+    <textarea name="reason" class="w-full border p-3 rounded-xl"></textarea>
+
+    <button class="bg-blue-600 text-white px-6 py-3 rounded-xl">Kirim</button>
+  </form>
+</div>

@@ -1,0 +1,49 @@
+<aside class="w-72 bg-slate-900 text-white flex flex-col">
+  <!-- LOGO -->
+  <div class="h-20 flex items-center px-6 border-b border-slate-800">
+    <div>
+      <h1 class="text-2xl font-bold">HRIS</h1>
+      <p class="text-slate-400 text-sm">Zafa Tour</p>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <div class="flex-1 overflow-y-auto px-4 py-6">
+    <a
+      href="/dashboard"
+      class="block px-4 py-3 rounded-xl bg-blue-600 font-medium mb-6"
+    >
+      Dashboard
+    </a>
+
+    <p class="text-xs text-slate-400 mb-3 px-2">Cuti</p>
+
+    <a href="/leave/apply" class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >Ajukan Cuti</a
+    >
+
+    <a href="/leave/my" class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >Riwayat Cuti</a
+    >
+
+    <a
+      href="/leave/request"
+      class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >Permintaan Cuti</a
+    >
+  </div>
+
+  <!-- USER -->
+  <div class="border-t border-slate-800 p-4">
+    <div class="bg-slate-800 rounded-xl p-4">
+      <p class="font-semibold"><%= user.email %></p>
+
+      <a
+        href="/logout"
+        class="inline-block mt-3 text-sm bg-red-500 px-4 py-2 rounded-lg"
+      >
+        Logout
+      </a>
+    </div>
+  </div>
+</aside>

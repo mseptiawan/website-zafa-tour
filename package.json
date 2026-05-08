@@ -1,0 +1,42 @@
+{
+  "name": "website-zafa-tour",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "tw": "npx @tailwindcss/cli -i ./src/public/css/input.css -o ./src/public/css/output.css --watch",
+    "seed": "node src/database/seeders/index.js",
+    "seed:role": "node src/database/seeders/roleSeeder.js",
+    "seed:bidang": "node src/database/seeders/bidangSeeder.js",
+    "seed:unit": "node src/database/seeders/unitSeeder.js",
+    "seed:user": "node src/database/seeders/userSeeder.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^5.0.2",
+    "ejs-mate": "^4.0.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.1",
+    "express-session": "^1.19.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "method-override": "^3.0.0",
+    "mongoose": "^9.6.1",
+    "multer": "^2.1.1",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "nodemon": "^3.1.14",
+    "tailwindcss": "^4.2.4"
+  }
+}

@@ -1,0 +1,122 @@
+<% layout('layouts/main') -%>
+
+<div class="max-w-6xl mx-auto p-6">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Riwayat Cuti Saya</h1>
+    <p class="text-slate-500 text-sm">Pantau pengajuan cuti kamu di sini</p>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <p class="text-slate-500 text-sm">Total Cuti</p>
+      <h2 class="text-2xl font-bold mt-2"><%= summary.total || 0 %></h2>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <p class="text-slate-500 text-sm">Pending</p>
+      <h2 class="text-2xl font-bold mt-2 text-yellow-500">
+        <%= summary.pending || 0 %>
+      </h2>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <p class="text-slate-500 text-sm">Terpakai</p>
+      <h2 class="text-2xl font-bold mt-2 text-green-600">
+        <%= summary.used || 0 %>
+      </h2>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <p class="text-slate-500 text-sm">Sisa</p>
+      <h2 class="text-2xl font-bold mt-2 text-blue-600">
+        <%= summary.remaining || 0 %>
+      </h2>
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+  <div class="bg-white rounded-2xl shadow p-6">
+
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold">Riwayat Pengajuan</h2>
+
+      <a href="/leave/apply"
+        class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm hover:bg-blue-700">
+        + Ajukan Cuti
+      </a>
+    </div>
+
+    <table class="w-full text-sm">
+
+      <thead>
+        <tr class="text-left border-b text-slate-500">
+          <th class="py-3">Jenis</th>
+          <th>Tanggal</th>
+          <th>Durasi</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <% if (leaves && leaves.length > 0) { %>
+
+          <% leaves.forEach(l => { %>
+
+            <tr class="border-b hover:bg-slate-50">
+
+              <td class="py-4 font-medium">
+                <%= l.type %>
+              </td>
+
+              <td>
+                <%= l.startDate %> - <%= l.endDate %>
+              </td>
+
+              <td>
+                <%= l.totalDays %> hari
+              </td>
+
+              <td>
+                <span class="px-3 py-1 rounded-full text-xs
+                  <%= l.status === 'Approved' ? 'bg-green-100 text-green-700' :
+                      l.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                      'bg-yellow-100 text-yellow-700' %>">
+                  <%= l.status %>
+                </span>
+              </td>
+
+              <td>
+                <a href="/leave/<%= l._id %>"
+                  class="text-blue-600 hover:underline">
+                  Detail
+                </a>
+              </td>
+
+            </tr>
+
+          <% }) %>
+
+        <% } else { %>
+
+          <tr>
+            <td colspan="5" class="py-10 text-center text-slate-500">
+              Belum ada pengajuan cuti
+            </td>
+          </tr>
+
+        <% } %>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
