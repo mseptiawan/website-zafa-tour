@@ -1,0 +1,234 @@
+<% layout('layouts/main') -%>
+
+<div class="max-w-7xl mx-auto p-6">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+
+    <h1 class="text-2xl font-bold">
+      Permintaan Cuti
+    </h1>
+
+    <p class="text-slate-500 text-sm">
+      Approval pengajuan cuti karyawan
+    </p>
+
+  </div>
+
+  <!-- CARD -->
+  <div class="bg-white rounded-2xl shadow overflow-hidden">
+
+    <!-- TABLE -->
+    <div class="overflow-x-auto">
+
+      <table class="w-full text-sm">
+
+        <!-- HEAD -->
+        <thead class="bg-slate-50">
+
+          <tr class="text-left text-slate-500 border-b">
+
+            <th class="px-6 py-4">Karyawan</th>
+            <th class="px-6 py-4">Jenis</th>
+            <th class="px-6 py-4">Tanggal</th>
+            <th class="px-6 py-4">Durasi</th>
+            <th class="px-6 py-4">Alasan</th>
+            <th class="px-6 py-4">Status</th>
+            <th class="px-6 py-4 text-center">Aksi</th>
+
+          </tr>
+
+        </thead>
+
+        <!-- BODY -->
+        <tbody>
+
+          <% if (leaves && leaves.length > 0) { %>
+
+            <% leaves.forEach(l => { %>
+
+              <tr class="border-b hover:bg-slate-50">
+
+                <!-- KARYAWAN -->
+                <td class="px-6 py-4">
+
+                  <div class="flex flex-col">
+
+                    <span class="font-semibold text-slate-800">
+                      <%= l.userId?.fullName || 'User Tidak Ditemukan' %>
+                    </span>
+
+                    <span class="text-xs text-slate-400">
+                      <%= l.userId?.employeeId || '-' %>
+                    </span>
+
+                  </div>
+
+                </td>
+
+                <!-- JENIS -->
+                <td class="px-6 py-4">
+                  <%= l.type %>
+                </td>
+
+                <!-- TANGGAL -->
+                <td class="px-6 py-4">
+
+                  <div class="flex flex-col">
+
+                    <span>
+                      <%= new Date(l.startDate)
+                        .toLocaleDateString("id-ID") %>
+                    </span>
+
+                    <span class="text-xs text-slate-400">
+                      sampai
+                    </span>
+
+                    <span>
+                      <%= new Date(l.endDate)
+                        .toLocaleDateString("id-ID") %>
+                    </span>
+
+                  </div>
+
+                </td>
+
+                <!-- DURASI -->
+                <td class="px-6 py-4">
+                  <%= l.totalDays %> hari
+                </td>
+
+                <!-- ALASAN -->
+                <td class="px-6 py-4 max-w-xs">
+
+                  <p class="truncate">
+                    <%= l.reason %>
+                  </p>
+
+                </td>
+
+                <!-- STATUS -->
+                <td class="px-6 py-4">
+
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-medium
+
+                    <%= l.status === 'Approved'
+                      ? 'bg-green-100 text-green-700'
+                      : l.status === 'Rejected'
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-yellow-100 text-yellow-700'
+                    %>">
+
+                    <%= l.status %>
+
+                  </span>
+
+                </td>
+
+                <!-- AKSI -->
+                <td class="px-6 py-4">
+
+                  <div class="flex flex-wrap gap-2 justify-center">
+
+                    <!-- APPROVE MANAGER -->
+                    <% if(l.status === 'Pending Manager'){ %>
+
+                      <form
+                        action="/leave/approval/<%= l._id %>/manager"
+                        method="POST">
+
+                        <button
+                          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs">
+
+                          Approve Manager
+
+                        </button>
+
+                      </form>
+
+                    <% } %>
+
+                    <!-- APPROVE HR -->
+                    <% if(l.status === 'Pending HR'){ %>
+
+                      <form
+                        action="/leave/approval/<%= l._id %>/hr"
+                        method="POST">
+
+                        <button
+                          class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs">
+
+                          Approve HR
+
+                        </button>
+
+                      </form>
+
+                    <% } %>
+
+                    <!-- REJECT -->
+                    <% if(
+                      l.status !== 'Approved' &&
+                      l.status !== 'Rejected'
+                    ){ %>
+
+                      <form
+                        action="/leave/approval/<%= l._id %>/reject"
+                        method="POST">
+
+                        <button
+                          class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs">
+
+                          Reject
+
+                        </button>
+
+                      </form>
+
+                    <% } %>
+
+                    <!-- DETAIL -->
+                    <a
+                      href="/leave/<%= l._id %>"
+                      class="bg-slate-200 hover:bg-slate-300 px-3 py-2 rounded-lg text-xs">
+
+                      Detail
+
+                    </a>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            <% }) %>
+
+          <% } else { %>
+
+            <!-- EMPTY -->
+            <tr>
+
+              <td
+                colspan="7"
+                class="text-center py-16 text-slate-500">
+
+                Belum ada pengajuan cuti
+
+              </td>
+
+            </tr>
+
+          <% } %>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

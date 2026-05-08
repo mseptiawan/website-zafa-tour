@@ -1,47 +1,194 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Detail Cuti</title>
+<% layout('layouts/main') -%>
 
-  <link rel="stylesheet" href="/css/output.css" />
-</head>
+<div class="max-w-4xl mx-auto p-6">
 
-<body class="bg-slate-100 p-10">
+  <!-- HEADER -->
+  <div class="mb-6">
 
-  <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow">
+    <h1 class="text-2xl font-bold">
+      Detail Pengajuan Cuti
+    </h1>
 
-    <h1 class="text-2xl font-bold mb-6">Detail Cuti</h1>
+    <p class="text-slate-500 text-sm">
+      Informasi lengkap pengajuan cuti karyawan
+    </p>
 
-    <div class="space-y-4 text-slate-700">
+  </div>
 
-      <p><b>Jenis:</b> <%= leave.type %></p>
+  <!-- CARD -->
+  <div class="bg-white rounded-2xl shadow p-8">
 
-      <p><b>Tanggal:</b> <%= leave.startDate %> - <%= leave.endDate %></p>
+    <!-- GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      <p><b>Jumlah Hari:</b> <%= leave.totalDays %></p>
+      <!-- JENIS CUTI -->
+      <div>
 
-      <p><b>Alasan:</b> <%= leave.reason %></p>
-
-      <p><b>Status:</b> <%= leave.status %></p>
-
-      <% if (leave.rejectedReason) { %>
-        <p class="text-red-500">
-          <b>Alasan Ditolak:</b> <%= leave.rejectedReason %>
+        <p class="text-sm text-slate-500">
+          Jenis Cuti
         </p>
-      <% } %>
 
-      <% if (leave.file) { %>
-        <div>
-          <p class="font-semibold">Bukti:</p>
-          <img src="/uploads/<%= leave.file %>"
-            class="mt-2 rounded-xl border"/>
+        <h2 class="font-semibold text-lg mt-1">
+          <%= leave.type %>
+        </h2>
+
+      </div>
+
+      <!-- STATUS -->
+      <div>
+
+        <p class="text-sm text-slate-500">
+          Status
+        </p>
+
+        <div class="mt-2">
+
+          <span class="px-3 py-1 rounded-full text-xs font-medium
+
+            <%= leave.status === 'Approved'
+              ? 'bg-green-100 text-green-700'
+              : leave.status === 'Rejected'
+              ? 'bg-red-100 text-red-700'
+              : 'bg-yellow-100 text-yellow-700'
+            %>">
+
+            <%= leave.status %>
+
+          </span>
+
         </div>
-      <% } %>
+
+      </div>
+
+      <!-- TANGGAL MULAI -->
+      <div>
+
+        <p class="text-sm text-slate-500">
+          Tanggal Mulai
+        </p>
+
+        <h2 class="font-semibold mt-1">
+
+          <%= new Date(leave.startDate)
+            .toLocaleDateString("id-ID") %>
+
+        </h2>
+
+      </div>
+
+      <!-- TANGGAL SELESAI -->
+      <div>
+
+        <p class="text-sm text-slate-500">
+          Tanggal Selesai
+        </p>
+
+        <h2 class="font-semibold mt-1">
+
+          <%= new Date(leave.endDate)
+            .toLocaleDateString("id-ID") %>
+
+        </h2>
+
+      </div>
+
+      <!-- DURASI -->
+      <div>
+
+        <p class="text-sm text-slate-500">
+          Durasi
+        </p>
+
+        <h2 class="font-semibold mt-1">
+          <%= leave.totalDays %> Hari
+        </h2>
+
+      </div>
+
+      <!-- CREATED -->
+      <div>
+
+        <p class="text-sm text-slate-500">
+          Tanggal Pengajuan
+        </p>
+
+        <h2 class="font-semibold mt-1">
+
+          <%= new Date(leave.createdAt)
+            .toLocaleDateString("id-ID") %>
+
+        </h2>
+
+      </div>
+
+    </div>
+
+    <!-- ALASAN -->
+    <div class="mt-8">
+
+      <p class="text-sm text-slate-500 mb-2">
+        Alasan Cuti
+      </p>
+
+      <div class="bg-slate-50 rounded-xl p-4 leading-relaxed">
+
+        <%= leave.reason %>
+
+      </div>
+
+    </div>
+
+    <!-- FILE -->
+    <% if(leave.file){ %>
+
+      <div class="mt-8">
+
+        <p class="text-sm text-slate-500 mb-2">
+          Lampiran Bukti
+        </p>
+
+        <div class="bg-slate-50 rounded-xl p-4 flex items-center justify-between">
+
+          <div>
+
+            <p class="font-medium">
+              <%= leave.file %>
+            </p>
+
+            <p class="text-xs text-slate-400 mt-1">
+              File pendukung pengajuan cuti
+            </p>
+
+          </div>
+
+          <a
+            href="/uploads/<%= leave.file %>"
+            target="_blank"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+
+            Lihat File
+
+          </a>
+
+        </div>
+
+      </div>
+
+    <% } %>
+
+    <!-- BUTTON -->
+    <div class="mt-8">
+
+      <a
+        href="/leave/my"
+        class="bg-slate-200 hover:bg-slate-300 px-5 py-3 rounded-xl text-sm inline-block">
+
+        ← Kembali
+
+      </a>
 
     </div>
 
   </div>
 
-</body>
-</html>
+</div>

@@ -76,9 +76,12 @@
               </td>
 
               <td>
-                <%= l.startDate %> - <%= l.endDate %>
+                <%= new Date(l.startDate)
+                  .toLocaleDateString("id-ID") %>
+                -
+                <%= new Date(l.endDate)
+                  .toLocaleDateString("id-ID") %>
               </td>
-
               <td>
                 <%= l.totalDays %> hari
               </td>

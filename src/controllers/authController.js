@@ -3,33 +3,44 @@ import User from "../models/User.js";
 const showLogin = (req, res) => {
   res.render("auth/login");
 };
-
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).populate("roleId");
+    const user = await User.findOne({
+      email,
+    }).populate("roleId");
 
-  if (!user) {
-    return res.send("User tidak ditemukan");
+    if (!user) {
+      return res.send("User tidak ditemukan");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.send("Password salah");
+    }
+
+    req.session.user = {
+      id: user._id,
+      email: user.email,
+      username: user.fullName,
+      role: user.roleId.name,
+    };
+
+    req.session.save((err) => {
+      if (err) {
+        console.log(err);
+        return res.send("Session gagal");
+      }
+
+      res.redirect("/dashboard");
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.send("Terjadi kesalahan");
   }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) {
-    return res.send("Password salah");
-  }
-
-  // 🔥 SIMPAN SESSION (INI YANG KAMU MAU)
-  req.session.user = {
-    id: user._id,
-    email: user.email,
-    username: user.fullName, // 👈 ini username
-    role: user.roleId.name, // optional tapi penting
-  };
-
-  return req.session.save(() => {
-    res.redirect("/dashboard");
-  });
 };
 const dashboard = (req, res) => {
   res.render("dashboard/index", {

@@ -1,4 +1,4 @@
-<aside class="w-72 bg-slate-900 text-white flex flex-col">
+<aside class="w-72 bg-slate-900 text-white flex flex-col min-h-screen">
   <!-- LOGO -->
   <div class="h-20 flex items-center px-6 border-b border-slate-800">
     <div>
@@ -9,38 +9,207 @@
 
   <!-- MENU -->
   <div class="flex-1 overflow-y-auto px-4 py-6">
+    <!-- DASHBOARD -->
     <a
       href="/dashboard"
-      class="block px-4 py-3 rounded-xl bg-blue-600 font-medium mb-6"
+      class="block px-4 py-3 rounded-xl hover:bg-slate-800 mb-2"
     >
       Dashboard
     </a>
 
-    <p class="text-xs text-slate-400 mb-3 px-2">Cuti</p>
+    <!-- ===================== -->
+    <!-- CUTI -->
+    <!-- ===================== -->
+    <p class="text-xs text-slate-400 mb-3 mt-6 px-2 uppercase tracking-wider">
+      Cuti
+    </p>
 
-    <a href="/leave/apply" class="block px-4 py-3 rounded-xl hover:bg-slate-800"
-      >Ajukan Cuti</a
-    >
+    <div class="space-y-1">
+      <a
+        href="/leave/apply"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Ajukan Cuti
+      </a>
 
-    <a href="/leave/my" class="block px-4 py-3 rounded-xl hover:bg-slate-800"
-      >Riwayat Cuti</a
-    >
+      <a href="/leave/my" class="block px-4 py-3 rounded-xl hover:bg-slate-800">
+        Riwayat Cuti
+      </a>
 
-    <a
-      href="/leave/request"
-      class="block px-4 py-3 rounded-xl hover:bg-slate-800"
-      >Permintaan Cuti</a
-    >
+      <a
+        href="/leave/approval"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Permintaan Cuti
+      </a>
+    </div>
+
+    <!-- ===================== -->
+    <!-- LEMBUR -->
+    <!-- ===================== -->
+    <p class="text-xs text-slate-400 mb-3 mt-8 px-2 uppercase tracking-wider">
+      Lembur
+    </p>
+
+    <div class="space-y-1">
+      <a
+        href="/overtime/apply"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Ajukan Lembur
+      </a>
+
+      <a
+        href="/overtime/my"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Riwayat Lembur
+      </a>
+
+      <a
+        href="/overtime/approval"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Approval Lembur
+      </a>
+    </div>
+
+    <!-- ===================== -->
+    <!-- DINAS LUAR -->
+    <!-- ===================== -->
+    <p class="text-xs text-slate-400 mb-3 mt-8 px-2 uppercase tracking-wider">
+      Dinas Luar
+    </p>
+
+    <div class="space-y-1">
+      <a
+        href="/trip/apply"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Ajukan Dinas
+      </a>
+
+      <a href="/trip/my" class="block px-4 py-3 rounded-xl hover:bg-slate-800">
+        Riwayat Dinas
+      </a>
+
+      <a
+        href="/trip/approval"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Approval Dinas
+      </a>
+    </div>
+
+    <!-- ===================== -->
+    <!-- KLAIM BEBAN -->
+    <!-- ===================== -->
+    <p class="text-xs text-slate-400 mb-3 mt-8 px-2 uppercase tracking-wider">
+      Klaim Beban
+    </p>
+
+    <div class="space-y-1">
+      <a
+        href="/expense/apply"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Ajukan Klaim
+      </a>
+
+      <a
+        href="/expense/my"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Riwayat Klaim
+      </a>
+
+      <a
+        href="/expense/approval"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Approval Klaim
+      </a>
+    </div>
+
+    <!-- ===================== -->
+    <!-- KASBON -->
+    <!-- ===================== -->
+    <p class="text-xs text-slate-400 mb-3 mt-8 px-2 uppercase tracking-wider">
+      Kasbon
+    </p>
+
+    <div class="space-y-1">
+      <a
+        href="/cash-advance/apply"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Ajukan Kasbon
+      </a>
+
+      <a
+        href="/cash-advance/my"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Riwayat Kasbon
+      </a>
+
+      <a
+        href="/cash-advance/approval"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Approval Kasbon
+      </a>
+    </div>
+
+    <!-- ===================== -->
+    <!-- TUGAS -->
+    <!-- ===================== -->
+    <p class="text-xs text-slate-400 mb-3 mt-8 px-2 uppercase tracking-wider">
+      Tugas
+    </p>
+
+    <div class="space-y-1">
+      <a href="/task" class="block px-4 py-3 rounded-xl hover:bg-slate-800">
+        Tugas Saya
+      </a>
+
+      <a
+        href="/task/report"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Laporan Tugas
+      </a>
+    </div>
+
+    <!-- ===================== -->
+    <!-- PENGUMUMAN -->
+    <!-- ===================== -->
+    <p class="text-xs text-slate-400 mb-3 mt-8 px-2 uppercase tracking-wider">
+      Pengumuman
+    </p>
+
+    <div class="space-y-1">
+      <a
+        href="/announcement"
+        class="block px-4 py-3 rounded-xl hover:bg-slate-800"
+      >
+        Semua Pengumuman
+      </a>
+    </div>
   </div>
 
   <!-- USER -->
   <div class="border-t border-slate-800 p-4">
     <div class="bg-slate-800 rounded-xl p-4">
-      <p class="font-semibold"><%= user.email %></p>
+      <p class="text-sm text-slate-400 mb-1">Login sebagai</p>
+
+      <p class="font-semibold"><%= user.username || user.email %></p>
+
+      <p class="text-xs text-slate-400 mt-1"><%= user.role || 'Karyawan' %></p>
 
       <a
         href="/logout"
-        class="inline-block mt-3 text-sm bg-red-500 px-4 py-2 rounded-lg"
+        class="inline-block mt-4 text-sm bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg"
       >
         Logout
       </a>

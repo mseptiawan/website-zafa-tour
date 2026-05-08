@@ -1,21 +1,102 @@
 <% layout('layouts/main') -%>
 
-<div class="max-w-3xl bg-white p-8 rounded-2xl shadow">
-  <h1 class="text-2xl font-bold mb-6">Ajukan Cuti</h1>
+<div class="max-w-3xl mx-auto p-6">
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Ajukan Cuti</h1>
 
-  <form action="/leave/apply" method="POST" class="space-y-5">
-    <select name="type" class="w-full border p-3 rounded-xl">
-      <option>Tahunan</option>
-      <option>Sakit</option>
-      <option>Keluarga</option>
-    </select>
+    <p class="text-slate-500 text-sm">Isi formulir pengajuan cuti karyawan</p>
+  </div>
 
-    <input type="date" name="startDate" class="w-full border p-3 rounded-xl" />
+  <!-- CARD -->
+  <div class="bg-white rounded-2xl shadow p-8">
+    <form
+      action="/leave/apply"
+      method="POST"
+      enctype="multipart/form-data"
+      class="space-y-5"
+    >
+      <!-- JENIS CUTI -->
+      <div>
+        <label class="block text-sm mb-2 font-medium"> Jenis Cuti </label>
 
-    <input type="date" name="endDate" class="w-full border p-3 rounded-xl" />
+        <select
+          name="type"
+          required
+          class="w-full border border-slate-300 p-3 rounded-xl"
+        >
+          <option value="">-- Pilih Jenis Cuti --</option>
 
-    <textarea name="reason" class="w-full border p-3 rounded-xl"></textarea>
+          <option value="Tahunan">Tahunan</option>
 
-    <button class="bg-blue-600 text-white px-6 py-3 rounded-xl">Kirim</button>
-  </form>
+          <option value="Sakit">Sakit</option>
+
+          <option value="Keluarga">Keluarga</option>
+        </select>
+      </div>
+
+      <!-- TANGGAL MULAI -->
+      <div>
+        <label class="block text-sm mb-2 font-medium"> Tanggal Mulai </label>
+
+        <input
+          type="date"
+          name="startDate"
+          required
+          class="w-full border border-slate-300 p-3 rounded-xl"
+        />
+      </div>
+
+      <!-- TANGGAL SELESAI -->
+      <div>
+        <label class="block text-sm mb-2 font-medium"> Tanggal Selesai </label>
+
+        <input
+          type="date"
+          name="endDate"
+          required
+          class="w-full border border-slate-300 p-3 rounded-xl"
+        />
+      </div>
+
+      <!-- ALASAN -->
+      <div>
+        <label class="block text-sm mb-2 font-medium"> Alasan Cuti </label>
+
+        <textarea
+          name="reason"
+          rows="5"
+          required
+          placeholder="Masukkan alasan cuti..."
+          class="w-full border border-slate-300 p-3 rounded-xl"
+        ></textarea>
+      </div>
+
+      <!-- UPLOAD FILE -->
+      <div>
+        <label class="block text-sm mb-2 font-medium">
+          Upload Bukti (PDF/Gambar)
+        </label>
+
+        <input
+          type="file"
+          name="file"
+          accept=".pdf,.png,.jpg,.jpeg"
+          class="w-full border border-slate-300 p-3 rounded-xl bg-white"
+        />
+
+        <p class="text-xs text-slate-400 mt-2">Format: PDF, PNG, JPG, JPEG</p>
+      </div>
+
+      <!-- BUTTON -->
+      <div class="pt-2">
+        <button
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl"
+        >
+          Kirim Pengajuan
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

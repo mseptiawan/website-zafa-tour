@@ -1,0 +1,69 @@
+<% layout('layouts/main') -%>
+
+<div class="max-w-6xl mx-auto p-6">
+
+  <div class="bg-white rounded-2xl shadow p-6">
+
+    <h1 class="text-2xl font-bold mb-6">
+      Riwayat Lembur
+    </h1>
+
+    <table class="w-full text-sm">
+
+      <thead>
+        <tr class="border-b text-left">
+          <th class="py-3">Tanggal</th>
+          <th>Jam</th>
+          <th>Total</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <% overtimes.forEach(o => { %>
+
+          <tr class="border-b">
+
+            <td class="py-4">
+              <%= new Date(o.date)
+              .toLocaleDateString("id-ID") %>
+            </td>
+
+            <td>
+              <%= o.startTime %> -
+              <%= o.endTime %>
+            </td>
+
+            <td>
+              <%= o.totalHours %> Jam
+            </td>
+
+            <td>
+
+              <span class="px-3 py-1 rounded-full text-xs
+
+              <%= o.status === 'Approved'
+              ? 'bg-green-100 text-green-700'
+              : o.status === 'Rejected'
+              ? 'bg-red-100 text-red-700'
+              : 'bg-yellow-100 text-yellow-700'
+              %>">
+
+              <%= o.status %>
+
+              </span>
+
+            </td>
+
+          </tr>
+
+        <% }) %>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
