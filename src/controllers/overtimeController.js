@@ -16,10 +16,13 @@ export const applyOvertime = async (req, res) => {
   try {
     const { date, startTime, endTime, workDescription, result } = req.body;
 
-    // HITUNG TOTAL JAM
     const start = new Date(`${date}T${startTime}`);
 
     const end = new Date(`${date}T${endTime}`);
+
+    if (end <= start) {
+      return res.send("Jam selesai harus lebih besar dari jam mulai");
+    }
 
     const diffMs = end - start;
 

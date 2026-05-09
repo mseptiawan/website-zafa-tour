@@ -5,24 +5,36 @@ import roleSeeder from "./roleSeeder.js";
 import bidangSeeder from "./bidangSeeder.js";
 import unitSeeder from "./unitSeeder.js";
 import userSeeder from "./userSeeder.js";
-
+import positionSeeder from "./positionSeeder.js";
+import employeeSeeder from "./employeeSeeder.js";
+import kpiTemplateSeeder from "./kpiTemplateSeeder.js";
+import kpiTemplateDetailSeeder from "./kpiTemplateDetailSeeder.js";
+import unitKpiMappingSeeder from "./unitKpiMappingSeeder.js";
 dotenv.config();
 
-await mongoose.connect(process.env.MONGODB_URI);
+const runSeeder = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
 
-try {
-  console.log("Seeder started...");
+    console.log("Seeder started...");
 
-  await roleSeeder();
-  await bidangSeeder();
-  await unitSeeder();
-  await userSeeder();
+    // 🧠 urutan WAJIB benar (dependency order)
+    await roleSeeder();
+    await bidangSeeder();
+    await unitSeeder();
+    await positionSeeder();
+    await userSeeder();
+    await employeeSeeder();
+    await kpiTemplateSeeder();
+    await kpiTemplateDetailSeeder();
+    await unitKpiMappingSeeder();
+    console.log("All seeders success");
 
-  console.log("All seeders success");
+    process.exit();
+  } catch (error) {
+    console.log("Seeder error:", error);
+    process.exit(1);
+  }
+};
 
-  process.exit();
-} catch (error) {
-  console.log(error);
-
-  process.exit(1);
-}
+runSeeder();

@@ -1,117 +1,58 @@
 import bcrypt from "bcrypt";
-
 import User from "../../models/User.js";
-
 import Role from "../../models/Role.js";
-import Bidang from "../../models/Bidang.js";
-import Unit from "../../models/Unit.js";
 
 const userSeeder = async () => {
   await User.deleteMany();
 
-  const hrRole = await Role.findOne({
-    name: "HR",
-  });
+  const password = await bcrypt.hash("zafasecret", 10);
 
-  const managerRole = await Role.findOne({
-    name: "Manager",
-  });
+  const hrRole = await Role.findOne({ name: "HR" });
+  const managerRole = await Role.findOne({ name: "Manager" });
+  const pimpinanRole = await Role.findOne({ name: "Pimpinan" });
+  const karyawanRole = await Role.findOne({ name: "Karyawan" });
+  const keuanganRole = await Role.findOne({ name: "Keuangan" });
 
-  const employeeRole = await Role.findOne({
-    name: "Karyawan",
-  });
+  const users = await User.insertMany([
+    // ================= PIMPINAN =================
+    { email: "rafika@zafa.com", password, roleId: pimpinanRole._id },
 
-  const marketingBidang = await Bidang.findOne({
-    name: "Marketing",
-  });
+    // ================= HR =================
+    { email: "duwi@zafa.com", password, roleId: hrRole._id },
 
-  const salesUnit = await Unit.findOne({
-    name: "Sales",
-  });
+    // ================= MANAGER =================
+    { email: "ronald@zafa.com", password, roleId: managerRole._id },
 
-  const payrollUnit = await Unit.findOne({
-    name: "Payroll",
-  });
+    // ================= KEUANGAN =================
+    { email: "fadhilah@zafa.com", password, roleId: keuanganRole._id },
 
-  const password = await bcrypt.hash("password123", 10);
-
-  const manager = await User.create({
-    employeeId: "EMP001",
-
-    fullName: "Budi Santoso",
-
-    email: "manager@zafa.com",
-
-    password,
-
-    phoneNumber: "081234567890",
-
-    gender: "Laki-Laki",
-
-    employmentStatus: "Tetap",
-
-    roleId: managerRole._id,
-
-    bidangId: marketingBidang._id,
-
-    unitId: salesUnit._id,
-
-    baseSalary: 10000000,
-  });
-
-  await User.insertMany([
-    {
-      employeeId: "EMP002",
-
-      fullName: "HR Administrator",
-
-      email: "hr@zafa.com",
-
-      password,
-
-      phoneNumber: "081111111111",
-
-      gender: "Perempuan",
-
-      employmentStatus: "Tetap",
-
-      roleId: hrRole._id,
-
-      bidangId: marketingBidang._id,
-
-      unitId: payrollUnit._id,
-
-      baseSalary: 8000000,
-    },
-
-    {
-      employeeId: "EMP003",
-
-      fullName: "Ahmad Fauzi",
-
-      email: "employee@zafa.com",
-
-      password,
-
-      phoneNumber: "082222222222",
-
-      gender: "Laki-Laki",
-
-      employmentStatus: "Tetap",
-
-      roleId: employeeRole._id,
-
-      bidangId: marketingBidang._id,
-
-      unitId: salesUnit._id,
-
-      managerId: manager._id,
-
-      baseSalary: 5000000,
-    },
+    // ================= EMPLOYEE =================
+    { email: "gusti@zafa.com", password, roleId: karyawanRole._id },
+    { email: "willy@zafa.com", password, roleId: karyawanRole._id },
+    { email: "melti@zafa.com", password, roleId: karyawanRole._id },
+    { email: "mrisky@zafa.com", password, roleId: karyawanRole._id },
+    { email: "lily@zafa.com", password, roleId: karyawanRole._id },
+    { email: "febriansyah@zafa.com", password, roleId: karyawanRole._id },
+    { email: "adinda@zafa.com", password, roleId: karyawanRole._id },
+    { email: "fajar@zafa.com", password, roleId: karyawanRole._id },
+    { email: "rendi@zafa.com", password, roleId: karyawanRole._id },
+    { email: "abdul@zafa.com", password, roleId: karyawanRole._id },
+    { email: "baso@zafa.com", password, roleId: karyawanRole._id },
+    { email: "ongki@zafa.com", password, roleId: karyawanRole._id },
+    { email: "sarwanto@zafa.com", password, roleId: karyawanRole._id },
+    { email: "diras@zafa.com", password, roleId: karyawanRole._id },
+    { email: "mulia@zafa.com", password, roleId: karyawanRole._id },
+    { email: "dina@zafa.com", password, roleId: karyawanRole._id },
+    { email: "nurul@zafa.com", password, roleId: karyawanRole._id },
+    { email: "arif@zafa.com", password, roleId: karyawanRole._id },
+    { email: "decky@zafa.com", password, roleId: karyawanRole._id },
+    { email: "adi@zafa.com", password, roleId: karyawanRole._id },
+    { email: "nico@zafa.com", password, roleId: karyawanRole._id },
+    { email: "mariani@zafa.com", password, roleId: karyawanRole._id },
   ]);
 
   console.log("User seeded");
+  return users;
 };
 
 export default userSeeder;

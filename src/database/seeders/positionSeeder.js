@@ -1,0 +1,35 @@
+import Position from "../../models/Position.js";
+
+const positionSeeder = async () => {
+  await Position.deleteMany();
+
+  await Position.insertMany([
+    {
+      name: "Komisaris",
+    },
+
+    {
+      name: "Direktur Utama",
+    },
+
+    {
+      name: "Wakil Direktur",
+    },
+
+    {
+      name: "General Manager",
+    },
+
+    {
+      name: "Manager",
+    },
+
+    {
+      name: "Staff",
+    },
+  ]);
+
+  console.log("Positions seeded");
+};
+
+export default positionSeeder;

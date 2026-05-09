@@ -5,7 +5,11 @@ const bidangSeeder = async () => {
 
   await Bidang.insertMany([
     {
-      name: "Marketing",
+      name: "Keuangan",
+    },
+
+    {
+      name: "Marketing dan Kemitraan",
     },
 
     {
@@ -13,15 +17,14 @@ const bidangSeeder = async () => {
     },
 
     {
-      name: "Keuangan",
+      name: "Haji dan Umrah",
     },
 
     {
-      name: "HRD",
+      name: "IT dan Multimedia",
     },
-
     {
-      name: "Operasional",
+      name: "Umum dan Perlengkapan",
     },
   ]);
 

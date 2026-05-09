@@ -70,7 +70,12 @@ router.get("/leave/:id", authMiddleware, detailLeave);
 
 router.get("/overtime/apply", authMiddleware, showApplyOvertime);
 
-router.post("/overtime/apply", authMiddleware, applyOvertime);
+router.post(
+  "/overtime/apply",
+  authMiddleware,
+  upload.single("proofFile"),
+  applyOvertime,
+);
 
 router.get("/overtime/my", authMiddleware, myOvertime);
 
