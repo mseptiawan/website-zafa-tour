@@ -1,106 +1,123 @@
 <% layout('layouts/main') -%>
 
-<div class="max-w-7xl mx-auto p-6">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+  <div class="max-w-7xl mx-auto">
 
-  <div class="bg-white rounded-2xl shadow p-6 overflow-x-auto">
+    <!-- HEADER -->
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+        Approval Lembur
+      </h1>
+      <p class="text-slate-500 mt-2 font-medium">
+        Kelola persetujuan lembur karyawan secara cepat dan terstruktur.
+      </p>
+    </div>
 
-    <h1 class="text-2xl font-bold mb-6">
-      Approval Lembur
-    </h1>
+    <!-- CARD -->
+    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-6">
 
-    <table class="w-full text-sm">
+      <!-- dekorasi -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
 
-      <thead>
-        <tr class="border-b text-left">
-          <th class="py-3">Karyawan</th>
-          <th>Tanggal</th>
-          <th>Jam</th>
-          <th>Total</th>
-          <th>Status</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
+      <div class="relative overflow-x-auto">
 
-      <tbody>
+        <table class="w-full text-sm">
 
-        <% overtimes.forEach(o => { %>
+          <!-- HEADER TABLE -->
+          <thead>
+            <tr class="text-left text-xs uppercase tracking-widest text-slate-400 border-b border-slate-200">
+              <th class="py-4 px-3">Karyawan</th>
+              <th class="py-4 px-3">Tanggal</th>
+              <th class="py-4 px-3">Jam</th>
+              <th class="py-4 px-3">Total</th>
+              <th class="py-4 px-3">Status</th>
+              <th class="py-4 px-3 text-center">Aksi</th>
+            </tr>
+          </thead>
 
-          <tr class="border-b">
+          <!-- BODY -->
+          <tbody class="divide-y divide-slate-100">
 
-            <td class="py-4">
-              <%= o.userId?.fullName %>
-            </td>
+            <% overtimes.forEach(o => { %>
 
-            <td>
-              <%= new Date(o.date)
-              .toLocaleDateString("id-ID") %>
-            </td>
+              <tr class="hover:bg-slate-50/60 transition">
 
-            <td>
-              <%= o.startTime %> -
-              <%= o.endTime %>
-            </td>
+                <td class="py-4 px-3 font-semibold text-slate-700">
+                  <%= o.userId?.fullName %>
+                </td>
 
-            <td>
-              <%= o.totalHours %> Jam
-            </td>
+                <td class="py-4 px-3 text-slate-600">
+                  <%= new Date(o.date).toLocaleDateString("id-ID") %>
+                </td>
 
-            <td>
-              <%= o.status %>
-            </td>
+                <td class="py-4 px-3 text-slate-600">
+                  <%= o.startTime %> - <%= o.endTime %>
+                </td>
 
-            <td>
+                <td class="py-4 px-3 text-slate-600 font-medium">
+                  <%= o.totalHours %> Jam
+                </td>
 
-              <div class="flex gap-2">
+                <!-- STATUS BADGE -->
+                <td class="py-4 px-3">
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold
+                    <% if (o.status === 'Pending Manager') { %>
+                      bg-yellow-100 text-yellow-700
+                    <% } else if (o.status === 'Pending HR') { %>
+                      bg-blue-100 text-blue-700
+                    <% } else { %>
+                      bg-green-100 text-green-700
+                    <% } %>
+                    "
+                  >
+                    <%= o.status %>
+                  </span>
+                </td>
 
-                <% if(o.status ===
-                'Pending Manager'){ %>
+                <!-- ACTION -->
+                <td class="py-4 px-3">
+                  <div class="flex justify-center gap-2">
 
-                <form
-                  action="/overtime/approval/<%= o._id %>/manager"
-                  method="POST">
+                    <% if(o.status === 'Pending Manager'){ %>
+                      <form action="/overtime/approval/<%= o._id %>/manager" method="POST">
+                        <button
+                          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition shadow-sm"
+                        >
+                          Approve Manager
+                        </button>
+                      </form>
+                    <% } %>
 
-                  <button
-                    class="bg-blue-600 text-white px-3 py-2 rounded-lg text-xs">
+                    <% if(o.status === 'Pending HR'){ %>
+                      <form action="/overtime/approval/<%= o._id %>/hr" method="POST">
+                        <button
+                          class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition shadow-sm"
+                        >
+                          Approve HR
+                        </button>
+                      </form>
+                    <% } %>
 
-                    Approve Manager
+                  </div>
+                </td>
 
-                  </button>
+              </tr>
 
-                </form>
+            <% }) %>
 
-                <% } %>
+          </tbody>
 
-                <% if(o.status ===
-                'Pending HR'){ %>
+        </table>
 
-                <form
-                  action="/overtime/approval/<%= o._id %>/hr"
-                  method="POST">
+      </div>
+    </div>
 
-                  <button
-                    class="bg-green-600 text-white px-3 py-2 rounded-lg text-xs">
-
-                    Approve HR
-
-                  </button>
-
-                </form>
-
-                <% } %>
-
-              </div>
-
-            </td>
-
-          </tr>
-
-        <% }) %>
-
-      </tbody>
-
-    </table>
+    <!-- FOOTER NOTE -->
+    <p class="text-center text-slate-400 text-xs mt-8">
+      Data approval diperbarui secara real-time sesuai status terakhir.
+    </p>
 
   </div>
-
 </div>

@@ -35,6 +35,9 @@ const employeeSeeder = async () => {
   const marketingUnit = await Unit.findOne({ name: "Marketing dan Kemitraan" });
   const perlengkapan = await Unit.findOne({ name: "Perlengkapan" });
   const visaHotel = await Unit.findOne({ name: "Visa dan Hotel" });
+  const pengeluaran = await Unit.findOne({
+    name: "Pengeluaran Operasional Harian",
+  });
 
   // =====================
   // USERS
@@ -141,7 +144,7 @@ const employeeSeeder = async () => {
       fullName: "fadhilah",
       employeeCode: "EMP-008",
       positionId: staff._id,
-      unitId: accounting._id,
+      unitId: pengeluaran._id,
       bidangId: keuangan._id,
     },
 

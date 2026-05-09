@@ -1,194 +1,151 @@
 <% layout('layouts/main') -%>
 
-<div class="max-w-4xl mx-auto p-6">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+  <div class="max-w-4xl mx-auto">
 
-  <!-- HEADER -->
-  <div class="mb-6">
+    <!-- HEADER -->
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+        Detail Pengajuan Cuti
+      </h1>
+      <p class="text-slate-500 mt-2 font-medium">
+        Informasi lengkap pengajuan cuti karyawan
+      </p>
+    </div>
 
-    <h1 class="text-2xl font-bold">
-      Detail Pengajuan Cuti
-    </h1>
+    <!-- CARD -->
+    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-8">
 
-    <p class="text-slate-500 text-sm">
-      Informasi lengkap pengajuan cuti karyawan
-    </p>
+      <!-- dekorasi -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
 
-  </div>
+      <!-- GRID -->
+      <div class="relative grid grid-cols-1 md:grid-cols-2 gap-6">
 
-  <!-- CARD -->
-  <div class="bg-white rounded-2xl shadow p-8">
+        <!-- JENIS CUTI -->
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+            Jenis Cuti
+          </p>
+          <h2 class="font-bold text-lg mt-1 text-slate-800">
+            <%= leave.type %>
+          </h2>
+        </div>
 
-    <!-- GRID -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- STATUS -->
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+            Status
+          </p>
 
-      <!-- JENIS CUTI -->
-      <div>
+          <div class="mt-2">
+            <span
+              class="px-3 py-1 rounded-full text-xs font-semibold
+              <%= leave.status === 'Approved'
+                ? 'bg-emerald-100 text-emerald-700'
+                : leave.status === 'Rejected'
+                ? 'bg-red-100 text-red-700'
+                : 'bg-yellow-100 text-yellow-700' %>
+              "
+            >
+              <%= leave.status %>
+            </span>
+          </div>
+        </div>
 
-        <p class="text-sm text-slate-500">
-          Jenis Cuti
-        </p>
+        <!-- TANGGAL -->
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+            Tanggal Mulai
+          </p>
+          <h2 class="font-semibold mt-1 text-slate-700">
+            <%= new Date(leave.startDate).toLocaleDateString("id-ID") %>
+          </h2>
+        </div>
 
-        <h2 class="font-semibold text-lg mt-1">
-          <%= leave.type %>
-        </h2>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+            Tanggal Selesai
+          </p>
+          <h2 class="font-semibold mt-1 text-slate-700">
+            <%= new Date(leave.endDate).toLocaleDateString("id-ID") %>
+          </h2>
+        </div>
 
-      </div>
+        <!-- DURASI -->
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+            Durasi
+          </p>
+          <h2 class="font-semibold mt-1 text-slate-700">
+            <%= leave.totalDays %> Hari
+          </h2>
+        </div>
 
-      <!-- STATUS -->
-      <div>
-
-        <p class="text-sm text-slate-500">
-          Status
-        </p>
-
-        <div class="mt-2">
-
-          <span class="px-3 py-1 rounded-full text-xs font-medium
-
-            <%= leave.status === 'Approved'
-              ? 'bg-green-100 text-green-700'
-              : leave.status === 'Rejected'
-              ? 'bg-red-100 text-red-700'
-              : 'bg-yellow-100 text-yellow-700'
-            %>">
-
-            <%= leave.status %>
-
-          </span>
-
+        <!-- CREATED -->
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+            Tanggal Pengajuan
+          </p>
+          <h2 class="font-semibold mt-1 text-slate-700">
+            <%= new Date(leave.createdAt).toLocaleDateString("id-ID") %>
+          </h2>
         </div>
 
       </div>
 
-      <!-- TANGGAL MULAI -->
-      <div>
-
-        <p class="text-sm text-slate-500">
-          Tanggal Mulai
+      <!-- ALASAN -->
+      <div class="mt-10">
+        <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+          Alasan Cuti
         </p>
 
-        <h2 class="font-semibold mt-1">
-
-          <%= new Date(leave.startDate)
-            .toLocaleDateString("id-ID") %>
-
-        </h2>
-
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 text-slate-700 leading-relaxed">
+          <%= leave.reason %>
+        </div>
       </div>
 
-      <!-- TANGGAL SELESAI -->
-      <div>
+      <!-- FILE -->
+      <% if(leave.file){ %>
+        <div class="mt-8">
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+            Lampiran Bukti
+          </p>
 
-        <p class="text-sm text-slate-500">
-          Tanggal Selesai
-        </p>
+          <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 flex items-center justify-between">
 
-        <h2 class="font-semibold mt-1">
+            <div>
+              <p class="font-semibold text-slate-700">
+                <%= leave.file %>
+              </p>
+              <p class="text-xs text-slate-400 mt-1">
+                File pendukung pengajuan cuti
+              </p>
+            </div>
 
-          <%= new Date(leave.endDate)
-            .toLocaleDateString("id-ID") %>
-
-        </h2>
-
-      </div>
-
-      <!-- DURASI -->
-      <div>
-
-        <p class="text-sm text-slate-500">
-          Durasi
-        </p>
-
-        <h2 class="font-semibold mt-1">
-          <%= leave.totalDays %> Hari
-        </h2>
-
-      </div>
-
-      <!-- CREATED -->
-      <div>
-
-        <p class="text-sm text-slate-500">
-          Tanggal Pengajuan
-        </p>
-
-        <h2 class="font-semibold mt-1">
-
-          <%= new Date(leave.createdAt)
-            .toLocaleDateString("id-ID") %>
-
-        </h2>
-
-      </div>
-
-    </div>
-
-    <!-- ALASAN -->
-    <div class="mt-8">
-
-      <p class="text-sm text-slate-500 mb-2">
-        Alasan Cuti
-      </p>
-
-      <div class="bg-slate-50 rounded-xl p-4 leading-relaxed">
-
-        <%= leave.reason %>
-
-      </div>
-
-    </div>
-
-    <!-- FILE -->
-    <% if(leave.file){ %>
-
-      <div class="mt-8">
-
-        <p class="text-sm text-slate-500 mb-2">
-          Lampiran Bukti
-        </p>
-
-        <div class="bg-slate-50 rounded-xl p-4 flex items-center justify-between">
-
-          <div>
-
-            <p class="font-medium">
-              <%= leave.file %>
-            </p>
-
-            <p class="text-xs text-slate-400 mt-1">
-              File pendukung pengajuan cuti
-            </p>
+            <a
+              href="/uploads/<%= leave.file %>"
+              target="_blank"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition"
+            >
+              Lihat File
+            </a>
 
           </div>
-
-          <a
-            href="/uploads/<%= leave.file %>"
-            target="_blank"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
-
-            Lihat File
-
-          </a>
-
         </div>
+      <% } %>
 
+      <!-- BUTTON -->
+      <div class="mt-10">
+        <a
+          href="/leave/my"
+          class="inline-flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-3 rounded-xl text-sm font-semibold transition"
+        >
+          ← Kembali
+        </a>
       </div>
 
-    <% } %>
-
-    <!-- BUTTON -->
-    <div class="mt-8">
-
-      <a
-        href="/leave/my"
-        class="bg-slate-200 hover:bg-slate-300 px-5 py-3 rounded-xl text-sm inline-block">
-
-        ← Kembali
-
-      </a>
-
     </div>
-
   </div>
-
 </div>

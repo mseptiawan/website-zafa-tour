@@ -24,7 +24,7 @@ const login = async (req, res) => {
     req.session.user = {
       id: user._id,
       email: user.email,
-      username: user.fullName,
+      username: user.email, // FIX (karena fullName tidak ada)
       role: user.roleId.name,
     };
 

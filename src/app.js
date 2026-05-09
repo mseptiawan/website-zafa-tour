@@ -19,6 +19,11 @@ import "./models/User.js";
 import "./models/Leave.js";
 import "./models/Bidang.js";
 import "./models/Unit.js";
+import "./models/Position.js";
+import "./models/Employee.js";
+import "./models/KpiTemplate.js";
+import "./models/KpiTemplateDetail.js";
+import "./models/UnitKpiMapping.js";
 
 // ROUTES
 import webRoutes from "./routes/web.js";

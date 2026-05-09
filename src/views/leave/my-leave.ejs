@@ -1,125 +1,151 @@
 <% layout('layouts/main') -%>
 
-<div class="max-w-6xl mx-auto p-6">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+  <div class="max-w-6xl mx-auto">
 
-  <!-- HEADER -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold">Riwayat Cuti Saya</h1>
-    <p class="text-slate-500 text-sm">Pantau pengajuan cuti kamu di sini</p>
-  </div>
-
-  <!-- SUMMARY -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <p class="text-slate-500 text-sm">Total Cuti</p>
-      <h2 class="text-2xl font-bold mt-2"><%= summary.total || 0 %></h2>
+    <!-- HEADER -->
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+        Riwayat Cuti Saya
+      </h1>
+      <p class="text-slate-500 mt-2 font-medium">
+        Pantau dan kelola semua pengajuan cuti kamu
+      </p>
     </div>
 
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <p class="text-slate-500 text-sm">Pending</p>
-      <h2 class="text-2xl font-bold mt-2 text-yellow-500">
-        <%= summary.pending || 0 %>
-      </h2>
+    <!-- SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+
+      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+        <p class="text-slate-500 text-sm">Total Cuti</p>
+        <h2 class="text-3xl font-extrabold mt-2 text-slate-800">
+          <%= summary.total || 0 %>
+        </h2>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+        <p class="text-slate-500 text-sm">Pending</p>
+        <h2 class="text-3xl font-extrabold mt-2 text-yellow-500">
+          <%= summary.pending || 0 %>
+        </h2>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+        <p class="text-slate-500 text-sm">Terpakai</p>
+        <h2 class="text-3xl font-extrabold mt-2 text-emerald-600">
+          <%= summary.used || 0 %>
+        </h2>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+        <p class="text-slate-500 text-sm">Sisa</p>
+        <h2 class="text-3xl font-extrabold mt-2 text-indigo-600">
+          <%= summary.remaining || 0 %>
+        </h2>
+      </div>
+
     </div>
 
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <p class="text-slate-500 text-sm">Terpakai</p>
-      <h2 class="text-2xl font-bold mt-2 text-green-600">
-        <%= summary.used || 0 %>
-      </h2>
-    </div>
+    <!-- TABLE CARD -->
+    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-6">
 
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <p class="text-slate-500 text-sm">Sisa</p>
-      <h2 class="text-2xl font-bold mt-2 text-blue-600">
-        <%= summary.remaining || 0 %>
-      </h2>
-    </div>
+      <!-- dekorasi -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
 
-  </div>
+      <!-- HEADER TABLE -->
+      <div class="flex justify-between items-center mb-6 relative">
+        <h2 class="text-xl font-bold text-slate-800">Riwayat Pengajuan</h2>
 
-  <!-- TABLE -->
-  <div class="bg-white rounded-2xl shadow p-6">
+        <a href="/leave/apply"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm"
+        >
+          + Ajukan Cuti
+        </a>
+      </div>
 
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-xl font-bold">Riwayat Pengajuan</h2>
+      <!-- TABLE -->
+      <div class="relative overflow-x-auto">
 
-      <a href="/leave/apply"
-        class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm hover:bg-blue-700">
-        + Ajukan Cuti
-      </a>
-    </div>
+        <table class="w-full text-sm">
 
-    <table class="w-full text-sm">
-
-      <thead>
-        <tr class="text-left border-b text-slate-500">
-          <th class="py-3">Jenis</th>
-          <th>Tanggal</th>
-          <th>Durasi</th>
-          <th>Status</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-
-      <tbody>
-
-        <% if (leaves && leaves.length > 0) { %>
-
-          <% leaves.forEach(l => { %>
-
-            <tr class="border-b hover:bg-slate-50">
-
-              <td class="py-4 font-medium">
-                <%= l.type %>
-              </td>
-
-              <td>
-                <%= new Date(l.startDate)
-                  .toLocaleDateString("id-ID") %>
-                -
-                <%= new Date(l.endDate)
-                  .toLocaleDateString("id-ID") %>
-              </td>
-              <td>
-                <%= l.totalDays %> hari
-              </td>
-
-              <td>
-                <span class="px-3 py-1 rounded-full text-xs
-                  <%= l.status === 'Approved' ? 'bg-green-100 text-green-700' :
-                      l.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                      'bg-yellow-100 text-yellow-700' %>">
-                  <%= l.status %>
-                </span>
-              </td>
-
-              <td>
-                <a href="/leave/<%= l._id %>"
-                  class="text-blue-600 hover:underline">
-                  Detail
-                </a>
-              </td>
-
+          <thead>
+            <tr class="text-left text-xs uppercase tracking-widest text-slate-400 border-b border-slate-200">
+              <th class="py-4 px-3">Jenis</th>
+              <th class="py-4 px-3">Tanggal</th>
+              <th class="py-4 px-3">Durasi</th>
+              <th class="py-4 px-3">Status</th>
+              <th class="py-4 px-3">Aksi</th>
             </tr>
+          </thead>
 
-          <% }) %>
+          <tbody class="divide-y divide-slate-100">
 
-        <% } else { %>
+            <% if (leaves && leaves.length > 0) { %>
 
-          <tr>
-            <td colspan="5" class="py-10 text-center text-slate-500">
-              Belum ada pengajuan cuti
-            </td>
-          </tr>
+              <% leaves.forEach(l => { %>
 
-        <% } %>
+                <tr class="hover:bg-slate-50/60 transition">
 
-      </tbody>
+                  <td class="py-4 px-3 font-semibold text-slate-700">
+                    <%= l.type %>
+                  </td>
 
-    </table>
+                  <td class="py-4 px-3 text-slate-600">
+                    <%= new Date(l.startDate).toLocaleDateString("id-ID") %>
+                    -
+                    <%= new Date(l.endDate).toLocaleDateString("id-ID") %>
+                  </td>
+
+                  <td class="py-4 px-3 text-slate-600 font-medium">
+                    <%= l.totalDays %> hari
+                  </td>
+
+                  <!-- STATUS BADGE -->
+                  <td class="py-4 px-3">
+                    <span
+                      class="px-3 py-1 rounded-full text-xs font-semibold
+                      <%= l.status === 'Approved'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : l.status === 'Rejected'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-yellow-100 text-yellow-700' %>
+                      "
+                    >
+                      <%= l.status %>
+                    </span>
+                  </td>
+
+                  <td class="py-4 px-3">
+                    <a
+                      href="/leave/<%= l._id %>"
+                      class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm"
+                    >
+                      Detail
+                    </a>
+                  </td>
+
+                </tr>
+
+              <% }) %>
+
+            <% } else { %>
+
+              <tr>
+                <td colspan="5" class="py-12 text-center text-slate-500">
+                  Belum ada pengajuan cuti
+                </td>
+              </tr>
+
+            <% } %>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
 
   </div>
-
 </div>

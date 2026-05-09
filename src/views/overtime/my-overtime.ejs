@@ -1,69 +1,87 @@
 <% layout('layouts/main') -%>
 
-<div class="max-w-6xl mx-auto p-6">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+  <div class="max-w-6xl mx-auto">
 
-  <div class="bg-white rounded-2xl shadow p-6">
+    <!-- HEADER -->
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+        Riwayat Lembur
+      </h1>
+      <p class="text-slate-500 mt-2 font-medium">
+        Catatan seluruh aktivitas lembur kamu
+      </p>
+    </div>
 
-    <h1 class="text-2xl font-bold mb-6">
-      Riwayat Lembur
-    </h1>
+    <!-- CARD -->
+    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-6">
 
-    <table class="w-full text-sm">
+      <!-- dekorasi -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
 
-      <thead>
-        <tr class="border-b text-left">
-          <th class="py-3">Tanggal</th>
-          <th>Jam</th>
-          <th>Total</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+      <div class="relative overflow-x-auto">
 
-      <tbody>
+        <table class="w-full text-sm">
 
-        <% overtimes.forEach(o => { %>
+          <!-- HEADER TABLE -->
+          <thead>
+            <tr class="text-left text-xs uppercase tracking-widest text-slate-400 border-b border-slate-200">
+              <th class="py-4 px-3">Tanggal</th>
+              <th class="py-4 px-3">Jam</th>
+              <th class="py-4 px-3">Total</th>
+              <th class="py-4 px-3">Status</th>
+            </tr>
+          </thead>
 
-          <tr class="border-b">
+          <!-- BODY -->
+          <tbody class="divide-y divide-slate-100">
 
-            <td class="py-4">
-              <%= new Date(o.date)
-              .toLocaleDateString("id-ID") %>
-            </td>
+            <% overtimes.forEach(o => { %>
 
-            <td>
-              <%= o.startTime %> -
-              <%= o.endTime %>
-            </td>
+              <tr class="hover:bg-slate-50/60 transition">
 
-            <td>
-              <%= o.totalHours %> Jam
-            </td>
+                <!-- TANGGAL -->
+                <td class="py-4 px-3 font-medium text-slate-700">
+                  <%= new Date(o.date).toLocaleDateString("id-ID") %>
+                </td>
 
-            <td>
+                <!-- JAM -->
+                <td class="py-4 px-3 text-slate-600">
+                  <%= o.startTime %> - <%= o.endTime %>
+                </td>
 
-              <span class="px-3 py-1 rounded-full text-xs
+                <!-- TOTAL -->
+                <td class="py-4 px-3 text-slate-600 font-medium">
+                  <%= o.totalHours %> Jam
+                </td>
 
-              <%= o.status === 'Approved'
-              ? 'bg-green-100 text-green-700'
-              : o.status === 'Rejected'
-              ? 'bg-red-100 text-red-700'
-              : 'bg-yellow-100 text-yellow-700'
-              %>">
+                <!-- STATUS -->
+                <td class="py-4 px-3">
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold
+                    <%= o.status === 'Approved'
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : o.status === 'Rejected'
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-yellow-100 text-yellow-700' %>
+                    "
+                  >
+                    <%= o.status %>
+                  </span>
+                </td>
 
-              <%= o.status %>
+              </tr>
 
-              </span>
+            <% }) %>
 
-            </td>
+          </tbody>
 
-          </tr>
+        </table>
 
-        <% }) %>
+      </div>
 
-      </tbody>
-
-    </table>
+    </div>
 
   </div>
-
-</div>
+</div>  

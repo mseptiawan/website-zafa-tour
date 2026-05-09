@@ -27,7 +27,13 @@ import {
   rejectOvertime,
 } from "../controllers/overtimeController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
-
+import {
+  kpiEmployeeList,
+  kpiForm,
+  submitKpi,
+  kpiManage,
+  kpiReport,
+} from "../controllers/kpiController.js";
 const router = express.Router();
 
 /*
@@ -90,4 +96,11 @@ router.post(
 router.post("/overtime/approval/:id/hr", authMiddleware, approveHROvertime);
 
 router.post("/overtime/approval/:id/reject", authMiddleware, rejectOvertime);
+router.get("/kpi/input", kpiEmployeeList);
+router.get("/kpi/input/:employeeId", kpiForm);
+router.post("/kpi/input/:employeeId", submitKpi);
+
+router.get("/kpi/manage", kpiManage);
+router.get("/kpi/report", kpiReport);
+
 export default router;
