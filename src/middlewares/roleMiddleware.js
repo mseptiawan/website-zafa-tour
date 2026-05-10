@@ -1,14 +1,25 @@
 const roleMiddleware = (...roles) => {
   return (req, res, next) => {
-    // belum login
     if (!req.session.user) {
       return res.redirect("/");
     }
 
-    const userRole = req.session.user.role;
+    let userRole = req.session.user.role;
 
-    // role tidak diizinkan
-    if (!roles.includes(userRole)) {
+    // amanin userRole
+    userRole = String(userRole || "")
+      .trim()
+      .toUpperCase();
+
+    const allowedRoles = roles
+      .flat() // kalau ada array nested
+      .filter(Boolean) // buang null/undefined
+      .map((r) => String(r).trim().toUpperCase());
+
+    console.log("USER ROLE:", userRole);
+    console.log("ALLOWED:", allowedRoles);
+
+    if (!allowedRoles.includes(userRole)) {
       return res.status(403).send("Access denied");
     }
 

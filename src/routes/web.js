@@ -100,13 +100,23 @@ router.get("/leave/apply", authMiddleware, showApplyLeave);
 router.post("/leave/apply", authMiddleware, uploadFile.single("file"), applyLeave);
 
 router.get("/leave/my", authMiddleware, myLeave);
-router.get("/leave/approval", authMiddleware, approvalPage);
+router.get("/leave/approval", authMiddleware, roleMiddleware(["HR", "MANAGER"]), approvalPage);
 
-router.post("/leave/approval/:id/manager", authMiddleware, approveManager);
+router.post(
+  "/leave/approval/:id/manager",
+  authMiddleware,
+  roleMiddleware(["MANAGER"]),
+  approveManager
+);
 
-router.post("/leave/approval/:id/hr", authMiddleware, approveHR);
+router.post("/leave/approval/:id/hr", authMiddleware, roleMiddleware(["HR"]), approveHR);
 
-router.post("/leave/approval/:id/reject", authMiddleware, rejectLeave);
+router.post(
+  "/leave/approval/:id/reject",
+  authMiddleware,
+  roleMiddleware(["HR", "MANAGER"]),
+  rejectLeave
+);
 router.get("/leave/:id", authMiddleware, detailLeave);
 // ==========================
 // OVERTIME
@@ -118,13 +128,28 @@ router.post("/overtime/apply", authMiddleware, uploadFile.single("proofFile"), a
 
 router.get("/overtime/my", authMiddleware, myOvertime);
 
-router.get("/overtime/approval", authMiddleware, approvalOvertimePage);
+router.get(
+  "/overtime/approval",
+  authMiddleware,
+  roleMiddleware(["HR", "MANAGER"]),
+  approvalOvertimePage
+);
 
-router.post("/overtime/approval/:id/manager", authMiddleware, approveManagerOvertime);
+router.post(
+  "/overtime/approval/:id/manager",
+  authMiddleware,
+  roleMiddleware(["MANAGER"]),
+  approveManagerOvertime
+);
 
-router.post("/overtime/approval/:id/hr", authMiddleware, approveHROvertime);
+router.post("/overtime/approval/:id/hr", authMiddleware, roleMiddleware(["HR"]), approveHROvertime);
 
-router.post("/overtime/approval/:id/reject", authMiddleware, rejectOvertime);
+router.post(
+  "/overtime/approval/:id/reject",
+  authMiddleware,
+  roleMiddleware(["HR", "MANAGER"]),
+  rejectOvertime
+);
 router.get("/kpi/input", roleMiddleware(["HR"]), kpiEmployeeList);
 
 router.get("/kpi/input/:employeeId", roleMiddleware(["HR"]), kpiForm);
@@ -140,7 +165,7 @@ router.get("/attendance/history", history);
 router.post("/attendance/checkin", uploadPhoto.single("photo"), checkIn);
 router.post("/attendance/checkout", checkOut);
 router.get("/attendance/detail/:id", detail);
-router.get("/attendance/all", allAttendance);
+router.get("/attendance/all", roleMiddleware(["HR"]), allAttendance);
 // form pengajuan dinas luar
 router.get("/trip/request", authMiddleware, formRequest);
 router.post("/trip/request", authMiddleware, createTrip);
@@ -155,12 +180,22 @@ router.get("/trip/my", authMiddleware, myTrips);
 | APPROVAL FLOW (HR / MANAGER / DIRECTOR)
 |--------------------------------------------------------------------------
 */
-router.get("/trip/all", allTrips);
+router.get("/trip/all", roleMiddleware(["HR", "MANAGER"]), allTrips);
 // approval manager
-router.post("/trip/:id/approve/manager", authMiddleware, approveManagerTrip);
+router.post(
+  "/trip/:id/approve/manager",
+  authMiddleware,
+  roleMiddleware(["MANAGER"]),
+  approveManagerTrip
+);
 
 // approval director
-router.post("/trip/:id/approve/director", authMiddleware, approveDirector);
+router.post(
+  "/trip/:id/approve/director",
+  authMiddleware,
+  roleMiddleware(["PIMPINAN", "HR"]),
+  approveDirector
+);
 router.get("/trip/detail/:id", authMiddleware, tripDetail);
 /*
 |--------------------------------------------------------------------------
@@ -175,18 +210,24 @@ router.post(
   storeVisit
 );
 
-router.get("/sales/report", authMiddleware, salesReport);
+router.get(
+  "/sales/report",
+  authMiddleware,
+  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
+  salesReport
+);
 router.get("/assignment/create", authMiddleware, formAssignment);
 router.post(
   "/assignment/create",
   authMiddleware,
   uploadFile.single("attachment"),
+  roleMiddleware(["PIMPINAN"]),
   createAssignment
 );
 
 router.get("/assignment/my", authMiddleware, myAssignments);
 
-router.get("/assignment/all", authMiddleware, allAssignments);
+router.get("/assignment/all", authMiddleware, roleMiddleware(["PIMPINAN"]), allAssignments);
 
 router.get("/assignment/:id", authMiddleware, assignmentDetail);
 router.get("/announcement/create", authMiddleware, formAnnouncement);
@@ -210,7 +251,12 @@ router.post("/expense/create", authMiddleware, uploadFile.single("proofFile"), c
 
 router.get("/expense/my", authMiddleware, myExpenses);
 
-router.get("/expense/all", authMiddleware, allExpenses);
+router.get(
+  "/expense/all",
+  authMiddleware,
+  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
+  allExpenses
+);
 
 router.get(
   "/expense/approval/manager",

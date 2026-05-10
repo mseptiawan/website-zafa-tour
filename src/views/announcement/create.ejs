@@ -60,18 +60,16 @@
             Jenis Pengumuman
           </label>
 
-          <select
-            name="category"
-            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-[13px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 transition"
-          >
-            <option value="LIGHT">
-              Pengumuman Ringan
-            </option>
+         <select
+  name="category"
+  class="w-full border border-slate-200 rounded-lg px-3 py-2 text-[13px]"
+>
+  <option value="LIGHT">Pengumuman Ringan</option>
 
-            <option value="OFFICIAL">
-              Pengumuman Resmi
-            </option>
-          </select>
+  <% if (user.role === "PIMPINAN") { %>
+    <option value="OFFICIAL">Pengumuman Resmi</option>
+  <% } %>
+</select>
         </div>
 
         <!-- FILE -->

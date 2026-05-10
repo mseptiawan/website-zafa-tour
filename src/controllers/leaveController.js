@@ -19,9 +19,7 @@ export const applyLeave = async (req, res) => {
 
     // VALIDASI TANGGAL
     if (new Date(startDate) > new Date(endDate)) {
-      return res.send(
-        "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
-      );
+      return res.send("Tanggal mulai tidak boleh lebih besar dari tanggal selesai");
     }
 
     // HITUNG TOTAL HARI
@@ -66,9 +64,8 @@ export const myLeave = async (req, res) => {
     const summary = {
       total: leaves.length,
 
-      pending: leaves.filter(
-        (l) => l.status === "Pending Manager" || l.status === "Pending HR",
-      ).length,
+      pending: leaves.filter((l) => l.status === "Pending Manager" || l.status === "Pending HR")
+        .length,
 
       used: leaves
         .filter((l) => l.status === "Approved")
