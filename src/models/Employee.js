@@ -9,12 +9,6 @@ const employeeSchema = new mongoose.Schema(
       unique: true,
     },
 
-    employeeCode: {
-      type: String,
-      unique: true,
-      required: true,
-    },
-
     fullName: {
       type: String,
       required: true,
@@ -26,8 +20,6 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       enum: ["Laki-Laki", "Perempuan"],
     },
-
-    birthDate: Date,
 
     address: String,
 

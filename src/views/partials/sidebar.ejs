@@ -57,8 +57,96 @@
         >Dashboard</span
       >
     </a>
+      <!-- KARYAWAN -->
+      <% if (
+  user.role === 'HR' 
+) { %><section>
+ 
+  <p
+    class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]"
+  >
+    Human Resource
+  </p>
 
+  <div class="space-y-1">
+
+   
+    <details class="group outline-none">
+
+      <summary
+        class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
+      >
+        <div class="flex items-center gap-3">
+
+          <!-- ICON -->
+          <svg
+            class="w-5 h-5 text-slate-500 group-hover:text-indigo-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m10-4a4 4 0 10-8 0 4 4 0 008 0z"
+            />
+          </svg>
+
+          <span
+            class="text-xs font-medium text-slate-600 group-hover:text-slate-800"
+          >
+            Karyawan
+          </span>
+
+        </div>
+
+        <!-- ARROW -->
+        <svg
+          class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+
+      </summary>
+
+      <!-- SUB MENU -->
+      <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+
+        <a
+          href="/employee"
+          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Data Karyawan
+        </a>
+
+        <a
+          href="/employee/create"
+          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Tambah Karyawan
+        </a>
+
+      </div>
+
+    </details>
+   
+
+  </div>
+</section>
+ <% } %>
     <!-- GROUP: KINERJA -->
+     <% if (
+  user.role === 'HR' 
+) { %>
     <section>
       <p
         class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]"
@@ -120,7 +208,7 @@
         </details>
       </div>
     </section>
-
+    <% } %>
     <!-- GROUP: ABSENSI -->
     <section>
       <p
@@ -665,6 +753,115 @@
           </a>
         </div>
       </details>
+    </section>
+    <section class="mt-6">
+      <p
+        class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]"
+      >
+        Expense & Finance
+      </p>
+
+      <div class="space-y-1">
+        <!-- EXPENSE CLAIM -->
+        <details class="group outline-none">
+          <summary
+            class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
+          >
+            <div class="flex items-center gap-3">
+              <!-- ICON -->
+              <svg
+                class="w-5 h-5 text-slate-500 group-hover:text-indigo-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6v2m0 16v2m8-10h2M2 12H4"
+                ></path>
+              </svg>
+
+              <span
+                class="text-xs font-medium text-slate-600 group-hover:text-slate-800"
+              >
+                Expense Claim
+              </span>
+            </div>
+
+            <!-- ARROW -->
+            <svg
+              class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </summary>
+
+          <!-- SUBMENU -->
+          <div
+            class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1"
+          >
+            <!-- AJUKAN -->
+            <a
+              href="/expense/create"
+              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+            >
+              Ajukan Klaim
+            </a>
+
+            <!-- KLAIM SAYA -->
+            <a
+              href="/expense/my"
+              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+            >
+              Klaim Saya
+            </a>
+
+            <!-- APPROVAL MANAGER -->
+        <% if (
+  user.role === 'MANAGER' ||
+  user.role === 'GENERAL MANAGER'
+) { %>
+
+<a
+  href="/expense/approval/manager"
+  class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+>
+  Approval Manager
+</a>
+
+<% } %>
+            <!-- VALIDASI FINANCE -->
+         <% if (user.role === 'KEUANGAN') { %>
+
+<a
+  href="/expense/finance"
+  class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+>
+  Validasi Finance
+</a>
+
+<% } %>
+
+            <!-- SEMUA -->
+            <a
+              href="/expense/all"
+              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+            >
+              Semua Klaim
+            </a>
+          </div>
+        </details>
+      </div>
     </section>
   </nav>
 

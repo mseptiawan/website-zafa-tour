@@ -19,24 +19,24 @@ export const showLogin = (req, res) => {
 ====================== */
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user = await User.findOne({ email }).populate("roleId");
+    const user = await User.findOne({ username }).populate("roleId");
 
     if (!user) {
       return res.redirect("/?error=USER_NOT_FOUND");
     }
-
-    // 🔥 ambil employee
-    const employee = await Employee.findOne({
-      userId: user._id,
-    });
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.redirect("/?error=INVALID_PASSWORD");
     }
+
+    // 🔥 cari employee berdasarkan user
+    const employee = await Employee.findOne({
+      userId: user._id,
+    });
 
     req.session.regenerate((err) => {
       if (err) {
@@ -45,12 +45,11 @@ export const login = async (req, res) => {
 
       req.session.user = {
         _id: user._id,
+        username: user.username,
 
-        email: user.email,
-
-        fullName: employee?.fullName || user.email,
-
-        employeeCode: employee?.employeeCode || "-",
+        // 🔥 tambahkan ini
+        fullName: employee?.fullName || user.username,
+        employeeId: employee?._id || null,
 
         role: user.roleId?.name?.toUpperCase() || "UNKNOWN",
       };
@@ -61,7 +60,6 @@ export const login = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-
     return res.redirect("/?error=SERVER_ERROR");
   }
 };

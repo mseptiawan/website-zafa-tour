@@ -53,25 +53,25 @@
         font-size:12px;
         margin-bottom:12px;
       ">
-        Login gagal, silakan cek email atau password
+        Login gagal, silakan cek username atau password
       </div>
     <% } %>
 
     <!-- FORM -->
     <form action="/login" method="POST" style="display:flex; flex-direction:column; gap:12px;">
 
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        style="
-          padding:10px 12px;
-          border:1px solid #cbd5e1;
-          border-radius:8px;
-          font-size:14px;
-          outline:none;
-        "
-      />
+    <input
+  type="text"
+  name="username"
+  placeholder="Username "
+  style="
+    padding:10px 12px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    font-size:14px;
+    outline:none;
+  "
+/>
 
       <input
         type="password"

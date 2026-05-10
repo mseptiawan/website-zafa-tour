@@ -1,0 +1,128 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-8">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold">
+      Approval Klaim Manager
+    </h1>
+
+    <p class="text-sm text-slate-500 mt-1">
+      Persetujuan klaim beban di atas Rp 200.000
+    </p>
+  </div>
+
+  <!-- TABLE -->
+  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+
+    <table class="w-full text-sm">
+
+      <thead class="bg-slate-50 text-slate-500">
+
+        <tr>
+          <th class="p-3 text-left">Karyawan</th>
+          <th class="p-3 text-left">Judul</th>
+          <th class="p-3 text-left">Kategori</th>
+          <th class="p-3 text-left">Nominal</th>
+          <th class="p-3 text-left">Bukti</th>
+          <th class="p-3 text-left">Aksi</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <% expenses.forEach(e => { %>
+
+          <tr class="border-t border-slate-100 hover:bg-slate-50">
+
+            <!-- KARYAWAN -->
+            <td class="p-3">
+              <div class="font-medium">
+                <%= e.employeeId?.fullName %>
+              </div>
+
+            </td>
+
+            <!-- JUDUL -->
+            <td class="p-3">
+              <div class="font-medium">
+                <%= e.title %>
+              </div>
+
+              <div class="text-xs text-slate-400 mt-1">
+                <%= e.description || '-' %>
+              </div>
+            </td>
+
+            <!-- KATEGORI -->
+            <td class="p-3">
+              <span
+                class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700"
+              >
+                <%= e.category %>
+              </span>
+            </td>
+
+            <!-- NOMINAL -->
+            <td class="p-3 font-semibold">
+              Rp <%= e.amount.toLocaleString() %>
+            </td>
+
+            <!-- BUKTI -->
+            <td class="p-3">
+
+              <% if(e.proofFile) { %>
+
+                <a
+                  href="/uploads/files/<%= e.proofFile %>"
+                  target="_blank"
+                  class="text-indigo-500 text-xs hover:underline"
+                >
+                  Lihat Bukti
+                </a>
+
+              <% } else { %>
+
+                <div class="text-xs text-amber-500">
+                  Tidak ada bukti
+                </div>
+
+                <div class="text-[11px] text-slate-400 mt-1">
+                  <%= e.noReceiptReason || '-' %>
+                </div>
+
+              <% } %>
+
+            </td>
+
+            <!-- AKSI -->
+            <td class="p-3">
+
+              <form
+                action="/expense/<%= e._id %>/approve/manager"
+                method="POST"
+              >
+
+                <button
+                  class="px-3 py-2 bg-indigo-500 text-white text-xs rounded-lg"
+                >
+                  Approve
+                </button>
+
+              </form>
+
+            </td>
+
+          </tr>
+
+        <% }) %>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

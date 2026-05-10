@@ -4,7 +4,7 @@ dotenv.config();
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-
+import employeeRoute from "./routes/employeeRoute.js";
 import ejsMate from "ejs-mate";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -106,5 +106,6 @@ app.use((req, res, next) => {
    ROUTES
 ========================= */
 app.use("/", webRoutes);
+app.use("/employee", employeeRoute);
 
 export default app;

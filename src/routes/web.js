@@ -1,11 +1,6 @@
 import express from "express";
-
-import {
-  showLogin,
-  login,
-  dashboard,
-  logout,
-} from "../controllers/authController.js";
+import roleMiddleware from "../middlewares/roleMiddleware.js";
+import { showLogin, login, dashboard, logout } from "../controllers/authController.js";
 import { uploadPhoto } from "../middlewares/uploadPhoto.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
 import {
@@ -52,11 +47,7 @@ import {
   allTrips,
   approveDirector,
 } from "../controllers/tripController.js";
-import {
-  salesReport,
-  visitForm,
-  storeVisit,
-} from "../controllers/salesController.js";
+import { salesReport, visitForm, storeVisit } from "../controllers/salesController.js";
 import {
   formAssignment,
   createAssignment,
@@ -71,6 +62,16 @@ import {
   detailAnnouncement,
   publishAnnouncement,
 } from "../controllers/announcementController.js";
+import {
+  formExpense,
+  createExpense,
+  myExpenses,
+  allExpenses,
+  approvalManagerExpense,
+  approveManagerExpense,
+  financeExpensePage,
+  payExpense,
+} from "../controllers/expenseController.js";
 const router = express.Router();
 
 /*
@@ -96,12 +97,7 @@ router.get("/dashboard", authMiddleware, dashboard);
 */
 router.get("/leave/apply", authMiddleware, showApplyLeave);
 
-router.post(
-  "/leave/apply",
-  authMiddleware,
-  uploadFile.single("file"),
-  applyLeave,
-);
+router.post("/leave/apply", authMiddleware, uploadFile.single("file"), applyLeave);
 
 router.get("/leave/my", authMiddleware, myLeave);
 router.get("/leave/approval", authMiddleware, approvalPage);
@@ -118,32 +114,26 @@ router.get("/leave/:id", authMiddleware, detailLeave);
 
 router.get("/overtime/apply", authMiddleware, showApplyOvertime);
 
-router.post(
-  "/overtime/apply",
-  authMiddleware,
-  uploadFile.single("proofFile"),
-  applyOvertime,
-);
+router.post("/overtime/apply", authMiddleware, uploadFile.single("proofFile"), applyOvertime);
 
 router.get("/overtime/my", authMiddleware, myOvertime);
 
 router.get("/overtime/approval", authMiddleware, approvalOvertimePage);
 
-router.post(
-  "/overtime/approval/:id/manager",
-  authMiddleware,
-  approveManagerOvertime,
-);
+router.post("/overtime/approval/:id/manager", authMiddleware, approveManagerOvertime);
 
 router.post("/overtime/approval/:id/hr", authMiddleware, approveHROvertime);
 
 router.post("/overtime/approval/:id/reject", authMiddleware, rejectOvertime);
-router.get("/kpi/input", kpiEmployeeList);
-router.get("/kpi/input/:employeeId", kpiForm);
-router.post("/kpi/input/:employeeId", submitKpi);
+router.get("/kpi/input", roleMiddleware(["HR"]), kpiEmployeeList);
 
-router.get("/kpi/manage", kpiManage);
-router.get("/kpi/report", kpiReport);
+router.get("/kpi/input/:employeeId", roleMiddleware(["HR"]), kpiForm);
+
+router.post("/kpi/input/:employeeId", roleMiddleware(["HR"]), submitKpi);
+
+router.get("/kpi/manage", roleMiddleware(["HR"]), kpiManage);
+
+router.get("/kpi/report", roleMiddleware(["HR"]), kpiReport);
 router.get("/attendance", index);
 router.get("/attendance/history", history);
 
@@ -182,7 +172,7 @@ router.post(
   "/sales/visit",
   authMiddleware,
   uploadPhoto.array("photo", 5), // bisa banyak foto
-  storeVisit,
+  storeVisit
 );
 
 router.get("/sales/report", authMiddleware, salesReport);
@@ -191,7 +181,7 @@ router.post(
   "/assignment/create",
   authMiddleware,
   uploadFile.single("attachment"),
-  createAssignment,
+  createAssignment
 );
 
 router.get("/assignment/my", authMiddleware, myAssignments);
@@ -205,7 +195,7 @@ router.post(
   "/announcement/create",
   authMiddleware,
   uploadFile.single("attachment"),
-  createAnnouncement,
+  createAnnouncement
 );
 
 router.get("/announcement/all", authMiddleware, allAnnouncements);
@@ -213,4 +203,30 @@ router.get("/announcement/all", authMiddleware, allAnnouncements);
 router.get("/announcement/:id", authMiddleware, detailAnnouncement);
 
 router.post("/announcement/:id/publish", authMiddleware, publishAnnouncement);
+
+router.get("/expense/create", authMiddleware, formExpense);
+
+router.post("/expense/create", authMiddleware, uploadFile.single("proofFile"), createExpense);
+
+router.get("/expense/my", authMiddleware, myExpenses);
+
+router.get("/expense/all", authMiddleware, allExpenses);
+
+router.get(
+  "/expense/approval/manager",
+  authMiddleware,
+  roleMiddleware("MANAGER", "GENERAL MANAGER"),
+  approvalManagerExpense
+);
+
+router.post(
+  "/expense/:id/approve/manager",
+  authMiddleware,
+  roleMiddleware("MANAGER", "GENERAL MANAGER"),
+  approveManagerExpense
+);
+
+router.get("/expense/finance", authMiddleware, roleMiddleware("KEUANGAN"), financeExpensePage);
+
+router.post("/expense/:id/pay", authMiddleware, roleMiddleware("KEUANGAN"), payExpense);
 export default router;

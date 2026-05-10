@@ -27,173 +27,330 @@ const employeeSeeder = async () => {
   const umum = await Bidang.findOne({ name: "Umum dan Perlengkapan" });
   const it = await Bidang.findOne({ name: "IT dan Multimedia" });
 
-  // =====================
-  // UNIT (minimal mapping)
-  // =====================
-  const cs = await Unit.findOne({ name: "Customer Service" });
-  const accounting = await Unit.findOne({ name: "Accounting" });
-  const marketingUnit = await Unit.findOne({ name: "Marketing dan Kemitraan" });
-  const perlengkapan = await Unit.findOne({ name: "Perlengkapan" });
-  const visaHotel = await Unit.findOne({ name: "Visa dan Hotel" });
-  const pengeluaran = await Unit.findOne({
-    name: "Pengeluaran Operasional Harian",
+  const manajemenAdministrasi = await Unit.findOne({
+    name: "Manajemen Administrasi",
   });
+  const ticketingHajiKhusus = await Unit.findOne({
+    name: "Ticketing dan Haji Khusus",
+  });
+  const pelaporanUmrahTransportasi = await Unit.findOne({
+    name: "Pelaporan Umrah dan Transportasi",
+  });
+  const onlineCustomerCare = await Unit.findOne({
+    name: "Online Customer Care",
+  });
+
+  const pelayananSaudi = await Unit.findOne({ name: "Pelayanan Saudi" });
+  const pendidikanPelatihan = await Unit.findOne({
+    name: "Pendidikan dan Pelatihan",
+  });
+
+  const multimedia = await Unit.findOne({ name: "Multimedia" });
+
+  const pengeluaranCOGS = await Unit.findOne({ name: "Pengeluaran COGS" });
+  const penerimaanPenagihan = await Unit.findOne({
+    name: "Penerimaan dan Penagihan",
+  });
+  const pengeluaranOperasional = await Unit.findOne({
+    name: "Pengeluaran Operasional",
+  });
+  const penerimaanStoran = await Unit.findOne({
+    name: "Penerimaan Storan Pembayaran",
+  });
+
+  const marketingUnit = await Unit.findOne({ name: "Marketing dan Kemitraan" });
+
+  const cs = await Unit.findOne({ name: "Customer Service" });
+
+  const visaHotel = await Unit.findOne({ name: "Visa dan Hotel" });
+  const accounting = await Unit.findOne({ name: "Accounting" });
+
+  const perlengkapan = await Unit.findOne({ name: "Perlengkapan" });
 
   // =====================
   // USERS
   // =====================
-  const gusti = await User.findOne({ email: "gusti@zafa.com" });
-  const rafika = await User.findOne({ email: "rafika@zafa.com" });
-  const duwi = await User.findOne({ email: "duwi@zafa.com" });
-  const ronald = await User.findOne({ email: "ronald@zafa.com" });
-  const willy = await User.findOne({ email: "willy@zafa.com" });
+  // ================= EMPLOYEE USERS =================
 
-  const melti = await User.findOne({ email: "melti@zafa.com" });
-  const mrisky = await User.findOne({ email: "mrisky@zafa.com" });
-  const fadhilah = await User.findOne({ email: "fadhilah@zafa.com" });
-
-  const febriansyah = await User.findOne({ email: "febriansyah@zafa.com" });
-  const adinda = await User.findOne({ email: "adinda@zafa.com" });
-
-  const dina = await User.findOne({ email: "dina@zafa.com" });
-  const nurul = await User.findOne({ email: "nurul@zafa.com" });
-
-  const decky = await User.findOne({ email: "decky@zafa.com" });
+  const gustidiansyah = await User.findOne({ username: "gustidiansyah" });
+  const willycauza = await User.findOne({ username: "willycauza" });
+  const rafikafitrianti = await User.findOne({ username: "rafikafitrianti" });
+  const duwihartati = await User.findOne({ username: "duwihartati" });
+  const ronaldrizky = await User.findOne({ username: "ronaldrizky" });
+  const meltisundari = await User.findOne({ username: "meltisundari" });
+  const fadhilah = await User.findOne({ username: "fadhilah" });
+  const mriskywindinata = await User.findOne({ username: "mriskywindinata" });
+  const lilymustikasari = await User.findOne({ username: "lilymustikasari" });
+  const febriansyah = await User.findOne({ username: "febriansyah" });
+  const adindarismayani = await User.findOne({ username: "adindarismayani" });
+  const fajarjaniko = await User.findOne({ username: "fajarjaniko" });
+  const rendijalil = await User.findOne({ username: "rendijalil" });
+  const abdulaziz = await User.findOne({ username: "abdulaziz" });
+  const basoherman = await User.findOne({ username: "basoherman" });
+  const ongkidwi = await User.findOne({ username: "ongkidwi" });
+  const sarwanto = await User.findOne({ username: "sarwanto" });
+  const dirasuhada = await User.findOne({ username: "dirasuhada" });
+  const muliaeka = await User.findOne({ username: "muliaeka" });
+  const dinaanggraini = await User.findOne({ username: "dinaanggraini" });
+  const nurul = await User.findOne({ username: "nurul" });
+  const arifsuprastiyo = await User.findOne({ username: "arifsuprastiyo" });
+  const deckycaprianus = await User.findOne({ username: "deckycaprianus" });
+  const adikurniadi = await User.findOne({ username: "adikurniadi" });
+  const nicoyudhira = await User.findOne({ username: "nicoyudhira" });
+  const mariani = await User.findOne({ username: "mariani" });
+  const adipuja = await User.findOne({ username: "adipuja" });
 
   // =====================
   // DIRECT INSERT EMPLOYEE
   // =====================
 
   await Employee.insertMany([
-    // =====================
-    // TOP MANAGEMENT
-    // =====================
     {
-      userId: gusti._id,
-      fullName: "gusti",
-      employeeCode: "EMP-001",
-      positionId: komisaris._id,
-      unitId: null,
-      bidangId: null,
-    },
-    {
-      userId: rafika._id,
-      fullName: "rafika",
-      employeeCode: "EMP-002",
+      userId: rafikafitrianti._id,
+      fullName: "Rafika Fitrianti",
       positionId: direkturUtama._id,
       unitId: null,
       bidangId: null,
     },
     {
-      userId: duwi._id,
-      fullName: "duwi hartati",
-      employeeCode: "EMP-003",
-      positionId: wakilDirektur._id,
+      userId: duwihartati._id,
+      fullName: "Duwi Hartati",
+
+      positionId: generalManager._id,
       unitId: null,
       bidangId: null,
     },
+    {
+      userId: ronaldrizky._id,
+      fullName: "Ronaldrizky",
+
+      positionId: manager._id,
+      unitId: null,
+      bidangId: null,
+    },
+    {
+      userId: meltisundari._id,
+      fullName: "Melti Sundari",
+
+      positionId: manager._id,
+      unitId: manajemenAdministrasi._id,
+      bidangId: administrasi._id,
+    },
+    {
+      userId: fadhilah._id,
+      fullName: "Fadhilah",
+
+      positionId: staff._id,
+      unitId: pengeluaranOperasional,
+      bidangId: keuangan._id,
+    },
 
     // =====================
-    // GENERAL MANAGER
+    // ADMINISTRASI
     // =====================
+
     {
-      userId: ronald._id,
-      fullName: "ronald",
-      employeeCode: "EMP-004",
+      userId: gustidiansyah._id,
+      fullName: "Gusti Diansyah",
+
+      positionId: komisaris._id,
+      unitId: null,
+      bidangId: null,
+    },
+    {
+      userId: willycauza._id,
+      fullName: "Willy Cauza",
+
       positionId: generalManager._id,
+      unitId: null,
+      bidangId: null,
+    },
+    {
+      userId: mriskywindinata._id,
+      fullName: "Mrisky Windinata",
+
+      positionId: staff._id,
+      unitId: ticketingHajiKhusus._id,
+      bidangId: administrasi._id,
+    },
+    {
+      userId: lilymustikasari._id,
+      fullName: "Lily Mustikasari",
+
+      positionId: staff._id,
+      unitId: cs._id,
+      bidangId: administrasi._id,
+    },
+
+    // =====================
+    // KEUANGAN
+    // =====================
+
+    {
+      userId: febriansyah._id,
+      fullName: "Febriansyah",
+
+      positionId: staff._id,
+      unitId: pelaporanUmrahTransportasi._id,
+      bidangId: administrasi._id,
+    },
+    {
+      userId: adindarismayani._id,
+      fullName: "Adinda Rismayani",
+
+      positionId: staff._id,
+      unitId: onlineCustomerCare._id,
+      bidangId: administrasi._id,
+    },
+    {
+      userId: fajarjaniko._id,
+      fullName: "Fajar Janiko",
+
+      positionId: staff._id,
+      unitId: cs._id,
+      bidangId: administrasi._id,
+    },
+    {
+      userId: rendijalil._id,
+      fullName: "Rendi Jalil",
+
+      positionId: staff._id,
+      unitId: visaHotel._id,
+      bidangId: hajiUmrah._id,
+    },
+
+    // =====================
+    // Haji & Umrah
+    // =====================
+
+    {
+      userId: abdulaziz._id,
+      fullName: "Abdul Aziz",
+
+      positionId: staff._id,
+      unitId: pelayananSaudi._id,
+      bidangId: hajiUmrah._id,
+    },
+    {
+      userId: basoherman._id,
+      fullName: "Baso Herman",
+
+      positionId: staff._id,
+      unitId: pendidikanPelatihan._id,
+      bidangId: hajiUmrah._id,
+    },
+    {
+      userId: ongkidwi._id,
+      fullName: "Ongki Dwi",
+
+      positionId: staff._id,
+      unitId: multimedia._id,
+      bidangId: it._id,
+    },
+
+    // =====================
+    // IT
+    // =====================
+
+    {
+      userId: sarwanto._id,
+      fullName: "Sarwanto",
+
+      positionId: staff._id,
+      unitId: multimedia._id,
+      bidangId: it._id,
+    },
+
+    // =====================
+    // MARKETING
+    // =====================
+
+    {
+      userId: dirasuhada._id,
+      fullName: "Dira Suhada",
+
+      positionId: staff._id,
       unitId: accounting._id,
       bidangId: keuangan._id,
     },
     {
-      userId: willy._id,
-      fullName: "willy",
-      employeeCode: "EMP-005",
-      positionId: generalManager._id,
-      unitId: cs._id,
-      bidangId: administrasi._id,
-    },
+      userId: muliaeka._id,
+      fullName: "Mulia Eka",
 
-    // =====================
-    // MANAGER
-    // =====================
-    {
-      userId: melti._id,
-      fullName: "melti sundari",
-      employeeCode: "EMP-006",
-      positionId: manager._id,
-      unitId: marketingUnit._id,
-      bidangId: marketing._id,
-    },
-
-    // =====================
-    // STAFF ADMIN
-    // =====================
-    {
-      userId: mrisky._id,
-      fullName: "mrisky",
-      employeeCode: "EMP-007",
       positionId: staff._id,
-      unitId: cs._id,
-      bidangId: administrasi._id,
-    },
-    // =====================
-    // KEUANGAN
-    // =====================
-    {
-      userId: fadhilah._id,
-      fullName: "fadhilah",
-      employeeCode: "EMP-008",
-      positionId: staff._id,
-      unitId: pengeluaran._id,
+      unitId: pengeluaranCOGS._id,
       bidangId: keuangan._id,
-    },
-
-    // =====================
-    // UMRAH
-    // =====================
-    {
-      userId: febriansyah._id,
-      fullName: "febriansyah",
-      employeeCode: "EMP-009",
-      positionId: staff._id,
-      unitId: visaHotel._id,
-      bidangId: hajiUmrah._id,
-    },
-    {
-      userId: adinda._id,
-      fullName: "adinda",
-      employeeCode: "EMP-010",
-      positionId: staff._id,
-      unitId: visaHotel._id,
-      bidangId: hajiUmrah._id,
-    },
-    // =====================
-    // MARKETING
-    // =====================
-    {
-      userId: dina._id,
-      fullName: "dina",
-      employeeCode: "EMP-011",
-      positionId: staff._id,
-      unitId: marketingUnit._id,
-      bidangId: marketing._id,
-    },
-    {
-      userId: nurul._id,
-      fullName: "nurul",
-      employeeCode: "EMP-012",
-      positionId: staff._id,
-      unitId: marketingUnit._id,
-      bidangId: marketing._id,
     },
 
     // =====================
     // UMUM
     // =====================
+
     {
-      userId: decky._id,
-      fullName: "decky",
-      employeeCode: "EMP-013",
+      userId: dinaanggraini._id,
+      fullName: "Dina Anggraini",
+
+      positionId: staff._id,
+      unitId: penerimaanPenagihan._id,
+      bidangId: keuangan._id,
+    },
+    {
+      userId: nurul._id,
+      fullName: "Nurul",
+
+      positionId: staff._id,
+      unitId: penerimaanStoran._id,
+      bidangId: keuangan._id,
+    },
+
+    // =====================
+    // SUPPORT / GENERAL STAFF
+    // =====================
+
+    {
+      userId: arifsuprastiyo._id,
+      fullName: "Arif Suprastiyo",
+
+      positionId: staff._id,
+      unitId: marketingUnit._id,
+      bidangId: marketing._id,
+    },
+    {
+      userId: deckycaprianus._id,
+      fullName: "Decky Caprianus",
+
+      positionId: staff._id,
+      unitId: marketingUnit._id,
+      bidangId: marketing._id,
+    },
+    {
+      userId: adikurniadi._id,
+      fullName: "Adi Kurniadi",
+
+      positionId: staff._id,
+      unitId: marketingUnit._id,
+      bidangId: marketing._id,
+    },
+    {
+      userId: nicoyudhira._id,
+      fullName: "Nico Yudhira",
+
+      positionId: staff._id,
+      unitId: perlengkapan._id,
+      bidangId: umum._id,
+    },
+    {
+      userId: mariani._id,
+      fullName: "Mariani",
+
+      positionId: staff._id,
+      unitId: perlengkapan._id,
+      bidangId: umum._id,
+    },
+    {
+      userId: adipuja._id,
+      fullName: "Adi Puja",
+
       positionId: staff._id,
       unitId: perlengkapan._id,
       bidangId: umum._id,
