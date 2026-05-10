@@ -1,187 +1,124 @@
 <% layout('layouts/main') -%>
 
-<!-- 
-  Kunci Layout: 
-  - ml-72 memberikan ruang untuk sidebar fixed.
-  - mx-auto pada child div memastikan konten presisi di tengah sisa layar.
--->
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-3xl mx-auto">
-    <!-- HEADER SECTION -->
-    <div class="mb-10 text-center">
-      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+    <!-- HEADER -->
+    <div class="mb-8 text-center">
+      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">
         Ajukan Cuti
       </h1>
-      <p class="text-slate-500 mt-2 font-medium">
-        Silakan lengkapi formulir di bawah untuk pengajuan cuti resmi.
+      <p class="text-sm text-slate-500 mt-1">
+        Lengkapi formulir pengajuan cuti dengan benar
       </p>
     </div>
 
-    <!-- MAIN CARD -->
+    <!-- CARD -->
     <div
-      class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-10"
+      class="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-slate-100 p-8"
     >
-      <!-- Aksesori Dekoratif (Blur Effect) -->
-      <div
-        class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"
-      ></div>
-      <div
-        class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"
-      ></div>
-
       <form
         action="/leave/apply"
         method="POST"
         enctype="multipart/form-data"
-        class="relative space-y-6"
+        class="space-y-5"
       >
-        <!-- ROW: JENIS CUTI -->
-        <div class="grid grid-cols-1 gap-6">
-          <div class="group">
-            <label
-              class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-              >Jenis Cuti</label
-            >
-            <div class="relative">
-              <select
-                name="type"
-                required
-                class="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer font-medium"
-              >
-                <option value="">-- Pilih Kategori --</option>
-                <option value="Tahunan">Cuti Tahunan</option>
-                <option value="Sakit">Izin Sakit (Medical)</option>
-                <option value="Keluarga">Urusan Keluarga</option>
-              </select>
-              <div
-                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400"
-              >
-                <svg
-                  class="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
+        <!-- JENIS CUTI -->
+        <div>
+          <label
+            class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
+          >
+            Jenis Cuti
+          </label>
+
+          <select
+            name="type"
+            required
+            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
+          >
+            <option value="">Pilih jenis cuti</option>
+            <option value="Tahunan">Cuti Tahunan</option>
+            <option value="Sakit">Izin Sakit</option>
+            <option value="Keluarga">Urusan Keluarga</option>
+          </select>
         </div>
 
-        <!-- ROW: TANGGAL (GRID) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="group">
+        <!-- TANGGAL -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
             <label
-              class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-              >Mulai</label
+              class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
             >
+              Mulai
+            </label>
+
             <input
               type="date"
               name="startDate"
               required
-              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
             />
           </div>
-          <div class="group">
+
+          <div>
             <label
-              class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-              >Selesai</label
+              class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
             >
+              Selesai
+            </label>
+
             <input
               type="date"
               name="endDate"
               required
-              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
             />
           </div>
         </div>
 
-        <!-- ROW: ALASAN -->
-        <div class="group">
+        <!-- ALASAN -->
+        <div>
           <label
-            class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-            >Alasan Cuti</label
+            class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
           >
+            Alasan
+          </label>
+
           <textarea
             name="reason"
-            rows="4"
+            rows="3"
             required
-            placeholder="Jelaskan keperluan cuti Anda secara singkat..."
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-300"
+            placeholder="Jelaskan alasan cuti..."
+            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
           ></textarea>
         </div>
 
-        <!-- ROW: UPLOAD FILE (MODERN LOOK) -->
-        <div class="group">
+        <!-- FILE -->
+        <div>
           <label
-            class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-            >Dokumen Pendukung</label
+            class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
           >
-          <div
-            class="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl p-6 hover:bg-slate-100/50 hover:border-indigo-300 transition-all cursor-pointer group/file"
-          >
-            <input
-              type="file"
-              name="file"
-              accept=".pdf,.png,.jpg,.jpeg"
-              class="absolute inset-0 opacity-0 cursor-pointer"
-            />
-            <svg
-              class="w-10 h-10 text-slate-300 mb-2 group-hover/file:text-indigo-400 transition-colors"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              ></path>
-            </svg>
-            <span class="text-sm font-semibold text-slate-500"
-              >Klik atau seret file ke sini</span
-            >
-            <span class="text-[10px] text-slate-400 uppercase mt-1"
-              >PDF, JPG, atau PNG (Max 5MB)</span
-            >
-          </div>
+            Dokumen (opsional)
+          </label>
+
+          <input
+            type="file"
+            name="file"
+            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition"
+          />
         </div>
 
-        <!-- BUTTON ACTION -->
-        <div class="pt-4">
-          <button
-            type="submit"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-500/30 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              ></path>
-            </svg>
-            Kirim Pengajuan Cuti
-          </button>
-        </div>
+        <!-- BUTTON -->
+        <button
+          type="submit"
+          class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold py-3 rounded-xl transition shadow-sm"
+        >
+          Kirim Pengajuan
+        </button>
       </form>
     </div>
 
-    <!-- FOOTER INFO -->
-    <p class="text-center text-slate-400 text-xs mt-8">
-      Pastikan tanggal yang diajukan tidak bentrok dengan jadwal tugas aktif.
+    <p class="text-center text-xs text-slate-400 mt-6">
+      Pastikan data sesuai sebelum dikirim
     </p>
   </div>
 </div>

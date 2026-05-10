@@ -1,0 +1,58 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-8">
+
+  <div class="max-w-6xl mx-auto">
+
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-slate-800">
+        Laporan Sales Visit
+      </h1>
+    </div>
+
+    <div class="grid gap-4">
+
+      <% visits.forEach(v => { %>
+        <div class="bg-white p-5 rounded-xl shadow border">
+
+          <div class="flex justify-between">
+            <h2 class="font-bold text-slate-800">
+              <%= v.customerName %>
+            </h2>
+
+            <span class="text-xs text-slate-400">
+              <%= new Date(v.createdAt).toLocaleDateString() %>
+            </span>
+          </div>
+
+          <p class="text-sm text-slate-500 mt-1">
+            <%= v.address %>
+          </p>
+
+          <p class="text-sm mt-2">
+            👤 <%= v.meetWith %>
+          </p>
+
+          <p class="text-sm mt-1 text-slate-600">
+            <%= v.result %>
+          </p>
+
+          <div class="mt-3 flex gap-3">
+            <% if (v.photo) { %>
+              <img src="/uploads/<%= v.photo %>" class="w-24 h-24 object-cover rounded-lg" />
+            <% } %>
+
+            <% if (v.location) { %>
+              <span class="text-xs text-slate-400">
+                📍 <%= v.location %>
+              </span>
+            <% } %>
+          </div>
+
+        </div>
+      <% }) %>
+
+    </div>
+
+  </div>
+</div>

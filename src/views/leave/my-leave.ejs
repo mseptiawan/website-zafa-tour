@@ -1,81 +1,71 @@
 <% layout('layouts/main') -%>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-6">
   <div class="max-w-6xl mx-auto">
 
     <!-- HEADER -->
-    <div class="mb-10 text-center">
-      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+    <div class="mb-8 text-center">
+      <h1 class="text-2xl font-bold text-slate-800">
         Riwayat Cuti Saya
       </h1>
-      <p class="text-slate-500 mt-2 font-medium">
-        Pantau dan kelola semua pengajuan cuti kamu
+      <p class="text-sm text-slate-500 mt-1">
+        Pantau semua pengajuan cuti kamu
       </p>
     </div>
 
     <!-- SUMMARY -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
 
-      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-        <p class="text-slate-500 text-sm">Total Cuti</p>
-        <h2 class="text-3xl font-extrabold mt-2 text-slate-800">
-          <%= summary.total || 0 %>
-        </h2>
+      <div class="bg-white border border-slate-100 rounded-xl p-5">
+        <p class="text-xs text-slate-400">Total</p>
+        <h2 class="text-2xl font-bold text-slate-800 mt-1"><%= summary.total || 0 %></h2>
       </div>
 
-      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-        <p class="text-slate-500 text-sm">Pending</p>
-        <h2 class="text-3xl font-extrabold mt-2 text-yellow-500">
-          <%= summary.pending || 0 %>
-        </h2>
+      <div class="bg-white border border-slate-100 rounded-xl p-5">
+        <p class="text-xs text-slate-400">Pending</p>
+        <h2 class="text-2xl font-bold text-yellow-500 mt-1"><%= summary.pending || 0 %></h2>
       </div>
 
-      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-        <p class="text-slate-500 text-sm">Terpakai</p>
-        <h2 class="text-3xl font-extrabold mt-2 text-emerald-600">
-          <%= summary.used || 0 %>
-        </h2>
+      <div class="bg-white border border-slate-100 rounded-xl p-5">
+        <p class="text-xs text-slate-400">Terpakai</p>
+        <h2 class="text-2xl font-bold text-emerald-600 mt-1"><%= summary.used || 0 %></h2>
       </div>
 
-      <div class="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-        <p class="text-slate-500 text-sm">Sisa</p>
-        <h2 class="text-3xl font-extrabold mt-2 text-indigo-600">
-          <%= summary.remaining || 0 %>
-        </h2>
+      <div class="bg-white border border-slate-100 rounded-xl p-5">
+        <p class="text-xs text-slate-400">Sisa</p>
+        <h2 class="text-2xl font-bold text-indigo-600 mt-1"><%= summary.remaining || 0 %></h2>
       </div>
 
     </div>
 
     <!-- TABLE CARD -->
-    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-6">
-
-      <!-- dekorasi -->
-      <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5">
 
       <!-- HEADER TABLE -->
-      <div class="flex justify-between items-center mb-6 relative">
-        <h2 class="text-xl font-bold text-slate-800">Riwayat Pengajuan</h2>
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="text-lg font-semibold text-slate-800">
+          Riwayat Pengajuan
+        </h2>
 
         <a href="/leave/apply"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm"
+          class="bg-slate-900 hover:bg-slate-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition"
         >
-          + Ajukan Cuti
+          + Ajukan
         </a>
       </div>
 
       <!-- TABLE -->
-      <div class="relative overflow-x-auto">
+      <div class="overflow-x-auto">
 
         <table class="w-full text-sm">
 
           <thead>
-            <tr class="text-left text-xs uppercase tracking-widest text-slate-400 border-b border-slate-200">
-              <th class="py-4 px-3">Jenis</th>
-              <th class="py-4 px-3">Tanggal</th>
-              <th class="py-4 px-3">Durasi</th>
-              <th class="py-4 px-3">Status</th>
-              <th class="py-4 px-3">Aksi</th>
+            <tr class="bg-slate-50 text-xs uppercase tracking-wider text-slate-400">
+              <th class="p-3 text-left">Jenis</th>
+              <th class="p-3 text-left">Tanggal</th>
+              <th class="p-3 text-left">Durasi</th>
+              <th class="p-3 text-left">Status</th>
+              <th class="p-3 text-left">Aksi</th>
             </tr>
           </thead>
 
@@ -84,55 +74,51 @@
             <% if (leaves && leaves.length > 0) { %>
 
               <% leaves.forEach(l => { %>
+                <tr class="hover:bg-slate-50 transition">
 
-                <tr class="hover:bg-slate-50/60 transition">
-
-                  <td class="py-4 px-3 font-semibold text-slate-700">
+                  <td class="p-3 font-medium text-slate-700">
                     <%= l.type %>
                   </td>
 
-                  <td class="py-4 px-3 text-slate-600">
+                  <td class="p-3 text-slate-600">
                     <%= new Date(l.startDate).toLocaleDateString("id-ID") %>
                     -
                     <%= new Date(l.endDate).toLocaleDateString("id-ID") %>
                   </td>
 
-                  <td class="py-4 px-3 text-slate-600 font-medium">
+                  <td class="p-3 text-slate-600">
                     <%= l.totalDays %> hari
                   </td>
 
-                  <!-- STATUS BADGE -->
-                  <td class="py-4 px-3">
+                  <!-- STATUS -->
+                  <td class="p-3">
                     <span
-                      class="px-3 py-1 rounded-full text-xs font-semibold
+                      class="text-xs px-2.5 py-1 rounded-full font-medium
                       <%= l.status === 'Approved'
                         ? 'bg-emerald-100 text-emerald-700'
                         : l.status === 'Rejected'
                         ? 'bg-red-100 text-red-700'
-                        : 'bg-yellow-100 text-yellow-700' %>
-                      "
+                        : 'bg-yellow-100 text-yellow-700' %>"
                     >
                       <%= l.status %>
                     </span>
                   </td>
 
-                  <td class="py-4 px-3">
-                    <a
-                      href="/leave/<%= l._id %>"
-                      class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm"
+                  <td class="p-3">
+                    <a href="/leave/<%= l._id %>"
+                      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                     >
                       Detail
                     </a>
                   </td>
 
                 </tr>
-
               <% }) %>
 
             <% } else { %>
 
               <tr>
-                <td colspan="5" class="py-12 text-center text-slate-500">
+                <td colspan="5" class="p-10 text-center text-slate-400 text-sm">
                   Belum ada pengajuan cuti
                 </td>
               </tr>

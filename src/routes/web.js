@@ -43,7 +43,16 @@ import {
   checkOut,
   history,
 } from "../controllers/attendanceController.js";
-
+import {
+  formRequest,
+  myTrips,
+  tripDetail,
+  createTrip,
+  approveManagerTrip,
+  allTrips,
+  approveDirector,
+} from "../controllers/tripController.js";
+import { salesReport } from "../controllers/salesController.js";
 const router = express.Router();
 
 /*
@@ -124,4 +133,32 @@ router.post("/attendance/checkin", uploadPhoto.single("photo"), checkIn);
 router.post("/attendance/checkout", checkOut);
 router.get("/attendance/detail/:id", detail);
 router.get("/attendance/all", allAttendance);
+// form pengajuan dinas luar
+router.get("/trip/request", authMiddleware, formRequest);
+router.post("/trip/request", authMiddleware, createTrip);
+
+// perjalanan saya (user login)
+router.get("/trip/my", authMiddleware, myTrips);
+
+// detail trip
+
+/*
+|--------------------------------------------------------------------------
+| APPROVAL FLOW (HR / MANAGER / DIRECTOR)
+|--------------------------------------------------------------------------
+*/
+router.get("/trip/all", allTrips);
+// approval manager
+router.post("/trip/:id/approve/manager", authMiddleware, approveManagerTrip);
+
+// approval director
+router.post("/trip/:id/approve/director", authMiddleware, approveDirector);
+router.get("/trip/detail/:id", authMiddleware, tripDetail);
+/*
+|--------------------------------------------------------------------------
+| SALES VISIT (PLACEHOLDER - nanti kita isi)
+|--------------------------------------------------------------------------
+*/
+
+router.get("/sales/report", authMiddleware, salesReport);
 export default router;

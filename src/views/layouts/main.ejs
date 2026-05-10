@@ -4,15 +4,22 @@
     <meta charset="UTF-8" />
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/output.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
-  <body class="bg-slate-100">
+  <body class="bg-slate-100 text-slate-800">
     <div class="flex min-h-screen">
-      <!-- SIDEBAR GLOBAL -->
+      <!-- SIDEBAR -->
       <%- include('../partials/sidebar') %>
 
-      <!-- CONTENT DINAMIS -->
-      <main class="flex-1 p-10"><%- body %></main>
+      <!-- CONTENT -->
+      <main class="flex-1 p-10"><%- body -%></main>
     </div>
   </body>
 </html>

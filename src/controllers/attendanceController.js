@@ -5,23 +5,27 @@ import Attendance from "../models/Attendance.js";
  */
 export const index = async (req, res) => {
   try {
-    const user = req.session.user; // konsisten pakai session
+    const user = req.session.user;
 
-    if (!user) {
-      return res.redirect("/");
-    }
+    if (!user) return res.redirect("/");
 
     const start = new Date();
     start.setHours(0, 0, 0, 0);
 
-    const already = await Attendance.findOne({
+    // ambil absensi hari ini
+    const attendance = await Attendance.findOne({
       userId: user._id,
       checkIn: { $gte: start },
     });
 
+    const already = !!attendance;
+    const hasCheckedOut = attendance?.checkOut ? true : false;
+
     return res.render("attendance/create", {
       title: "Absensi",
-      already: already || null,
+      attendance,
+      already,
+      hasCheckedOut,
     });
   } catch (err) {
     console.log(err);
@@ -46,7 +50,6 @@ export const checkIn = async (req, res) => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
 
-    // cek sudah absen hari ini
     const already = await Attendance.findOne({
       userId: user._id,
       checkIn: { $gte: start },
@@ -64,7 +67,6 @@ export const checkIn = async (req, res) => {
 
     let location = null;
 
-    // ✅ hanya DINAS_LUAR simpan lokasi
     if (req.body.type === "DINAS_LUAR") {
       location = {
         lat: req.body.lat,
@@ -95,7 +97,7 @@ export const checkIn = async (req, res) => {
 };
 
 /**
- * CHECK OUT
+ * CHECK OUT (PULANG)
  */
 export const checkOut = async (req, res) => {
   try {
@@ -103,26 +105,32 @@ export const checkOut = async (req, res) => {
 
     if (!user) return res.redirect("/");
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
 
-    const att = await Attendance.findOne({
+    const attendance = await Attendance.findOne({
       userId: user._id,
-      checkIn: { $gte: today },
+      checkIn: { $gte: start },
     });
 
-    if (att) {
-      att.checkOut = new Date();
-      await att.save();
+    if (!attendance) {
+      return res.redirect("/attendance");
     }
 
-    res.redirect("/attendance/history");
+    // kalau sudah pulang, jangan update lagi
+    if (attendance.checkOut) {
+      return res.redirect("/attendance/history");
+    }
+
+    attendance.checkOut = new Date();
+    await attendance.save();
+
+    return res.redirect("/attendance/history");
   } catch (err) {
     console.log(err);
-    res.status(500).send("error checkout");
+    return res.status(500).send("error checkout");
   }
 };
-
 /**
  * HISTORY
  */

@@ -1,0 +1,118 @@
+<%- layout('layouts/main', { title }) %>
+
+<div style="
+  margin-left:280px;
+  min-height:100vh;
+  padding:32px;
+  background:#f8fafc;
+  font-family: system-ui, sans-serif;
+  color:#0f172a;
+">
+
+  <div style="max-width:640px; margin:auto;">
+
+    <!-- HEADER -->
+    <div style="margin-bottom:24px;">
+      <h1 style="font-size:22px; font-weight:700;">
+        Pengajuan Dinas Luar
+      </h1>
+      <p style="font-size:13px; color:#64748b; margin-top:4px;">
+        Form pengajuan perjalanan dinas
+      </p>
+    </div>
+
+    <!-- CARD -->
+    <div style="
+      background:#fff;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      padding:20px;
+    ">
+
+      <form action="/trip/request" method="POST" style="display:flex; flex-direction:column; gap:12px;">
+
+        <!-- INPUT -->
+        <input type="text" name="title" placeholder="Judul perjalanan"
+          style="
+            padding:10px 12px;
+            border-radius:8px;
+            border:1px solid #e2e8f0;
+            font-size:14px;
+            outline:none;
+          "
+        />
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+
+          <input type="date" name="startDate"
+            style="
+              padding:10px 12px;
+              border-radius:8px;
+              border:1px solid #e2e8f0;
+              font-size:14px;
+            "
+          />
+
+          <input type="date" name="endDate"
+            style="
+              padding:10px 12px;
+              border-radius:8px;
+              border:1px solid #e2e8f0;
+              font-size:14px;
+            "
+          />
+
+        </div>
+
+        <input type="text" name="destination" placeholder="Tujuan"
+          style="
+            padding:10px 12px;
+            border-radius:8px;
+            border:1px solid #e2e8f0;
+            font-size:14px;
+          "
+        />
+
+        <textarea name="description" rows="3" placeholder="Deskripsi"
+          style="
+            padding:10px 12px;
+            border-radius:8px;
+            border:1px solid #e2e8f0;
+            font-size:14px;
+            resize:none;
+          "
+        ></textarea>
+
+        <input type="number" name="budget" placeholder="Budget"
+          style="
+            padding:10px 12px;
+            border-radius:8px;
+            border:1px solid #e2e8f0;
+            font-size:14px;
+          "
+        />
+
+        <!-- BUTTON (PROFESIONAL, BUKAN AI NEON) -->
+        <button type="submit"
+          style="
+            margin-top:6px;
+            padding:10px 14px;
+            border-radius:8px;
+            border:1px solid #2563eb;
+            background:#2563eb;
+            color:white;
+            font-size:14px;
+            font-weight:500;
+            cursor:pointer;
+          "
+        >
+          Ajukan Perjalanan
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,34 +1,35 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 p-6">
+<div class="ml-72 p-8 bg-slate-50 min-h-screen">
 
   <!-- HEADER -->
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800">Data Absensi Karyawan</h1>
+    <h1 class="text-xl font-semibold text-slate-800">
+      Data Absensi Karyawan
+    </h1>
     <p class="text-sm text-slate-500 mt-1">
       Monitoring kehadiran, keterlambatan, dan aktivitas karyawan
     </p>
   </div>
 
-  <!-- TABLE CARD -->
-  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+  <!-- CARD -->
+  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
 
-    <!-- TABLE WRAPPER -->
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
 
         <!-- HEADER -->
-        <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
+        <thead class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
           <tr>
-            <th class="p-4 text-left">Karyawan</th>
-            <th class="text-left">Tanggal</th>
-            <th class="text-left">Check In</th>
-            <th class="text-left">Check Out</th>
-            <th class="text-left">Type</th>
-            <th class="text-left">Status</th>
-            <th class="text-left">Foto</th>
-            <th class="text-left">Lokasi</th>
-            <th class="text-left">Aksi</th>
+            <th class="p-4 text-left font-medium">Karyawan</th>
+            <th class="text-left font-medium">Tanggal</th>
+            <th class="text-left font-medium">Check In</th>
+            <th class="text-left font-medium">Check Out</th>
+            <th class="text-left font-medium">Type</th>
+            <th class="text-left font-medium">Status</th>
+            <th class="text-left font-medium">Foto</th>
+            <th class="text-left font-medium">Lokasi</th>
+            <th class="text-left font-medium">Aksi</th>
           </tr>
         </thead>
 
@@ -39,7 +40,7 @@
             <tr class="hover:bg-slate-50 transition">
 
               <!-- KARYAWAN -->
-              <td class="p-4 font-medium text-slate-700">
+              <td class="p-4 text-slate-700 font-medium">
                 <%= d.userId?.email || '-' %>
               </td>
 
@@ -60,17 +61,14 @@
 
               <!-- TYPE -->
               <td>
-                <span class="px-3 py-1 text-xs rounded-full font-medium
-                  <%= d.type === 'DINAS_LUAR'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'bg-slate-100 text-slate-600' %>">
+                <span class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-600">
                   <%= d.type %>
                 </span>
               </td>
 
               <!-- STATUS -->
               <td>
-                <span class="px-3 py-1 text-xs rounded-full font-medium
+                <span class="px-2 py-1 text-xs rounded-md
                   <%= d.status === 'TELAT'
                     ? 'bg-red-50 text-red-600'
                     : 'bg-emerald-50 text-emerald-600' %>">
@@ -83,7 +81,7 @@
                 <% if (d.photo) { %>
                   <img
                     src="<%= d.photo %>"
-                    class="w-10 h-10 rounded-full object-cover border border-slate-200"
+                    class="w-9 h-9 rounded-full object-cover border border-slate-200"
                   >
                 <% } else { %>
                   <span class="text-slate-400 text-xs">-</span>
@@ -91,11 +89,11 @@
               </td>
 
               <!-- LOKASI -->
-              <td class="text-slate-500">
+              <td class="text-slate-500 text-xs">
                 <% if (d.location && d.location.lat) { %>
-                  <span class="text-xs">📍 Tersedia</span>
+                  📍 Available
                 <% } else { %>
-                  <span class="text-slate-400 text-xs">-</span>
+                  -
                 <% } %>
               </td>
 
@@ -103,9 +101,9 @@
               <td>
                 <a
                   href="/attendance/detail/<%= d._id %>"
-                  class="inline-flex items-center text-indigo-500 hover:text-indigo-600 text-sm font-medium"
+                  class="text-indigo-500 hover:text-indigo-600 text-sm font-medium"
                 >
-                  Detail →
+                  Detail
                 </a>
               </td>
 

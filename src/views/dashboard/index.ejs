@@ -1,30 +1,94 @@
-<% layout('layouts/main') -%>
+<%- layout('layouts/main') -%>
 
-<!-- TOP -->
-<div class="mb-8 ml-72">
-  <h1 class="text-3xl font-bold text-slate-800">Dashboard</h1>
-  <p class="text-slate-500">Welcome back, <%= user.email %></p>
-</div>
+<div class="ml-72 min-h-screen bg-slate-50 p-10 text-slate-800">
 
-<!-- CARDS -->
-<div class="grid grid-cols-4 gap-6 ml-72">
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <p>Total Karyawan</p>
-    <h2 class="text-3xl font-bold">120</h2>
+  <!-- HEADER -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold tracking-tight">Dashboard</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Welcome back, <%= user.email %>
+    </p>
   </div>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <p>Hadir</p>
-    <h2 class="text-3xl font-bold text-green-600">98</h2>
+  <!-- SUMMARY -->
+  <div class="grid grid-cols-4 gap-6 mb-10">
+
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+      <p class="text-xs text-slate-500">Total Karyawan</p>
+      <h2 class="text-2xl font-semibold mt-1"><%= totalEmployee %></h2>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+      <p class="text-xs text-slate-500">Hadir Hari Ini</p>
+      <h2 class="text-2xl font-semibold mt-1 text-slate-800"><%= hadir %></h2>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+      <p class="text-xs text-slate-500">Cuti Aktif</p>
+      <h2 class="text-2xl font-semibold mt-1"><%= cuti %></h2>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+      <p class="text-xs text-slate-500">Dinas / Trip</p>
+      <h2 class="text-2xl font-semibold mt-1"><%= trip %></h2>
+    </div>
+
   </div>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <p>Cuti</p>
-    <h2 class="text-3xl font-bold text-yellow-500">12</h2>
+  <!-- TABLE -->
+  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+
+    <div class="p-4 border-b border-slate-200">
+      <h2 class="font-semibold">Absensi Hari Ini</h2>
+    </div>
+
+    <table class="w-full text-sm">
+
+      <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+          <th class="p-3">Nama</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Waktu</th>
+          <th class="p-3">Tipe</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <% todayAttendance.forEach(a => { %>
+          <tr class="border-t border-slate-100 hover:bg-slate-50">
+
+            <td class="p-3 font-medium">
+              <%= a.userId?.email %>
+            </td>
+
+            <td class="p-3">
+              <% if (a.status === 'HADIR') { %>
+                <span class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700">
+                  HADIR
+                </span>
+              <% } else { %>
+                <span class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700">
+                  <%= a.status %>
+                </span>
+              <% } %>
+            </td>
+
+            <td class="p-3 text-slate-500">
+              <%= new Date(a.checkIn).toLocaleTimeString() %>
+            </td>
+
+            <td class="p-3 text-slate-500">
+              <%= a.type %>
+            </td>
+
+          </tr>
+        <% }) %>
+
+      </tbody>
+
+    </table>
+
   </div>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <p>Lembur</p>
-    <h2 class="text-3xl font-bold text-blue-600">7</h2>
-  </div>
 </div>

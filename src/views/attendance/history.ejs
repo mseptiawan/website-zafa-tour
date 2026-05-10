@@ -5,7 +5,7 @@
   - ml-72 untuk konsistensi sidebar
   - max-w-5xl karena tabel biasanya butuh ruang lebih luas
 -->
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50 p-8">
   <div class="max-w-5xl mx-auto">
 
     <!-- HEADER SECTION -->
@@ -28,14 +28,33 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-slate-50/50 border-b border-slate-100">
-              <th class="p-6 text-xs font-bold uppercase tracking-widest text-slate-400">Tanggal</th>
-              <th class="p-6 text-xs font-bold uppercase tracking-widest text-slate-400">Check In</th>
-              <th class="p-6 text-xs font-bold uppercase tracking-widest text-slate-400">Check Out</th>
-              <th class="p-6 text-xs font-bold uppercase tracking-widest text-slate-400">Status</th>
-              <th class="p-6 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Verifikasi</th>
-              <th>Aksi</th>
-            </tr>
+           <tr class="bg-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+  
+  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+    Tanggal
+  </th>
+
+  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+    Check In
+  </th>
+
+  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+    Check Out
+  </th>
+
+  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+    Status
+  </th>
+
+  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500 text-center">
+    Verifikasi
+  </th>
+
+  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+    Aksi
+  </th>
+
+</tr>
           </thead>
           <tbody class="divide-y divide-slate-50">
             <% if (data.length > 0) { %>
