@@ -1,0 +1,101 @@
+<%- layout('layouts/main', { title: "Detail Absensi" }) %>
+
+<div class="ml-72 p-6">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Detail Absensi</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Informasi lengkap aktivitas kehadiran karyawan
+    </p>
+  </div>
+
+  <!-- CARD -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+
+    <!-- INFO -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
+
+      <div>
+        <p class="text-slate-400 text-xs uppercase">User</p>
+        <p class="font-semibold text-slate-700">
+          <%= data.userId?.email || '-' %>
+        </p>
+      </div>
+
+      <div>
+        <p class="text-slate-400 text-xs uppercase">Tipe</p>
+        <span class="inline-block mt-1 px-3 py-1 text-xs rounded-full font-medium
+          <%= data.type === 'DINAS_LUAR'
+            ? 'bg-blue-50 text-blue-600'
+            : 'bg-slate-100 text-slate-600' %>">
+          <%= data.type %>
+        </span>
+      </div>
+
+      <div>
+        <p class="text-slate-400 text-xs uppercase">Check In</p>
+        <p class="font-medium text-slate-700">
+          <%= data.checkIn ? new Date(data.checkIn).toLocaleString('id-ID') : '-' %>
+        </p>
+      </div>
+
+      <div>
+        <p class="text-slate-400 text-xs uppercase">Check Out</p>
+        <p class="font-medium text-slate-700">
+          <%= data.checkOut ? new Date(data.checkOut).toLocaleString('id-ID') : '-' %>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- MAP -->
+    <% if (data.location && data.location.lat && data.location.lng) { %>
+      <div id="map" class="w-full h-80 mt-6 rounded-xl border"></div>
+    <% } else { %>
+      <p class="text-slate-400 mt-6 text-sm">Tidak ada lokasi tersedia</p>
+    <% } %>
+
+  </div>
+
+</div>
+
+<!-- ===================== -->
+<!-- LEAFLET CDN WAJIB -->
+<!-- ===================== -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ===================== -->
+<!-- MAP SCRIPT (FIXED) -->
+<!-- ===================== -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const locationData = JSON.parse('<%- JSON.stringify(data.location ?? null) %>');
+
+  // debug (boleh dihapus)
+  console.log("LOCATION:", locationData);
+
+  if (!locationData || !locationData.lat || !locationData.lng) return;
+
+  const map = L.map('map').setView(
+    [locationData.lat, locationData.lng],
+    16
+  );
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  L.marker([locationData.lat, locationData.lng])
+    .addTo(map)
+    .bindPopup("Lokasi Absen")
+    .openPopup();
+
+});
+</script>

@@ -1,0 +1,226 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<!-- 
+  Layout Sync: 
+  - ml-72 agar sejajar dengan sidebar fixed Anda
+  - max-w-3xl agar lebar card konsisten dengan form cuti
+-->
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+  <div class="max-w-3xl mx-auto">
+    
+    <!-- HEADER SECTION -->
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+        Absensi Kamera
+      </h1>
+      <p class="text-slate-500 mt-2 font-medium">
+        Pastikan wajah terlihat jelas pada frame sebelum menekan tombol absen.
+      </p>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-10">
+      
+      <!-- Aksesori Dekoratif -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+
+      <% if (already) { %>
+        <!-- STATE: ALREADY CHECKED IN -->
+        <div class="relative text-center space-y-6 py-4">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 text-green-600 rounded-full mb-2">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <div class="space-y-2">
+            <h2 class="text-xl font-bold text-slate-800">Anda Sudah Absen Hari Ini</h2>
+            <p class="text-slate-500">Data kehadiran Anda telah tercatat di sistem kami.</p>
+          </div>
+          
+          <form action="/attendance/checkout" method="POST" class="pt-4">
+            <button class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-rose-500/30 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Check Out Sekarang
+            </button>
+          </form>
+        </div>
+
+      <% } else { %>
+        <!-- STATE: CAMERA FORM -->
+        <div class="relative space-y-6">
+          
+          <!-- CAMERA PREVIEW -->
+          <div class="group relative overflow-hidden rounded-2xl border-2 border-slate-200 bg-black aspect-video shadow-inner">
+            <video id="video" autoplay class="w-full h-full object-cover"></video>
+            <canvas id="canvas" class="hidden"></canvas>
+            <div class="absolute inset-0 border-[1.5rem] border-black/10 pointer-events-none"></div>
+            <div class="absolute top-4 left-4 flex items-center gap-2">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </span>
+              <span class="text-white text-xs font-bold tracking-widest uppercase bg-black/40 backdrop-blur-md px-2 py-1 rounded">Live Camera</span>
+            </div>
+          </div>
+
+          <!-- INPUT GROUP -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="group">
+              <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1">Kategori Absen</label>
+              <div class="relative">
+                <select name="type" class="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer font-medium">
+                  <option value="KANTOR">🏢 Kantor (WFO)</option>
+                  <option value="DINAS_LUAR">🚗 Dinas Luar</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="group">
+              <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1">Catatan (Opsional)</label>
+              <input 
+                type="text" 
+                name="note" 
+                placeholder="Contoh: Lokasi meeting..."
+                class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-300"
+              />
+            </div>
+          </div>
+
+          <!-- ACTION BUTTON -->
+          <div class="pt-2">
+            <button 
+              onclick="takePhoto()" 
+              type="button"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-500/30 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              Ambil Foto & Absen
+            </button>
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- FOOTER INFO -->
+    <p class="text-center text-slate-400 text-xs mt-8">
+      Sistem mendeteksi lokasi dan waktu secara otomatis untuk validasi data.
+    </p>
+  </div>
+</div>
+<script>
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+
+  let streamReady = false;
+
+  // ===== CAMERA INIT =====
+  if (video) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+
+        video.onloadedmetadata = () => {
+          streamReady = true;
+        };
+      })
+      .catch(err => {
+        console.error("Kamera error:", err);
+        alert("Tidak bisa akses kamera");
+      });
+  }
+
+  // ===== GPS FUNCTION =====
+  async function getLocation() {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          resolve({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        (err) => reject(err),
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+        }
+      );
+    });
+  }
+
+  // ===== TAKE PHOTO =====
+  async function takePhoto() {
+    if (!streamReady) {
+      alert("Kamera belum siap");
+      return;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    if (canvas.width === 0 || canvas.height === 0) {
+      alert("Kamera belum siap, coba lagi");
+      return;
+    }
+
+    ctx.drawImage(video, 0, 0);
+
+    canvas.toBlob(async (blob) => {
+      const formData = new FormData();
+
+      const type = document.querySelector("[name=type]").value;
+      const note = document.querySelector("[name=note]").value;
+
+      formData.append("photo", blob, "absensi.png");
+      formData.append("type", type);
+      formData.append("note", note);
+
+      // ===== GPS ONLY DINAS LUAR =====
+      if (type === "DINAS_LUAR") {
+        try {
+          const loc = await getLocation();
+          formData.append("lat", loc.lat);
+          formData.append("lng", loc.lng);
+        } catch (err) {
+          alert("GPS tidak aktif / ditolak");
+          return;
+        }
+      }
+
+      try {
+        const res = await fetch("/attendance/checkin", {
+          method: "POST",
+          body: formData,
+          credentials: "include" // 🔥 PENTING BIAR SESSION KEKIRIM
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("Absen berhasil");
+          location.reload();
+        } else {
+          alert(data.message || "Gagal absen");
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Server error");
+      }
+
+    }, "image/png");
+  }
+</script>

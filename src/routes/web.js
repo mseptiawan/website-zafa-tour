@@ -6,7 +6,8 @@ import {
   dashboard,
   logout,
 } from "../controllers/authController.js";
-import upload from "../middlewares/uploadMiddleware.js";
+import { uploadPhoto } from "../middlewares/uploadPhoto.js";
+import { uploadFile } from "../middlewares/uploadFile.js";
 import {
   showApplyLeave,
   applyLeave,
@@ -34,6 +35,15 @@ import {
   kpiManage,
   kpiReport,
 } from "../controllers/kpiController.js";
+import {
+  index,
+  checkIn,
+  allAttendance,
+  detail,
+  checkOut,
+  history,
+} from "../controllers/attendanceController.js";
+
 const router = express.Router();
 
 /*
@@ -59,7 +69,12 @@ router.get("/dashboard", authMiddleware, dashboard);
 */
 router.get("/leave/apply", authMiddleware, showApplyLeave);
 
-router.post("/leave/apply", authMiddleware, upload.single("file"), applyLeave);
+router.post(
+  "/leave/apply",
+  authMiddleware,
+  uploadFile.single("file"),
+  applyLeave,
+);
 
 router.get("/leave/my", authMiddleware, myLeave);
 router.get("/leave/approval", authMiddleware, approvalPage);
@@ -79,7 +94,7 @@ router.get("/overtime/apply", authMiddleware, showApplyOvertime);
 router.post(
   "/overtime/apply",
   authMiddleware,
-  upload.single("proofFile"),
+  uploadFile.single("proofFile"),
   applyOvertime,
 );
 
@@ -102,5 +117,11 @@ router.post("/kpi/input/:employeeId", submitKpi);
 
 router.get("/kpi/manage", kpiManage);
 router.get("/kpi/report", kpiReport);
+router.get("/attendance", index);
+router.get("/attendance/history", history);
 
+router.post("/attendance/checkin", uploadPhoto.single("photo"), checkIn);
+router.post("/attendance/checkout", checkOut);
+router.get("/attendance/detail/:id", detail);
+router.get("/attendance/all", allAttendance);
 export default router;

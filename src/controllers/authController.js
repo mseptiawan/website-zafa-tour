@@ -1,15 +1,21 @@
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
-const showLogin = (req, res) => {
+
+/* ======================
+   SHOW LOGIN PAGE
+====================== */
+export const showLogin = (req, res) => {
   res.render("auth/login");
 };
-const login = async (req, res) => {
+
+/* ======================
+   LOGIN
+====================== */
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({
-      email,
-    }).populate("roleId");
+    const user = await User.findOne({ email }).populate("roleId");
 
     if (!user) {
       return res.send("User tidak ditemukan");
@@ -21,37 +27,43 @@ const login = async (req, res) => {
       return res.send("Password salah");
     }
 
-    req.session.user = {
-      id: user._id,
-      email: user.email,
-      username: user.email, // FIX (karena fullName tidak ada)
-      role: user.roleId.name,
-    };
+    // 🔥 RESET SESSION BIAR TIDAK KETUKER USER
+    req.session.regenerate((err) => {
+      if (err) return res.send("Session error");
 
-    req.session.save((err) => {
-      if (err) {
-        console.log(err);
-        return res.send("Session gagal");
-      }
+      req.session.user = {
+        _id: user._id,
+        email: user.email,
+        username: user.email,
+        role: user.roleId?.name,
+      };
 
-      res.redirect("/dashboard");
+      req.session.save(() => {
+        return res.redirect("/dashboard");
+      });
     });
   } catch (err) {
     console.log(err);
-
     res.send("Terjadi kesalahan");
   }
 };
-const dashboard = (req, res) => {
+
+/* ======================
+   DASHBOARD
+====================== */
+export const dashboard = (req, res) => {
   res.render("dashboard/index", {
     user: req.session.user,
     title: "Dashboard",
   });
 };
-const logout = (req, res) => {
-  req.session.destroy();
 
-  res.redirect("/");
+/* ======================
+   LOGOUT (FIXED)
+====================== */
+export const logout = (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie("connect.sid");
+    res.redirect("/");
+  });
 };
-
-export { showLogin, login, dashboard, logout };

@@ -1,0 +1,121 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<div class="ml-72 p-6">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Data Absensi Karyawan</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Monitoring kehadiran, keterlambatan, dan aktivitas karyawan
+    </p>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+
+    <!-- TABLE WRAPPER -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+
+        <!-- HEADER -->
+        <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
+          <tr>
+            <th class="p-4 text-left">Karyawan</th>
+            <th class="text-left">Tanggal</th>
+            <th class="text-left">Check In</th>
+            <th class="text-left">Check Out</th>
+            <th class="text-left">Type</th>
+            <th class="text-left">Status</th>
+            <th class="text-left">Foto</th>
+            <th class="text-left">Lokasi</th>
+            <th class="text-left">Aksi</th>
+          </tr>
+        </thead>
+
+        <!-- BODY -->
+        <tbody class="divide-y divide-slate-100">
+
+          <% data.forEach(d => { %>
+            <tr class="hover:bg-slate-50 transition">
+
+              <!-- KARYAWAN -->
+              <td class="p-4 font-medium text-slate-700">
+                <%= d.userId?.email || '-' %>
+              </td>
+
+              <!-- TANGGAL -->
+              <td class="text-slate-600">
+                <%= new Date(d.createdAt).toLocaleDateString('id-ID') %>
+              </td>
+
+              <!-- CHECK IN -->
+              <td class="text-slate-600">
+                <%= d.checkIn ? new Date(d.checkIn).toLocaleTimeString('id-ID') : '-' %>
+              </td>
+
+              <!-- CHECK OUT -->
+              <td class="text-slate-600">
+                <%= d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID') : '-' %>
+              </td>
+
+              <!-- TYPE -->
+              <td>
+                <span class="px-3 py-1 text-xs rounded-full font-medium
+                  <%= d.type === 'DINAS_LUAR'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'bg-slate-100 text-slate-600' %>">
+                  <%= d.type %>
+                </span>
+              </td>
+
+              <!-- STATUS -->
+              <td>
+                <span class="px-3 py-1 text-xs rounded-full font-medium
+                  <%= d.status === 'TELAT'
+                    ? 'bg-red-50 text-red-600'
+                    : 'bg-emerald-50 text-emerald-600' %>">
+                  <%= d.status %>
+                </span>
+              </td>
+
+              <!-- FOTO -->
+              <td>
+                <% if (d.photo) { %>
+                  <img
+                    src="<%= d.photo %>"
+                    class="w-10 h-10 rounded-full object-cover border border-slate-200"
+                  >
+                <% } else { %>
+                  <span class="text-slate-400 text-xs">-</span>
+                <% } %>
+              </td>
+
+              <!-- LOKASI -->
+              <td class="text-slate-500">
+                <% if (d.location && d.location.lat) { %>
+                  <span class="text-xs">📍 Tersedia</span>
+                <% } else { %>
+                  <span class="text-slate-400 text-xs">-</span>
+                <% } %>
+              </td>
+
+              <!-- ACTION -->
+              <td>
+                <a
+                  href="/attendance/detail/<%= d._id %>"
+                  class="inline-flex items-center text-indigo-500 hover:text-indigo-600 text-sm font-medium"
+                >
+                  Detail →
+                </a>
+              </td>
+
+            </tr>
+          <% }) %>
+
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+</div>
