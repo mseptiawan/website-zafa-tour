@@ -1,0 +1,165 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-8">
+
+  <div class="max-w-2xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+      <h1 class="text-2xl text-slate-800">
+        Buat Penugasan
+      </h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Tambahkan tugas / penugasan untuk karyawan
+      </p>
+    </div>
+
+    <!-- CARD -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-3">
+
+        <!-- TITLE -->
+        <div>
+          <label class="text-xs text-slate-500">Judul</label>
+          <input
+            name="title"
+            placeholder="Judul penugasan"
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+          />
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div>
+          <label class="text-xs text-slate-500">Deskripsi</label>
+          <textarea
+            name="description"
+            placeholder="Deskripsi tugas"
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+          ></textarea>
+        </div>
+
+        <!-- TYPE -->
+        <div>
+          <label class="text-xs text-slate-500">Tipe</label>
+          <select
+            name="type"
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+          >
+            <option value="UNDANGAN">Undangan</option>
+            <option value="INTERNAL">Internal</option>
+            <option value="TRAINING">Training</option>
+            <option value="LAINNYA">Lainnya</option>
+          </select>
+        </div>
+
+        <!-- LOCATION -->
+        <div>
+          <label class="text-xs text-slate-500">Lokasi</label>
+          <input
+            name="location"
+            placeholder="Lokasi kegiatan"
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+          />
+        </div>
+
+        <!-- DATE GRID -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-500">Tanggal Mulai</label>
+            <input
+              type="date"
+              name="startDate"
+              class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+            />
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-500">Tanggal Selesai</label>
+            <input
+              type="date"
+              name="endDate"
+              class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+            />
+          </div>
+        </div>
+<div class="space-y-1.5">
+  <label class="text-[13px] text-slate-600 font-normal">
+    Surat Penugasan <span class="text-slate-400">(opsional)</span>
+  </label>
+
+  <div
+    class="relative flex items-center border border-slate-200 rounded-lg bg-white hover:border-slate-300 transition overflow-hidden"
+  >
+    <input
+      type="file"
+      name="attachment"
+      class="w-full text-sm text-slate-500
+      file:mr-4
+      file:border-0
+      file:bg-slate-900
+      file:text-white
+      file:px-4
+      file:py-2.5
+      file:text-sm
+      file:font-normal
+      file:cursor-pointer
+      hover:file:bg-slate-800
+      cursor-pointer"
+    />
+  </div>
+
+  <p class="text-[11px] text-slate-400">
+    Upload PDF atau gambar surat penugasan
+  </p>
+</div>
+        <!-- EMPLOYEES -->
+       <div>
+  <label class="text-xs text-slate-500">Pilih Karyawan</label>
+
+  <div class="mt-2 border border-slate-200 rounded-lg p-3 max-h-60 overflow-y-auto space-y-2">
+
+    <% employees.forEach(e => { %>
+      
+      <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+
+        <input
+          type="checkbox"
+          name="employees"
+          value="<%= e._id %>"
+          class="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-400"
+        />
+
+        <div class="flex flex-col">
+          <span class="text-sm text-slate-700">
+            <%= e.fullName %>
+          </span>
+       <span class="text-[11px] text-slate-400">
+  ID: <%= e.employeeCode || '-' %>
+</span>
+        </div>
+
+      </label>
+
+    <% }) %>
+
+  </div>
+
+  <p class="text-[11px] text-slate-400 mt-1">
+    Klik langsung untuk memilih karyawan
+  </p>
+</div>
+
+        <!-- BUTTON -->
+        <button
+          class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm py-2.5 rounded-lg transition"
+        >
+          Simpan Penugasan
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+</div>

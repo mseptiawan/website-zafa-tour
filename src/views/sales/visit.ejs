@@ -2,10 +2,11 @@
 
 <div class="ml-72 min-h-screen bg-slate-50 p-8">
 
-  <div class="max-w-3xl mx-auto">
+  <div class="max-w-2xl mx-auto">
 
+    <!-- HEADER -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-slate-800">
+      <h1 class="text-2xl text-slate-800">
         Input Sales Visit
       </h1>
       <p class="text-sm text-slate-500 mt-1">
@@ -13,71 +14,80 @@
       </p>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow border">
+    <!-- CARD -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
 
-      <form action="/sales/visit" method="POST" enctype="multipart/form-data" class="space-y-5">
+      <form action="/sales/visit" method="POST" enctype="multipart/form-data" class="space-y-4">
 
-        <!-- Nama Toko / Customer -->
+        <!-- Customer -->
         <div>
-          <label class="text-sm font-medium text-slate-600">Nama Toko / Customer</label>
+          <label class="text-xs text-slate-500">Nama Toko / Customer</label>
           <input
             type="text"
             name="customerName"
-            class="w-full mt-1 p-3 border rounded-lg"
             required
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
         </div>
 
         <!-- Alamat -->
         <div>
-          <label class="text-sm font-medium text-slate-600">Alamat</label>
+          <label class="text-xs text-slate-500">Alamat</label>
           <input
             type="text"
             name="address"
-            class="w-full mt-1 p-3 border rounded-lg"
             required
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
         </div>
 
-        <!-- Orang yang ditemui -->
+        <!-- Meet -->
         <div>
-          <label class="text-sm font-medium text-slate-600">Bertemu Dengan</label>
+          <label class="text-xs text-slate-500">Bertemu Dengan</label>
           <input
             type="text"
             name="meetWith"
-            class="w-full mt-1 p-3 border rounded-lg"
-            placeholder="Nama owner / staff toko"
+            placeholder="Owner / staff toko"
             required
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
         </div>
 
-        <!-- Hasil kunjungan -->
+        <!-- Result -->
         <div>
-          <label class="text-sm font-medium text-slate-600">Hasil Kunjungan</label>
+          <label class="text-xs text-slate-500">Hasil Kunjungan</label>
           <textarea
             name="result"
-            rows="4"
-            class="w-full mt-1 p-3 border rounded-lg"
-            placeholder="Contoh: nego harga, presentasi produk, dll"
+            rows="3"
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
           ></textarea>
         </div>
 
-        <!-- Foto -->
+        <!-- File -->
         <div>
-          <label class="text-sm font-medium text-slate-600">Foto Bukti</label>
-          <input type="file" name="photo" class="w-full mt-1" />
+          <label class="text-xs text-slate-500">Foto Bukti</label>
+          <input
+            type="file"
+            name="photo"
+            class="w-full mt-1 text-sm text-slate-600"
+          />
         </div>
 
-        <!-- Lokasi -->
+        <!-- GPS -->
         <div>
-          <label class="text-sm font-medium text-slate-600">Lokasi GPS</label>
-          <input type="text" name="location" placeholder="lat,lng (auto nanti bisa GPS)" class="w-full mt-1 p-3 border rounded-lg" />
+          <label class="text-xs text-slate-500">Lokasi GPS</label>
+          <input
+            type="text"
+            name="location"
+            placeholder="lat,lng"
+            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+          />
         </div>
 
         <!-- BUTTON -->
         <button
           type="submit"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg"
+          class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm py-2.5 rounded-lg transition"
         >
           Simpan Kunjungan
         </button>

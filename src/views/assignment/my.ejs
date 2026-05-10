@@ -1,0 +1,24 @@
+<%- layout('layouts/main', { title: title }) %>
+<div class="ml-72 p-6">
+  <h1 class="text-lg font-semibold mb-4">Penugasan Saya</h1>
+
+  <div class="space-y-3">
+
+    <% assignments.forEach(a => { %>
+      <a href="/assignment/<%= a._id %>"
+         class="block border p-3 rounded hover:bg-slate-50">
+
+        <div class="font-medium text-sm"><%= a.title %></div>
+        <div class="text-xs text-slate-500">
+          <%= a.location %>
+        </div>
+
+        <div class="text-xs mt-1">
+          Status: <%= a.status %>
+        </div>
+
+      </a>
+    <% }) %>
+
+  </div>
+</div>

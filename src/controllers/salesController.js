@@ -18,26 +18,40 @@ export const visitForm = (req, res) => {
 */
 export const storeVisit = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    const user = req.session.user;
 
-    const { customerName, address, note, result, lat, lng } = req.body;
+    if (!user) {
+      return res.status(401).send("Session tidak valid");
+    }
 
-    // foto bukti kunjungan
-    const photos = req.files?.map((f) => `/uploads/${f.filename}`) || [];
+    const { customerName, address, meetWith, result, note, lat, lng } =
+      req.body;
+
+    // FOTO (bisa multiple atau single)
+    let photos = [];
+
+    if (req.file) {
+      photos.push(`/uploads/${req.file.filename}`);
+    }
+
+    if (req.files && req.files.length > 0) {
+      photos = req.files.map((f) => `/uploads/${f.filename}`);
+    }
 
     const visit = await SalesVisit.create({
-      userId,
+      userId: user._id,
 
       customerName,
       address,
-      note,
+      meetWith,
       result,
+      note,
 
       location:
         lat && lng
           ? {
-              lat,
-              lng,
+              lat: Number(lat),
+              lng: Number(lng),
             }
           : null,
 
@@ -46,17 +60,10 @@ export const storeVisit = async (req, res) => {
       visitTime: new Date(),
     });
 
-    return res.json({
-      success: true,
-      message: "Sales visit berhasil disimpan",
-      data: visit,
-    });
+    return res.redirect("/sales/report");
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    console.log("STORE SALES VISIT ERROR:", err);
+    return res.status(500).send("Gagal menyimpan sales visit");
   }
 };
 

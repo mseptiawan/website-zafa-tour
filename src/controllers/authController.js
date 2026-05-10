@@ -4,6 +4,7 @@ import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 import Leave from "../models/Leave.js";
 import BusinessTrip from "../models/BusinessTrip.js";
+import Announcement from "../models/Announcement.js";
 /* ======================
    SHOW LOGIN PAGE
 ====================== */
@@ -26,6 +27,11 @@ export const login = async (req, res) => {
       return res.redirect("/?error=USER_NOT_FOUND");
     }
 
+    // 🔥 ambil employee
+    const employee = await Employee.findOne({
+      userId: user._id,
+    });
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -33,12 +39,19 @@ export const login = async (req, res) => {
     }
 
     req.session.regenerate((err) => {
-      if (err) return res.redirect("/?error=SESSION_ERROR");
+      if (err) {
+        return res.redirect("/?error=SESSION_ERROR");
+      }
 
       req.session.user = {
         _id: user._id,
+
         email: user.email,
-        username: user.email,
+
+        fullName: employee?.fullName || user.email,
+
+        employeeCode: employee?.employeeCode || "-",
+
         role: user.roleId?.name?.toUpperCase() || "UNKNOWN",
       };
 
@@ -48,6 +61,7 @@ export const login = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
+
     return res.redirect("/?error=SERVER_ERROR");
   }
 };
@@ -59,43 +73,85 @@ export const login = async (req, res) => {
 export const dashboard = async (req, res) => {
   try {
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
 
-    // 🔥 TOTAL KARYAWAN
+    // =========================
+    // SUMMARY
+    // =========================
     const totalEmployee = await Employee.countDocuments();
 
-    // 🔥 HADIR HARI INI
     const hadir = await Attendance.countDocuments({
       checkIn: { $gte: today },
-      status: { $in: ["HADIR", "TELAT"] },
+
+      status: {
+        $in: ["HADIR", "TELAT"],
+      },
     });
 
-    // 🔥 CUTI PENDING/APPROVED
     const cuti = await Leave.countDocuments({
       status: "APPROVED",
     });
 
-    // 🔥 DINAS LUAR PENDING/APPROVED
     const trip = await BusinessTrip.countDocuments({
-      status: { $in: ["PENDING", "APPROVED_MANAGER", "APPROVED_DIRECTOR"] },
+      status: {
+        $in: ["PENDING", "APPROVED_MANAGER", "APPROVED_DIRECTOR"],
+      },
     });
 
-    // 🔥 ABSEN HARI INI DETAIL (opsional)
+    // =========================
+    // ATTENDANCE TODAY
+    // =========================
     const todayAttendance = await Attendance.find({
       checkIn: { $gte: today },
-    }).populate("userId");
+    })
+      .populate("userId")
+      .sort({
+        checkIn: -1,
+      });
 
+    // 🔥 inject employee
+    for (const attendance of todayAttendance) {
+      const employee = await Employee.findOne({
+        userId: attendance.userId?._id,
+      });
+
+      attendance.employee = employee;
+    }
+
+    // =========================
+    // ANNOUNCEMENT
+    // =========================
+    const announcements = await Announcement.find({
+      status: "PUBLISHED",
+    })
+      .populate("createdBy")
+      .sort({
+        isPinned: -1,
+        createdAt: -1,
+      })
+      .limit(5);
+
+    // =========================
+    // RENDER
+    // =========================
     res.render("dashboard/index", {
-      user: req.session.user,
       title: "Dashboard",
+
+      user: req.session.user,
+
       totalEmployee,
       hadir,
       cuti,
       trip,
+
       todayAttendance,
+
+      announcements,
     });
   } catch (err) {
     console.log(err);
+
     res.status(500).send("Dashboard error");
   }
 };

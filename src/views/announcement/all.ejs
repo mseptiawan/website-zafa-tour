@@ -1,0 +1,176 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
+
+  <div class="max-w-5xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex items-end justify-between mb-7">
+
+      <div>
+        <h1 class="text-2xl text-slate-800 tracking-tight">
+          Pengumuman
+        </h1>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Informasi perusahaan dan pemberitahuan internal
+        </p>
+      </div>
+
+      <a
+        href="/announcement/create"
+        class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-lg text-sm transition"
+      >
+        + Buat Pengumuman
+      </a>
+
+    </div>
+
+    <!-- LIST -->
+    <div class="space-y-4">
+
+      <% if(announcements.length > 0) { %>
+
+        <% announcements.forEach(a => { %>
+
+          <a
+            href="/announcement/<%= a._id %>"
+            class="block bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 hover:shadow-sm transition"
+          >
+
+            <div class="flex items-start justify-between gap-5">
+
+              <!-- LEFT -->
+              <div class="flex-1 min-w-0">
+
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+
+                  <% if(a.isPinned) { %>
+
+                    <span
+                      class="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-full text-[10px]"
+                    >
+                      PINNED
+                    </span>
+
+                  <% } %>
+
+                  <% if(a.category === "OFFICIAL") { %>
+
+                    <span
+                      class="bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-full text-[10px]"
+                    >
+                      RESMI
+                    </span>
+
+                  <% } else { %>
+
+                    <span
+                      class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-full text-[10px]"
+                    >
+                      RINGAN
+                    </span>
+
+                  <% } %>
+
+                </div>
+
+                <h2
+                  class="text-[17px] text-slate-800 leading-snug line-clamp-1"
+                >
+                  <%= a.title %>
+                </h2>
+
+                <p
+                  class="text-sm text-slate-500 mt-2 leading-6 line-clamp-2"
+                >
+                  <%= a.content %>
+                </p>
+
+                <div class="mt-4 flex items-center gap-4">
+
+                  <span class="text-[12px] text-slate-400">
+                    Dipublikasikan
+                  </span>
+
+                  <span class="text-[12px] text-slate-500">
+                    <%= new Date(a.createdAt).toLocaleDateString("id-ID", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric"
+                    }) %>
+                  </span>
+
+                </div>
+
+              </div>
+
+              <!-- RIGHT -->
+              <div
+                class="hidden md:flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 text-slate-500"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+
+            </div>
+
+          </a>
+
+        <% }) %>
+
+      <% } else { %>
+
+        <!-- EMPTY -->
+        <div
+          class="bg-white border border-dashed border-slate-300 rounded-2xl p-14 text-center"
+        >
+
+          <div
+            class="w-16 h-16 rounded-2xl bg-slate-100 mx-auto flex items-center justify-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-7 h-7 text-slate-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14-6H5m14 12H5m14 6H5"
+              />
+            </svg>
+          </div>
+
+          <h3 class="mt-5 text-slate-700 text-lg">
+            Belum Ada Pengumuman
+          </h3>
+
+          <p class="text-sm text-slate-400 mt-2">
+            Pengumuman perusahaan akan tampil di halaman ini
+          </p>
+
+        </div>
+
+      <% } %>
+
+    </div>
+
+  </div>
+
+</div>

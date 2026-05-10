@@ -1,0 +1,36 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<div class="ml-72 p-6">
+  <h1 class="text-lg font-semibold"><%= assignment.title %></h1>
+
+  <p class="text-sm text-slate-500">
+    <%= assignment.description %>
+  </p>
+
+  <div class="mt-4 text-sm">
+    <p>Lokasi: <%= assignment.location %></p>
+    <p>Status: <%= assignment.status %></p>
+  </div>
+
+  <div class="mt-4">
+    <h2 class="text-sm font-semibold">Karyawan:</h2>
+    <ul class="text-sm list-disc ml-5">
+      <% assignment.employees.forEach(e => { %>
+        <li><%= e.fullName %></li>
+      <% }) %>
+    </ul>
+  </div>
+  <% if (assignment.attachment) { %>
+  <div class="mt-4">
+    <h2 class="text-sm font-semibold">Surat Penugasan</h2>
+
+    <a
+      href="/uploads/<%= assignment.attachment %>"
+      target="_blank"
+      class="text-indigo-500 text-sm"
+    >
+      Lihat File
+    </a>
+  </div>
+<% } %>
+</div>

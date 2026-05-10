@@ -52,7 +52,25 @@ import {
   allTrips,
   approveDirector,
 } from "../controllers/tripController.js";
-import { salesReport } from "../controllers/salesController.js";
+import {
+  salesReport,
+  visitForm,
+  storeVisit,
+} from "../controllers/salesController.js";
+import {
+  formAssignment,
+  createAssignment,
+  myAssignments,
+  allAssignments,
+  assignmentDetail,
+} from "../controllers/assignmentController.js";
+import {
+  formAnnouncement,
+  createAnnouncement,
+  allAnnouncements,
+  detailAnnouncement,
+  publishAnnouncement,
+} from "../controllers/announcementController.js";
 const router = express.Router();
 
 /*
@@ -159,6 +177,40 @@ router.get("/trip/detail/:id", authMiddleware, tripDetail);
 | SALES VISIT (PLACEHOLDER - nanti kita isi)
 |--------------------------------------------------------------------------
 */
+router.get("/sales/visit", authMiddleware, visitForm);
+router.post(
+  "/sales/visit",
+  authMiddleware,
+  uploadPhoto.array("photo", 5), // bisa banyak foto
+  storeVisit,
+);
 
 router.get("/sales/report", authMiddleware, salesReport);
+router.get("/assignment/create", authMiddleware, formAssignment);
+router.post(
+  "/assignment/create",
+  authMiddleware,
+  uploadFile.single("attachment"),
+  createAssignment,
+);
+
+router.get("/assignment/my", authMiddleware, myAssignments);
+
+router.get("/assignment/all", authMiddleware, allAssignments);
+
+router.get("/assignment/:id", authMiddleware, assignmentDetail);
+router.get("/announcement/create", authMiddleware, formAnnouncement);
+
+router.post(
+  "/announcement/create",
+  authMiddleware,
+  uploadFile.single("attachment"),
+  createAnnouncement,
+);
+
+router.get("/announcement/all", authMiddleware, allAnnouncements);
+
+router.get("/announcement/:id", authMiddleware, detailAnnouncement);
+
+router.post("/announcement/:id/publish", authMiddleware, publishAnnouncement);
 export default router;
