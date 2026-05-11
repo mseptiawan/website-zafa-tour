@@ -8,7 +8,6 @@ import ejsMate from "ejs-mate";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import methodOverride from "method-override";
-
 import session from "express-session";
 import MongoStore from "connect-mongo";
 
@@ -51,7 +50,6 @@ app.use(methodOverride("_method"));
 ========================= */
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
 /* =========================
    SESSION (FIXED CLEAN)
 ========================= */
@@ -88,5 +86,4 @@ app.use((req, res, next) => {
 ========================= */
 app.use("/", webRoutes);
 app.use("/employee", employeeRoute);
-
 export default app;

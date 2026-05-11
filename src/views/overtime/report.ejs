@@ -1,0 +1,221 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
+
+  <div class="max-w-6xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-start mb-6">
+
+      <div>
+        <h1 class="text-xl font-medium text-slate-800">
+          Laporan Lembur
+        </h1>
+        <p class="text-sm text-slate-500 mt-1">
+          Semua data pengajuan lembur karyawan
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+
+      <button
+  onclick="openExportModal()"
+  class="px-3 py-1 bg-green-600 text-white rounded"
+>
+  export Excel
+</button>
+
+
+      </div>
+
+    </div>
+
+    <!-- FILTER -->
+    <form method="GET"
+      class="bg-white border border-slate-200 rounded-xl p-4 mb-5 flex flex-wrap gap-2">
+
+      <input type="text" name="search" placeholder="Cari nama"
+        value="<%= query.search || '' %>"
+        class="border border-slate-200 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+
+      <select name="status"
+        class="border border-slate-200 px-3 py-2 rounded-lg text-sm">
+        <option value="">Semua Status</option>
+        <option value="Pending Manager">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+
+      <select name="sort"
+        class="border border-slate-200 px-3 py-2 rounded-lg text-sm">
+        <option value="desc">Terbaru</option>
+        <option value="asc">Terlama</option>
+      </select>
+
+      <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+        Filter
+      </button>
+
+    </form>
+
+    <!-- SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-sm">
+        <p class="text-slate-500">Total</p>
+        <p class="text-lg font-medium text-slate-800"><%= summary.totalData %></p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-sm">
+        <p class="text-slate-500">Approved</p>
+        <p class="text-lg font-medium text-green-600"><%= summary.approved %></p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-sm">
+        <p class="text-slate-500">Rejected</p>
+        <p class="text-lg font-medium text-red-600"><%= summary.rejected %></p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-sm">
+        <p class="text-slate-500">Pending</p>
+        <p class="text-lg font-medium text-yellow-600"><%= summary.pending %></p>
+      </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full text-sm border-collapse">
+
+          <thead class="bg-yellow-300">
+            <tr class="text-left text-xs text-slate-700">
+
+              <th class="px-3 py-3 font-normal">Karyawan</th>
+              <th class="px-3 py-3 font-normal">Tanggal</th>
+              <th class="px-3 py-3 font-normal">Jam</th>
+              <th class="px-3 py-3 font-normal">Total</th>
+              <th class="px-3 py-3 font-normal">Status</th>
+              <th class="px-3 py-3 font-normal">Aksi</th>
+
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-100">
+
+            <% data.forEach(o => { %>
+            <tr class="hover:bg-slate-50 transition">
+
+              <td class="px-3 py-2 text-slate-700">
+                <%= o.employeeName %>
+              </td>
+
+              <td class="px-3 py-2 text-slate-600">
+                <%= new Date(o.date).toLocaleDateString('id-ID') %>
+              </td>
+
+              <td class="px-3 py-2 text-slate-600">
+                <%= o.startTime %> - <%= o.endTime %>
+              </td>
+
+              <td class="px-3 py-2 text-slate-600">
+                <%= o.totalHours %> jam
+              </td>
+
+              <td class="px-3 py-2">
+                <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-600">
+                  <%= o.status %>
+                </span>
+              </td>
+
+              <td class="px-3 py-2">
+                <button class="text-indigo-600 text-sm hover:underline">
+                  Detail
+                </button>
+              </td>
+
+            </tr>
+            <% }) %>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="mt-4 flex items-center justify-between text-sm text-slate-600">
+
+      <div>
+        Page <%= pagination.page %> / <%= pagination.totalPages %>
+      </div>
+
+      <div class="flex gap-2">
+
+        <a href="?page=<%= pagination.page - 1 %>"
+           class="px-3 py-1 border rounded-lg hover:bg-slate-100">
+          Prev
+        </a>
+
+        <a href="?page=<%= pagination.page + 1 %>"
+           class="px-3 py-1 border rounded-lg hover:bg-slate-100">
+          Next
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="exportModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="bg-white w-[360px] rounded-xl p-5 shadow-lg">
+
+    <h2 class="text-sm font-semibold mb-4">Export Excel</h2>
+
+    <form id="exportForm" method="GET" action="/report/overtime/export/excel" class="space-y-3">
+
+      <div>
+        <label class="text-xs text-slate-500">Tanggal Mulai</label>
+        <input type="date" name="startDate" class="w-full border p-2 rounded text-sm" required />
+      </div>
+
+      <div>
+        <label class="text-xs text-slate-500">Tanggal Akhir</label>
+        <input type="date" name="endDate" class="w-full border p-2 rounded text-sm" required />
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+
+        <button type="button" onclick="closeExportModal()"
+          class="px-3 py-1 text-sm bg-slate-200 rounded">
+          Batal
+        </button>
+
+        <button type="submit"
+          class="px-3 py-1 text-sm bg-green-600 text-white rounded">
+          Export
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div><script>
+  function openExportModal() {
+    document.getElementById("exportModal").classList.remove("hidden");
+  }
+
+  function closeExportModal() {
+    document.getElementById("exportModal").classList.add("hidden");
+  }
+</script>

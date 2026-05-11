@@ -7,6 +7,7 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "tw": "npx @tailwindcss/cli -i ./src/public/css/input.css -o ./src/public/css/output.css --watch",
+    "seed:overtime": "node src/database/seeders/seedOvertime.js",
     "seed": "node src/database/seeders/index.js",
     "seed:role": "node src/database/seeders/roleSeeder.js",
     "seed:bidang": "node src/database/seeders/bidangSeeder.js",
@@ -26,6 +27,7 @@
     "dotenv": "^17.4.2",
     "ejs": "^5.0.2",
     "ejs-mate": "^4.0.0",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",
     "express-session": "^1.19.0",
@@ -36,6 +38,7 @@
     "mongoose": "^9.6.1",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.7",
+    "puppeteer": "^24.43.1",
     "redis": "^5.12.1",
     "uuid": "^14.0.0"
   },

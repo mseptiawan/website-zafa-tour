@@ -73,6 +73,7 @@ import {
   detailAnnouncement,
   publishAnnouncement,
 } from "../controllers/announcementController.js";
+import { getReportPage, exportExcel, exportPDF } from "../controllers/overtimeReportController.js";
 import {
   formExpense,
   createExpense,
@@ -178,6 +179,11 @@ router.post(
   roleMiddleware(["MANAGER"]),
   rejectOvertime
 );
+
+router.get("/report/overtime", authMiddleware, getReportPage);
+router.get("/report/overtime/export/excel", authMiddleware, exportExcel);
+router.get("/report/export/pdf", authMiddleware, exportPDF);
+
 router.get("/kpi/input", roleMiddleware(["HR"]), kpiEmployeeList);
 
 router.get("/kpi/input/:employeeId", roleMiddleware(["HR"]), kpiForm);

@@ -15,6 +15,50 @@ export const applyOvertime = async (req, res) => {
   try {
     const { date, startTime, endTime, workDescription, result } = req.body;
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI FIELD WAJIB
+    |--------------------------------------------------------------------------
+    */
+
+    if (!date || !startTime || !endTime || !workDescription) {
+      return res.send("Semua field wajib diisi");
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI DESKRIPSI PEKERJAAN
+    |--------------------------------------------------------------------------
+    */
+
+    if (workDescription.trim().length < 10) {
+      return res.send("Deskripsi pekerjaan minimal 10 karakter");
+    }
+
+    if (workDescription.trim().length > 500) {
+      return res.send("Deskripsi pekerjaan maksimal 500 karakter");
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI HASIL PEKERJAAN
+    |--------------------------------------------------------------------------
+    */
+
+    if (result && result.trim().length < 10) {
+      return res.send("Hasil pekerjaan minimal 10 karakter");
+    }
+
+    if (result && result.trim().length > 500) {
+      return res.send("Hasil pekerjaan maksimal 500 karakter");
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI JAM
+    |--------------------------------------------------------------------------
+    */
+
     const start = new Date(`${date}T${startTime}`);
     const end = new Date(`${date}T${endTime}`);
 
@@ -22,35 +66,79 @@ export const applyOvertime = async (req, res) => {
       return res.send("Jam selesai harus lebih besar dari jam mulai");
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | HITUNG TOTAL JAM
+    |--------------------------------------------------------------------------
+    */
+
     const diffMs = end - start;
+
     const totalHours = diffMs / (1000 * 60 * 60);
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI TOTAL JAM
+    |--------------------------------------------------------------------------
+    */
+
+    if (totalHours > 12) {
+      return res.send("Lembur maksimal 12 jam");
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | USER SESSION
+    |--------------------------------------------------------------------------
+    */
 
     const user = req.session.user;
 
     const isManager = user.role === "MANAGER";
 
+    /*
+    |--------------------------------------------------------------------------
+    | SIMPAN DATA
+    |--------------------------------------------------------------------------
+    */
+
     await Overtime.create({
       userId: user._id,
+
       employeeName: user.fullName,
+
       date,
+
       startTime,
+
       endTime,
+
       totalHours,
-      workDescription,
-      result,
+
+      workDescription: workDescription.trim(),
+
+      result: result ? result.trim() : "",
+
       proofFile: req.file ? req.file.filename : null,
 
       status: isManager ? "Approved" : "Pending Manager",
+
       approvedByManager: isManager ? true : false,
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | REDIRECT
+    |--------------------------------------------------------------------------
+    */
 
     return res.redirect("/overtime/my");
   } catch (err) {
     console.log(err);
-    res.send(err.message);
+
+    return res.send(err.message);
   }
 };
-
 // ==========================
 // MY OVERTIME
 // ==========================
