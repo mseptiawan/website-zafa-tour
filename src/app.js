@@ -3,6 +3,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import employeeRoute from "./routes/employeeRoute.js";
+import { attachPermissions } from "./middlewares/permission.middleware.js";
 import ejsMate from "ejs-mate";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -59,6 +60,7 @@ app.use(sessionMiddleware);
    INJECT USER (WAJIB SETELAH SESSION)
 ========================= */
 app.use(injectUser);
+app.use(attachPermissions);
 
 /* =========================
    STATIC FILES (FIXED)

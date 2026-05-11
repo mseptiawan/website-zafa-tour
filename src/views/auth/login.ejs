@@ -6,6 +6,8 @@
   <title>Zafa Tour</title>
 
   <link rel="stylesheet" href="/css/output.css" />
+  <!-- Tambahkan CDN Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
     body {
@@ -15,9 +17,9 @@
       height: 100vh;
       display: flex;
     }
-.submit{
-  background: #1e2d41;
-}
+    .submit{
+      background: #1e2d41;
+    }
     .wrapper {
       width: 950px;
       margin: auto;
@@ -43,7 +45,6 @@
       max-width: 350px;
       object-fit: contain;
     }
-    
 
     /* RIGHT SIDE */
     .right {
@@ -77,10 +78,29 @@
       border-radius: 8px;
       font-size: 14px;
       outline: none;
+      width: 100%; /* Pastikan input memenuhi container */
+      box-sizing: border-box;
     }
 
     input:focus {
       border-color: #2563eb;
+    }
+
+    /* Style Tambahan untuk Password Wrapper */
+    .password-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #64748b;
+      display: flex;
+      align-items: center;
     }
 
     button {
@@ -112,15 +132,17 @@
       color: #475569;
     }
 
+    .options input[type="checkbox"] {
+        width: auto;
+    }
+
     a {
       color: #2563eb;
       text-decoration: none;
     }
 
     .error {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #e65d5d;
+      color: #d11414;
       padding: 10px;
       border-radius: 8px;
       font-size: 12px;
@@ -155,13 +177,13 @@
 
     <!-- LEFT IMAGE -->
     <div class="left">
-      <img src="/images/zafa.png" alt="Zafa Tour"  class=""/>
+      <img src="/images/zafa.png" alt="Zafa Tour" class=""/>
     </div>
 
     <!-- RIGHT FORM -->
     <div class="right">
 
-      <div class="title">
+      <div class="title font-medium">
         <h1>Zafa Tour</h1>
         <p>Sistem Informasi Kepegawaian Terintegrasi</p>
       </div>
@@ -181,11 +203,18 @@
           placeholder="Username atau Email"
         />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-        />
+        <!-- PASSWORD FIELD DENGAN TOGGLE -->
+        <div class="password-container">
+          <input
+            id="passwordInput"
+            type="password"
+            name="password"
+            placeholder="Password"
+          />
+          <span class="toggle-password" id="toggleIcon">
+            <i data-lucide="eye"></i>
+          </span>
+        </div>
 
         <div class="options">
 
@@ -207,6 +236,34 @@
     </div>
 
   </div>
+
+  <script>
+    // Inisialisasi Lucide Icons
+  lucide.createIcons({
+    attrs: {
+        width: 18,
+        height: 18,
+        'stroke-width': 2 // Ketebalan garis icon
+    }
+});
+
+    const passwordInput = document.getElementById('passwordInput');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    toggleIcon.addEventListener('click', () => {
+      // Toggle tipe input
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+
+      // Ganti icon (Eye ke EyeOff atau sebaliknya)
+      toggleIcon.innerHTML = isPassword 
+        ? '<i data-lucide="eye-off"></i>' 
+        : '<i data-lucide="eye"></i>';
+      
+      // Render ulang icon baru
+      lucide.createIcons();
+    });
+  </script>
 
 </body>
 </html>

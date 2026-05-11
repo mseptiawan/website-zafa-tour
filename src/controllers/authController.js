@@ -1,7 +1,8 @@
 import { redisClient } from "../config/redis.js";
-import { mailer } from "../utils/email.js";
+import transporter from "../config/mailer.js";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
+import crypto from "crypto";
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 import Leave from "../models/Leave.js";
@@ -215,105 +216,86 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-export const requestOtp = async (req, res) => {
+export const requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
 
-    // =========================
-    // DEBUG INPUT
-    // =========================
-    console.log("=== REQUEST OTP START ===");
-    console.log("EMAIL INPUT:", email);
-
-    if (!email) {
-      console.log("EMAIL EMPTY");
-      return res.redirect("/forgot-password?error=INVALID_EMAIL");
-    }
-
-    // normalize email biar tidak case-sensitive issue
-    const cleanEmail = email.toLowerCase().trim();
-    console.log("CLEAN EMAIL:", cleanEmail);
-
-    // =========================
-    // CHECK USER
-    // =========================
-    const user = await User.findOne({ email: cleanEmail });
-
-    console.log("USER FOUND:", user ? "YES" : "NO");
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.redirect("/forgot-password?error=EMAIL_NOT_FOUND");
     }
 
-    // =========================
-    // GENERATE OTP
-    // =========================
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    // generate token random
+    const token = crypto.randomBytes(32).toString("hex");
 
-    console.log("OTP GENERATED:", otp);
+    // simpan token di redis (15 menit)
+    await redisClient.setEx(`reset:${token}`, 900, user.email);
 
-    // =========================
-    // CHECK REDIS STATUS
-    // =========================
-    console.log("REDIS OPEN:", redisClient.isOpen);
+    // link reset password
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
 
-    // =========================
-    // SEND EMAIL FIRST (lebih aman)
-    // =========================
-    console.log("SENDING EMAIL TO:", cleanEmail);
-
-    await mailer.sendMail({
+    // kirim email
+    await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: cleanEmail,
-      subject: "OTP Reset Password",
-      text: `Kode OTP kamu adalah: ${otp}. Berlaku 5 menit.`,
+      to: email,
+      subject: "Reset Password",
+      text: `Klik link ini untuk reset password: ${resetLink}`,
     });
 
-    console.log("EMAIL SENT SUCCESS");
-
-    // =========================
-    // STORE OTP IN REDIS
-    // =========================
-    await redisClient.setEx(`otp:${cleanEmail}`, 300, otp.toString());
-
-    console.log("OTP SAVED TO REDIS");
-
-    console.log("=== REQUEST OTP SUCCESS ===");
-
-    return res.redirect(`/verify-otp?email=${cleanEmail}`);
+    return res.redirect("/forgot-password?success=EMAIL_SENT");
   } catch (err) {
-    console.error("=== REQUEST OTP ERROR ===");
-    console.error(err);
-
+    console.log(err);
     return res.redirect("/forgot-password?error=SERVER_ERROR");
   }
 };
+export const showResetPasswordPage = async (req, res) => {
+  const { token } = req.query;
 
-export const verifyOtp = async (req, res) => {
+  if (!token) {
+    return res.redirect("/forgot-password");
+  }
+
+  const email = await redisClient.get(`reset:${token}`);
+
+  if (!email) {
+    return res.send("Token expired atau tidak valid");
+  }
+
+  res.render("auth/reset-password", {
+    token,
+    query: req.query || {},
+  });
+};
+
+export const handleResetPassword = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { token, password, confirmPassword } = req.body;
 
-    if (!email) {
+    if (!token) {
       return res.redirect("/forgot-password");
     }
 
-    const storedOtp = await redisClient.get(`otp:${email}`);
-
-    if (!storedOtp) {
-      return res.redirect(`/verify-otp?email=${email}&error=OTP_EXPIRED`);
+    if (password !== confirmPassword) {
+      return res.redirect(`/reset-password?token=${token}&error=PASSWORD_MISMATCH`);
     }
 
-    if (storedOtp !== otp) {
-      return res.redirect(`/verify-otp?email=${email}&error=INVALID_OTP`);
+    const email = await redisClient.get(`reset:${token}`);
+
+    if (!email) {
+      return res.redirect("/forgot-password?error=TOKEN_EXPIRED");
     }
 
-    await redisClient.del(`otp:${email}`);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    req.session.resetEmail = email;
+    await User.updateOne({ email }, { $set: { password: hashedPassword } });
 
-    return res.redirect("/reset-password");
+    // hapus token
+    await redisClient.del(`reset:${token}`);
+
+    return res.redirect("/?success=PASSWORD_CHANGED");
   } catch (err) {
     console.log(err);
-    return res.redirect("/verify-otp?error=SERVER_ERROR");
+    return res.redirect("/reset-password?error=SERVER_ERROR");
   }
 };

@@ -6,8 +6,9 @@ import {
   dashboard,
   logout,
   showForgotPassword,
-  requestOtp,
-  verifyOtp,
+  requestPasswordReset,
+  showResetPasswordPage,
+  handleResetPassword,
   resetPassword,
 } from "../controllers/authController.js";
 import { uploadPhoto } from "../middlewares/uploadPhoto.js";
@@ -91,17 +92,14 @@ const router = express.Router();
 router.get("/", showLogin);
 router.post("/login", login);
 router.get("/logout", logout);
-router.get("/forgot-password", showForgotPassword);
-router.post("/forgot-password", requestOtp);
-router.get("/verify-otp", (req, res) => {
-  res.render("auth/verify-otp");
-});
-router.post("/verify-otp", verifyOtp);
-router.get("/reset-password", (req, res) => {
-  res.render("auth/reset-password");
-});
-router.post("/reset-password", resetPassword);
 
+// forgot password
+router.get("/forgot-password", showForgotPassword);
+router.post("/forgot-password", requestPasswordReset);
+
+// reset password page (via link)
+router.get("/reset-password", showResetPasswordPage);
+router.post("/reset-password", handleResetPassword);
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD
@@ -199,7 +197,7 @@ router.get("/trip/my", authMiddleware, myTrips);
 | APPROVAL FLOW (HR / MANAGER / DIRECTOR)
 |--------------------------------------------------------------------------
 */
-router.get("/trip/all", roleMiddleware(["HR", "MANAGER"]), allTrips);
+router.get("/trip/all", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), allTrips);
 // approval manager
 router.post(
   "/trip/:id/approve/manager",

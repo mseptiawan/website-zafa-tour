@@ -42,7 +42,7 @@ const userSeeder = async () => {
       username: "gustidiansyah",
       email: "gustidiansyah@gmail.com",
       password,
-      roleId: karyawanRole._id,
+      roleId: pimpinanRole._id,
     },
     { username: "willycauza", email: "willycauza@gmail.com", password, roleId: karyawanRole._id },
 
