@@ -144,17 +144,38 @@ export const applyOvertime = async (req, res) => {
 // ==========================
 export const myOvertime = async (req, res) => {
   try {
-    console.log("SESSION USER:", req.session.user._id);
+    const userId = req.session.user._id;
 
-    const overtimes = await Overtime.find({
-      userId: req.session.user._id,
-    }).sort({
-      createdAt: -1,
+    // page dari query
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // jumlah data per halaman
+    const skip = (page - 1) * limit;
+
+    // total data
+    const totalData = await Overtime.countDocuments({
+      userId: userId,
     });
+
+    const totalPages = Math.ceil(totalData / limit);
+
+    // data paginated
+    const overtimes = await Overtime.find({
+      userId: userId,
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.render("overtime/my-overtime", {
       title: "Riwayat Lembur",
       overtimes,
+      pagination: {
+        page,
+        totalPages,
+        totalData,
+        hasPrev: page > 1,
+        hasNext: page < totalPages,
+      },
     });
   } catch (err) {
     console.log(err);
