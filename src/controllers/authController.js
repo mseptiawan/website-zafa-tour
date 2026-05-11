@@ -19,9 +19,11 @@ export const showLogin = (req, res) => {
 ====================== */
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { identifier, password, remember } = req.body;
 
-    const user = await User.findOne({ username }).populate("roleId");
+    const user = await User.findOne({
+      $or: [{ username: identifier }, { email: identifier }],
+    }).populate("roleId");
 
     if (!user) {
       return res.redirect("/?error=USER_NOT_FOUND");
@@ -33,26 +35,30 @@ export const login = async (req, res) => {
       return res.redirect("/?error=INVALID_PASSWORD");
     }
 
-    // 🔥 cari employee berdasarkan user
     const employee = await Employee.findOne({
       userId: user._id,
     });
 
     req.session.regenerate((err) => {
-      if (err) {
-        return res.redirect("/?error=SESSION_ERROR");
-      }
+      if (err) return res.redirect("/?error=SESSION_ERROR");
 
       req.session.user = {
         _id: user._id,
         username: user.username,
-
-        // 🔥 tambahkan ini
+        email: user.email,
         fullName: employee?.fullName || user.username,
         employeeId: employee?._id || null,
-
         role: user.roleId?.name?.toUpperCase() || "UNKNOWN",
       };
+
+      // =========================
+      // REMEMBER ME (3 DAYS)
+      // =========================
+      if (remember) {
+        req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000; // 3 hari
+      } else {
+        req.session.cookie.expires = false; // session cookie
+      }
 
       req.session.save(() => {
         return res.redirect("/dashboard");
@@ -160,5 +166,11 @@ export const logout = (req, res) => {
   req.session.destroy(() => {
     res.clearCookie("connect.sid");
     res.redirect("/");
+  });
+};
+
+export const showForgotPassword = (req, res) => {
+  res.render("auth/forgot-password", {
+    query: req.query || {},
   });
 };

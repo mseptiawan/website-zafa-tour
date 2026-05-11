@@ -1,6 +1,12 @@
 import express from "express";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
-import { showLogin, login, dashboard, logout } from "../controllers/authController.js";
+import {
+  showLogin,
+  login,
+  dashboard,
+  logout,
+  showForgotPassword,
+} from "../controllers/authController.js";
 import { uploadPhoto } from "../middlewares/uploadPhoto.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
 import {
@@ -82,7 +88,7 @@ const router = express.Router();
 router.get("/", showLogin);
 router.post("/login", login);
 router.get("/logout", logout);
-
+router.get("/forgot-password", showForgotPassword);
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD

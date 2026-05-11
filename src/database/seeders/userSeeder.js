@@ -15,42 +15,87 @@ const userSeeder = async () => {
 
   const users = await User.insertMany([
     // ================= PIMPINAN =================
-    { username: "rafikafitrianti", password, roleId: pimpinanRole._id },
+    {
+      username: "rafikafitrianti",
+      email: "rafikafitrianti@gmail.com",
+      password,
+      roleId: pimpinanRole._id,
+    },
 
     // ================= HR =================
-    { username: "duwihartati", password, roleId: hrRole._id },
+    { username: "duwihartati", email: "mseptiawan017@gmail.com", password, roleId: hrRole._id },
 
     // ================= MANAGER =================
-    { username: "ronaldrizky", password, roleId: managerRole._id },
-    { username: "meltisundari", password, roleId: managerRole._id },
+    { username: "ronaldrizky", email: "ronaldrizky@gmail.com", password, roleId: managerRole._id },
+    {
+      username: "meltisundari",
+      email: "meltisundari@gmail.com",
+      password,
+      roleId: managerRole._id,
+    },
+
     // ================= KEUANGAN =================
-    { username: "fadhilah", password, roleId: keuanganRole._id },
+    { username: "fadhilah", email: "fadhilah@gmail.com", password, roleId: keuanganRole._id },
 
     // ================= EMPLOYEE =================
-    { username: "gustidiansyah", password, roleId: karyawanRole._id },
-    { username: "willycauza", password, roleId: karyawanRole._id },
+    {
+      username: "gustidiansyah",
+      email: "gustidiansyah@gmail.com",
+      password,
+      roleId: karyawanRole._id,
+    },
+    { username: "willycauza", email: "willycauza@gmail.com", password, roleId: karyawanRole._id },
 
-    { username: "mriskywindinata", password, roleId: karyawanRole._id },
-    { username: "lilymustikasari", password, roleId: karyawanRole._id },
-    { username: "febriansyah", password, roleId: karyawanRole._id },
-    { username: "adindarismayani", password, roleId: karyawanRole._id },
-    { username: "fajarjaniko", password, roleId: karyawanRole._id },
-    { username: "rendijalil", password, roleId: karyawanRole._id },
-    { username: "abdulaziz", password, roleId: karyawanRole._id },
-    { username: "basoherman", password, roleId: karyawanRole._id },
-    { username: "ongkidwi", password, roleId: karyawanRole._id },
-    { username: "sarwanto", password, roleId: karyawanRole._id },
-    { username: "dirasuhada", password, roleId: karyawanRole._id },
-    { username: "muliaeka", password, roleId: karyawanRole._id },
-    { username: "dinaanggraini", password, roleId: karyawanRole._id },
-    { username: "nurul", password, roleId: karyawanRole._id },
-    { username: "arifsuprastiyo", password, roleId: karyawanRole._id },
-    { username: "deckycaprianus", password, roleId: karyawanRole._id },
-    { username: "adikurniadi", password, roleId: karyawanRole._id },
-    { username: "nicoyudhira", password, roleId: karyawanRole._id },
-    { username: "mariani", password, roleId: karyawanRole._id },
-    { username: "adipuja", password, roleId: karyawanRole._id },
-
+    {
+      username: "mriskywindinata",
+      email: "mriskywindinata@gmail.com",
+      password,
+      roleId: karyawanRole._id,
+    },
+    {
+      username: "lilymustikasari",
+      email: "lilymustikasari@gmail.com",
+      password,
+      roleId: karyawanRole._id,
+    },
+    { username: "febriansyah", email: "febriansyah@gmail.com", password, roleId: karyawanRole._id },
+    {
+      username: "adindarismayani",
+      email: "adindarismayani@gmail.com",
+      password,
+      roleId: karyawanRole._id,
+    },
+    { username: "fajarjaniko", email: "fajarjaniko@gmail.com", password, roleId: karyawanRole._id },
+    { username: "rendijalil", email: "rendijalil@gmail.com", password, roleId: karyawanRole._id },
+    { username: "abdulaziz", email: "abdulaziz@gmail.com", password, roleId: karyawanRole._id },
+    { username: "basoherman", email: "basoherman@gmail.com", password, roleId: karyawanRole._id },
+    { username: "ongkidwi", email: "ongkidwi@gmail.com", password, roleId: karyawanRole._id },
+    { username: "sarwanto", email: "sarwanto@gmail.com", password, roleId: karyawanRole._id },
+    { username: "dirasuhada", email: "dirasuhada@gmail.com", password, roleId: karyawanRole._id },
+    { username: "muliaeka", email: "muliaeka@gmail.com", password, roleId: karyawanRole._id },
+    {
+      username: "dinaanggraini",
+      email: "dinaanggraini@gmail.com",
+      password,
+      roleId: karyawanRole._id,
+    },
+    { username: "nurul", email: "nurul@gmail.com", password, roleId: karyawanRole._id },
+    {
+      username: "arifsuprastiyo",
+      email: "arifsuprastiyo@gmail.com",
+      password,
+      roleId: karyawanRole._id,
+    },
+    {
+      username: "deckycaprianus",
+      email: "deckycaprianus@gmail.com",
+      password,
+      roleId: karyawanRole._id,
+    },
+    { username: "adikurniadi", email: "adikurniadi@gmail.com", password, roleId: karyawanRole._id },
+    { username: "nicoyudhira", email: "nicoyudhira@gmail.com", password, roleId: karyawanRole._id },
+    { username: "mariani", email: "mariani@gmail.com", password, roleId: karyawanRole._id },
+    { username: "adipuja", email: "adipuja@gmail.com", password, roleId: karyawanRole._id },
   ]);
 
   console.log("User seeded");
