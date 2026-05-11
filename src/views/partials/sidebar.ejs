@@ -33,7 +33,7 @@
   </div>
 
   <!-- NAVIGATION -->
-  <nav class="flex-1 overflow-y-auto scrollbar-hide px-4 py-6 space-y-7 pb-10">
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto scrollbar-hide px-4 py-6 space-y-7 pb-10">
     <!-- DASHBOARD -->
     <a
       href="/dashboard"
@@ -71,7 +71,7 @@
   <div class="space-y-1">
 
    
-    <details class="group outline-none">
+    <details class="group outline-none" data-menu="karyawan">
 
       <summary
         class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
@@ -123,14 +123,14 @@
 
         <a
           href="/employee"
-          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
         >
           Data Karyawan
         </a>
 
         <a
           href="/employee/create"
-          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
         >
           Tambah Karyawan
         </a>
@@ -154,7 +154,7 @@
         Kinerja & Tugas
       </p>
       <div class="space-y-1">
-        <details class="group outline-none">
+        <details class="group outline-none" data-menu="kpi">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
           >
@@ -196,12 +196,12 @@
           >
             <a
               href="/kpi/input"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Input KPI</a
             >
             <a
               href="/kpi/manage"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Kelola KPI</a
             >
           </div>
@@ -220,7 +220,7 @@
 
       <div class="space-y-1">
         <!-- CUTI -->
-        <details class="group outline-none">
+        <details class="group outline-none" data-menu="leave">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
           >
@@ -263,7 +263,7 @@
           <% if (user.permissions.leave_request) { %>
             <a
               href="/leave/apply"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Ajukan</a
             >
           <% } %>
@@ -271,7 +271,7 @@
           
             <a
               href="/leave/my"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Riwayat cuti</a
             >
           <% } %>
@@ -280,7 +280,7 @@
             
             <a
               href="/leave/approval"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Approval</a
             >
           <% } %>
@@ -289,7 +289,7 @@
     
 
         <!-- LEMBUR -->
-        <details class="group outline-none">
+        <details class="group outline-none" data-menu="overtime">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
           >
@@ -332,34 +332,38 @@
           <% if (user.permissions.overtime_request) { %>
             <a
               href="/overtime/apply"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Ajukan Lembur</a
             >
           <% } %>
           <% if (user.permissions.overtime_my) { %>
             <a
               href="/overtime/my"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Riwayat Lembur</a
             >
           <% } %>
           <% if (user.permissions.overtime_approval) { %>
             <a
               href="/overtime/approval"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Pengajuan Masuk</a
             >
             <% } %>
+          <% if (user.permissions.overtime_approval_history) { %>
+            
               <a
               href="/overtime/approval/history"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Riwayat Pengajuan</a
             >
+            <% } %>
+
           </div>
         </details>
       </div>
       <div class="space-y-1">
-        <details class="group outline-none">
+        <details class="group outline-none" data-menu="attendance">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
           >
@@ -405,14 +409,14 @@
           >
             <a
               href="/attendance"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Input Absensi
             </a>
 
             <a
               href="/attendance/history"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Riwayat Absensi
             </a>
@@ -421,7 +425,7 @@
 ) { %>
             <a
               href="/attendance/all"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Data Absensi
             </a>
@@ -440,7 +444,7 @@
 
       <div class="space-y-1">
         <!-- DINAS LUAR -->
-        <details class="group outline-none">
+        <details class="group outline-none" data-menu="trip">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
           >
@@ -486,14 +490,14 @@
           >
             <a
               href="/trip/request"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Pengajuan Dinas Luar
             </a>
 
             <a
               href="/trip/my"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Perjalanan Saya
             </a>
@@ -504,7 +508,7 @@
 ) { %>
             <a
               href="/trip/all"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Persetujuan Dinas
             </a>
@@ -513,7 +517,7 @@
         </details>
 
         <!-- SALES VISIT -->
-        <details class="group outline-none">
+        <details class="group outline-none" data-menu="sales">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
           >
@@ -559,7 +563,7 @@
           >
             <a
               href="/sales/visit"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Input Kunjungan
             </a>
@@ -570,7 +574,7 @@
 ) { %>
             <a
               href="/sales/report"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
               Laporan Sales
             </a>
@@ -591,7 +595,7 @@
 
         <div class="space-y-1">
           <!-- PENGUMUMAN -->
-          <details class="group outline-none">
+          <details class="group outline-none" data-menu="announcement">
             <summary
               class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
             >
@@ -641,7 +645,7 @@
               <!-- BUAT -->
               <a
                 href="/announcement/create"
-                class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+                class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
               >
                 Buat Pengumuman
               </a>
@@ -649,7 +653,7 @@
               <!-- SEMUA -->
               <a
                 href="/announcement/all"
-                class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+                class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
               >
                 Semua Pengumuman
               </a>
@@ -658,7 +662,7 @@
         </div>
       </section>
       <!-- PENUGASAN -->
-      <details class="group outline-none">
+      <details class="group outline-none" data-menu="assignment">
         <summary
           class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
         >
@@ -708,7 +712,7 @@
 ) { %>
           <a
             href="/assignment/create"
-            class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
           >
             Buat Penugasan
           </a>
@@ -716,7 +720,7 @@
           <!-- PENUGASAN SAYA -->
           <a
             href="/assignment/my"
-            class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
           >
             Penugasan Saya
           </a>
@@ -725,7 +729,7 @@
           <!-- MONITORING -->
           <a
             href="/assignment/all"
-            class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
           >
             Semua Penugasan
           </a>
@@ -741,7 +745,7 @@
 
       <div class="space-y-1">
         <!-- EXPENSE CLAIM -->
-        <details class="group outline-none">
+        <details class="group outline-none" data-menu="expense">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
           >
@@ -791,7 +795,7 @@
             <!-- AJUKAN -->
             <a
               href="/expense/create"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
             >
               Ajukan Klaim
             </a>
@@ -799,7 +803,7 @@
             <!-- KLAIM SAYA -->
             <a
               href="/expense/my"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
             >
               Klaim Saya
             </a>
@@ -812,7 +816,7 @@
 
 <a
   href="/expense/approval/manager"
-  class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
 >
   Approval Manager
 </a>
@@ -823,7 +827,7 @@
 
 <a
   href="/expense/finance"
-  class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
 >
   Validasi Finance
 </a>
@@ -838,7 +842,7 @@
 ) { %>
             <a
               href="/expense/all"
-              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
             >
               Semua Klaim
             </a>
@@ -857,7 +861,7 @@
   <div class="space-y-1">
 
     <!-- LAPORAN -->
-    <details class="group outline-none">
+    <details class="group outline-none" data-menu="report">
       <summary
         class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
       >
@@ -908,7 +912,7 @@
         <% if (user.permissions.report_kpi) { %>
         <a
           href="/report/kpi"
-          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
         >
           Laporan KPI
         </a>
@@ -918,7 +922,7 @@
         <% if (user.permissions.report_leave) { %>
         <a
           href="/report/leave"
-          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
         >
           Laporan Cuti
         </a>
@@ -928,7 +932,7 @@
         <% if (user.permissions.report_overtime) { %>
         <a
           href="/report/overtime"
-          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
         >
           Laporan Lembur
         </a>
@@ -938,7 +942,7 @@
         <% if (user.permissions.report_attendance) { %>
         <a
           href="/report/attendance"
-          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
         >
           Laporan Absensi
         </a>

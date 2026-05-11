@@ -8,6 +8,7 @@
       <h1 class="text-xl font-medium text-slate-800">
         Approval Lembur
       </h1>
+
       <p class="text-sm text-slate-500 mt-1">
         Kelola persetujuan lembur karyawan
       </p>
@@ -36,11 +37,12 @@
           <tbody class="divide-y divide-slate-100">
 
             <% overtimes.forEach(o => { %>
+
               <tr class="hover:bg-slate-50">
 
                 <!-- KARYAWAN -->
                 <td class="py-3 px-3 text-slate-700">
-             <%= o.employeeName %>
+                  <%= o.employeeName %>
                 </td>
 
                 <!-- TANGGAL -->
@@ -69,18 +71,32 @@
                 <td class="py-3 px-3">
                   <div class="flex justify-center gap-2">
 
+                    <!-- DETAIL -->
+                    <a
+                      href="/overtime/<%= o._id %>"
+                      class="text-xs px-3 py-1.5 rounded border border-slate-200 text-slate-600 hover:bg-slate-100"
+                    >
+                      Detail
+                    </a>
+
+                    <!-- APPROVE -->
                     <% if(o.status === 'Pending Manager'){ %>
+
                       <form action="/overtime/approval/<%= o._id %>/manager" method="POST">
-                        <button class="text-xs px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-700">
+                        <button
+                          class="text-xs px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-700"
+                        >
                           Approve
                         </button>
                       </form>
+
                     <% } %>
 
                   </div>
                 </td>
 
               </tr>
+
             <% }) %>
 
           </tbody>

@@ -22,4 +22,66 @@
       <main class="flex-1 p-10"><%- body -%></main>
     </div>
   </body>
+  <script>
+    const currentPath = window.location.pathname;
+
+    const links = document.querySelectorAll(".sidebar-link");
+    const detailsMenus = document.querySelectorAll("details[data-menu]");
+    const sidebarNav = document.getElementById("sidebarNav");
+
+    // restore scroll sidebar
+    const savedScroll = localStorage.getItem("sidebarScroll");
+
+    if (savedScroll) {
+      sidebarNav.scrollTop = savedScroll;
+    }
+
+    // simpan scroll sidebar
+    sidebarNav.addEventListener("scroll", () => {
+      localStorage.setItem("sidebarScroll", sidebarNav.scrollTop);
+    });
+
+    // restore menu aktif
+    const activeMenu = localStorage.getItem("activeMenu");
+
+    if (activeMenu) {
+      const activeDetails = document.querySelector(`details[data-menu="${activeMenu}"]`);
+
+      if (activeDetails) {
+        activeDetails.open = true;
+      }
+    }
+
+    // active link
+    links.forEach((link) => {
+      const href = link.getAttribute("href");
+
+      if (currentPath === href) {
+        link.classList.remove("text-slate-500");
+
+        link.classList.add("text-indigo-500", "font-semibold", "bg-indigo-50", "rounded-lg");
+
+        const parentDetails = link.closest("details");
+
+        if (parentDetails) {
+          parentDetails.open = true;
+        }
+      }
+    });
+
+    // hanya satu submenu terbuka
+    detailsMenus.forEach((menu) => {
+      menu.addEventListener("toggle", () => {
+        if (menu.open) {
+          detailsMenus.forEach((otherMenu) => {
+            if (otherMenu !== menu) {
+              otherMenu.open = false;
+            }
+          });
+
+          localStorage.setItem("activeMenu", menu.dataset.menu);
+        }
+      });
+    });
+  </script>
 </html>

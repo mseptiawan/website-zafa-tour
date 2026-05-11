@@ -40,7 +40,6 @@ export const applyOvertime = async (req, res) => {
       result,
       proofFile: req.file ? req.file.filename : null,
 
-      // ⬇️ penting: status logic
       status: isManager ? "Approved" : "Pending Manager",
       approvedByManager: isManager ? true : false,
     });
@@ -145,4 +144,22 @@ export const approvalOvertimeHistory = async (req, res) => {
     title: "Riwayat Approval Lembur",
     overtimes,
   });
+};
+
+export const detailOvertime = async (req, res) => {
+  try {
+    const overtime = await Overtime.findById(req.params.id);
+
+    if (!overtime) {
+      return res.send("Data lembur tidak ditemukan");
+    }
+
+    res.render("overtime/detail", {
+      title: "Detail Lembur",
+      overtime,
+    });
+  } catch (err) {
+    console.log(err);
+    res.send(err.message);
+  }
 };

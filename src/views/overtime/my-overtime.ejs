@@ -16,58 +16,103 @@
     <!-- TABLE CARD -->
     <div class="bg-white border border-slate-200 rounded-xl p-4">
 
-      <div class="overflow-x-auto">
+      <% if (overtimes.length > 0) { %>
 
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto">
 
-          <!-- HEADER -->
-          <thead>
-            <tr class="text-left text-xs text-slate-500 border-b border-slate-200">
-              <th class="py-2 px-3 font-normal">Tanggal</th>
-              <th class="py-2 px-3 font-normal">Jam</th>
-              <th class="py-2 px-3 font-normal">Total</th>
-              <th class="py-2 px-3 font-normal">Status</th>
-            </tr>
-          </thead>
+          <table class="w-full text-sm">
 
-          <!-- BODY -->
-          <tbody class="divide-y divide-slate-100">
-
-            <% overtimes.forEach(o => { %>
-              <tr class="hover:bg-slate-50">
-
-                <!-- TANGGAL -->
-                <td class="py-3 px-3 text-slate-700">
-                  <%= new Date(o.date).toLocaleDateString("id-ID") %>
-                </td>
-
-                <!-- JAM -->
-                <td class="py-3 px-3 text-slate-600">
-                  <%= o.startTime %> - <%= o.endTime %>
-                </td>
-
-                <!-- TOTAL -->
-                <td class="py-3 px-3 text-slate-600">
-                  <%= o.totalHours %> jam
-                </td>
-
-                <!-- STATUS -->
-                <td class="py-3 px-3">
-                  <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-600">
-
-                    <%= o.status %>
-
-                  </span>
-                </td>
-
+            <!-- HEADER -->
+            <thead>
+              <tr class="text-left text-xs text-slate-500 border-b border-slate-200">
+                <th class="py-2 px-3 font-normal">Tanggal</th>
+                <th class="py-2 px-3 font-normal">Jam</th>
+                <th class="py-2 px-3 font-normal">Total</th>
+                <th class="py-2 px-3 font-normal">Status</th>
+                <th class="py-2 px-3 font-normal">Aksi</th>
               </tr>
-            <% }) %>
+            </thead>
 
-          </tbody>
+            <!-- BODY -->
+            <tbody class="divide-y divide-slate-100">
 
-        </table>
+              <% overtimes.forEach(o => { %>
+                <tr class="hover:bg-slate-50">
 
-      </div>
+                  <!-- TANGGAL -->
+                  <td class="py-3 px-3 text-slate-700">
+                    <%= new Date(o.date).toLocaleDateString("id-ID") %>
+                  </td>
+
+                  <!-- JAM -->
+                  <td class="py-3 px-3 text-slate-600">
+                    <%= o.startTime %> - <%= o.endTime %>
+                  </td>
+
+                  <!-- TOTAL -->
+                  <td class="py-3 px-3 text-slate-600">
+                    <%= o.totalHours %> jam
+                  </td>
+
+                  <!-- STATUS -->
+                  <td class="py-3 px-3">
+                    <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-600">
+                      <%= o.status %>
+                    </span>
+                  </td>
+
+                  <!-- AKSI -->
+                  <td class="py-3 px-3">
+                    <a
+                      href="/overtime/<%= o._id %>"
+                      class="text-xs px-3 py-1 rounded-lg bg-slate-800 text-white hover:bg-slate-700"
+                    >
+                      Detail
+                    </a>
+                  </td>
+
+                </tr>
+              <% }) %>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      <% } else { %>
+
+        <!-- EMPTY STATE -->
+        <div class="py-16 text-center">
+
+          <div class="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6 text-slate-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M9 17v-6h13v6M9 5h13v6M3 5h.01M3 11h.01M3 17h.01"
+              />
+            </svg>
+          </div>
+
+          <h2 class="text-sm font-medium text-slate-700">
+            Belum ada riwayat lembur
+          </h2>
+
+          <p class="text-sm text-slate-500 mt-1">
+            Data pengajuan lembur kamu akan muncul di sini
+          </p>
+
+        </div>
+
+      <% } %>
 
     </div>
 
