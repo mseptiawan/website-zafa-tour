@@ -9,6 +9,10 @@ import Announcement from "../models/Announcement.js";
    SHOW LOGIN PAGE
 ====================== */
 export const showLogin = (req, res) => {
+  if (req.session.user) {
+    return res.redirect("/dashboard");
+  }
+
   res.render("auth/login", {
     query: req.query || {},
   });
@@ -20,7 +24,11 @@ export const showLogin = (req, res) => {
 export const login = async (req, res) => {
   try {
     const { identifier, password, remember } = req.body;
-
+    console.log("REMEMBER RAW:", remember);
+    console.log("BEFORE SESSION:", {
+      cookie: req.session.cookie,
+      sessionID: req.sessionID,
+    });
     const user = await User.findOne({
       $or: [{ username: identifier }, { email: identifier }],
     }).populate("roleId");
@@ -39,30 +47,21 @@ export const login = async (req, res) => {
       userId: user._id,
     });
 
-    req.session.regenerate((err) => {
-      if (err) return res.redirect("/?error=SESSION_ERROR");
+    req.session.user = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      fullName: employee?.fullName || user.username,
+      employeeId: employee?._id || null,
+      role: user.roleId?.name?.toUpperCase() || "UNKNOWN",
+    };
 
-      req.session.user = {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        fullName: employee?.fullName || user.username,
-        employeeId: employee?._id || null,
-        role: user.roleId?.name?.toUpperCase() || "UNKNOWN",
-      };
+    if (remember) {
+      req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000;
+    }
 
-      // =========================
-      // REMEMBER ME (3 DAYS)
-      // =========================
-      if (remember) {
-        req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000; // 3 hari
-      } else {
-        req.session.cookie.expires = false; // session cookie
-      }
-
-      req.session.save(() => {
-        return res.redirect("/dashboard");
-      });
+    req.session.save(() => {
+      return res.redirect("/dashboard");
     });
   } catch (err) {
     console.log(err);

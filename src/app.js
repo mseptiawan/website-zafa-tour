@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-
+import { sessionMiddleware } from "./config/session.js";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -56,26 +56,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 /* =========================
    SESSION (FIXED CLEAN)
 ========================= */
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "hris_secret_session",
-    resave: false,
-    saveUninitialized: false,
-    rolling: true,
-
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
-    }),
-
-    cookie: {
-      httpOnly: true,
-      secure: false, // set true kalau HTTPS
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24, // 1 hari
-    },
-  }),
-);
-
+app.use(sessionMiddleware);
 /* =========================
    INJECT USER (WAJIB SETELAH SESSION)
 ========================= */
