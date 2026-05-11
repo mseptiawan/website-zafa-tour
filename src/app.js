@@ -1,5 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
 import { sessionMiddleware } from "./config/session.js";
 import express from "express";
 import path from "path";

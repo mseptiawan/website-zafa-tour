@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HRIS Login</title>
+  <title>Zafa Tour</title>
 
   <link rel="stylesheet" href="/css/output.css" />
 
@@ -12,110 +12,199 @@
       margin: 0;
       font-family: system-ui, sans-serif;
       background: #f1f5f9;
+      height: 100vh;
+      display: flex;
+    }
+.submit{
+  background: #1e2d41;
+}
+    .wrapper {
+      width: 950px;
+      margin: auto;
+      display: flex;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(128, 119, 119, 0.08);
+    }
+
+    /* LEFT SIDE */
+    .left {
+      flex: 1;
+      background: #dfdd88;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      padding: 30px;
+    }
+
+    .left img {
+      width: 80%;
+      max-width: 350px;
+      object-fit: contain;
+    }
+    
+
+    /* RIGHT SIDE */
+    .right {
+      flex: 1;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 22px;
+      color: #0f172a;
+    }
+
+    .title p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    input {
+      padding: 11px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+    }
+
+    button {
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid #2563eb;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #475569;
+    }
+
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #e65d5d;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .wrapper {
+        flex-direction: column;
+        width: 90%;
+      }
+
+      .left {
+        padding: 20px;
+      }
+
+      .left img {
+        max-width: 200px;
+      }
+
+      .right {
+        padding: 25px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div style="
-    width: 360px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-  ">
+  <div class="wrapper">
 
-    <div style="text-align:center; margin-bottom:18px;">
-      <h1 style="font-size:18px; font-weight:700; color:#0f172a;">
-        HRIS Zafa Tour
-      </h1>
-      <p style="font-size:12px; color:#64748b;">
-        Login to your account
-      </p>
+    <!-- LEFT IMAGE -->
+    <div class="left">
+      <img src="/images/zafa.png" alt="Zafa Tour"  class=""/>
     </div>
 
-    <% if (query?.error) { %>
-      <div style="
-        background:#fef2f2;
-        border:1px solid #fecaca;
-        color:#b91c1c;
-        padding:10px;
-        border-radius:8px;
-        font-size:12px;
-        margin-bottom:12px;
-      ">
-        Login gagal, silakan cek username/email atau password
-      </div>
-    <% } %>
+    <!-- RIGHT FORM -->
+    <div class="right">
 
-    <form action="/login" method="POST" style="display:flex; flex-direction:column; gap:12px;">
-
-      <!-- IDENTIFIER -->
-      <input
-        type="text"
-        name="identifier"
-        placeholder="Username atau Email"
-        style="
-          padding:10px 12px;
-          border:1px solid #cbd5e1;
-          border-radius:8px;
-          font-size:14px;
-        "
-      />
-
-      <!-- PASSWORD -->
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        style="
-          padding:10px 12px;
-          border:1px solid #cbd5e1;
-          border-radius:8px;
-          font-size:14px;
-        "
-      />
-
-      <!-- OPTIONS -->
-      <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
-
-        <!-- REMEMBER ME -->
-        <label style="display:flex; align-items:center; gap:6px; color:#475569;">
-          <input type="checkbox" name="remember" />
-          Ingat saya
-        </label>
-
-        <!-- FORGOT PASSWORD -->
-        <a href="/forgot-password" style="color:#2563eb; text-decoration:none;">
-          Lupa password?
-        </a>
-
+      <div class="title">
+        <h1>Zafa Tour</h1>
+        <p>Sistem Informasi Kepegawaian Terintegrasi</p>
       </div>
 
-      <button
-        type="submit"
-        style="
-          margin-top:6px;
-          padding:10px;
-          border-radius:8px;
-          border:1px solid #2563eb;
-          background:#2563eb;
-          color:white;
-          font-weight:500;
-          cursor:pointer;
-          font-size:14px;
-        "
-      >
-        Login
-      </button>
+      <!-- ERROR MESSAGE -->
+      <% if (query?.error) { %>
+        <div class="error">
+          Login gagal, silakan cek username/email atau password
+        </div>
+      <% } %>
 
-    </form>
+      <form action="/login" method="POST" style="display:flex; flex-direction:column; gap:12px;">
+
+        <input
+          type="text"
+          name="identifier"
+          placeholder="Username atau Email"
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+        />
+
+        <div class="options">
+
+          <label>
+            <input type="checkbox" name="remember" />
+            Ingat saya ( 3 Hari )
+          </label>
+
+          <a href="/forgot-password">Lupa password?</a>
+
+        </div>
+
+        <button type="submit">
+          Login
+        </button>
+
+      </form>
+
+    </div>
 
   </div>
 

@@ -6,6 +6,9 @@ import {
   dashboard,
   logout,
   showForgotPassword,
+  requestOtp,
+  verifyOtp,
+  resetPassword,
 } from "../controllers/authController.js";
 import { uploadPhoto } from "../middlewares/uploadPhoto.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
@@ -89,6 +92,16 @@ router.get("/", showLogin);
 router.post("/login", login);
 router.get("/logout", logout);
 router.get("/forgot-password", showForgotPassword);
+router.post("/forgot-password", requestOtp);
+router.get("/verify-otp", (req, res) => {
+  res.render("auth/verify-otp");
+});
+router.post("/verify-otp", verifyOtp);
+router.get("/reset-password", (req, res) => {
+  res.render("auth/reset-password");
+});
+router.post("/reset-password", resetPassword);
+
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD
@@ -281,4 +294,5 @@ router.post(
 router.get("/expense/finance", authMiddleware, roleMiddleware("KEUANGAN"), financeExpensePage);
 
 router.post("/expense/:id/pay", authMiddleware, roleMiddleware("KEUANGAN"), payExpense);
+
 export default router;

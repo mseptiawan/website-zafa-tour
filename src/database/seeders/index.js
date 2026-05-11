@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 import roleSeeder from "./roleSeeder.js";
@@ -10,7 +9,6 @@ import employeeSeeder from "./employeeSeeder.js";
 import kpiTemplateSeeder from "./kpiTemplateSeeder.js";
 import kpiTemplateDetailSeeder from "./kpiTemplateDetailSeeder.js";
 import unitKpiMappingSeeder from "./unitKpiMappingSeeder.js";
-dotenv.config();
 
 const runSeeder = async () => {
   try {

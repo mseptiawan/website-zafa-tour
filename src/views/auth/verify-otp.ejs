@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify OTP</title>
+
+  <link rel="stylesheet" href="/css/output.css" />
+</head>
+
+<body class="bg-slate-100 h-screen flex items-center justify-center">
+
+  <div class="w-full max-w-md bg-white p-8 rounded-xl shadow">
+
+    <h1 class="text-xl font-bold text-center text-slate-900 mb-2">
+      Verifikasi OTP
+    </h1>
+
+    <p class="text-center text-sm text-slate-500 mb-6">
+      Masukkan kode OTP yang dikirim ke email kamu
+    </p>
+
+    <% if (query?.error === "EXPIRED") { %>
+      <div class="bg-red-100 text-red-700 text-sm p-3 rounded mb-4">
+        OTP sudah expired, silakan kirim ulang
+      </div>
+    <% } %>
+
+    <% if (query?.error === "INVALID") { %>
+      <div class="bg-red-100 text-red-700 text-sm p-3 rounded mb-4">
+        OTP tidak valid
+      </div>
+    <% } %>
+
+    <form action="/verify-otp" method="POST" class="flex flex-col gap-3">
+
+      <input type="hidden" name="email" value="<%= query.email %>" />
+
+      <input
+        type="text"
+        name="otp"
+        placeholder="Masukkan OTP"
+        maxlength="6"
+        class="border border-slate-300 p-3 rounded-lg text-center tracking-widest text-lg focus:outline-none focus:border-blue-500"
+      />
+
+      <button
+        type="submit"
+        class="bg-slate-800 text-white py-3 rounded-lg hover:bg-slate-900 transition"
+      >
+        Verifikasi
+      </button>
+
+    </form>
+
+    <div class="text-center mt-4 text-sm">
+      <a href="/forgot-password" class="text-blue-600 hover:underline">
+        Kirim ulang OTP
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

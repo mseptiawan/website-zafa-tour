@@ -8,7 +8,7 @@ export const sessionMiddleware = session({
     prefix: "hris:",
   }),
 
-  secret: process.env.SESSION_SECRET || "hris_secret",
+  secret: process.env.SESSION_SECRET || "rahasia",
   resave: false,
   saveUninitialized: false,
   rolling: true,
