@@ -28,7 +28,7 @@ export const applyLeave = async (req, res) => {
     const totalDays = diff / (1000 * 60 * 60 * 24) + 1;
 
     await Leave.create({
-      userId: req.session.user.id,
+      userId: req.session.user._id,
 
       type,
       startDate,

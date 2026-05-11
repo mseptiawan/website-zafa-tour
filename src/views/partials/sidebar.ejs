@@ -286,6 +286,7 @@
           <% } %>
           </div>
         </details>
+    
 
         <!-- LEMBUR -->
         <details class="group outline-none">
@@ -328,26 +329,32 @@
           <div
             class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1"
           >
+          <% if (user.permissions.overtime_request) { %>
             <a
               href="/overtime/apply"
               class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Ajukan Lembur</a
             >
+          <% } %>
+          <% if (user.permissions.overtime_my) { %>
             <a
               href="/overtime/my"
               class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
               >Riwayat Lembur</a
             >
-             <% if (
-  user.role === 'MANAGER' ||
-  user.role === 'GENERAL MANAGER'
-) { %>
+          <% } %>
+          <% if (user.permissions.overtime_approval) { %>
             <a
               href="/overtime/approval"
               class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
-              >Approval Lembur</a
+              >Pengajuan Masuk</a
             >
             <% } %>
+              <a
+              href="/overtime/approval/history"
+              class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
+              >Riwayat Pengajuan</a
+            >
           </div>
         </details>
       </div>
@@ -840,6 +847,108 @@
         </details>
       </div>
     </section>
+    <section class="mt-6">
+  <p
+    class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]"
+  >
+    Laporan
+  </p>
+
+  <div class="space-y-1">
+
+    <!-- LAPORAN -->
+    <details class="group outline-none">
+      <summary
+        class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
+      >
+        <div class="flex items-center gap-3">
+
+          <!-- ICON -->
+          <svg
+            class="w-5 h-5 text-slate-500 group-hover:text-indigo-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 17v-6h6v6m-7 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-2-2h-4L7 5H4a2 2 0 00-2 2v12a2 2 0 002 2z"
+            ></path>
+          </svg>
+
+          <span
+            class="text-xs font-medium text-slate-600 group-hover:text-slate-800"
+          >
+            Laporan
+          </span>
+        </div>
+
+        <!-- ARROW -->
+        <svg
+          class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          ></path>
+        </svg>
+      </summary>
+
+      <!-- SUB MENU -->
+      <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+
+        <!-- KPI REPORT -->
+        <% if (user.permissions.report_kpi) { %>
+        <a
+          href="/report/kpi"
+          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Laporan KPI
+        </a>
+        <% } %>
+
+        <!-- CUTI REPORT -->
+        <% if (user.permissions.report_leave) { %>
+        <a
+          href="/report/leave"
+          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Laporan Cuti
+        </a>
+        <% } %>
+
+        <!-- LEMBUR REPORT -->
+        <% if (user.permissions.report_overtime) { %>
+        <a
+          href="/report/overtime"
+          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Laporan Lembur
+        </a>
+        <% } %>
+
+        <!-- ABSENSI REPORT -->
+        <% if (user.permissions.report_attendance) { %>
+        <a
+          href="/report/attendance"
+          class="py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Laporan Absensi
+        </a>
+        <% } %>
+
+      </div>
+    </details>
+
+  </div>
+</section>
   </nav>
 
   <!-- USER FOOTER -->

@@ -1,19 +1,20 @@
 <% layout('layouts/main') -%>
 
 <div class="ml-72 min-h-screen bg-slate-50 p-6">
-  <div class="max-w-5xl mx-auto">
+
+  <div class="max-w-6xl mx-auto">
 
     <!-- HEADER -->
     <div class="mb-6 text-center">
       <h1 class="text-xl font-medium text-slate-800">
-        Riwayat Lembur
+        Riwayat Approval Lembur
       </h1>
       <p class="text-sm text-slate-500 mt-1">
-        Catatan aktivitas lembur kamu
+        Semua data lembur yang sudah diproses
       </p>
     </div>
 
-    <!-- TABLE CARD -->
+    <!-- CARD -->
     <div class="bg-white border border-slate-200 rounded-xl p-4">
 
       <div class="overflow-x-auto">
@@ -23,21 +24,36 @@
           <!-- HEADER -->
           <thead>
             <tr class="text-left text-xs text-slate-500 border-b border-slate-200">
+              <th class="py-2 px-3 font-normal">Karyawan</th>
               <th class="py-2 px-3 font-normal">Tanggal</th>
               <th class="py-2 px-3 font-normal">Jam</th>
               <th class="py-2 px-3 font-normal">Total</th>
               <th class="py-2 px-3 font-normal">Status</th>
+              <th class="py-2 px-3 font-normal text-center">Dibuat</th>
             </tr>
           </thead>
 
           <!-- BODY -->
           <tbody class="divide-y divide-slate-100">
 
+            <% if (overtimes.length === 0) { %>
+              <tr>
+                <td colspan="6" class="text-center py-6 text-slate-400">
+                  Tidak ada data riwayat approval
+                </td>
+              </tr>
+            <% } %>
+
             <% overtimes.forEach(o => { %>
               <tr class="hover:bg-slate-50">
 
-                <!-- TANGGAL -->
+                <!-- KARYAWAN -->
                 <td class="py-3 px-3 text-slate-700">
+           <%= o.employeeName %>
+                </td>
+
+                <!-- TANGGAL -->
+                <td class="py-3 px-3 text-slate-600">
                   <%= new Date(o.date).toLocaleDateString("id-ID") %>
                 </td>
 
@@ -53,11 +69,24 @@
 
                 <!-- STATUS -->
                 <td class="py-3 px-3">
-                  <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-600">
+                  <% if (o.status === "Approved") { %>
+                    <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-600">
+                      Approved
+                    </span>
+                  <% } else if (o.status === "Rejected") { %>
+                    <span class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">
+                      Rejected
+                    </span>
+                  <% } else { %>
+                    <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-600">
+                      <%= o.status %>
+                    </span>
+                  <% } %>
+                </td>
 
-                    <%= o.status %>
-
-                  </span>
+                <!-- CREATED -->
+                <td class="py-3 px-3 text-center text-slate-500 text-xs">
+                  <%= new Date(o.createdAt).toLocaleString("id-ID") %>
                 </td>
 
               </tr>
@@ -72,4 +101,5 @@
     </div>
 
   </div>
+
 </div>

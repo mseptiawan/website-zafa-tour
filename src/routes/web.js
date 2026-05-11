@@ -29,8 +29,8 @@ import {
   myOvertime,
   approvalOvertimePage,
   approveManagerOvertime,
-  approveHROvertime,
   rejectOvertime,
+  approvalOvertimeHistory,
 } from "../controllers/overtimeController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import {
@@ -149,7 +149,7 @@ router.get("/overtime/apply", authMiddleware, showApplyOvertime);
 router.post("/overtime/apply", authMiddleware, uploadFile.single("proofFile"), applyOvertime);
 
 router.get("/overtime/my", authMiddleware, myOvertime);
-
+router.get("/overtime/approval/history", authMiddleware, approvalOvertimeHistory);
 router.get(
   "/overtime/approval",
   authMiddleware,
@@ -164,12 +164,10 @@ router.post(
   approveManagerOvertime
 );
 
-router.post("/overtime/approval/:id/hr", authMiddleware, roleMiddleware(["HR"]), approveHROvertime);
-
 router.post(
   "/overtime/approval/:id/reject",
   authMiddleware,
-  roleMiddleware(["HR", "MANAGER"]),
+  roleMiddleware(["MANAGER"]),
   rejectOvertime
 );
 router.get("/kpi/input", roleMiddleware(["HR"]), kpiEmployeeList);

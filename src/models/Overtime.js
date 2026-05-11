@@ -8,6 +8,10 @@ const overtimeSchema = new mongoose.Schema(
       required: true,
     },
 
+    employeeName: {
+      type: String,
+    },
+
     date: {
       type: Date,
       required: true,
@@ -47,20 +51,15 @@ const overtimeSchema = new mongoose.Schema(
       default: false,
     },
 
-    approvedByHR: {
-      type: Boolean,
-      default: false,
-    },
-
     status: {
       type: String,
-      enum: ["Pending Manager", "Pending HR", "Approved", "Rejected"],
+      enum: ["Pending Manager", "Approved", "Rejected"],
       default: "Pending Manager",
     },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 const Overtime = mongoose.model("Overtime", overtimeSchema);

@@ -1,179 +1,92 @@
 <% layout('layouts/main') -%>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
-  <div class="max-w-3xl mx-auto">
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
+  <div class="max-w-2xl mx-auto">
     <!-- HEADER -->
-    <div class="mb-10 text-center">
-      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
-        Ajukan Lembur
-      </h1>
-      <p class="text-slate-500 mt-2 font-medium">
-        Silakan isi detail lembur yang telah dilakukan.
-      </p>
+    <div class="mb-6 text-center">
+      <h1 class="text-xl font-medium text-slate-800">Ajukan Lembur</h1>
+      <p class="text-sm text-slate-500 mt-1">Isi detail lembur yang dilakukan</p>
     </div>
 
     <!-- CARD -->
-    <div
-      class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-10"
-    >
-      <!-- dekorasi -->
-      <div
-        class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"
-      ></div>
-      <div
-        class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"
-      ></div>
-
-      <form
-        action="/overtime/apply"
-        method="POST"
-        enctype="multipart/form-data"
-        class="relative space-y-6"
-      >
-        <!-- ROW: TANGGAL -->
-        <div class="group">
-          <label
-            class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-          >
-            Tanggal Lembur
-          </label>
+    <div class="bg-white border border-slate-200 rounded-xl p-6">
+      <form action="/overtime/apply" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <!-- TANGGAL -->
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">Tanggal Lembur</label>
           <input
             type="date"
             name="date"
             required
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
           />
         </div>
 
-        <!-- ROW: JAM -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="group">
-            <label
-              class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-            >
-              Jam Mulai
-            </label>
+        <!-- JAM -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">Jam Mulai</label>
             <input
               type="time"
               name="startTime"
               required
-              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+              class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
             />
           </div>
 
-          <div class="group">
-            <label
-              class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-            >
-              Jam Selesai
-            </label>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">Jam Selesai</label>
             <input
               type="time"
               name="endTime"
               required
-              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+              class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
             />
           </div>
         </div>
 
-        <!-- ROW: DESKRIPSI -->
-        <div class="group">
-          <label
-            class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-          >
-            Pekerjaan
-          </label>
+        <!-- DESKRIPSI -->
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">Pekerjaan</label>
           <textarea
             name="workDescription"
-            rows="4"
+            rows="3"
             required
-            placeholder="Jelaskan pekerjaan yang dilakukan saat lembur..."
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-300"
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            placeholder="Jelaskan pekerjaan lembur..."
           ></textarea>
         </div>
 
-        <!-- ROW: HASIL -->
-        <div class="group">
-          <label
-            class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-          >
-            Hasil Pekerjaan
-          </label>
+        <!-- HASIL -->
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">Hasil (opsional)</label>
           <textarea
             name="result"
-            rows="3"
-            placeholder="Hasil yang dicapai (opsional)..."
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-300"
+            rows="2"
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            placeholder="Hasil pekerjaan..."
           ></textarea>
         </div>
 
-        <!-- ROW: FILE -->
-        <div class="group">
-          <label
-            class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1"
-          >
-            Bukti Lembur
-          </label>
+        <!-- FILE -->
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">Bukti (opsional)</label>
 
-          <div
-            class="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl p-6 hover:bg-slate-100/50 hover:border-indigo-300 transition-all cursor-pointer group/file"
-          >
-            <input
-              type="file"
-              name="proofFile"
-              class="absolute inset-0 opacity-0 cursor-pointer"
-            />
-
-            <svg
-              class="w-10 h-10 text-slate-300 mb-2 group-hover/file:text-indigo-400 transition-colors"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-
-            <span class="text-sm font-semibold text-slate-500">
-              Upload bukti lembur (opsional)
-            </span>
-            <span class="text-[10px] text-slate-400 uppercase mt-1">
-              JPG, PNG, atau PDF
-            </span>
-          </div>
+          <input
+            type="file"
+            name="proofFile"
+            class="w-full text-sm border border-slate-200 rounded-lg p-2 bg-slate-50"
+          />
         </div>
 
         <!-- BUTTON -->
-        <div class="pt-4">
-          <button
-            type="submit"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-500/30 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
-            Kirim Pengajuan Lembur
-          </button>
-        </div>
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-lg transition"
+        >
+          Kirim Pengajuan
+        </button>
       </form>
     </div>
-
-    <p class="text-center text-slate-400 text-xs mt-8">
-      Pastikan jam lembur sesuai dengan persetujuan atasan.
-    </p>
   </div>
 </div>

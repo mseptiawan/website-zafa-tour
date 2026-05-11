@@ -13,6 +13,7 @@ export function getPermissions(role) {
     overtime_request: false,
     overtime_my: false,
     overtime_approval: false,
+    overtime_approval_history: false,
 
     // =========================
     // DINAS LUAR / TRIP
@@ -32,7 +33,6 @@ export function getPermissions(role) {
     // =========================
     kasbon_request: false,
     kasbon_approval: false,
-
     // =========================
     // ABSENSI
     // =========================
@@ -63,13 +63,18 @@ export function getPermissions(role) {
     // ADMIN / MASTER DATA
     // =========================
     employee_manage: false,
+
+    report_kpi: false,
+    report_leave: false,
+    report_overtime: false,
+    report_attendance: false,
   };
 
   switch (role) {
     // =========================
     // STAFF (KARYAWAN)
     // =========================
-    case "STAFF":
+    case "KARYAWAN":
       permissions.leave_request = true;
       permissions.leave_my = true;
 
@@ -102,6 +107,7 @@ export function getPermissions(role) {
       permissions.overtime_request = true;
       permissions.overtime_my = true;
       permissions.overtime_approval = true;
+      permissions.overtime_approval_history = true;
 
       permissions.trip_request = true;
       permissions.trip_my = true;
@@ -119,6 +125,11 @@ export function getPermissions(role) {
 
       permissions.announcement_create = true;
 
+      permissions.report_kpi = true;
+      permissions.report_leave = true;
+      permissions.report_overtime = true;
+      permissions.report_attendance = true;
+
       break;
 
     // =========================
@@ -131,7 +142,6 @@ export function getPermissions(role) {
 
       permissions.overtime_request = true;
       permissions.overtime_my = true;
-      permissions.overtime_approval = true;
 
       permissions.trip_request = true;
       permissions.trip_my = true;
@@ -150,17 +160,20 @@ export function getPermissions(role) {
       permissions.employee_manage = true;
 
       permissions.announcement_create = true;
+      permissions.report_kpi = true;
+      permissions.report_leave = true;
+      permissions.report_overtime = true;
+      permissions.report_attendance = true;
 
       break;
 
     // =========================
     // GENERAL MANAGER / PIMPINAN
     // =========================
-    case "GENERAL MANAGER":
+    case "MANAGER":
+    case "HR":
     case "PIMPINAN":
       permissions.leave_approval = true;
-
-      permissions.overtime_approval = true;
 
       permissions.trip_approval = true;
 
@@ -171,6 +184,11 @@ export function getPermissions(role) {
       permissions.payroll_view = true;
 
       permissions.announcement_create = true;
+
+      permissions.report_kpi = true;
+      permissions.report_leave = true;
+      permissions.report_overtime = true;
+      permissions.report_attendance = true;
 
       break;
 
