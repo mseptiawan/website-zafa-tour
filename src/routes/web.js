@@ -117,7 +117,12 @@ router.get("/leave/apply", authMiddleware, showApplyLeave);
 router.post("/leave/apply", authMiddleware, uploadFile.single("file"), applyLeave);
 
 router.get("/leave/my", authMiddleware, myLeave);
-router.get("/leave/approval", authMiddleware, roleMiddleware(["HR", "MANAGER"]), approvalPage);
+router.get(
+  "/leave/approval",
+  authMiddleware,
+  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
+  approvalPage
+);
 
 router.post(
   "/leave/approval/:id/manager",
