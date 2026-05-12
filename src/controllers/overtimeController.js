@@ -191,16 +191,54 @@ export const approvalOvertimePage = async (req, res) => {
   try {
     const user = req.session.user;
 
-    const overtimes = await Overtime.find({
-      status: "Pending Manager",
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const { search, status, sort } = req.query;
+
+    // filter base
+    let filter = {
       userId: { $ne: user._id },
-    })
+    };
+
+    // status filter
+    if (status) {
+      filter.status = status;
+    } else {
+      filter.status = "Pending Manager";
+    }
+
+    // search filter
+    if (search) {
+      filter.employeeName = { $regex: search, $options: "i" };
+    }
+
+    // sort
+    let sortOption = { createdAt: -1 };
+    if (sort === "asc") sortOption = { createdAt: 1 };
+
+    const totalData = await Overtime.countDocuments(filter);
+
+    const overtimes = await Overtime.find(filter)
       .populate("userId")
-      .sort({ createdAt: -1 });
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
+
+    const totalPages = Math.ceil(totalData / limit);
 
     res.render("overtime/approval", {
       title: "Approval Lembur",
       overtimes,
+      query: req.query,
+      pagination: {
+        page,
+        totalPages,
+        totalData,
+        hasPrev: page > 1,
+        hasNext: page < totalPages,
+      },
     });
   } catch (err) {
     console.log(err);
@@ -245,16 +283,68 @@ export const rejectOvertime = async (req, res) => {
   }
 };
 export const approvalOvertimeHistory = async (req, res) => {
-  const overtimes = await Overtime.find({
-    status: { $in: ["Approved", "Rejected"] },
-  }).sort({ createdAt: -1 });
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-  res.render("overtime/approval-history", {
-    title: "Riwayat Approval Lembur",
-    overtimes,
-  });
+    const { search, status, sort } = req.query;
+
+    // =========================
+    // BUILD FILTER
+    // =========================
+    const filter = {
+      status: { $in: ["Approved", "Rejected"] },
+    };
+
+    if (search) {
+      filter.employeeName = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    if (status) {
+      filter.status = status; // tetap bisa override Approved/Rejected
+    }
+
+    // =========================
+    // SORTING
+    // =========================
+    const sortOption = sort === "asc" ? { createdAt: 1 } : { createdAt: -1 };
+
+    // =========================
+    // COUNT
+    // =========================
+    const totalData = await Overtime.countDocuments(filter);
+    const totalPages = Math.ceil(totalData / limit);
+
+    // =========================
+    // DATA
+    // =========================
+    const overtimes = await Overtime.find(filter).sort(sortOption).skip(skip).limit(limit);
+
+    // =========================
+    // RENDER
+    // =========================
+    res.render("overtime/approval-history", {
+      title: "Riwayat Approval Lembur",
+      overtimes,
+      query: req.query,
+      pagination: {
+        page,
+        limit,
+        totalData,
+        totalPages,
+        hasPrev: page > 1,
+        hasNext: page < totalPages,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message);
+  }
 };
-
 export const detailOvertime = async (req, res) => {
   try {
     const overtime = await Overtime.findById(req.params.id);

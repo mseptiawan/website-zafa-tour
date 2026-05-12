@@ -1,7 +1,6 @@
 <%- layout('layouts/main', { title: title }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50 p-8">
-
   <div class="max-w-3xl mx-auto">
 
     <!-- HEADER -->
@@ -19,11 +18,11 @@
 
       <% if (already) { %>
 
-        <!-- STATE SUDAH ABSEN -->
+        <!-- SUDAH ABSEN -->
         <div class="text-center space-y-4 py-8">
 
           <div class="w-12 h-12 mx-auto flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-            <i data-lucide="check" class="w-5 h-5"></i>
+            ✔
           </div>
 
           <h2 class="text-sm font-medium text-slate-800">
@@ -31,21 +30,13 @@
           </h2>
 
           <% if (!hasCheckedOut) { %>
-
             <form action="/attendance/checkout" method="POST">
-              <button
-                class="px-4 py-2 text-sm rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition"
-              >
+              <button class="px-4 py-2 text-sm rounded-lg bg-slate-900 text-white hover:bg-slate-800">
                 Pulang
               </button>
             </form>
-
           <% } else { %>
-
-            <p class="text-sm text-slate-500">
-              Sudah checkout hari ini
-            </p>
-
+            <p class="text-sm text-slate-500">Sudah checkout hari ini</p>
           <% } %>
 
         </div>
@@ -53,59 +44,38 @@
       <% } else { %>
 
         <!-- FORM ABSENSI -->
-        <form id="attendanceForm" class="space-y-5">
+        <form class="space-y-5">
 
           <!-- CAMERA -->
-          <div class="relative bg-slate-900 rounded-2xl overflow-hidden aspect-video shadow-sm">
-
-            <video
-              id="video"
-              autoplay
-              playsinline
-              muted
-              class="w-full h-full object-cover"
-            ></video>
-
+          <div class="relative bg-slate-900 rounded-2xl overflow-hidden aspect-video">
+            <video id="video" autoplay playsinline muted class="w-full h-full object-cover"></video>
             <canvas id="canvas" class="hidden"></canvas>
-
           </div>
 
           <!-- TYPE -->
-          <div>
-            <label class="text-xs text-slate-500">Kategori</label>
+<div>
+  <label class="text-xs text-slate-500">Kategori</label>
 
-            <select
-              name="type"
-              id="type"
-              class="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-            >
-              <option value="KANTOR">Kantor</option>
-              <option value="DINAS_LUAR">Dinas Luar</option>
-            </select>
-          </div>
+  <div class="mt-2 space-y-2">
 
-          <!-- NOTE -->
-          <div>
-            <label class="text-xs text-slate-500">Catatan</label>
+    <label class="flex items-center gap-2 text-sm text-slate-700">
+      <input type="radio" name="type" value="KANTOR" checked>
+      Kantor
+    </label>
 
-            <input
-              type="text"
-              name="note"
-              id="note"
-              placeholder="Opsional..."
-              class="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-            />
-          </div>
+    <label class="flex items-center gap-2 text-sm text-slate-700">
+      <input type="radio" name="type" value="LUAR KANTOR">
+      Luar Kantor
+    </label>
+
+  </div>
+</div>
+
 
           <!-- BUTTON -->
-          <button
-            type="button"
-            onclick="takePhoto()"
-            class="w-full py-3 rounded-lg bg-slate-900 text-white text-sm
-                   hover:bg-slate-800 transition shadow-sm"
-          >
+         <button type="button"
+  onclick="takePhoto(event)"
+            class="w-full py-3 bg-slate-900 text-white rounded-lg">
             Ambil Foto & Absen
           </button>
 
@@ -114,61 +84,214 @@
       <% } %>
 
     </div>
-
   </div>
 </div>
 
-<!-- SCRIPT CAMERA -->
+<!-- MAP LIB -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- MODAL MAP CONFIRM -->
+<div id="mapModal" class="hidden fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+  <div class="bg-white w-full max-w-xl rounded-xl p-4">
+    <div id="map" class="h-64 rounded-lg"></div>
+
+    <button onclick="submitAbsensi()"
+      class="mt-4 w-full bg-black text-white py-2 rounded-lg">
+      Konfirmasi Absen
+    </button>
+  </div>
+</div>
+
 <script>
+let stream = null;
+let lat = null;
+let lng = null;
+let pendingBlob = null;
+
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 
-// START CAMERA
-navigator.mediaDevices.getUserMedia({ video: true })
-  .then(stream => {
-    video.srcObject = stream;
-  })
-  .catch(err => {
-    console.log("Camera error:", err);
-    alert("Kamera tidak bisa diakses");
-  });
+window.APP_STATE = <%- JSON.stringify({ already, hasCheckedOut }) %>;
+const { already } = window.APP_STATE;
 
-// TAKE PHOTO + SEND
-function takePhoto() {
-  const context = canvas.getContext("2d");
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  canvas.toBlob(async (blob) => {
-
-    const formData = new FormData();
-    formData.append("photo", blob, "selfie.jpg");
-    formData.append("type", document.getElementById("type").value);
-    formData.append("note", document.getElementById("note").value);
-
-    try {
-      const res = await fetch("/attendance/checkin", {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        alert("Absen berhasil");
-        location.reload();
-      } else {
-        alert(data.message || "Gagal absen");
-      }
-
-    } catch (err) {
-      console.log(err);
-      alert("Terjadi kesalahan saat absen");
+/**
+ * GPS
+ */
+function getLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject("GPS not supported");
     }
 
-  }, "image/jpeg");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        resolve({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+      },
+      (err) => {
+        reject(err);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  });
 }
+
+/**
+ * CAMERA
+ */
+async function startCamera() {
+  if (already) return;
+
+  stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+}
+
+function stopCamera() {
+  if (!stream) return;
+  stream.getTracks().forEach(t => t.stop());
+  video.srcObject = null;
+  stream = null;
+}
+
+/**
+ * INIT
+ */
+(async () => {
+  await startCamera();
+
+  try {
+    const loc = await getLocation();
+    lat = loc.lat;
+    lng = loc.lng;
+  } catch (e) {
+    alert("GPS tidak aktif");
+  }
+})();
+
+/**
+ * TAKE PHOTO
+ */
+let isProcessing = false;
+
+async function takePhoto(event) {
+  if (isProcessing) return;
+
+  isProcessing = true;
+
+  const btn = event.target; // FIX: ambil button yang diklik
+
+  const originalText = btn.innerText;
+
+  btn.disabled = true;
+  btn.innerText = "Memproses...";
+
+  try {
+    const position = await getLocation();
+
+    const formData = new FormData();
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+
+if (!video.videoWidth) {
+  alert("Kamera belum siap");
+  return;
+}
+canvas.height = video.videoHeight;
+
+context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+const blob = await new Promise((resolve, reject) => {
+  canvas.toBlob((b) => {
+    if (!b) reject("Gagal ambil foto");
+    else resolve(b);
+  }, "image/jpeg", 0.8);
+});
+formData.append("photo", blob, "selfie.jpg");
+    formData.append("lat", position.lat);
+    formData.append("lng", position.lng);
+    formData.append("type", document.getElementById("type").value);
+
+    const res = await fetch("/attendance/checkin", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      btn.innerText = "Berhasil ✓";
+
+      stopCamera();
+
+      setTimeout(() => {
+        location.reload();
+      }, 800);
+    } else {
+      alert(data.message || "Gagal absen");
+    }
+
+  } catch (err) {
+    alert("GPS belum siap / error");
+  } finally {
+    isProcessing = false;
+
+    btn.disabled = false;
+    btn.innerText = originalText;
+  }
+}
+/**
+ * MAP CONFIRM
+ */
+function openMap(lat, lng) {
+  document.getElementById("mapModal").classList.remove("hidden");
+  document.getElementById("mapModal").classList.add("flex");
+
+  const map = L.map("map").setView([lat, lng], 16);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+  L.marker([lat, lng]).addTo(map).bindPopup("Lokasi Absen").openPopup();
+}
+
+/**
+ * SUBMIT ABSENSI
+ */
+async function submitAbsensi() {
+  const form = new FormData();
+
+  form.append("photo", pendingBlob, "selfie.jpg");
+  form.append("type", document.getElementById("type").value);
+  form.append("lat", lat);
+  form.append("lng", lng);
+
+  const res = await fetch("/attendance/checkin", {
+    method: "POST",
+    body: form
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert("Absen berhasil");
+    stopCamera();
+    location.reload();
+  } else {
+    alert(data.message);
+  }
+}
+
+/**
+ * AUTO STOP CAMERA TAB
+ */
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopCamera();
+  else if (!already) startCamera();
+});
 </script>

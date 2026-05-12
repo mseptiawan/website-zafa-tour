@@ -1,154 +1,328 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<!-- 
-  Kunci Layout: 
-  - ml-72 untuk konsistensi sidebar
-  - max-w-5xl karena tabel biasanya butuh ruang lebih luas
--->
-<div class="ml-72 min-h-screen bg-slate-50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
+
   <div class="max-w-5xl mx-auto">
 
-    <!-- HEADER SECTION -->
-    <div class="mb-8 flex justify-between items-end">
+    <!-- HEADER -->
+    <div class="mb-6 flex justify-between items-end">
+
       <div>
-        <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+        <h1 class="text-2xl font-semibold text-slate-800">
           Riwayat Absensi
         </h1>
-        <p class="text-slate-500 mt-2 font-medium">
-          Pantau catatan kehadiran dan ketepatan waktu Anda.
+
+        <p class="text-sm text-slate-500 mt-1">
+          Pantau catatan kehadiran karyawan
         </p>
       </div>
-      <div class="bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm text-sm font-semibold text-slate-600">
-        Total Log: <%= data.length %>
+
+      <div class="text-sm text-slate-500 bg-white border rounded-lg px-3 py-1">
+        Total: <%= data.length %>
       </div>
+
     </div>
 
-    <!-- TABLE CARD -->
-    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white overflow-hidden">
+    <!-- TABLE -->
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-           <tr class="bg-slate-100 border border-slate-200 rounded-xl overflow-hidden">
-  
-  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-    Tanggal
-  </th>
 
-  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-    Check In
-  </th>
+        <table class="w-full text-sm">
 
-  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-    Check Out
-  </th>
-
-  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-    Status
-  </th>
-
-  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500 text-center">
-    Verifikasi
-  </th>
-
-  <th class="p-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-    Aksi
-  </th>
-
-</tr>
+          <thead class="bg-slate-100 border-b border-slate-200">
+            <tr class="text-left text-xs text-slate-600">
+              <th class="px-4 py-3">Tanggal</th>
+              <th class="px-4 py-3">Check In</th>
+              <th class="px-4 py-3">Check Out</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3 text-center">Foto</th>
+              <th class="px-4 py-3">Aksi</th>
+            </tr>
           </thead>
-          <tbody class="divide-y divide-slate-50">
+
+          <tbody class="divide-y divide-slate-100">
+
             <% if (data.length > 0) { %>
+
               <% data.forEach(d => { %>
-                <tr class="hover:bg-slate-50/50 transition-colors group">
-                  
-                  <!-- TANGGAL -->
-                  <td class="p-6">
-                    <div class="flex flex-col">
-                      <span class="font-bold text-slate-700">
-                        <%= d.createdAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
-                      </span>
-                      <span class="text-xs text-slate-400 font-medium">Hari ini</span>
-                    </div>
+                <tr class="hover:bg-slate-50 transition">
+
+                  <td class="px-4 py-3">
+                    <%= new Date(d.createdAt).toLocaleDateString("id-ID") %>
                   </td>
 
-                  <!-- CHECK IN -->
-                  <td class="p-6">
-                    <div class="flex items-center gap-2 text-slate-600 font-semibold text-sm">
-                      <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                      <%= d.checkIn ? d.checkIn.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "--:--" %>
-                    </div>
+                  <td class="px-4 py-3">
+                    <%= d.checkIn ? new Date(d.checkIn).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
                   </td>
 
-                  <!-- CHECK OUT -->
-                  <td class="p-6">
-                    <div class="flex items-center gap-2 text-slate-600 font-semibold text-sm">
-                      <div class="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
-                      <%= d.checkOut ? d.checkOut.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "--:--" %>
-                    </div>
+                  <td class="px-4 py-3">
+                    <%= d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
                   </td>
 
-                  <!-- STATUS -->
-                  <td class="p-6">
-                    <% if (d.status === 'TELAT') { %>
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-100">
-                        <%= d.status %>
-                      </span>
+                  <td class="px-4 py-3">
+                    <% if (d.status === "TELAT") { %>
+                      <span class="text-slate-600">Telat</span>
                     <% } else { %>
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
-                        <%= d.status %>
-                      </span>
+                      <span class="text-slate-600"><%= d.status %></span>
                     <% } %>
                   </td>
 
-                  <!-- FOTO / VERIFIKASI -->
-                  <td class="p-6">
-                    <div class="flex justify-center">
-                      <% if (d.photo) { %>
-                        <div class="relative group/img">
-                          <img 
-                            src="<%= d.photo %>" 
-                            class="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-md group-hover/img:scale-110 transition-transform duration-300"
-                          >
-                          <div class="absolute inset-0 bg-indigo-600/20 opacity-0 group-hover/img:opacity-100 rounded-xl transition-opacity flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2" />
-                              <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-width="2" />
-                            </svg>
-                          </div>
-                        </div>
-                      <% } else { %>
-                        <span class="text-slate-300 italic text-xs">No Image</span>
-                      <% } %>
-                    </div>
-                      
+                  <td class="px-4 py-3 text-center">
+
+                    <% if (d.photo) { %>
+                      <img
+                        src="<%= d.photo %>"
+                        class="w-10 h-10 mx-auto rounded-lg object-cover border"
+                      />
+                    <% } else { %>
+                      <span class="text-xs text-slate-400">-</span>
+                    <% } %>
+
                   </td>
-                    <td>
-                        <a href="/attendance/detail/<%= d._id %>" 
-   class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition">
-   Detail
-   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-       d="M9 5l7 7-7 7"/>
-   </svg>
-</a>
-                    </td>
+
+                  <td class="px-4 py-3">
+
+                <button
+  class="openModal"
+  data-date="<%= d.createdAt.toLocaleDateString('id-ID') %>"
+  data-status="<%= d.status %>"
+data-checkin="<%= d.checkIn ? new Date(d.checkIn).toLocaleString('id-ID') : '-' %>"
+data-checkout="<%= d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '-' %>"
+  data-type="<%= d.type %>"
+  data-note="<%= d.note || '-' %>"
+  data-workduration="<%= d.workDuration %>"
+  data-address="<%= d.location?.address || '-' %>"
+  data-lat="<%= d.location?.lat || '' %>"
+  data-lng="<%= d.location?.lng || '' %>"
+  data-useragent="<%= d.deviceInfo?.userAgent || '-' %>"
+  data-platform="<%= d.deviceInfo?.platform || '-' %>"
+  data-photo="<%= d.photo || '' %>"
+>
+  Detail
+</button>
+
+                  </td>
+
                 </tr>
               <% }) %>
+
             <% } else { %>
+
               <tr>
-                <td colspan="5" class="p-20 text-center text-slate-400 font-medium italic">
-                  Belum ada data absensi untuk ditampilkan.
+                <td colspan="6" class="text-center py-10 text-slate-400">
+                  Belum ada data absensi
                 </td>
               </tr>
+
             <% } %>
+
           </tbody>
+
         </table>
+
       </div>
     </div>
-
-    <!-- FOOTER INFO -->
-    <p class="text-center text-slate-400 text-xs mt-8">
-      Data riwayat di atas diperbarui secara real-time setiap kali Anda melakukan Check In/Out.
-    </p>
   </div>
 </div>
+
+<!-- ================= MODAL ================= -->
+<div id="detailModal"
+  class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+
+  <!-- BOX -->
+  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-100">
+
+    <!-- HEADER -->
+    <div class="p-5 border-b border-slate-100 flex justify-between items-center shrink-0 bg-slate-50">
+      <div>
+        <h2 class="font-semibold text-slate-800 text-base">
+          Detail Absensi
+        </h2>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Informasi lengkap kehadiran karyawan
+        </p>
+      </div>
+
+      <button onclick="closeModal()"
+        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition">
+        ✕
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="p-5 space-y-5 text-sm overflow-y-auto">
+
+      <!-- GRID INFO -->
+      <div class="grid grid-cols-2 gap-4">
+
+        <div>
+          <p class="text-xs text-slate-400 uppercase">Tanggal</p>
+          <p class="text-slate-700 font-medium mt-1" id="mDate"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-slate-400 uppercase">Status</p>
+          <p class="text-slate-700 font-medium mt-1" id="mStatus"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-slate-400 uppercase">Check In</p>
+          <p class="text-slate-700 font-medium mt-1" id="mIn"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-slate-400 uppercase">Check Out</p>
+          <p class="text-slate-700 font-medium mt-1" id="mOut"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-slate-400 uppercase">Type</p>
+          <p class="text-slate-700 font-medium mt-1" id="mType"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-slate-400 uppercase">Durasi</p>
+          <p class="text-slate-700 font-medium mt-1">
+            <span id="mDuration"></span> menit
+          </p>
+        </div>
+
+      </div>
+
+      <!-- NOTE -->
+      <div class="border-t border-slate-100 pt-4">
+        <p class="text-xs text-slate-400 uppercase mb-1">Catatan</p>
+        <p id="mNote" class="text-slate-600 leading-relaxed"></p>
+      </div>
+
+      <!-- ADDRESS -->
+      <div>
+        <p class="text-xs text-slate-400 uppercase mb-1">Lokasi</p>
+        <p id="mAddress" class="text-slate-600 leading-relaxed"></p>
+      </div>
+
+      <!-- PHOTO -->
+      <div id="photoBox" class="hidden">
+        <p class="text-xs text-slate-400 uppercase mb-2">Foto</p>
+        <img id="mPhoto"
+          class="w-44 h-44 object-cover rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <!-- DEVICE INFO -->
+      <div class="bg-slate-50 border border-slate-100 p-4 rounded-xl text-xs text-slate-600 space-y-1">
+
+        <p class="font-semibold text-slate-700 mb-2">Device Info</p>
+
+        <p class="truncate">User Agent: <span id="mUA"></span></p>
+        <p>Platform: <span id="mPlatform"></span></p>
+
+      </div>
+
+      <!-- LAT LNG -->
+      <div class="text-xs text-slate-500 flex gap-4">
+        <p>Lat: <span id="mLat"></span></p>
+        <p>Lng: <span id="mLng"></span></p>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="p-4 border-t border-slate-100 text-right shrink-0 bg-white">
+      <button onclick="closeModal()"
+        class="px-4 py-2 bg-slate-900 text-white text-sm rounded-lg hover:bg-slate-800 transition">
+        Tutup
+      </button>
+    </div>
+
+  </div>
+</div>
+<!-- ================= SCRIPT ================= -->
+<script>
+
+const modal = document.getElementById("detailModal");
+
+/**
+ * OPEN MODAL
+ */
+document.querySelectorAll(".openModal").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    // BASIC INFO
+    document.getElementById("mDate").textContent = btn.dataset.date || "-";
+    document.getElementById("mIn").textContent = btn.dataset.checkin || "-";
+    document.getElementById("mOut").textContent = btn.dataset.checkout || "-";
+    document.getElementById("mStatus").textContent = btn.dataset.status || "-";
+    document.getElementById("mType").textContent = btn.dataset.type || "-";
+
+    document.getElementById("mNote").textContent =
+      btn.dataset.note || "-";
+
+    document.getElementById("mDuration").textContent =
+      btn.dataset.duration || "0";
+
+    /**
+     * ADDRESS (HASIL GEO / NOMINATIM)
+     */
+    document.getElementById("mAddress").textContent =
+      btn.dataset.address || "Lokasi tidak tersedia";
+
+    /**
+     * LAT LNG
+     */
+    const lat = btn.dataset.lat;
+    const lng = btn.dataset.lng;
+
+    document.getElementById("mLat").textContent = lat || "-";
+    document.getElementById("mLng").textContent = lng || "-";
+
+    /**
+     * DEVICE INFO
+     */
+    document.getElementById("mUA").textContent =
+      btn.dataset.ua || "-";
+
+    document.getElementById("mPlatform").textContent =
+      btn.dataset.platform || "-";
+
+    /**
+     * PHOTO
+     */
+    if (btn.dataset.photo) {
+      document.getElementById("photoBox").classList.remove("hidden");
+      document.getElementById("mPhoto").src = btn.dataset.photo;
+    } else {
+      document.getElementById("photoBox").classList.add("hidden");
+    }
+
+    /**
+     * SHOW MODAL
+     */
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  });
+});
+
+/**
+ * CLOSE MODAL
+ */
+function closeModal() {
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+/**
+ * CLOSE ON OUTSIDE CLICK
+ */
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) closeModal();
+});
+
+/**
+ * ESC KEY CLOSE
+ */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+});
+
+</script>

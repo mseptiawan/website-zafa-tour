@@ -14,32 +14,90 @@
       </p>
     </div>
 
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4">
+    <!-- FILTER -->
+    <form method="GET"
+      class="bg-white border border-slate-200 rounded-xl p-4 mb-5">
+
+      <div class="flex flex-col md:flex-row gap-3">
+
+        <!-- SEARCH -->
+        <div class="flex-1">
+          <input
+            type="text"
+            name="search"
+            value="<%= query?.search || '' %>"
+            placeholder="Cari nama karyawan..."
+            class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm
+            focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+          />
+        </div>
+
+        <!-- STATUS -->
+        <div class="w-full md:w-48">
+          <select
+            name="status"
+            class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm"
+          >
+            <option value="">Semua Status</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <!-- SORT -->
+        <div class="w-full md:w-40">
+          <select
+            name="sort"
+            class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm"
+          >
+            <option value="desc">Terbaru</option>
+            <option value="asc">Terlama</option>
+          </select>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="flex gap-2">
+          <button
+            class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm hover:bg-indigo-700"
+          >
+            Filter
+          </button>
+
+          <a href="/overtime/approval/history"
+            class="px-4 py-2.5 text-sm border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
+          >
+            Reset
+          </a>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- TABLE -->
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
 
       <div class="overflow-x-auto">
 
         <table class="w-full text-sm">
 
-          <!-- HEADER -->
-          <thead>
-            <tr class="text-left text-xs text-slate-500 border-b border-slate-200">
-              <th class="py-2 px-3 font-normal">Karyawan</th>
-              <th class="py-2 px-3 font-normal">Tanggal</th>
-              <th class="py-2 px-3 font-normal">Jam</th>
-              <th class="py-2 px-3 font-normal">Total</th>
-              <th class="py-2 px-3 font-normal">Status</th>
-              <th class="py-2 px-3 font-normal text-center">Dibuat</th>
+          <!-- THEAD (simple clean style) -->
+          <thead class="bg-slate-100 border-b border-slate-200">
+            <tr class="text-left text-xs text-slate-600">
+              <th class="px-3 py-3 font-medium">Karyawan</th>
+              <th class="px-3 py-3 font-medium">Tanggal</th>
+              <th class="px-3 py-3 font-medium">Jam</th>
+              <th class="px-3 py-3 font-medium">Total</th>
+              <th class="px-3 py-3 font-medium">Status</th>
+              <th class="px-3 py-3 font-medium text-center">Dibuat</th>
             </tr>
           </thead>
 
-          <!-- BODY -->
           <tbody class="divide-y divide-slate-100">
 
             <% if (overtimes.length === 0) { %>
               <tr>
                 <td colspan="6" class="text-center py-6 text-slate-400">
-                  Tidak ada data riwayat approval
+                  Tidak ada data
                 </td>
               </tr>
             <% } %>
@@ -47,45 +105,47 @@
             <% overtimes.forEach(o => { %>
               <tr class="hover:bg-slate-50">
 
-                <!-- KARYAWAN -->
-                <td class="py-3 px-3 text-slate-700">
-           <%= o.employeeName %>
+                <td class="px-3 py-3 text-slate-700">
+                  <%= o.employeeName %>
                 </td>
 
-                <!-- TANGGAL -->
-                <td class="py-3 px-3 text-slate-600">
+                <td class="px-3 py-3 text-slate-600">
                   <%= new Date(o.date).toLocaleDateString("id-ID") %>
                 </td>
 
-                <!-- JAM -->
-                <td class="py-3 px-3 text-slate-600">
+                <td class="px-3 py-3 text-slate-600">
                   <%= o.startTime %> - <%= o.endTime %>
                 </td>
 
-                <!-- TOTAL -->
-                <td class="py-3 px-3 text-slate-600">
+                <td class="px-3 py-3 text-slate-600">
                   <%= o.totalHours %> jam
                 </td>
 
-                <!-- STATUS -->
-                <td class="py-3 px-3">
-                  <% if (o.status === "Approved") { %>
-                    <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-600">
-                      Approved
-                    </span>
-                  <% } else if (o.status === "Rejected") { %>
-                    <span class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">
-                      Rejected
-                    </span>
-                  <% } else { %>
-                    <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-600">
-                      <%= o.status %>
-                    </span>
-                  <% } %>
+                <!-- STATUS SIMPLE (ICON + TEXT, NO WARNA RAMAI) -->
+                <td class="px-3 py-3">
+                  <div class="flex items-center gap-2 text-xs">
+
+                    <% if (o.status === "Approved") { %>
+
+                      <i data-lucide="check-circle" class="w-4 h-4 text-slate-500"></i>
+                      <span class="text-slate-600">Approved</span>
+
+                    <% } else if (o.status === "Rejected") { %>
+
+                      <i data-lucide="x-circle" class="w-4 h-4 text-slate-500"></i>
+                      <span class="text-slate-600">Rejected</span>
+
+                    <% } else { %>
+
+                      <i data-lucide="clock" class="w-4 h-4 text-slate-500"></i>
+                      <span class="text-slate-600">Pending</span>
+
+                    <% } %>
+
+                  </div>
                 </td>
 
-                <!-- CREATED -->
-                <td class="py-3 px-3 text-center text-slate-500 text-xs">
+                <td class="px-3 py-3 text-center text-xs text-slate-500">
                   <%= new Date(o.createdAt).toLocaleString("id-ID") %>
                 </td>
 
@@ -100,6 +160,32 @@
 
     </div>
 
-  </div>
+    <!-- PAGINATION (20 DATA / PAGE UI) -->
+    <div class="mt-4 flex items-center justify-between text-sm text-slate-600">
 
+      <div>
+        Page <%= pagination.page %> / <%= pagination.totalPages %>
+      </div>
+
+      <div class="flex gap-2">
+
+        <% if (pagination.page > 1) { %>
+          <a href="?page=<%= pagination.page - 1 %>"
+            class="px-3 py-1 border rounded-lg hover:bg-slate-100">
+            Prev
+          </a>
+        <% } %>
+
+        <% if (pagination.page < pagination.totalPages) { %>
+          <a href="?page=<%= pagination.page + 1 %>"
+            class="px-3 py-1 border rounded-lg hover:bg-slate-100">
+            Next
+          </a>
+        <% } %>
+
+      </div>
+
+    </div>
+
+  </div>
 </div>

@@ -13,27 +13,84 @@
         Kelola persetujuan lembur karyawan
       </p>
     </div>
+<form method="GET"
+  class="bg-white border border-slate-200 rounded-xl p-4 mb-5">
 
+  <div class="flex flex-col md:flex-row gap-3">
+
+    <!-- SEARCH -->
+    <div class="flex-1">
+      <input
+        type="text"
+        name="search"
+        value="<%= query?.search || '' %>"
+        placeholder="Cari nama karyawan..."
+        class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm"
+      />
+    </div>
+
+    <!-- STATUS -->
+    <div class="w-full md:w-48">
+      <select name="status"
+        class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm">
+
+        <option value="">Semua Status</option>
+        <option value="Pending Manager">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+
+      </select>
+    </div>
+
+    <!-- SORT -->
+    <div class="w-full md:w-40">
+      <select name="sort"
+        class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm">
+
+        <option value="desc">Terbaru</option>
+        <option value="asc">Terlama</option>
+
+      </select>
+    </div>
+
+    <!-- BUTTON -->
+    <div class="flex gap-2">
+
+      <button class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm hover:bg-indigo-700">
+        Filter
+      </button>
+
+      <a href="/overtime/approval"
+        class="px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50">
+        Reset
+      </a>
+
+    </div>
+
+  </div>
+</form>
     <!-- TABLE CARD -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4">
+    <div class="bg-white border border-slate-200 rounded-xl  w-full text-sm border-collapse">
 
       <% if (overtimes.length > 0) { %>
 
-        <div class="overflow-x-auto">
-
-          <table class="w-full text-sm">
+       <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <table class="w-full text-sm border-collapse">
 
             <!-- HEADER -->
-            <thead>
-              <tr class="text-left text-xs text-slate-500 border-b border-slate-200">
-                <th class="py-2 px-3 font-normal">Karyawan</th>
-                <th class="py-2 px-3 font-normal">Tanggal</th>
-                <th class="py-2 px-3 font-normal">Jam</th>
-                <th class="py-2 px-3 font-normal">Total</th>
-                <th class="py-2 px-3 font-normal">Status</th>
-                <th class="py-2 px-3 font-normal text-center">Aksi</th>
-              </tr>
-            </thead>
+         <thead class="bg-slate-100 border-b border-slate-200">
+            <tr class="text-left text-xs text-slate-600">
+
+
+    <th class="py-3 px-3 font-medium">Karyawan</th>
+    <th class="py-3 px-3 font-medium">Tanggal</th>
+    <th class="py-3 px-3 font-medium">Jam</th>
+    <th class="py-3 px-3 font-medium">Total</th>
+    <th class="py-3 px-3 font-medium">Status</th>
+    <th class="py-3 px-3 font-medium text-center">Aksi</th>
+
+  </tr>
+</thead>
 
             <!-- BODY -->
             <tbody class="divide-y divide-slate-100">
@@ -106,7 +163,31 @@
           </table>
 
         </div>
+<div class="mt-4 flex items-center justify-between text-sm text-slate-600">
 
+  <div>
+    Page <%= pagination.page %> / <%= pagination.totalPages %>
+  </div>
+
+  <div class="flex gap-2">
+
+    <% if (pagination.page > 1) { %>
+      <a href="?page=<%= pagination.page - 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>"
+        class="px-3 py-1 border rounded-lg hover:bg-slate-100">
+        Prev
+      </a>
+    <% } %>
+
+    <% if (pagination.page < pagination.totalPages) { %>
+      <a href="?page=<%= pagination.page + 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>"
+        class="px-3 py-1 border rounded-lg hover:bg-slate-100">
+        Next
+      </a>
+    <% } %>
+
+  </div>
+
+</div>
       <% } else { %>
 
         <!-- EMPTY STATE -->

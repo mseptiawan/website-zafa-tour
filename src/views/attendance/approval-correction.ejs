@@ -1,0 +1,69 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<div class="ml-72 p-8 bg-slate-50 min-h-screen">
+
+  <div class="bg-white border rounded-xl overflow-hidden">
+
+    <table class="w-full text-sm">
+
+      <thead class="bg-slate-100 text-xs">
+        <tr>
+          <th class="p-3 text-left">Karyawan</th>
+          <th>Tanggal</th>
+          <th>Alasan</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <% data.forEach(d => { %>
+          <tr class="border-t">
+
+            <td class="p-3">
+              <%= d.userId?.username %>
+            </td>
+
+            <td>
+              <%= new Date(d.date).toLocaleDateString('id-ID') %>
+            </td>
+
+            <td>
+              <%= d.reasonType %>
+            </td>
+
+            <td>
+              <span class="text-xs"><%= d.status %></span>
+            </td>
+
+            <td class="flex gap-2 p-2">
+
+              <% if (d.status === "PENDING") { %>
+
+                <a href="/attendance/correction/<%= d._id %>/APPROVED"
+                  class="text-green-600 text-sm">
+                  Approve
+                </a>
+
+                <a href="/attendance/correction/<%= d._id %>/REJECTED"
+                  class="text-red-600 text-sm">
+                  Reject
+                </a>
+
+              <% } else { %>
+                <span class="text-xs text-slate-400">Done</span>
+              <% } %>
+
+            </td>
+
+          </tr>
+        <% }) %>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

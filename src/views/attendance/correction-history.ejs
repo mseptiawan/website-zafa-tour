@@ -1,0 +1,101 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<div class="ml-72 p-8 bg-slate-50 min-h-screen">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-xl font-semibold text-slate-800">
+      Riwayat Koreksi Absensi
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Daftar pengajuan koreksi yang pernah kamu kirim
+    </p>
+  </div>
+
+  <!-- CARD -->
+  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+
+    <div class="overflow-x-auto">
+
+      <table class="w-full text-sm">
+
+        <!-- HEADER -->
+        <thead class="bg-slate-100 text-xs text-slate-500">
+          <tr>
+            <th class="p-4 text-left font-medium">Tanggal</th>
+            <th class="text-left font-medium">Jam</th>
+            <th class="text-left font-medium">Jenis</th>
+            <th class="text-left font-medium">Alasan</th>
+            <th class="text-left font-medium">Status</th>
+            <th class="text-left font-medium">Dibuat</th>
+          </tr>
+        </thead>
+
+        <!-- BODY -->
+        <tbody class="divide-y divide-slate-100">
+
+          <% if (data && data.length > 0) { %>
+
+            <% data.forEach(d => { %>
+              <tr class="hover:bg-slate-50 transition">
+
+                <!-- TANGGAL -->
+                <td class="p-4 text-slate-700">
+                  <%= d.startDate ? new Date(d.startDate).toLocaleDateString('id-ID') : '-' %>
+                </td>
+
+                <!-- JAM -->
+                <td class="text-slate-600">
+                  <%= d.startTime %> - <%= d.endTime %>
+                </td>
+
+                <!-- JENIS -->
+                <td class="text-slate-600">
+                  <%= d.reasonType %>
+                </td>
+
+                <!-- ALASAN -->
+                <td class="text-slate-600 max-w-xs truncate">
+                  <%= d.reason %>
+                </td>
+
+                <!-- STATUS -->
+                <td>
+                  <span class="text-xs px-2 py-1 rounded-md
+                    <%= d.status === 'PENDING'
+                      ? 'bg-slate-100 text-slate-600'
+                      : d.status === 'APPROVED'
+                      ? 'bg-emerald-50 text-emerald-600'
+                      : 'bg-red-50 text-red-600' %>">
+                    <%= d.status %>
+                  </span>
+                </td>
+
+                <!-- DIBUAT -->
+                <td class="text-slate-500 text-xs">
+                  <%= d.createdAt
+                    ? new Date(d.createdAt).toLocaleString('id-ID')
+                    : '-' %>
+                </td>
+
+              </tr>
+            <% }) %>
+
+          <% } else { %>
+
+            <tr>
+              <td colspan="6" class="text-center py-10 text-slate-400">
+                Belum ada pengajuan koreksi
+              </td>
+            </tr>
+
+          <% } %>
+
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+
+</div>

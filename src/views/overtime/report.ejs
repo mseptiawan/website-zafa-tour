@@ -128,8 +128,8 @@
 
         <table class="w-full text-sm border-collapse">
 
-          <thead class="bg-yellow-300">
-            <tr class="text-left text-xs text-slate-700">
+      <thead class="bg-slate-100 border-b border-slate-200">
+            <tr class="text-left text-xs text-slate-600">
 
               <th class="px-3 py-3 font-normal">Karyawan</th>
               <th class="px-3 py-3 font-normal">Tanggal</th>
@@ -170,7 +170,7 @@
 
               <td class="px-3 py-2">
                 <button
-  class="openDetailModal text-indigo-600 text-sm hover:underline"
+  class="openDetailModal text-slate-400 hover:text-slate-600 text-sm hover:underline"
   data-employee="<%= o.employeeName %>"
   data-date="<%= new Date(o.date).toLocaleDateString('id-ID') %>"
   data-time="<%= o.startTime %> - <%= o.endTime %>"
@@ -181,7 +181,7 @@
   data-created="<%= new Date(o.createdAt).toLocaleString('id-ID') %>"
   data-proof="<%= o.proofFile || '' %>"
 >
-  Detail
+    <i data-lucide="eye" class="w-4 h-4"></i>
 </button>
               </td>
 

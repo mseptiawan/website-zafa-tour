@@ -10,7 +10,12 @@ const attendanceSchema = new mongoose.Schema(
 
     checkIn: Date,
     checkOut: Date,
-    workDuration: Number,
+
+    workDuration: {
+      type: Number,
+      default: 0,
+    },
+
     status: {
       type: String,
       enum: ["HADIR", "TELAT", "ALPHA"],
@@ -25,22 +30,17 @@ const attendanceSchema = new mongoose.Schema(
 
     photo: String,
 
-    note: String,
-
     location: {
       lat: Number,
       lng: Number,
-      accuracy: Number, // meter
+      accuracy: Number,
       address: String,
     },
+
     deviceInfo: {
       userAgent: String,
       platform: String,
       deviceId: String,
-    },
-    overtime: {
-      isOvertime: Boolean,
-      duration: Number,
     },
   },
   { timestamps: true }

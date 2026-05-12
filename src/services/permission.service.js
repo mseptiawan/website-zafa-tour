@@ -40,6 +40,10 @@ export function getPermissions(role) {
     attendance_view_my: false,
     attendance_view_all: false,
 
+    attendance_correction_view_my: false,
+    attendance_correction_approval: false,
+    attendance_correction_request: false,
+
     // =========================
     // TASK
     // =========================
@@ -90,6 +94,8 @@ export function getPermissions(role) {
 
       permissions.attendance_input = true;
       permissions.attendance_view_my = true;
+      permissions.attendance_correction_view_my = true;
+      permissions.attendance_correction_request = true;
 
       permissions.task_create = true;
       permissions.task_view_my = true;
@@ -112,6 +118,8 @@ export function getPermissions(role) {
 
       permissions.attendance_input = true;
       permissions.attendance_view_my = true;
+      permissions.attendance_correction_view_my = true;
+      permissions.attendance_correction_request = true;
 
       permissions.task_create = true;
       permissions.task_view_my = true;
@@ -140,6 +148,8 @@ export function getPermissions(role) {
       permissions.kasbon_approval = true;
 
       permissions.attendance_view_all = true;
+      permissions.attendance_correction_view_my = true;
+      permissions.attendance_correction_request = true;
 
       permissions.task_view_all = true;
 
@@ -175,6 +185,7 @@ export function getPermissions(role) {
       permissions.kasbon_approval = true;
 
       permissions.attendance_view_all = true;
+      permissions.attendance_correction_approval = true;
 
       permissions.payroll_process = true;
       permissions.payroll_view = true;

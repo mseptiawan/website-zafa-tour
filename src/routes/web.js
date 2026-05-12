@@ -1,6 +1,14 @@
 import express from "express";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 import {
+  formCorrection,
+  submitCorrection,
+  myCorrections,
+  allCorrections,
+  updateStatus,
+} from "../controllers/attendanceCorrectionController.js";
+
+import {
   showLogin,
   login,
   dashboard,
@@ -45,7 +53,6 @@ import {
   index,
   checkIn,
   allAttendance,
-  detail,
   checkOut,
   history,
 } from "../controllers/attendanceController.js";
@@ -198,8 +205,18 @@ router.get("/attendance/history", history);
 
 router.post("/attendance/checkin", uploadPhoto.single("photo"), checkIn);
 router.post("/attendance/checkout", checkOut);
-router.get("/attendance/detail/:id", detail);
 router.get("/attendance/all", roleMiddleware(["HR"]), allAttendance);
+
+router.get("/attendance/correction", formCorrection);
+router.post("/attendance/correction", submitCorrection);
+router.get("/attendance/correction/history", myCorrections);
+
+/**
+ * ADMIN
+ */
+router.get("/attendance/approval-correction", roleMiddleware(["HR"]), allCorrections);
+router.get("/attendance/correction/:id/:status", roleMiddleware(["HR"]), updateStatus);
+
 // form pengajuan dinas luar
 router.get("/trip/request", authMiddleware, formRequest);
 router.post("/trip/request", authMiddleware, createTrip);
