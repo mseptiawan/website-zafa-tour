@@ -8,14 +8,9 @@ const attendanceSchema = new mongoose.Schema(
       required: true,
     },
 
-    date: {
-      type: Date,
-      default: Date.now,
-    },
-
     checkIn: Date,
     checkOut: Date,
-
+    workDuration: Number,
     status: {
       type: String,
       enum: ["HADIR", "TELAT", "ALPHA"],
@@ -24,7 +19,7 @@ const attendanceSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["KANTOR", "DINAS_LUAR"],
+      enum: ["KANTOR", "LUAR KANTOR"],
       default: "KANTOR",
     },
 
@@ -32,14 +27,23 @@ const attendanceSchema = new mongoose.Schema(
 
     note: String,
 
-    // ✅ TAMBAHAN UNTUK DINAS LUAR
     location: {
       lat: Number,
       lng: Number,
-      address: String, // optional kalau mau reverse geocoding
+      accuracy: Number, // meter
+      address: String,
+    },
+    deviceInfo: {
+      userAgent: String,
+      platform: String,
+      deviceId: String,
+    },
+    overtime: {
+      isOvertime: Boolean,
+      duration: Number,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default mongoose.model("Attendance", attendanceSchema);

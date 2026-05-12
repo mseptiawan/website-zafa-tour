@@ -96,6 +96,28 @@ export function getPermissions(role) {
 
       break;
 
+    case "KEUANGAN":
+      permissions.leave_request = true;
+      permissions.leave_my = true;
+
+      permissions.overtime_request = true;
+      permissions.overtime_my = true;
+
+      permissions.trip_request = true;
+      permissions.trip_my = true;
+
+      permissions.claim_request = true;
+
+      permissions.kasbon_request = true;
+
+      permissions.attendance_input = true;
+      permissions.attendance_view_my = true;
+
+      permissions.task_create = true;
+      permissions.task_view_my = true;
+
+      break;
+
     // =========================
     // MANAGER
     // =========================

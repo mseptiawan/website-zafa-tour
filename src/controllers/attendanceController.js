@@ -1,25 +1,35 @@
 import Attendance from "../models/Attendance.js";
 
 /**
+ * HELPER: RANGE HARI INI
+ */
+const getTodayRange = () => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
+};
+
+/**
  * AMBIL HALAMAN ABSENSI
  */
 export const index = async (req, res) => {
   try {
     const user = req.session.user;
-
     if (!user) return res.redirect("/");
 
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
+    const { start, end } = getTodayRange();
 
-    // ambil absensi hari ini
     const attendance = await Attendance.findOne({
       userId: user._id,
-      checkIn: { $gte: start },
+      checkIn: { $gte: start, $lte: end },
     });
 
     const already = !!attendance;
-    const hasCheckedOut = attendance?.checkOut ? true : false;
+    const hasCheckedOut = !!attendance?.checkOut;
 
     return res.render("attendance/create", {
       title: "Absensi",
@@ -47,12 +57,11 @@ export const checkIn = async (req, res) => {
       });
     }
 
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
+    const { start, end } = getTodayRange();
 
     const already = await Attendance.findOne({
       userId: user._id,
-      checkIn: { $gte: start },
+      checkIn: { $gte: start, $lte: end },
     });
 
     if (already) {
@@ -97,27 +106,24 @@ export const checkIn = async (req, res) => {
 };
 
 /**
- * CHECK OUT (PULANG)
+ * CHECK OUT
  */
 export const checkOut = async (req, res) => {
   try {
     const user = req.session.user;
-
     if (!user) return res.redirect("/");
 
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
+    const { start, end } = getTodayRange();
 
     const attendance = await Attendance.findOne({
       userId: user._id,
-      checkIn: { $gte: start },
+      checkIn: { $gte: start, $lte: end },
     });
 
     if (!attendance) {
       return res.redirect("/attendance");
     }
 
-    // kalau sudah pulang, jangan update lagi
     if (attendance.checkOut) {
       return res.redirect("/attendance/history");
     }
@@ -131,38 +137,55 @@ export const checkOut = async (req, res) => {
     return res.status(500).send("error checkout");
   }
 };
+
 /**
  * HISTORY
  */
 export const history = async (req, res) => {
-  const user = req.session.user;
+  try {
+    const user = req.session.user;
 
-  const data = await Attendance.find({
-    userId: user._id,
-  }).sort({ createdAt: -1 });
+    const data = await Attendance.find({
+      userId: user._id,
+    }).sort({ createdAt: -1 });
 
-  res.render("attendance/history", {
-    data,
-    title: "Riwayat Absensi",
-  });
-};
-export const detail = async (req, res) => {
-  const data = await Attendance.findById(req.params.id).populate("userId");
-
-  if (!data) {
-    return res.status(404).send("Data tidak ditemukan");
+    res.render("attendance/history", {
+      data,
+      title: "Riwayat Absensi",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("error history");
   }
-
-  res.render("attendance/detail", {
-    data,
-    title: "Detail Absensi",
-  });
 };
+
+/**
+ * DETAIL
+ */
+export const detail = async (req, res) => {
+  try {
+    const data = await Attendance.findById(req.params.id).populate("userId");
+
+    if (!data) {
+      return res.status(404).send("Data tidak ditemukan");
+    }
+
+    res.render("attendance/detail", {
+      data,
+      title: "Detail Absensi",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("error detail");
+  }
+};
+
+/**
+ * ALL ATTENDANCE (ADMIN)
+ */
 export const allAttendance = async (req, res) => {
   try {
-    const data = await Attendance.find()
-      .populate("userId")
-      .sort({ createdAt: -1 });
+    const data = await Attendance.find().populate("userId").sort({ createdAt: -1 });
 
     res.render("attendance/index", {
       data,

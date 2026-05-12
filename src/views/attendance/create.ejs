@@ -6,107 +6,169 @@
 
     <!-- HEADER -->
     <div class="mb-8 text-center">
-      <h1 class="text-xl font-semibold text-slate-800">
+      <h1 class="text-lg font-medium text-slate-800">
         Absensi Kamera
       </h1>
       <p class="text-sm text-slate-500 mt-1">
-        Pastikan wajah terlihat jelas sebelum melakukan absen
+        Pastikan wajah terlihat jelas sebelum absen
       </p>
     </div>
 
     <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-6">
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
 
       <% if (already) { %>
 
-        <!-- ALREADY CHECKED -->
-        <div class="text-center space-y-4 py-6">
+        <!-- STATE SUDAH ABSEN -->
+        <div class="text-center space-y-4 py-8">
 
-          <div class="w-14 h-14 mx-auto flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-            ✔
+          <div class="w-12 h-12 mx-auto flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+            <i data-lucide="check" class="w-5 h-5"></i>
           </div>
 
-          <div>
-            <h2 class="text-base font-medium text-slate-800">
-              Sudah Absen Hari Ini
-            </h2>
-            <p class="text-sm text-slate-500 mt-1">
-              Data kehadiran sudah tersimpan
+          <h2 class="text-sm font-medium text-slate-800">
+            Sudah Absen Hari Ini
+          </h2>
+
+          <% if (!hasCheckedOut) { %>
+
+            <form action="/attendance/checkout" method="POST">
+              <button
+                class="px-4 py-2 text-sm rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition"
+              >
+                Pulang
+              </button>
+            </form>
+
+          <% } else { %>
+
+            <p class="text-sm text-slate-500">
+              Sudah checkout hari ini
             </p>
-          </div>
 
-              <% if (already && !hasCheckedOut) { %>
-
-  <form action="/attendance/checkout" method="POST" class="inline-block">
-    <button
-      class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition"
-    >
-      Pulang
-    </button>
-  </form>
-
-<% } else if (hasCheckedOut) { %>
-
-  <p class="text-sm text-slate-500 font-medium">
-    ✔ Sudah pulang hari ini
-  </p>
-
-<% } %>
+          <% } %>
 
         </div>
 
       <% } else { %>
 
-        <!-- CAMERA -->
-        <div class="space-y-4">
+        <!-- FORM ABSENSI -->
+        <form id="attendanceForm" class="space-y-5">
 
-          <div class="relative overflow-hidden rounded-xl border border-slate-200 bg-black aspect-video">
-            <video id="video" autoplay class="w-full h-full object-cover"></video>
+          <!-- CAMERA -->
+          <div class="relative bg-slate-900 rounded-2xl overflow-hidden aspect-video shadow-sm">
+
+            <video
+              id="video"
+              autoplay
+              playsinline
+              muted
+              class="w-full h-full object-cover"
+            ></video>
+
             <canvas id="canvas" class="hidden"></canvas>
+
           </div>
 
-          <!-- FORM -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- TYPE -->
+          <div>
+            <label class="text-xs text-slate-500">Kategori</label>
 
-            <!-- TYPE -->
-            <div>
-              <label class="text-xs text-slate-500">Kategori</label>
-              <select name="type"
-                class="mt-1 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200">
-                <option value="KANTOR">Kantor</option>
-                <option value="DINAS_LUAR">Dinas Luar</option>
-              </select>
-            </div>
+            <select
+              name="type"
+              id="type"
+              class="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            >
+              <option value="KANTOR">Kantor</option>
+              <option value="DINAS_LUAR">Dinas Luar</option>
+            </select>
+          </div>
 
-            <!-- NOTE -->
-            <div>
-              <label class="text-xs text-slate-500">Catatan</label>
-              <input type="text" name="note"
-                class="mt-1 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
-                placeholder="Opsional..." />
-            </div>
+          <!-- NOTE -->
+          <div>
+            <label class="text-xs text-slate-500">Catatan</label>
 
+            <input
+              type="text"
+              name="note"
+              id="note"
+              placeholder="Opsional..."
+              class="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            />
           </div>
 
           <!-- BUTTON -->
           <button
-            onclick="takePhoto()"
             type="button"
-            class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium py-3 rounded-lg transition"
+            onclick="takePhoto()"
+            class="w-full py-3 rounded-lg bg-slate-900 text-white text-sm
+                   hover:bg-slate-800 transition shadow-sm"
           >
             Ambil Foto & Absen
           </button>
 
-        </div>
+        </form>
 
       <% } %>
 
     </div>
 
-    <!-- FOOTER -->
-    <p class="text-center text-xs text-slate-400 mt-6">
-      Sistem otomatis mencatat waktu dan lokasi absensi
-    </p>
-
   </div>
 </div>
+
+<!-- SCRIPT CAMERA -->
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+
+// START CAMERA
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => {
+    video.srcObject = stream;
+  })
+  .catch(err => {
+    console.log("Camera error:", err);
+    alert("Kamera tidak bisa diakses");
+  });
+
+// TAKE PHOTO + SEND
+function takePhoto() {
+  const context = canvas.getContext("2d");
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob(async (blob) => {
+
+    const formData = new FormData();
+    formData.append("photo", blob, "selfie.jpg");
+    formData.append("type", document.getElementById("type").value);
+    formData.append("note", document.getElementById("note").value);
+
+    try {
+      const res = await fetch("/attendance/checkin", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Absen berhasil");
+        location.reload();
+      } else {
+        alert(data.message || "Gagal absen");
+      }
+
+    } catch (err) {
+      console.log(err);
+      alert("Terjadi kesalahan saat absen");
+    }
+
+  }, "image/jpeg");
+}
+</script>
