@@ -31,8 +31,9 @@
               <th class="px-5 py-4 text-left font-medium">Tujuan</th>
               <th class="px-5 py-4 text-left font-medium">Tanggal</th>
               <th class="px-5 py-4 text-left font-medium">Budget</th>
+              <th class="px-5 py-4 text-left font-medium">Timeline</th>
+              <th class="px-5 py-4 text-left font-medium">Contact</th>
               <th class="px-5 py-4 text-left font-medium">Status</th>
-              <th class="px-5 py-4 text-left font-medium">Aksi</th>
 
             </tr>
 
@@ -42,21 +43,16 @@
           <tbody class="divide-y divide-slate-100">
 
             <% if (trips.length === 0) { %>
-
               <tr>
-                <td colspan="6" class="px-5 py-14 text-center">
-
+                <td colspan="8" class="px-5 py-14 text-center">
                   <div class="text-sm font-medium text-slate-600">
                     Belum ada pengajuan perjalanan
                   </div>
-
                   <p class="text-xs text-slate-400 mt-1">
                     Silakan buat pengajuan dinas luar terlebih dahulu
                   </p>
-
                 </td>
               </tr>
-
             <% } %>
 
             <% trips.forEach(trip => { %>
@@ -74,27 +70,67 @@
                 </td>
 
                 <!-- TANGGAL -->
-                <td class="px-5 py-4 text-slate-600">
-
-                  <div class="text-xs leading-relaxed">
-
-                    <div>
-                      <span class="text-slate-400">Mulai:</span>
-                      <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
-                    </div>
-
-                    <div>
-                      <span class="text-slate-400">Selesai:</span>
-                      <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
-                    </div>
-
+                <td class="px-5 py-4 text-slate-600 text-xs leading-relaxed">
+                  <div>
+                    <span class="text-slate-400">Mulai:</span>
+                    <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
                   </div>
-
+                  <div>
+                    <span class="text-slate-400">Selesai:</span>
+                    <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
+                  </div>
                 </td>
 
                 <!-- BUDGET -->
                 <td class="px-5 py-4 font-medium text-slate-700">
                   Rp <%= Number(trip.budget).toLocaleString('id-ID') %>
+                </td>
+
+                <!-- TIMELINE -->
+                <td class="px-5 py-4 text-xs text-slate-600">
+                  <% if (trip.timeline && trip.timeline.length) { %>
+
+                    <div class="space-y-1">
+
+                      <% trip.timeline.slice(0, 3).forEach((t, i) => { %>
+                        <div class="truncate">
+                          <span class="text-slate-400"><%= i + 1 %>.</span>
+                          <%= t.address %>
+                        </div>
+                      <% }) %>
+
+                      <% if (trip.timeline.length > 3) { %>
+                        <div class="text-slate-400">
+                          +<%= trip.timeline.length - 3 %> lainnya
+                        </div>
+                      <% } %>
+
+                    </div>
+
+                  <% } else { %>
+                    <span class="text-slate-400">-</span>
+                  <% } %>
+                </td>
+
+                <!-- CONTACT PERSON -->
+                <td class="px-5 py-4 text-xs text-slate-600">
+
+                  <% if (trip.contactName || trip.contactPhone) { %>
+
+                    <div class="font-medium text-slate-700">
+                      <%= trip.contactName || '-' %>
+                    </div>
+
+                    <div class="text-slate-400">
+                      <%= trip.contactPhone || '-' %>
+                    </div>
+
+                  <% } else { %>
+
+                    <span class="text-slate-400">-</span>
+
+                  <% } %>
+
                 </td>
 
                 <!-- STATUS -->
@@ -125,24 +161,6 @@
                     </span>
 
                   <% } %>
-
-                </td>
-
-                <!-- AKSI -->
-                <td class="px-5 py-4">
-
-                  <a
-                    href="/trip/detail/<%= trip._id %>"
-                    class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-700 text-sm font-medium transition"
-                  >
-                    Detail
-
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 5l7 7-7 7"/>
-                    </svg>
-
-                  </a>
 
                 </td>
 

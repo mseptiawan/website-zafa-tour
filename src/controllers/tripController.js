@@ -12,7 +12,6 @@ export const formRequest = (req, res) => {
     title: "Pengajuan Dinas Luar",
   });
 };
-
 export const createTrip = async (req, res) => {
   try {
     const user = req.session.user;
@@ -21,71 +20,71 @@ export const createTrip = async (req, res) => {
       return res.status(401).send("Session tidak valid");
     }
 
-    let { title, startDate, endDate, destination, description, budget } = req.body;
+    let {
+      title,
+      startDate,
+      endDate,
+      destination,
+      description,
+      budget,
+      contactName,
+      contactPhone,
+      timeline, // 👈 ARRAY INPUT
+    } = req.body;
 
     // =========================
-    // NORMALIZE INPUT
+    // NORMALIZE
     // =========================
     title = title?.trim();
     destination = destination?.trim();
     description = description?.trim();
     budget = Number(budget);
 
-    // =========================
-    // VALIDATION RULES
-    // =========================
-
-    // 1. TITLE
-    if (!title || title.length < 5 || title.length > 100) {
-      return res.status(400).send("Judul harus 5-100 karakter");
+    // timeline bisa string atau array dari form
+    if (!Array.isArray(timeline)) {
+      timeline = timeline ? [timeline] : [];
     }
 
-    // 2. DATE CHECK
-    if (!startDate || !endDate) {
-      return res.status(400).send("Tanggal wajib diisi");
+    timeline = timeline
+      .map((t, index) => ({
+        address: t?.trim(),
+        order: index + 1,
+      }))
+      .filter((t) => t.address);
+
+    // =========================
+    // VALIDATION
+    // =========================
+
+    if (!title || title.length < 5 || title.length > 100) {
+      return res.status(400).send("Judul minimal 5 karakter");
     }
 
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    if (isNaN(start) || isNaN(end)) {
-      return res.status(400).send("Format tanggal tidak valid");
-    }
-
     if (start > end) {
-      return res.status(400).send("Tanggal mulai tidak boleh lebih besar dari tanggal selesai");
+      return res.status(400).send("Tanggal tidak valid");
     }
 
-    // optional: tidak boleh masa lalu
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (start < today) {
-      return res.status(400).send("Tanggal tidak boleh di masa lalu");
+    if (!destination || destination.length < 3) {
+      return res.status(400).send("Tujuan tidak valid");
     }
 
-    // 3. DESTINATION
-    if (!destination || destination.length < 3 || destination.length > 150) {
-      return res.status(400).send("Tujuan harus 3-150 karakter");
+    if (!description || description.length < 10) {
+      return res.status(400).send("Deskripsi terlalu pendek");
     }
 
-    // 4. DESCRIPTION
-    if (!description || description.length < 10 || description.length > 1000) {
-      return res.status(400).send("Deskripsi minimal 10 karakter");
-    }
-
-    // 5. BUDGET
     if (isNaN(budget) || budget < 0) {
       return res.status(400).send("Budget tidak valid");
     }
 
-    const MAX_BUDGET = 50000000;
-    if (budget > MAX_BUDGET) {
-      return res.status(400).send("Budget melebihi batas 50 juta");
+    if (timeline.length === 0) {
+      return res.status(400).send("Timeline wajib diisi minimal 1 lokasi");
     }
 
     // =========================
-    // SAVE TO DATABASE
+    // SAVE
     // =========================
     const trip = await BusinessTrip.create({
       userId: user._id,
@@ -95,16 +94,23 @@ export const createTrip = async (req, res) => {
       destination,
       description,
       budget,
+
+      contactPerson: {
+        name: contactName,
+        phone: contactPhone,
+      },
+
+      timeline,
+
       status: "PENDING",
     });
 
     return res.redirect("/trip/my");
   } catch (err) {
-    console.error("CREATE_TRIP_ERROR:", err);
+    console.error(err);
     return res.status(500).send("Gagal membuat pengajuan");
   }
 };
-
 export const myTrips = async (req, res) => {
   try {
     const user = req.session.user;
