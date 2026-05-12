@@ -9,8 +9,21 @@ const businessTripSchema = new mongoose.Schema(
     },
 
     title: String,
+
+    purpose: {
+      type: String,
+      enum: ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"],
+    },
+
+    contactPerson: {
+      name: String,
+      phone: String,
+      position: String,
+    },
+
     startDate: Date,
     endDate: Date,
+
     destination: String,
     description: String,
 
@@ -18,6 +31,13 @@ const businessTripSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    timeline: [
+      {
+        address: String,
+        order: Number,
+      },
+    ],
 
     status: {
       type: String,
@@ -35,7 +55,7 @@ const businessTripSchema = new mongoose.Schema(
       date: Date,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default mongoose.model("BusinessTrip", businessTripSchema);
