@@ -56,7 +56,8 @@
                       </div>
                       <div>
                         <p class="font-medium text-slate-700">
-                          <%= l.userId?.fullName || 'Unknown' %>
+                         <%= l.employee?.fullName || 'Unknown' %>
+
                         </p>
                         <p class="text-xs text-slate-400">
                           <%= l.userId?.employeeId || '-' %>
@@ -69,7 +70,7 @@
                   <td class="px-5 py-4">
                     <div class="space-y-1">
                       <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                        <%= l.type %>
+                   <%= l.type?.name || '-' %>
                       </span>
                       <p class="text-xs text-slate-400 truncate max-w-[200px]">
                         <%= l.reason %>
@@ -107,40 +108,110 @@
                   </td>
 
                   <!-- ACTION -->
-                  <td class="px-5 py-4">
-                    <div class="flex justify-center gap-2">
+               
+<td class="px-5 py-4">
+  <div class="flex justify-center gap-2">
 
-                      <% if(l.status === 'Pending Manager'){ %>
-                        <form action="/leave/approval/<%= l._id %>/manager" method="POST">
-                          <button class="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition">
-                            ✔
-                          </button>
-                        </form>
-                      <% } %>
+    <!-- ===================================
+    MANAGER
+    hanya approve STAFF
+    ==================================== -->
+    <% if (
+      userRole === 'MANAGER' &&
+      l.status === 'Pending Manager' &&
+      l.userId?.roleId?.name === 'STAFF'
+    ) { %>
 
-                      <% if(l.status === 'Pending HR'){ %>
-                        <form action="/leave/approval/<%= l._id %>/hr" method="POST">
-                          <button class="p-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition">
-                            ✔
-                          </button>
-                        </form>
-                      <% } %>
+      <!-- APPROVE -->
+      <form action="/leave/approval/<%= l._id %>/manager" method="POST">
+        <button
+          class="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+          ✔
+        </button>
+      </form>
 
-                      <% if(l.status !== 'Approved' && l.status !== 'Rejected'){ %>
-                        <form action="/leave/approval/<%= l._id %>/reject" method="POST">
-                          <button class="p-2 rounded-lg bg-white border border-slate-200 text-rose-500 hover:bg-rose-50 transition">
-                            ✕
-                          </button>
-                        </form>
-                      <% } %>
+      <!-- REJECT -->
+      <form action="/leave/approval/<%= l._id %>/reject" method="POST">
+        <button
+          class="p-2 bg-white border border-rose-200 text-rose-500 rounded-lg hover:bg-rose-50 transition">
+          ✕
+        </button>
+      </form>
 
-                      <a href="/leave/<%= l._id %>"
-                        class="p-2 rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 transition">
-                        👁
-                      </a>
+    <% } %>
 
-                    </div>
-                  </td>
+
+    <!-- ===================================
+    HR
+    approve:
+    - manager
+    - staff yg sudah lolos manager
+    ==================================== -->
+    <% if (
+      userRole === 'HR' &&
+      l.status === 'Pending HR'
+    ) { %>
+
+      <!-- APPROVE -->
+      <form action="/leave/approval/<%= l._id %>/hr" method="POST">
+        <button
+          class="p-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+          ✔
+        </button>
+      </form>
+
+      <!-- REJECT -->
+      <form action="/leave/approval/<%= l._id %>/reject" method="POST">
+        <button
+          class="p-2 bg-white border border-rose-200 text-rose-500 rounded-lg hover:bg-rose-50 transition">
+          ✕
+        </button>
+      </form>
+
+    <% } %>
+
+
+    <!-- ===================================
+    PIMPINAN
+    hanya approve HR
+    ==================================== -->
+    <% if (
+      userRole === 'PIMPINAN' &&
+      l.status === 'Pending Pimpinan' &&
+      l.userId?.roleId?.name === 'HR'
+    ) { %>
+
+      <!-- APPROVE -->
+      <form action="/leave/approval/<%= l._id %>/pimpinan" method="POST">
+        <button
+          class="p-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition">
+          ✔
+        </button>
+      </form>
+
+      <!-- REJECT -->
+      <form action="/leave/approval/<%= l._id %>/reject" method="POST">
+        <button
+          class="p-2 bg-white border border-rose-200 text-rose-500 rounded-lg hover:bg-rose-50 transition">
+          ✕
+        </button>
+      </form>
+
+    <% } %>
+
+
+    <!-- ===================================
+    DETAIL
+    ==================================== -->
+    <a
+      href="/leave/<%= l._id %>"
+      class="p-2 bg-white border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-50 transition">
+      👁
+    </a>
+
+  </div>
+</td>
+    
 
                 </tr>
 

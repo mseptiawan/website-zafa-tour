@@ -7,13 +7,11 @@ const leaveSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     type: {
-      type: String,
-      enum: ["Tahunan", "Sakit", "Keluarga"],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LeaveType",
       required: true,
     },
-
     startDate: Date,
     endDate: Date,
 
@@ -25,7 +23,7 @@ const leaveSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Pending Manager", "Pending HR", "Approved", "Rejected"],
+      enum: ["Pending Manager", "Pending HR", "Pending Pimpinan", "Approved", "Rejected"],
       default: "Pending Manager",
     },
 
@@ -41,7 +39,7 @@ const leaveSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default mongoose.model("Leave", leaveSchema);

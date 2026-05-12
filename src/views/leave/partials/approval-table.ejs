@@ -1,0 +1,175 @@
+<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden">
+
+  <div class="overflow-x-auto">
+
+    <table class="w-full text-sm">
+
+      <!-- HEAD -->
+      <thead class="bg-slate-50 text-xs text-slate-400 uppercase tracking-wider">
+        <tr>
+          <th class="px-5 py-4 text-left">Karyawan</th>
+          <th class="px-5 py-4 text-left">Jenis & Alasan</th>
+          <th class="px-5 py-4 text-left">Periode</th>
+          <th class="px-5 py-4 text-center">Durasi</th>
+          <th class="px-5 py-4 text-left">Status</th>
+          <th class="px-5 py-4 text-center">Aksi</th>
+        </tr>
+      </thead>
+
+      <!-- BODY -->
+      <tbody class="divide-y divide-slate-100">
+
+        <% if (leaves && leaves.length > 0) { %>
+
+          <% leaves.forEach(l => { %>
+
+            <tr class="hover:bg-slate-50 transition">
+
+              <!-- USER -->
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+
+                  <div class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold border border-indigo-100">
+                    <%= l.employee?.fullName
+                      ? l.employee.fullName.substring(0,2).toUpperCase()
+                      : 'U' %>
+                  </div>
+
+                  <div>
+                    <p class="font-medium text-slate-700">
+                      <%= l.employee?.fullName || 'Unknown' %>
+                    </p>
+
+                    <p class="text-xs text-slate-400">
+                      <%= l.employee?.employeeId || '-' %>
+                    </p>
+                  </div>
+
+                </div>
+              </td>
+
+              <!-- TYPE -->
+              <td class="px-5 py-4">
+                <div class="space-y-1">
+
+                  <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                    <%= l.type?.name || '-' %>
+                  </span>
+
+                  <p class="text-xs text-slate-400 truncate max-w-[220px]">
+                    <%= l.reason %>
+                  </p>
+
+                </div>
+              </td>
+
+              <!-- PERIODE -->
+              <td class="px-5 py-4 text-slate-600">
+
+                <div class="text-xs">
+                  <%= new Date(l.startDate).toLocaleDateString("id-ID") %>
+                  -
+                  <%= new Date(l.endDate).toLocaleDateString("id-ID") %>
+                </div>
+
+              </td>
+
+              <!-- DURASI -->
+              <td class="px-5 py-4 text-center">
+
+                <span class="text-sm font-semibold text-slate-700">
+                  <%= l.totalDays %>
+                </span>
+
+                <p class="text-[10px] text-slate-400">
+                  hari
+                </p>
+
+              </td>
+
+              <!-- STATUS -->
+              <td class="px-5 py-4">
+
+                <span class="text-xs px-2.5 py-1 rounded-full font-medium border
+                  <%= l.status === 'Approved'
+                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                    : l.status === 'Rejected'
+                    ? 'bg-rose-50 text-rose-600 border-rose-100'
+                    : 'bg-amber-50 text-amber-600 border-amber-100'
+                  %>">
+
+                  <%= l.status %>
+
+                </span>
+
+              </td>
+
+              <!-- ACTION -->
+              <td class="px-5 py-4">
+
+                <div class="flex justify-center gap-2">
+
+                  <!-- APPROVE -->
+                  <form
+                    action="/leave/approval/<%= l._id %>/<%= actionUrl %>"
+                    method="POST">
+
+                    <button
+                      class="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+
+                      ✔
+
+                    </button>
+
+                  </form>
+
+                  <!-- REJECT -->
+                  <form
+                    action="/leave/approval/<%= l._id %>/reject"
+                    method="POST">
+
+                    <button
+                      class="p-2 bg-white border border-rose-200 text-rose-500 rounded-lg hover:bg-rose-50 transition">
+
+                      ✕
+
+                    </button>
+
+                  </form>
+
+                  <!-- DETAIL -->
+                  <a
+                    href="/leave/<%= l._id %>"
+                    class="p-2 bg-white border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-50 transition">
+
+                    👁
+
+                  </a>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          <% }) %>
+
+        <% } else { %>
+
+          <tr>
+
+            <td colspan="6" class="py-16 text-center text-slate-400">
+              Belum ada pengajuan cuti
+            </td>
+
+          </tr>
+
+        <% } %>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

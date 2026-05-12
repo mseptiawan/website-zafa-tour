@@ -3,241 +3,191 @@
 <div class="ml-72 p-8 bg-slate-50 min-h-screen">
 
   <!-- HEADER -->
-  <div class="mb-6">
-    <h1 class="text-xl font-semibold text-slate-800">
-      Data Absensi Karyawan
-    </h1>
-    <p class="text-sm text-slate-500 mt-1">
-      Monitoring kehadiran, keterlambatan, dan aktivitas karyawan
-    </p>
+  <div class="flex justify-between items-end mb-6">
+
+    <div>
+      <h1 class="text-xl font-semibold text-slate-800">
+        Data Absensi Karyawan
+      </h1>
+      <p class="text-sm text-slate-500">
+        HR Management Absensi
+      </p>
+    </div>
+
+    <!-- BUTTON MANUAL -->
+    <a href="/attendance/create-manual"
+      class="bg-slate-900 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800 transition">
+      + Absen Manual
+    </a>
+
   </div>
 
-  <!-- CARD -->
+  <!-- FILTER -->
+  <form class="flex flex-wrap gap-2 mb-4">
+
+    <input type="date" name="from" class="border px-3 py-2 rounded-lg text-sm">
+    <input type="date" name="to" class="border px-3 py-2 rounded-lg text-sm">
+
+    <select name="status" class="border px-3 py-2 rounded-lg text-sm">
+      <option value="">Status</option>
+      <option value="HADIR">Hadir</option>
+      <option value="TELAT">Telat</option>
+    </select>
+
+    <select name="type" class="border px-3 py-2 rounded-lg text-sm">
+      <option value="">Type</option>
+      <option value="KANTOR">Kantor</option>
+      <option value="LUAR KANTOR">Luar Kantor</option>
+    </select>
+
+    <button class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm">
+      Filter
+    </button>
+
+  </form>
+
+  <!-- TABLE -->
   <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
 
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
 
-        <!-- HEADER -->
-        <thead class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+        <thead class="bg-slate-100 text-xs text-slate-500">
           <tr>
-            <th class="p-4 text-left font-medium">Karyawan</th>
-            <th class="text-left font-medium">Tanggal</th>
-            <th class="text-left font-medium">Check In</th>
-            <th class="text-left font-medium">Check Out</th>
-            <th class="text-left font-medium">Type</th>
-            <th class="text-left font-medium">Status</th>
-            <th class="text-left font-medium">Foto</th>
-            <th class="text-left font-medium">Lokasi</th>
-            <th class="text-left font-medium">Aksi</th>
+            <th class="p-3 text-left">User</th>
+            <th>Tanggal</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Foto</th>
+            <th>Aksi</th>
           </tr>
         </thead>
 
-        <!-- BODY -->
         <tbody class="divide-y divide-slate-100">
 
           <% data.forEach(d => { %>
-            <tr class="hover:bg-slate-50 transition">
+          <tr class="hover:bg-slate-50">
 
-              <!-- KARYAWAN -->
-              <td class="p-4 text-slate-700 font-medium">
-                <%= d.userId?.username || '-' %>
-              </td>
+            <td class="p-3 font-medium text-slate-700">
+              <%= d.userId?.username %>
+            </td>
 
-              <!-- TANGGAL -->
-              <td class="text-slate-600">
-                <%= new Date(d.createdAt).toLocaleDateString('id-ID') %>
-              </td>
+            <td><%= new Date(d.createdAt).toLocaleDateString('id-ID') %></td>
 
-              <!-- CHECK IN -->
-              <td class="text-slate-600">
-                <%= d.checkIn ? new Date(d.checkIn).toLocaleTimeString('id-ID') : '-' %>
-              </td>
+            <td><%= d.checkIn ? new Date(d.checkIn).toLocaleTimeString('id-ID') : '-' %></td>
 
-              <!-- CHECK OUT -->
-              <td class="text-slate-600">
-                <%= d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID') : '-' %>
-              </td>
+            <td><%= d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID') : '-' %></td>
 
-              <!-- TYPE -->
-              <td>
-                <span class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-600">
-                  <%= d.type %>
-                </span>
-              </td>
+            <td>
+              <span class="text-xs px-2 py-1 rounded bg-slate-100">
+                <%= d.type %>
+              </span>
+            </td>
 
-              <!-- STATUS -->
-             <td>
-  <span class="text-xs text-slate-600">
-    <%= d.status %>
-  </span>
-</td>
+            <!-- STATUS SIMPLE -->
+            <td>
+              <span class="text-xs text-slate-600">
+                <%= d.status %>
+              </span>
+            </td>
 
-              <!-- FOTO -->
-              <td>
-                <% if (d.photo) { %>
-                  <img
-                    src="<%= d.photo %>"
-                    class="w-9 h-9 rounded-full object-cover border border-slate-200"
-                  >
-                <% } else { %>
-                  <span class="text-slate-400 text-xs">-</span>
-                <% } %>
-              </td>
+            <td>
+              <% if (d.photo) { %>
+                <img src="<%= d.photo %>" class="w-8 h-8 rounded object-cover">
+              <% } else { %>
+                -
+              <% } %>
+            </td>
 
-              <!-- LOKASI -->
-              <td class="text-slate-500 text-xs">
-                <% if (d.location && d.location.lat) { %>
-                  Tersedia
-                <% } else { %>
-                  -
-                <% } %>
-              </td>
+            <td class="space-x-3">
 
-              <!-- ACTION -->
-              <td>
+              <a href="/attendance/edit/<%= d._id %>"
+                class="text-blue-500 text-sm">
+                Edit
+              </a>
+
               <button
-  class="openModal text-indigo-500 hover:text-indigo-600 text-sm font-medium"
-  data-date="<%= new Date(d.createdAt).toLocaleDateString('id-ID') %>"
-  data-status="<%= d.status %>"
-  data-checkin="<%= d.checkIn ? new Date(d.checkIn).toLocaleString('id-ID') : '-' %>"
-  data-checkout="<%= d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '-' %>"
-  data-type="<%= d.type %>"
-  data-note="<%= d.note || '-' %>"
-  data-workduration="<%= d.workDuration || 0 %>"
-  data-address="<%= d.location?.address || '-' %>"
-  data-lat="<%= d.location?.lat || '' %>"
-  data-lng="<%= d.location?.lng || '' %>"
-  data-useragent="<%= d.deviceInfo?.userAgent || '-' %>"
-  data-platform="<%= d.deviceInfo?.platform || '-' %>"
-  data-photo="<%= d.photo || '' %>"
->
-  Detail
-</button>
-              </td>
+                class="openModal text-indigo-500 text-sm"
+                data-user="<%= d.userId?.username %>"
+                data-date="<%= d.createdAt %>"
+                data-checkin="<%= d.checkIn %>"
+                data-checkout="<%= d.checkOut %>"
+                data-type="<%= d.type %>"
+                data-status="<%= d.status %>"
+                data-note="<%= d.note || '-' %>"
+                data-address="<%= d.location?.address || '-' %>"
+                data-photo="<%= d.photo || '' %>"
+              >
+                Detail
+              </button>
 
-            </tr>
+            </td>
+
+          </tr>
           <% }) %>
 
         </tbody>
 
       </table>
     </div>
+  </div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div id="modal"
+  class="fixed inset-0 hidden bg-black/50 items-center justify-center p-4">
+
+  <div class="bg-white w-full max-w-lg rounded-xl p-5 shadow-xl">
+
+    <h2 class="font-semibold mb-4 text-slate-800">
+      Detail Absensi
+    </h2>
+
+    <div class="text-sm space-y-1 text-slate-600">
+
+      <p>User: <span id="mUser"></span></p>
+      <p>Status: <span id="mStatus"></span></p>
+      <p>Type: <span id="mType"></span></p>
+      <p>Check In: <span id="mIn"></span></p>
+      <p>Check Out: <span id="mOut"></span></p>
+      <p>Note: <span id="mNote"></span></p>
+      <p>Address: <span id="mAddress"></span></p>
+
+    </div>
+
+    <img id="mPhoto"
+      class="mt-4 hidden w-32 h-32 object-cover rounded-lg border">
+
+    <button onclick="closeModal()"
+      class="mt-5 bg-slate-900 text-white px-4 py-2 rounded-lg w-full">
+      Tutup
+    </button>
 
   </div>
 </div>
-<!-- MODAL -->
-<div id="detailModal"
-  class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
 
-  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[90vh] overflow-hidden">
-
-    <!-- HEADER -->
-    <div class="p-5 border-b flex justify-between items-center bg-slate-50">
-      <div>
-        <h2 class="font-semibold text-slate-800">Detail Absensi</h2>
-        <p class="text-xs text-slate-500">Informasi lengkap kehadiran</p>
-      </div>
-
-      <button onclick="closeModal()" class="text-slate-500 hover:text-slate-800">
-        ✕
-      </button>
-    </div>
-
-    <!-- BODY -->
-    <div class="p-5 space-y-4 text-sm overflow-y-auto">
-
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <p class="text-xs text-slate-400">Tanggal</p>
-          <p id="mDate"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400">Status</p>
-          <p id="mStatus"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400">Check In</p>
-          <p id="mIn"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400">Check Out</p>
-          <p id="mOut"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400">Type</p>
-          <p id="mType"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400">Durasi</p>
-          <p><span id="mDuration"></span> menit</p>
-        </div>
-      </div>
-
-      <div>
-        <p class="text-xs text-slate-400">Catatan</p>
-        <p id="mNote"></p>
-      </div>
-
-      <div>
-        <p class="text-xs text-slate-400">Lokasi</p>
-        <p id="mAddress"></p>
-      </div>
-
-      <div id="photoBox" class="hidden">
-        <p class="text-xs text-slate-400 mb-2">Foto</p>
-        <img id="mPhoto" class="w-40 h-40 rounded-xl object-cover border">
-      </div>
-
-      <div class="text-xs text-slate-500">
-        <p>Lat: <span id="mLat"></span></p>
-        <p>Lng: <span id="mLng"></span></p>
-        <p>Device: <span id="mUA"></span></p>
-        <p>Platform: <span id="mPlatform"></span></p>
-      </div>
-
-    </div>
-
-    <div class="p-4 border-t text-right">
-      <button onclick="closeModal()" class="px-4 py-2 bg-slate-900 text-white rounded-lg">
-        Tutup
-      </button>
-    </div>
-
-  </div>
-</div>
+<!-- ================= SCRIPT ================= -->
 <script>
-  const modal = document.getElementById("detailModal");
+const modal = document.getElementById("modal");
 
 document.querySelectorAll(".openModal").forEach(btn => {
   btn.addEventListener("click", () => {
 
-    document.getElementById("mDate").textContent = btn.dataset.date;
+    document.getElementById("mUser").textContent = btn.dataset.user;
     document.getElementById("mStatus").textContent = btn.dataset.status;
+    document.getElementById("mType").textContent = btn.dataset.type;
     document.getElementById("mIn").textContent = btn.dataset.checkin;
     document.getElementById("mOut").textContent = btn.dataset.checkout;
-    document.getElementById("mType").textContent = btn.dataset.type;
     document.getElementById("mNote").textContent = btn.dataset.note;
-    document.getElementById("mDuration").textContent = btn.dataset.workduration || 0;
-
     document.getElementById("mAddress").textContent = btn.dataset.address;
 
-    document.getElementById("mLat").textContent = btn.dataset.lat || "-";
-    document.getElementById("mLng").textContent = btn.dataset.lng || "-";
-
-    document.getElementById("mUA").textContent = btn.dataset.useragent;
-    document.getElementById("mPlatform").textContent = btn.dataset.platform;
-
     if (btn.dataset.photo) {
-      document.getElementById("photoBox").classList.remove("hidden");
       document.getElementById("mPhoto").src = btn.dataset.photo;
+      document.getElementById("mPhoto").classList.remove("hidden");
     } else {
-      document.getElementById("photoBox").classList.add("hidden");
+      document.getElementById("mPhoto").classList.add("hidden");
     }
 
     modal.classList.remove("hidden");
@@ -249,5 +199,4 @@ function closeModal() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
-
 </script>

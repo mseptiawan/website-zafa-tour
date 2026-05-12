@@ -11,7 +11,7 @@
     "seed": "node src/database/seeders/index.js",
     "seed:role": "node src/database/seeders/roleSeeder.js",
     "seed:absen": "node src/database/seeders/attendanceSeeder.js",
-
+    "seed:leaveType": "node src/database/seeders/leaveTypeSeeder.js",
     "seed:bidang": "node src/database/seeders/bidangSeeder.js",
     "seed:unit": "node src/database/seeders/unitSeeder.js",
     "seed:user": "node src/database/seeders/userSeeder.js"

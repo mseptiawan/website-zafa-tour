@@ -1,113 +1,91 @@
 <% layout('layouts/main') -%>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
-  <div class="max-w-3xl mx-auto">
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
+  <div class="max-w-2xl mx-auto">
     <!-- HEADER -->
-    <div class="mb-8 text-center">
-      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Ajukan Cuti</h1>
+    <div class="mb-6 text-center">
+      <h1 class="text-xl font-medium text-slate-800">Ajukan Cuti</h1>
       <p class="text-sm text-slate-500 mt-1">Lengkapi formulir pengajuan cuti dengan benar</p>
     </div>
 
     <!-- CARD -->
-    <div
-      class="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-slate-100 p-8"
-    >
-      <form action="/leave/apply" method="POST" enctype="multipart/form-data" class="space-y-5">
+    <div class="bg-white border border-slate-200 rounded-xl p-6">
+      <form action="/leave/apply" method="POST" enctype="multipart/form-data" class="space-y-4">
         <!-- JENIS CUTI -->
         <div>
-          <label
-            class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
-          >
-            Jenis Cuti
-          </label>
+          <label class="block text-xs text-slate-500 mb-1">Jenis Cuti</label>
+  <select name="typeId" required class="w-full border px-3 py-2 rounded-lg">
 
-          <select
-            name="type"
-            required
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
-          >
-            <option value="">Pilih jenis cuti</option>
-            <option value="Tahunan">Cuti Tahunan</option>
-            <option value="Sakit">Izin Sakit</option>
-            <option value="Keluarga">Urusan Keluarga</option>
-          </select>
+  <% if (leaveTypes && leaveTypes.length > 0) { %>
+
+    <% leaveTypes.forEach(t => { %>
+      <option value="<%= t._id %>">
+        <%= t.name %>
+      </option>
+    <% }) %>
+
+  <% } else { %>
+
+    <option disabled>Tidak ada jenis cuti</option>
+
+  <% } %>
+
+</select>
         </div>
 
         <!-- TANGGAL -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label
-              class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
-            >
-              Mulai
-            </label>
-
+            <label class="block text-xs text-slate-500 mb-1">Mulai</label>
             <input
               type="date"
               name="startDate"
               required
-              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
+              class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
             />
           </div>
 
           <div>
-            <label
-              class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
-            >
-              Selesai
-            </label>
-
+            <label class="block text-xs text-slate-500 mb-1">Selesai</label>
             <input
               type="date"
               name="endDate"
               required
-              class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
+              class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
             />
           </div>
         </div>
 
         <!-- ALASAN -->
         <div>
-          <label
-            class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
-          >
-            Alasan
-          </label>
-
+          <label class="block text-xs text-slate-500 mb-1">Alasan</label>
           <textarea
             name="reason"
             rows="3"
             required
             placeholder="Jelaskan alasan cuti..."
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition"
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
           ></textarea>
         </div>
 
         <!-- FILE -->
         <div>
-          <label
-            class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1 ml-1"
-          >
-            Dokumen (opsional)
-          </label>
-
+          <label class="block text-xs text-slate-500 mb-1">Dokumen (opsional)</label>
           <input
             type="file"
             name="file"
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition"
+            class="w-full text-sm border border-slate-200 rounded-lg p-2 bg-slate-50"
           />
         </div>
 
         <!-- BUTTON -->
         <button
           type="submit"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition shadow-sm"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-lg transition"
         >
           Kirim Pengajuan
         </button>
       </form>
     </div>
-
-    <p class="text-center text-xs text-slate-400 mt-6">Pastikan data sesuai sebelum dikirim</p>
   </div>
 </div>

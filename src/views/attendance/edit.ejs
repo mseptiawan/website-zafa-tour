@@ -1,0 +1,80 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<div class="ml-72 p-8 bg-slate-50 min-h-screen">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-xl font-semibold text-slate-800">
+      Edit Absensi
+    </h1>
+    <p class="text-sm text-slate-500">
+      HR dapat mengubah data absensi karyawan
+    </p>
+  </div>
+
+  <!-- CARD -->
+  <div class="max-w-xl bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+
+    <form method="POST" class="space-y-4 text-sm">
+
+      <!-- CHECK IN -->
+      <div>
+        <label class="text-xs text-slate-500">Check In</label>
+        <input
+          name="checkIn"
+          value="<%= data.checkIn %>"
+          class="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400"
+        >
+      </div>
+
+      <!-- CHECK OUT -->
+      <div>
+        <label class="text-xs text-slate-500">Check Out</label>
+        <input
+          name="checkOut"
+          value="<%= data.checkOut %>"
+          class="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400"
+        >
+      </div>
+
+      <!-- TYPE -->
+      <div>
+        <label class="text-xs text-slate-500">Type</label>
+        <input
+          name="type"
+          value="<%= data.type %>"
+          class="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg"
+        >
+      </div>
+
+      <!-- STATUS -->
+      <div>
+        <label class="text-xs text-slate-500">Status</label>
+        <input
+          name="status"
+          value="<%= data.status %>"
+          class="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg"
+        >
+      </div>
+
+      <!-- NOTE -->
+      <div>
+        <label class="text-xs text-slate-500">Catatan</label>
+        <textarea
+          name="note"
+          rows="4"
+          class="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg resize-none"
+        ><%= data.note %></textarea>
+      </div>
+
+      <!-- BUTTON -->
+      <button
+        class="w-full bg-slate-900 text-white py-2 rounded-lg hover:bg-slate-800 transition"
+      >
+        Update Data
+      </button>
+
+    </form>
+
+  </div>
+</div>

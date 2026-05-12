@@ -25,10 +25,13 @@ import {
   showApplyLeave,
   applyLeave,
   myLeave,
+  managerApprovalPage,
+  hrApprovalPage,
+  pimpinanApprovalPage,
   detailLeave,
-  approvalPage,
   approveManager,
   approveHR,
+  approvePimpinan,
   rejectLeave,
 } from "../controllers/leaveController.js";
 import {
@@ -54,6 +57,10 @@ import {
   checkIn,
   allAttendance,
   checkOut,
+  editForm,
+  manualForm,
+  createManual,
+  updateAttendance,
   history,
 } from "../controllers/attendanceController.js";
 import {
@@ -126,11 +133,21 @@ router.get("/leave/apply", authMiddleware, showApplyLeave);
 router.post("/leave/apply", authMiddleware, uploadFile.single("file"), applyLeave);
 
 router.get("/leave/my", authMiddleware, myLeave);
+
 router.get(
-  "/leave/approval",
+  "/leave/approval/manager",
   authMiddleware,
-  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
-  approvalPage
+  roleMiddleware("MANAGER"),
+  managerApprovalPage
+);
+
+router.get("/leave/approval/hr", authMiddleware, roleMiddleware("HR"), hrApprovalPage);
+
+router.get(
+  "/leave/approval/pimpinan",
+  authMiddleware,
+  roleMiddleware("PIMPINAN"),
+  pimpinanApprovalPage
 );
 
 router.post(
@@ -141,11 +158,16 @@ router.post(
 );
 
 router.post("/leave/approval/:id/hr", authMiddleware, roleMiddleware(["HR"]), approveHR);
-
+router.post(
+  "/leave/approval/:id/pimpinan",
+  authMiddleware,
+  roleMiddleware(["PIMPINAN"]),
+  approvePimpinan
+);
 router.post(
   "/leave/approval/:id/reject",
   authMiddleware,
-  roleMiddleware(["HR", "MANAGER"]),
+  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
   rejectLeave
 );
 router.get("/leave/:id", authMiddleware, detailLeave);
@@ -206,7 +228,11 @@ router.get("/attendance/history", history);
 router.post("/attendance/checkin", uploadPhoto.single("photo"), checkIn);
 router.post("/attendance/checkout", checkOut);
 router.get("/attendance/all", roleMiddleware(["HR"]), allAttendance);
+router.get("/attendance/edit/:id", roleMiddleware(["HR"]), editForm);
+router.post("/attendance/edit/:id", roleMiddleware(["HR"]), updateAttendance);
 
+router.get("/attendance/create-manual", roleMiddleware(["HR"]), manualForm);
+router.post("/attendance/create-manual", roleMiddleware(["HR"]), createManual);
 router.get("/attendance/correction", formCorrection);
 router.post("/attendance/correction", submitCorrection);
 router.get("/attendance/correction/history", myCorrections);
