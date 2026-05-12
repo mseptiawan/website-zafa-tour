@@ -685,3 +685,71 @@ export const pimpinanApprovalPage = async (req, res) => {
     res.status(500).send(err.message);
   }
 };
+
+export const allLeavePage = async (req, res) => {
+  try {
+    const leaves = await Leave.find()
+
+      .populate({
+        path: "type",
+        select: "name",
+      })
+
+      .populate({
+        path: "userId",
+        select: "email roleId",
+        populate: {
+          path: "roleId",
+          select: "name",
+        },
+      })
+
+      .sort({
+        createdAt: -1,
+      });
+
+    // ==========================
+    // USER IDS
+    // ==========================
+    const userIds = leaves.map((leave) => leave.userId?._id);
+
+    // ==========================
+    // EMPLOYEE
+    // ==========================
+    const employees = await Employee.find({
+      userId: {
+        $in: userIds,
+      },
+    });
+
+    // ==========================
+    // EMPLOYEE MAP
+    // ==========================
+    const employeeMap = {};
+
+    employees.forEach((emp) => {
+      employeeMap[emp.userId.toString()] = emp;
+    });
+
+    // ==========================
+    // ENRICH DATA
+    // ==========================
+    const enrichedLeaves = leaves.map((leave) => {
+      const employee = employeeMap[leave.userId?._id?.toString()] || null;
+
+      return {
+        ...leave.toObject(),
+        employee,
+      };
+    });
+
+    res.render("leave/all-leave", {
+      title: "Semua Pengajuan Cuti",
+      leaves: enrichedLeaves,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send(err.message);
+  }
+};

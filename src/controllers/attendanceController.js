@@ -1,5 +1,5 @@
 import Employee from "../models/Employee.js";
-
+import AttendanceCorrection from "../models/AttendanceCorrection.js";
 import Attendance from "../models/Attendance.js";
 
 /**
@@ -324,5 +324,29 @@ export const createManual = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send("Error manual input");
+  }
+};
+
+export const getCorrectionDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await AttendanceCorrection.findById(id).populate("userId"); // pastikan field ini benar
+
+    if (!data) {
+      return res.status(404).send("Data tidak ditemukan");
+    }
+
+    return res.render("attendance/correction-detail", {
+      title: "Detail Koreksi Absensi",
+      data,
+    });
+  } catch (err) {
+    console.error("ERROR getCorrectionDetail:", err);
+
+    return res.status(500).send({
+      message: "Server error",
+      error: err.message,
+    });
   }
 };

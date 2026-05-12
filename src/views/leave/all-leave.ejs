@@ -1,0 +1,212 @@
+<% layout('layouts/main') -%>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="mb-6 flex justify-between items-end">
+
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">
+          Semua Pengajuan Cuti
+        </h1>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Riwayat seluruh pengajuan cuti karyawan
+        </p>
+      </div>
+
+      <div class="hidden md:block">
+        <span class="text-xs font-medium text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-lg">
+          Total: <%= leaves.length %>
+        </span>
+      </div>
+
+    </div>
+
+    <!-- CARD -->
+    <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden">
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full text-sm">
+
+          <!-- HEAD -->
+          <thead class="bg-slate-50 text-xs text-slate-400 uppercase tracking-wider">
+
+            <tr>
+              <th class="px-5 py-4 text-left">Karyawan</th>
+              <th class="px-5 py-4 text-left">Jenis & Alasan</th>
+              <th class="px-5 py-4 text-left">Periode</th>
+              <th class="px-5 py-4 text-center">Durasi</th>
+              <th class="px-5 py-4 text-left">Status</th>
+              <th class="px-5 py-4 text-center">Aksi</th>
+            </tr>
+
+          </thead>
+
+          <!-- BODY -->
+          <tbody class="divide-y divide-slate-100">
+
+            <% if (leaves && leaves.length > 0) { %>
+
+              <% leaves.forEach((l) => { %>
+
+                <tr class="hover:bg-slate-50 transition">
+
+                  <!-- KARYAWAN -->
+                  <td class="px-5 py-4">
+
+                    <div class="flex items-center gap-3">
+
+
+                      <div>
+
+                        <p class="font-medium text-slate-700">
+                          <%= l.employee?.fullName || '-' %>
+                        </p>
+
+                        <p class="text-xs text-slate-400">
+                          <%= l.userId?.roleId?.name || '-' %>
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </td>
+
+                  <!-- JENIS -->
+                  <td class="px-5 py-4">
+
+                    <div class="space-y-1">
+
+                      <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                        <%= l.type?.name || '-' %>
+                      </span>
+
+
+                    </div>
+
+                  </td>
+
+                  <!-- PERIODE -->
+                  <td class="px-5 py-4 text-slate-600">
+
+                    <div class="text-xs">
+
+                      <%= new Date(l.startDate).toLocaleDateString("id-ID") %>
+
+                      -
+
+                      <%= new Date(l.endDate).toLocaleDateString("id-ID") %>
+
+                    </div>
+
+                  </td>
+
+                  <!-- DURASI -->
+                  <td class="px-5 py-4 text-center">
+
+                    <span class="text-sm font-semibold text-slate-700">
+                      <%= l.totalDays %>
+                    </span>
+
+                    <p class="text-[10px] text-slate-400">
+                      hari
+                    </p>
+
+                  </td>
+
+                  <!-- STATUS -->
+                 <td class="px-5 py-4">
+
+  <div class="flex items-center gap-2 text-sm">
+
+    <% if (l.status === "Approved") { %>
+
+      <i
+        data-lucide="check-circle"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600">
+        Approved
+      </span>
+
+    <% } else if (l.status === "Rejected") { %>
+
+      <i
+        data-lucide="x-circle"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600">
+        Rejected
+      </span>
+
+    <% } else { %>
+
+      <i
+        data-lucide="clock"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600">
+        <%= l.status %>
+      </span>
+
+    <% } %>
+
+  </div>
+
+</td>
+                  <!-- AKSI -->
+                  <td class="px-5 py-4">
+
+                    <div class="flex justify-center">
+
+                      <a
+                        href="/leave/<%= l._id %>"
+                        class="p-2 bg-white border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-50 transition">
+
+                        👁
+
+                      </a>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              <% }) %>
+
+            <% } else { %>
+
+              <tr>
+
+                <td
+                  colspan="6"
+                  class="py-16 text-center text-slate-400">
+
+                  Belum ada data pengajuan cuti
+
+                </td>
+
+              </tr>
+
+            <% } %>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

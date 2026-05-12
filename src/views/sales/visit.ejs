@@ -1,93 +1,124 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
 
   <div class="max-w-2xl mx-auto">
 
     <!-- HEADER -->
     <div class="mb-6">
-      <h1 class="text-2xl text-slate-800">
+      <h1 class="text-xl font-medium text-slate-800">
         Input Sales Visit
       </h1>
+
       <p class="text-sm text-slate-500 mt-1">
-        Catat kunjungan toko / pelanggan / prospek
+        Catat kunjungan toko, customer, atau prospek
       </p>
     </div>
 
     <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <div class="bg-white border border-slate-200 rounded-2xl p-6">
 
-      <form action="/sales/visit" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <form action="/sales/visit"
+        method="POST"
+        enctype="multipart/form-data"
+        class="space-y-4">
 
-        <!-- Customer -->
+        <!-- CUSTOMER -->
         <div>
-          <label class="text-xs text-slate-500">Nama Toko / Customer</label>
+          <label class="block text-xs text-slate-500 mb-1">
+            Nama Toko / Customer
+          </label>
+
           <input
             type="text"
             name="customerName"
             required
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
-          />
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
+            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            placeholder="Contoh: Toko Sinar Jaya"
+          >
         </div>
 
-        <!-- Alamat -->
+        <!-- ALAMAT -->
         <div>
-          <label class="text-xs text-slate-500">Alamat</label>
+          <label class="block text-xs text-slate-500 mb-1">
+            Alamat
+          </label>
+
           <input
             type="text"
             name="address"
             required
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
-          />
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
+            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            placeholder="Alamat lengkap customer"
+          >
         </div>
 
-        <!-- Meet -->
+        <!-- MEET -->
         <div>
-          <label class="text-xs text-slate-500">Bertemu Dengan</label>
+          <label class="block text-xs text-slate-500 mb-1">
+            Bertemu Dengan
+          </label>
+
           <input
             type="text"
             name="meetWith"
-            placeholder="Owner / staff toko"
             required
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
-          />
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
+            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            placeholder="Owner / staff / manager"
+          >
         </div>
 
-        <!-- Result -->
+        <!-- RESULT -->
         <div>
-          <label class="text-xs text-slate-500">Hasil Kunjungan</label>
+          <label class="block text-xs text-slate-500 mb-1">
+            Hasil Kunjungan
+          </label>
+
           <textarea
             name="result"
             rows="3"
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+            maxlength="500"
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
+            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            placeholder="Jelaskan hasil kunjungan..."
           ></textarea>
         </div>
 
-        <!-- File -->
+        <!-- FILE -->
         <div>
-          <label class="text-xs text-slate-500">Foto Bukti</label>
+          <label class="block text-xs text-slate-500 mb-1">
+            Foto Bukti
+          </label>
+
           <input
             type="file"
             name="photo"
-            class="w-full mt-1 text-sm text-slate-600"
-          />
+            class="w-full text-sm border border-slate-200 rounded-lg p-2 bg-slate-50"
+          >
         </div>
 
         <!-- GPS -->
         <div>
-          <label class="text-xs text-slate-500">Lokasi GPS</label>
+          <label class="block text-xs text-slate-500 mb-1">
+            Lokasi GPS
+          </label>
+
           <input
             type="text"
             name="location"
             placeholder="lat,lng"
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
-          />
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
+            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+          >
         </div>
 
         <!-- BUTTON -->
         <button
           type="submit"
-          class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm py-2.5 rounded-lg transition"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-lg transition"
         >
           Simpan Kunjungan
         </button>
@@ -97,4 +128,5 @@
     </div>
 
   </div>
+
 </div>

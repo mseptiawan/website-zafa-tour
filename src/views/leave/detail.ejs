@@ -29,7 +29,7 @@
             Jenis Cuti
           </p>
           <h2 class="text-lg font-bold text-slate-800 mt-1">
-            <%= leave.type %>
+           <%= leave.type?.name || '-' %>
           </h2>
         </div>
 
@@ -39,16 +39,62 @@
             Status
           </p>
 
-          <div class="mt-2">
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border
-              <%= leave.status === 'Approved'
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : leave.status === 'Rejected'
-                ? 'bg-rose-50 text-rose-700 border-rose-200'
-                : 'bg-amber-50 text-amber-700 border-amber-200' %>">
-              <%= leave.status %>
-            </span>
-          </div>
+         <div class="mt-2">
+
+  <div class="flex items-center gap-2 text-sm">
+
+    <% if (leave.status === "Approved") { %>
+
+      <i
+        data-lucide="check-circle"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600 font-medium">
+        Approved
+      </span>
+
+    <% } else if (leave.status === "Rejected") { %>
+
+      <i
+        data-lucide="x-circle"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600 font-medium">
+        Rejected
+      </span>
+
+    <% } else { %>
+
+      <i
+        data-lucide="clock"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600 font-medium">
+
+        <% if (leave.status === "Pending Manager") { %>
+          Menunggu Manager
+
+        <% } else if (leave.status === "Pending HR") { %>
+          Menunggu HR
+
+        <% } else if (leave.status === "Pending Pimpinan") { %>
+          Menunggu Pimpinan
+
+        <% } else { %>
+          <%= leave.status %>
+
+        <% } %>
+
+      </span>
+
+    <% } %>
+
+  </div>
+
+</div>
         </div>
 
         <!-- TANGGAL MULAI -->

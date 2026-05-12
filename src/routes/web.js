@@ -28,6 +28,7 @@ import {
   managerApprovalPage,
   hrApprovalPage,
   pimpinanApprovalPage,
+  allLeavePage,
   detailLeave,
   approveManager,
   approveHR,
@@ -61,6 +62,7 @@ import {
   manualForm,
   createManual,
   updateAttendance,
+  getCorrectionDetail,
   history,
 } from "../controllers/attendanceController.js";
 import {
@@ -170,7 +172,10 @@ router.post(
   roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
   rejectLeave
 );
+router.get("/leave/all", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), allLeavePage);
+
 router.get("/leave/:id", authMiddleware, detailLeave);
+
 // ==========================
 // OVERTIME
 // ==========================
@@ -241,6 +246,7 @@ router.get("/attendance/correction/history", myCorrections);
  * ADMIN
  */
 router.get("/attendance/approval-correction", roleMiddleware(["HR"]), allCorrections);
+router.get("/attendance/correction/:id", authMiddleware, getCorrectionDetail);
 router.get("/attendance/correction/:id/:status", roleMiddleware(["HR"]), updateStatus);
 
 // form pengajuan dinas luar

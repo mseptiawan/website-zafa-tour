@@ -29,11 +29,6 @@
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
 
-                  <div class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold border border-indigo-100">
-                    <%= l.employee?.fullName
-                      ? l.employee.fullName.substring(0,2).toUpperCase()
-                      : 'U' %>
-                  </div>
 
                   <div>
                     <p class="font-medium text-slate-700">
@@ -88,21 +83,62 @@
               </td>
 
               <!-- STATUS -->
-              <td class="px-5 py-4">
+         <td class="px-5 py-4">
 
-                <span class="text-xs px-2.5 py-1 rounded-full font-medium border
-                  <%= l.status === 'Approved'
-                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                    : l.status === 'Rejected'
-                    ? 'bg-rose-50 text-rose-600 border-rose-100'
-                    : 'bg-amber-50 text-amber-600 border-amber-100'
-                  %>">
+  <div class="flex items-center gap-2 text-sm">
 
-                  <%= l.status %>
+    <% if (l.status === "Approved") { %>
 
-                </span>
+      <i
+        data-lucide="check-circle"
+        class="w-4 h-4 text-slate-500">
+      </i>
 
-              </td>
+      <span class="text-slate-600 font-medium">
+        Approved
+      </span>
+
+    <% } else if (l.status === "Rejected") { %>
+
+      <i
+        data-lucide="x-circle"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600 font-medium">
+        Rejected
+      </span>
+
+    <% } else { %>
+
+      <i
+        data-lucide="clock"
+        class="w-4 h-4 text-slate-500">
+      </i>
+
+      <span class="text-slate-600 font-medium">
+
+        <% if (l.status === "Pending Manager") { %>
+          Menunggu Manager
+
+        <% } else if (l.status === "Pending HR") { %>
+          Menunggu HR
+
+        <% } else if (l.status === "Pending Pimpinan") { %>
+          Menunggu Pimpinan
+
+        <% } else { %>
+          <%= l.status %>
+
+        <% } %>
+
+      </span>
+
+    <% } %>
+
+  </div>
+
+</td>
 
               <!-- ACTION -->
               <td class="px-5 py-4">
