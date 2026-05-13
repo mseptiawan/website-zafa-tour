@@ -311,7 +311,8 @@ function renderModal(t){
 
   ${
   window.__USER__.role === "PIMPINAN" &&
-  t.currentStep === "PIMPINAN"
+  t.currentStep === "PIMPINAN" &&
+  t.userId?.roleId?.name !== "HR"
   ? `
     <form
       action="/trip/${t._id}/delegate"

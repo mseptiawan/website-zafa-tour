@@ -108,18 +108,28 @@ export const createTrip = async (req, res) => {
     // =========================
     let currentStep = "MANAGER";
 
-    // RULE ENGINE HRIS
+    let status = "PENDING";
+
+    // =========================
+    // ROLE RULES
+    // =========================
+
+    // manager submit → langsung ke pimpinan
     if (role === "MANAGER") {
       currentStep = "PIMPINAN";
+      status = "IN_REVIEW";
     }
 
+    // HR submit → tetap manager dulu
     if (role === "HR") {
       currentStep = "MANAGER";
+      status = "PENDING";
     }
 
-    // KARYAWAN & KEUANGAN default
+    // karyawan & keuangan
     if (role === "KARYAWAN" || role === "KEUANGAN") {
       currentStep = "MANAGER";
+      status = "PENDING";
     }
 
     // =========================
@@ -146,7 +156,7 @@ export const createTrip = async (req, res) => {
       // =========================
       // WORKFLOW STATE
       // =========================
-      status: "PENDING",
+      status,
       currentStep,
 
       approvals: [],
@@ -228,7 +238,14 @@ export const approvalPage = async (req, res) => {
     // GET DATA
     // =========================
     const trips = await BusinessTrip.find(filter)
-      .populate("userId", "username")
+      .populate({
+        path: "userId",
+        select: "username roleId",
+        populate: {
+          path: "roleId",
+          select: "name",
+        },
+      })
       .sort({ createdAt: -1 });
 
     // =========================
@@ -597,7 +614,14 @@ export const delegateTripToHR = async (req, res) => {
     // =========================
     // FIND TRIP
     // =========================
-    const trip = await BusinessTrip.findById(id);
+    const trip = await BusinessTrip.findById(id).populate({
+      path: "userId",
+      select: "username roleId",
+      populate: {
+        path: "roleId",
+        select: "name",
+      },
+    });
 
     if (!trip) {
       return res.status(404).send("Pengajuan tidak ditemukan");
@@ -608,6 +632,13 @@ export const delegateTripToHR = async (req, res) => {
     // =========================
     if (trip.currentStep !== "PIMPINAN") {
       return res.status(400).send("Pengajuan tidak berada pada tahap pimpinan");
+    }
+
+    // =========================
+    // HR CANNOT APPROVE OWN REQUEST
+    // =========================
+    if (trip.userId?.roleId?.name === "HR") {
+      return res.status(403).send("Pengajuan HR tidak boleh didelegasikan ke HR");
     }
 
     // =========================
@@ -623,6 +654,7 @@ export const delegateTripToHR = async (req, res) => {
     trip.delegation = {
       from: "PIMPINAN",
       to: "HR",
+
       active: true,
 
       createdBy: user._id,
@@ -632,12 +664,11 @@ export const delegateTripToHR = async (req, res) => {
       note: "Delegasi approval ke HR",
     };
 
-    // status tetap
-    trip.status = "IN_REVIEW";
-
-    // current step tetap pimpinan
-    // karena HR approve sebagai pimpinan
+    // tetap di tahap pimpinan
     trip.currentStep = "PIMPINAN";
+
+    // tetap review
+    trip.status = "IN_REVIEW";
 
     await trip.save();
 
