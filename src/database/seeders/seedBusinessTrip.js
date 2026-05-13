@@ -2,12 +2,16 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import BusinessTrip from "../../models/BusinessTrip.js";
-import Employee from "../../models/Employee.js";
 import User from "../../models/User.js";
 
 dotenv.config();
 
 await mongoose.connect(process.env.MONGODB_URI);
+
+// =========================
+// TARGET USERS
+// =========================
+const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
 
 // =========================
 // SAMPLE DATA
@@ -24,17 +28,15 @@ const destinations = ["Jakarta", "Bandung", "Surabaya", "Palembang", "Yogyakarta
 
 const descriptions = [
   "Kunjungan untuk membahas kerja sama bisnis",
-  "Meeting dengan pihak client terkait project baru",
-  "Training internal terkait sistem perusahaan",
-  "Survey lokasi untuk pembukaan cabang baru",
+  "Meeting dengan client terkait project",
+  "Training internal perusahaan",
+  "Survey lokasi cabang baru",
 ];
 
 const purposes = ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"];
 
-const statuses = ["PENDING", "APPROVED_MANAGER", "APPROVED_DIRECTOR", "REJECTED"];
-
 // =========================
-// HELPER
+// HELPERS
 // =========================
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -43,102 +45,131 @@ function randomItem(arr) {
 function randomDate() {
   const start = new Date(2026, 3, 1);
   const end = new Date(2026, 4, 30);
-
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-function randomTimeline() {
-  const places = ["Kantor Pusat", "Cabang A", "Cabang B", "Client Office", "Hotel Meeting Room"];
+// =========================
+// APPROVAL GENERATOR
+// =========================
+function generateApprovals(status) {
+  const approvals = [];
 
-  const count = Math.floor(Math.random() * 4) + 1;
+  // manager always exists if not PENDING
+  if (status !== "PENDING") {
+    approvals.push({
+      role: "MANAGER",
+      actingAs: "MANAGER",
+      userId: new mongoose.Types.ObjectId(),
+      status: "APPROVED",
+      date: randomDate(),
+    });
+  }
 
-  return Array.from({ length: count }).map((_, i) => ({
-    address: randomItem(places),
-    note: "Checkpoint kunjungan",
-    time: `${String(8 + i * 2).padStart(2, "0")}:00`,
-    order: i + 1,
-  }));
+  // IN_REVIEW = stuck di director step
+  if (status === "IN_REVIEW") {
+    return approvals;
+  }
+
+  // REJECTED at manager level
+  if (status === "REJECTED") {
+    return [
+      {
+        role: "MANAGER",
+        actingAs: "MANAGER",
+        userId: new mongoose.Types.ObjectId(),
+        status: "REJECTED",
+        date: randomDate(),
+      },
+    ];
+  }
+
+  // APPROVED full flow
+  if (status === "APPROVED") {
+    const useDelegation = Math.random() > 0.6;
+
+    approvals.push({
+      role: "DIRECTOR",
+      actingAs: useDelegation ? "HR" : "DIRECTOR",
+      userId: new mongoose.Types.ObjectId(),
+      status: "APPROVED",
+      date: randomDate(),
+      note: useDelegation ? "Approved via HR delegation" : "",
+    });
+  }
+
+  return approvals;
 }
 
 // =========================
-// SEED FUNCTION
+// MAIN SEED
 // =========================
 async function seed() {
-  const employees = await Employee.find().populate("userId");
+  const users = await User.find({
+    username: { $in: usernames },
+  });
 
-  if (!employees.length) {
-    console.log("Employee tidak ditemukan");
+  if (!users.length) {
+    console.log("User tidak ditemukan");
     process.exit();
   }
 
-  await BusinessTrip.deleteMany();
+  await BusinessTrip.deleteMany({});
 
   const data = [];
 
-  for (let i = 0; i < 50; i++) {
-    const employee = randomItem(employees);
+  for (const user of users) {
+    for (let i = 0; i < 30; i++) {
+      const statusPool = ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"];
+      const status = randomItem(statusPool);
 
-    const startDate = randomDate();
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 3) + 1);
+      const base = {
+        userId: user._id,
 
-    const status = randomItem(statuses);
+        title: randomItem(titles),
+        purpose: randomItem(purposes),
 
-    const base = {
-      userId: employee.userId._id,
+        startDate: randomDate(),
+        endDate: randomDate(),
 
-      title: randomItem(titles),
+        destination: randomItem(destinations),
+        description: randomItem(descriptions),
 
-      startDate,
-      endDate,
+        budget: Math.floor(Math.random() * 25000000) + 1000000,
 
-      destination: randomItem(destinations),
+        timeline: [
+          {
+            address: randomItem(destinations),
+            order: 1,
+          },
+        ],
 
-      description: randomItem(descriptions),
+        status,
 
-      budget: Math.floor(Math.random() * 50000000) + 1000000,
+        currentStep: status === "PENDING" ? "MANAGER" : status === "IN_REVIEW" ? "DIRECTOR" : null,
 
-      purpose: randomItem(purposes),
+        approvals: generateApprovals(status),
 
-      contactName: employee.fullName,
-      contactPhone: "08" + Math.floor(1000000000 + Math.random() * 8999999999),
+        delegation:
+          Math.random() > 0.8
+            ? {
+                from: "DIRECTOR",
+                to: "HR",
+                active: true,
+                createdAt: randomDate(),
+              }
+            : null,
 
-      timeline: randomTimeline(),
-
-      status,
-
-      createdAt: randomDate(),
-      updatedAt: new Date(),
-    };
-
-    // =========================
-    // APPROVAL LOGIC
-    // =========================
-    if (status === "APPROVED_MANAGER") {
-      base.approvedByManager = {
-        userId: employee.userId._id,
-        date: new Date(),
+        createdAt: randomDate(),
+        updatedAt: new Date(),
       };
+
+      data.push(base);
     }
-
-    if (status === "APPROVED_DIRECTOR") {
-      base.approvedByManager = {
-        userId: employee.userId._id,
-        date: new Date(),
-      };
-
-      base.approvedByDirector = {
-        userId: employee.userId._id,
-        date: new Date(),
-      };
-    }
-
-    data.push(base);
   }
 
   await BusinessTrip.insertMany(data);
 
-  console.log("Seeder BusinessTrip berhasil");
+  console.log("Seeder HRIS COMPLETE (30 per user, full workflow)");
 
   mongoose.disconnect();
 }

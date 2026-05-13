@@ -18,7 +18,6 @@ const businessTripSchema = new mongoose.Schema(
     contactPerson: {
       name: String,
       phone: String,
-      position: String,
     },
 
     startDate: Date,
@@ -39,20 +38,79 @@ const businessTripSchema = new mongoose.Schema(
       },
     ],
 
+    // =========================
+    // WORKFLOW STATE
+    // =========================
     status: {
       type: String,
-      enum: ["PENDING", "APPROVED_MANAGER", "APPROVED_DIRECTOR", "REJECTED"],
+      enum: ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"],
       default: "PENDING",
     },
 
-    approvedByManager: {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      date: Date,
+    currentStep: {
+      type: String,
+      enum: ["MANAGER", "PIMPINAN", null],
+      default: "MANAGER",
     },
 
-    approvedByDirector: {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      date: Date,
+    // =========================
+    // APPROVAL AUDIT TRAIL
+    // =========================
+    approvals: [
+      {
+        role: {
+          type: String,
+          enum: ["MANAGER", "PIMPINAN"],
+        },
+
+        actingAs: {
+          type: String,
+          enum: ["MANAGER", "HR", "PIMPINAN"],
+        },
+
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+
+        status: {
+          type: String,
+          enum: ["APPROVED", "REJECTED"],
+        },
+
+        date: Date,
+
+        note: String,
+      },
+    ],
+
+    // =========================
+    // DELEGATION (PIMPINAN ↔ HR)
+    // =========================
+    delegation: {
+      from: {
+        type: String,
+        enum: ["PIMPINAN"],
+      },
+
+      to: {
+        type: String,
+        enum: ["HR"],
+      },
+
+      active: {
+        type: Boolean,
+        default: false,
+      },
+
+      createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+
+      createdAt: Date,
+
+      note: String,
     },
   },
   { timestamps: true }

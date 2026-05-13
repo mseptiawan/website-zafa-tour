@@ -15,7 +15,7 @@
       </p>
     </div>
 
-    <!-- CARD -->
+    <!-- TABLE -->
     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
 
       <div class="overflow-x-auto">
@@ -24,25 +24,22 @@
 
           <!-- HEADER -->
           <thead class="bg-slate-50 border-b border-slate-200">
-
             <tr class="text-xs uppercase tracking-wide text-slate-500">
-
-              <th class="px-5 py-4 text-left font-medium">Judul</th>
-              <th class="px-5 py-4 text-left font-medium">Tujuan</th>
-              <th class="px-5 py-4 text-left font-medium">Tanggal</th>
-              <th class="px-5 py-4 text-left font-medium">Budget</th>
-              <th class="px-5 py-4 text-left font-medium">Timeline</th>
-              <th class="px-5 py-4 text-left font-medium">Contact</th>
-              <th class="px-5 py-4 text-left font-medium">Status</th>
-
+              <th class="px-5 py-4 text-left">Judul</th>
+              <th class="px-5 py-4 text-left">Tujuan</th>
+              <th class="px-5 py-4 text-left">Tanggal</th>
+              <th class="px-5 py-4 text-left">Budget</th>
+              <th class="px-5 py-4 text-left">Timeline</th>
+              <th class="px-5 py-4 text-left">Contact</th>
+              <th class="px-5 py-4 text-left">Step</th>
+              <th class="px-5 py-4 text-left">Status</th>
             </tr>
-
           </thead>
 
           <!-- BODY -->
           <tbody class="divide-y divide-slate-100">
 
-            <% if (trips.length === 0) { %>
+            <% if (!trips || trips.length === 0) { %>
               <tr>
                 <td colspan="8" class="px-5 py-14 text-center">
                   <div class="text-sm font-medium text-slate-600">
@@ -59,18 +56,18 @@
 
               <tr class="hover:bg-slate-50 transition">
 
-                <!-- JUDUL -->
+                <!-- TITLE -->
                 <td class="px-5 py-4 font-medium text-slate-800">
                   <%= trip.title %>
                 </td>
 
-                <!-- TUJUAN -->
+                <!-- DESTINATION -->
                 <td class="px-5 py-4 text-slate-600">
                   <%= trip.destination %>
                 </td>
 
-                <!-- TANGGAL -->
-                <td class="px-5 py-4 text-slate-600 text-xs leading-relaxed">
+                <!-- DATE -->
+                <td class="px-5 py-4 text-xs text-slate-600">
                   <div>
                     <span class="text-slate-400">Mulai:</span>
                     <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
@@ -83,17 +80,18 @@
 
                 <!-- BUDGET -->
                 <td class="px-5 py-4 font-medium text-slate-700">
-                  Rp <%= Number(trip.budget).toLocaleString('id-ID') %>
+                  Rp <%= Number(trip.budget || 0).toLocaleString('id-ID') %>
                 </td>
 
                 <!-- TIMELINE -->
                 <td class="px-5 py-4 text-xs text-slate-600">
+
                   <% if (trip.timeline && trip.timeline.length) { %>
 
                     <div class="space-y-1">
 
                       <% trip.timeline.slice(0, 3).forEach((t, i) => { %>
-                        <div class="truncate">
+                        <div>
                           <span class="text-slate-400"><%= i + 1 %>.</span>
                           <%= t.address %>
                         </div>
@@ -110,27 +108,31 @@
                   <% } else { %>
                     <span class="text-slate-400">-</span>
                   <% } %>
+
                 </td>
 
                 <!-- CONTACT PERSON -->
                 <td class="px-5 py-4 text-xs text-slate-600">
 
-                  <% if (trip.contactName || trip.contactPhone) { %>
+                  <% if (trip.contactPerson?.name || trip.contactPerson?.phone) { %>
 
                     <div class="font-medium text-slate-700">
-                      <%= trip.contactName || '-' %>
+                      <%= trip.contactPerson?.name || '-' %>
                     </div>
 
                     <div class="text-slate-400">
-                      <%= trip.contactPhone || '-' %>
+                      <%= trip.contactPerson?.phone || '-' %>
                     </div>
 
                   <% } else { %>
-
                     <span class="text-slate-400">-</span>
-
                   <% } %>
 
+                </td>
+
+                <!-- CURRENT STEP -->
+                <td class="px-5 py-4 text-xs text-slate-600">
+                  <%= trip.currentStep || '-' %>
                 </td>
 
                 <!-- STATUS -->
@@ -142,16 +144,16 @@
                       Pending
                     </span>
 
-                  <% } else if (trip.status === 'APPROVED_MANAGER') { %>
+                  <% } else if (trip.status === 'IN_REVIEW') { %>
 
                     <span class="px-2.5 py-1 text-xs rounded-full bg-blue-50 text-blue-600 border border-blue-100 font-medium">
-                      Manager Approved
+                      In Review
                     </span>
 
-                  <% } else if (trip.status === 'APPROVED_DIRECTOR') { %>
+                  <% } else if (trip.status === 'APPROVED') { %>
 
                     <span class="px-2.5 py-1 text-xs rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-medium">
-                      Director Approved
+                      Approved
                     </span>
 
                   <% } else { %>

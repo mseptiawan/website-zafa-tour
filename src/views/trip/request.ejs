@@ -39,7 +39,7 @@
           style="padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;"
         />
 
-        <!-- PURPOSE (SELECT ENUM) -->
+        <!-- PURPOSE -->
         <select
           name="purpose"
           required
@@ -55,7 +55,6 @@
 
         <!-- DATE -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-
           <input
             type="date"
             name="startDate"
@@ -69,7 +68,6 @@
             required
             style="padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;"
           />
-
         </div>
 
         <!-- DESTINATION -->
@@ -94,56 +92,56 @@
           style="padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0; resize:none;"
         ></textarea>
 
-        <!-- BUDGET (FORMAT RIBUAN) -->
+        <!-- BUDGET -->
         <input
           type="text"
           id="budget"
-          name="budgetDisplay"
           placeholder="Budget (Rp)"
           required
           style="padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;"
         />
 
-        <!-- hidden real value -->
+        <!-- hidden REAL budget -->
         <input type="hidden" name="budget" id="budgetRaw" />
 
-        <!-- CONTACT PERSON -->
+        <!-- CONTACT PERSON (FIXED STRUCTURE) -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
 
           <input
             type="text"
-            name="contactName"
+            name="contactPerson[name]"
             placeholder="Nama orang yang ditemui"
             style="padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;"
           />
 
           <input
             type="text"
-            name="contactPhone"
+            name="contactPerson[phone]"
             placeholder="No HP (opsional)"
             style="padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;"
           />
 
         </div>
 
-        <!-- TIMELINE -->
-        <div>
 
+        <!-- TIMELINE (FIXED STRUCTURE) -->
+        <div>
           <label style="font-size:12px; color:#64748b;">
             Timeline Perjalanan
           </label>
 
-          <div id="timelineBox"
-            style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+          <div id="timelineBox" style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
 
             <div class="timeline-item" style="display:flex; gap:8px;">
               <input
                 type="text"
-                name="timeline[]"
+                name="timeline[0][address]"
                 placeholder="Alamat 1"
                 required
                 style="flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;"
               />
+
+              <input type="hidden" name="timeline[0][order]" value="1" />
 
               <button type="button" onclick="removeTimeline(this)"
                 style="padding:10px; border:none; background:#fee2e2; color:#dc2626; border-radius:8px; cursor:pointer;">
@@ -182,59 +180,59 @@
     </div>
 
   </div>
-
 </div>
 
-<!-- SCRIPT -->
 <script>
+let timelineIndex = 1;
 
-  // =========================
-  // TIMELINE ADD + REMOVE
-  // =========================
-  function addTimeline() {
-    const box = document.getElementById("timelineBox");
+// BUDGET FORMAT
+const budgetInput = document.getElementById("budget");
+const budgetRaw = document.getElementById("budgetRaw");
 
-    const div = document.createElement("div");
-    div.className = "timeline-item";
-    div.style = "display:flex; gap:8px; margin-top:8px;";
+budgetInput.addEventListener("input", function (e) {
+  let value = e.target.value.replace(/\D/g, "");
 
-    div.innerHTML = `
-      <input type="text" name="timeline[]" placeholder="Alamat berikutnya"
-        required
-        style="flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;" />
+  budgetRaw.value = value;
 
-      <button type="button"
-        onclick="removeTimeline(this)"
-        style="padding:10px; border:none; background:#fee2e2; color:#dc2626; border-radius:8px; cursor:pointer;">
-        ✕
-      </button>
-    `;
-
-    box.appendChild(div);
+  if (!value) {
+    e.target.value = "";
+    return;
   }
 
-  function removeTimeline(btn) {
-    const item = btn.parentElement;
-    item.remove();
-  }
+  e.target.value = Number(value).toLocaleString("id-ID");
+});
 
-  // =========================
-  // BUDGET FORMAT 1.000.000
-  // =========================
-  const budgetInput = document.getElementById("budget");
-  const budgetRaw = document.getElementById("budgetRaw");
+// ADD TIMELINE
+function addTimeline() {
+  const box = document.getElementById("timelineBox");
 
-  budgetInput.addEventListener("input", function (e) {
-    let value = e.target.value.replace(/\D/g, "");
+  const div = document.createElement("div");
+  div.style = "display:flex; gap:8px; margin-top:8px;";
 
-    budgetRaw.value = value;
+  div.innerHTML = `
+    <input type="text"
+      name="timeline[${timelineIndex}][address]"
+      placeholder="Alamat berikutnya"
+      required
+      style="flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0;" />
 
-    if (!value) {
-      e.target.value = "";
-      return;
-    }
+    <input type="hidden"
+      name="timeline[${timelineIndex}][order]"
+      value="${timelineIndex + 1}" />
 
-    e.target.value = Number(value).toLocaleString("id-ID");
-  });
+    <button type="button"
+      onclick="removeTimeline(this)"
+      style="padding:10px; border:none; background:#fee2e2; color:#dc2626; border-radius:8px; cursor:pointer;">
+      ✕
+    </button>
+  `;
 
+  box.appendChild(div);
+  timelineIndex++;
+}
+
+// REMOVE
+function removeTimeline(btn) {
+  btn.parentElement.remove();
+}
 </script>

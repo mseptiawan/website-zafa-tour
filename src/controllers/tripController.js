@@ -12,6 +12,7 @@ export const formRequest = (req, res) => {
     title: "Pengajuan Dinas Luar",
   });
 };
+
 export const createTrip = async (req, res) => {
   try {
     const user = req.session.user;
@@ -20,55 +21,66 @@ export const createTrip = async (req, res) => {
       return res.status(401).send("Session tidak valid");
     }
 
+    // =========================
+    // ROLE FROM SESSION (ALWAYS UPPERCASE)
+    // =========================
+    const role = user.role;
+    // MANAGER | HR | PIMPINAN | KARYAWAN | KEUANGAN
+
     let {
       title,
+      purpose,
       startDate,
       endDate,
       destination,
       description,
       budget,
-      contactName,
-      contactPhone,
-      timeline, // 👈 ARRAY INPUT
+      contactPerson,
+      timeline,
     } = req.body;
 
     // =========================
-    // NORMALIZE
+    // NORMALIZATION
     // =========================
     title = title?.trim();
     destination = destination?.trim();
     description = description?.trim();
     budget = Number(budget);
 
-    // timeline bisa string atau array dari form
+    // =========================
+    // TIMELINE NORMALIZATION
+    // =========================
     if (!Array.isArray(timeline)) {
       timeline = timeline ? [timeline] : [];
     }
 
-    timeline = timeline
-      .map((t, index) => ({
-        address: t?.trim(),
-        order: index + 1,
-      }))
+    const normalizedTimeline = timeline
+      .map((t, index) => {
+        const address = typeof t === "string" ? t : t?.address || t?.trim?.();
+
+        return {
+          address,
+          order: index + 1,
+        };
+      })
       .filter((t) => t.address);
 
     // =========================
     // VALIDATION
     // =========================
-
-    if (!title || title.length < 5 || title.length > 100) {
+    if (!title || title.length < 5) {
       return res.status(400).send("Judul minimal 5 karakter");
     }
 
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    if (start > end) {
+    if (isNaN(start) || isNaN(end) || start > end) {
       return res.status(400).send("Tanggal tidak valid");
     }
 
     if (!destination || destination.length < 3) {
-      return res.status(400).send("Tujuan tidak valid");
+      return res.status(400).send("Destination tidak valid");
     }
 
     if (!description || description.length < 10) {
@@ -79,30 +91,69 @@ export const createTrip = async (req, res) => {
       return res.status(400).send("Budget tidak valid");
     }
 
-    if (timeline.length === 0) {
-      return res.status(400).send("Timeline wajib diisi minimal 1 lokasi");
+    if (normalizedTimeline.length === 0) {
+      return res.status(400).send("Timeline wajib diisi");
     }
 
     // =========================
-    // SAVE
+    // CONTACT PERSON
+    // =========================
+    const contact = {
+      name: contactPerson?.name?.trim() || null,
+      phone: contactPerson?.phone?.trim() || null,
+    };
+
+    // =========================
+    // WORKFLOW ROUTING ENGINE (BASED ON UPPERCASE ROLE)
+    // =========================
+    let currentStep = "MANAGER";
+
+    // RULE ENGINE HRIS
+    if (role === "MANAGER") {
+      currentStep = "PIMPINAN";
+    }
+
+    if (role === "HR") {
+      currentStep = "MANAGER";
+    }
+
+    // KARYAWAN & KEUANGAN default
+    if (role === "KARYAWAN" || role === "KEUANGAN") {
+      currentStep = "MANAGER";
+    }
+
+    // =========================
+    // CREATE DOCUMENT
     // =========================
     const trip = await BusinessTrip.create({
       userId: user._id,
+
       title,
+      purpose,
+
       startDate: start,
       endDate: end,
+
       destination,
       description,
+
       budget,
 
-      contactPerson: {
-        name: contactName,
-        phone: contactPhone,
-      },
+      contactPerson: contact,
 
-      timeline,
+      timeline: normalizedTimeline,
 
+      // =========================
+      // WORKFLOW STATE
+      // =========================
       status: "PENDING",
+      currentStep,
+
+      approvals: [],
+
+      delegation: {
+        active: false,
+      },
     });
 
     return res.redirect("/trip/my");
@@ -111,6 +162,134 @@ export const createTrip = async (req, res) => {
     return res.status(500).send("Gagal membuat pengajuan");
   }
 };
+
+export const handleApproval = async (req, res) => {
+  try {
+    const user = req.session.user;
+    const { id } = req.params;
+    const { action, note } = req.body;
+    // action = "APPROVE" | "REJECT"
+
+    const trip = await BusinessTrip.findById(id);
+
+    if (!trip) {
+      return res.status(404).send("Data tidak ditemukan");
+    }
+
+    const role = user.role; // MANAGER | HR | PIMPINAN | etc
+
+    // =========================
+    // VALID STEP CHECK
+    // =========================
+    const currentStep = trip.currentStep;
+
+    // HR acting as PIMPINAN (delegation)
+    const isHRDelegatedAsPimpinan =
+      role === "HR" && currentStep === "PIMPINAN" && trip.delegation?.active === true;
+
+    const isPimpinan = role === "PIMPINAN";
+
+    const isManager = role === "MANAGER";
+
+    // =========================
+    // AUTHORIZATION RULE
+    // =========================
+    if (currentStep === "MANAGER" && !isManager) {
+      return res.status(403).send("Hanya Manager yang bisa approve step ini");
+    }
+
+    if (currentStep === "PIMPINAN" && !isPimpinan && !isHRDelegatedAsPimpinan) {
+      return res.status(403).send("Tidak berhak approve step Pimpinan");
+    }
+
+    // =========================
+    // REJECT RULE
+    // =========================
+    if (action === "REJECT") {
+      if (!note || note.length < 5) {
+        return res.status(400).send("Alasan reject wajib diisi");
+      }
+
+      trip.approvals.push({
+        role: currentStep,
+        actingAs: role,
+        userId: user._id,
+        status: "REJECTED",
+        date: new Date(),
+        note,
+      });
+
+      trip.status = "REJECTED";
+      trip.currentStep = null;
+
+      await trip.save();
+
+      return res.json({ message: "Rejected successfully" });
+    }
+
+    // =========================
+    // APPROVE RULE
+    // =========================
+    if (action === "APPROVE") {
+      trip.approvals.push({
+        role: currentStep,
+        actingAs: role,
+        userId: user._id,
+        status: "APPROVED",
+        date: new Date(),
+      });
+
+      // =========================
+      // STATE TRANSITION
+      // =========================
+
+      if (currentStep === "MANAGER") {
+        trip.currentStep = "PIMPINAN";
+        trip.status = "IN_REVIEW";
+      } else if (currentStep === "PIMPINAN") {
+        trip.currentStep = null;
+        trip.status = "APPROVED";
+      }
+
+      await trip.save();
+
+      return res.json({ message: "Approved successfully" });
+    }
+
+    return res.status(400).send("Action tidak valid");
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Server error");
+  }
+};
+
+export const resubmitTrip = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const trip = await BusinessTrip.findById(id);
+
+    if (!trip) {
+      return res.status(404).send("Not found");
+    }
+
+    if (trip.status !== "REJECTED") {
+      return res.status(400).send("Hanya data rejected yang bisa di-resubmit");
+    }
+
+    // reset workflow
+    trip.status = "PENDING";
+    trip.currentStep = "MANAGER";
+
+    await trip.save();
+
+    return res.json({ message: "Resubmitted successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Server error");
+  }
+};
+
 export const myTrips = async (req, res) => {
   try {
     const user = req.session.user;
@@ -137,52 +316,4 @@ export const allTrips = async (req, res) => {
     trips,
     user: req.session.user,
   });
-};
-
-export const tripDetail = async (req, res) => {
-  try {
-    const trip = await BusinessTrip.findById(req.params.id).populate("userId");
-
-    if (!trip) {
-      return res.status(404).send("Data tidak ditemukan");
-    }
-
-    res.render("trip/detail", {
-      title: "Detail Dinas Luar",
-      trip,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error detail");
-  }
-};
-
-export const approveManagerTrip = async (req, res) => {
-  try {
-    await BusinessTrip.findByIdAndUpdate(req.params.id, {
-      status: "APPROVED_MANAGER",
-      "approvedByManager.userId": req.session.user._id,
-      "approvedByManager.date": new Date(),
-    });
-
-    return res.redirect("/trip/all");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error approval manager");
-  }
-};
-
-export const approveDirector = async (req, res) => {
-  try {
-    await BusinessTrip.findByIdAndUpdate(req.params.id, {
-      status: "APPROVED_DIRECTOR",
-      "approvedByDirector.userId": req.session.user._id,
-      "approvedByDirector.date": new Date(),
-    });
-
-    return res.redirect("/trip/all");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error approval director");
-  }
 };

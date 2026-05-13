@@ -65,15 +65,16 @@ import {
   getCorrectionDetail,
   history,
 } from "../controllers/attendanceController.js";
+
 import {
   formRequest,
   myTrips,
-  tripDetail,
+  resubmitTrip,
+  handleApproval,
   createTrip,
-  approveManagerTrip,
   allTrips,
-  approveDirector,
 } from "../controllers/tripController.js";
+
 import { salesReport, visitForm, storeVisit } from "../controllers/salesController.js";
 import {
   formAssignment,
@@ -241,50 +242,15 @@ router.post("/attendance/create-manual", roleMiddleware(["HR"]), createManual);
 router.get("/attendance/correction", formCorrection);
 router.post("/attendance/correction", submitCorrection);
 router.get("/attendance/correction/history", myCorrections);
-
-/**
- * ADMIN
- */
 router.get("/attendance/approval-correction", roleMiddleware(["HR"]), allCorrections);
 router.get("/attendance/correction/:id", authMiddleware, getCorrectionDetail);
 router.get("/attendance/correction/:id/:status", roleMiddleware(["HR"]), updateStatus);
 
-// form pengajuan dinas luar
 router.get("/trip/request", authMiddleware, formRequest);
 router.post("/trip/request", authMiddleware, createTrip);
-
-// perjalanan saya (user login)
 router.get("/trip/my", authMiddleware, myTrips);
-
-// detail trip
-
-/*
-|--------------------------------------------------------------------------
-| APPROVAL FLOW (HR / MANAGER / DIRECTOR)
-|--------------------------------------------------------------------------
-*/
 router.get("/trip/all", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), allTrips);
-// approval manager
-router.post(
-  "/trip/:id/approve/manager",
-  authMiddleware,
-  roleMiddleware(["MANAGER"]),
-  approveManagerTrip
-);
 
-// approval director
-router.post(
-  "/trip/:id/approve/director",
-  authMiddleware,
-  roleMiddleware(["PIMPINAN", "HR"]),
-  approveDirector
-);
-router.get("/trip/detail/:id", authMiddleware, tripDetail);
-/*
-|--------------------------------------------------------------------------
-| SALES VISIT (PLACEHOLDER - nanti kita isi)
-|--------------------------------------------------------------------------
-*/
 router.get("/sales/visit", authMiddleware, visitForm);
 router.post(
   "/sales/visit",
