@@ -14,12 +14,12 @@ const attendanceCorrectionSchema = new mongoose.Schema(
     },
 
     startTime: {
-      type: String, // format "HH:mm"
+      type: String,
       required: true,
     },
 
     endTime: {
-      type: String, // format "HH:mm"
+      type: String,
       required: true,
     },
 

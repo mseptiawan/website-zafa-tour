@@ -1,0 +1,226 @@
+<%- layout('layouts/main', { title }) %>
+
+<div style="margin-left:280px; padding:24px; font-family:system-ui; background:#f8fafc; min-height:100vh;">
+
+  <h2 style="font-size:20px; font-weight:600; margin-bottom:16px;">
+    Approval Dinas Luar
+  </h2>
+
+  <div style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:auto;">
+
+    <table style="width:100%; border-collapse:collapse; font-size:13px; min-width:900px;">
+
+      <thead style="background:#f1f5f9;">
+        <tr>
+          <th style="padding:12px; text-align:left;">Pengaju</th>
+          <th style="padding:12px; text-align:left;">Judul</th>
+          <th style="padding:12px; text-align:left;">Tujuan</th>
+          <th style="padding:12px; text-align:left;">Budget</th>
+          <th style="padding:12px; text-align:left;">Status</th>
+          <th style="padding:12px; text-align:left;">Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% trips.forEach(t => { %>
+          <tr style="border-top:1px solid #e2e8f0;">
+
+            <td style="padding:12px; font-weight:500;">
+              <%= t.userId?.username || '-' %>
+            </td>
+
+            <td style="padding:12px;">
+              <%= t.title %>
+            </td>
+
+            <td style="padding:12px;">
+              <%= t.destination || '-' %>
+            </td>
+
+            <td style="padding:12px; font-weight:500;">
+              Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+            </td>
+
+            <td style="padding:12px;">
+              <span style="
+                padding:4px 10px;
+                border-radius:999px;
+                font-size:11px;
+                background:
+                  <%= t.status === 'APPROVED' ? '#ecfdf5'
+                  : t.status === 'REJECTED' ? '#fef2f2'
+                  : '#eff6ff' %>;
+                color:
+                  <%= t.status === 'APPROVED' ? '#059669'
+                  : t.status === 'REJECTED' ? '#dc2626'
+                  : '#2563eb' %>;
+              ">
+                <%= t.status %>
+              </span>
+            </td>
+
+            <td style="padding:12px;">
+              <button
+                type="button"
+                onclick="openModal('<%= t._id %>')"
+                style="padding:6px 12px; background:#4f46e5; color:#fff; border:none; border-radius:8px; cursor:pointer;">
+                Review
+              </button>
+            </td>
+
+          </tr>
+        <% }) %>
+      </tbody>
+
+    </table>
+  </div>
+</div>
+
+
+<!-- =========================
+     MODAL (OUTSIDE TABLE)
+========================= -->
+<div id="modalContainer"></div>
+
+<style>
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.modal-box{
+  width:700px;
+  background:#fff;
+  border-radius:12px;
+  padding:18px;
+  max-height:85vh;
+  overflow:auto;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.modal-title{
+  font-size:16px;
+  font-weight:600;
+}
+</style>
+
+
+<script>
+function openModal(id){
+  const trip = getTripData(id);
+  document.getElementById("modalContainer").innerHTML = renderModal(trip);
+  document.getElementById("modal-"+id).style.display = "flex";
+}
+
+function closeModal(id){
+  document.getElementById("modal-"+id).style.display = "none";
+}
+
+function getTripData(id){
+  // ambil dari window cache
+  return window.__TRIPS__.find(t => t._id === id);
+}
+
+// inject data server ke JS (biar modal lengkap)
+window.__TRIPS__ = <%- JSON.stringify(trips) %>;
+
+function renderModal(t){
+  return `
+  <div id="modal-${t._id}" class="modal-overlay">
+    <div class="modal-box">
+
+      <div class="modal-header">
+        <div class="modal-title">Detail Pengajuan</div>
+        <button onclick="closeModal('${t._id}')" style="border:none;background:none;font-size:18px;">×</button>
+      </div>
+
+      <div style="font-size:13px; line-height:1.6;">
+
+        <p><b>Pengaju:</b> ${t.userId?.username || '-'}</p>
+        <p><b>Judul:</b> ${t.title}</p>
+        <p><b>Tujuan:</b> ${t.destination || '-'}</p>
+        <p><b>Deskripsi:</b> ${t.description || '-'}</p>
+
+        <p><b>Tanggal:</b>
+          ${new Date(t.startDate).toLocaleDateString('id-ID')} -
+          ${new Date(t.endDate).toLocaleDateString('id-ID')}
+        </p>
+
+        <p><b>Budget:</b> Rp ${Number(t.budget || 0).toLocaleString('id-ID')}</p>
+
+        <hr style="margin:12px 0;">
+
+        <p><b>Timeline:</b></p>
+        <ul>
+          ${(t.timeline || []).map(x => `<li>${x.address}</li>`).join('')}
+        </ul>
+
+        <p><b>Step:</b> ${t.currentStep || '-'}</p>
+
+        <p><b>Status:</b> ${t.status}</p>
+
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:8px;">
+        <button onclick="approve('${t._id}')" style="background:#16a34a; color:#fff; padding:8px 12px; border:none; border-radius:8px;">
+          Approve
+        </button>
+
+        <button onclick="showReject('${t._id}')" style="background:#dc2626; color:#fff; padding:8px 12px; border:none; border-radius:8px;">
+          Reject
+        </button>
+
+        <button onclick="submitReject('${t._id}')" id="confirm-${t._id}" style="display:none; background:#991b1b; color:#fff; padding:8px 12px; border:none; border-radius:8px;">
+          Confirm Reject
+        </button>
+      </div>
+
+      <textarea id="note-${t._id}" placeholder="Alasan reject..."
+        style="display:none; width:100%; margin-top:10px; padding:10px;"></textarea>
+
+    </div>
+  </div>`;
+}
+
+// APPROVE
+async function approve(id){
+  await fetch(`/trip/approval/${id}`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ action:"APPROVE" })
+  });
+
+  location.reload();
+}
+
+// SHOW REJECT
+function showReject(id){
+  document.getElementById("note-"+id).style.display = "block";
+  document.getElementById("confirm-"+id).style.display = "inline-block";
+}
+
+// REJECT
+async function submitReject(id){
+  const note = document.getElementById("note-"+id).value;
+
+  await fetch(`/trip/approval/${id}`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ action:"REJECT", note })
+  });
+
+  location.reload();
+}
+</script>

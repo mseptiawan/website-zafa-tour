@@ -163,6 +163,44 @@ export const createTrip = async (req, res) => {
   }
 };
 
+export const approvalPage = async (req, res) => {
+  try {
+    const user = req.session.user;
+
+    const role = user.role;
+
+    // =========================
+    // FILTER WORKFLOW
+    // =========================
+    const filter = {
+      status: { $in: ["PENDING", "IN_REVIEW"] },
+    };
+
+    // MANAGER hanya lihat step MANAGER
+    if (role === "MANAGER") {
+      filter.currentStep = "MANAGER";
+    }
+
+    // PIMPINAN + HR (delegation) lihat step PIMPINAN
+    if (role === "PIMPINAN" || role === "HR") {
+      filter.currentStep = "PIMPINAN";
+    }
+
+    const trips = await BusinessTrip.find(filter)
+      .populate("userId", "username")
+      .sort({ createdAt: -1 });
+
+    res.render("trip/approval", {
+      title: "Approval Dinas Luar",
+      trips,
+      user,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error load approval page");
+  }
+};
+
 export const handleApproval = async (req, res) => {
   try {
     const user = req.session.user;
