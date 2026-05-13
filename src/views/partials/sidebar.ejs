@@ -210,6 +210,8 @@
     </section>
     <% } %>
     <!-- GROUP: ABSENSI -->
+        <% if (user.role !== "PIMPINAN") { %>
+
     <section>
    
       <p
@@ -304,13 +306,17 @@
     Approval Cuti
   </a>
 <% } %>
+          <% if (user.permissions.leave_all) { %>
+
   <a
     href="/leave/all"
     class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
     Semua Pengajuan
   </a>
+  <% } %>
           </div>
         </details>
+     
     
 
         <!-- LEMBUR -->
@@ -387,6 +393,7 @@
           </div>
         </details>
       </div>
+      
       <div class="space-y-1">
         <details class="group outline-none" data-menu="attendance">
           <summary
@@ -487,6 +494,7 @@
         </details>
       </div>
     </section>
+       <% } %>
     <!-- GROUP: FIELD OPERATION -->
     <section>
       <p
@@ -575,6 +583,8 @@
         </details>
 
         <!-- SALES VISIT -->
+        <% if (user.role !== "PIMPINAN") { %>
+
         <details class="group outline-none" data-menu="sales">
           <summary
             class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10"
@@ -625,20 +635,15 @@
             >
               Input Kunjungan
             </a>
-  <% if (
-  user.role === 'MANAGER' ||
-  user.role === 'HR' ||
-  user.role === 'PIMPINAN'
-) { %>
             <a
-              href="/sales/report"
+              href="/sales/history"
               class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
             >
-              Laporan Sales
+              Riwayat Kunjungan
             </a>
-            <% } %>
           </div>
         </details>
+        <% } %>
       </div>
       <!-- ===================================================== -->
       <!-- PENGUMUMAN -->
@@ -774,8 +779,9 @@
           >
             Buat Penugasan
           </a>
-
+  <% } %>
           <!-- PENUGASAN SAYA -->
+           <% if (user.permissions.assignment_my) { %>
           <a
             href="/assignment/my"
             class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400"
@@ -783,6 +789,7 @@
             Penugasan Saya
           </a>
           <% } %>
+        
 
           <!-- MONITORING -->
           <a
@@ -986,6 +993,18 @@
           Laporan Cuti
         </a>
         <% } %>
+         <a
+          href="/trip/report"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Laporan Dinas Luar
+        </a>
+         <a
+          href="/sales/report"
+          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition"
+        >
+          Laporan Kunjugan Sales
+        </a>
 
         <!-- LEMBUR REPORT -->
         <% if (user.permissions.report_overtime) { %>

@@ -679,3 +679,44 @@ export const delegateTripToHR = async (req, res) => {
     return res.status(500).send("Server error");
   }
 };
+
+export const reportTripPage = async (req, res) => {
+  try {
+    const user = req.session.user;
+
+    const role = user.role;
+
+    const filter = {};
+
+    // =========================
+    // KARYAWAN ONLY OWN DATA
+    // =========================
+    if (role === "KARYAWAN") {
+      filter.userId = user._id;
+    }
+
+    // =========================
+    // LOAD DATA
+    // =========================
+    const trips = await BusinessTrip.find(filter)
+      .populate({
+        path: "userId",
+        select: "username roleId",
+        populate: {
+          path: "roleId",
+          select: "name",
+        },
+      })
+      .sort({ createdAt: -1 });
+
+    return res.render("trip/report", {
+      title: "Laporan Dinas Luar",
+      trips,
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+
+    return res.status(500).send("Gagal memuat laporan");
+  }
+};

@@ -6,6 +6,7 @@ export function getPermissions(role) {
     leave_request: false,
     leave_my: false,
     leave_approval: false,
+    leave_all: false,
 
     // =========================
     // LEMBUR
@@ -72,6 +73,8 @@ export function getPermissions(role) {
     report_leave: false,
     report_overtime: false,
     report_attendance: false,
+
+    assignment_my: false,
   };
 
   switch (role) {
@@ -99,6 +102,7 @@ export function getPermissions(role) {
 
       permissions.task_create = true;
       permissions.task_view_my = true;
+      permissions.assignment_my = true;
 
       break;
 
@@ -123,6 +127,7 @@ export function getPermissions(role) {
 
       permissions.task_create = true;
       permissions.task_view_my = true;
+      permissions.assignment_my = true;
 
       break;
 
@@ -132,6 +137,7 @@ export function getPermissions(role) {
     case "MANAGER":
       permissions.leave_request = true;
       permissions.leave_my = true;
+      permissions.leave_all = true;
       permissions.leave_approval = true;
 
       permissions.overtime_request = true;
@@ -161,6 +167,7 @@ export function getPermissions(role) {
       permissions.report_leave = true;
       permissions.report_overtime = true;
       permissions.report_attendance = true;
+      permissions.assignment_my = true;
 
       break;
 
@@ -170,6 +177,8 @@ export function getPermissions(role) {
     case "HR":
       permissions.leave_request = true;
       permissions.leave_my = true;
+      permissions.leave_all = true;
+
       permissions.leave_approval = true;
 
       permissions.overtime_request = true;
@@ -197,6 +206,8 @@ export function getPermissions(role) {
       permissions.report_leave = true;
       permissions.report_overtime = true;
       permissions.report_attendance = true;
+
+      permissions.assignment_my = true;
 
       break;
 

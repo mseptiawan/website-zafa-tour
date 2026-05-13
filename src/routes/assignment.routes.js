@@ -24,7 +24,7 @@ router.post(
 );
 
 router.get("/assignment/my", authMiddleware, myAssignments);
-router.get("/assignment/all", authMiddleware, roleMiddleware(["PIMPINAN"]), allAssignments);
+router.get("/assignment/all", authMiddleware, allAssignments);
 
 router.get("/assignment/:id", authMiddleware, assignmentDetail);
 

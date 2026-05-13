@@ -13,16 +13,11 @@ const salesVisitSchema = new mongoose.Schema(
     note: String,
     result: String,
 
-    location: {
-      lat: Number,
-      lng: Number,
-    },
-
     photos: [String],
 
     visitTime: Date,
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default mongoose.model("SalesVisit", salesVisitSchema);

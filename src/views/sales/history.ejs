@@ -1,0 +1,113 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
+
+  <div class="max-w-4xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-medium text-slate-800">
+          Riwayat Kunjungan
+        </h1>
+        <p class="text-sm text-slate-500 mt-1">
+          Daftar sales visit yang pernah kamu lakukan
+        </p>
+      </div>
+
+      
+     <a
+  href="/sales/visit"
+  class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+>
+  + Tambah Kunjungan
+</a>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <% if (visits.length === 0) { %>
+      <div class="bg-white border border-slate-200 rounded-2xl p-10 text-center">
+        <p class="text-slate-400 text-sm">Belum ada riwayat kunjungan.</p>
+      </div>
+
+    <% } else { %>
+
+      <!-- LIST -->
+      <div class="space-y-3">
+
+        <% visits.forEach(visit => { %>
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+
+            <div class="flex items-start justify-between gap-4">
+
+              <!-- INFO -->
+              <div class="flex-1 min-w-0">
+
+                <!-- CUSTOMER -->
+                <p class="text-sm font-medium text-slate-800 truncate">
+                  <%= visit.customerName %>
+                </p>
+
+                <!-- ALAMAT -->
+                <p class="text-xs text-slate-400 mt-0.5 truncate">
+                  <%= visit.address %>
+                </p>
+
+                <!-- HASIL -->
+                <% if (visit.result) { %>
+                  <p class="text-xs text-slate-600 mt-2 line-clamp-2">
+                    <%= visit.result %>
+                  </p>
+                <% } %>
+
+                <!-- META -->
+                <div class="flex items-center gap-3 mt-3">
+
+                  <!-- TANGGAL -->
+                  <span class="text-xs text-slate-400">
+                    <%= new Date(visit.visitTime || visit.createdAt).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    }) %>
+                  </span>
+
+                  <!-- FOTO BADGE -->
+                  <% if (visit.photos && visit.photos.length > 0) { %>
+                    <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+                      <%= visit.photos.length %> foto
+                    </span>
+                  <% } %>
+
+                  <!-- GPS BADGE -->
+                  <% if (visit.location?.lat) { %>
+                    <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
+                      GPS
+                    </span>
+                  <% } %>
+
+                </div>
+              </div>
+
+              <!-- FOTO THUMBNAIL -->
+             <% if (visit.photos && visit.photos.length > 0 && visit.photos[0]) { %>
+  <img
+    src="<%= visit.photos[0] %>"
+    alt="foto"
+    class="w-16 h-16 object-cover rounded-lg border border-slate-200 flex-shrink-0"
+    onerror="this.style.display='none'"
+  >
+<% } %>
+
+            </div>
+
+          </div>
+        <% }) %>
+
+      </div>
+
+    <% } %>
+
+  </div>
+
+</div>
