@@ -89,12 +89,10 @@
 
   <!-- Tombol Resubmit (Hanya jika REJECTED) -->
   <% if (t.status === 'REJECTED') { %>
-    <button
-      type="button"
-      onclick="resubmitTrip('<%= t._id %>')"
+    <a href="/trip/<%= t._id %>/edit"
       style="padding:6px 12px; background:#10b981; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
       Resubmit
-    </button>
+  </a>
   <% } %>
 </td>
 
@@ -184,7 +182,9 @@ function renderModal(t) {
             <span style="color:${t.status === 'REJECTED' ? '#dc2626' : '#2563eb'}">${t.status}</span>
             ${t.currentStep ? `<small style="color:#64748b;">(Step: ${t.currentStep})</small>` : ''}
           </div>
+          
         </div>
+        <p>${t.note || '-'}</p>
       </div>
 
       <div class="detail-item" style="margin-top:8px;">

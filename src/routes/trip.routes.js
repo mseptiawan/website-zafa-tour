@@ -4,9 +4,14 @@ import roleMiddleware from "../middlewares/roleMiddleware.js";
 import {
   formRequest,
   myTrips,
+  delegateTripToHR,
+  editTripForm,
   createTrip,
+  showEditTrip,
+  resubmitUpdateTrip,
   allTrips,
   approvalPage,
+  updateTrip,
   handleApproval,
 } from "../controllers/tripController.js";
 
@@ -21,8 +26,13 @@ router.get(
   roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
   approvalPage
 );
+router.get("/trip/edit/:id", authMiddleware, editTripForm);
+router.post("/trip/edit/:id", authMiddleware, updateTrip);
+router.get("/trip/:id/edit", authMiddleware, showEditTrip);
 
-router.post("/trip/approval/:id", handleApproval);
+router.post("/trip/:id/update", authMiddleware, resubmitUpdateTrip);
+router.post("/trip/approval/:id", authMiddleware, handleApproval);
+router.post("/trip/:id/delegate", authMiddleware, delegateTripToHR);
 router.get("/trip/all", authMiddleware, roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), allTrips);
 
 export default router;

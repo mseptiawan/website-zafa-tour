@@ -448,6 +448,9 @@
   .inline-flex {
     display: inline-flex;
   }
+  .table-row {
+    display: table-row;
+  }
   .aspect-video {
     aspect-ratio: var(--aspect-video);
   }
