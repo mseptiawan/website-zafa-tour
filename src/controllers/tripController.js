@@ -531,16 +531,6 @@ export const myTrips = async (req, res) => {
   }
 };
 
-export const allTrips = async (req, res) => {
-  const trips = await BusinessTrip.find().populate("userId").sort({ createdAt: -1 });
-
-  res.render("trip/all", {
-    title: "Monitoring Dinas Luar",
-    trips,
-    user: req.session.user,
-  });
-};
-
 export const showEditTrip = async (req, res) => {
   const user = req.session.user;
 

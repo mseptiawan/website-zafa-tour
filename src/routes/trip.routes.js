@@ -9,7 +9,6 @@ import {
   createTrip,
   showEditTrip,
   resubmitUpdateTrip,
-  allTrips,
   approvalPage,
   updateTrip,
   handleApproval,
@@ -33,6 +32,5 @@ router.get("/trip/:id/edit", authMiddleware, showEditTrip);
 router.post("/trip/:id/update", authMiddleware, resubmitUpdateTrip);
 router.post("/trip/approval/:id", authMiddleware, handleApproval);
 router.post("/trip/:id/delegate", authMiddleware, delegateTripToHR);
-router.get("/trip/all", authMiddleware, roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), allTrips);
 
 export default router;
