@@ -26,7 +26,7 @@ const announcementSchema = new mongoose.Schema(
       ref: "User",
     },
 
-    attachment: String, // surat / sk
+    attachment: String,
 
     signedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -40,7 +40,7 @@ const announcementSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Announcement = mongoose.model("Announcement", announcementSchema);

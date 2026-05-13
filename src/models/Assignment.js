@@ -20,8 +20,7 @@ const assignmentSchema = new mongoose.Schema(
     startDate: Date,
     endDate: Date,
 
-    // ✅ FIXED (HANYA SATU)
-    attachment: String, // file surat penugasan
+    attachment: String,
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -43,7 +42,7 @@ const assignmentSchema = new mongoose.Schema(
 
     reportFile: String,
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Assignment = mongoose.model("Assignment", assignmentSchema);

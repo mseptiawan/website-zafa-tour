@@ -6,14 +6,13 @@ const roleMiddleware = (...roles) => {
 
     let userRole = req.session.user.role;
 
-    // amanin userRole
     userRole = String(userRole || "")
       .trim()
       .toUpperCase();
 
     const allowedRoles = roles
-      .flat() // kalau ada array nested
-      .filter(Boolean) // buang null/undefined
+      .flat()
+      .filter(Boolean)
       .map((r) => String(r).trim().toUpperCase());
 
     console.log("USER ROLE:", userRole);
