@@ -17,6 +17,9 @@
           <th style="padding:16px 20px; text-align:left; color:#475569; font-weight:600;">Pengaju</th>
           <th style="padding:16px 20px; text-align:left; color:#475569; font-weight:600;">Judul Kegiatan</th>
           <th style="padding:16px 20px; text-align:left; color:#475569; font-weight:600;">Tujuan</th>
+            <% if (user.role === "HR") { %>
+      <th>Delegasi</th>
+    <% } %>
           <th style="padding:16px 20px; text-align:left; color:#475569; font-weight:600;">Estimasi Budget</th>
           <th style="padding:16px 20px; text-align:left; color:#475569; font-weight:600;">Status</th>
           <th style="padding:16px 20px; text-align:center; color:#475569; font-weight:600;">Aksi</th>
@@ -36,6 +39,32 @@
             </td>
             <td style="padding:16px 20px; color:#334155;"><%= t.title %></td>
             <td style="padding:16px 20px; color:#64748b;"><%= t.destination || '-' %></td>
+             <% if (user.role === "HR") { %>
+
+    <td>
+
+      <% if (t.delegation?.active) { %>
+
+        <span style="
+          padding:6px 10px;
+          border-radius:999px;
+          background:#fef3c7;
+          color:#92400e;
+          font-size:12px;
+          font-weight:600;
+        ">
+          Pimpinan → HR
+        </span>
+
+      <% } else { %>
+
+        -
+
+      <% } %>
+
+    </td>
+
+  <% } %>
             <td style="padding:16px 20px; font-weight:600; color:#0f172a;">
               Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
             </td>
@@ -199,6 +228,8 @@
 </style>
 
 <script>
+  
+
 // Logic Tetap Sama, Hanya Struktur RenderModal yang dipercantik
 function openModal(id){
   const trip = getTripData(id);
@@ -215,7 +246,7 @@ function getTripData(id){
 }
 
 window.__TRIPS__ = <%- JSON.stringify(trips) %>;
-
+window.__USER__ = <%- JSON.stringify(user) %>;
 function renderModal(t){
   return `
   <div id="modal-${t._id}" class="modal-overlay" onclick="if(event.target===this) closeModal('${t._id}')">
@@ -278,26 +309,26 @@ function renderModal(t){
     Tolak
   </button>
 
-  <!-- DELEGATE -->
   ${
-    t.currentStep === "PIMPINAN"
-    ? `
-      <form
-        action="/trip/${t._id}/delegate"
-        method="POST"
-        style="flex:1;"
+  window.__USER__.role === "PIMPINAN" &&
+  t.currentStep === "PIMPINAN"
+  ? `
+    <form
+      action="/trip/${t._id}/delegate"
+      method="POST"
+      style="flex:1;"
+    >
+      <button
+        type="submit"
+        class="btn-delegate"
+        style="width:100%;"
       >
-        <button
-          type="submit"
-          class="btn-delegate"
-          style="width:100%;"
-        >
-          Delegasikan ke HR
-        </button>
-      </form>
-    `
-    : ""
-  }
+        Delegasikan ke HR
+      </button>
+    </form>
+  `
+  : ""
+}
 
 </div>
 

@@ -245,7 +245,6 @@ export const approvalPage = async (req, res) => {
     return res.status(500).send("Error load approval page");
   }
 };
-
 export const editTripForm = async (req, res) => {
   const user = req.session.user;
   const { id } = req.params;
