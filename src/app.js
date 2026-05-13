@@ -2,7 +2,6 @@ import { sessionMiddleware } from "./config/session.js";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import employeeRoute from "./routes/employeeRoute.js";
 import { attachPermissions } from "./middlewares/permission.middleware.js";
 import ejsMate from "ejs-mate";
 import cookieParser from "cookie-parser";
@@ -12,8 +11,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 
 import injectUser from "./middlewares/injectUser.js";
-import webRoutes from "./routes/web.js";
-
+import routes from "./routes/index.js";
 /* =========================
    MODELS AUTO REGISTER
 ========================= */
@@ -84,6 +82,6 @@ app.use((req, res, next) => {
 /* =========================
    ROUTES
 ========================= */
-app.use("/", webRoutes);
-app.use("/employee", employeeRoute);
+app.use("/", routes);
+
 export default app;
