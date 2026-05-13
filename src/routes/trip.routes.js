@@ -21,6 +21,7 @@ router.get(
   roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
   approvalPage
 );
+
 router.post("/trip/approval/:id", handleApproval);
 router.get("/trip/all", authMiddleware, roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), allTrips);
 

@@ -1,183 +1,227 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
+<div style="margin-left:280px; padding:24px; font-family:system-ui; background:#f8fafc; min-height:100vh;">
 
-  <div class="max-w-7xl mx-auto">
-
-    <!-- HEADER -->
-    <div class="mb-6">
-      <h1 class="text-xl font-medium text-slate-800">
-        Perjalanan Saya
-      </h1>
-
-      <p class="text-sm text-slate-500 mt-1">
-        Daftar pengajuan dinas luar yang kamu ajukan
-      </p>
-    </div>
-
-    <!-- TABLE -->
-    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-
-      <div class="overflow-x-auto">
-
-        <table class="w-full text-sm">
-
-          <!-- HEADER -->
-          <thead class="bg-slate-50 border-b border-slate-200">
-            <tr class="text-xs uppercase tracking-wide text-slate-500">
-              <th class="px-5 py-4 text-left">Judul</th>
-              <th class="px-5 py-4 text-left">Tujuan</th>
-              <th class="px-5 py-4 text-left">Tanggal</th>
-              <th class="px-5 py-4 text-left">Budget</th>
-              <th class="px-5 py-4 text-left">Timeline</th>
-              <th class="px-5 py-4 text-left">Contact</th>
-              <th class="px-5 py-4 text-left">Step</th>
-              <th class="px-5 py-4 text-left">Status</th>
-            </tr>
-          </thead>
-
-          <!-- BODY -->
-          <tbody class="divide-y divide-slate-100">
-
-            <% if (!trips || trips.length === 0) { %>
-              <tr>
-                <td colspan="8" class="px-5 py-14 text-center">
-                  <div class="text-sm font-medium text-slate-600">
-                    Belum ada pengajuan perjalanan
-                  </div>
-                  <p class="text-xs text-slate-400 mt-1">
-                    Silakan buat pengajuan dinas luar terlebih dahulu
-                  </p>
-                </td>
-              </tr>
-            <% } %>
-
-            <% trips.forEach(trip => { %>
-
-              <tr class="hover:bg-slate-50 transition">
-
-                <!-- TITLE -->
-                <td class="px-5 py-4 font-medium text-slate-800">
-                  <%= trip.title %>
-                </td>
-
-                <!-- DESTINATION -->
-                <td class="px-5 py-4 text-slate-600">
-                  <%= trip.destination %>
-                </td>
-
-                <!-- DATE -->
-                <td class="px-5 py-4 text-xs text-slate-600">
-                  <div>
-                    <span class="text-slate-400">Mulai:</span>
-                    <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
-                  </div>
-                  <div>
-                    <span class="text-slate-400">Selesai:</span>
-                    <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
-                  </div>
-                </td>
-
-                <!-- BUDGET -->
-                <td class="px-5 py-4 font-medium text-slate-700">
-                  Rp <%= Number(trip.budget || 0).toLocaleString('id-ID') %>
-                </td>
-
-                <!-- TIMELINE -->
-                <td class="px-5 py-4 text-xs text-slate-600">
-
-                  <% if (trip.timeline && trip.timeline.length) { %>
-
-                    <div class="space-y-1">
-
-                      <% trip.timeline.slice(0, 3).forEach((t, i) => { %>
-                        <div>
-                          <span class="text-slate-400"><%= i + 1 %>.</span>
-                          <%= t.address %>
-                        </div>
-                      <% }) %>
-
-                      <% if (trip.timeline.length > 3) { %>
-                        <div class="text-slate-400">
-                          +<%= trip.timeline.length - 3 %> lainnya
-                        </div>
-                      <% } %>
-
-                    </div>
-
-                  <% } else { %>
-                    <span class="text-slate-400">-</span>
-                  <% } %>
-
-                </td>
-
-                <!-- CONTACT PERSON -->
-                <td class="px-5 py-4 text-xs text-slate-600">
-
-                  <% if (trip.contactPerson?.name || trip.contactPerson?.phone) { %>
-
-                    <div class="font-medium text-slate-700">
-                      <%= trip.contactPerson?.name || '-' %>
-                    </div>
-
-                    <div class="text-slate-400">
-                      <%= trip.contactPerson?.phone || '-' %>
-                    </div>
-
-                  <% } else { %>
-                    <span class="text-slate-400">-</span>
-                  <% } %>
-
-                </td>
-
-                <!-- CURRENT STEP -->
-                <td class="px-5 py-4 text-xs text-slate-600">
-                  <%= trip.currentStep || '-' %>
-                </td>
-
-                <!-- STATUS -->
-                <td class="px-5 py-4">
-
-                  <% if (trip.status === 'PENDING') { %>
-
-                    <span class="px-2.5 py-1 text-xs rounded-full bg-amber-50 text-amber-600 border border-amber-100 font-medium">
-                      Pending
-                    </span>
-
-                  <% } else if (trip.status === 'IN_REVIEW') { %>
-
-                    <span class="px-2.5 py-1 text-xs rounded-full bg-blue-50 text-blue-600 border border-blue-100 font-medium">
-                      In Review
-                    </span>
-
-                  <% } else if (trip.status === 'APPROVED') { %>
-
-                    <span class="px-2.5 py-1 text-xs rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-medium">
-                      Approved
-                    </span>
-
-                  <% } else { %>
-
-                    <span class="px-2.5 py-1 text-xs rounded-full bg-rose-50 text-rose-600 border border-rose-100 font-medium">
-                      Rejected
-                    </span>
-
-                  <% } %>
-
-                </td>
-
-              </tr>
-
-            <% }) %>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2 style="font-size:20px; font-weight:600; margin:0;">
+      Daftar Pengajuan Dinas Saya
+    </h2>
+    <a href="/trip/request" style="padding:10px 18px; background:#4f46e5; color:#fff; text-decoration:none; border-radius:8px; font-size:14px; font-weight:500;">
+      + Buat Pengajuan Baru
+    </a>
   </div>
 
+  <div style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+
+    <table style="width:100%; border-collapse:collapse; font-size:13px; min-width:800px;">
+
+      <thead style="background:#f1f5f9; color:#475569;">
+        <tr>
+          <th style="padding:14px 12px; text-align:left;">Judul</th>
+          <th style="padding:14px 12px; text-align:left;">Tujuan</th>
+          <th style="padding:14px 12px; text-align:left;">Budget</th>
+          <th style="padding:14px 12px; text-align:left;">Status</th>
+          <th style="padding:14px 12px; text-align:left;">Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% if (trips.length === 0) { %>
+          <tr>
+            <td colspan="5" style="padding:40px; text-align:center; color:#94a3b8;">Belum ada data pengajuan.</td>
+          </tr>
+        <% } %>
+
+        <% trips.forEach(t => { %>
+          <tr style="border-top:1px solid #e2e8f0; hover:background:#f8fafc;">
+
+            <td style="padding:14px 12px; font-weight:500; color:#1e293b;">
+              <%= t.title %>
+            </td>
+
+            <td style="padding:14px 12px; color:#64748b;">
+              <%= t.destination || '-' %>
+            </td>
+
+            <td style="padding:14px 12px; font-weight:600; color:#0f172a;">
+              Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+            </td>
+
+            <td style="padding:14px 12px;">
+              <span style="
+                padding:4px 12px;
+                border-radius:999px;
+                font-size:11px;
+                font-weight:600;
+                background:
+                  <%= t.status === 'APPROVED' ? '#ecfdf5'
+                  : t.status === 'REJECTED' ? '#fef2f2'
+                  : '#eff6ff' %>;
+                color:
+                  <%= t.status === 'APPROVED' ? '#059669'
+                  : t.status === 'REJECTED' ? '#dc2626'
+                  : '#2563eb' %>;
+                border: 1px solid 
+                  <%= t.status === 'APPROVED' ? '#10b981'
+                  : t.status === 'REJECTED' ? '#ef4444'
+                  : '#3b82f6' %>20;
+              ">
+                <%= t.status %>
+              </span>
+            </td>
+
+            <td style="padding:14px 12px; display: flex; gap: 8px;">
+  <!-- Tombol Detail (Selalu Ada) -->
+  <button
+    type="button"
+    onclick="openModal('<%= t._id %>')"
+    style="padding:6px 12px; background:#fff; color:#4f46e5; border:1px solid #4f46e5; border-radius:8px; cursor:pointer; font-size:12px;">
+    Detail
+  </button>
+
+  <!-- Tombol Edit (Hanya jika PENDING) -->
+  <% if (t.status === 'PENDING') { %>
+    <a href="/trip/edit/<%= t._id %>" 
+       style="padding:6px 12px; background:#fbbf24; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:12px; text-decoration:none;">
+       Edit
+    </a>
+  <% } %>
+
+  <!-- Tombol Resubmit (Hanya jika REJECTED) -->
+  <% if (t.status === 'REJECTED') { %>
+    <button
+      type="button"
+      onclick="resubmitTrip('<%= t._id %>')"
+      style="padding:6px 12px; background:#10b981; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+      Resubmit
+    </button>
+  <% } %>
+</td>
+
+          </tr>
+        <% }) %>
+      </tbody>
+
+    </table>
+  </div>
 </div>
+
+<!-- =========================
+      MODAL CONTAINER
+========================= -->
+<div id="modalContainer"></div>
+
+<style>
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(15, 23, 42, 0.5); 
+  backdrop-filter: blur(4px); display:none; align-items:center; 
+  justify-content:center; z-index:9999;
+}
+.modal-box {
+  width:650px; background:#fff; border-radius:16px; padding:24px; 
+  max-height:85vh; overflow-y:auto; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
+}
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.detail-item { margin-bottom: 12px; }
+.detail-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 2px; }
+.detail-value { font-size: 14px; color: #1e293b; font-weight: 500; }
+.timeline-list { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
+.timeline-item { padding: 4px 0; border-bottom: 1px dashed #e2e8f0; display: flex; gap: 8px; }
+.timeline-item:last-child { border-bottom: none; }
+</style>
+
+<script>
+// Inject data dari server ke Client-side JS
+window.__MY_TRIPS__ = <%- JSON.stringify(trips) %>;
+
+function openModal(id) {
+  const trip = window.__MY_TRIPS__.find(t => t._id === id);
+  if (!trip) return;
+
+  const container = document.getElementById("modalContainer");
+  container.innerHTML = renderModal(trip);
+  document.getElementById("modal-" + id).style.display = "flex";
+}
+
+function closeModal(id) {
+  const modal = document.getElementById("modal-" + id);
+  if (modal) modal.style.display = "none";
+}
+
+function renderModal(t) {
+  const startDate = new Date(t.startDate).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  const endDate = new Date(t.endDate).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+  return `
+  <div id="modal-${t._id}" class="modal-overlay" onclick="if(event.target === this) closeModal('${t._id}')">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+        <h3 style="margin:0; font-size:18px; color:#1e293b;">Detail Perjalanan Dinas</h3>
+        <button onclick="closeModal('${t._id}')" style="border:none; background:#f1f5f9; width:32px; height:32px; border-radius:50%; cursor:pointer;">&times;</button>
+      </div>
+
+      <div class="detail-item">
+        <span class="detail-label">Judul Pengajuan</span>
+        <div class="detail-value" style="font-size:16px; color:#4f46e5;">${t.title}</div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Tujuan</span>
+          <div class="detail-value">${t.destination || '-'}</div>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Budget Anggaran</span>
+          <div class="detail-value">Rp ${Number(t.budget || 0).toLocaleString('id-ID')}</div>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tanggal Pelaksanaan</span>
+          <div class="detail-value">${startDate} - ${endDate}</div>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status Saat Ini</span>
+          <div class="detail-value">
+            <span style="color:${t.status === 'REJECTED' ? '#dc2626' : '#2563eb'}">${t.status}</span>
+            ${t.currentStep ? `<small style="color:#64748b;">(Step: ${t.currentStep})</small>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item" style="margin-top:8px;">
+        <span class="detail-label">Deskripsi / Tugas</span>
+        <div class="detail-value" style="background:#f1f5f9; padding:10px; border-radius:8px; font-weight:400;">
+          ${t.description || '-'}
+        </div>
+      </div>
+
+      <div class="detail-item" style="margin-top:16px;">
+        <span class="detail-label">Rute / Timeline Lokasi</span>
+        <div class="timeline-list">
+          ${(t.timeline || []).map((step, index) => `
+            <div class="timeline-item">
+              <span style="color:#94a3b8;">${index + 1}.</span>
+              <span class="detail-value" style="font-size:13px;">${step.address}</span>
+            </div>
+          `).join('')}
+          ${t.timeline.length === 0 ? '<span style="color:#94a3b8;">Tidak ada timeline</span>' : ''}
+        </div>
+      </div>
+
+      ${t.status === 'REJECTED' && t.approvals.some(a => a.note) ? `
+        <div style="margin-top:20px; padding:15px; background:#fff1f2; border-left:4px solid #e11d48; border-radius:4px;">
+          <span class="detail-label" style="color:#be123c;">Alasan Penolakan:</span>
+          <div class="detail-value" style="color:#9f1239;">
+            ${t.approvals.filter(a => a.status === 'REJECTED').pop()?.note || 'Tidak ada catatan.'}
+          </div>
+        </div>
+      ` : ''}
+
+      <div style="margin-top:24px; text-align:right;">
+        <button onclick="closeModal('${t._id}')" style="padding:10px 24px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+</script>

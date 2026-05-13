@@ -88,8 +88,8 @@ function generateApprovals(status) {
     const useDelegation = Math.random() > 0.6;
 
     approvals.push({
-      role: "DIRECTOR",
-      actingAs: useDelegation ? "HR" : "DIRECTOR",
+      role: "PIMPINAN",
+      actingAs: useDelegation ? "HR" : "PIMPINAN",
       userId: new mongoose.Types.ObjectId(),
       status: "APPROVED",
       date: randomDate(),
@@ -145,14 +145,14 @@ async function seed() {
 
         status,
 
-        currentStep: status === "PENDING" ? "MANAGER" : status === "IN_REVIEW" ? "DIRECTOR" : null,
+        currentStep: status === "PENDING" ? "MANAGER" : status === "IN_REVIEW" ? "PIMPINAN" : null,
 
         approvals: generateApprovals(status),
 
         delegation:
           Math.random() > 0.8
             ? {
-                from: "DIRECTOR",
+                from: "PIMPINAN",
                 to: "HR",
                 active: true,
                 createdAt: randomDate(),

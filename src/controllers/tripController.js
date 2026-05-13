@@ -200,7 +200,25 @@ export const approvalPage = async (req, res) => {
     res.status(500).send("Error load approval page");
   }
 };
+export const updateTrip = async (req, res) => {
+  const user = req.session.user;
+  const { id } = req.params;
 
+  const trip = await BusinessTrip.findOne({
+    _id: id,
+    userId: user._id,
+  });
+
+  if (!trip) return res.status(404).send("Not found");
+
+  if (trip.status !== "PENDING") {
+    return res.status(403).send("Tidak bisa edit setelah masuk approval");
+  }
+
+  await BusinessTrip.findByIdAndUpdate(id, req.body);
+
+  return res.redirect("/trip/my");
+};
 export const handleApproval = async (req, res) => {
   try {
     const user = req.session.user;
