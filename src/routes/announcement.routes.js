@@ -2,23 +2,17 @@ import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
 
-import {
-  formAnnouncement,
-  createAnnouncement,
-  allAnnouncements,
-  detailAnnouncement,
-  publishAnnouncement,
-} from "../controllers/announcementController.js";
+import { newForm, create, index, show, publish } from "../controllers/announcement.controller.js";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", allAnnouncements);
-router.get("/new", formAnnouncement);
-router.post("/", uploadFile.single("attachment"), createAnnouncement);
+router.get("/", index);
+router.get("/new", newForm);
+router.post("/", uploadFile.single("attachment"), create);
 
-router.get("/:id", detailAnnouncement);
-router.post("/:id/publish", publishAnnouncement);
+router.get("/:id", show);
+router.post("/:id/publish", publish);
 
 export default router;
