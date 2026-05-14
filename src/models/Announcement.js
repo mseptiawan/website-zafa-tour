@@ -15,12 +15,6 @@ const announcementSchema = new mongoose.Schema(
       default: "LIGHT",
     },
 
-    status: {
-      type: String,
-      enum: ["DRAFT", "REVIEW", "SIGNED", "PUBLISHED"],
-      default: "PUBLISHED",
-    },
-
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -34,11 +28,6 @@ const announcementSchema = new mongoose.Schema(
     },
 
     publishDate: Date,
-
-    isPinned: {
-      type: Boolean,
-      default: false,
-    },
   },
   { timestamps: true }
 );

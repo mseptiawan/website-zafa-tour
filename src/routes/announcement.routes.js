@@ -3,7 +3,7 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
 import { createAnnouncementSchema } from "../validations/announcement/announcement.schema.js";
 import { newForm, create, index, show, publish } from "../controllers/announcement.controller.js";
-
+import { validate } from "../middlewares/validate.js";
 const router = express.Router();
 
 router.use(authMiddleware);

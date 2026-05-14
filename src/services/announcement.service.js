@@ -1,4 +1,5 @@
 import Announcement from "../models/Announcement.js";
+import { createAnnouncementSchema } from "../validations/announcement/announcement.schema.js";
 
 const create = async (req) => {
   const parsed = createAnnouncementSchema.safeParse(req.body);

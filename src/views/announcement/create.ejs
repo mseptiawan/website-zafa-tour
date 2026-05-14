@@ -1,94 +1,141 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
-
-  <div class="max-w-3xl mx-auto">
-
-    <div class="mb-6">
-      <h1 class="text-[24px] font-medium text-slate-800">
-        Buat Pengumuman
-      </h1>
-
-      <p class="text-[13px] text-slate-500 mt-1">
-        Publikasikan informasi internal perusahaan
-      </p>
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-2xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+        <span>Workspace</span>
+        <span class="text-slate-300">/</span>
+        <span class="text-slate-900">Announcements</span>
+      </nav>
+      <h1 class="text-2xl font-bold text-slate-900">Buat Pengumuman</h1>
+      <p class="text-[14px] text-slate-500 mt-1">Publikasikan informasi internal untuk tim Anda.</p>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl p-6">
+    <!-- Main Form Card -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+      <form method="POST" action="/announcement/" enctype="multipart/form-data" class="p-8 space-y-6">
+        
+        <% if (error) { %>
+          <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100 flex items-center gap-3">
+            <%= error %>
+          </div>
+        <% } %>
 
-      <form
-  method="POST"
-  action="/announcement/"
-  enctype="multipart/form-data"
-  class="space-y-5"
->
-
-        <!-- TITLE -->
-        <div>
-          <label class="text-[12px] text-slate-600">Judul</label>
+        <!-- Row 1: Judul -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Judul Pengumuman</label>
           <input
             type="text"
             name="title"
+            placeholder="Ketik judul di sini..."
             required
-            class="w-full border rounded-lg px-3 py-2 text-[13px]"
+            value="<%= old?.title || '' %>"
+            class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-[14px] focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all"
           />
         </div>
 
-        <!-- CONTENT -->
-        <div>
-          <label class="text-[12px] text-slate-600">Isi</label>
-          <textarea
-            name="content"
-            rows="5"
-            required
-            class="w-full border rounded-lg px-3 py-2 text-[13px]"
-          ></textarea>
-        </div>
-
-        <!-- CATEGORY -->
-        <div>
-          <label class="text-[12px] text-slate-600">Kategori</label>
-
+        <!-- Row 2: Kategori (Full Width) -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Kategori</label>
           <select
             name="category"
-            class="w-full border rounded-lg px-3 py-2 text-[13px]"
+            class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-[14px] focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none appearance-none cursor-pointer"
           >
-            <option value="LIGHT">Pengumuman Ringan</option>
-
+            <option value="LIGHT">🍃 Pengumuman Ringan</option>
             <% if (user.role === "PIMPINAN") { %>
-              <option value="OFFICIAL">Pengumuman Resmi</option>
+              <option value="OFFICIAL">⚖️ Pengumuman Resmi</option>
             <% } %>
           </select>
         </div>
 
-        <!-- FILE (OPTIONAL) -->
-        <div>
-          <label class="text-[12px] text-slate-600">
-            File Pengumuman
-            <span class="text-slate-400">(opsional)</span>
-          </label>
-
-          <input
-            type="file"
-            name="attachment"
-            class="w-full text-[12px] border rounded-lg px-3 py-2"
-          />
-
-          <p class="text-[10px] text-slate-400 mt-1">
-            Bisa diisi atau dikosongkan
-          </p>
+        <!-- Row 3: Detail Informasi -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Isi Pengumuman</label>
+          <textarea
+            name="content"
+            rows="6"
+            placeholder="Tulis detail informasi..."
+            required
+            class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-[14px] focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none resize-none transition-all"
+          ><%= old?.content || '' %></textarea>
         </div>
 
-        <!-- BUTTON -->
-        <button
-          class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-lg text-[13px]"
-        >
-          Simpan
-        </button>
+        <!-- Row 4: Attachment (Upload Area Modern) -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Lampiran <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          
+          <div class="relative group">
+            <input type="file" name="attachment" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
+            
+            <!-- Empty State -->
+            <div id="dropzone-empty" class="border-2 border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300 transition-all">
+              <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <p class="text-sm text-slate-600 font-medium">Klik untuk upload file</p>
+              <p class="text-xs text-slate-400 mt-1">PNG, JPG, PDF (Maks. 5MB)</p>
+            </div>
 
+            <!-- Filled State (Hidden) -->
+            <div id="dropzone-filled" class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-3">
+                <div id="preview-box" class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
+                  <img id="img-preview" class="hidden w-full h-full object-cover" />
+                  <svg id="doc-icon" class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="1.5"/></svg>
+                </div>
+                <div class="overflow-hidden">
+                  <p id="name-preview" class="text-sm font-bold text-slate-800 truncate max-w-[200px]">file.pdf</p>
+                  <p id="size-preview" class="text-xs text-slate-400">1.2 MB</p>
+                </div>
+              </div>
+              <button type="button" onclick="clearFile()" class="p-2 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-4">
+          <button type="submit" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0">
+            Publikasikan Pengumuman
+          </button>
+        </div>
       </form>
-
     </div>
-
   </div>
 </div>
+
+<script>
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      
+      document.getElementById('name-preview').textContent = file.name;
+      document.getElementById('size-preview').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+      if (file.type.startsWith('image/')) {
+        reader.onload = e => {
+          document.getElementById('img-preview').src = e.target.result;
+          document.getElementById('img-preview').classList.remove('hidden');
+          document.getElementById('doc-icon').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        document.getElementById('img-preview').classList.add('hidden');
+        document.getElementById('doc-icon').classList.remove('hidden');
+      }
+
+      document.getElementById('dropzone-empty').classList.add('hidden');
+      document.getElementById('dropzone-filled').classList.remove('hidden');
+    }
+  }
+
+  function clearFile() {
+    document.getElementById('file-input').value = '';
+    document.getElementById('dropzone-empty').classList.remove('hidden');
+    document.getElementById('dropzone-filled').classList.add('hidden');
+  }
+</script>

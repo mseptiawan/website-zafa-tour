@@ -4,6 +4,8 @@ export const newForm = (req, res) => {
   res.render("announcement/create", {
     title: "Buat Pengumuman",
     user: req.session.user,
+    error: null,
+    old: {},
   });
 };
 
@@ -12,7 +14,12 @@ export const create = async (req, res, next) => {
     await announcementService.create(req);
     return res.redirect("/announcement");
   } catch (err) {
-    next(err);
+    return res.status(400).render("announcement/create", {
+      title: "Buat Pengumuman",
+      user: req.session.user,
+      error: err.message,
+      old: req.body,
+    });
   }
 };
 
