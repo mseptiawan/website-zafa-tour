@@ -1,25 +1,16 @@
 import Announcement from "../models/Announcement.js";
 
-/* =================================
-   FORM CREATE
-================================= */
-export const index = (req, res) => {
+export const newForm = (req, res) => {
   res.render("announcement/create", {
     title: "Buat Pengumuman",
     user: req.session.user,
   });
 };
 
-/* =================================
-   CREATE ANNOUNCEMENT
-================================= */
-export const createAnnouncement = async (req, res) => {
+export const create = async (req, res) => {
   try {
     const { title, content, category } = req.body;
 
-    // =========================
-    // VALIDATION BASIC
-    // =========================
     if (!title || title.trim().length < 5) {
       return res.status(400).send("Judul minimal 5 karakter");
     }
@@ -28,18 +19,12 @@ export const createAnnouncement = async (req, res) => {
       return res.status(400).send("Isi pengumuman terlalu pendek");
     }
 
-    // =========================
-    // STATUS LOGIC
-    // =========================
     let status = "PUBLISHED";
 
     if (category === "OFFICIAL") {
       status = "DRAFT";
     }
 
-    // =========================
-    // CREATE ANNOUNCEMENT
-    // =========================
     await Announcement.create({
       title: title.trim(),
       content: content.trim(),
@@ -47,7 +32,6 @@ export const createAnnouncement = async (req, res) => {
       status,
       createdBy: req.session.user._id,
 
-      // OPTIONAL FILE
       attachment: req.file ? req.file.filename : null,
     });
 
@@ -58,10 +42,7 @@ export const createAnnouncement = async (req, res) => {
   }
 };
 
-/* =================================
-   ALL ANNOUNCEMENT
-================================= */
-export const allAnnouncements = async (req, res) => {
+export const index = async (req, res) => {
   try {
     const announcements = await Announcement.find().populate("createdBy").sort({ createdAt: -1 });
 
@@ -76,10 +57,7 @@ export const allAnnouncements = async (req, res) => {
   }
 };
 
-/* =================================
-   DETAIL
-================================= */
-export const detailAnnouncement = async (req, res) => {
+export const show = async (req, res) => {
   try {
     const announcement = await Announcement.findById(req.params.id).populate("createdBy");
 
@@ -94,10 +72,7 @@ export const detailAnnouncement = async (req, res) => {
   }
 };
 
-/* =================================
-   PUBLISH
-================================= */
-export const publishAnnouncement = async (req, res) => {
+export const publish = async (req, res) => {
   try {
     await Announcement.findByIdAndUpdate(req.params.id, {
       status: "PUBLISHED",
