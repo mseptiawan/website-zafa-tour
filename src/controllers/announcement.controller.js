@@ -7,16 +7,16 @@ export const newForm = (req, res) => {
   });
 };
 
-export const create = async (req, res) => {
+export const create = async (req, res, next) => {
   try {
     await announcementService.create(req);
     return res.redirect("/announcement");
   } catch (err) {
-    return res.status(400).send(err.message);
+    next(err);
   }
 };
 
-export const index = async (req, res) => {
+export const index = async (req, res, next) => {
   try {
     const announcements = await announcementService.getAll();
 
@@ -26,11 +26,11 @@ export const index = async (req, res) => {
       user: req.session.user,
     });
   } catch (err) {
-    res.status(500).send(err.message);
+    next(err);
   }
 };
 
-export const show = async (req, res) => {
+export const show = async (req, res, next) => {
   try {
     const announcement = await announcementService.getById(req.params.id);
 
@@ -40,15 +40,15 @@ export const show = async (req, res) => {
       user: req.session.user,
     });
   } catch (err) {
-    res.status(500).send(err.message);
+    next(err);
   }
 };
 
-export const publish = async (req, res) => {
+export const publish = async (req, res, next) => {
   try {
     await announcementService.publish(req.params.id);
     return res.redirect("/announcement");
   } catch (err) {
-    return res.status(500).send(err.message);
+    next(err);
   }
 };

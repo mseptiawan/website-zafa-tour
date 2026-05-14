@@ -21,6 +21,7 @@ import "./models/Employee.js";
 import "./models/KpiTemplate.js";
 import "./models/KpiTemplateDetail.js";
 import "./models/UnitKpiMapping.js";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -44,4 +45,5 @@ app.use((req, res, next) => {
 });
 app.use("/", routes);
 
+app.use(globalErrorHandler);
 export default app;

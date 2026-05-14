@@ -1,22 +1,20 @@
 import Announcement from "../models/Announcement.js";
 
 const create = async (req) => {
-  const { title, content, category } = req.body;
+  const parsed = createAnnouncementSchema.safeParse(req.body);
 
-  if (!title || title.trim().length < 5) {
-    throw new Error("Judul minimal 5 karakter");
+  if (!parsed.success) {
+    throw new AppError(parsed.error.errors[0].message, 400);
   }
 
-  if (!content || content.trim().length < 10) {
-    throw new Error("Isi pengumuman terlalu pendek");
-  }
+  const { title, content, category } = parsed.data;
 
   let status = "PUBLISHED";
   if (category === "OFFICIAL") status = "DRAFT";
 
   return Announcement.create({
-    title: title.trim(),
-    content: content.trim(),
+    title,
+    content,
     category,
     status,
     createdBy: req.session.user._id,
