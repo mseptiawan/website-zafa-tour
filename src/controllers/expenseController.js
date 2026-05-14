@@ -19,49 +19,83 @@ export const formExpense = (req, res) => {
 */
 export const createExpense = async (req, res) => {
   try {
-    const { title, description, category, amount, expenseDate, noReceiptReason, selfDeclaration } =
-      req.body;
-
-    const user = req.session.user;
-
-    if (!user) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    // optional: ambil employee (kalau memang masih dipakai di sistem lain)
-    const employee = await Employee.findOne({ userId: user._id });
-
-    if (!req.file && !selfDeclaration) {
-      return res.send("Upload bukti atau centang pernyataan");
-    }
-
-    // AUTO FLOW
-    let status = "PENDING_FINANCE";
-    if (Number(amount) > 200000) {
-      status = "PENDING_MANAGER";
-    }
-
-    await ExpenseClaim.create({
-      userId: user._id,
-
+    const {
       title,
       description,
       category,
       amount,
       expenseDate,
       noReceiptReason,
+      selfDeclaration,
+      noReceipt,
+    } = req.body;
 
-      selfDeclaration: selfDeclaration === "on",
+    const user = req.session.user;
+
+    if (!user) {
+      return res.status(401).send("Unauthorized");
+    }
+    const employee = await Employee.findOne({ userId: user._id });
+
+    if (!employee) {
+      return res.status(404).send("Employee data tidak ditemukan");
+    }
+    const isNoReceipt = noReceipt === "on";
+    const hasFile = !!req.file;
+
+    // =========================
+    // VALIDASI BUSINESS RULE
+    // =========================
+    if (!isNoReceipt && !hasFile) {
+      return res
+        .status(400)
+        .send("Upload bukti transaksi wajib jika tidak memilih 'tidak ada bukti'");
+    }
+
+    if (isNoReceipt && !selfDeclaration) {
+      return res.status(400).send("Self declaration wajib dicentang jika tidak ada bukti");
+    }
+
+    if (isNoReceipt && !noReceiptReason) {
+      return res.status(400).send("Alasan tidak ada bukti wajib diisi");
+    }
+
+    // optional (kalau masih dipakai di sistem lain)
+    await Employee.findOne({ userId: user._id });
+
+    // =========================
+    // AUTO FLOW STATUS
+    // =========================
+    let status = "PENDING_FINANCE";
+    if (Number(amount) > 200000) {
+      status = "PENDING_MANAGER";
+    }
+
+    // =========================
+    // CREATE DATA
+    // =========================
+    await ExpenseClaim.create({
+      userId: user._id,
+      employeeId: employee._id,
+      title,
+      category,
+      amount,
+      expenseDate,
+
+      // hanya dipakai jika no receipt
+      noReceiptReason: isNoReceipt ? noReceiptReason : null,
+
+      selfDeclaration: isNoReceipt ? true : false,
 
       status,
 
-      proofFile: req.file ? req.file.filename : null,
+      proofFile: hasFile ? req.file.filename : null,
     });
 
-    res.redirect("/expense/my");
+    return res.redirect("/expense/my");
   } catch (err) {
     console.log(err);
-    res.status(500).send("Create expense error");
+    return res.status(500).send("Create expense error");
   }
 };
 
@@ -76,9 +110,7 @@ export const myExpenses = async (req, res) => {
 
     const expenses = await ExpenseClaim.find({
       userId: user._id,
-    }).sort({
-      createdAt: -1,
-    });
+    }).sort({ createdAt: -1 });
 
     res.render("expense/my", {
       title: "Klaim Saya",
@@ -118,7 +150,9 @@ export const approvalManagerExpense = async (req, res) => {
   try {
     const expenses = await ExpenseClaim.find({
       status: "PENDING_MANAGER",
-    }).populate("userId");
+    })
+      .populate("userId")
+      .populate("employeeId");
 
     res.render("expense/approval-manager", {
       title: "Approval Klaim",
@@ -158,7 +192,9 @@ export const financeExpensePage = async (req, res) => {
   try {
     const expenses = await ExpenseClaim.find({
       status: "PENDING_FINANCE",
-    }).populate("userId");
+    })
+      .populate("userId")
+      .populate("employeeId");
 
     res.render("expense/finance", {
       title: "Validasi Finance",
@@ -169,7 +205,6 @@ export const financeExpensePage = async (req, res) => {
     res.status(500).send("Error");
   }
 };
-
 /*
 |--------------------------------------------------------------------------
 | MARK AS PAID

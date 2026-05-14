@@ -4,7 +4,6 @@
 
   <!-- HEADER -->
   <div class="mb-6">
-
     <h1 class="text-2xl font-semibold">
       Validasi Finance
     </h1>
@@ -12,7 +11,6 @@
     <p class="text-sm text-slate-500 mt-1">
       Klaim yang siap dicairkan
     </p>
-
   </div>
 
   <!-- TABLE -->
@@ -25,15 +23,17 @@
         <tr>
           <th class="p-3 text-left">Karyawan</th>
           <th class="p-3 text-left">Judul</th>
+          <th class="p-3 text-left">Kategori</th>
           <th class="p-3 text-left">Nominal</th>
-          <th class="p-3 text-left">Status</th>
+          <th class="p-3 text-left">Tanggal</th>
           <th class="p-3 text-left">Bukti</th>
+          <th class="p-3 text-left">Status</th>
           <th class="p-3 text-left">Aksi</th>
         </tr>
 
       </thead>
 
-      <tbody>
+      <tbody class="text-slate-700">
 
         <% expenses.forEach(e => { %>
 
@@ -42,75 +42,100 @@
             <!-- KARYAWAN -->
             <td class="p-3">
 
-              <div class="font-medium">
-                <%= e.employeeId?.fullName %>
+              <div class="font-medium"> 
+      <%= e.employeeId?.fullName || '-' %>
               </div>
 
+              <div class="text-xs text-slate-400">
+                <%= e.userId?.email || '' %>
+              </div>
 
             </td>
 
             <!-- JUDUL -->
+            <td class="p-3 font-medium">
+              <%= e.title %>
+            </td>
+
+            <!-- KATEGORI -->
             <td class="p-3">
-
-              <div class="font-medium">
-                <%= e.title %>
-              </div>
-
-              <div class="text-xs text-slate-400 mt-1">
-                <%= e.category %>
-              </div>
-
+              <%= e.category %>
             </td>
 
             <!-- NOMINAL -->
             <td class="p-3 font-semibold">
-              Rp <%= e.amount.toLocaleString() %>
+              Rp <%= e.amount.toLocaleString('id-ID') %>
             </td>
 
-            <!-- STATUS -->
+            <!-- TANGGAL -->
             <td class="p-3">
-
-              <span
-                class="px-2 py-1 text-xs rounded-md bg-amber-100 text-amber-700"
-              >
-                <%= e.status %>
-              </span>
-
+              <%= new Date(e.expenseDate).toLocaleDateString('id-ID') %>
             </td>
 
             <!-- BUKTI -->
             <td class="p-3">
 
-              <% if(e.proofFile) { %>
+              <% if (!e.proofFile) { %>
 
-                <a
-                  href="/uploads/<%= e.proofFile %>"
-                  target="_blank"
-                  class="text-indigo-500 text-xs hover:underline"
-                >
-                  Lihat Bukti
-                </a>
-
-              <% } else { %>
-
-                <div class="text-xs text-amber-500">
+                <span class="text-xs text-amber-500">
                   Self Declaration
-                </div>
+                </span>
+
+              <% } else { 
+                const file = e.proofFile;
+                const ext = file.split('.').pop().toLowerCase();
+                const isImage = ['jpg','jpeg','png','webp'].includes(ext);
+              %>
+
+                <% if (isImage) { %>
+
+                  <a href="/uploads/<%= file %>" target="_blank">
+                    <img
+                      src="/uploads/<%= file %>"
+                      class="w-12 h-12 object-cover rounded border"
+                    />
+                  </a>
+
+                <% } else { %>
+
+                  <a
+                    href="/uploads/<%= file %>"
+                    download
+                    class="text-indigo-500 text-xs underline"
+                  >
+                    Download File
+                  </a>
+
+                <% } %>
 
               <% } %>
+
+            </td>
+
+            <!-- STATUS -->
+            <td class="p-3">
+
+              <% 
+                let statusLabel = e.status;
+                if (e.status === "PENDING_FINANCE") statusLabel = "Menunggu Finance";
+                if (e.status === "PENDING_MANAGER") statusLabel = "Menunggu Manager";
+                if (e.status === "PAID") statusLabel = "Dibayar";
+                if (e.status === "REJECTED") statusLabel = "Ditolak";
+              %>
+
+              <span class="px-2 py-1 text-xs rounded-md bg-amber-100 text-amber-700">
+                <%= statusLabel %>
+              </span>
 
             </td>
 
             <!-- AKSI -->
             <td class="p-3">
 
-              <form
-                action="/expense/<%= e._id %>/pay"
-                method="POST"
-              >
+              <form action="/expense/<%= e._id %>/pay" method="POST">
 
                 <button
-                  class="px-3 py-2 bg-emerald-500 text-white text-xs rounded-lg"
+                  class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg"
                 >
                   Cairkan
                 </button>

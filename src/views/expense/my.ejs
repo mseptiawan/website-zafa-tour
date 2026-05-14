@@ -10,30 +10,117 @@
 
     <table class="w-full text-sm">
 
-      <thead class="bg-slate-50">
+      <thead class="bg-slate-50 text-slate-600">
         <tr>
           <th class="p-3 text-left">Judul</th>
+          <th class="p-3 text-left">Kategori</th>
           <th class="p-3 text-left">Nominal</th>
+          <th class="p-3 text-left">Tanggal</th>
           <th class="p-3 text-left">Status</th>
+          <th class="p-3 text-left">Approval</th>
+          <th class="p-3 text-left">Bukti</th>
         </tr>
       </thead>
 
-      <tbody>
+      <tbody class="text-slate-700">
+
+        <% function humanStatus(status) { %>
+          <% if (status === "PENDING_MANAGER") { %> Menunggu Manager <% } %>
+          <% if (status === "PENDING_FINANCE") { %> Menunggu Finance <% } %>
+          <% if (status === "PAID") { %> Dibayar <% } %>
+          <% if (status === "REJECTED") { %> Ditolak <% } %>
+        <% } %>
 
         <% expenses.forEach(e => { %>
 
-          <tr class="border-t">
+          <tr class="border-t hover:bg-slate-50">
 
-            <td class="p-3">
+            <!-- TITLE -->
+            <td class="p-3 font-medium">
               <%= e.title %>
             </td>
 
+            <!-- CATEGORY -->
             <td class="p-3">
-              Rp <%= e.amount.toLocaleString() %>
+              <%= e.category %>
             </td>
 
+            <!-- AMOUNT -->
             <td class="p-3">
-              <%= e.status %>
+              Rp <%= e.amount.toLocaleString('id-ID') %>
+            </td>
+
+            <!-- DATE -->
+            <td class="p-3">
+              <%= new Date(e.expenseDate).toLocaleDateString('id-ID') %>
+            </td>
+
+            <!-- STATUS -->
+            <td class="p-3">
+              <span class="px-2 py-1 rounded bg-slate-100 text-xs">
+                <%= humanStatus(e.status) %>
+              </span>
+            </td>
+
+            <!-- APPROVAL -->
+            <td class="p-3 text-xs text-slate-600">
+
+              <% if (e.managerApprovedBy) { %>
+                ✔ Manager
+              <% } else { %>
+                - Manager
+              <% } %>
+
+              <br/>
+
+              <% if (e.financeApprovedBy) { %>
+                ✔ Finance
+              <% } else { %>
+                - Finance
+              <% } %>
+
+            </td>
+
+            <!-- PROOF -->
+            <td class="p-3">
+
+              <% if (!e.proofFile) { %>
+
+                <span class="text-xs text-slate-400">
+                  Self Declaration
+                </span>
+
+              <% } else { %>
+
+                <% 
+                  const file = e.proofFile;
+                  const ext = file.split('.').pop().toLowerCase();
+                  const isImage = ['jpg','jpeg','png','webp'].includes(ext);
+                %>
+
+                <% if (isImage) { %>
+
+                  <a href="/uploads/<%= file %>" target="_blank">
+                    <img
+                      src="/uploads/<%= file %>"
+                      class="w-12 h-12 object-cover rounded border"
+                    />
+                  </a>
+
+                <% } else { %>
+
+                  <a
+                    href="/uploads/<%= file %>"
+                    download
+                    class="text-blue-600 text-xs underline"
+                  >
+                    Download File
+                  </a>
+
+                <% } %>
+
+              <% } %>
+
             </td>
 
           </tr>

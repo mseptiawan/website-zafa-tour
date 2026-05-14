@@ -19,19 +19,19 @@
     <table class="w-full text-sm">
 
       <thead class="bg-slate-50 text-slate-500">
-
         <tr>
           <th class="p-3 text-left">Karyawan</th>
           <th class="p-3 text-left">Judul</th>
           <th class="p-3 text-left">Kategori</th>
           <th class="p-3 text-left">Nominal</th>
+          <th class="p-3 text-left">Tanggal</th>
           <th class="p-3 text-left">Bukti</th>
+          <th class="p-3 text-left">Status</th>
           <th class="p-3 text-left">Aksi</th>
         </tr>
-
       </thead>
 
-      <tbody>
+      <tbody class="text-slate-700">
 
         <% expenses.forEach(e => { %>
 
@@ -43,6 +43,9 @@
                 <%= e.employeeId?.fullName %>
               </div>
 
+              <div class="text-xs text-slate-400">
+                <%= e.employeeId?.position || '' %>
+              </div>
             </td>
 
             <!-- JUDUL -->
@@ -58,35 +61,55 @@
 
             <!-- KATEGORI -->
             <td class="p-3">
-              <span
-                class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700"
-              >
+              <span class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700">
                 <%= e.category %>
               </span>
             </td>
 
             <!-- NOMINAL -->
             <td class="p-3 font-semibold">
-              Rp <%= e.amount.toLocaleString() %>
+              Rp <%= e.amount.toLocaleString('id-ID') %>
+            </td>
+
+            <!-- TANGGAL -->
+            <td class="p-3 text-xs">
+              <%= new Date(e.expenseDate).toLocaleDateString('id-ID') %>
             </td>
 
             <!-- BUKTI -->
             <td class="p-3">
 
-              <% if(e.proofFile) { %>
+              <% if (e.proofFile) { 
+                const file = e.proofFile;
+                const ext = file.split('.').pop().toLowerCase();
+                const isImage = ['jpg','jpeg','png','webp'].includes(ext);
+              %>
 
-                <a
-                  href="/uploads/files/<%= e.proofFile %>"
-                  target="_blank"
-                  class="text-indigo-500 text-xs hover:underline"
-                >
-                  Lihat Bukti
-                </a>
+                <% if (isImage) { %>
+
+                  <a href="/uploads/<%= file %>" target="_blank">
+                    <img
+                      src="/uploads/<%= file %>"
+                      class="w-12 h-12 object-cover rounded border"
+                    />
+                  </a>
+
+                <% } else { %>
+
+                  <a
+                    href="/uploads/<%= file %>"
+                    download
+                    class="text-indigo-500 text-xs underline"
+                  >
+                    Download Bukti
+                  </a>
+
+                <% } %>
 
               <% } else { %>
 
                 <div class="text-xs text-amber-500">
-                  Tidak ada bukti
+                  Self Declaration
                 </div>
 
                 <div class="text-[11px] text-slate-400 mt-1">
@@ -97,22 +120,22 @@
 
             </td>
 
+            <!-- STATUS -->
+            <td class="p-3">
+              <span class="px-2 py-1 text-xs rounded-md bg-amber-100 text-amber-700">
+                Menunggu Manager
+              </span>
+            </td>
+
             <!-- AKSI -->
             <td class="p-3">
-
-              <form
-                action="/expense/<%= e._id %>/approve/manager"
-                method="POST"
-              >
-
+              <form action="/expense/<%= e._id %>/approve/manager" method="POST">
                 <button
-                  class="px-3 py-2 bg-indigo-500 text-white text-xs rounded-lg"
+                  class="px-3 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-xs rounded-lg"
                 >
                   Approve
                 </button>
-
               </form>
-
             </td>
 
           </tr>

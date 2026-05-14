@@ -7,13 +7,15 @@ const expenseClaimSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
+    employeeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
     title: {
       type: String,
       required: true,
     },
-
-    description: String,
 
     category: {
       type: String,
