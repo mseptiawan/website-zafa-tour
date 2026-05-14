@@ -1,32 +1,35 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 p-6">
-  <!-- HEADER -->
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-slate-800">
-        Semua Penugasan
-      </h1>
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
 
-      <p class="text-sm text-slate-500 mt-1">
-        Monitoring seluruh penugasan karyawan
-      </p>
+  <div class="max-w-5xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-6">
+
+      <div>
+        <h1 class="text-2xl font-semibold text-slate-800">
+          Semua Penugasan
+        </h1>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Monitoring penugasan karyawan
+        </p>
+      </div>
+
+      <a
+        href="/assignment/create"
+        class="bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2.5 rounded-lg transition"
+      >
+        Buat Penugasan
+      </a>
+
     </div>
 
-    <a
-      href="/assignment/create"
-      class="bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-xl transition"
-    >
-      + Buat Penugasan
-    </a>
-  </div>
-
-  <!-- LIST -->
-  <div class="space-y-4">
-
+    <!-- EMPTY -->
     <% if(assignments.length === 0) { %>
 
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+      <div class="bg-white border border-slate-200 rounded-xl p-10 text-center">
         <p class="text-sm text-slate-500">
           Belum ada data penugasan
         </p>
@@ -34,132 +37,110 @@
 
     <% } %>
 
+    <div class="space-y-3">
+
+  <% if(assignments.length > 0) { %>
+
     <% assignments.forEach(a => { %>
 
       <a
         href="/assignment/<%= a._id %>"
-        class="block bg-white border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 hover:shadow-sm transition"
+        class="block bg-white border border-slate-200 rounded-xl px-5 py-4 hover:border-slate-300 hover:bg-slate-50 transition"
       >
+
         <!-- TOP -->
         <div class="flex items-start justify-between gap-4">
 
-          <div>
-            <!-- TITLE -->
-            <h2 class="text-sm font-semibold text-slate-800">
+          <div class="min-w-0">
+
+            <h2 class="text-[15px] font-medium text-slate-800 break-words">
               <%= a.title %>
             </h2>
 
-            <!-- DESCRIPTION -->
-            <p class="text-xs text-slate-500 mt-1 line-clamp-2">
-              <%= a.description || '-' %>
+            <p class="text-sm text-slate-500 mt-1 line-clamp-1 break-words">
+              <%= a.description || 'Tidak ada deskripsi' %>
             </p>
+
           </div>
 
-          <!-- STATUS -->
-          <div>
-            <% if(a.status === "ACTIVE") { %>
+          <div class="flex-shrink-0">
 
-              <span
-                class="text-[11px] bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full font-medium"
-              >
-                ACTIVE
+            <% if(a.endDate && new Date(a.endDate) >= new Date()) { %>
+
+              <span class="text-[11px] bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md">
+                Active
               </span>
 
             <% } else { %>
 
-              <span
-                class="text-[11px] bg-slate-200 text-slate-600 px-3 py-1 rounded-full font-medium"
-              >
-                COMPLETED
+              <span class="text-[11px] bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md">
+                Completed
               </span>
 
             <% } %>
+
           </div>
+
         </div>
 
-        <!-- INFO -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+        <!-- META -->
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-[13px] text-slate-500">
 
-          <!-- TYPE -->
           <div>
-            <p class="text-[11px] text-slate-400 uppercase">
-              Tipe
-            </p>
-
-            <p class="text-sm text-slate-700 mt-1">
+            <span class="text-slate-400">Tipe:</span>
+            <span class="text-slate-700 ml-1">
               <%= a.type %>
-            </p>
+            </span>
           </div>
 
-          <!-- LOCATION -->
           <div>
-            <p class="text-[11px] text-slate-400 uppercase">
-              Lokasi
-            </p>
-
-            <p class="text-sm text-slate-700 mt-1">
+            <span class="text-slate-400">Lokasi:</span>
+            <span class="text-slate-700 ml-1">
               <%= a.location || '-' %>
-            </p>
+            </span>
           </div>
 
-          <!-- START -->
           <div>
-            <p class="text-[11px] text-slate-400 uppercase">
-              Mulai
-            </p>
-
-            <p class="text-sm text-slate-700 mt-1">
+            <span class="text-slate-400">Mulai:</span>
+            <span class="text-slate-700 ml-1">
               <%= new Date(a.startDate).toLocaleDateString("id-ID") %>
-            </p>
+            </span>
           </div>
 
-          <!-- END -->
           <div>
-            <p class="text-[11px] text-slate-400 uppercase">
-              Selesai
-            </p>
-
-            <p class="text-sm text-slate-700 mt-1">
+            <span class="text-slate-400">Selesai:</span>
+            <span class="text-slate-700 ml-1">
               <%= new Date(a.endDate).toLocaleDateString("id-ID") %>
-            </p>
+            </span>
           </div>
 
         </div>
 
         <!-- EMPLOYEE -->
-        <div class="mt-5 border-t pt-4">
+        <div class="flex flex-wrap gap-2 mt-4">
 
-          <p class="text-[11px] text-slate-400 uppercase mb-3">
-            Karyawan Ditugaskan
-          </p>
+          <% a.employees.slice(0, 5).forEach(e => { %>
 
-          <div class="flex flex-wrap gap-2">
+            <span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-md">
+              <%= e.fullName %>
+            </span>
 
-            <% a.employees.forEach(e => { %>
+          <% }) %>
 
-              <div
-                class="bg-slate-100 px-3 py-2 rounded-xl"
-              >
-                <div class="text-xs font-medium text-slate-700">
-                  <%= e.fullName %>
-                </div>
+          <% if(a.employees.length > 5) { %>
 
-              </div>
+            <span class="text-xs text-slate-400 px-1 py-1">
+              +<%= a.employees.length - 5 %> lainnya
+            </span>
 
-            <% }) %>
+          <% } %>
 
-          </div>
         </div>
 
-        <!-- FILE -->
         <% if(a.attachment) { %>
 
-          <div class="mt-4">
-            <span
-              class="text-[11px] bg-indigo-50 text-indigo-500 px-3 py-1 rounded-full"
-            >
-              Ada Surat Penugasan
-            </span>
+          <div class="mt-3 text-[12px] text-slate-400">
+            Ada lampiran surat penugasan
           </div>
 
         <% } %>
@@ -168,5 +149,52 @@
 
     <% }) %>
 
-  </div>
+    <!-- PAGINATION -->
+    <div class="mt-5 flex items-center justify-between text-sm text-slate-600">
+
+      <div>
+        Page <%= pagination.page %> / <%= pagination.totalPages %>
+      </div>
+
+      <div class="flex gap-2">
+
+        <% if (pagination.page > 1) { %>
+
+          <a
+            href="?page=<%= pagination.page - 1 %>"
+            class="px-3 py-1 border border-slate-200 rounded-lg hover:bg-slate-100 transition"
+          >
+            Prev
+          </a>
+
+        <% } %>
+
+        <% if (pagination.page < pagination.totalPages) { %>
+
+          <a
+            href="?page=<%= pagination.page + 1 %>"
+            class="px-3 py-1 border border-slate-200 rounded-lg hover:bg-slate-100 transition"
+          >
+            Next
+          </a>
+
+        <% } %>
+
+      </div>
+
+    </div>
+
+  <% } else { %>
+
+    <!-- EMPTY -->
+    <div class="bg-white border border-slate-200 rounded-xl py-14 text-center">
+
+      <p class="text-sm text-slate-500">
+        No assignment data
+      </p>
+
+    </div>
+
+  <% } %>
+
 </div>

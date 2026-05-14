@@ -49,11 +49,34 @@ export const myAssignments = async (req, res) => {
 };
 
 export const allAssignments = async (req, res) => {
-  const assignments = await Assignment.find().populate("employees").sort({ createdAt: -1 });
+  const page = parseInt(req.query.page) || 1;
+
+  const limit = 7;
+
+  const skip = (page - 1) * limit;
+
+  const totalData = await Assignment.countDocuments();
+
+  const totalPages = Math.ceil(totalData / limit);
+
+  const assignments = await Assignment.find()
+    .populate("employees")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 
   res.render("assignment/all", {
     title: "Semua Penugasan",
+
     assignments,
+
+    pagination: {
+      page,
+      totalPages,
+      totalData,
+    },
+
+    query: req.query,
   });
 };
 

@@ -1,36 +1,170 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 p-6">
-  <h1 class="text-lg font-semibold"><%= assignment.title %></h1>
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
 
-  <p class="text-sm text-slate-500">
-    <%= assignment.description %>
-  </p>
+  <div class="max-w-3xl mx-auto">
 
-  <div class="mt-4 text-sm">
-    <p>Lokasi: <%= assignment.location %></p>
-    <p>Status: <%= assignment.status %></p>
-  </div>
-
-  <div class="mt-4">
-    <h2 class="text-sm font-semibold">Karyawan:</h2>
-    <ul class="text-sm list-disc ml-5">
-      <% assignment.employees.forEach(e => { %>
-        <li><%= e.fullName %></li>
-      <% }) %>
-    </ul>
-  </div>
-  <% if (assignment.attachment) { %>
-  <div class="mt-4">
-    <h2 class="text-sm font-semibold">Surat Penugasan</h2>
-
+    <!-- BACK -->
     <a
-      href="/uploads/<%= assignment.attachment %>"
-      target="_blank"
-      class="text-indigo-500 text-sm"
+      href="/assignment"
+      class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition mb-5"
     >
-      Lihat File
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+
+      Kembali
     </a>
+
+    <!-- CARD -->
+    <div class="bg-white border border-slate-200 rounded-xl p-6">
+
+      <!-- HEADER -->
+      <div class="flex items-start justify-between gap-4">
+
+        <div class="min-w-0">
+
+          <h1 class="text-2xl font-semibold text-slate-800 break-words">
+            <%= assignment.title %>
+          </h1>
+
+          <p class="text-sm text-slate-500 mt-2 leading-6 break-words">
+            <%= assignment.description || 'Tidak ada deskripsi' %>
+          </p>
+
+        </div>
+
+        <% if(assignment.endDate && new Date(assignment.endDate) >= new Date()) { %>
+
+          <span class="bg-emerald-50 text-emerald-600 text-xs px-3 py-1 rounded-md whitespace-nowrap">
+            Active
+          </span>
+
+        <% } else { %>
+
+          <span class="bg-slate-100 text-slate-500 text-xs px-3 py-1 rounded-md whitespace-nowrap">
+            Completed
+          </span>
+
+        <% } %>
+
+      </div>
+
+      <!-- INFO -->
+      <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
+
+        <div>
+          <p class="text-slate-400 mb-1">
+            Tipe
+          </p>
+
+          <p class="text-slate-700">
+            <%= assignment.type %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-slate-400 mb-1">
+            Lokasi
+          </p>
+
+          <p class="text-slate-700">
+            <%= assignment.location || '-' %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-slate-400 mb-1">
+            Mulai
+          </p>
+
+          <p class="text-slate-700">
+            <%= new Date(assignment.startDate).toLocaleDateString("id-ID") %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-slate-400 mb-1">
+            Selesai
+          </p>
+
+          <p class="text-slate-700">
+            <%= new Date(assignment.endDate).toLocaleDateString("id-ID") %>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- EMPLOYEE -->
+      <div class="mt-8 pt-5 border-t border-slate-100">
+
+        <h2 class="text-sm font-medium text-slate-700 mb-3">
+          Karyawan Ditugaskan
+        </h2>
+
+        <div class="flex flex-wrap gap-2">
+
+          <% assignment.employees.forEach(e => { %>
+
+            <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-md">
+              <%= e.fullName %>
+            </span>
+
+          <% }) %>
+
+        </div>
+
+      </div>
+
+      <!-- ATTACHMENT -->
+      <% if (assignment.attachment) { %>
+
+        <div class="mt-8 pt-5 border-t border-slate-100">
+
+          <h2 class="text-sm font-medium text-slate-700 mb-3">
+            Surat Penugasan
+          </h2>
+
+          <a
+            href="/uploads/<%= assignment.attachment %>"
+            target="_blank"
+            class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-lg transition"
+          >
+
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+              />
+            </svg>
+
+            Lihat File
+
+          </a>
+
+        </div>
+
+      <% } %>
+
+    </div>
+
   </div>
-<% } %>
+
 </div>
