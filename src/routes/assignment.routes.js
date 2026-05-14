@@ -9,11 +9,11 @@ import { uploadFile } from "../middlewares/uploadFile.js";
 import { validate } from "../middlewares/validate.js";
 
 import {
-  formAssignment,
-  createAssignment,
+  newForm,
+  create,
   myAssignments,
-  allAssignments,
-  assignmentDetail,
+  index,
+  show,
 } from "../controllers/assignment.controller.js";
 
 import { createAssignmentSchema } from "../validations/assignment/assignment.schema.js";
@@ -22,9 +22,9 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", allAssignments);
+router.get("/", index);
 
-router.get("/new", formAssignment);
+router.get("/new", newForm);
 
 router.post(
   "/",
@@ -35,11 +35,11 @@ router.post(
 
   validate(createAssignmentSchema),
 
-  createAssignment
+  create
 );
 
 router.get("/my", myAssignments);
 
-router.get("/:id", assignmentDetail);
+router.get("/:id", show);
 
 export default router;

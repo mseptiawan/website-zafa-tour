@@ -1,9 +1,10 @@
 import Assignment from "../models/Assignment.js";
 import Employee from "../models/Employee.js";
+
 import { createAssignmentSchema } from "../validations/assignment/assignment.schema.js";
 
-const create = async (req) => {
-  const parsed = createAssignmentSchema.safeParse(req.body);
+const create = async ({ body, file, userId }) => {
+  const parsed = createAssignmentSchema.safeParse(body);
 
   if (!parsed.success) {
     throw new Error(parsed.error.errors[0].message);
@@ -21,19 +22,19 @@ const create = async (req) => {
 
     employees: Array.isArray(employees) ? employees : [employees],
 
-    createdBy: req.session.user._id,
+    createdBy: userId,
 
-    attachment: req.file ? req.file.filename : null,
+    attachment: file ? file.filename : null,
   });
 };
 
-const getEmployees = () => {
+const findEmployees = () => {
   return Employee.find().sort({
     fullName: 1,
   });
 };
 
-const getMyAssignments = async (userId) => {
+const findMine = async (userId) => {
   const employee = await Employee.findOne({
     userId,
   });
@@ -47,14 +48,20 @@ const getMyAssignments = async (userId) => {
   });
 };
 
-const getAllAssignments = async ({ page = 1, limit = 7 }) => {
+const findAll = async ({ page = 1, limit = 7 }) => {
   const skip = (page - 1) * limit;
 
   const totalData = await Assignment.countDocuments();
 
   const assignments = await Assignment.find()
-    .populate("employees")
-    .populate("createdBy")
+    .populate([
+      {
+        path: "employees",
+      },
+      {
+        path: "createdBy",
+      },
+    ])
     .sort({
       createdAt: -1,
     })
@@ -73,14 +80,21 @@ const getAllAssignments = async ({ page = 1, limit = 7 }) => {
   };
 };
 
-const getById = (id) => {
-  return Assignment.findById(id).populate("employees").populate("createdBy");
+const findById = (id) => {
+  return Assignment.findById(id).populate([
+    {
+      path: "employees",
+    },
+    {
+      path: "createdBy",
+    },
+  ]);
 };
 
 export default {
   create,
-  getEmployees,
-  getMyAssignments,
-  getAllAssignments,
-  getById,
+  findAll,
+  findById,
+  findMine,
+  findEmployees,
 };
