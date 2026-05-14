@@ -720,3 +720,97 @@ export const reportTripPage = async (req, res) => {
     return res.status(500).send("Gagal memuat laporan");
   }
 };
+
+export const financeTripPage = async (req, res) => {
+  try {
+    const trips = await BusinessTrip.find({
+      status: "APPROVED",
+    })
+      .populate({
+        path: "userId",
+        select: "username roleId",
+        populate: {
+          path: "roleId",
+          select: "name",
+        },
+      })
+      .sort({ createdAt: -1 });
+
+    return res.render("trip/finance", {
+      title: "Permintaan Pembayaran Dinas Luar",
+      trips,
+      user: req.session.user,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Gagal load data finance");
+  }
+};
+
+/* =========================
+   CONFIRM PAYMENT
+========================= */
+export const confirmPayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.session.user;
+
+    const trip = await BusinessTrip.findById(id);
+
+    if (!trip) {
+      return res.status(404).send("Data tidak ditemukan");
+    }
+
+    if (trip.status !== "APPROVED") {
+      return res.status(400).send("Hanya data APPROVED yang bisa dibayar");
+    }
+
+    trip.paymentStatus = "PAID";
+    trip.paidAt = new Date();
+    trip.paidBy = user._id;
+
+    await trip.save();
+
+    return res.redirect("/finance/trips");
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Server error");
+  }
+};
+
+export const paymentHistoryPage = async (req, res) => {
+  try {
+    const user = req.session.user;
+
+    const role = user.role;
+
+    // filter dasar
+    let filter = {
+      status: "APPROVED",
+    };
+
+    // optional: kalau kamu mau karyawan tidak lihat semua
+    // tapi kamu request MANAGER/HR/PIMPINAN jadi semua boleh lihat
+
+    const trips = await BusinessTrip.find(filter)
+      .populate({
+        path: "userId",
+        select: "username roleId",
+        populate: {
+          path: "roleId",
+          select: "name",
+        },
+      })
+      .populate("paidBy", "username")
+      .sort({ createdAt: -1 });
+
+    return res.render("trip/payment-history", {
+      title: "Riwayat Pembayaran Dinas Luar",
+      trips,
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Gagal load riwayat pembayaran");
+  }
+};

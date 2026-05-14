@@ -75,6 +75,9 @@ export function getPermissions(role) {
     report_attendance: false,
 
     assignment_my: false,
+
+    finance_request: false,
+    finance_history: false,
   };
 
   switch (role) {
@@ -129,6 +132,9 @@ export function getPermissions(role) {
       permissions.task_view_my = true;
       permissions.assignment_my = true;
 
+      permissions.finance_request = true;
+      permissions.finance_history = true;
+
       break;
 
     // =========================
@@ -168,6 +174,7 @@ export function getPermissions(role) {
       permissions.report_overtime = true;
       permissions.report_attendance = true;
       permissions.assignment_my = true;
+      permissions.finance_history = true;
 
       break;
 
@@ -208,6 +215,7 @@ export function getPermissions(role) {
       permissions.report_attendance = true;
 
       permissions.assignment_my = true;
+      permissions.finance_history = true;
 
       break;
 
@@ -233,6 +241,8 @@ export function getPermissions(role) {
       permissions.report_leave = true;
       permissions.report_overtime = true;
       permissions.report_attendance = true;
+
+      permissions.finance_history = true;
 
       break;
 

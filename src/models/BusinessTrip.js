@@ -30,7 +30,18 @@ const businessTripSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    paymentStatus: {
+      type: String,
+      enum: ["UNPAID", "PAID"],
+      default: "UNPAID",
+    },
 
+    paidAt: Date,
+
+    paidBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     timeline: [
       {
         address: String,
@@ -49,7 +60,7 @@ const businessTripSchema = new mongoose.Schema(
 
     currentStep: {
       type: String,
-      enum: ["MANAGER", "PIMPINAN", null],
+      enum: ["MANAGER", "PIMPINAN"],
       default: "MANAGER",
     },
 

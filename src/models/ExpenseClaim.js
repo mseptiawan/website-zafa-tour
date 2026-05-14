@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const expenseClaimSchema = new mongoose.Schema(
   {
-    employeeId: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
+      ref: "User",
       required: true,
     },
 
@@ -60,7 +60,7 @@ const expenseClaimSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 const ExpenseClaim = mongoose.model("ExpenseClaim", expenseClaimSchema);

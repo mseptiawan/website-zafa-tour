@@ -6,6 +6,7 @@ import Announcement from "../models/Announcement.js";
 export const formAnnouncement = (req, res) => {
   res.render("announcement/create", {
     title: "Buat Pengumuman",
+    user: req.session.user,
   });
 };
 
@@ -14,13 +15,17 @@ export const formAnnouncement = (req, res) => {
 ================================= */
 export const createAnnouncement = async (req, res) => {
   try {
-    const { title, content, category, isPinned } = req.body;
+    const { title, content, category } = req.body;
 
     // =========================
-    // OFFICIAL = wajib surat
+    // VALIDATION BASIC
     // =========================
-    if (category === "OFFICIAL" && !req.file) {
-      return res.send("Pengumuman resmi wajib upload surat");
+    if (!title || title.trim().length < 5) {
+      return res.status(400).send("Judul minimal 5 karakter");
+    }
+
+    if (!content || content.trim().length < 10) {
+      return res.status(400).send("Isi pengumuman terlalu pendek");
     }
 
     // =========================
@@ -32,23 +37,24 @@ export const createAnnouncement = async (req, res) => {
       status = "DRAFT";
     }
 
+    // =========================
+    // CREATE ANNOUNCEMENT
+    // =========================
     await Announcement.create({
-      title,
-      content,
+      title: title.trim(),
+      content: content.trim(),
       category,
       status,
-
       createdBy: req.session.user._id,
 
-      isPinned: isPinned === "on",
-
+      // OPTIONAL FILE
       attachment: req.file ? req.file.filename : null,
     });
 
-    res.redirect("/announcement/all");
+    return res.redirect("/announcement/all");
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Create announcement error");
+    console.error(err);
+    return res.status(500).send("Create announcement error");
   }
 };
 
@@ -57,14 +63,12 @@ export const createAnnouncement = async (req, res) => {
 ================================= */
 export const allAnnouncements = async (req, res) => {
   try {
-    const announcements = await Announcement.find().populate("createdBy").sort({
-      isPinned: -1,
-      createdAt: -1,
-    });
+    const announcements = await Announcement.find().populate("createdBy").sort({ createdAt: -1 });
 
     res.render("announcement/all", {
       title: "Semua Pengumuman",
       announcements,
+      user: req.session.user,
     });
   } catch (err) {
     console.log(err);
@@ -77,13 +81,12 @@ export const allAnnouncements = async (req, res) => {
 ================================= */
 export const detailAnnouncement = async (req, res) => {
   try {
-    const announcement = await Announcement.findById(req.params.id).populate(
-      "createdBy",
-    );
+    const announcement = await Announcement.findById(req.params.id).populate("createdBy");
 
     res.render("announcement/detail", {
       title: "Detail Pengumuman",
       announcement,
+      user: req.session.user,
     });
   } catch (err) {
     console.log(err);
@@ -92,7 +95,7 @@ export const detailAnnouncement = async (req, res) => {
 };
 
 /* =================================
-   PUBLISH OFFICIAL ANNOUNCEMENT
+   PUBLISH
 ================================= */
 export const publishAnnouncement = async (req, res) => {
   try {
@@ -100,9 +103,9 @@ export const publishAnnouncement = async (req, res) => {
       status: "PUBLISHED",
     });
 
-    res.redirect("/announcement/all");
+    return res.redirect("/announcement/all");
   } catch (err) {
     console.log(err);
-    res.status(500).send("Publish error");
+    return res.status(500).send("Publish error");
   }
 };

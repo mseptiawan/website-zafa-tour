@@ -48,6 +48,30 @@
               <% } %>
 
             </div>
+
+            <div class="flex items-center gap-3 mt-4 text-[12px] text-slate-500">
+
+  <!-- CREATED BY -->
+  <span>
+    Dibuat oleh
+    <span class="text-slate-700 font-medium">
+      <%= announcement.createdBy?.username || 'Unknown' %>
+    </span>
+  </span>
+
+  <!-- DOT -->
+  <span>•</span>
+
+  <!-- DATE -->
+  <span>
+    <%= new Date(announcement.createdAt).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    }) %>
+  </span>
+
+</div>
           </div>
 
         </div>

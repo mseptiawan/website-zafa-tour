@@ -19,49 +19,36 @@ export const formExpense = (req, res) => {
 */
 export const createExpense = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      category,
-      amount,
-      expenseDate,
-      noReceiptReason,
-      selfDeclaration,
-    } = req.body;
+    const { title, description, category, amount, expenseDate, noReceiptReason, selfDeclaration } =
+      req.body;
 
-    const employee = await Employee.findById(req.session.user.employeeId);
-    console.log(req.session.user);
-    if (!employee) {
-      return res.send("Employee not found");
+    const user = req.session.user;
+
+    if (!user) {
+      return res.status(401).send("Unauthorized");
     }
 
-    // =========================
-    // VALIDASI
-    // =========================
+    // optional: ambil employee (kalau memang masih dipakai di sistem lain)
+    const employee = await Employee.findOne({ userId: user._id });
+
     if (!req.file && !selfDeclaration) {
       return res.send("Upload bukti atau centang pernyataan");
     }
 
-    // =========================
     // AUTO FLOW
-    // =========================
     let status = "PENDING_FINANCE";
-
     if (Number(amount) > 200000) {
       status = "PENDING_MANAGER";
     }
 
     await ExpenseClaim.create({
-      employeeId: employee._id,
+      userId: user._id,
 
       title,
       description,
       category,
-
       amount,
-
       expenseDate,
-
       noReceiptReason,
 
       selfDeclaration: selfDeclaration === "on",
@@ -74,7 +61,6 @@ export const createExpense = async (req, res) => {
     res.redirect("/expense/my");
   } catch (err) {
     console.log(err);
-
     res.status(500).send("Create expense error");
   }
 };
@@ -86,12 +72,10 @@ export const createExpense = async (req, res) => {
 */
 export const myExpenses = async (req, res) => {
   try {
-    const employee = await Employee.findOne({
-      userId: req.session.user._id,
-    });
+    const user = req.session.user;
 
     const expenses = await ExpenseClaim.find({
-      employeeId: employee._id,
+      userId: user._id,
     }).sort({
       createdAt: -1,
     });
@@ -102,7 +86,6 @@ export const myExpenses = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-
     res.status(500).send("Error");
   }
 };
@@ -114,9 +97,7 @@ export const myExpenses = async (req, res) => {
 */
 export const allExpenses = async (req, res) => {
   try {
-    const expenses = await ExpenseClaim.find().populate("employeeId").sort({
-      createdAt: -1,
-    });
+    const expenses = await ExpenseClaim.find().populate("userId").sort({ createdAt: -1 });
 
     res.render("expense/all", {
       title: "Semua Klaim",
@@ -124,7 +105,6 @@ export const allExpenses = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-
     res.status(500).send("Error");
   }
 };
@@ -138,7 +118,7 @@ export const approvalManagerExpense = async (req, res) => {
   try {
     const expenses = await ExpenseClaim.find({
       status: "PENDING_MANAGER",
-    }).populate("employeeId");
+    }).populate("userId");
 
     res.render("expense/approval-manager", {
       title: "Approval Klaim",
@@ -146,7 +126,6 @@ export const approvalManagerExpense = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-
     res.status(500).send("Error");
   }
 };
@@ -160,14 +139,12 @@ export const approveManagerExpense = async (req, res) => {
   try {
     await ExpenseClaim.findByIdAndUpdate(req.params.id, {
       status: "PENDING_FINANCE",
-
       managerApprovedBy: req.session.user._id,
     });
 
     res.redirect("/expense/approval/manager");
   } catch (err) {
     console.log(err);
-
     res.status(500).send("Approve manager error");
   }
 };
@@ -181,7 +158,7 @@ export const financeExpensePage = async (req, res) => {
   try {
     const expenses = await ExpenseClaim.find({
       status: "PENDING_FINANCE",
-    }).populate("employeeId");
+    }).populate("userId");
 
     res.render("expense/finance", {
       title: "Validasi Finance",
@@ -189,7 +166,6 @@ export const financeExpensePage = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-
     res.status(500).send("Error");
   }
 };
@@ -203,16 +179,13 @@ export const payExpense = async (req, res) => {
   try {
     await ExpenseClaim.findByIdAndUpdate(req.params.id, {
       status: "PAID",
-
       financeApprovedBy: req.session.user._id,
-
       paidAt: new Date(),
     });
 
     res.redirect("/expense/finance");
   } catch (err) {
     console.log(err);
-
     res.status(500).send("Payment error");
   }
 };

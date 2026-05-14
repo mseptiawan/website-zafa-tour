@@ -9,10 +9,13 @@ import {
   editTripForm,
   createTrip,
   showEditTrip,
+  paymentHistoryPage,
   resubmitUpdateTrip,
   approvalPage,
   updateTrip,
   handleApproval,
+  financeTripPage,
+  confirmPayment,
 } from "../controllers/tripController.js";
 
 const router = express.Router();
@@ -33,5 +36,12 @@ router.get("/trip/report", authMiddleware, reportTripPage);
 router.post("/trip/:id/update", authMiddleware, resubmitUpdateTrip);
 router.post("/trip/approval/:id", authMiddleware, handleApproval);
 router.post("/trip/:id/delegate", authMiddleware, delegateTripToHR);
+router.get("/finance/trips", roleMiddleware("KEUANGAN"), financeTripPage);
 
+router.post("/finance/trips/:id/pay", roleMiddleware("KEUANGAN"), confirmPayment);
+router.get(
+  "/finance/payment-history",
+  roleMiddleware(["MANAGER", "HR", "PIMPINAN", "KEUANGAN"]),
+  paymentHistoryPage
+);
 export default router;

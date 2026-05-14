@@ -87,21 +87,29 @@
                   <%= a.content %>
                 </p>
 
-                <div class="mt-4 flex items-center gap-4">
+              <div class="mt-4 flex items-center gap-4">
 
-                  <span class="text-[12px] text-slate-400">
-                    Dipublikasikan
-                  </span>
+  <span class="text-[12px] text-slate-400">
+    Dipublikasikan
+  </span>
 
-                  <span class="text-[12px] text-slate-500">
-                    <%= new Date(a.createdAt).toLocaleDateString("id-ID", {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric"
-                    }) %>
-                  </span>
+  <span class="text-[12px] text-slate-500">
+    <%= new Date(a.createdAt).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    }) %>
+  </span>
 
-                </div>
+  <!-- TAMBAHAN: CREATED BY -->
+  <span class="text-[12px] text-slate-400">
+    • dibuat oleh
+    <span class="text-slate-600 font-medium">
+      <%= a.createdBy?.username || 'Unknown' %>
+    </span>
+  </span>
+
+</div>
 
               </div>
 

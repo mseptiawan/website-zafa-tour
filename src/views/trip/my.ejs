@@ -47,28 +47,44 @@
               Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
             </td>
 
-            <td style="padding:14px 12px;">
-              <span style="
-                padding:4px 12px;
-                border-radius:999px;
-                font-size:11px;
-                font-weight:600;
-                background:
-                  <%= t.status === 'APPROVED' ? '#ecfdf5'
-                  : t.status === 'REJECTED' ? '#fef2f2'
-                  : '#eff6ff' %>;
-                color:
-                  <%= t.status === 'APPROVED' ? '#059669'
-                  : t.status === 'REJECTED' ? '#dc2626'
-                  : '#2563eb' %>;
-                border: 1px solid 
-                  <%= t.status === 'APPROVED' ? '#10b981'
-                  : t.status === 'REJECTED' ? '#ef4444'
-                  : '#3b82f6' %>20;
-              ">
-                <%= t.status %>
-              </span>
-            </td>
+           <td style="padding:14px 12px;">
+  <span style="
+    padding:4px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:600;
+    background:
+      <%= t.status === 'APPROVED' ? '#ecfdf5'
+      : t.status === 'REJECTED' ? '#fef2f2'
+      : '#eff6ff' %>;
+    color:
+      <%= t.status === 'APPROVED' ? '#059669'
+      : t.status === 'REJECTED' ? '#dc2626'
+      : '#2563eb' %>;
+    border: 1px solid 
+      <%= t.status === 'APPROVED' ? '#10b981'
+      : t.status === 'REJECTED' ? '#ef4444'
+      : '#3b82f6' %>20;
+  ">
+    <%= t.status %>
+  </span>
+
+  <% if (t.status === 'APPROVED') { %>
+    <span style="
+      margin-left:6px;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:600;
+
+      background: <%= t.paymentStatus === 'PAID' ? '#ecfdf5' : '#fff7ed' %>;
+      color: <%= t.paymentStatus === 'PAID' ? '#059669' : '#c2410c' %>;
+      border:1px solid <%= t.paymentStatus === 'PAID' ? '#10b981' : '#fb923c' %>33;
+    ">
+      <%= t.paymentStatus || 'UNPAID' %>
+    </span>
+  <% } %>
+</td>
 
             <td style="padding:14px 12px; display: flex; gap: 8px;">
   <!-- Tombol Detail (Selalu Ada) -->

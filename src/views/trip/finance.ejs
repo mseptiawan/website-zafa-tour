@@ -1,0 +1,73 @@
+<%- layout('layouts/main', { title }) %>
+
+<div style="margin-left:280px; padding:32px;">
+
+  <h1 style="font-size:24px; font-weight:700;">
+    Permintaan Pembayaran Dinas Luar
+  </h1>
+
+  <div style="
+    margin-top:24px;
+    background:#fff;
+    border-radius:14px;
+    border:1px solid #e2e8f0;
+    overflow:hidden;
+  ">
+
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+
+      <thead>
+        <tr style="background:#f8fafc;">
+          <th style="padding:14px;">Pengaju</th>
+          <th style="padding:14px;">Judul</th>
+          <th style="padding:14px;">Budget</th>
+          <th style="padding:14px;">Status</th>
+          <th style="padding:14px;">Pembayaran</th>
+          <th style="padding:14px;">Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% trips.forEach(t => { %>
+          <tr style="border-top:1px solid #f1f5f9;">
+
+            <td style="padding:14px;">
+              <%= t.userId?.username %>
+            </td>
+
+            <td style="padding:14px;">
+              <%= t.title %>
+            </td>
+
+            <td style="padding:14px;">
+              Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+            </td>
+
+            <td style="padding:14px;">
+              <%= t.status %>
+            </td>
+
+            <td style="padding:14px;">
+              <%= t.paymentStatus || "UNPAID" %>
+            </td>
+
+            <td style="padding:14px;">
+              <% if (t.paymentStatus !== "PAID") { %>
+                <form method="POST" action="/finance/trips/<%= t._id %>/pay">
+                  <button type="submit" class="bg-blue-400">
+                    Confirm Payment
+                  </button>
+                </form>
+              <% } else { %>
+                SUDAH DIBAYAR
+              <% } %>
+            </td>
+
+          </tr>
+        <% }) %>
+      </tbody>
+
+    </table>
+
+  </div>
+</div>
