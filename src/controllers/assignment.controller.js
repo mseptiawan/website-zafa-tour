@@ -22,7 +22,7 @@ export const createAssignment = async (req, res) => {
   try {
     await assignmentService.create(req);
 
-    return res.redirect("/assignment/all");
+    return res.redirect("/assignment/");
   } catch (err) {
     const employees = await assignmentService.getEmployees();
 

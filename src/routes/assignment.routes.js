@@ -22,10 +22,12 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/create", formAssignment);
+router.get("/", allAssignments);
+
+router.get("/new", formAssignment);
 
 router.post(
-  "/create",
+  "/",
 
   roleMiddleware(["PIMPINAN"]),
 
@@ -37,8 +39,6 @@ router.post(
 );
 
 router.get("/my", myAssignments);
-
-router.get("/all", allAssignments);
 
 router.get("/:id", assignmentDetail);
 
