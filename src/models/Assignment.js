@@ -34,12 +34,6 @@ const assignmentSchema = new mongoose.Schema(
       },
     ],
 
-    status: {
-      type: String,
-      enum: ["ACTIVE", "COMPLETED"],
-      default: "ACTIVE",
-    },
-
     reportFile: String,
   },
   { timestamps: true }

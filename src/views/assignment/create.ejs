@@ -1,162 +1,377 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
   <div class="max-w-2xl mx-auto">
 
     <!-- HEADER -->
-    <div class="mb-6">
-      <h1 class="text-2xl text-slate-800">
+    <div class="mb-8">
+
+      <nav class="flex items-center gap-2 mb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+        <span>Workspace</span>
+        <span>/</span>
+        <span class="text-slate-700">Assignment</span>
+      </nav>
+
+      <h1 class="text-2xl font-semibold text-slate-800">
         Buat Penugasan
       </h1>
+
       <p class="text-sm text-slate-500 mt-1">
-        Tambahkan tugas / penugasan untuk karyawan
+        Tambahkan tugas atau penugasan untuk karyawan.
       </p>
+
     </div>
 
     <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
-    <form method="POST" enctype="multipart/form-data" class="space-y-3">
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="p-8 space-y-6"
+      >
 
         <!-- TITLE -->
-        <div>
-          <label class="text-xs text-slate-500">Judul</label>
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-semibold text-slate-700">
+            Judul Penugasan
+          </label>
+
           <input
             name="title"
-            placeholder="Judul penugasan"
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+            placeholder="Ketik judul penugasan..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
           />
+
         </div>
 
         <!-- DESCRIPTION -->
-        <div>
-          <label class="text-xs text-slate-500">Deskripsi</label>
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-semibold text-slate-700">
+            Deskripsi
+          </label>
+
           <textarea
             name="description"
-            placeholder="Deskripsi tugas"
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+            rows="5"
+            placeholder="Tulis detail penugasan..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
           ></textarea>
+
         </div>
 
         <!-- TYPE -->
-        <div>
-          <label class="text-xs text-slate-500">Tipe</label>
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-semibold text-slate-700">
+            Tipe Penugasan
+          </label>
+
           <select
             name="type"
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none appearance-none cursor-pointer focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
           >
             <option value="UNDANGAN">Undangan</option>
             <option value="INTERNAL">Internal</option>
             <option value="TRAINING">Training</option>
             <option value="LAINNYA">Lainnya</option>
           </select>
+
         </div>
 
         <!-- LOCATION -->
-        <div>
-          <label class="text-xs text-slate-500">Lokasi</label>
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-semibold text-slate-700">
+            Lokasi
+          </label>
+
           <input
             name="location"
             placeholder="Lokasi kegiatan"
-            class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
           />
+
         </div>
 
-        <!-- DATE GRID -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs text-slate-500">Tanggal Mulai</label>
+        <!-- DATE -->
+        <div class="grid grid-cols-2 gap-4">
+
+          <div class="space-y-1.5">
+
+            <label class="text-[13px] font-semibold text-slate-700">
+              Tanggal Mulai
+            </label>
+
             <input
               type="date"
               name="startDate"
-              class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
             />
+
           </div>
 
-          <div>
-            <label class="text-xs text-slate-500">Tanggal Selesai</label>
+          <div class="space-y-1.5">
+
+            <label class="text-[13px] font-semibold text-slate-700">
+              Tanggal Selesai
+            </label>
+
             <input
               type="date"
               name="endDate"
-              class="w-full mt-1 p-2.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
             />
+
           </div>
-        </div>
-<div class="space-y-1.5">
-  <label class="text-[13px] text-slate-600 font-normal">
-    Surat Penugasan <span class="text-slate-400">(opsional)</span>
-  </label>
 
-  <div
-    class="relative flex items-center border border-slate-200 rounded-lg bg-white hover:border-slate-300 transition overflow-hidden"
-  >
-    <input
-      type="file"
-      name="attachment"
-      class="w-full text-sm text-slate-500
-      file:mr-4
-      file:border-0
-      file:bg-slate-900
-      file:text-white
-      file:px-4
-      file:py-2.5
-      file:text-sm
-      file:font-normal
-      file:cursor-pointer
-      hover:file:bg-slate-800
-      cursor-pointer"
-    />
-  </div>
-
-  <p class="text-[11px] text-slate-400">
-    Upload PDF atau gambar surat penugasan
-  </p>
-</div>
-        <!-- EMPLOYEES -->
-       <div>
-  <label class="text-xs text-slate-500">Pilih Karyawan</label>
-
-  <div class="mt-2 border border-slate-200 rounded-lg p-3 max-h-60 overflow-y-auto space-y-2">
-
-    <% employees.forEach(e => { %>
-      
-      <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
-
-        <input
-          type="checkbox"
-          name="employees"
-          value="<%= e._id %>"
-          class="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-400"
-        />
-
-        <div class="flex flex-col">
-          <span class="text-sm text-slate-700">
-            <%= e.fullName %>
-          </span>
         </div>
 
-      </label>
+        <!-- ATTACHMENT -->
+        <div class="space-y-1.5">
 
-    <% }) %>
+          <label class="text-[13px] font-semibold text-slate-700">
+            Surat Penugasan
+            <span class="text-slate-400 font-normal">(opsional)</span>
+          </label>
 
-  </div>
+          <div class="relative group">
 
-  <p class="text-[11px] text-slate-400 mt-1">
-    Klik langsung untuk memilih karyawan
-  </p>
-</div>
+            <input
+              type="file"
+              name="attachment"
+              id="file-input"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              onchange="handleFileSelect(this)"
+            />
 
-        <!-- BUTTON -->
-        <button
-          class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm py-2.5 rounded-lg transition"
-        >
-          Simpan Penugasan
-        </button>
+            <!-- EMPTY -->
+            <div
+              id="dropzone-empty"
+              class="border-2 border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300 transition-all"
+            >
+
+              <svg
+                class="w-8 h-8 text-slate-400 mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+
+              <p class="text-sm text-slate-600 font-medium">
+                Klik untuk upload file
+              </p>
+
+              <p class="text-xs text-slate-400 mt-1">
+                PDF atau gambar dokumen
+              </p>
+
+            </div>
+
+            <!-- FILLED -->
+            <div
+              id="dropzone-filled"
+              class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm"
+            >
+
+              <div class="flex items-center gap-3">
+
+                <div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
+
+                  <img
+                    id="img-preview"
+                    class="hidden w-full h-full object-cover"
+                  />
+
+                  <svg
+                    id="doc-icon"
+                    class="w-6 h-6 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      stroke-width="1.5"
+                    />
+                  </svg>
+
+                </div>
+
+                <div class="overflow-hidden">
+                  <p
+                    id="name-preview"
+                    class="text-sm font-medium text-slate-700 truncate max-w-[220px]"
+                  >
+                    file.pdf
+                  </p>
+
+                  <p
+                    id="size-preview"
+                    class="text-xs text-slate-400"
+                  >
+                    1.2 MB
+                  </p>
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                onclick="clearFile()"
+                class="p-2 rounded-full text-red-400 hover:bg-red-50 hover:text-red-600 transition"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M6 18L18 6M6 6l12 12"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- EMPLOYEE -->
+        <div class="space-y-2">
+
+          <label class="text-[13px] font-semibold text-slate-700">
+            Pilih Karyawan
+          </label>
+
+          <!-- SEARCH -->
+          <input
+            type="text"
+            id="employee-search"
+            placeholder="Cari nama karyawan..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
+          />
+
+          <!-- LIST -->
+          <div
+            id="employee-list"
+            class="border border-slate-200 rounded-xl p-2 max-h-72 overflow-y-auto bg-slate-50 space-y-1"
+          >
+
+            <% employees.forEach(e => { %>
+
+              <label
+                class="employee-item flex items-center gap-3 p-3 rounded-xl hover:bg-white cursor-pointer transition-all"
+                data-name="<%= e.fullName.toLowerCase() %>"
+              >
+
+                <input
+                  type="checkbox"
+                  name="employees"
+                  value="<%= e._id %>"
+                  class="w-4 h-4 rounded border-slate-300 text-slate-800 focus:ring-slate-400"
+                />
+
+                <div class="flex flex-col">
+                  <span class="text-sm text-slate-700">
+                    <%= e.fullName %>
+                  </span>
+                </div>
+
+              </label>
+
+            <% }) %>
+
+          </div>
+
+          <p class="text-xs text-slate-400">
+            Cari lalu pilih karyawan yang akan ditugaskan
+          </p>
+
+        </div>
+
+        <!-- ACTION -->
+        <div class="pt-4 border-t border-slate-100">
+
+          <button
+            class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl text-sm font-medium transition-all"
+          >
+            Kirim Penugasan
+          </button>
+
+        </div>
 
       </form>
 
     </div>
 
   </div>
+
 </div>
+
+<script>
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      document.getElementById("name-preview").textContent = file.name;
+      document.getElementById("size-preview").textContent =
+        (file.size / (1024 * 1024)).toFixed(2) + " MB";
+
+      if (file.type.startsWith("image/")) {
+        reader.onload = e => {
+          document.getElementById("img-preview").src = e.target.result;
+          document.getElementById("img-preview").classList.remove("hidden");
+          document.getElementById("doc-icon").classList.add("hidden");
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        document.getElementById("img-preview").classList.add("hidden");
+        document.getElementById("doc-icon").classList.remove("hidden");
+      }
+
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
+    }
+  }
+
+  function clearFile() {
+    document.getElementById("file-input").value = "";
+
+    document.getElementById("dropzone-empty").classList.remove("hidden");
+    document.getElementById("dropzone-filled").classList.add("hidden");
+  }
+
+  // SEARCH EMPLOYEE
+  const searchInput = document.getElementById("employee-search");
+
+  searchInput.addEventListener("keyup", function () {
+    const keyword = this.value.toLowerCase();
+
+    document.querySelectorAll(".employee-item").forEach(item => {
+      const name = item.dataset.name;
+
+      if (name.includes(keyword)) {
+        item.style.display = "flex";
+      } else {
+        item.style.display = "none";
+      }
+    });
+  });
+</script>
