@@ -12,15 +12,13 @@ import {
 
 const router = express.Router();
 
-router.get("/announcement/create", authMiddleware, formAnnouncement);
-router.post(
-  "/announcement/create",
-  authMiddleware,
-  uploadFile.single("attachment"),
-  createAnnouncement
-);
-router.get("/announcement/all", authMiddleware, allAnnouncements);
-router.get("/announcement/:id", authMiddleware, detailAnnouncement);
-router.post("/announcement/:id/publish", authMiddleware, publishAnnouncement);
+router.use(authMiddleware);
+
+router.get("/", allAnnouncements);
+router.get("/new", formAnnouncement);
+router.post("/", uploadFile.single("attachment"), createAnnouncement);
+
+router.get("/:id", detailAnnouncement);
+router.post("/:id/publish", publishAnnouncement);
 
 export default router;

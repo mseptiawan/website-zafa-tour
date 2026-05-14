@@ -3,7 +3,7 @@ import Announcement from "../models/Announcement.js";
 /* =================================
    FORM CREATE
 ================================= */
-export const formAnnouncement = (req, res) => {
+export const index = (req, res) => {
   res.render("announcement/create", {
     title: "Buat Pengumuman",
     user: req.session.user,
@@ -51,7 +51,7 @@ export const createAnnouncement = async (req, res) => {
       attachment: req.file ? req.file.filename : null,
     });
 
-    return res.redirect("/announcement/all");
+    return res.redirect("/announcement");
   } catch (err) {
     console.error(err);
     return res.status(500).send("Create announcement error");
@@ -103,7 +103,7 @@ export const publishAnnouncement = async (req, res) => {
       status: "PUBLISHED",
     });
 
-    return res.redirect("/announcement/all");
+    return res.redirect("/announcement");
   } catch (err) {
     console.log(err);
     return res.status(500).send("Publish error");

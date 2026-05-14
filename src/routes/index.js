@@ -21,7 +21,7 @@ router.use("/", kpiRoutes);
 router.use("/", tripRoutes);
 router.use("/", salesRoutes);
 router.use("/", assignmentRoutes);
-router.use("/", announcementRoutes);
+router.use("/announcement", announcementRoutes);
 router.use("/", expenseRoutes);
 
 export default router;
