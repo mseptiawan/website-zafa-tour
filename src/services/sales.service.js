@@ -1,26 +1,17 @@
 import SalesVisit from "../models/SalesVisit.js";
+import {
+  createSalesVisitSchema,
+  updateSalesVisitSchema,
+} from "../validations/sales-visit/sales.validation.js";
+import { validate } from "../middlewares/validate.js";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
+/* ---------------- CREATE ---------------- */
 const create = async ({ body, files, userId }) => {
-  let { title, address, meetWith, result } = body;
+  // ✔ ZOD VALIDATION (single source of truth)
+  const data = validate(createSalesVisitSchema, body);
 
-  title = title?.trim();
-  address = address?.trim();
-  meetWith = meetWith?.trim();
-  result = result?.trim();
-
-  // VALIDATION (business layer)
-  if (!title) throw new Error("Judul wajib diisi");
-  if (!address) throw new Error("Alamat wajib diisi");
-  if (!meetWith) throw new Error("Bertemu dengan wajib diisi");
-
-  if (title.length > 100) throw new Error("Judul maksimal 100 karakter");
-  if (address.length > 300) throw new Error("Alamat maksimal 300 karakter");
-  if (meetWith.length > 100) throw new Error("Meet with maksimal 100 karakter");
-  if (result && result.length > 500) throw new Error("Hasil maksimal 500 karakter");
-
-  // FILE VALIDATION
   const attachments = (files || []).map((file) => {
     if (!allowedMimeTypes.includes(file.mimetype)) {
       throw new Error("Format file tidak valid (JPG, PNG, WEBP, PDF)");
@@ -37,27 +28,20 @@ const create = async ({ body, files, userId }) => {
 
   return SalesVisit.create({
     userId,
-    title,
-    address,
-    meetWith,
-    result,
+    ...data,
     attachments,
     visitTime: new Date(),
   });
 };
 
-const findMine = async (userId) => {
-  return SalesVisit.find({ userId }).sort({ createdAt: -1 });
-};
+/* ---------------- FIND ---------------- */
+const findMine = (userId) => SalesVisit.find({ userId }).sort({ createdAt: -1 });
 
-const findAll = async () => {
-  return SalesVisit.find().populate("userId").sort({ createdAt: -1 });
-};
+const findAll = () => SalesVisit.find().populate("userId").sort({ createdAt: -1 });
 
-const findById = async (id) => {
-  return SalesVisit.findById(id).populate("userId");
-};
+const findById = (id) => SalesVisit.findById(id).populate("userId");
 
+/* ---------------- UPDATE ---------------- */
 const update = async ({ id, userId, body, files }) => {
   const visit = await SalesVisit.findById(id);
 
@@ -65,34 +49,22 @@ const update = async ({ id, userId, body, files }) => {
     throw new Error("Data tidak ditemukan");
   }
 
-  // OWNER CHECK
+  // ✔ OWNERSHIP CHECK
   if (visit.userId.toString() !== userId) {
     throw new Error("Tidak boleh mengedit data ini");
   }
 
-  // ⛔ 24 JAM LOCK RULE
-  const createdAt = new Date(visit.createdAt);
-  const now = Date.now();
-
-  const diffHours = (now - createdAt.getTime()) / (1000 * 60 * 60);
+  // ⛔ 24 HOURS LOCK RULE
+  const diffHours = (Date.now() - new Date(visit.createdAt).getTime()) / (1000 * 60 * 60);
 
   if (diffHours > 24) {
     throw new Error("Data tidak bisa diedit setelah 24 jam");
   }
 
-  let { title, address, meetWith, result } = body;
+  // ✔ ZOD VALIDATION
+  const data = validate(updateSalesVisitSchema, body);
 
-  title = title?.trim();
-  address = address?.trim();
-  meetWith = meetWith?.trim();
-  result = result?.trim();
-
-  if (!title) throw new Error("Judul wajib diisi");
-  if (!address) throw new Error("Alamat wajib diisi");
-  if (!meetWith) throw new Error("Bertemu dengan wajib diisi");
-
-  const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-
+  // ✔ FILE HANDLING
   let attachments = visit.attachments || [];
 
   if (files && files.length > 0) {
@@ -111,18 +83,17 @@ const update = async ({ id, userId, body, files }) => {
     });
   }
 
-  visit.title = title;
-  visit.address = address;
-  visit.meetWith = meetWith;
-  visit.result = result;
+  // ✔ APPLY UPDATE
+  Object.assign(visit, data);
   visit.attachments = attachments;
 
   return visit.save();
 };
+
 export default {
   create,
+  update,
   findMine,
   findAll,
   findById,
-  update,
 };
