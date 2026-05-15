@@ -192,3 +192,30 @@ export const show = async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 };
+
+export const resubmitTrip = async (req, res, next) => {
+  try {
+    await tripService.resubmit({
+      id: req.params.id,
+      user: req.session.user,
+    });
+
+    return res.json({ message: "Resubmitted successfully" });
+  } catch (err) {
+    return res.status(400).send(err.message);
+  }
+};
+
+export const resubmitUpdateTrip = async (req, res, next) => {
+  try {
+    await tripService.resubmitUpdate({
+      id: req.params.id,
+      user: req.session.user,
+      body: req.body,
+    });
+
+    return res.redirect("/trip/my");
+  } catch (err) {
+    return res.status(400).send(err.message);
+  }
+};

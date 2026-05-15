@@ -273,6 +273,37 @@ const paymentHistory = async (user) => {
   return { trips, user };
 };
 
+export const show = async ({ id }) => {
+  const trip = await BusinessTrip.findById(id).populate("employees").lean();
+
+  if (!trip) throw new Error("Not found");
+
+  return trip;
+};
+
+export const resubmit = async ({ id, user }) => {
+  const trip = await BusinessTrip.findOne({
+    _id: id,
+    userId: user._id,
+  });
+
+  if (!trip) throw new Error("Not found");
+
+  if (trip.status !== "REJECTED") {
+    throw new Error("Only rejected trip can be resubmitted");
+  }
+
+  trip.status = "PENDING";
+  trip.currentStep = "MANAGER";
+
+  trip.approvals = [];
+  trip.delegation = {
+    active: false,
+  };
+
+  await trip.save();
+};
+
 export default {
   create,
   findMine,
@@ -285,4 +316,6 @@ export default {
   findApprovedForFinance,
   confirmPayment,
   paymentHistory,
+  show,
+  resubmit,
 };
