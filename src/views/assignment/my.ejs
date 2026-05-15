@@ -1,24 +1,132 @@
 <%- layout('layouts/main', { title: title }) %>
-<div class="ml-72 p-6">
-  <h1 class="text-lg font-semibold mb-4">Penugasan Saya</h1>
 
-  <div class="space-y-3">
+<div class="ml-72 min-h-screen bg-slate-50 p-6">
 
-    <% assignments.forEach(a => { %>
-      <a href="/assignment/<%= a._id %>"
-         class="block border p-3 rounded hover:bg-slate-50">
+  <div class="max-w-5xl mx-auto">
 
-        <div class="font-medium text-sm"><%= a.title %></div>
-        <div class="text-xs text-slate-500">
-          <%= a.location %>
-        </div>
+    <!-- HEADER -->
+    <div class="mb-6">
 
-        <div class="text-xs mt-1">
-          Status: <%= a.status %>
-        </div>
+      <h1 class="text-2xl font-semibold text-slate-800">
+        Penugasan Saya
+      </h1>
 
-      </a>
-    <% }) %>
+      <p class="text-sm text-slate-500 mt-1">
+        Daftar penugasan yang diberikan kepada Anda
+      </p>
+
+    </div>
+
+    <!-- EMPTY -->
+    <% if(assignments.length === 0) { %>
+
+      <div class="bg-white border border-slate-200 rounded-xl py-14 text-center">
+
+        <p class="text-sm text-slate-500">
+          Belum ada penugasan
+        </p>
+
+      </div>
+
+    <% } %>
+
+    <!-- LIST -->
+    <div class="space-y-3">
+
+      <% assignments.forEach(a => { %>
+
+        <a
+          href="/assignment/<%= a._id %>"
+          class="block bg-white border border-slate-200 rounded-xl px-5 py-4 hover:border-slate-300 hover:bg-slate-50 transition"
+        >
+
+          <!-- TOP -->
+          <div class="flex items-start justify-between gap-4">
+
+            <div class="min-w-0">
+
+              <h2 class="text-[15px] font-medium text-slate-800 break-words">
+                <%= a.title %>
+              </h2>
+
+              <p class="text-sm text-slate-500 mt-1 line-clamp-1 break-words">
+                <%= a.description || 'Tidak ada deskripsi' %>
+              </p>
+
+            </div>
+
+            <div class="flex-shrink-0">
+
+              <% if(a.endDate && new Date(a.endDate) >= new Date()) { %>
+
+                <span class="text-[11px] bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md">
+                  Active
+                </span>
+
+              <% } else { %>
+
+                <span class="text-[11px] bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md">
+                  Completed
+                </span>
+
+              <% } %>
+
+            </div>
+
+          </div>
+
+          <!-- META -->
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-[13px] text-slate-500">
+
+            <div>
+              <span class="text-slate-400">Tipe:</span>
+
+              <span class="text-slate-700 ml-1">
+                <%= a.type %>
+              </span>
+            </div>
+
+            <div>
+              <span class="text-slate-400">Lokasi:</span>
+
+              <span class="text-slate-700 ml-1">
+                <%= a.location || '-' %>
+              </span>
+            </div>
+
+            <div>
+              <span class="text-slate-400">Mulai:</span>
+
+              <span class="text-slate-700 ml-1">
+                <%= new Date(a.startDate).toLocaleDateString("id-ID") %>
+              </span>
+            </div>
+
+            <div>
+              <span class="text-slate-400">Selesai:</span>
+
+              <span class="text-slate-700 ml-1">
+                <%= new Date(a.endDate).toLocaleDateString("id-ID") %>
+              </span>
+            </div>
+
+          </div>
+
+          <!-- ATTACHMENT -->
+          <% if(a.attachment) { %>
+
+            <div class="mt-3 text-[12px] text-slate-400">
+              Ada lampiran surat penugasan
+            </div>
+
+          <% } %>
+
+        </a>
+
+      <% }) %>
+
+    </div>
 
   </div>
+
 </div>
