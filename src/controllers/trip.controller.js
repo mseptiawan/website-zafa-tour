@@ -1,12 +1,5 @@
 import BusinessTrip from "../models/BusinessTrip.js";
 
-/* =========================
-   HALAMAN FORM PENGAJUAN
-========================= */
-
-/* =========================
-   HALAMAN FORM PENGAJUAN
-========================= */
 export const formRequest = (req, res) => {
   res.render("trip/request", {
     title: "Pengajuan Dinas Luar",
@@ -21,11 +14,7 @@ export const createTrip = async (req, res) => {
       return res.status(401).send("Session tidak valid");
     }
 
-    // =========================
-    // ROLE FROM SESSION (ALWAYS UPPERCASE)
-    // =========================
     const role = user.role;
-    // MANAGER | HR | PIMPINAN | KARYAWAN | KEUANGAN
 
     let {
       title,
@@ -39,17 +28,11 @@ export const createTrip = async (req, res) => {
       timeline,
     } = req.body;
 
-    // =========================
-    // NORMALIZATION
-    // =========================
     title = title?.trim();
     destination = destination?.trim();
     description = description?.trim();
     budget = Number(budget);
 
-    // =========================
-    // TIMELINE NORMALIZATION
-    // =========================
     if (!Array.isArray(timeline)) {
       timeline = timeline ? [timeline] : [];
     }
@@ -65,9 +48,6 @@ export const createTrip = async (req, res) => {
       })
       .filter((t) => t.address);
 
-    // =========================
-    // VALIDATION
-    // =========================
     if (!title || title.length < 5) {
       return res.status(400).send("Judul minimal 5 karakter");
     }
@@ -95,46 +75,30 @@ export const createTrip = async (req, res) => {
       return res.status(400).send("Timeline wajib diisi");
     }
 
-    // =========================
-    // CONTACT PERSON
-    // =========================
     const contact = {
       name: contactPerson?.name?.trim() || null,
       phone: contactPerson?.phone?.trim() || null,
     };
 
-    // =========================
-    // WORKFLOW ROUTING ENGINE (BASED ON UPPERCASE ROLE)
-    // =========================
     let currentStep = "MANAGER";
 
     let status = "PENDING";
 
-    // =========================
-    // ROLE RULES
-    // =========================
-
-    // manager submit → langsung ke pimpinan
     if (role === "MANAGER") {
       currentStep = "PIMPINAN";
       status = "IN_REVIEW";
     }
 
-    // HR submit → tetap manager dulu
     if (role === "HR") {
       currentStep = "MANAGER";
       status = "PENDING";
     }
 
-    // karyawan & keuangan
     if (role === "KARYAWAN" || role === "KEUANGAN") {
       currentStep = "MANAGER";
       status = "PENDING";
     }
 
-    // =========================
-    // CREATE DOCUMENT
-    // =========================
     const trip = await BusinessTrip.create({
       userId: user._id,
 
@@ -153,9 +117,6 @@ export const createTrip = async (req, res) => {
 
       timeline: normalizedTimeline,
 
-      // =========================
-      // WORKFLOW STATE
-      // =========================
       status,
       currentStep,
 
@@ -179,14 +140,8 @@ export const approvalPage = async (req, res) => {
 
     const role = user.role;
 
-    // =========================
-    // FILTER
-    // =========================
     let filter = {};
 
-    // =========================
-    // MANAGER
-    // =========================
     if (role === "MANAGER") {
       filter = {
         status: {
@@ -195,12 +150,7 @@ export const approvalPage = async (req, res) => {
 
         currentStep: "MANAGER",
       };
-    }
-
-    // =========================
-    // PIMPINAN
-    // =========================
-    else if (role === "PIMPINAN") {
+    } else if (role === "PIMPINAN") {
       filter = {
         status: {
           $in: ["PENDING", "IN_REVIEW"],
@@ -208,12 +158,7 @@ export const approvalPage = async (req, res) => {
 
         currentStep: "PIMPINAN",
       };
-    }
-
-    // =========================
-    // HR (delegation only)
-    // =========================
-    else if (role === "HR") {
+    } else if (role === "HR") {
       filter = {
         status: {
           $in: ["PENDING", "IN_REVIEW"],
@@ -225,18 +170,10 @@ export const approvalPage = async (req, res) => {
 
         "delegation.to": "HR",
       };
-    }
-
-    // =========================
-    // NO ACCESS
-    // =========================
-    else {
+    } else {
       return res.status(403).send("Tidak memiliki akses approval");
     }
 
-    // =========================
-    // GET DATA
-    // =========================
     const trips = await BusinessTrip.find(filter)
       .populate({
         path: "userId",
@@ -248,9 +185,6 @@ export const approvalPage = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    // =========================
-    // RENDER
-    // =========================
     return res.render("trip/approval", {
       title: "Approval Dinas Luar",
       trips,
@@ -273,7 +207,6 @@ export const editTripForm = async (req, res) => {
 
   if (!trip) return res.status(404).send("Not found");
 
-  // hanya boleh edit sebelum IN_REVIEW
   if (trip.status !== "PENDING" && trip.status !== "REJECTED") {
     return res.status(403).send("Tidak bisa edit saat sudah diproses approval");
   }
@@ -311,7 +244,6 @@ export const updateTrip = async (req, res) => {
     timeline,
   } = req.body;
 
-  // normalize
   budget = Number(budget);
 
   if (!Array.isArray(timeline)) {
@@ -342,11 +274,6 @@ export const handleApproval = async (req, res) => {
     const user = req.session.user;
     const { id } = req.params;
 
-    // action:
-    // APPROVE
-    // REJECT
-    // DELEGATE_TO_HR
-
     const { action, note } = req.body;
 
     const trip = await BusinessTrip.findById(id);
@@ -359,20 +286,12 @@ export const handleApproval = async (req, res) => {
 
     const currentStep = trip.currentStep;
 
-    // =========================
-    // ROLE CHECK
-    // =========================
-
     const isManager = role === "MANAGER";
 
     const isPimpinan = role === "PIMPINAN";
 
     const isHRDelegatedAsPimpinan =
       role === "HR" && currentStep === "PIMPINAN" && trip.delegation?.active === true;
-
-    // =========================
-    // AUTHORIZATION
-    // =========================
 
     if (currentStep === "MANAGER" && !isManager) {
       return res.status(403).send("Hanya Manager yang bisa approve tahap ini");
@@ -381,11 +300,6 @@ export const handleApproval = async (req, res) => {
     if (currentStep === "PIMPINAN" && !isPimpinan && !isHRDelegatedAsPimpinan) {
       return res.status(403).send("Tidak memiliki akses approval pimpinan");
     }
-
-    // =========================
-    // DELEGATE TO HR
-    // =========================
-    // hanya pimpinan yg bisa delegasi
 
     if (action === "DELEGATE_TO_HR") {
       if (!isPimpinan) {
@@ -408,10 +322,6 @@ export const handleApproval = async (req, res) => {
       });
     }
 
-    // =========================
-    // REJECT
-    // =========================
-
     if (action === "REJECT") {
       if (!note || note.trim().length < 5) {
         return res.status(400).send("Alasan reject minimal 5 karakter");
@@ -420,7 +330,6 @@ export const handleApproval = async (req, res) => {
       trip.approvals.push({
         role: currentStep,
 
-        // siapa yg bertindak
         actingAs: role,
 
         userId: user._id,
@@ -436,7 +345,6 @@ export const handleApproval = async (req, res) => {
 
       trip.currentStep = null;
 
-      // delegation dimatikan
       if (trip.delegation) {
         trip.delegation.active = false;
       }
@@ -447,10 +355,6 @@ export const handleApproval = async (req, res) => {
         message: "Pengajuan berhasil ditolak",
       });
     }
-
-    // =========================
-    // APPROVE
-    // =========================
 
     if (action === "APPROVE") {
       trip.approvals.push({
@@ -465,24 +369,15 @@ export const handleApproval = async (req, res) => {
         date: new Date(),
       });
 
-      // =========================
-      // FLOW
-      // =========================
-
-      // manager approve
       if (currentStep === "MANAGER") {
         trip.currentStep = "PIMPINAN";
 
         trip.status = "IN_REVIEW";
-      }
-
-      // pimpinan / HR delegated approve final
-      else if (currentStep === "PIMPINAN") {
+      } else if (currentStep === "PIMPINAN") {
         trip.currentStep = null;
 
         trip.status = "APPROVED";
 
-        // selesai → delegation off
         if (trip.delegation) {
           trip.delegation.active = false;
         }
@@ -517,7 +412,6 @@ export const resubmitTrip = async (req, res) => {
       return res.status(400).send("Hanya data rejected yang bisa di-resubmit");
     }
 
-    // reset workflow
     trip.status = "PENDING";
     trip.currentStep = "MANAGER";
 
@@ -579,7 +473,6 @@ export const resubmitUpdateTrip = async (req, res) => {
     return res.status(404).send("Data tidak ditemukan");
   }
 
-  // hanya pending/rejected boleh edit
   if (trip.status !== "PENDING" && trip.status !== "REJECTED") {
     return res.status(403).send("Tidak dapat edit pengajuan ini");
   }
@@ -587,11 +480,9 @@ export const resubmitUpdateTrip = async (req, res) => {
   await BusinessTrip.findByIdAndUpdate(id, {
     ...req.body,
 
-    // reset workflow
     status: "PENDING",
     currentStep: "MANAGER",
 
-    // audit trail tetap disimpan
     updatedAt: new Date(),
   });
 
@@ -604,16 +495,10 @@ export const delegateTripToHR = async (req, res) => {
 
     const { id } = req.params;
 
-    // =========================
-    // ONLY PIMPINAN
-    // =========================
     if (user.role !== "PIMPINAN") {
       return res.status(403).send("Hanya pimpinan yang dapat melakukan delegasi");
     }
 
-    // =========================
-    // FIND TRIP
-    // =========================
     const trip = await BusinessTrip.findById(id).populate({
       path: "userId",
       select: "username roleId",
@@ -627,30 +512,18 @@ export const delegateTripToHR = async (req, res) => {
       return res.status(404).send("Pengajuan tidak ditemukan");
     }
 
-    // =========================
-    // VALID STEP
-    // =========================
     if (trip.currentStep !== "PIMPINAN") {
       return res.status(400).send("Pengajuan tidak berada pada tahap pimpinan");
     }
 
-    // =========================
-    // HR CANNOT APPROVE OWN REQUEST
-    // =========================
     if (trip.userId?.roleId?.name === "HR") {
       return res.status(403).send("Pengajuan HR tidak boleh didelegasikan ke HR");
     }
 
-    // =========================
-    // ALREADY DELEGATED
-    // =========================
     if (trip.delegation?.active) {
       return res.status(400).send("Pengajuan sudah didelegasikan");
     }
 
-    // =========================
-    // CREATE DELEGATION
-    // =========================
     trip.delegation = {
       from: "PIMPINAN",
       to: "HR",
@@ -664,10 +537,8 @@ export const delegateTripToHR = async (req, res) => {
       note: "Delegasi approval ke HR",
     };
 
-    // tetap di tahap pimpinan
     trip.currentStep = "PIMPINAN";
 
-    // tetap review
     trip.status = "IN_REVIEW";
 
     await trip.save();
@@ -688,16 +559,10 @@ export const reportTripPage = async (req, res) => {
 
     const filter = {};
 
-    // =========================
-    // KARYAWAN ONLY OWN DATA
-    // =========================
     if (role === "KARYAWAN") {
       filter.userId = user._id;
     }
 
-    // =========================
-    // LOAD DATA
-    // =========================
     const trips = await BusinessTrip.find(filter)
       .populate({
         path: "userId",
@@ -747,9 +612,6 @@ export const financeTripPage = async (req, res) => {
   }
 };
 
-/* =========================
-   CONFIRM PAYMENT
-========================= */
 export const confirmPayment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -784,13 +646,9 @@ export const paymentHistoryPage = async (req, res) => {
 
     const role = user.role;
 
-    // filter dasar
     let filter = {
       status: "APPROVED",
     };
-
-    // optional: kalau kamu mau karyawan tidak lihat semua
-    // tapi kamu request MANAGER/HR/PIMPINAN jadi semua boleh lihat
 
     const trips = await BusinessTrip.find(filter)
       .populate({

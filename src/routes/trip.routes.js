@@ -16,7 +16,7 @@ import {
   handleApproval,
   financeTripPage,
   confirmPayment,
-} from "../controllers/tripController.js";
+} from "../controllers/trip.controller.js";
 
 const router = express.Router();
 

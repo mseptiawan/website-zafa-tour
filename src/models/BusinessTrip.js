@@ -15,9 +15,10 @@ const businessTripSchema = new mongoose.Schema(
       enum: ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"],
     },
 
-    contactPerson: {
-      name: String,
-      phone: String,
+    meetWith: {
+      type: String,
+      required: true,
+      maxlength: 100,
     },
 
     startDate: Date,
@@ -42,6 +43,7 @@ const businessTripSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
     timeline: [
       {
         address: String,
@@ -49,9 +51,6 @@ const businessTripSchema = new mongoose.Schema(
       },
     ],
 
-    // =========================
-    // WORKFLOW STATE
-    // =========================
     status: {
       type: String,
       enum: ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"],
@@ -64,9 +63,6 @@ const businessTripSchema = new mongoose.Schema(
       default: "MANAGER",
     },
 
-    // =========================
-    // APPROVAL AUDIT TRAIL
-    // =========================
     approvals: [
       {
         role: {
@@ -95,9 +91,6 @@ const businessTripSchema = new mongoose.Schema(
       },
     ],
 
-    // =========================
-    // DELEGATION (PIMPINAN ↔ HR)
-    // =========================
     delegation: {
       from: {
         type: String,
