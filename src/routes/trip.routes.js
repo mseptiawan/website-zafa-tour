@@ -3,20 +3,18 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 import {
-  formRequest,
-  createTrip,
+  newForm,
   myTrips,
-  approvalPage,
   editTripForm,
   updateTrip,
-  showEditTrip,
-  reportTripPage,
-  resubmitUpdateTrip,
+  approvalPage,
   handleApproval,
+  reportTripPage,
   delegateTripToHR,
   financeTripPage,
   confirmPayment,
   paymentHistoryPage,
+  create,
 } from "../controllers/trip.controller.js";
 
 const router = express.Router();
@@ -27,25 +25,22 @@ router.use(authMiddleware);
 router.get("/new", newForm);
 router.post("/", create);
 
-/* USER */
-router.get("/my", myTrips);
+/* MY TRIPS */
+router.get("/trip/my", myTrips);
+
+/* EDIT (single entry point) */
+router.get("/trip/:id/edit", editTripForm);
+router.post("/trip/:id/edit", updateTrip);
 
 /* APPROVAL */
-router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
-
-router.post("/:id/approval", handleApproval);
-
-/* EDIT */
-router.get("/:id/edit", editTripForm);
-router.post("/:id/edit", updateTrip);
-// router.get("/:id/edit", showEditTrip);
-router.post("/:id/update", resubmitUpdateTrip);
-
-/* REPORT */
-router.get("/report", reportTripPage);
+router.get("/trip/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
+router.post("/trip/approval/:id", handleApproval);
 
 /* DELEGATION */
-router.post("/:id/delegate", delegateTripToHR);
+router.post("/trip/:id/delegate", delegateTripToHR);
+
+/* REPORT */
+router.get("/trip/report", reportTripPage);
 
 /* FINANCE */
 router.get("/finance/trips", roleMiddleware("KEUANGAN"), financeTripPage);
