@@ -3,18 +3,18 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 import {
-  newForm,
-  create,
+  formRequest,
+  createTrip,
   myTrips,
   approvalPage,
-  showEditForm,
-  update,
+  editTripForm,
+  updateTrip,
+  showEditTrip,
+  reportTripPage,
+  resubmitUpdateTrip,
   handleApproval,
-  show,
-  resubmitForm,
-  delegateToHR,
-  reportPage,
-  financePage,
+  delegateTripToHR,
+  financeTripPage,
   confirmPayment,
   paymentHistoryPage,
 } from "../controllers/trip.controller.js";
@@ -23,33 +23,38 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
+/* REQUEST */
 router.get("/new", newForm);
 router.post("/", create);
 
+/* USER */
 router.get("/my", myTrips);
 
+/* APPROVAL */
 router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
+
 router.post("/:id/approval", handleApproval);
 
-router.get("/report", reportPage);
+/* EDIT */
+router.get("/:id/edit", editTripForm);
+router.post("/:id/edit", updateTrip);
+// router.get("/:id/edit", showEditTrip);
+router.post("/:id/update", resubmitUpdateTrip);
 
-router.get("/finance", roleMiddleware(["KEUANGAN"]), financePage);
-router.post("/finance/:id/pay", roleMiddleware(["KEUANGAN"]), confirmPayment);
+/* REPORT */
+router.get("/report", reportTripPage);
+
+/* DELEGATION */
+router.post("/:id/delegate", delegateTripToHR);
+
+/* FINANCE */
+router.get("/finance/trips", roleMiddleware("KEUANGAN"), financeTripPage);
+router.post("/finance/trips/:id/pay", roleMiddleware("KEUANGAN"), confirmPayment);
 
 router.get(
-  "/finance/history",
+  "/finance/payment-history",
   roleMiddleware(["MANAGER", "HR", "PIMPINAN", "KEUANGAN"]),
   paymentHistoryPage
 );
-
-router.get("/:id/edit", showEditForm);
-
-router.get("/:id/edit", resubmitForm);
-
-router.get("/:id", show);
-
-router.post("/:id", update);
-
-router.post("/:id/delegate", delegateToHR);
 
 export default router;
