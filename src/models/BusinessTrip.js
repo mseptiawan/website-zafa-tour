@@ -2,11 +2,19 @@ import mongoose from "mongoose";
 
 const businessTripSchema = new mongoose.Schema(
   {
+    // Core
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+
+    employees: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Employee",
+      },
+    ],
 
     title: String,
 
@@ -31,18 +39,6 @@ const businessTripSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    paymentStatus: {
-      type: String,
-      enum: ["UNPAID", "PAID"],
-      default: "UNPAID",
-    },
-
-    paidAt: Date,
-
-    paidBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
 
     timeline: [
       {
@@ -57,6 +53,21 @@ const businessTripSchema = new mongoose.Schema(
       default: "PENDING",
     },
 
+    // Finance
+    paymentStatus: {
+      type: String,
+      enum: ["UNPAID", "PAID"],
+      default: "UNPAID",
+    },
+
+    paidAt: Date,
+
+    paidBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    // Workflow approval
     currentStep: {
       type: String,
       enum: ["MANAGER", "PIMPINAN"],
@@ -91,6 +102,7 @@ const businessTripSchema = new mongoose.Schema(
       },
     ],
 
+    // Delegasi
     delegation: {
       from: {
         type: String,

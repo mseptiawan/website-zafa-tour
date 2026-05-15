@@ -1,0 +1,132 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50 p-8">
+
+  <div class="max-w-4xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-800">
+        Detail Dinas Luar
+      </h1>
+      <p class="text-sm text-slate-500 mt-2">
+        Informasi lengkap pengajuan perjalanan
+      </p>
+    </div>
+
+    <!-- CARD -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 space-y-6">
+
+      <!-- GRID INFO -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
+        <div>
+          <p class="text-xs uppercase text-slate-400">Nama Karyawan</p>
+          <p class="font-semibold text-slate-800 mt-1">
+            <%= trip.userId?.username || '-' %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase text-slate-400">Judul</p>
+          <p class="font-semibold text-slate-800 mt-1">
+            <%= trip.title %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase text-slate-400">Tanggal</p>
+          <p class="font-medium text-slate-700 mt-1">
+            <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
+            -
+            <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase text-slate-400">Tujuan</p>
+          <p class="font-semibold text-slate-800 mt-1">
+            <%= trip.destination %>
+          </p>
+        </div>
+
+        <div class="md:col-span-2">
+          <p class="text-xs uppercase text-slate-400">Deskripsi</p>
+          <p class="text-slate-600 mt-1 leading-relaxed">
+            <%= trip.description || '-' %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase text-slate-400">Budget</p>
+          <p class="font-semibold text-slate-800 mt-1">
+            Rp <%= Number(trip.budget || 0).toLocaleString('id-ID') %>
+          </p>
+        </div>
+
+        <!-- STATUS -->
+        <div>
+          <p class="text-xs uppercase text-slate-400">Status</p>
+
+          <% if (trip.status === 'PENDING') { %>
+            <span class="inline-block mt-1 px-3 py-1 text-xs rounded-full bg-yellow-50 text-yellow-700 font-medium">
+              Pending
+            </span>
+
+          <% } else if (trip.status === 'APPROVED_MANAGER') { %>
+            <span class="inline-block mt-1 px-3 py-1 text-xs rounded-full bg-blue-50 text-blue-600 font-medium">
+              Approved Manager
+            </span>
+
+          <% } else if (trip.status === 'APPROVED_DIRECTOR') { %>
+            <span class="inline-block mt-1 px-3 py-1 text-xs rounded-full bg-emerald-50 text-emerald-600 font-medium">
+              Approved Director
+            </span>
+
+          <% } else { %>
+            <span class="inline-block mt-1 px-3 py-1 text-xs rounded-full bg-red-50 text-red-600 font-medium">
+              Rejected
+            </span>
+          <% } %>
+
+        </div>
+
+      </div>
+
+      <!-- APPROVAL INFO -->
+      <div class="border-t pt-6 space-y-4">
+
+        <% if (trip.approvedByManager?.userId) { %>
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Disetujui Manager</p>
+            <p class="text-slate-700 font-medium mt-1">
+              <%= new Date(trip.approvedByManager.date).toLocaleDateString('id-ID') %>
+            </p>
+          </div>
+        <% } %>
+
+        <% if (trip.approvedByDirector?.userId) { %>
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Disetujui Director</p>
+            <p class="text-slate-700 font-medium mt-1">
+              <%= new Date(trip.approvedByDirector.date).toLocaleDateString('id-ID') %>
+            </p>
+          </div>
+        <% } %>
+
+      </div>
+
+      <!-- BUTTON -->
+      <div class="pt-4">
+        <a href="/trip/all"
+           class="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-xl
+                  hover:bg-slate-800 transition shadow-sm">
+          ← Kembali
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

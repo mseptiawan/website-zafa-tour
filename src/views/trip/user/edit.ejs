@@ -1,16 +1,10 @@
 <%- layout('layouts/main', { title }) %>
 
-<%
-  const isRejected = trip.status === "REJECTED";
+  <% const isRejected=trip.status==="REJECTED" ; const lastReject=trip.approvals ?.slice() .reverse() .find(a=> a.status
+    === "REJECTED");
+    %>
 
-  const lastReject =
-    trip.approvals
-      ?.slice()
-      .reverse()
-      .find(a => a.status === "REJECTED");
-%>
-
-<div style="
+    <div style="
   margin-left:280px;
   min-height:100vh;
   padding:32px;
@@ -19,40 +13,35 @@
   color:#0f172a;
 ">
 
-  <div style="max-width:720px; margin:auto;">
+      <div style="max-width:720px; margin:auto;">
 
-    <!-- HEADER -->
-    <div style="margin-bottom:24px;">
+        <!-- HEADER -->
+        <div style="margin-bottom:24px;">
 
-      <h1 style="
+          <h1 style="
         font-size:22px;
         font-weight:700;
         margin-bottom:6px;
       ">
 
-        <%= isRejected
-          ? "Resubmit Pengajuan Dinas Luar"
-          : "Edit Pengajuan Dinas Luar"
-        %>
+            <%= isRejected ? "Resubmit Pengajuan Dinas Luar" : "Edit Pengajuan Dinas Luar" %>
 
-      </h1>
+          </h1>
 
-      <p style="
+          <p style="
         font-size:13px;
         color:#64748b;
       ">
 
-        <%= isRejected
-          ? "Perbaiki pengajuan yang ditolak lalu ajukan kembali"
-          : "Perbarui data pengajuan sebelum masuk approval"
-        %>
+            <%= isRejected ? "Perbaiki pengajuan yang ditolak lalu ajukan kembali"
+              : "Perbarui data pengajuan sebelum masuk approval" %>
 
-      </p>
+          </p>
 
-    </div>
+        </div>
 
-    <!-- CARD -->
-    <div style="
+        <!-- CARD -->
+        <div style="
       background:#fff;
       border:1px solid #e2e8f0;
       border-radius:16px;
@@ -60,8 +49,8 @@
       box-shadow:0 1px 2px rgba(0,0,0,.04);
     ">
 
-      <!-- STATUS -->
-      <div style="
+          <!-- STATUS -->
+          <div style="
         margin-bottom:18px;
         padding:14px;
         border-radius:12px;
@@ -74,7 +63,7 @@
           <%= isRejected ? '#fecaca' : '#bfdbfe' %>;
       ">
 
-        <div style="
+            <div style="
           font-size:12px;
           font-weight:700;
           letter-spacing:.4px;
@@ -82,31 +71,31 @@
           color:
             <%= isRejected ? '#b91c1c' : '#1d4ed8' %>;
         ">
-          STATUS PENGAJUAN
-        </div>
+              STATUS PENGAJUAN
+            </div>
 
-        <div style="
+            <div style="
           margin-top:4px;
           font-size:14px;
           font-weight:600;
         ">
-          <%= trip.status %>
-        </div>
+              <%= trip.status %>
+            </div>
 
-        <% if (isRejected) { %>
+            <% if (isRejected) { %>
 
-          <div style="
+              <div style="
             margin-top:10px;
             font-size:13px;
             color:#7f1d1d;
             line-height:1.6;
           ">
-            Pengajuan sebelumnya ditolak dan perlu diperbaiki sebelum diajukan kembali.
-          </div>
+                Pengajuan sebelumnya ditolak dan perlu diperbaiki sebelum diajukan kembali.
+              </div>
 
-          <% if (lastReject?.note) { %>
+              <% if (lastReject?.note) { %>
 
-            <div style="
+                <div style="
               margin-top:14px;
               background:#fff;
               border:1px solid #fecaca;
@@ -114,415 +103,333 @@
               padding:12px;
             ">
 
-              <div style="
+                  <div style="
                 font-size:11px;
                 font-weight:700;
                 color:#991b1b;
                 margin-bottom:6px;
               ">
-                ALASAN PENOLAKAN
-              </div>
+                    ALASAN PENOLAKAN
+                  </div>
 
-              <div style="
+                  <div style="
                 font-size:13px;
                 line-height:1.6;
                 color:#450a0a;
               ">
-                <%= lastReject.note %>
-              </div>
+                    <%= lastReject.note %>
+                  </div>
 
-            </div>
+                </div>
 
-          <% } %>
+                <% } %>
 
-        <% } %>
+                  <% } %>
 
-      </div>
+          </div>
 
-      <!-- FORM -->
-      <form
-        action="<%= trip.status === 'REJECTED'
+          <!-- FORM -->
+          <form action="<%= trip.status === 'REJECTED'
     ? '/trip/' + trip._id + '/update'
-    : '/trip/edit/' + trip._id %>"
-        method="POST"
-        style="
+    : '/trip/edit/' + trip._id %>" method="POST" style="
           display:flex;
           flex-direction:column;
           gap:14px;
-        "
-      >
+        ">
 
-        <!-- TITLE -->
-        <div>
+            <!-- TITLE -->
+            <div>
 
-          <label style="
+              <label style="
             display:block;
             margin-bottom:6px;
             font-size:12px;
             font-weight:600;
             color:#475569;
           ">
-            Judul Perjalanan
-          </label>
+                Judul Perjalanan
+              </label>
 
-          <input
-            type="text"
-            name="title"
-            value="<%= trip.title %>"
-            minlength="5"
-            maxlength="100"
-            required
-            style="
+              <input type="text" name="title" value="<%= trip.title %>" minlength="5" maxlength="100" required style="
               width:100%;
               padding:11px 12px;
               border-radius:10px;
               border:1px solid #e2e8f0;
               outline:none;
-            "
-          />
+            " />
 
-        </div>
+            </div>
 
-        <!-- PURPOSE -->
-        <div>
+            <!-- PURPOSE -->
+            <div>
 
-          <label style="
+              <label style="
             display:block;
             margin-bottom:6px;
             font-size:12px;
             font-weight:600;
             color:#475569;
           ">
-            Tujuan Perjalanan
-          </label>
+                Tujuan Perjalanan
+              </label>
 
-          <select
-            name="purpose"
-            required
-            style="
+              <select name="purpose" required style="
               width:100%;
               padding:11px 12px;
               border-radius:10px;
               border:1px solid #e2e8f0;
               background:#fff;
-            "
-          >
+            ">
 
-            <option value="">Pilih tujuan perjalanan</option>
+                <option value="">Pilih tujuan perjalanan</option>
 
-            <% const purposes = ["SALES_VISIT","MEETING","TRAINING","SURVEY","OTHER"]; %>
+                <% const purposes=["SALES_VISIT","MEETING","TRAINING","SURVEY","OTHER"]; %>
 
-            <% purposes.forEach(p => { %>
+                  <% purposes.forEach(p=> { %>
 
-              <option
-                value="<%= p %>"
-                <%= trip.purpose === p ? 'selected' : '' %>
-              >
-                <%= p %>
-              </option>
+                    <option value="<%= p %>" <%=trip.purpose===p ? 'selected' : '' %>
+                      >
+                      <%= p %>
+                    </option>
 
-            <% }) %>
+                    <% }) %>
 
-          </select>
+              </select>
 
-        </div>
+            </div>
 
-        <!-- DATE -->
-        <div style="
+            <!-- DATE -->
+            <div style="
           display:grid;
           grid-template-columns:1fr 1fr;
           gap:12px;
         ">
 
-          <div>
+              <div>
 
-            <label style="
+                <label style="
               display:block;
               margin-bottom:6px;
               font-size:12px;
               font-weight:600;
               color:#475569;
             ">
-              Tanggal Mulai
-            </label>
+                  Tanggal Mulai
+                </label>
 
-            <input
-              type="date"
-              name="startDate"
-              value="<%= trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : '' %>"
-              required
-              style="
+                <input type="date" name="startDate"
+                  value="<%= trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : '' %>" required
+                  style="
                 width:100%;
                 padding:11px 12px;
                 border-radius:10px;
                 border:1px solid #e2e8f0;
-              "
-            />
+              " />
 
-          </div>
+              </div>
 
-          <div>
+              <div>
 
-            <label style="
+                <label style="
               display:block;
               margin-bottom:6px;
               font-size:12px;
               font-weight:600;
               color:#475569;
             ">
-              Tanggal Selesai
-            </label>
+                  Tanggal Selesai
+                </label>
 
-            <input
-              type="date"
-              name="endDate"
-              value="<%= trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : '' %>"
-              required
-              style="
+                <input type="date" name="endDate"
+                  value="<%= trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : '' %>" required style="
                 width:100%;
                 padding:11px 12px;
                 border-radius:10px;
                 border:1px solid #e2e8f0;
-              "
-            />
+              " />
 
-          </div>
+              </div>
 
-        </div>
+            </div>
 
-        <!-- DESTINATION -->
-        <div>
+            <!-- DESTINATION -->
+            <div>
 
-          <label style="
+              <label style="
             display:block;
             margin-bottom:6px;
             font-size:12px;
             font-weight:600;
             color:#475569;
           ">
-            Destinasi
-          </label>
+                Destinasi
+              </label>
 
-          <input
-            type="text"
-            name="destination"
-            value="<%= trip.destination %>"
-            minlength="3"
-            maxlength="150"
-            required
-            style="
+              <input type="text" name="destination" value="<%= trip.destination %>" minlength="3" maxlength="150"
+                required style="
               width:100%;
               padding:11px 12px;
               border-radius:10px;
               border:1px solid #e2e8f0;
-            "
-          />
+            " />
 
-        </div>
+            </div>
 
-        <!-- DESCRIPTION -->
-        <div>
+            <!-- DESCRIPTION -->
+            <div>
 
-          <label style="
+              <label style="
             display:block;
             margin-bottom:6px;
             font-size:12px;
             font-weight:600;
             color:#475569;
           ">
-            Deskripsi Perjalanan
-          </label>
+                Deskripsi Perjalanan
+              </label>
 
-          <textarea
-            name="description"
-            rows="4"
-            minlength="10"
-            maxlength="1000"
-            required
-            style="
+              <textarea name="description" rows="4" minlength="10" maxlength="1000" required style="
               width:100%;
               padding:11px 12px;
               border-radius:10px;
               border:1px solid #e2e8f0;
               resize:none;
-            "
-          ><%= trip.description %></textarea>
+            "><%= trip.description %></textarea>
 
-        </div>
+            </div>
 
-        <!-- BUDGET -->
-        <div>
+            <!-- BUDGET -->
+            <div>
 
-          <label style="
+              <label style="
             display:block;
             margin-bottom:6px;
             font-size:12px;
             font-weight:600;
             color:#475569;
           ">
-            Budget
-          </label>
+                Budget
+              </label>
 
-          <input
-            type="text"
-            id="budget"
-            value="<%= (trip.budget || 0).toLocaleString('id-ID') %>"
-            required
-            style="
+              <input type="text" id="budget" value="<%= (trip.budget || 0).toLocaleString('id-ID') %>" required style="
               width:100%;
               padding:11px 12px;
               border-radius:10px;
               border:1px solid #e2e8f0;
-            "
-          />
+            " />
 
-          <input
-            type="hidden"
-            name="budget"
-            id="budgetRaw"
-            value="<%= trip.budget %>"
-          />
+              <input type="hidden" name="budget" id="budgetRaw" value="<%= trip.budget %>" />
 
-        </div>
+            </div>
 
-        <!-- CONTACT -->
-        <div style="
+            <!-- CONTACT -->
+            <div style="
           display:grid;
           grid-template-columns:1fr 1fr;
           gap:12px;
         ">
 
-          <div>
+              <div>
 
-            <label style="
+                <label style="
               display:block;
               margin-bottom:6px;
               font-size:12px;
               font-weight:600;
               color:#475569;
             ">
-              Nama Contact Person
-            </label>
+                  Nama Contact Person
+                </label>
 
-            <input
-              type="text"
-              name="contactPerson[name]"
-              value="<%= trip.contactPerson?.name || '' %>"
-              style="
+                <input type="text" name="contactPerson[name]" value="<%= trip.contactPerson?.name || '' %>" style="
                 width:100%;
                 padding:11px 12px;
                 border-radius:10px;
                 border:1px solid #e2e8f0;
-              "
-            />
+              " />
 
-          </div>
+              </div>
 
-          <div>
+              <div>
 
-            <label style="
+                <label style="
               display:block;
               margin-bottom:6px;
               font-size:12px;
               font-weight:600;
               color:#475569;
             ">
-              No HP
-            </label>
+                  No HP
+                </label>
 
-            <input
-              type="text"
-              name="contactPerson[phone]"
-              value="<%= trip.contactPerson?.phone || '' %>"
-              style="
+                <input type="text" name="contactPerson[phone]" value="<%= trip.contactPerson?.phone || '' %>" style="
                 width:100%;
                 padding:11px 12px;
                 border-radius:10px;
                 border:1px solid #e2e8f0;
-              "
-            />
+              " />
 
-          </div>
+              </div>
 
-        </div>
+            </div>
 
-        <!-- TIMELINE -->
-        <div>
+            <!-- TIMELINE -->
+            <div>
 
-          <label style="
+              <label style="
             display:block;
             margin-bottom:8px;
             font-size:12px;
             font-weight:600;
             color:#475569;
           ">
-            Timeline Perjalanan
-          </label>
+                Timeline Perjalanan
+              </label>
 
-          <div
-            id="timelineBox"
-            style="
+              <div id="timelineBox" style="
               display:flex;
               flex-direction:column;
               gap:10px;
-            "
-          >
+            ">
 
-            <% if (trip.timeline && trip.timeline.length) { %>
+                <% if (trip.timeline && trip.timeline.length) { %>
 
-              <% trip.timeline.forEach((t, i) => { %>
+                  <% trip.timeline.forEach((t, i)=> { %>
 
-                <div style="
+                    <div style="
                   display:flex;
                   gap:8px;
                 ">
 
-                  <input
-                    type="text"
-                    name="timeline[<%= i %>][address]"
-                    value="<%= t.address %>"
-                    required
-                    style="
+                      <input type="text" name="timeline[<%= i %>][address]" value="<%= t.address %>" required style="
                       flex:1;
                       padding:11px 12px;
                       border-radius:10px;
                       border:1px solid #e2e8f0;
-                    "
-                  />
+                    " />
 
-                  <input
-                    type="hidden"
-                    name="timeline[<%= i %>][order]"
-                    value="<%= i + 1 %>"
-                  />
+                      <input type="hidden" name="timeline[<%= i %>][order]" value="<%= i + 1 %>" />
 
-                  <button
-                    type="button"
-                    onclick="removeTimeline(this)"
-                    style="
+                      <button type="button" onclick="removeTimeline(this)" style="
                       padding:0 14px;
                       border:none;
                       background:#fee2e2;
                       color:#dc2626;
                       border-radius:10px;
                       cursor:pointer;
-                    "
-                  >
-                    ✕
-                  </button>
+                    ">
+                        ✕
+                      </button>
 
-                </div>
+                    </div>
 
-              <% }) %>
+                    <% }) %>
 
-            <% } %>
+                      <% } %>
 
-          </div>
+              </div>
 
-          <button
-            type="button"
-            onclick="addTimeline()"
-            style="
+              <button type="button" onclick="addTimeline()" style="
               margin-top:10px;
               background:none;
               border:none;
@@ -530,17 +437,14 @@
               cursor:pointer;
               font-size:13px;
               font-weight:600;
-            "
-          >
-            + Tambah Timeline
-          </button>
+            ">
+                + Tambah Timeline
+              </button>
 
-        </div>
+            </div>
 
-        <!-- SUBMIT -->
-        <button
-          type="submit"
-          style="
+            <!-- SUBMIT -->
+            <button type="submit" style="
             margin-top:8px;
             padding:12px;
             border:none;
@@ -553,62 +457,58 @@
             font-size:14px;
             font-weight:600;
             cursor:pointer;
-          "
-        >
+          ">
 
-          <%= isRejected
-            ? "Resubmit Pengajuan"
-            : "Simpan Perubahan"
-          %>
+              <%= isRejected ? "Resubmit Pengajuan" : "Simpan Perubahan" %>
 
-        </button>
+            </button>
 
-      </form>
+          </form>
+
+        </div>
+
+      </div>
 
     </div>
 
-  </div>
+    <script>
+      let timelineIndex = <%= trip.timeline ?trip.timeline.length: 0 %>;
 
-</div>
+      // =========================
+      // BUDGET FORMAT
+      // =========================
+      const budgetInput = document.getElementById("budget");
+      const budgetRaw = document.getElementById("budgetRaw");
 
-<script>
-let timelineIndex = <%= trip.timeline ? trip.timeline.length : 0 %>;
+      budgetInput.addEventListener("input", function (e) {
 
-// =========================
-// BUDGET FORMAT
-// =========================
-const budgetInput = document.getElementById("budget");
-const budgetRaw = document.getElementById("budgetRaw");
+        let value = e.target.value.replace(/\D/g, "");
 
-budgetInput.addEventListener("input", function(e){
+        budgetRaw.value = value;
 
-  let value = e.target.value.replace(/\D/g, "");
+        if (!value) {
+          e.target.value = "";
+          return;
+        }
 
-  budgetRaw.value = value;
+        e.target.value = Number(value).toLocaleString("id-ID");
+      });
 
-  if(!value){
-    e.target.value = "";
-    return;
-  }
+      // =========================
+      // ADD TIMELINE
+      // =========================
+      function addTimeline() {
 
-  e.target.value = Number(value).toLocaleString("id-ID");
-});
+        const box = document.getElementById("timelineBox");
 
-// =========================
-// ADD TIMELINE
-// =========================
-function addTimeline(){
+        const div = document.createElement("div");
 
-  const box = document.getElementById("timelineBox");
-
-  const div = document.createElement("div");
-
-  div.style = `
+        div.style = `
     display:flex;
     gap:8px;
   `;
 
-  div.innerHTML = `
+        div.innerHTML = `
     <input
       type="text"
       name="timeline[${timelineIndex}][address]"
@@ -644,15 +544,15 @@ function addTimeline(){
     </button>
   `;
 
-  box.appendChild(div);
+        box.appendChild(div);
 
-  timelineIndex++;
-}
+        timelineIndex++;
+      }
 
-// =========================
-// REMOVE TIMELINE
-// =========================
-function removeTimeline(btn){
-  btn.parentElement.remove();
-}
-</script>
+      // =========================
+      // REMOVE TIMELINE
+      // =========================
+      function removeTimeline(btn) {
+        btn.parentElement.remove();
+      }
+    </script>

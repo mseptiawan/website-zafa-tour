@@ -1,260 +1,205 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
-  <div class="max-w-2xl mx-auto">
+    <div class="max-w-2xl mx-auto">
 
-    <!-- HEADER -->
-    <div class="mb-8">
+      <!-- HEADER -->
+      <div class="mb-8">
 
-      <nav class="flex items-center gap-2 mb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-        <span>Workspace</span>
-        <span>/</span>
-        <span class="text-slate-700">Trip</span>
-      </nav>
+        <nav class="flex items-center gap-2 mb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+          <span>Workspace</span>
+          <span>/</span>
+          <span class="text-slate-700">Trip</span>
+        </nav>
 
-      <h1 class="text-2xl font-semibold text-slate-800">
-        Pengajuan Dinas Luar
-      </h1>
+        <h1 class="text-2xl font-semibold text-slate-800">
+          Pengajuan Dinas Luar
+        </h1>
 
-      <p class="text-sm text-slate-500 mt-1">
-        Form pengajuan perjalanan dinas
-      </p>
+        <p class="text-sm text-slate-500 mt-1">
+          Form pengajuan perjalanan dinas
+        </p>
 
-    </div>
+      </div>
 
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+      <!-- CARD -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
-      <form action="/trip/request" method="POST" class="p-8 space-y-6">
+        <form action="/trip/" method="POST" class="p-8 space-y-6">
 
-        <!-- TITLE -->
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Judul Perjalanan
-          </label>
-
-          <input
-            type="text"
-            name="title"
-            placeholder="Judul perjalanan"
-            minlength="5"
-            maxlength="100"
-            required
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-          />
-        </div>
-
-        <!-- PURPOSE -->
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Tujuan Perjalanan
-          </label>
-
-          <select
-            name="purpose"
-            required
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-          >
-            <option value="">Pilih tujuan</option>
-            <option value="SALES_VISIT">Sales Visit</option>
-            <option value="MEETING">Meeting</option>
-            <option value="TRAINING">Training</option>
-            <option value="SURVEY">Survey</option>
-            <option value="OTHER">Other</option>
-          </select>
-        </div>
-
-        <!-- DATE -->
-        <div class="grid grid-cols-2 gap-4">
-
+          <!-- TITLE -->
           <div class="space-y-1.5">
             <label class="text-[13px] font-semibold text-slate-700">
-              Tanggal Mulai
+              Judul Perjalanan
             </label>
 
-            <input
-              type="date"
-              name="startDate"
-              required
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-            />
+            <input type="text" name="title" placeholder="Judul perjalanan" minlength="5" maxlength="100" required
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
           </div>
 
+          <!-- PURPOSE -->
           <div class="space-y-1.5">
             <label class="text-[13px] font-semibold text-slate-700">
-              Tanggal Selesai
+              Tujuan Perjalanan
             </label>
 
-            <input
-              type="date"
-              name="endDate"
-              required
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-            />
+            <select name="purpose" required
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
+              <option value="">Pilih tujuan</option>
+              <option value="SALES_VISIT">Sales Visit</option>
+              <option value="MEETING">Meeting</option>
+              <option value="TRAINING">Training</option>
+              <option value="SURVEY">Survey</option>
+              <option value="OTHER">Other</option>
+            </select>
           </div>
 
-        </div>
+          <!-- DATE -->
+          <div class="grid grid-cols-2 gap-4">
 
-        <!-- DESTINATION -->
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Tujuan / Lokasi
-          </label>
+            <div class="space-y-1.5">
+              <label class="text-[13px] font-semibold text-slate-700">
+                Tanggal Mulai
+              </label>
 
-          <input
-            type="text"
-            name="destination"
-            placeholder="Tujuan perjalanan"
-            minlength="3"
-            maxlength="150"
-            required
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-          />
-        </div>
+              <input type="date" name="startDate" required
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+            </div>
 
-        <!-- DESCRIPTION -->
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Deskripsi
-          </label>
+            <div class="space-y-1.5">
+              <label class="text-[13px] font-semibold text-slate-700">
+                Tanggal Selesai
+              </label>
 
-          <textarea
-            name="description"
-            rows="4"
-            minlength="10"
-            maxlength="1000"
-            required
-            placeholder="Deskripsi perjalanan"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-          ></textarea>
-        </div>
-
-        <!-- BUDGET -->
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Budget
-          </label>
-
-          <input
-            type="text"
-            id="budget"
-            placeholder="Budget (Rp)"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-          />
-
-          <input type="hidden" name="budget" id="budgetRaw" />
-        </div>
-
-        <!-- CONTACT PERSON -->
-        <div class="grid grid-cols-2 gap-4">
-
-          <input
-            type="text"
-            name="contactPerson[name]"
-            placeholder="Nama kontak"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-          />
-
-          <input
-            type="text"
-            name="contactPerson[phone]"
-            placeholder="No HP"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-          />
-
-        </div>
-
-        <!-- TIMELINE -->
-        <div class="space-y-2">
-
-          <label class="text-[13px] font-semibold text-slate-700">
-            Timeline Perjalanan
-          </label>
-
-          <div id="timelineBox" class="space-y-2">
-
-            <div class="flex gap-2 timeline-item">
-
-              <input
-                type="text"
-                name="timeline[0][address]"
-                placeholder="Alamat 1"
-                required
-                class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-              />
-
-              <input type="hidden" name="timeline[0][order]" value="1" />
-
-              <button
-                type="button"
-                onclick="removeTimeline(this)"
-                class="px-3 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition"
-              >
-                ✕
-              </button>
-
+              <input type="date" name="endDate" required
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
             </div>
 
           </div>
 
-          <button
-            type="button"
-            onclick="addTimeline()"
-            class="text-sm text-indigo-600 hover:text-indigo-700"
-          >
-            + Tambah Timeline
-          </button>
+          <!-- DESTINATION -->
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-semibold text-slate-700">
+              Tujuan / Lokasi
+            </label>
 
-        </div>
+            <input type="text" name="destination" placeholder="Tujuan perjalanan" minlength="3" maxlength="150" required
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+          </div>
 
-        <!-- SUBMIT -->
-        <div class="pt-4 border-t border-slate-100">
+          <!-- DESCRIPTION -->
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-semibold text-slate-700">
+              Deskripsi
+            </label>
 
-          <button
-            type="submit"
-            class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl text-sm font-medium transition-all"
-          >
-            Ajukan Perjalanan
-          </button>
+            <textarea name="description" rows="4" minlength="10" maxlength="1000" required
+              placeholder="Deskripsi perjalanan"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"></textarea>
+          </div>
 
-        </div>
+          <!-- BUDGET -->
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-semibold text-slate-700">
+              Budget
+            </label>
 
-      </form>
+            <input type="text" id="budget" placeholder="Budget (Rp)"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
+            <input type="hidden" name="budget" id="budgetRaw" />
+          </div>
+
+          <!-- CONTACT PERSON -->
+          <div class="space-y-1.5">
+
+            <label class="text-[13px] font-semibold text-slate-700">
+              Bertemu dengan
+            </label>
+
+            <input type="text" name="meetWith" placeholder="..."
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
+
+          </div>
+
+          <!-- TIMELINE -->
+          <div class="space-y-2">
+
+            <label class="text-[13px] font-semibold text-slate-700">
+              Timeline Perjalanan
+            </label>
+
+            <div id="timelineBox" class="space-y-2">
+
+              <div class="flex gap-2 timeline-item">
+
+                <input type="text" name="timeline[0][address]" placeholder="Alamat 1" required
+                  class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
+                <input type="hidden" name="timeline[0][order]" value="1" />
+
+                <button type="button" onclick="removeTimeline(this)"
+                  class="px-3 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition">
+                  ✕
+                </button>
+
+              </div>
+
+            </div>
+
+            <button type="button" onclick="addTimeline()" class="text-sm text-indigo-600 hover:text-indigo-700">
+              + Tambah Timeline
+            </button>
+
+          </div>
+
+          <!-- SUBMIT -->
+          <div class="pt-4 border-t border-slate-100">
+
+            <button type="submit"
+              class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl text-sm font-medium transition-all">
+              Ajukan Perjalanan
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
 
     </div>
-
   </div>
-</div>
 
-<script>
-let timelineIndex = 1;
+  <script>
+    let timelineIndex = 1;
 
-// BUDGET FORMAT
-const budgetInput = document.getElementById("budget");
-const budgetRaw = document.getElementById("budgetRaw");
+    // BUDGET FORMAT
+    const budgetInput = document.getElementById("budget");
+    const budgetRaw = document.getElementById("budgetRaw");
 
-budgetInput.addEventListener("input", function (e) {
-  let value = e.target.value.replace(/\D/g, "");
+    budgetInput.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, "");
 
-  budgetRaw.value = value;
+      budgetRaw.value = value;
 
-  if (!value) {
-    e.target.value = "";
-    return;
-  }
+      if (!value) {
+        e.target.value = "";
+        return;
+      }
 
-  e.target.value = Number(value).toLocaleString("id-ID");
-});
+      e.target.value = Number(value).toLocaleString("id-ID");
+    });
 
-// ADD TIMELINE
-function addTimeline() {
-  const box = document.getElementById("timelineBox");
+    // ADD TIMELINE
+    function addTimeline() {
+      const box = document.getElementById("timelineBox");
 
-  const div = document.createElement("div");
-  div.className = "flex gap-2";
+      const div = document.createElement("div");
+      div.className = "flex gap-2";
 
-  div.innerHTML = `
+      div.innerHTML = `
     <input type="text"
       name="timeline[${timelineIndex}][address]"
       placeholder="Alamat berikutnya"
@@ -272,12 +217,12 @@ function addTimeline() {
     </button>
   `;
 
-  box.appendChild(div);
-  timelineIndex++;
-}
+      box.appendChild(div);
+      timelineIndex++;
+    }
 
-// REMOVE
-function removeTimeline(btn) {
-  btn.parentElement.remove();
-}
-</script>
+    // REMOVE
+    function removeTimeline(btn) {
+      btn.parentElement.remove();
+    }
+  </script>

@@ -1,18 +1,8 @@
 import BusinessTrip from "../models/BusinessTrip.js";
 
-/* ---------------- CREATE ---------------- */
 const create = async ({ body, user }) => {
-  let {
-    title,
-    purpose,
-    startDate,
-    endDate,
-    destination,
-    description,
-    budget,
-    contactPerson,
-    timeline,
-  } = body;
+  let { title, purpose, startDate, endDate, destination, description, budget, meetWith, timeline } =
+    body;
 
   if (!user) throw new Error("Session tidak valid");
 
@@ -47,11 +37,6 @@ const create = async ({ body, user }) => {
 
   if (normalizedTimeline.length === 0) throw new Error("Timeline wajib diisi");
 
-  const contact = {
-    name: contactPerson?.name?.trim() || null,
-    phone: contactPerson?.phone?.trim() || null,
-  };
-
   let currentStep = "MANAGER";
   let status = "PENDING";
 
@@ -74,7 +59,7 @@ const create = async ({ body, user }) => {
     destination,
     description,
     budget,
-    contactPerson: contact,
+    meetWith,
     timeline: normalizedTimeline,
     status,
     currentStep,
@@ -85,7 +70,7 @@ const create = async ({ body, user }) => {
   return trip;
 };
 
-/* ---------------- FIND ---------------- */
+// FIND
 const findMine = (userId) => BusinessTrip.find({ userId }).sort({ createdAt: -1 });
 
 const findByIdForOwner = async ({ id, userId }) => {
@@ -100,7 +85,7 @@ const findByIdForOwner = async ({ id, userId }) => {
   return trip;
 };
 
-/* ---------------- UPDATE ---------------- */
+// UPDATE
 const update = async ({ id, user, body }) => {
   const trip = await BusinessTrip.findOne({
     _id: id,
@@ -150,7 +135,7 @@ const update = async ({ id, user, body }) => {
   });
 };
 
-/* ---------------- APPROVAL PAGE ---------------- */
+// APPROVAL PAGE
 const approvalPage = async (user) => {
   let filter = {};
 
@@ -176,7 +161,7 @@ const approvalPage = async (user) => {
   return { trips, user };
 };
 
-/* ---------------- APPROVAL ACTION ---------------- */
+// APPROVAL ACTION
 const handleApproval = async ({ id, user, body }) => {
   const { action, note } = body;
 
@@ -238,7 +223,7 @@ const handleApproval = async ({ id, user, body }) => {
   throw new Error("Invalid action");
 };
 
-/* ---------------- DELEGATION ---------------- */
+// DELEGATION
 const delegateToHR = async ({ id, user }) => {
   if (user.role !== "PIMPINAN") throw new Error("Forbidden");
 
@@ -255,7 +240,7 @@ const delegateToHR = async ({ id, user }) => {
   await trip.save();
 };
 
-/* ---------------- REPORT ---------------- */
+// REPORT
 const report = async (user) => {
   const filter = user.role === "KARYAWAN" ? { userId: user._id } : {};
 
@@ -264,10 +249,10 @@ const report = async (user) => {
   return { trips, user };
 };
 
-/* ---------------- FINANCE ---------------- */
+// FINANCE
 const findApprovedForFinance = () => BusinessTrip.find({ status: "APPROVED" }).populate("userId");
 
-/* ---------------- PAYMENT ---------------- */
+//PAYMENT
 const confirmPayment = async ({ id, user }) => {
   const trip = await BusinessTrip.findById(id);
   if (!trip) throw new Error("Not found");
@@ -279,7 +264,7 @@ const confirmPayment = async ({ id, user }) => {
   await trip.save();
 };
 
-/* ---------------- HISTORY ---------------- */
+// HISTORY
 const paymentHistory = async (user) => {
   const trips = await BusinessTrip.find({ status: "APPROVED" })
     .populate("userId")

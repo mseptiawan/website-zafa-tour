@@ -7,9 +7,7 @@ import { validateData } from "../utils/validateData.js";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
-/* ---------------- CREATE ---------------- */
 const create = async ({ body, files, userId }) => {
-  // ✔ ZOD VALIDATION (single source of truth)
   const data = validateData(createSalesVisitSchema, body);
 
   const attachments = (files || []).map((file) => {

@@ -10,6 +10,7 @@ import {
   showEditForm,
   update,
   handleApproval,
+  show,
   delegateToHR,
   reportPage,
   financePage,
@@ -29,11 +30,6 @@ router.get("/my", myTrips);
 router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
 router.post("/:id/approval", handleApproval);
 
-router.get("/:id/edit", showEditForm);
-router.post("/:id", update);
-
-router.post("/:id/delegate", delegateToHR);
-
 router.get("/report", reportPage);
 
 router.get("/finance", roleMiddleware(["KEUANGAN"]), financePage);
@@ -44,5 +40,13 @@ router.get(
   roleMiddleware(["MANAGER", "HR", "PIMPINAN", "KEUANGAN"]),
   paymentHistoryPage
 );
+
+router.get("/:id/edit", showEditForm);
+
+router.get("/:id", show);
+
+router.post("/:id", update);
+
+router.post("/:id/delegate", delegateToHR);
 
 export default router;

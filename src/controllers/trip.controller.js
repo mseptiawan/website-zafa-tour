@@ -1,13 +1,15 @@
 import tripService from "../services/trip.service.js";
-
-/* ---------------- FORM ---------------- */
+import BusinessTrip from "../models/BusinessTrip.js";
+// FORM
 export const newForm = (req, res) => {
-  res.render("trip/user/index", {
+  res.render("trip/user/create", {
     title: "Pengajuan Dinas Luar",
+    error: null,
+    old: {},
   });
 };
 
-/* ---------------- CREATE ---------------- */
+//  CREATE
 export const create = async (req, res, next) => {
   try {
     await tripService.create({
@@ -21,7 +23,7 @@ export const create = async (req, res, next) => {
   }
 };
 
-/* ---------------- MY TRIPS ---------------- */
+// MY TRIPS
 export const myTrips = async (req, res, next) => {
   try {
     const trips = await tripService.findMine(req.session.user._id);
@@ -35,7 +37,7 @@ export const myTrips = async (req, res, next) => {
   }
 };
 
-/* ---------------- APPROVAL PAGE ---------------- */
+// APPROVAL PAGE
 export const approvalPage = async (req, res, next) => {
   try {
     const result = await tripService.approvalPage(req.session.user);
@@ -49,7 +51,7 @@ export const approvalPage = async (req, res, next) => {
   }
 };
 
-/* ---------------- EDIT FORM ---------------- */
+// EDIT FORM
 export const showEditForm = async (req, res, next) => {
   try {
     const trip = await tripService.findByIdForOwner({
@@ -66,7 +68,7 @@ export const showEditForm = async (req, res, next) => {
   }
 };
 
-/* ---------------- UPDATE ---------------- */
+// UPDATE
 export const update = async (req, res, next) => {
   try {
     await tripService.update({
@@ -81,7 +83,7 @@ export const update = async (req, res, next) => {
   }
 };
 
-/* ---------------- APPROVAL ACTION ---------------- */
+// APPROVAL ACTION
 export const handleApproval = async (req, res, next) => {
   try {
     const result = await tripService.handleApproval({
@@ -96,7 +98,7 @@ export const handleApproval = async (req, res, next) => {
   }
 };
 
-/* ---------------- DELEGATION ---------------- */
+// DELEGATION
 export const delegateToHR = async (req, res, next) => {
   try {
     await tripService.delegateToHR({
@@ -110,7 +112,7 @@ export const delegateToHR = async (req, res, next) => {
   }
 };
 
-/* ---------------- REPORT ---------------- */
+// REPORT
 export const reportPage = async (req, res, next) => {
   try {
     const result = await tripService.report(req.session.user);
@@ -124,7 +126,7 @@ export const reportPage = async (req, res, next) => {
   }
 };
 
-/* ---------------- FINANCE ---------------- */
+// FINANCE
 export const financePage = async (req, res, next) => {
   try {
     const trips = await tripService.findApprovedForFinance();
@@ -139,7 +141,7 @@ export const financePage = async (req, res, next) => {
   }
 };
 
-/* ---------------- PAYMENT ---------------- */
+// PAYMENT
 export const confirmPayment = async (req, res, next) => {
   try {
     await tripService.confirmPayment({
@@ -153,7 +155,7 @@ export const confirmPayment = async (req, res, next) => {
   }
 };
 
-/* ---------------- HISTORY ---------------- */
+// HISTORY
 export const paymentHistoryPage = async (req, res, next) => {
   try {
     const result = await tripService.paymentHistory(req.session.user);
@@ -164,5 +166,27 @@ export const paymentHistoryPage = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+export const show = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const trip = await BusinessTrip.findById(id).populate("employees").lean();
+
+    if (!trip) {
+      return res.status(404).send("Trip not found");
+    }
+
+    return res.render("trip/user/show", {
+      title: "Detail Trip",
+      trip,
+      error: null,
+      old: {},
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Internal Server Error");
   }
 };
