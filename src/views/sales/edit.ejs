@@ -1,32 +1,123 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
   <div class="max-w-2xl mx-auto">
 
-    <h1 class="text-xl font-bold mb-6">Edit Sales Visit</h1>
+    <!-- HEADER -->
+    <div class="mb-8">
 
-    <% if (error) { %>
-      <div class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg">
-        <%= error %>
-      </div>
-    <% } %>
+      <h1 class="text-2xl font-bold text-slate-900">
+        Edit Sales Visit
+      </h1>
 
-    <form action="/sales/<%= visit._id %>/edit" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <p class="text-sm text-slate-500 mt-1">
+        Perbarui data kunjungan yang sudah dibuat
+      </p>
 
-      <input name="title" value="<%= visit.title %>" class="w-full p-3 border rounded-lg" placeholder="Title" />
+    </div>
 
-      <input name="address" value="<%= visit.address %>" class="w-full p-3 border rounded-lg" placeholder="Address" />
+    <!-- CARD -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
-      <input name="meetWith" value="<%= visit.meetWith %>" class="w-full p-3 border rounded-lg" placeholder="Meet With" />
+      <form
+        action="/sales/<%= visit._id %>/edit"
+        method="POST"
+        enctype="multipart/form-data"
+        class="p-8 space-y-6"
+      >
 
-      <textarea name="result" class="w-full p-3 border rounded-lg"><%= visit.result %></textarea>
+        <% if (error) { %>
+          <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+            <%= error %>
+          </div>
+        <% } %>
 
-      <button class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-        Update
-      </button>
+        <!-- TITLE -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Judul Kunjungan</label>
 
-    </form>
+          <input
+            name="title"
+            value="<%= visit.title %>"
+            required
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none transition-all"
+          />
+        </div>
+
+        <!-- ADDRESS -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Alamat</label>
+
+          <input
+            name="address"
+            value="<%= visit.address %>"
+            required
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none transition-all"
+          />
+        </div>
+
+        <!-- MEET WITH -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Bertemu Dengan</label>
+
+          <input
+            name="meetWith"
+            value="<%= visit.meetWith %>"
+            required
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none transition-all"
+          />
+        </div>
+
+        <!-- RESULT -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Hasil Kunjungan</label>
+
+          <textarea
+            name="result"
+            rows="5"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none resize-none transition-all"
+          ><%= visit.result %></textarea>
+        </div>
+
+        <!-- ATTACHMENT INFO -->
+        <% if (visit.attachments && visit.attachments.length > 0) { %>
+          <div class="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+            <span class="font-medium text-slate-700">Lampiran saat ini:</span>
+            <%= visit.attachments.length %> file
+          </div>
+        <% } %>
+
+        <!-- ACTION -->
+        <div class="pt-6 border-t border-slate-100 flex justify-end gap-3">
+
+          <a
+            href="/sales/my"
+            class="px-5 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition"
+          >
+            Batal
+          </a>
+
+          <button
+            type="submit"
+            class="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-xl text-sm font-bold shadow-sm transition-all"
+          >
+            Update Kunjungan
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
 
   </div>
 

@@ -70,6 +70,16 @@ const update = async ({ id, userId, body, files }) => {
     throw new Error("Tidak boleh mengedit data ini");
   }
 
+  // ⛔ 24 JAM LOCK RULE
+  const createdAt = new Date(visit.createdAt);
+  const now = Date.now();
+
+  const diffHours = (now - createdAt.getTime()) / (1000 * 60 * 60);
+
+  if (diffHours > 24) {
+    throw new Error("Data tidak bisa diedit setelah 24 jam");
+  }
+
   let { title, address, meetWith, result } = body;
 
   title = title?.trim();
@@ -81,7 +91,6 @@ const update = async ({ id, userId, body, files }) => {
   if (!address) throw new Error("Alamat wajib diisi");
   if (!meetWith) throw new Error("Bertemu dengan wajib diisi");
 
-  // FILE HANDLING (replace if new files uploaded)
   const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
   let attachments = visit.attachments || [];
@@ -110,7 +119,6 @@ const update = async ({ id, userId, body, files }) => {
 
   return visit.save();
 };
-
 export default {
   create,
   findMine,
