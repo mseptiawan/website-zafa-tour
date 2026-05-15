@@ -1,9 +1,11 @@
 import {
+  createTripService,
   getEditableTripService,
   updateTripService,
   approvalPageService,
   handleApprovalService,
   confirmPaymentService,
+  getMyTripsService,
 } from "../services/trip.service.js";
 
 export const newForm = (req, res) => {
@@ -11,8 +13,23 @@ export const newForm = (req, res) => {
 };
 
 export const create = async (req, res) => {
-  res.redirect("/trip/user/my");
+  try {
+    const trip = await createTripService({
+      user: req.session.user,
+      body: req.body,
+      error: null,
+    });
+
+    return res.redirect("/trip/my");
+  } catch (err) {
+    console.error(err);
+
+    const status = err.status || 500;
+
+    return res.status(status).send(err.message || "Gagal membuat pengajuan");
+  }
 };
+
 export const editTripForm = async (req, res) => {
   try {
     const trip = await getEditableTripService({
@@ -118,7 +135,20 @@ export const paymentHistoryPage = async (req, res) => {
 };
 
 export const myTrips = async (req, res) => {
-  res.render("trip/my", {
-    title: "My Trips",
-  });
+  try {
+    const trips = await getMyTripsService(req.session.user._id);
+
+    res.render("trip/user/my", {
+      title: "Perjalanan Saya",
+      trips,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Gagal memuat data",
+      errors: null,
+    });
+  }
 };

@@ -21,12 +21,10 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-/* REQUEST */
 router.get("/new", newForm);
 router.post("/", create);
 
-/* MY TRIPS */
-router.get("/trip/my", myTrips);
+router.get("/my", myTrips);
 
 /* EDIT (single entry point) */
 router.get("/trip/:id/edit", editTripForm);

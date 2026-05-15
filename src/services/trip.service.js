@@ -1,8 +1,114 @@
 import BusinessTrip from "../models/BusinessTrip.js";
 
-/* =========================
-   EDIT FORM SERVICE
-========================= */
+export const createTripService = async ({ user, body }) => {
+  if (!user) {
+    const err = new Error("Session tidak valid");
+    err.status = 401;
+    throw err;
+  }
+
+  let { title, purpose, startDate, endDate, destination, description, budget, meetWith, timeline } =
+    body;
+
+  title = title?.trim();
+  destination = destination?.trim();
+  description = description?.trim();
+  budget = Number(budget);
+
+  if (!Array.isArray(timeline)) {
+    timeline = timeline ? [timeline] : [];
+  }
+
+  const normalizedTimeline = timeline
+    .map((t, index) => {
+      const address = typeof t === "string" ? t : t?.address || t?.trim?.();
+
+      return {
+        address,
+        order: index + 1,
+      };
+    })
+    .filter((t) => t.address);
+
+  if (!title || title.length < 5) {
+    const err = new Error("Judul minimal 5 karakter");
+    err.status = 400;
+    throw err;
+  }
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  if (isNaN(start) || isNaN(end) || start > end) {
+    const err = new Error("Tanggal tidak valid");
+    err.status = 400;
+    throw err;
+  }
+
+  if (!destination || destination.length < 3) {
+    const err = new Error("Destination tidak valid");
+    err.status = 400;
+    throw err;
+  }
+
+  if (!description || description.length < 10) {
+    const err = new Error("Deskripsi terlalu pendek");
+    err.status = 400;
+    throw err;
+  }
+
+  if (isNaN(budget) || budget < 0) {
+    const err = new Error("Budget tidak valid");
+    err.status = 400;
+    throw err;
+  }
+
+  if (normalizedTimeline.length === 0) {
+    const err = new Error("Timeline wajib diisi");
+    err.status = 400;
+    throw err;
+  }
+
+  let currentStep = "MANAGER";
+  let status = "PENDING";
+
+  if (user.role === "MANAGER") {
+    currentStep = "PIMPINAN";
+    status = "IN_REVIEW";
+  }
+
+  if (user.role === "HR") {
+    currentStep = "MANAGER";
+    status = "PENDING";
+  }
+
+  if (user.role === "KARYAWAN" || user.role === "KEUANGAN") {
+    currentStep = "MANAGER";
+    status = "PENDING";
+  }
+
+  const trip = await BusinessTrip.create({
+    userId: user._id,
+    title,
+    purpose,
+    startDate: start,
+    endDate: end,
+    destination,
+    description,
+    budget,
+    meetWith,
+    timeline: normalizedTimeline,
+    status,
+    currentStep,
+    approvals: [],
+    delegation: {
+      active: false,
+    },
+  });
+
+  return trip;
+};
+
 export const getEditableTripService = async ({ id, userId }) => {
   const trip = await BusinessTrip.findOne({
     _id: id,
@@ -182,4 +288,12 @@ export const confirmPaymentService = async ({ id, user }) => {
   await trip.save();
 
   return trip;
+};
+
+export const getMyTripsService = async (userId) => {
+  return await BusinessTrip.find({
+    userId,
+  }).sort({
+    createdAt: -1,
+  });
 };
