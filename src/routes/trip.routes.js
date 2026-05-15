@@ -1,47 +1,48 @@
 import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
+
 import {
-  formRequest,
+  newForm,
+  create,
   myTrips,
-  reportTripPage,
-  delegateTripToHR,
-  editTripForm,
-  createTrip,
-  showEditTrip,
-  paymentHistoryPage,
-  resubmitUpdateTrip,
   approvalPage,
-  updateTrip,
+  showEditForm,
+  update,
   handleApproval,
-  financeTripPage,
+  delegateToHR,
+  reportPage,
+  financePage,
   confirmPayment,
+  paymentHistoryPage,
 } from "../controllers/trip.controller.js";
 
 const router = express.Router();
 
-router.get("/trip/request", authMiddleware, formRequest);
-router.post("/trip/request", authMiddleware, createTrip);
-router.get("/trip/my", authMiddleware, myTrips);
-router.get(
-  "/trip/approval",
-  authMiddleware,
-  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
-  approvalPage
-);
-router.get("/trip/edit/:id", authMiddleware, editTripForm);
-router.post("/trip/edit/:id", authMiddleware, updateTrip);
-router.get("/trip/:id/edit", authMiddleware, showEditTrip);
-router.get("/trip/report", authMiddleware, reportTripPage);
-router.post("/trip/:id/update", authMiddleware, resubmitUpdateTrip);
-router.post("/trip/approval/:id", authMiddleware, handleApproval);
-router.post("/trip/:id/delegate", authMiddleware, delegateTripToHR);
-router.get("/finance/trips", roleMiddleware("KEUANGAN"), financeTripPage);
+router.use(authMiddleware);
 
-router.post("/finance/trips/:id/pay", roleMiddleware("KEUANGAN"), confirmPayment);
+router.get("/new", newForm);
+router.post("/", create);
+
+router.get("/my", myTrips);
+
+router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
+router.post("/:id/approval", handleApproval);
+
+router.get("/:id/edit", showEditForm);
+router.post("/:id", update);
+
+router.post("/:id/delegate", delegateToHR);
+
+router.get("/report", reportPage);
+
+router.get("/finance", roleMiddleware(["KEUANGAN"]), financePage);
+router.post("/finance/:id/pay", roleMiddleware(["KEUANGAN"]), confirmPayment);
+
 router.get(
-  "/finance/payment-history",
+  "/finance/history",
   roleMiddleware(["MANAGER", "HR", "PIMPINAN", "KEUANGAN"]),
   paymentHistoryPage
 );
+
 export default router;

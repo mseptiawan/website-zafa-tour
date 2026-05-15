@@ -34,14 +34,12 @@ const create = async ({ body, files, userId }) => {
   });
 };
 
-/* ---------------- FIND ---------------- */
 const findMine = (userId) => SalesVisit.find({ userId }).sort({ createdAt: -1 });
 
 const findAll = () => SalesVisit.find().populate("userId").sort({ createdAt: -1 });
 
 const findById = (id) => SalesVisit.findById(id).populate("userId");
 
-/* ---------------- UPDATE ---------------- */
 const update = async ({ id, userId, body, files }) => {
   const visit = await SalesVisit.findById(id);
 
@@ -49,22 +47,18 @@ const update = async ({ id, userId, body, files }) => {
     throw new Error("Data tidak ditemukan");
   }
 
-  // ✔ OWNERSHIP CHECK
   if (visit.userId.toString() !== userId) {
     throw new Error("Tidak boleh mengedit data ini");
   }
 
-  // ⛔ 24 HOURS LOCK RULE
   const diffHours = (Date.now() - new Date(visit.createdAt).getTime()) / (1000 * 60 * 60);
 
   if (diffHours > 24) {
     throw new Error("Data tidak bisa diedit setelah 24 jam");
   }
 
-  // ✔ ZOD VALIDATION
   const data = validateData(updateSalesVisitSchema, body);
 
-  // ✔ FILE HANDLING
   let attachments = visit.attachments || [];
 
   if (files && files.length > 0) {
@@ -83,7 +77,6 @@ const update = async ({ id, userId, body, files }) => {
     });
   }
 
-  // ✔ APPLY UPDATE
   Object.assign(visit, data);
   visit.attachments = attachments;
 
