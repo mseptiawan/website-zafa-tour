@@ -1,49 +1,30 @@
 import SalesVisit from "../models/SalesVisit.js";
 
-/*
-|--------------------------------------------------------------------------
-| HALAMAN FORM SALES VISIT
-|--------------------------------------------------------------------------
-*/
 export const visitForm = (req, res) => {
   res.render("sales/visit", {
     title: "Input Sales Visit",
+    error: null,
+    old: {},
   });
 };
 
-/*
-|--------------------------------------------------------------------------
-| SIMPAN KUNJUNGAN SALES
-|--------------------------------------------------------------------------
-*/
 export const storeVisit = async (req, res) => {
   try {
     const user = req.session.user;
 
-    // =========================
-    // SESSION VALIDATION
-    // =========================
     if (!user) {
       return res.status(401).send("Session tidak valid");
     }
 
-    // =========================
-    // BODY
-    // =========================
     let { customerName, address, meetWith, result, note } = req.body;
 
-    // =========================
-    // TRIM
-    // =========================
     customerName = customerName?.trim();
     address = address?.trim();
     meetWith = meetWith?.trim();
     result = result?.trim();
     note = note?.trim();
 
-    // =========================
-    // REQUIRED VALIDATION
-    // =========================
+    // VALIDATION
     if (!customerName) {
       return res.status(400).send("Nama toko / customer wajib diisi");
     }
@@ -56,9 +37,6 @@ export const storeVisit = async (req, res) => {
       return res.status(400).send("Bertemu dengan wajib diisi");
     }
 
-    // =========================
-    // LENGTH VALIDATION
-    // =========================
     if (customerName.length > 100) {
       return res.status(400).send("Nama customer maksimal 100 karakter");
     }
@@ -79,65 +57,45 @@ export const storeVisit = async (req, res) => {
       return res.status(400).send("Catatan maksimal 500 karakter");
     }
 
-    // =========================
-    // PHOTO VALIDATION
-    // =========================
-    let photos = [];
+    // FILE HANDLING (ONLY req.files)
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
-    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    const files = req.files || [];
 
-    // SINGLE FILE
-    if (req.file) {
-      if (!allowedMimeTypes.includes(req.file.mimetype)) {
-        return res.status(400).send("Format foto harus JPG, PNG, atau WEBP");
-      }
+    const invalidFile = files.find((file) => !allowedMimeTypes.includes(file.mimetype));
 
-      photos.push(`/uploads/${req.file.filename}`);
+    if (invalidFile) {
+      return res.status(400).send("Format file tidak valid (JPG, PNG, WEBP, PDF)");
     }
 
-    // MULTIPLE FILE
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        if (!allowedMimeTypes.includes(file.mimetype)) {
-          return res.status(400).send("Format foto harus JPG, PNG, atau WEBP");
-        }
-      }
+    const attachments = files.map((file) => ({
+      filename: file.filename,
+      originalName: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size,
+      path: `/uploads/files/${file.filename}`,
+    }));
 
-      photos = req.files.map((file) => `/uploads/${file.filename}`);
-    }
-
-    // =========================
     // SAVE
-    // =========================
     await SalesVisit.create({
-      userId: new mongoose.Types.ObjectId(user._id),
+      userId: user._id,
 
       customerName,
       address,
-      meetWith,
       result,
       note,
 
-      photos,
+      attachments,
 
       visitTime: new Date(),
     });
 
-    // =========================
-    // REDIRECT
-    // =========================
     return res.redirect("/sales/report");
   } catch (err) {
     console.log("STORE SALES VISIT ERROR:", err);
-
     return res.status(500).send("Gagal menyimpan sales visit");
   }
 };
-/*
-|--------------------------------------------------------------------------
-| LIST SALES VISIT USER
-|--------------------------------------------------------------------------
-*/
 export const myVisits = async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -156,11 +114,6 @@ export const myVisits = async (req, res) => {
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| DETAIL SALES VISIT
-|--------------------------------------------------------------------------
-*/
 export const visitDetail = async (req, res) => {
   try {
     const visit = await SalesVisit.findById(req.params.id).populate("userId");
@@ -184,7 +137,7 @@ export const salesReport = async (req, res) => {
 
     res.render("sales/report", {
       title: "Laporan Sales",
-      visits: visits || [], // 🔥 PENTING
+      visits: visits || [],
       user: req.session.user,
     });
   } catch (err) {
@@ -192,14 +145,13 @@ export const salesReport = async (req, res) => {
     res.status(500).send("Error load sales report");
   }
 };
-import mongoose from "mongoose";
 
 export const salesHistory = async (req, res) => {
   try {
     const user = req.session.user;
 
     const visits = await SalesVisit.find({
-      userId: new mongoose.Types.ObjectId(user._id), // ← convert String ke ObjectId
+      userId: new mongoose.Types.ObjectId(user._id),
     }).sort({ createdAt: -1 });
 
     res.render("sales/history", {

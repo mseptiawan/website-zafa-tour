@@ -1,31 +1,54 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
   <div class="max-w-2xl mx-auto">
 
     <!-- HEADER -->
-    <div class="mb-6">
-      <h1 class="text-xl font-medium text-slate-800">
+    <div class="mb-8">
+
+      <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+        <span>Workspace</span>
+
+        <span class="text-slate-300">/</span>
+
+        <span class="text-slate-900">
+          Sales Visit
+        </span>
+      </nav>
+
+      <h1 class="text-2xl font-bold text-slate-900">
         Input Sales Visit
       </h1>
 
-      <p class="text-sm text-slate-500 mt-1">
+      <p class="text-[14px] text-slate-500 mt-1">
         Catat kunjungan toko, customer, atau prospek
       </p>
+
     </div>
 
     <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
-      <form action="/sales/visit"
+      <form
+        action="/sales/visit"
         method="POST"
         enctype="multipart/form-data"
-        class="space-y-4">
+        class="p-8 space-y-6"
+      >
+
+        <% if (error) { %>
+
+          <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+            <%= error %>
+          </div>
+
+        <% } %>
 
         <!-- CUSTOMER -->
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-bold text-slate-700">
             Nama Toko / Customer
           </label>
 
@@ -33,15 +56,19 @@
             type="text"
             name="customerName"
             required
-            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
-            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            value="<%= old?.customerName || '' %>"
             placeholder="Contoh: Toko Sinar Jaya"
-          >
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none transition-all"
+          />
+
         </div>
 
-        <!-- ALAMAT -->
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">
+        <!-- ADDRESS -->
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-bold text-slate-700">
             Alamat
           </label>
 
@@ -49,15 +76,19 @@
             type="text"
             name="address"
             required
-            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
-            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            value="<%= old?.address || '' %>"
             placeholder="Alamat lengkap customer"
-          >
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none transition-all"
+          />
+
         </div>
 
-        <!-- MEET -->
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">
+        <!-- MEET WITH -->
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-bold text-slate-700">
             Bertemu Dengan
           </label>
 
@@ -65,49 +96,158 @@
             type="text"
             name="meetWith"
             required
-            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
-            focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            value="<%= old?.meetWith || '' %>"
             placeholder="Owner / staff / manager"
-          >
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none transition-all"
+          />
+
         </div>
 
         <!-- RESULT -->
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-bold text-slate-700">
             Hasil Kunjungan
           </label>
 
           <textarea
             name="result"
-            rows="3"
+            rows="5"
             maxlength="500"
-            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
-            focus:outline-none focus:ring-1 focus:ring-indigo-400"
             placeholder="Jelaskan hasil kunjungan..."
-          ></textarea>
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
+            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+            outline-none resize-none transition-all"
+          ><%= old?.result || '' %></textarea>
+
         </div>
 
         <!-- FILE -->
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">
+        <div class="space-y-1.5">
+
+          <label class="text-[13px] font-bold text-slate-700">
             Foto Bukti
+            <span class="text-slate-400 font-normal">
+              (Opsional)
+            </span>
           </label>
 
-          <input
-            type="file"
-            name="photo"
-            class="w-full text-sm border border-slate-200 rounded-lg p-2 bg-slate-50"
-          >
+          <div class="relative group">
+
+           <input
+  type="file"
+  name="attachments"
+  id="file-input"
+  multiple
+  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+  onchange="handleFileSelect(this)"
+/>
+
+            <!-- EMPTY -->
+            <div
+              id="dropzone-empty"
+              class="border-2 border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300 transition-all"
+            >
+
+              <svg
+                class="w-8 h-8 text-slate-400 mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+
+              <p class="text-sm text-slate-600 font-medium">
+                Klik untuk upload foto
+              </p>
+
+              <p class="text-xs text-slate-400 mt-1">
+                PNG, JPG (Maks. 5MB)
+              </p>
+
+            </div>
+
+            <!-- FILLED -->
+            <div
+              id="dropzone-filled"
+              class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm"
+            >
+
+              <div class="flex items-center gap-3">
+
+                <div class="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
+                  <img
+                    id="img-preview"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div class="overflow-hidden">
+
+                  <p
+                    id="name-preview"
+                    class="text-sm font-bold text-slate-800 truncate max-w-[200px]"
+                  >
+                    image.jpg
+                  </p>
+
+                  <p
+                    id="size-preview"
+                    class="text-xs text-slate-400"
+                  >
+                    0 MB
+                  </p>
+
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                onclick="clearFile()"
+                class="p-2 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-colors"
+              >
+
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M6 18L18 6M6 6l12 12"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+
+              </button>
+
+            </div>
+
+          </div>
+
         </div>
 
-
         <!-- BUTTON -->
-        <button
-          type="submit"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-lg transition"
-        >
-          Simpan Kunjungan
-        </button>
+        <div class="pt-6 border-t border-slate-100 flex items-center justify-end">
+
+          <button
+            type="submit"
+            class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
+          >
+            Simpan Kunjungan
+          </button>
+
+        </div>
 
       </form>
 
@@ -116,3 +256,44 @@
   </div>
 
 </div>
+<script>
+  function handleFileSelect(input) {
+    if (input.files && input.files.length > 0) {
+
+      const files = Array.from(input.files);
+
+      const firstFile = files[0];
+
+      document.getElementById("name-preview").textContent =
+        firstFile.name + (files.length > 1 ? ` (+${files.length - 1} lainnya)` : "");
+
+      document.getElementById("size-preview").textContent =
+        (firstFile.size / (1024 * 1024)).toFixed(2) + " MB";
+
+      const reader = new FileReader();
+
+      if (firstFile.type.startsWith("image/")) {
+        reader.onload = (e) => {
+          document.getElementById("img-preview").src = e.target.result;
+        };
+        reader.readAsDataURL(firstFile);
+      }
+
+      document.getElementById("dropzone-empty")
+        .classList.add("hidden");
+
+      document.getElementById("dropzone-filled")
+        .classList.remove("hidden");
+    }
+  }
+
+  function clearFile() {
+    document.getElementById("file-input").value = "";
+
+    document.getElementById("dropzone-empty")
+      .classList.remove("hidden");
+
+    document.getElementById("dropzone-filled")
+      .classList.add("hidden");
+  }
+</script>

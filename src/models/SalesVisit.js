@@ -10,10 +10,17 @@ const salesVisitSchema = new mongoose.Schema(
     customerName: String,
     address: String,
 
-    note: String,
     result: String,
 
-    photos: [String],
+    attachments: [
+      {
+        filename: String,
+        originalName: String,
+        mimetype: String,
+        size: Number,
+        path: String,
+      },
+    ],
 
     visitTime: Date,
   },
