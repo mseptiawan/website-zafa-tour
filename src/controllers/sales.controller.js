@@ -69,7 +69,7 @@ export const report = async (req, res, next) => {
   }
 };
 
-export const editForm = async (req, res, next) => {
+export const edit = async (req, res, next) => {
   try {
     const visit = await salesService.findById(req.params.id);
     if (!visit) {
@@ -98,7 +98,7 @@ export const editForm = async (req, res, next) => {
 | UPDATE
 |-----------------------------
 */
-export const updateVisit = async (req, res, next) => {
+export const update = async (req, res, next) => {
   try {
     await salesService.update({
       id: req.params.id,

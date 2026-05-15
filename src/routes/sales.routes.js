@@ -9,8 +9,8 @@ import {
   myVisits,
   report,
   show,
-  editForm,
-  updateVisit,
+  edit,
+  update,
 } from "../controllers/sales.controller.js";
 
 const router = express.Router();
@@ -28,8 +28,8 @@ router.get("/report", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), report);
 
 router.get("/:id", show);
 
-router.get("/:id/edit", authMiddleware, editForm);
+router.get("/:id/edit", authMiddleware, edit);
 
-router.post("/:id/edit", authMiddleware, uploadFile.array("attachments", 5), updateVisit);
+router.post("/:id/edit", authMiddleware, uploadFile.array("attachments", 5), update);
 
 export default router;
