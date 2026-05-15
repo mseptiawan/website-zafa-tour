@@ -27,7 +27,7 @@ export const index = async (req, res, next) => {
   try {
     const announcements = await announcementService.getAll();
 
-    res.render("announcement/all", {
+    res.render("announcement/index", {
       title: "Semua Pengumuman",
       announcements,
       user: req.session.user,
@@ -41,7 +41,7 @@ export const show = async (req, res, next) => {
   try {
     const announcement = await announcementService.getById(req.params.id);
 
-    res.render("announcement/detail", {
+    res.render("announcement/show", {
       title: "Detail Pengumuman",
       announcement,
       user: req.session.user,

@@ -57,7 +57,7 @@ export const index = async (req, res, next) => {
       page,
     });
 
-    res.render("assignment/all", {
+    res.render("assignment/index", {
       title: "Semua Penugasan",
       assignments: result.assignments,
       pagination: result.pagination,
@@ -72,7 +72,7 @@ export const show = async (req, res, next) => {
   try {
     const assignment = await assignmentService.findById(req.params.id);
 
-    res.render("assignment/detail", {
+    res.render("assignment/show", {
       title: "Detail Penugasan",
       assignment,
     });

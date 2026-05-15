@@ -1,7 +1,7 @@
 import salesService from "../services/sales.service.js";
 
 export const newForm = (req, res) => {
-  res.render("sales/visit", {
+  res.render("sales/create", {
     title: "Input Sales Visit",
     error: null,
     old: {},
@@ -16,9 +16,9 @@ export const create = async (req, res) => {
       userId: req.session.user._id,
     });
 
-    return res.redirect("/sales/report");
+    return res.redirect("/sales/my");
   } catch (err) {
-    return res.status(400).render("sales/visit", {
+    return res.status(400).render("sales/create", {
       title: "Input Sales Visit",
       error: err.message,
       old: req.body,
@@ -46,7 +46,7 @@ export const show = async (req, res, next) => {
 
     if (!visit) return res.status(404).send("Data tidak ditemukan");
 
-    res.render("sales/detail", {
+    res.render("sales/show", {
       title: "Detail Sales Visit",
       visit,
     });

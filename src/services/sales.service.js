@@ -3,14 +3,14 @@ import {
   createSalesVisitSchema,
   updateSalesVisitSchema,
 } from "../validations/sales-visit/sales.validation.js";
-import { validate } from "../middlewares/validate.js";
+import { validateData } from "../utils/validateData.js";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
 /* ---------------- CREATE ---------------- */
 const create = async ({ body, files, userId }) => {
   // ✔ ZOD VALIDATION (single source of truth)
-  const data = validate(createSalesVisitSchema, body);
+  const data = validateData(createSalesVisitSchema, body);
 
   const attachments = (files || []).map((file) => {
     if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -62,7 +62,7 @@ const update = async ({ id, userId, body, files }) => {
   }
 
   // ✔ ZOD VALIDATION
-  const data = validate(updateSalesVisitSchema, body);
+  const data = validateData(updateSalesVisitSchema, body);
 
   // ✔ FILE HANDLING
   let attachments = visit.attachments || [];

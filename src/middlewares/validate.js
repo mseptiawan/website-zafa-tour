@@ -1,22 +1,15 @@
-export const validate = (schema) => (req, res, next) => {
-  const result = schema.safeParse({
-    ...req.body,
-    file: req.file,
-    files: req.files,
-  });
+export const validate =
+  (schema, source = "body") =>
+  (req, res, next) => {
+    const result = schema.safeParse(req[source]);
 
-  if (!result.success) {
-    return res.status(400).json({
-      success: false,
-      message: "Validation error",
-      errors: result.error.errors.map((e) => ({
-        field: e.path[0],
-        message: e.message,
-      })),
-    });
-  }
+    if (!result.success) {
+      const error = new Error("Validation error");
+      error.status = 400;
+      error.details = result.error.errors;
+      return next(error);
+    }
 
-  req.body = result.data;
-
-  next();
-};
+    req.validated = result.data;
+    next();
+  };

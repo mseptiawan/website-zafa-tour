@@ -19,7 +19,7 @@ router.use(authMiddleware);
 
 // FORM + CREATE
 router.get("/new", newForm);
-router.post("/create", uploadFile.array("attachments", 5), create);
+router.post("/", uploadFile.array("attachments", 5), create);
 
 // READ
 router.get("/my", myVisits);
