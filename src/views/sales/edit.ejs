@@ -1,0 +1,33 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+
+  <div class="max-w-2xl mx-auto">
+
+    <h1 class="text-xl font-bold mb-6">Edit Sales Visit</h1>
+
+    <% if (error) { %>
+      <div class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/sales/<%= visit._id %>/edit" method="POST" enctype="multipart/form-data" class="space-y-4">
+
+      <input name="title" value="<%= visit.title %>" class="w-full p-3 border rounded-lg" placeholder="Title" />
+
+      <input name="address" value="<%= visit.address %>" class="w-full p-3 border rounded-lg" placeholder="Address" />
+
+      <input name="meetWith" value="<%= visit.meetWith %>" class="w-full p-3 border rounded-lg" placeholder="Meet With" />
+
+      <textarea name="result" class="w-full p-3 border rounded-lg"><%= visit.result %></textarea>
+
+      <button class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+        Update
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

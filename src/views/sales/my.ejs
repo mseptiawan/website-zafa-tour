@@ -2,106 +2,115 @@
 
 <div class="ml-72 min-h-screen bg-slate-50 p-6">
 
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w-5xl mx-auto">
 
     <!-- HEADER -->
     <div class="mb-6 flex items-center justify-between">
+
       <div>
-        <h1 class="text-xl font-medium text-slate-800">
-          Riwayat Kunjungan
+        <h1 class="text-2xl font-semibold text-slate-800">
+          Riwayat Sales Visit
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-          Daftar sales visit yang pernah kamu lakukan
+          Daftar kunjungan yang telah kamu lakukan
         </p>
       </div>
 
-      
-     <a
-  href="/sales/new"
-  class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
->
-  + Tambah Kunjungan
-</a>
+      <a href="/sales/new"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+        + Tambah Kunjungan
+      </a>
+
     </div>
 
-    <!-- EMPTY STATE -->
+    <!-- EMPTY -->
     <% if (visits.length === 0) { %>
-      <div class="bg-white border border-slate-200 rounded-2xl p-10 text-center">
-        <p class="text-slate-400 text-sm">Belum ada riwayat kunjungan.</p>
+      <div class="bg-white border border-slate-200 rounded-xl py-14 text-center">
+        <p class="text-sm text-slate-500">Belum ada data kunjungan</p>
       </div>
-
     <% } else { %>
 
       <!-- LIST -->
       <div class="space-y-3">
 
-        <% visits.forEach(visit => { %>
-          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+        <% visits.forEach(v => { %>
+
+          <div class="bg-white border border-slate-200 rounded-xl px-5 py-4 hover:border-slate-300 transition">
 
             <div class="flex items-start justify-between gap-4">
 
-              <!-- INFO -->
-              <div class="flex-1 min-w-0">
+              <!-- LEFT -->
+              <div class="min-w-0 flex-1">
 
-                <!-- CUSTOMER -->
-                <p class="text-sm font-medium text-slate-800 truncate">
-                  <%= visit.customerName %>
+                <!-- TITLE -->
+                <h2 class="text-[15px] font-medium text-slate-800 break-words">
+                  <%= v.title %>
+                </h2>
+
+                <!-- ADDRESS -->
+                <p class="text-sm text-slate-500 mt-1 truncate">
+                  <%= v.address %>
                 </p>
-
-                <!-- ALAMAT -->
-                <p class="text-xs text-slate-400 mt-0.5 truncate">
-                  <%= visit.address %>
-                </p>
-
-                <!-- HASIL -->
-                <% if (visit.result) { %>
-                  <p class="text-xs text-slate-600 mt-2 line-clamp-2">
-                    <%= visit.result %>
-                  </p>
-                <% } %>
 
                 <!-- META -->
-                <div class="flex items-center gap-3 mt-3">
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-[13px] text-slate-500">
 
-                  <!-- TANGGAL -->
-                  <span class="text-xs text-slate-400">
-                    <%= new Date(visit.visitTime || visit.createdAt).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    }) %>
-                  </span>
-
-                  <!-- FOTO BADGE -->
-                  <% if (visit.photos && visit.photos.length > 0) { %>
-                    <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
-                      <%= visit.photos.length %> foto
+                  <div>
+                    <span class="text-slate-400">Meet:</span>
+                    <span class="text-slate-700 ml-1">
+                      <%= v.meetWith %>
                     </span>
-                  <% } %>
+                  </div>
 
-                  <!-- GPS BADGE -->
-                  <% if (visit.location?.lat) { %>
-                    <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
-                      GPS
+                  <div>
+                    <span class="text-slate-400">Waktu:</span>
+                    <span class="text-slate-700 ml-1">
+                      <%= new Date(v.visitTime).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric"
+                      }) %>
                     </span>
+                  </div>
+
+                  <% if (v.attachments && v.attachments.length > 0) { %>
+                    <div>
+                      <span class="text-slate-400">Lampiran:</span>
+                      <span class="text-slate-700 ml-1">
+                        <%= v.attachments.length %> file
+                      </span>
+                    </div>
                   <% } %>
 
                 </div>
+
+                <!-- RESULT -->
+                <% if (v.result) { %>
+                  <p class="text-xs text-slate-600 mt-3 line-clamp-2">
+                    <%= v.result %>
+                  </p>
+                <% } %>
+
               </div>
 
-              <!-- FOTO THUMBNAIL -->
-             <% if (visit.photos && visit.photos.length > 0 && visit.photos[0]) { %>
-  <img
-    src="<%= visit.photos[0] %>"
-    alt="foto"
-    class="w-16 h-16 object-cover rounded-lg border border-slate-200 flex-shrink-0"
-    onerror="this.style.display='none'"
-  >
-<% } %>
+              <!-- RIGHT ACTION -->
+              <div class="flex items-start gap-3">
+
+                <!-- EDIT ICON -->
+                <a href="/sales/<%= v._id %>/edit"
+                   class="text-slate-400 hover:text-indigo-600 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+                    <path d="M20.71 7.04a1.003 1.003 0 000-1.42l-2.34-2.34a1.003 1.003 0 00-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+                  </svg>
+                </a>
+
+              </div>
 
             </div>
 
           </div>
+
         <% }) %>
 
       </div>

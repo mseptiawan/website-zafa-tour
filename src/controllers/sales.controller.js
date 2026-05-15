@@ -68,3 +68,47 @@ export const report = async (req, res, next) => {
     next(err);
   }
 };
+
+export const editForm = async (req, res, next) => {
+  try {
+    const visit = await salesService.findById(req.params.id);
+    if (!visit) {
+      return res.status(404).send("Data tidak ditemukan");
+    }
+
+    const ownerId = String(visit.userId._id || visit.userId);
+    const sessionId = String(req.session.user._id);
+
+    if (ownerId !== sessionId) {
+      return res.status(403).send("Tidak diizinkan");
+    }
+
+    res.render("sales/edit", {
+      title: "Edit Sales Visit",
+      visit,
+      error: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/*
+|-----------------------------
+| UPDATE
+|-----------------------------
+*/
+export const updateVisit = async (req, res, next) => {
+  try {
+    await salesService.update({
+      id: req.params.id,
+      userId: req.session.user._id,
+      body: req.body,
+      files: req.files,
+    });
+
+    return res.redirect("/sales/my");
+  } catch (err) {
+    next(err);
+  }
+};
