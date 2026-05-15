@@ -11,6 +11,7 @@ import {
   update,
   handleApproval,
   show,
+  resubmitForm,
   delegateToHR,
   reportPage,
   financePage,
@@ -42,6 +43,8 @@ router.get(
 );
 
 router.get("/:id/edit", showEditForm);
+
+router.get("/:id/edit", resubmitForm);
 
 router.get("/:id", show);
 
