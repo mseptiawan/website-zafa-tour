@@ -62,6 +62,8 @@ export const showEditForm = async (req, res, next) => {
     return res.render("trip/user/edit", {
       title: "Edit Dinas Luar",
       trip,
+      error: null,
+      old: {},
     });
   } catch (err) {
     next(err);
