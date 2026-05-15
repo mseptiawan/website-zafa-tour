@@ -1,25 +1,23 @@
 import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
-import { uploadFile } from "../middlewares/uploadFile.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
+import { uploadFile } from "../middlewares/uploadFile.js";
 
-import {
-  visitForm,
-  salesHistory,
-  storeVisit,
-  salesReport,
-} from "../controllers/salesController.js";
+import { newForm, create, myVisits, report, show } from "../controllers/sales.controller.js";
 
 const router = express.Router();
 
-router.get("/sales/visit", authMiddleware, visitForm);
-router.post("/visit", authMiddleware, uploadFile.array("attachments", 5), storeVisit);
-router.get("/sales/history", authMiddleware, salesHistory);
-router.get(
-  "/sales/report",
-  authMiddleware,
-  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
-  salesReport
-);
+router.use(authMiddleware);
+
+// FORM + CREATE
+router.get("/new", newForm);
+router.post("/create", uploadFile.array("attachments", 5), create);
+
+// READ
+router.get("/my", myVisits);
+
+router.get("/report", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), report);
+
+router.get("/:id", show);
 
 export default router;

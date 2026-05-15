@@ -1,4 +1,4 @@
-import Bidang from "../../models/Bidang.js";
+ackimport Bidang from "../../models/Bidang.js";
 
 const bidangSeeder = async () => {
   await Bidang.deleteMany();

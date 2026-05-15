@@ -19,7 +19,7 @@ router.use("/", overtimeRoutes);
 router.use("/", attendanceRoutes);
 router.use("/", kpiRoutes);
 router.use("/", tripRoutes);
-router.use("/", salesRoutes);
+router.use("/sales", salesRoutes);
 router.use("/assignment", assignmentRoutes);
 router.use("/announcement", announcementRoutes);
 router.use("/", expenseRoutes);

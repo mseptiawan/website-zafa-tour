@@ -4,17 +4,12 @@
 
   <div class="max-w-2xl mx-auto">
 
-    <!-- HEADER -->
     <div class="mb-8">
 
       <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
         <span>Workspace</span>
-
         <span class="text-slate-300">/</span>
-
-        <span class="text-slate-900">
-          Sales Visit
-        </span>
+        <span class="text-slate-900">Sales Visit</span>
       </nav>
 
       <h1 class="text-2xl font-bold text-slate-900">
@@ -31,33 +26,31 @@
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
       <form
-        action="/sales/visit"
+        action="/sales/"
         method="POST"
         enctype="multipart/form-data"
         class="p-8 space-y-6"
       >
 
         <% if (error) { %>
-
           <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
             <%= error %>
           </div>
-
         <% } %>
 
-        <!-- CUSTOMER -->
+        <!-- TITLE -->
         <div class="space-y-1.5">
 
           <label class="text-[13px] font-bold text-slate-700">
-            Nama Toko / Customer
+            Judul Kunjungan
           </label>
 
           <input
             type="text"
-            name="customerName"
+            name="title"
             required
-            value="<%= old?.customerName || '' %>"
-            placeholder="Contoh: Toko Sinar Jaya"
+            value="<%= old?.title || '' %>"
+            placeholder="Contoh: Visit Toko Sinar Jaya"
             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
             focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
             outline-none transition-all"
@@ -97,7 +90,7 @@
             name="meetWith"
             required
             value="<%= old?.meetWith || '' %>"
-            placeholder="Owner / staff / manager"
+            placeholder="Owner / manager / staff"
             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px]
             focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
             outline-none transition-all"
@@ -129,21 +122,19 @@
 
           <label class="text-[13px] font-bold text-slate-700">
             Foto Bukti
-            <span class="text-slate-400 font-normal">
-              (Opsional)
-            </span>
+            <span class="text-slate-400 font-normal">(Opsional)</span>
           </label>
 
           <div class="relative group">
 
-           <input
-  type="file"
-  name="attachments"
-  id="file-input"
-  multiple
-  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-  onchange="handleFileSelect(this)"
-/>
+            <input
+              type="file"
+              name="attachments"
+              id="file-input"
+              multiple
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              onchange="handleFileSelect(this)"
+            />
 
             <!-- EMPTY -->
             <div
@@ -151,12 +142,7 @@
               class="border-2 border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300 transition-all"
             >
 
-              <svg
-                class="w-8 h-8 text-slate-400 mb-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   stroke-width="1.5"
@@ -170,7 +156,7 @@
               </p>
 
               <p class="text-xs text-slate-400 mt-1">
-                PNG, JPG (Maks. 5MB)
+                PNG, JPG, PDF (maks 5MB)
               </p>
 
             </div>
@@ -184,25 +170,16 @@
               <div class="flex items-center gap-3">
 
                 <div class="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
-                  <img
-                    id="img-preview"
-                    class="w-full h-full object-cover"
-                  />
+                  <img id="img-preview" class="w-full h-full object-cover" />
                 </div>
 
                 <div class="overflow-hidden">
 
-                  <p
-                    id="name-preview"
-                    class="text-sm font-bold text-slate-800 truncate max-w-[200px]"
-                  >
-                    image.jpg
+                  <p id="name-preview" class="text-sm font-bold text-slate-800 truncate max-w-[200px]">
+                    file
                   </p>
 
-                  <p
-                    id="size-preview"
-                    class="text-xs text-slate-400"
-                  >
+                  <p id="size-preview" class="text-xs text-slate-400">
                     0 MB
                   </p>
 
@@ -215,20 +192,7 @@
                 onclick="clearFile()"
                 class="p-2 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-colors"
               >
-
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M6 18L18 6M6 6l12 12"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-
+                ✕
               </button>
 
             </div>
@@ -237,12 +201,11 @@
 
         </div>
 
-        <!-- BUTTON -->
-        <div class="pt-6 border-t border-slate-100 flex items-center justify-end">
+        <div class="pt-6 border-t border-slate-100 flex justify-end">
 
           <button
             type="submit"
-            class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
+            class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all"
           >
             Simpan Kunjungan
           </button>
@@ -256,16 +219,16 @@
   </div>
 
 </div>
+
 <script>
   function handleFileSelect(input) {
     if (input.files && input.files.length > 0) {
 
       const files = Array.from(input.files);
-
       const firstFile = files[0];
 
       document.getElementById("name-preview").textContent =
-        firstFile.name + (files.length > 1 ? ` (+${files.length - 1} lainnya)` : "");
+        firstFile.name + (files.length > 1 ? ` (+${files.length - 1})` : "");
 
       document.getElementById("size-preview").textContent =
         (firstFile.size / (1024 * 1024)).toFixed(2) + " MB";
@@ -279,21 +242,14 @@
         reader.readAsDataURL(firstFile);
       }
 
-      document.getElementById("dropzone-empty")
-        .classList.add("hidden");
-
-      document.getElementById("dropzone-filled")
-        .classList.remove("hidden");
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
     }
   }
 
   function clearFile() {
     document.getElementById("file-input").value = "";
-
-    document.getElementById("dropzone-empty")
-      .classList.remove("hidden");
-
-    document.getElementById("dropzone-filled")
-      .classList.add("hidden");
+    document.getElementById("dropzone-empty").classList.remove("hidden");
+    document.getElementById("dropzone-filled").classList.add("hidden");
   }
 </script>

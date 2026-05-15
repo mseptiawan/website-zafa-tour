@@ -7,8 +7,20 @@ const salesVisitSchema = new mongoose.Schema(
       ref: "User",
     },
 
-    customerName: String,
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 100,
+    },
+
     address: String,
+
+    meetWith: {
+      type: String,
+      required: true,
+      maxlength: 100,
+    },
 
     result: String,
 
