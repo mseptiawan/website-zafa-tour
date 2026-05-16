@@ -81,26 +81,55 @@
 
                       </td>
 
-                      <td class="px-6 py-4 flex gap-2">
+                      <td class="px-6 py-4 flex items-center gap-2">
 
-                        <!-- DETAIL (FULL PAGE) -->
-                        <a href="/trip/<%= t._id %>"
-                          class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100">
-                          Detail
+                        <!-- DETAIL -->
+                        <a href="/trip/<%= t._id %>" title="Detail"
+                          class="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
+
+                          <!-- eye icon -->
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5
+           c4.478 0 8.268 2.943 9.542 7
+           -1.274 4.057-5.064 7-9.542 7
+           -4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+
                         </a>
 
+                        <!-- EDIT -->
                         <% if (t.status==='PENDING' ) { %>
-                          <a href="/trip/<%= t._id %>/edit"
-                            class="px-3 py-1.5 text-xs rounded-lg bg-amber-400 text-white hover:bg-amber-500">
-                            Edit
+
+                          <a href="/trip/<%= t._id %>/edit" title="Edit"
+                            class="p-2 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition">
+
+                            <!-- pencil icon (correct edit icon) -->
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5
+               L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
+                            </svg>
+
                           </a>
+
                           <% } %>
 
+                            <!-- RESUBMIT -->
                             <% if (t.status==='REJECTED' ) { %>
-                              <a href="/trip/<%= t._id %>/edit"
-                                class="px-3 py-1.5 text-xs rounded-lg bg-emerald-500 text-white hover:bg-emerald-600">
-                                Resubmit
+
+                              <a href="/trip/<%= t._id %>/edit" title="Resubmit"
+                                class="p-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition">
+
+                                <!-- refresh icon -->
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581
+             M5.08 13a7 7 0 0113.84 0
+             M18.92 11A7 7 0 005.08 11" />
+                                </svg>
+
                               </a>
+
                               <% } %>
 
                       </td>

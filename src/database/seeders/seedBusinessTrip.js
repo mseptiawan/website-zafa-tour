@@ -26,6 +26,14 @@ const titles = [
 
 const destinations = ["Jakarta", "Bandung", "Surabaya", "Palembang", "Yogyakarta", "Medan"];
 
+const meetWithList = [
+  "PT Mitra Sejahtera",
+  "CV Sumber Rejeki",
+  "Bank Mandiri Cabang",
+  "Dinas Perdagangan",
+  "Client Retail Partner",
+];
+
 const descriptions = [
   "Kunjungan untuk membahas kerja sama bisnis",
   "Meeting dengan client terkait project",
@@ -48,13 +56,19 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
+function fixDateRange() {
+  const start = randomDate();
+  const end = new Date(start);
+  end.setDate(start.getDate() + Math.floor(Math.random() * 5) + 1);
+  return { start, end };
+}
+
 // =========================
 // APPROVAL GENERATOR
 // =========================
 function generateApprovals(status) {
   const approvals = [];
 
-  // manager always exists if not PENDING
   if (status !== "PENDING") {
     approvals.push({
       role: "MANAGER",
@@ -65,12 +79,6 @@ function generateApprovals(status) {
     });
   }
 
-  // IN_REVIEW = stuck di director step
-  if (status === "IN_REVIEW") {
-    return approvals;
-  }
-
-  // REJECTED at manager level
   if (status === "REJECTED") {
     return [
       {
@@ -79,11 +87,15 @@ function generateApprovals(status) {
         userId: new mongoose.Types.ObjectId(),
         status: "REJECTED",
         date: randomDate(),
+        note: "Rejected by manager",
       },
     ];
   }
 
-  // APPROVED full flow
+  if (status === "IN_REVIEW") {
+    return approvals;
+  }
+
   if (status === "APPROVED") {
     const useDelegation = Math.random() > 0.6;
 
@@ -122,14 +134,18 @@ async function seed() {
       const statusPool = ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"];
       const status = randomItem(statusPool);
 
-      const base = {
+      const { start, end } = fixDateRange();
+
+      data.push({
         userId: user._id,
 
         title: randomItem(titles),
         purpose: randomItem(purposes),
 
-        startDate: randomDate(),
-        endDate: randomDate(),
+        meetWith: randomItem(meetWithList),
+
+        startDate: start,
+        endDate: end,
 
         destination: randomItem(destinations),
         description: randomItem(descriptions),
@@ -161,15 +177,13 @@ async function seed() {
 
         createdAt: randomDate(),
         updatedAt: new Date(),
-      };
-
-      data.push(base);
+      });
     }
   }
 
   await BusinessTrip.insertMany(data);
 
-  console.log("Seeder HRIS COMPLETE (30 per user, full workflow)");
+  console.log("Seeder FIXED sesuai schema (meetWith included)");
 
   mongoose.disconnect();
 }

@@ -2,6 +2,7 @@ import {
   createTripService,
   getTripDetailService,
   resubmitTripService,
+  delegateTripToHRService,
   getEditableTripService,
   handleApprovalService,
   updateTripService,
@@ -80,15 +81,10 @@ export const handleApproval = async (req, res) => {
       note: req.body.note,
     });
 
-    return res.json({
-      message: result.message,
-    });
+    return res.redirect(`/trip/approval/${req.params.id}`);
   } catch (err) {
     console.error(err);
-
-    const status = err.status || 500;
-
-    return res.status(status).send(err.message || "Server error");
+    return res.status(err.status || 500).send(err.message);
   }
 };
 export const reportTripPage = async (req, res) => {
@@ -99,7 +95,20 @@ export const reportTripPage = async (req, res) => {
 };
 
 export const delegateTripToHR = async (req, res) => {
-  res.redirect("/trip/approval");
+  try {
+    const user = req.session.user;
+
+    const trip = await delegateTripToHRService({
+      id: req.params.id,
+      user,
+    });
+
+    return res.redirect(`/trip/approval/${trip._id}`);
+  } catch (err) {
+    console.error(err);
+
+    return res.status(err.status || 500).send(err.message || "Server error");
+  }
 };
 
 export const financeTripPage = async (req, res) => {

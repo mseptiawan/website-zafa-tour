@@ -246,7 +246,10 @@ export const resubmitTripService = async (id, userId, body) => {
 
   trip.approvals = [];
 
-  if (trip.delegation) {
+  const rejectedByHRDelegation =
+    lastRejectedApproval.role === "PIMPINAN" && lastRejectedApproval.actingAs === "HR";
+
+  if (trip.delegation && !rejectedByHRDelegation) {
     trip.delegation.active = false;
   }
 
@@ -260,7 +263,9 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
 
   if (!trip) {
     const err = new Error("Data tidak ditemukan");
+
     err.status = 404;
+
     throw err;
   }
 
@@ -343,7 +348,10 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
 
     trip.currentStep = null;
 
-    if (trip.delegation) {
+    const rejectedByHRDelegation =
+      role === "HR" && currentStep === "PIMPINAN" && trip.delegation?.active === true;
+
+    if (trip.delegation && !rejectedByHRDelegation) {
       trip.delegation.active = false;
     }
 
@@ -393,4 +401,61 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
   err.status = 400;
 
   throw err;
+};
+
+export const delegateTripToHRService = async ({ id, user }) => {
+  if (user.role !== "PIMPINAN") {
+    const err = new Error("Hanya pimpinan yang dapat melakukan delegasi");
+    err.status = 403;
+    throw err;
+  }
+
+  const trip = await BusinessTrip.findById(id).populate({
+    path: "userId",
+    select: "username roleId",
+    populate: {
+      path: "roleId",
+      select: "name",
+    },
+  });
+
+  if (!trip) {
+    const err = new Error("Pengajuan tidak ditemukan");
+    err.status = 404;
+    throw err;
+  }
+
+  if (trip.currentStep !== "PIMPINAN") {
+    const err = new Error("Pengajuan tidak berada pada tahap pimpinan");
+    err.status = 400;
+    throw err;
+  }
+
+  if (trip.userId?.roleId?.name === "HR") {
+    const err = new Error("Pengajuan HR tidak boleh didelegasikan ke HR");
+    err.status = 403;
+    throw err;
+  }
+
+  if (trip.delegation?.active) {
+    const err = new Error("Pengajuan sudah didelegasikan");
+    err.status = 400;
+    throw err;
+  }
+
+  trip.delegation = {
+    from: "PIMPINAN",
+    to: "HR",
+    active: true,
+    createdBy: user._id,
+    createdAt: new Date(),
+    note: "Delegasi approval ke HR",
+  };
+
+  trip.currentStep = "PIMPINAN";
+  trip.status = "IN_REVIEW";
+
+  await trip.save();
+
+  return trip;
 };
