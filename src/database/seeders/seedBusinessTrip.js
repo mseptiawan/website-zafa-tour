@@ -247,7 +247,7 @@ async function seed() {
     const data = [];
 
     for (const user of users) {
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 100; i++) {
         const status = randomItem(statuses);
 
         const { start, end } = createDateRange();

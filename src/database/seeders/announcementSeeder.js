@@ -8,72 +8,204 @@ dotenv.config();
 
 await mongoose.connect(process.env.MONGODB_URI);
 
-// =========================
+// ======================================================
 // TARGET USERS
-// =========================
+// ======================================================
+
 const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
 
-// =========================
+// ======================================================
 // SAMPLE DATA
-// =========================
-const titles = [
-  "Perubahan Jam Operasional Kantor",
-  "Pemberitahuan Maintenance Sistem",
-  "Pelaksanaan Training Internal",
-  "Kegiatan Family Gathering",
-  "Evaluasi Kinerja Semester 1",
-  "Penggunaan Absensi Digital",
-  "Kebijakan Work From Office",
-  "Pemberitahuan Cuti Bersama",
-  "Rapat Koordinasi Divisi",
-  "Peluncuran Sistem HRIS Baru",
+// ======================================================
+
+const announcements = [
+  {
+    title: "Perubahan Jam Operasional Kantor Pusat",
+    content: `
+Mulai tanggal 1 Juni 2026, jam operasional kantor pusat mengalami perubahan menjadi pukul 08.00 WIB sampai dengan 17.00 WIB.
+
+Perubahan ini dilakukan untuk menyesuaikan kebutuhan operasional perusahaan dan meningkatkan efektivitas koordinasi antar divisi.
+
+Seluruh karyawan diwajibkan hadir tepat waktu dan melakukan absensi sesuai prosedur yang berlaku. Keterlambatan tanpa alasan yang jelas akan dicatat dalam evaluasi kedisiplinan bulanan.
+
+Untuk divisi tertentu yang memiliki kebutuhan operasional khusus, jadwal kerja akan diinformasikan langsung oleh masing-masing pimpinan divisi.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Maintenance Sistem HRIS dan Payroll",
+    content: `
+Divisi IT akan melakukan maintenance terhadap sistem HRIS dan payroll perusahaan pada hari Sabtu pukul 21.00 WIB hingga Minggu pukul 06.00 WIB.
+
+Selama proses maintenance berlangsung, beberapa fitur seperti pengajuan cuti, absensi online, reimbursement, dan slip gaji tidak dapat diakses sementara waktu.
+
+Kami menghimbau seluruh karyawan untuk menyelesaikan kebutuhan administrasi sebelum jadwal maintenance dimulai guna menghindari kendala operasional.
+
+Apabila ditemukan kendala setelah maintenance selesai, segera hubungi tim IT support internal.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Pelaksanaan Training Internal Cyber Security",
+    content: `
+Dalam rangka meningkatkan kesadaran keamanan digital perusahaan, akan dilaksanakan training internal mengenai cyber security dan perlindungan data perusahaan.
+
+Materi training meliputi:
+- Pencegahan phishing
+- Pengamanan password
+- Penggunaan VPN perusahaan
+- Identifikasi malware
+- Kebijakan keamanan perangkat kerja
+
+Seluruh karyawan wajib mengikuti kegiatan ini karena akan menjadi bagian dari penilaian kepatuhan keamanan informasi perusahaan.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Kegiatan Family Gathering Tahunan",
+    content: `
+Perusahaan akan mengadakan kegiatan family gathering tahunan pada akhir bulan ini sebagai bentuk apresiasi terhadap seluruh karyawan dan keluarga.
+
+Acara akan dilaksanakan selama dua hari satu malam dengan berbagai agenda seperti outbound, team building, hiburan, dan pembagian penghargaan karyawan terbaik.
+
+Diharapkan seluruh karyawan dapat berpartisipasi untuk mempererat hubungan antar tim dan meningkatkan semangat kerja bersama.
+    `,
+    category: "LIGHT",
+  },
+
+  {
+    title: "Evaluasi Kinerja Semester Pertama 2026",
+    content: `
+Manajemen perusahaan akan melaksanakan evaluasi kinerja semester pertama pada minggu kedua bulan Juni 2026.
+
+Setiap divisi diwajibkan menyiapkan:
+- Laporan capaian target
+- Kendala operasional
+- Rencana pengembangan
+- Strategi peningkatan performa
+
+Hasil evaluasi akan digunakan sebagai dasar pengambilan keputusan terkait promosi, bonus kinerja, dan pengembangan organisasi.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Penerapan Sistem Absensi Digital Baru",
+    content: `
+Mulai bulan depan, perusahaan akan menggunakan sistem absensi digital berbasis mobile untuk meningkatkan akurasi pencatatan kehadiran.
+
+Karyawan diwajibkan melakukan:
+- Check in saat masuk kerja
+- Check out saat selesai bekerja
+- Validasi lokasi kerja
+
+Penggunaan titip absensi atau manipulasi data kehadiran akan dikenakan sanksi sesuai peraturan perusahaan.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Kebijakan Work From Office",
+    content: `
+Berdasarkan hasil evaluasi manajemen, perusahaan menetapkan kebijakan Work From Office penuh untuk seluruh divisi operasional mulai bulan depan.
+
+Kebijakan ini diterapkan guna meningkatkan koordinasi kerja, percepatan pengambilan keputusan, dan efektivitas komunikasi antar tim.
+
+Pengecualian hanya berlaku untuk kondisi tertentu yang telah mendapatkan persetujuan langsung dari HR dan pimpinan divisi terkait.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Pemberitahuan Cuti Bersama Nasional",
+    content: `
+Sehubungan dengan penetapan cuti bersama nasional oleh pemerintah, perusahaan akan menyesuaikan jadwal operasional selama periode libur berlangsung.
+
+Seluruh karyawan diminta memastikan:
+- Pekerjaan utama telah diselesaikan
+- Dokumen penting telah diamankan
+- Koordinasi antar tim tetap berjalan
+
+Divisi tertentu yang memiliki operasional khusus tetap diwajibkan standby sesuai jadwal piket yang telah ditentukan.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Rapat Koordinasi Seluruh Divisi",
+    content: `
+Akan dilaksanakan rapat koordinasi lintas divisi guna membahas progres operasional perusahaan dan target semester kedua tahun 2026.
+
+Agenda utama meliputi:
+- Evaluasi pencapaian target
+- Kendala antar divisi
+- Efisiensi operasional
+- Strategi pertumbuhan perusahaan
+
+Kehadiran seluruh kepala divisi dan supervisor bersifat wajib.
+    `,
+    category: "OFFICIAL",
+  },
+
+  {
+    title: "Peluncuran Sistem HRIS Generasi Baru",
+    content: `
+Perusahaan resmi meluncurkan sistem HRIS terbaru yang memiliki berbagai fitur tambahan untuk meningkatkan efisiensi administrasi karyawan.
+
+Fitur baru meliputi:
+- Pengajuan cuti online
+- Reimbursement digital
+- Tracking approval
+- Dashboard performa
+- Integrasi payroll
+
+Panduan penggunaan akan dibagikan melalui email internal dan sesi pelatihan khusus akan dijadwalkan minggu depan.
+    `,
+    category: "OFFICIAL",
+  },
 ];
 
-const contents = [
-  "Seluruh karyawan diharapkan memperhatikan perubahan kebijakan terbaru yang berlaku mulai minggu depan.",
-
-  "Akan dilakukan maintenance sistem sehingga beberapa layanan internal tidak dapat digunakan sementara waktu.",
-
-  "Karyawan diwajibkan mengikuti kegiatan internal perusahaan sesuai jadwal yang telah ditentukan.",
-
-  "Mohon seluruh divisi melakukan koordinasi dan memastikan seluruh data telah diperbarui.",
-
-  "Pengumuman ini dibuat untuk meningkatkan efisiensi operasional perusahaan.",
-
-  "Harap seluruh pegawai membaca informasi ini dengan seksama dan mengikuti ketentuan yang berlaku.",
-];
+// ======================================================
+// ATTACHMENTS
+// ======================================================
 
 const attachments = [
   null,
   null,
-  "/uploads/announcement/sample1.pdf",
-  "/uploads/announcement/sample2.pdf",
-  "/uploads/announcement/sample3.pdf",
+  "/uploads/announcement/company-policy.pdf",
+  "/uploads/announcement/training-schedule.pdf",
+  "/uploads/announcement/hris-guide.pdf",
+  "/uploads/announcement/family-gathering.pdf",
 ];
 
-const categories = ["LIGHT", "OFFICIAL"];
-
-// =========================
+// ======================================================
 // HELPERS
-// =========================
+// ======================================================
+
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function randomDate() {
   const start = new Date(2026, 0, 1);
-  const end = new Date(2026, 4, 30);
+  const end = new Date(2026, 5, 30);
 
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-// =========================
+// ======================================================
 // MAIN SEED
-// =========================
+// ======================================================
+
 async function seed() {
   try {
     const users = await User.find({
-      username: { $in: usernames },
+      username: {
+        $in: usernames,
+      },
     });
 
     if (!users.length) {
@@ -87,21 +219,25 @@ async function seed() {
     const data = [];
 
     for (const user of users) {
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 12; i++) {
+        const item = randomItem(announcements);
+
         const createdAt = randomDate();
 
+        const signedByUser = Math.random() > 0.4 ? randomItem(users) : null;
+
         data.push({
-          title: randomItem(titles),
+          title: item.title,
 
-          content: randomItem(contents),
+          content: item.content.trim(),
 
-          category: randomItem(categories),
+          category: item.category,
 
           createdBy: user._id,
 
           attachment: randomItem(attachments),
 
-          signedBy: Math.random() > 0.5 ? randomItem(users)._id : null,
+          signedBy: signedByUser?._id || null,
 
           publishDate: createdAt,
 
@@ -114,12 +250,13 @@ async function seed() {
 
     await Announcement.insertMany(data);
 
-    console.log("Seeder Announcement COMPLETE");
+    console.log("Seeder Announcement berhasil dibuat");
 
-    mongoose.disconnect();
+    await mongoose.disconnect();
   } catch (err) {
     console.error(err);
-    mongoose.disconnect();
+
+    await mongoose.disconnect();
   }
 }
 
