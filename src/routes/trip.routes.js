@@ -3,10 +3,13 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 import {
+  show,
+  approvalDetailPage,
   newForm,
+  showEditForm,
+  update,
+  resubmit,
   myTrips,
-  editTripForm,
-  updateTrip,
   approvalPage,
   handleApproval,
   reportTripPage,
@@ -26,21 +29,25 @@ router.post("/", create);
 
 router.get("/my", myTrips);
 
-/* EDIT (single entry point) */
-router.get("/trip/:id/edit", editTripForm);
-router.post("/trip/:id/edit", updateTrip);
+router.get("/:id/edit", showEditForm);
 
-/* APPROVAL */
-router.get("/trip/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
-router.post("/trip/approval/:id", handleApproval);
+router.put("/:id", update);
 
-/* DELEGATION */
-router.post("/trip/:id/delegate", delegateTripToHR);
+router.post("/:id/resubmit", resubmit);
 
-/* REPORT */
-router.get("/trip/report", reportTripPage);
+// router.get("/trip/:id/edit", editTripForm);
+// router.post("/trip/:id/edit", updateTrip);
 
-/* FINANCE */
+router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
+
+router.get("/approval/:id", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalDetailPage);
+
+router.post("/approval/:id", handleApproval);
+
+router.post("/:id/delegate", delegateTripToHR);
+
+router.get("/report", reportTripPage);
+
 router.get("/finance/trips", roleMiddleware("KEUANGAN"), financeTripPage);
 router.post("/finance/trips/:id/pay", roleMiddleware("KEUANGAN"), confirmPayment);
 
@@ -49,5 +56,7 @@ router.get(
   roleMiddleware(["MANAGER", "HR", "PIMPINAN", "KEUANGAN"]),
   paymentHistoryPage
 );
+
+router.get("/:id", show);
 
 export default router;

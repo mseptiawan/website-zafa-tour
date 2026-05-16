@@ -1,0 +1,384 @@
+<%- layout('layouts/main', { title }) %>
+
+  <div style="
+  margin-left:280px;
+  padding:32px;
+  background:#f1f5f9;
+  min-height:100vh;
+  font-family:'Inter',sans-serif;
+">
+
+    <div style="
+    max-width:900px;
+    margin:auto;
+  ">
+
+      <!-- HEADER -->
+      <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:24px;
+    ">
+
+        <div>
+
+          <h1 style="
+          margin:0;
+          font-size:28px;
+          font-weight:700;
+          color:#0f172a;
+        ">
+            Detail Pengajuan Dinas
+          </h1>
+
+          <p style="
+          margin-top:6px;
+          color:#64748b;
+        ">
+            Tinjau detail pengajuan perjalanan dinas karyawan.
+          </p>
+
+        </div>
+
+        <a href="/trip/approval" style="
+          text-decoration:none;
+          background:#fff;
+          border:1px solid #e2e8f0;
+          color:#334155;
+          padding:10px 16px;
+          border-radius:10px;
+          font-weight:600;
+        ">
+          Kembali
+        </a>
+
+      </div>
+
+      <!-- CARD -->
+      <div style="
+      background:#fff;
+      border-radius:20px;
+      padding:32px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    ">
+
+        <!-- STATUS -->
+        <div style="margin-bottom:24px;">
+
+          <span style="
+          padding:8px 14px;
+          border-radius:999px;
+          font-size:12px;
+          font-weight:700;
+
+          background:
+            <%= trip.status === 'APPROVED'
+              ? '#dcfce7'
+              : trip.status === 'REJECTED'
+              ? '#fee2e2'
+              : '#dbeafe'
+            %>;
+
+          color:
+            <%= trip.status === 'APPROVED'
+              ? '#15803d'
+              : trip.status === 'REJECTED'
+              ? '#b91c1c'
+              : '#1d4ed8'
+            %>;
+        ">
+            <%= trip.status %>
+          </span>
+
+        </div>
+
+        <!-- GRID -->
+        <div style="
+        display:grid;
+        grid-template-columns:repeat(2,1fr);
+        gap:24px;
+        margin-bottom:32px;
+      ">
+
+          <div>
+            <div style="font-size:12px; color:#94a3b8; font-weight:700;">
+              PENGAJU
+            </div>
+
+            <div style="margin-top:6px; font-weight:600;">
+              <%= trip.userId?.username || '-' %>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px; color:#94a3b8; font-weight:700;">
+              JUDUL KEGIATAN
+            </div>
+
+            <div style="margin-top:6px; font-weight:600;">
+              <%= trip.title %>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px; color:#94a3b8; font-weight:700;">
+              DESTINASI
+            </div>
+
+            <div style="margin-top:6px;">
+              <%= trip.destination || '-' %>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px; color:#94a3b8; font-weight:700;">
+              ESTIMASI BUDGET
+            </div>
+
+            <div style="margin-top:6px; font-weight:600;">
+              Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px; color:#94a3b8; font-weight:700;">
+              TANGGAL
+            </div>
+
+            <div style="margin-top:6px;">
+              <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
+                -
+                <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div style="margin-bottom:32px;">
+
+          <div style="
+          font-size:12px;
+          color:#94a3b8;
+          font-weight:700;
+          margin-bottom:10px;
+        ">
+            DESKRIPSI
+          </div>
+
+          <div style="
+          background:#f8fafc;
+          border-radius:14px;
+          padding:18px;
+          line-height:1.7;
+          color:#334155;
+        ">
+            <%= trip.description || '-' %>
+          </div>
+
+        </div>
+        <div>
+          <%= trip.currentStep || '-' %>
+        </div>
+
+        <!-- TIMELINE -->
+        <div style="margin-bottom:32px;">
+
+          <div style="
+          font-size:12px;
+          color:#94a3b8;
+          font-weight:700;
+          margin-bottom:12px;
+        ">
+            RENCANA LOKASI
+          </div>
+
+          <div style="
+          border:1px solid #e2e8f0;
+          border-radius:14px;
+          padding:20px;
+          background:#fff;
+        ">
+
+            <% (trip.timeline || []).forEach(item=> { %>
+
+              <div style="
+              padding:12px 0;
+              border-left:2px solid #cbd5e1;
+              padding-left:16px;
+              position:relative;
+            ">
+
+                <div style="
+                width:10px;
+                height:10px;
+                background:#4f46e5;
+                border-radius:50%;
+                position:absolute;
+                left:-6px;
+                top:18px;
+              "></div>
+
+                <div>
+                  <%= item.address %>
+                </div>
+
+              </div>
+
+              <% }) %>
+
+          </div>
+
+        </div>
+
+        <!-- ACTION -->
+        <div style="
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+      ">
+
+          <!-- APPROVE -->
+          <button onclick="approve('<%= trip._id %>')" style="
+            flex:1;
+            background:#16a34a;
+            color:#fff;
+            border:none;
+            padding:14px;
+            border-radius:12px;
+            font-weight:700;
+            cursor:pointer;
+          ">
+            Setujui
+          </button>
+
+          <!-- REJECT -->
+          <button onclick="toggleReject()" style="
+            flex:1;
+            background:#fff;
+            color:#dc2626;
+            border:1px solid #fecaca;
+            padding:14px;
+            border-radius:12px;
+            font-weight:700;
+            cursor:pointer;
+          ">
+            Tolak
+          </button>
+
+          <% if ( user.role==="PIMPINAN" && trip.currentStep==="PIMPINAN" && trip.userId?.roleId?.name !=="HR" ) { %>
+
+            <form action="/trip/<%= trip._id %>/delegate" method="POST" style="flex:1;">
+
+              <button type="submit" style="
+                width:100%;
+                background:#f59e0b;
+                color:#fff;
+                border:none;
+                padding:14px;
+                border-radius:12px;
+                font-weight:700;
+                cursor:pointer;
+              ">
+                Delegasikan ke HR
+              </button>
+
+            </form>
+
+            <% } %>
+
+        </div>
+
+        <!-- REJECT AREA -->
+        <div id="rejectArea" style="
+          display:none;
+          margin-top:24px;
+          border-top:1px solid #e2e8f0;
+          padding-top:24px;
+        ">
+
+          <textarea id="rejectNote" placeholder="Masukkan alasan penolakan..." style="
+            width:100%;
+            min-height:100px;
+            border:1px solid #e2e8f0;
+            border-radius:12px;
+            padding:14px;
+            resize:vertical;
+            font-family:inherit;
+            margin-bottom:12px;
+          "></textarea>
+
+          <button onclick="submitReject('<%= trip._id %>')" style="
+            width:100%;
+            background:#dc2626;
+            color:#fff;
+            border:none;
+            padding:14px;
+            border-radius:12px;
+            font-weight:700;
+            cursor:pointer;
+          ">
+            Konfirmasi Penolakan
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    function toggleReject() {
+      const el = document.getElementById("rejectArea");
+
+      el.style.display =
+        el.style.display === "none"
+          ? "block"
+          : "none";
+    }
+
+    async function approve(id) {
+
+      if (!confirm("Setujui pengajuan ini?")) return;
+
+      await fetch(`/trip/approval/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "APPROVE"
+        })
+      });
+
+      location.reload();
+    }
+
+    async function submitReject(id) {
+
+      const note =
+        document.getElementById("rejectNote").value;
+
+      if (!note) {
+        return alert("Mohon isi alasan penolakan.");
+      }
+
+      await fetch(`/trip/approval/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "REJECT",
+          note
+        })
+      });
+
+      location.reload();
+    }
+
+  </script>

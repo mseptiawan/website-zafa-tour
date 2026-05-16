@@ -46,7 +46,12 @@
               <%= trip.destination || '-' %>
             </div>
           </div>
-
+          <div>
+            <div class="text-xs text-slate-400 uppercase">Bertemu Dengan</div>
+            <div class="text-slate-700">
+              <%= trip.meetWith || '-' %>
+            </div>
+          </div>
           <div>
             <div class="text-xs text-slate-400 uppercase">Budget</div>
             <div class="text-slate-700">
@@ -67,8 +72,32 @@
               <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
             </div>
           </div>
+          <div>
+            <div class="text-xs text-slate-400 uppercase">
+              Tahap Validasi
+            </div>
+
+            <div class="text-slate-700">
+              <%= trip.currentStep || '-' %>
+            </div>
+          </div>
+          <% const rejectedApproval=trip.approvals ?.filter(a=> a.status === "REJECTED")
+            ?.slice(-1)[0];
+            %>
+
+            <div>
+              <div class="text-xs text-slate-400 uppercase">
+                Catatan Reject
+              </div>
+
+              <div class="text-slate-700">
+                <%= rejectedApproval?.note || '-' %>
+              </div>
+            </div>
+
 
         </div>
+
 
         <!-- NOTE -->
         <% if (trip.note) { %>

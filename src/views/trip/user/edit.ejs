@@ -1,471 +1,273 @@
 <%- layout('layouts/main', { title }) %>
 
-  <% const isRejected=trip.status==="REJECTED" ; const lastReject=trip.approvals ?.slice() .reverse() .find(a=> a.status
-    === "REJECTED");
+  <% const isRejected=trip.status==="REJECTED" ; const action=isRejected ? `/trip/${trip._id}/resubmit` :
+    `/trip/${trip._id}`; const method=isRejected ? "POST" : "PUT" ; const lastReject=trip.approvals ?.slice() .reverse()
+    .find(a=> a.status === "REJECTED");
     %>
 
-    <div style="
-  margin-left:280px;
-  min-height:100vh;
-  padding:32px;
-  background:#f8fafc;
-  font-family:system-ui,sans-serif;
-  color:#0f172a;
-">
+    <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
-      <div style="max-width:720px; margin:auto;">
+      <div class="max-w-2xl mx-auto">
 
         <!-- HEADER -->
-        <div style="margin-bottom:24px;">
+        <div class="mb-8">
 
-          <h1 style="
-        font-size:22px;
-        font-weight:700;
-        margin-bottom:6px;
-      ">
+          <nav class="flex items-center gap-2 mb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+            <span>Workspace</span>
+            <span>/</span>
+            <span>Trip</span>
+            <span>/</span>
+            <span class="text-slate-700">
+              <%= isRejected ? "Resubmit" : "Edit" %>
+            </span>
+          </nav>
 
-            <%= isRejected ? "Resubmit Pengajuan Dinas Luar" : "Edit Pengajuan Dinas Luar" %>
-
+          <h1 class="text-2xl font-semibold text-slate-800">
+            <%= isRejected ? "Resubmit Pengajuan Dinas" : "Edit Pengajuan Dinas" %>
           </h1>
 
-          <p style="
-        font-size:13px;
-        color:#64748b;
-      ">
-
+          <p class="text-sm text-slate-500 mt-1">
             <%= isRejected ? "Perbaiki pengajuan yang ditolak lalu ajukan kembali"
-              : "Perbarui data pengajuan sebelum masuk approval" %>
-
+              : "Perbarui data pengajuan perjalanan dinas" %>
           </p>
 
         </div>
 
-        <!-- CARD -->
-        <div style="
-      background:#fff;
-      border:1px solid #e2e8f0;
-      border-radius:16px;
-      padding:24px;
-      box-shadow:0 1px 2px rgba(0,0,0,.04);
-    ">
+        <!-- ALERT -->
+        <% if (isRejected) { %>
 
-          <!-- STATUS -->
-          <div style="
-        margin-bottom:18px;
-        padding:14px;
-        border-radius:12px;
+          <div class="mb-6 bg-red-50 border border-red-200 rounded-2xl p-5">
 
-        background:
-          <%= isRejected ? '#fef2f2' : '#eff6ff' %>;
-
-        border:
-          1px solid
-          <%= isRejected ? '#fecaca' : '#bfdbfe' %>;
-      ">
-
-            <div style="
-          font-size:12px;
-          font-weight:700;
-          letter-spacing:.4px;
-
-          color:
-            <%= isRejected ? '#b91c1c' : '#1d4ed8' %>;
-        ">
-              STATUS PENGAJUAN
+            <div class="text-sm font-semibold text-red-700">
+              Pengajuan Ditolak
             </div>
 
-            <div style="
-          margin-top:4px;
-          font-size:14px;
-          font-weight:600;
-        ">
-              <%= trip.status %>
-            </div>
+            <p class="text-sm text-red-600 mt-1">
+              Perbaiki data pengajuan sebelum diajukan kembali.
+            </p>
 
-            <% if (isRejected) { %>
+            <% if (lastReject?.note) { %>
 
-              <div style="
-            margin-top:10px;
-            font-size:13px;
-            color:#7f1d1d;
-            line-height:1.6;
-          ">
-                Pengajuan sebelumnya ditolak dan perlu diperbaiki sebelum diajukan kembali.
+              <div class="mt-4 bg-white border border-red-100 rounded-xl p-4">
+
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-red-500 mb-2">
+                  Catatan Penolakan
+                </div>
+
+                <div class="text-sm text-slate-700 leading-relaxed">
+                  <%= lastReject.note %>
+                </div>
+
               </div>
 
-              <% if (lastReject?.note) { %>
+              <% } %>
 
-                <div style="
-              margin-top:14px;
-              background:#fff;
-              border:1px solid #fecaca;
-              border-radius:10px;
-              padding:12px;
-            ">
+          </div>
 
-                  <div style="
-                font-size:11px;
-                font-weight:700;
-                color:#991b1b;
-                margin-bottom:6px;
-              ">
-                    ALASAN PENOLAKAN
+          <% } %>
+
+            <!-- CARD -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+
+              <form action="<%= action %>?_method=<%= method %>" method="POST" class="p-8 space-y-6">
+
+                <!-- TITLE -->
+                <div class="space-y-1.5">
+
+                  <label class="text-[13px] font-semibold text-slate-700">
+                    Judul Perjalanan
+                  </label>
+
+                  <input type="text" name="title" value="<%= trip.title %>" minlength="5" maxlength="100" required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
+                </div>
+
+                <!-- PURPOSE -->
+                <div class="space-y-1.5">
+
+                  <label class="text-[13px] font-semibold text-slate-700">
+                    Tujuan Perjalanan
+                  </label>
+
+                  <select name="purpose" required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
+
+                    <option value="">Pilih tujuan</option>
+
+                    <option value="SALES_VISIT" <%=trip.purpose==="SALES_VISIT" ? "selected" : "" %>
+                      >
+                      Sales Visit
+                    </option>
+
+                    <option value="MEETING" <%=trip.purpose==="MEETING" ? "selected" : "" %>
+                      >
+                      Meeting
+                    </option>
+
+                    <option value="TRAINING" <%=trip.purpose==="TRAINING" ? "selected" : "" %>
+                      >
+                      Training
+                    </option>
+
+                    <option value="SURVEY" <%=trip.purpose==="SURVEY" ? "selected" : "" %>
+                      >
+                      Survey
+                    </option>
+
+                    <option value="OTHER" <%=trip.purpose==="OTHER" ? "selected" : "" %>
+                      >
+                      Other
+                    </option>
+
+                  </select>
+
+                </div>
+
+                <!-- DATE -->
+                <div class="grid grid-cols-2 gap-4">
+
+                  <div class="space-y-1.5">
+
+                    <label class="text-[13px] font-semibold text-slate-700">
+                      Tanggal Mulai
+                    </label>
+
+                    <input type="date" name="startDate"
+                      value="<%= trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : '' %>" required
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
                   </div>
 
-                  <div style="
-                font-size:13px;
-                line-height:1.6;
-                color:#450a0a;
-              ">
-                    <%= lastReject.note %>
+                  <div class="space-y-1.5">
+
+                    <label class="text-[13px] font-semibold text-slate-700">
+                      Tanggal Selesai
+                    </label>
+
+                    <input type="date" name="endDate"
+                      value="<%= trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : '' %>" required
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
                   </div>
 
                 </div>
 
-                <% } %>
+                <!-- DESTINATION -->
+                <div class="space-y-1.5">
 
-                  <% } %>
+                  <label class="text-[13px] font-semibold text-slate-700">
+                    Tujuan / Lokasi
+                  </label>
 
-          </div>
+                  <input type="text" name="destination" value="<%= trip.destination %>" minlength="3" maxlength="150"
+                    required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
 
-          <!-- FORM -->
-          <form action="<%= trip.status === 'REJECTED'
-    ? '/trip/' + trip._id + '/update'
-    : '/trip/edit/' + trip._id %>" method="POST" style="
-          display:flex;
-          flex-direction:column;
-          gap:14px;
-        ">
+                </div>
 
-            <!-- TITLE -->
-            <div>
+                <!-- DESCRIPTION -->
+                <div class="space-y-1.5">
 
-              <label style="
-            display:block;
-            margin-bottom:6px;
-            font-size:12px;
-            font-weight:600;
-            color:#475569;
-          ">
-                Judul Perjalanan
-              </label>
+                  <label class="text-[13px] font-semibold text-slate-700">
+                    Deskripsi
+                  </label>
 
-              <input type="text" name="title" value="<%= trip.title %>" minlength="5" maxlength="100" required style="
-              width:100%;
-              padding:11px 12px;
-              border-radius:10px;
-              border:1px solid #e2e8f0;
-              outline:none;
-            " />
+                  <textarea name="description" rows="4" minlength="10" maxlength="1000" required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"><%= trip.description %></textarea>
 
-            </div>
+                </div>
 
-            <!-- PURPOSE -->
-            <div>
+                <!-- BUDGET -->
+                <div class="space-y-1.5">
 
-              <label style="
-            display:block;
-            margin-bottom:6px;
-            font-size:12px;
-            font-weight:600;
-            color:#475569;
-          ">
-                Tujuan Perjalanan
-              </label>
+                  <label class="text-[13px] font-semibold text-slate-700">
+                    Budget
+                  </label>
 
-              <select name="purpose" required style="
-              width:100%;
-              padding:11px 12px;
-              border-radius:10px;
-              border:1px solid #e2e8f0;
-              background:#fff;
+                  <input type="text" id="budget" value="<%= (trip.budget || 0).toLocaleString('id-ID') %>"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
+                  <input type="hidden" name="budget" id="budgetRaw" value="<%= trip.budget %>" />
+
+                </div>
+
+                <!-- MEET WITH -->
+                <div class="space-y-1.5">
+
+                  <label class="text-[13px] font-semibold text-slate-700">
+                    Bertemu Dengan
+                  </label>
+
+                  <input type="text" name="meetWith" value="<%= trip.meetWith || '' %>"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
+                </div>
+
+                <!-- TIMELINE -->
+                <div class="space-y-2">
+
+                  <label class="text-[13px] font-semibold text-slate-700">
+                    Timeline Perjalanan
+                  </label>
+
+                  <div id="timelineBox" class="space-y-2">
+
+                    <% if (trip.timeline && trip.timeline.length) { %>
+
+                      <% trip.timeline.forEach((t, i)=> { %>
+
+                        <div class="flex gap-2 timeline-item">
+
+                          <input type="text" name="timeline[<%= i %>][address]" value="<%= t.address %>" required
+                            class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+
+                          <input type="hidden" name="timeline[<%= i %>][order]" value="<%= i + 1 %>" />
+
+                          <button type="button" onclick="removeTimeline(this)"
+                            class="px-3 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition">
+                            ✕
+                          </button>
+
+                        </div>
+
+                        <% }) %>
+
+                          <% } %>
+
+                  </div>
+
+                  <button type="button" onclick="addTimeline()" class="text-sm text-indigo-600 hover:text-indigo-700">
+                    + Tambah Timeline
+                  </button>
+
+                </div>
+
+                <!-- SUBMIT -->
+                <div class="pt-4 border-t border-slate-100">
+
+                  <button type="submit" class="
+              w-full
+              text-white
+              py-3
+              rounded-xl
+              text-sm
+              font-medium
+              transition-all
+
+              <%= isRejected
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-slate-900 hover:bg-slate-800'
+              %>
             ">
+                    <%= isRejected ? "Ajukan Ulang Pengajuan" : "Simpan Perubahan" %>
+                  </button>
 
-                <option value="">Pilih tujuan perjalanan</option>
+                </div>
 
-                <% const purposes=["SALES_VISIT","MEETING","TRAINING","SURVEY","OTHER"]; %>
-
-                  <% purposes.forEach(p=> { %>
-
-                    <option value="<%= p %>" <%=trip.purpose===p ? 'selected' : '' %>
-                      >
-                      <%= p %>
-                    </option>
-
-                    <% }) %>
-
-              </select>
+              </form>
 
             </div>
-
-            <!-- DATE -->
-            <div style="
-          display:grid;
-          grid-template-columns:1fr 1fr;
-          gap:12px;
-        ">
-
-              <div>
-
-                <label style="
-              display:block;
-              margin-bottom:6px;
-              font-size:12px;
-              font-weight:600;
-              color:#475569;
-            ">
-                  Tanggal Mulai
-                </label>
-
-                <input type="date" name="startDate"
-                  value="<%= trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : '' %>" required
-                  style="
-                width:100%;
-                padding:11px 12px;
-                border-radius:10px;
-                border:1px solid #e2e8f0;
-              " />
-
-              </div>
-
-              <div>
-
-                <label style="
-              display:block;
-              margin-bottom:6px;
-              font-size:12px;
-              font-weight:600;
-              color:#475569;
-            ">
-                  Tanggal Selesai
-                </label>
-
-                <input type="date" name="endDate"
-                  value="<%= trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : '' %>" required style="
-                width:100%;
-                padding:11px 12px;
-                border-radius:10px;
-                border:1px solid #e2e8f0;
-              " />
-
-              </div>
-
-            </div>
-
-            <!-- DESTINATION -->
-            <div>
-
-              <label style="
-            display:block;
-            margin-bottom:6px;
-            font-size:12px;
-            font-weight:600;
-            color:#475569;
-          ">
-                Destinasi
-              </label>
-
-              <input type="text" name="destination" value="<%= trip.destination %>" minlength="3" maxlength="150"
-                required style="
-              width:100%;
-              padding:11px 12px;
-              border-radius:10px;
-              border:1px solid #e2e8f0;
-            " />
-
-            </div>
-
-            <!-- DESCRIPTION -->
-            <div>
-
-              <label style="
-            display:block;
-            margin-bottom:6px;
-            font-size:12px;
-            font-weight:600;
-            color:#475569;
-          ">
-                Deskripsi Perjalanan
-              </label>
-
-              <textarea name="description" rows="4" minlength="10" maxlength="1000" required style="
-              width:100%;
-              padding:11px 12px;
-              border-radius:10px;
-              border:1px solid #e2e8f0;
-              resize:none;
-            "><%= trip.description %></textarea>
-
-            </div>
-
-            <!-- BUDGET -->
-            <div>
-
-              <label style="
-            display:block;
-            margin-bottom:6px;
-            font-size:12px;
-            font-weight:600;
-            color:#475569;
-          ">
-                Budget
-              </label>
-
-              <input type="text" id="budget" value="<%= (trip.budget || 0).toLocaleString('id-ID') %>" required style="
-              width:100%;
-              padding:11px 12px;
-              border-radius:10px;
-              border:1px solid #e2e8f0;
-            " />
-
-              <input type="hidden" name="budget" id="budgetRaw" value="<%= trip.budget %>" />
-
-            </div>
-
-            <!-- CONTACT -->
-            <div style="
-          display:grid;
-          grid-template-columns:1fr 1fr;
-          gap:12px;
-        ">
-
-              <div>
-
-                <label style="
-              display:block;
-              margin-bottom:6px;
-              font-size:12px;
-              font-weight:600;
-              color:#475569;
-            ">
-                  Nama Contact Person
-                </label>
-
-                <input type="text" name="contactPerson[name]" value="<%= trip.contactPerson?.name || '' %>" style="
-                width:100%;
-                padding:11px 12px;
-                border-radius:10px;
-                border:1px solid #e2e8f0;
-              " />
-
-              </div>
-
-              <div>
-
-                <label style="
-              display:block;
-              margin-bottom:6px;
-              font-size:12px;
-              font-weight:600;
-              color:#475569;
-            ">
-                  No HP
-                </label>
-
-                <input type="text" name="contactPerson[phone]" value="<%= trip.contactPerson?.phone || '' %>" style="
-                width:100%;
-                padding:11px 12px;
-                border-radius:10px;
-                border:1px solid #e2e8f0;
-              " />
-
-              </div>
-
-            </div>
-
-            <!-- TIMELINE -->
-            <div>
-
-              <label style="
-            display:block;
-            margin-bottom:8px;
-            font-size:12px;
-            font-weight:600;
-            color:#475569;
-          ">
-                Timeline Perjalanan
-              </label>
-
-              <div id="timelineBox" style="
-              display:flex;
-              flex-direction:column;
-              gap:10px;
-            ">
-
-                <% if (trip.timeline && trip.timeline.length) { %>
-
-                  <% trip.timeline.forEach((t, i)=> { %>
-
-                    <div style="
-                  display:flex;
-                  gap:8px;
-                ">
-
-                      <input type="text" name="timeline[<%= i %>][address]" value="<%= t.address %>" required style="
-                      flex:1;
-                      padding:11px 12px;
-                      border-radius:10px;
-                      border:1px solid #e2e8f0;
-                    " />
-
-                      <input type="hidden" name="timeline[<%= i %>][order]" value="<%= i + 1 %>" />
-
-                      <button type="button" onclick="removeTimeline(this)" style="
-                      padding:0 14px;
-                      border:none;
-                      background:#fee2e2;
-                      color:#dc2626;
-                      border-radius:10px;
-                      cursor:pointer;
-                    ">
-                        ✕
-                      </button>
-
-                    </div>
-
-                    <% }) %>
-
-                      <% } %>
-
-              </div>
-
-              <button type="button" onclick="addTimeline()" style="
-              margin-top:10px;
-              background:none;
-              border:none;
-              color:#4f46e5;
-              cursor:pointer;
-              font-size:13px;
-              font-weight:600;
-            ">
-                + Tambah Timeline
-              </button>
-
-            </div>
-
-            <!-- SUBMIT -->
-            <button type="submit" style="
-            margin-top:8px;
-            padding:12px;
-            border:none;
-            border-radius:12px;
-
-            background:
-              <%= isRejected ? '#dc2626' : '#4f46e5' %>;
-
-            color:#fff;
-            font-size:14px;
-            font-weight:600;
-            cursor:pointer;
-          ">
-
-              <%= isRejected ? "Resubmit Pengajuan" : "Simpan Perubahan" %>
-
-            </button>
-
-          </form>
-
-        </div>
 
       </div>
 
@@ -474,9 +276,7 @@
     <script>
       let timelineIndex = <%= trip.timeline ?trip.timeline.length: 0 %>;
 
-      // =========================
       // BUDGET FORMAT
-      // =========================
       const budgetInput = document.getElementById("budget");
       const budgetRaw = document.getElementById("budgetRaw");
 
@@ -491,67 +291,49 @@
           return;
         }
 
-        e.target.value = Number(value).toLocaleString("id-ID");
+        e.target.value = Number(value)
+          .toLocaleString("id-ID");
       });
 
-      // =========================
       // ADD TIMELINE
-      // =========================
       function addTimeline() {
 
         const box = document.getElementById("timelineBox");
 
         const div = document.createElement("div");
 
-        div.style = `
-    display:flex;
-    gap:8px;
-  `;
+        div.className = "flex gap-2 timeline-item";
 
         div.innerHTML = `
-    <input
-      type="text"
-      name="timeline[${timelineIndex}][address]"
-      placeholder="Alamat berikutnya"
-      required
-      style="
-        flex:1;
-        padding:11px 12px;
-        border-radius:10px;
-        border:1px solid #e2e8f0;
-      "
-    />
+      <input
+        type="text"
+        name="timeline[${timelineIndex}][address]"
+        placeholder="Alamat berikutnya"
+        required
+        class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
+      />
 
-    <input
-      type="hidden"
-      name="timeline[${timelineIndex}][order]"
-      value="${timelineIndex + 1}"
-    />
+      <input
+        type="hidden"
+        name="timeline[${timelineIndex}][order]"
+        value="${timelineIndex + 1}"
+      />
 
-    <button
-      type="button"
-      onclick="removeTimeline(this)"
-      style="
-        padding:0 14px;
-        border:none;
-        background:#fee2e2;
-        color:#dc2626;
-        border-radius:10px;
-        cursor:pointer;
-      "
-    >
-      ✕
-    </button>
-  `;
+      <button
+        type="button"
+        onclick="removeTimeline(this)"
+        class="px-3 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition"
+      >
+        ✕
+      </button>
+    `;
 
         box.appendChild(div);
 
         timelineIndex++;
       }
 
-      // =========================
-      // REMOVE TIMELINE
-      // =========================
+      // REMOVE
       function removeTimeline(btn) {
         btn.parentElement.remove();
       }
