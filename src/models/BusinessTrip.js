@@ -2,43 +2,32 @@ import mongoose from "mongoose";
 
 const businessTripSchema = new mongoose.Schema(
   {
-    // Core
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    employees: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Employee",
-      },
-    ],
+    // SNAPSHOT penting (hindari dependency populate untuk rule bisnis)
+    requesterRole: {
+      type: String,
+      enum: ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"],
+      required: true,
+    },
 
     title: String,
-
     purpose: {
       type: String,
       enum: ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"],
     },
 
-    meetWith: {
-      type: String,
-      required: true,
-      maxlength: 100,
-    },
+    meetWith: { type: String, required: true, maxlength: 100 },
 
     startDate: Date,
     endDate: Date,
-
     destination: String,
     description: String,
-
-    budget: {
-      type: Number,
-      default: 0,
-    },
+    budget: { type: Number, default: 0 },
 
     timeline: [
       {
@@ -53,21 +42,6 @@ const businessTripSchema = new mongoose.Schema(
       default: "PENDING",
     },
 
-    // Finance
-    paymentStatus: {
-      type: String,
-      enum: ["UNPAID", "PAID"],
-      default: "UNPAID",
-    },
-
-    paidAt: Date,
-
-    paidBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-
-    // Workflow approval
     currentStep: {
       type: String,
       enum: ["MANAGER", "PIMPINAN"],
@@ -76,56 +50,21 @@ const businessTripSchema = new mongoose.Schema(
 
     approvals: [
       {
-        role: {
-          type: String,
-          enum: ["MANAGER", "PIMPINAN"],
-        },
-
-        actingAs: {
-          type: String,
-          enum: ["MANAGER", "HR", "PIMPINAN"],
-        },
-
-        userId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
-
-        status: {
-          type: String,
-          enum: ["APPROVED", "REJECTED"],
-        },
-
+        step: { type: String, enum: ["MANAGER", "PIMPINAN"] },
+        actor: { type: String, enum: ["MANAGER", "PIMPINAN", "HR"] },
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        status: { type: String, enum: ["APPROVED", "REJECTED"] },
         date: Date,
-
         note: String,
       },
     ],
 
-    // Delegasi
     delegation: {
-      from: {
-        type: String,
-        enum: ["PIMPINAN"],
-      },
-
-      to: {
-        type: String,
-        enum: ["HR"],
-      },
-
-      active: {
-        type: Boolean,
-        default: false,
-      },
-
-      createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-
-      createdAt: Date,
-
+      active: { type: Boolean, default: false },
+      from: { type: String, enum: ["PIMPINAN"] },
+      to: { type: String, enum: ["HR"] },
+      delegatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      delegatedAt: Date,
       note: String,
     },
   },

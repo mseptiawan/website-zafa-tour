@@ -1,15 +1,14 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-[#FCFCFD] p-8 antialiased">
+  <div class="ml-72 min-h-screen bg-slate-50 p-8 antialiased">
 
     <div class="max-w-4xl mx-auto">
 
       <!-- BACK -->
       <a href="/trip/approval"
-        class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6 transition group">
+        class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-6 transition">
 
-        <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor"
-          viewBox="0 0 24 24">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
 
@@ -17,36 +16,33 @@
       </a>
 
       <!-- CARD -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="bg-white/80 backdrop-blur border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
         <!-- HEADER -->
-        <div class="px-8 py-8 border-b border-slate-100">
+        <div class="px-8 py-7 border-b border-slate-100">
 
-          <div class="flex flex-col gap-4">
+          <div class="flex items-center gap-2">
 
-            <div class="flex items-center gap-2">
+            <span class="px-3 py-1 text-xs rounded-full border font-medium
+            <%= trip.status === 'APPROVED'
+              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+              : trip.status === 'REJECTED'
+              ? 'bg-red-50 text-red-600 border-red-200'
+              : 'bg-slate-100 text-slate-600 border-slate-200'
+            %>">
+              <%= trip.status %>
+            </span>
 
-              <span class="px-3 py-1 text-[11px] rounded-md border font-medium
-              <%= trip.status === 'APPROVED'
-                ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                : trip.status === 'REJECTED'
-                ? 'bg-red-50 text-red-600 border-red-200'
-                : 'bg-blue-50 text-blue-600 border-blue-200'
-              %>">
-                <%= trip.status %>
-              </span>
-
-              <span class="text-xs text-slate-400">
-                Step: <%= trip.currentStep || 'SELESAI' %>
-              </span>
-
-            </div>
-
-            <h1 class="text-2xl font-semibold text-slate-800">
-              <%= trip.title %>
-            </h1>
+            <span class="text-xs text-slate-400">
+              Step: <%= trip.currentStep || 'SELESAI' %>
+            </span>
 
           </div>
+
+          <h1 class="text-2xl font-semibold mt-3 tracking-tight text-slate-900">
+            <%= trip.title %>
+          </h1>
+
         </div>
 
         <!-- BODY -->
@@ -57,31 +53,22 @@
 
             <div>
               <div class="text-xs text-slate-400">Pengaju</div>
-              <div class="font-medium">
+              <div class="font-medium text-slate-900">
                 <%= trip.userId?.username || '-' %>
               </div>
             </div>
 
             <div>
               <div class="text-xs text-slate-400">Destinasi</div>
-              <div class="font-medium">
+              <div class="font-medium text-slate-900">
                 <%= trip.destination || '-' %>
               </div>
             </div>
 
             <div>
               <div class="text-xs text-slate-400">Budget</div>
-              <div class="font-medium">
+              <div class="font-medium text-slate-900">
                 Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
-              </div>
-            </div>
-
-            <div>
-              <div class="text-xs text-slate-400">Tanggal</div>
-              <div class="font-medium">
-                <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
-                  -
-                  <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
               </div>
             </div>
 
@@ -90,7 +77,7 @@
           <!-- DESCRIPTION -->
           <div>
             <div class="text-xs text-slate-400 mb-2">Deskripsi</div>
-            <div class="leading-7 text-slate-700">
+            <div class="text-slate-700 leading-relaxed">
               <%= trip.description || '-' %>
             </div>
           </div>
@@ -99,15 +86,14 @@
           <div>
             <div class="text-xs text-slate-400 mb-3">Timeline</div>
 
-            <div class="space-y-3">
+            <div class="space-y-2">
               <% (trip.timeline || []).forEach(item=> { %>
-                <div class="border-l-2 border-slate-200 pl-4">
-                  <div>
-                    <%= item.address %>
-                  </div>
+                <div class="border-l-2 border-slate-200 pl-4 text-slate-700">
+                  <%= item.address %>
                 </div>
                 <% }) %>
             </div>
+
           </div>
 
           <!-- APPROVAL HISTORY -->
@@ -118,107 +104,119 @@
               <div class="text-slate-400">Belum ada approval</div>
               <% } %>
 
-                <% (trip.approvals || []).forEach(a=> { %>
-                  <div class="border border-slate-100 rounded-xl p-3 mb-2">
-                    <div class="text-xs text-slate-400">
-                      <%= a.role %> • <%= a.actingAs %>
+                <div class="space-y-2">
+                  <% (trip.approvals || []).forEach(a=> { %>
+                    <div class="border border-slate-200 rounded-xl p-3 bg-white">
+                      <div class="text-xs text-slate-400">
+                        <%= a.step %> • <%= a.actor %>
+                      </div>
+                      <div class="font-semibold text-slate-900">
+                        <%= a.status %>
+                      </div>
+                      <div class="text-xs text-slate-500 mt-1">
+                        <%= a.note || '-' %>
+                      </div>
                     </div>
-                    <div class="font-medium">
-                      <%= a.status %>
-                    </div>
-                    <div class="text-xs text-slate-500">
-                      <%= a.note || '-' %>
-                    </div>
+                    <% }) %>
+                </div>
+
+          </div>
+
+          <!-- ACTION LOGIC -->
+          <% const isFinal=['APPROVED', 'REJECTED' ].includes(trip.status); const isManagerStep=user.role==='MANAGER' &&
+            trip.currentStep==='MANAGER' && !isFinal; const isPimpinanStep=user.role==='PIMPINAN' &&
+            trip.currentStep==='PIMPINAN' && !isFinal; const isHrStep=user.role==='HR' && trip.currentStep==='PIMPINAN'
+            && trip.delegation?.active===true && trip.delegation?.to==='HR' && !isFinal; const canApprove=!isFinal &&
+            (isManagerStep || isPimpinanStep || isHrStep); const requesterIsHR=trip.requesterRole==='HR' ; const
+            canDelegate=user.role==='PIMPINAN' && trip.currentStep==='PIMPINAN' && !trip.delegation?.active && !isFinal
+            && !requesterIsHR; const isDelegatedToHR=trip.delegation?.active===true && trip.delegation?.to==='HR' ; /**
+            * 🔥 FIX PENTING: * hanya PIMPINAN yang diblok saat delegasi, * HR TIDAK boleh ikut kena guard ini */ const
+            isPimpinanBlocked=user.role==='PIMPINAN' && isDelegatedToHR && trip.currentStep==='PIMPINAN' ; %>
+
+            <!-- ===================== -->
+            <!-- ACTION BUTTONS -->
+            <!-- ===================== -->
+
+            <% if (canApprove && !isPimpinanBlocked) { %>
+
+              <div class="flex gap-3 pt-4 border-t border-slate-100">
+
+                <!-- APPROVE -->
+                <form method="POST" action="/trip/approval/<%= trip._id %>">
+                  <input type="hidden" name="action" value="APPROVE" />
+                  <button class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition">
+                    Setujui
+                  </button>
+                </form>
+
+                <!-- REJECT -->
+                <form method="POST" action="/trip/approval/<%= trip._id %>" class="flex gap-2">
+                  <input name="note" required class="border px-3 py-2 rounded-xl w-64 focus:outline-none focus:ring"
+                    placeholder="Alasan reject" />
+
+                  <input type="hidden" name="action" value="REJECT" />
+
+                  <button class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition">
+                    Tolak
+                  </button>
+                </form>
+
+              </div>
+
+              <% } %>
+
+                <!-- ===================== -->
+                <!-- STATUS -->
+                <!-- ===================== -->
+
+                <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
+
+                  <div class="text-sm text-slate-500">
+                    <% if (trip.status==='APPROVED' ) { %>
+                      Disetujui
+                      <% } else if (trip.status==='REJECTED' ) { %>
+                        Ditolak
+                        <% } else if (trip.delegation?.active) { %>
+                          Delegasi aktif: HR sedang memproses
+                          <% } else { %>
+                            Menunggu approval
+                            <% } %>
                   </div>
-                  <% }) %>
-          </div>
 
-          <!-- ACTION (FIXED LOGIC) -->
-          <div class="pt-4 border-t border-slate-100">
+                  <span class="text-xs px-3 py-1 rounded-full border font-medium
+    <%= trip.status === 'APPROVED'
+      ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+      : trip.status === 'REJECTED'
+      ? 'bg-red-50 text-red-600 border-red-200'
+      : trip.delegation?.active
+        ? 'bg-amber-50 text-amber-600 border-amber-200'
+        : 'bg-blue-50 text-blue-600 border-blue-200'
+    %>">
 
-            <% const isFinal=trip.status==='APPROVED' || trip.status==='REJECTED' ; %>
+                    <%= trip.delegation?.active ? 'HR (DELEGATED)' : trip.currentStep %>
 
-              <% const isManagerStep=user.role==='MANAGER' && trip.currentStep==='MANAGER' ; %>
-                <% const isPimpinanStep=user.role==='PIMPINAN' && trip.currentStep==='PIMPINAN' ; %>
-                  <% const isHrStep=user.role==='HR' && trip.currentStep==='PIMPINAN' && trip.delegation?.active; %>
+                  </span>
 
-                    <% const canApprove=!isFinal && (isManagerStep || isPimpinanStep || isHrStep); %>
+                </div>
 
-                      <!-- ACTION BUTTONS -->
-                      <% if (canApprove) { %>
+                <!-- ===================== -->
+                <!-- DELEGATION BUTTON -->
+                <!-- ===================== -->
 
-                        <div class="flex gap-3">
+                <% if (canDelegate) { %>
 
-                          <!-- APPROVE -->
-                          <form method="POST" action="/trip/approval/<%= trip._id %>">
-                            <input type="hidden" name="action" value="APPROVE" />
-                            <button
-                              class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium">
-                              Setujui
-                            </button>
-                          </form>
+                  <div class="mt-6 pt-6 border-t border-slate-100">
 
-                          <!-- REJECT -->
-                          <form method="POST" action="/trip/approval/<%= trip._id %>" class="flex gap-2">
-                            <input type="hidden" name="action" value="REJECT" />
+                    <form method="POST" action="/trip/<%= trip._id %>/delegate">
+                      <button class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition">
+                        Delegasikan ke HR
+                      </button>
+                    </form>
 
-                            <input name="note" placeholder="Alasan reject"
-                              class="border border-slate-200 px-3 py-2 rounded-xl focus:ring-2 focus:ring-red-200 outline-none"
-                              required />
+                  </div>
 
-                            <button class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium">
-                              Tolak
-                            </button>
-                          </form>
-
-                        </div>
-
-                        <% } else { %>
-
-                          <div class="flex items-center justify-between">
-
-                            <div class="text-sm text-slate-400">
-                              <%= isFinal ? 'Proses approval selesai' : 'Menunggu approval tahap berikutnya' %>
-                            </div>
-
-                            <span class="text-xs px-3 py-1 rounded-full border
-        <%= trip.status === 'APPROVED'
-          ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-          : trip.status === 'REJECTED'
-          ? 'bg-red-50 text-red-600 border-red-200'
-          : 'bg-blue-50 text-blue-600 border-blue-200'
-        %>">
-                              <%= trip.currentStep || 'DONE' %>
-                            </span>
-
-                          </div>
-
-                          <% } %>
-
-                            <!-- DELEGASI HR (KHUSUS PIMPINAN) -->
-                            <% if (user.role==='PIMPINAN' && trip.currentStep==='PIMPINAN' && !trip.delegation?.active)
-                              { %>
-
-                              <div class="mt-4 pt-4 border-t border-slate-100">
-
-                                <form method="POST" action="/trip/<%= trip._id %>/delegate">
-
-                                  <input type="hidden" name="action" value="DELEGATE_TO_HR" />
-
-                                  <button
-                                    class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium">
-                                    Delegasikan ke HR
-                                  </button>
-
-                                </form>
-
-                              </div>
-
-                              <% } %>
-
-          </div>
+                  <% } %>
         </div>
-
       </div>
 
     </div>

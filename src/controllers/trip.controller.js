@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import {
   createTripService,
   getTripDetailService,
@@ -57,31 +59,43 @@ export const approvalPage = async (req, res) => {
 
 export const approvalDetailPage = async (req, res) => {
   try {
-    const trip = await BusinessTrip.findById(req.params.id).populate("userId");
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send("Invalid ID");
+    }
+
+    const trip = await BusinessTrip.findById(id).populate("userId");
 
     if (!trip) {
       return res.status(404).send("Trip not found");
     }
 
-    res.render("trip/approval/approval-detail", {
+    return res.render("trip/approval/approval-detail", {
       title: "Detail Persetujuan",
       trip,
       user: req.session.user,
     });
   } catch (err) {
-    res.status(500).send(err.message);
+    return res.status(500).send(err.message);
   }
 };
 export const handleApproval = async (req, res) => {
   try {
-    const result = await handleApprovalService({
-      id: req.params.id,
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send("Invalid ID");
+    }
+
+    await handleApprovalService({
+      id,
       user: req.session.user,
       action: req.body.action,
       note: req.body.note,
     });
 
-    return res.redirect(`/trip/approval/${req.params.id}`);
+    return res.redirect(`/trip/approval/${id}`);
   } catch (err) {
     console.error(err);
     return res.status(err.status || 500).send(err.message);
@@ -96,21 +110,16 @@ export const reportTripPage = async (req, res) => {
 
 export const delegateTripToHR = async (req, res) => {
   try {
-    const user = req.session.user;
-
     const trip = await delegateTripToHRService({
       id: req.params.id,
-      user,
+      user: req.session.user,
     });
 
     return res.redirect(`/trip/approval/${trip._id}`);
   } catch (err) {
-    console.error(err);
-
-    return res.status(err.status || 500).send(err.message || "Server error");
+    return res.status(err.status || 500).send(err.message);
   }
 };
-
 export const financeTripPage = async (req, res) => {
   res.render("trip/finance", {
     title: "Finance",

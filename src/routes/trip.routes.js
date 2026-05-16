@@ -35,9 +35,6 @@ router.put("/:id", update);
 
 router.post("/:id/resubmit", resubmit);
 
-// router.get("/trip/:id/edit", editTripForm);
-// router.post("/trip/:id/edit", updateTrip);
-
 router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
 
 router.get("/approval/:id", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalDetailPage);
@@ -45,8 +42,6 @@ router.get("/approval/:id", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), appro
 router.post("/approval/:id", handleApproval);
 
 router.post("/:id/delegate", delegateTripToHR);
-
-router.get("/report", reportTripPage);
 
 router.get("/finance/trips", roleMiddleware("KEUANGAN"), financeTripPage);
 router.post("/finance/trips/:id/pay", roleMiddleware("KEUANGAN"), confirmPayment);
@@ -56,6 +51,7 @@ router.get(
   roleMiddleware(["MANAGER", "HR", "PIMPINAN", "KEUANGAN"]),
   paymentHistoryPage
 );
+router.get("/report", reportTripPage);
 
 router.get("/:id", show);
 

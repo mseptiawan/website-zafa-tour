@@ -43,6 +43,8 @@ const descriptions = [
 
 const purposes = ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"];
 
+const roles = ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"];
+
 // =========================
 // HELPERS
 // =========================
@@ -64,26 +66,16 @@ function fixDateRange() {
 }
 
 // =========================
-// APPROVAL GENERATOR
+// APPROVAL GENERATOR (FIXED SCHEMA)
 // =========================
 function generateApprovals(status) {
   const approvals = [];
 
-  if (status !== "PENDING") {
-    approvals.push({
-      role: "MANAGER",
-      actingAs: "MANAGER",
-      userId: new mongoose.Types.ObjectId(),
-      status: "APPROVED",
-      date: randomDate(),
-    });
-  }
-
   if (status === "REJECTED") {
     return [
       {
-        role: "MANAGER",
-        actingAs: "MANAGER",
+        step: "MANAGER",
+        actor: "MANAGER",
         userId: new mongoose.Types.ObjectId(),
         status: "REJECTED",
         date: randomDate(),
@@ -92,16 +84,23 @@ function generateApprovals(status) {
     ];
   }
 
-  if (status === "IN_REVIEW") {
-    return approvals;
+  if (status === "IN_REVIEW" || status === "APPROVED") {
+    approvals.push({
+      step: "MANAGER",
+      actor: "MANAGER",
+      userId: new mongoose.Types.ObjectId(),
+      status: "APPROVED",
+      date: randomDate(),
+      note: "",
+    });
   }
 
   if (status === "APPROVED") {
-    const useDelegation = Math.random() > 0.6;
+    const useDelegation = Math.random() > 0.7;
 
     approvals.push({
-      role: "PIMPINAN",
-      actingAs: useDelegation ? "HR" : "PIMPINAN",
+      step: "PIMPINAN",
+      actor: useDelegation ? "HR" : "PIMPINAN",
       userId: new mongoose.Types.ObjectId(),
       status: "APPROVED",
       date: randomDate(),
@@ -136,8 +135,14 @@ async function seed() {
 
       const { start, end } = fixDateRange();
 
+      const requesterRole = randomItem(roles);
+
+      const isDelegated = Math.random() > 0.8 && status !== "PENDING";
+
       data.push({
         userId: user._id,
+
+        requesterRole,
 
         title: randomItem(titles),
         purpose: randomItem(purposes),
@@ -165,15 +170,18 @@ async function seed() {
 
         approvals: generateApprovals(status),
 
-        delegation:
-          Math.random() > 0.8
-            ? {
-                from: "PIMPINAN",
-                to: "HR",
-                active: true,
-                createdAt: randomDate(),
-              }
-            : null,
+        delegation: isDelegated
+          ? {
+              active: true,
+              from: "PIMPINAN",
+              to: "HR",
+              delegatedBy: user._id,
+              delegatedAt: randomDate(),
+              note: "Auto seeded delegation",
+            }
+          : {
+              active: false,
+            },
 
         createdAt: randomDate(),
         updatedAt: new Date(),
@@ -183,9 +191,9 @@ async function seed() {
 
   await BusinessTrip.insertMany(data);
 
-  console.log("Seeder FIXED sesuai schema (meetWith included)");
+  console.log("Seeder sesuai schema berhasil");
 
-  mongoose.disconnect();
+  await mongoose.disconnect();
 }
 
 seed();
