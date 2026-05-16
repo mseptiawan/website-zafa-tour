@@ -10,7 +10,7 @@ import salesRoutes from "./sales.routes.js";
 import assignmentRoutes from "./assignment.routes.js";
 import announcementRoutes from "./announcement.routes.js";
 import expenseRoutes from "./expense.routes.js";
-
+import finance from "./finance.routes.js";
 const router = express.Router();
 
 router.use("/", authRoutes);
@@ -19,6 +19,7 @@ router.use("/", overtimeRoutes);
 router.use("/", attendanceRoutes);
 router.use("/", kpiRoutes);
 router.use("/trip", tripRoutes);
+router.use("/finance", finance);
 router.use("/sales", salesRoutes);
 router.use("/assignment", assignmentRoutes);
 router.use("/announcement", announcementRoutes);

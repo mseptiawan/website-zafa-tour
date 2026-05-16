@@ -1,0 +1,182 @@
+<%- layout('layouts/main', { title }) %>
+
+  <div class="ml-72 min-h-screen bg-slate-50 p-8">
+    <div class="max-w-5xl mx-auto">
+
+      <!-- BACK -->
+      <a href="/finance" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Kembali
+      </a>
+
+      <!-- CARD -->
+      <div class="bg-white border rounded-2xl shadow-sm">
+
+        <!-- HEADER -->
+        <div class="px-8 py-6 border-b flex justify-between items-center">
+
+          <div>
+            <h1 class="text-xl font-semibold text-slate-900">
+              <%= trip.title %>
+            </h1>
+            <p class="text-sm text-slate-500">Finance Processing Panel</p>
+          </div>
+
+          <!-- PAYMENT STATUS -->
+          <span class="text-xs px-3 py-1 rounded-full border font-medium
+          <%= trip.payment?.status === 'PAID'
+            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+            : trip.payment?.status === 'PROCESSING'
+              ? 'bg-amber-50 text-amber-600 border-amber-200'
+              : 'bg-blue-50 text-blue-600 border-blue-200'
+          %>">
+            <%= trip.payment?.status || 'PENDING' %>
+          </span>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="p-8 space-y-10 text-sm text-slate-700">
+
+          <!-- ========================= -->
+          <!-- CORE INFORMATION -->
+          <!-- ========================= -->
+          <div class="grid grid-cols-2 gap-6">
+
+            <div>
+              <div class="text-xs text-slate-400">Nama Pengaju</div>
+              <div class="font-semibold text-slate-900">
+                <%= trip.userId?.username || '-' %>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-xs text-slate-400">Destinasi</div>
+              <div class="font-semibold text-slate-900">
+                <%= trip.destination || '-' %>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-xs text-slate-400">Budget</div>
+              <div class="font-semibold text-slate-900">
+                Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-xs text-slate-400">Status Approval</div>
+              <div class="font-semibold text-slate-900">
+                <%= trip.status==='APPROVED' ? 'Sudah Disetujui Pimpinan' : trip.status %>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================= -->
+          <!-- DESCRIPTION -->
+          <!-- ========================= -->
+          <div>
+            <div class="text-xs text-slate-400 mb-2">Deskripsi</div>
+            <div class="text-slate-800">
+              <%= trip.description || '-' %>
+            </div>
+          </div>
+
+          <!-- ========================= -->
+          <!-- TIMELINE -->
+          <!-- ========================= -->
+          <div>
+            <div class="text-xs text-slate-400 mb-3">Timeline</div>
+
+            <% if (!trip.timeline || trip.timeline.length===0) { %>
+              <div class="text-slate-400">Tidak ada timeline</div>
+              <% } else { %>
+                <div class="space-y-2">
+                  <% trip.timeline.forEach(t=> { %>
+                    <div class="border-l-2 border-slate-200 pl-4">
+                      <div class="text-slate-800 font-medium">
+                        <%= t.address %>
+                      </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } %>
+          </div>
+
+          <!-- ========================= -->
+          <!-- FINANCE FLOW (STATE MACHINE UI) -->
+          <!-- ========================= -->
+
+          <!-- 1. PENDING -> PROCESS PAYMENT -->
+          <% if (trip.payment?.status==='PENDING' ) { %>
+            <form method="POST" action="/finance/<%= trip._id %>/process">
+              <button class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Process Payment
+              </button>
+            </form>
+            <% } %>
+
+              <!-- 2. PROCESSING -> UPLOAD PROOF -->
+              <% if (trip.payment?.status==='PROCESSING' && trip.payment?.proof?.filename) { %>
+                <form method="POST" action="/finance/<%= trip._id %>/upload-proof" enctype="multipart/form-data"
+                  class="space-y-3">
+
+                  <div class="text-xs text-slate-400">Upload Bukti Pembayaran</div>
+
+                  <input type="file" name="proof" required class="block w-full border rounded-lg p-2" />
+
+                  <button class="px-5 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">
+                    Upload Proof
+                  </button>
+                </form>
+                <% } %>
+
+                  <!-- 3. PROOF UPLOADED -> SHOW FILE + CONFIRM -->
+                  <% if (trip.payment?.status==='PROCESSING' && trip.payment?.proof) { %>
+
+                    <div class="p-4 border rounded-lg bg-slate-50 space-y-3">
+
+                      <div>
+                        <div class="text-xs text-slate-400">Bukti Upload</div>
+                        <div class="text-slate-800 font-medium">
+                          <%= trip.payment.proof.filename %>
+                        </div>
+                      </div>
+
+                      <div class="flex gap-3">
+
+                        <a href="<%= trip.payment.proof.url %>" target="_blank"
+                          class="px-4 py-2 border rounded-lg hover:bg-slate-100">
+                          View File
+                        </a>
+
+                        <form method="POST" action="/finance/<%= trip._id %>/confirm">
+                          <button class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+                            Mark as Paid
+                          </button>
+                        </form>
+
+                      </div>
+
+                    </div>
+
+                    <% } %>
+
+                      <!-- 4. PAID STATE -->
+                      <% if (trip.payment?.status==='PAID' ) { %>
+                        <div class="p-4 rounded-lg bg-emerald-50 border border-emerald-200">
+                          <div class="font-semibold text-emerald-700">Payment Completed</div>
+                          <div class="text-xs text-emerald-600 mt-1">
+                            Paid at:
+                            <%= trip.payment.paidAt ? new Date(trip.payment.paidAt).toLocaleString('id-ID') : '-' %>
+                          </div>
+                        </div>
+                        <% } %>
+
+        </div>
+      </div>
+    </div>
+  </div>

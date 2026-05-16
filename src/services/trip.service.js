@@ -336,6 +336,7 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
 
   const role = user.role;
   const step = trip.currentStep;
+
   const isFinal = ["APPROVED", "REJECTED"].includes(trip.status);
 
   if (isFinal) {
@@ -347,9 +348,9 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
   const effectiveActor =
     trip.delegation?.active && step === "PIMPINAN" && role === "HR" ? "HR" : role;
 
-  // ======================
-  // APPROVE
-  // ======================
+  // ======================================================
+  // APPROVE FLOW
+  // ======================================================
   if (action === "APPROVE") {
     trip.approvals.push({
       step,
@@ -360,23 +361,29 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
       note: note || null,
     });
 
+    // STEP 1 → MANAGER APPROVE
     if (step === "MANAGER") {
       trip.currentStep = "PIMPINAN";
       trip.status = "IN_REVIEW";
     }
 
+    // STEP 2 → PIMPINAN APPROVE (FINAL APPROVAL)
     if (step === "PIMPINAN") {
       trip.status = "APPROVED";
       trip.currentStep = null;
+
+      // 🔥 AUTO TRIGGER FINANCE FLOW
+      trip.payment.status = "PENDING";
+      trip.payment.amount = trip.budget || 0;
     }
 
     await trip.save();
     return { message: "Approved" };
   }
 
-  // ======================
-  // REJECT
-  // ======================
+  // ======================================================
+  // REJECT FLOW
+  // ======================================================
   if (action === "REJECT") {
     if (!note || note.trim().length < 5) {
       const err = new Error("Alasan reject minimal 5 karakter");
@@ -394,14 +401,15 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
     });
 
     trip.status = "REJECTED";
+    trip.currentStep = null;
 
     await trip.save();
     return { message: "Rejected" };
   }
 
-  // ======================
-  // DELEGATE
-  // ======================
+  // ======================================================
+  // DELEGATION FLOW (PIMPINAN → HR)
+  // ======================================================
   if (action === "DELEGATE_TO_HR") {
     if (role !== "PIMPINAN" || step !== "PIMPINAN") {
       const err = new Error("Tidak boleh delegasi");
@@ -432,7 +440,6 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
   err.status = 400;
   throw err;
 };
-
 export const delegateTripToHRService = async ({ id, user }) => {
   const trip = await BusinessTrip.findById(id);
 

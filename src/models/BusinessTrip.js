@@ -35,10 +35,34 @@ const businessTripSchema = new mongoose.Schema(
         order: Number,
       },
     ],
+    tripReport: {
+      isSubmitted: { type: Boolean, default: false },
 
+      submittedAt: Date,
+
+      description: String,
+
+      attachments: [
+        {
+          filename: String,
+          url: String,
+          mimetype: String,
+          size: Number,
+        },
+      ],
+    },
     status: {
       type: String,
-      enum: ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"],
+      enum: [
+        "PENDING",
+        "IN_REVIEW",
+        "APPROVED",
+        "REJECTED",
+        "PAYMENT_PROCESSING",
+        "PAID",
+        "ON_TRIP",
+        "SUBMITTED",
+      ],
       default: "PENDING",
     },
 
@@ -65,6 +89,31 @@ const businessTripSchema = new mongoose.Schema(
       to: { type: String, enum: ["HR"] },
       delegatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       delegatedAt: Date,
+      note: String,
+    },
+
+    payment: {
+      status: {
+        type: String,
+        enum: ["PENDING", "PROCESSING", "PAID", "FAILED"],
+        default: "PENDING",
+      },
+
+      proof: {
+        filename: String,
+        url: String,
+        uploadedAt: Date,
+      },
+
+      amount: { type: Number, default: 0 },
+
+      paidAt: Date,
+
+      paidBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+
       note: String,
     },
   },

@@ -66,7 +66,7 @@ function fixDateRange() {
 }
 
 // =========================
-// APPROVAL GENERATOR (FIXED SCHEMA)
+// APPROVAL GENERATOR (UPDATED)
 // =========================
 function generateApprovals(status) {
   const approvals = [];
@@ -84,7 +84,9 @@ function generateApprovals(status) {
     ];
   }
 
-  if (status === "IN_REVIEW" || status === "APPROVED") {
+  if (
+    ["IN_REVIEW", "APPROVED", "PAYMENT_PROCESSING", "PAID", "ON_TRIP", "SUBMITTED"].includes(status)
+  ) {
     approvals.push({
       step: "MANAGER",
       actor: "MANAGER",
@@ -95,7 +97,7 @@ function generateApprovals(status) {
     });
   }
 
-  if (status === "APPROVED") {
+  if (["APPROVED", "PAYMENT_PROCESSING", "PAID", "ON_TRIP", "SUBMITTED"].includes(status)) {
     const useDelegation = Math.random() > 0.7;
 
     approvals.push({
@@ -126,27 +128,33 @@ async function seed() {
 
   await BusinessTrip.deleteMany({});
 
+  const statusPool = [
+    "PENDING",
+    "IN_REVIEW",
+    "APPROVED",
+    "REJECTED",
+    "PAYMENT_PROCESSING",
+    "PAID",
+    "ON_TRIP",
+    "SUBMITTED",
+  ];
+
   const data = [];
 
   for (const user of users) {
     for (let i = 0; i < 30; i++) {
-      const statusPool = ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"];
       const status = randomItem(statusPool);
-
       const { start, end } = fixDateRange();
-
       const requesterRole = randomItem(roles);
 
       const isDelegated = Math.random() > 0.8 && status !== "PENDING";
 
       data.push({
         userId: user._id,
-
         requesterRole,
 
         title: randomItem(titles),
         purpose: randomItem(purposes),
-
         meetWith: randomItem(meetWithList),
 
         startDate: start,
@@ -183,6 +191,24 @@ async function seed() {
               active: false,
             },
 
+        tripReport: {
+          isSubmitted: status === "SUBMITTED",
+          submittedAt: status === "SUBMITTED" ? randomDate() : null,
+          description: status === "SUBMITTED" ? "Laporan perjalanan dinas" : "",
+          attachments: [],
+        },
+
+        payment: {
+          status:
+            status === "PAID" ? "PAID" : status === "PAYMENT_PROCESSING" ? "PROCESSING" : "PENDING",
+
+          amount: 0,
+
+          paidAt: status === "PAID" ? randomDate() : null,
+          paidBy: null,
+          note: "",
+        },
+
         createdAt: randomDate(),
         updatedAt: new Date(),
       });
@@ -191,7 +217,7 @@ async function seed() {
 
   await BusinessTrip.insertMany(data);
 
-  console.log("Seeder sesuai schema berhasil");
+  console.log("Seeder updated sesuai schema terbaru");
 
   await mongoose.disconnect();
 }

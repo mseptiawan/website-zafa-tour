@@ -120,32 +120,6 @@ export const delegateTripToHR = async (req, res) => {
     return res.status(err.status || 500).send(err.message);
   }
 };
-export const financeTripPage = async (req, res) => {
-  res.render("trip/finance", {
-    title: "Finance",
-    user: req.session.user,
-  });
-};
-
-export const confirmPayment = async (req, res) => {
-  try {
-    await confirmPaymentService({
-      id: req.params.id,
-      user: req.session.user,
-    });
-
-    res.redirect("/finance/trips");
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
-};
-
-export const paymentHistoryPage = async (req, res) => {
-  res.render("trip/payment-history", {
-    title: "Payment History",
-    user: req.session.user,
-  });
-};
 
 export const myTrips = async (req, res) => {
   try {
@@ -253,3 +227,7 @@ export const resubmit = async (req, res) => {
     return res.status(500).send("Error resubmit pengajuan");
   }
 };
+
+/**
+ * UPLOAD BUKTI TRANSFER
+ */

@@ -14,9 +14,6 @@ import {
   handleApproval,
   reportTripPage,
   delegateTripToHR,
-  financeTripPage,
-  confirmPayment,
-  paymentHistoryPage,
   create,
 } from "../controllers/trip.controller.js";
 
@@ -43,14 +40,6 @@ router.post("/approval/:id", handleApproval);
 
 router.post("/:id/delegate", delegateTripToHR);
 
-router.get("/finance/trips", roleMiddleware("KEUANGAN"), financeTripPage);
-router.post("/finance/trips/:id/pay", roleMiddleware("KEUANGAN"), confirmPayment);
-
-router.get(
-  "/finance/payment-history",
-  roleMiddleware(["MANAGER", "HR", "PIMPINAN", "KEUANGAN"]),
-  paymentHistoryPage
-);
 router.get("/report", reportTripPage);
 
 router.get("/:id", show);
