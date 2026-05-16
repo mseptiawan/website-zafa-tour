@@ -16,8 +16,7 @@
           </p>
         </div>
 
-        <a href="/trip/request"
-          class="bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-3 rounded-xl transition">
+        <a href="/trip/new" class="bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-3 rounded-xl transition">
           + Buat Pengajuan
         </a>
 
@@ -66,35 +65,32 @@
                       </td>
 
                       <td class="px-6 py-4">
-
-                        <span class="
-                    text-xs px-3 py-1 rounded-md font-medium border
-                    <%= t.status === 'APPROVED'
-                      ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                      : t.status === 'REJECTED'
-                        ? 'bg-red-50 text-red-600 border-red-200'
-                        : 'bg-blue-50 text-blue-600 border-blue-200'
-                    %>
-                  ">
+                        <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
+    <%= t.status === 'APPROVED'
+      ? 'bg-emerald-50/50 text-emerald-700 border-emerald-200/60'
+      : t.status === 'REJECTED'
+        ? 'bg-red-50/50 text-red-700 border-red-200/60'
+        : 'bg-slate-50 text-slate-600 border-slate-200'
+    %>">
                           <%= t.status %>
                         </span>
-
                       </td>
 
                       <td class="px-6 py-4 flex items-center gap-2">
 
                         <!-- DETAIL -->
-                        <a href="/trip/<%= t._id %>" title="Detail"
-                          class="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
+                        <a href="/trip/<%= t._id %>" title="Detail" class="inline-flex items-center justify-center w-9 h-9 rounded-lg
+            border border-slate-200
+            text-slate-600
+            hover:bg-slate-50 hover:text-slate-800
+            transition">
 
                           <!-- eye icon -->
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5
-           c4.478 0 8.268 2.943 9.542 7
-           -1.274 4.057-5.064 7-9.542 7
-           -4.477 0-8.268-2.943-9.542-7z" />
+                              d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
                           </svg>
 
                         </a>
@@ -145,4 +141,49 @@
       </div>
 
     </div>
+    <% if (pagination.totalPages> 1) { %>
+      <div
+        class="flex items-center justify-between mt-6 px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[13px] antialiased">
+
+        <!-- LEFT INFO -->
+        <div class="text-slate-500 font-medium">
+          Menampilkan halaman
+          <span class="font-bold text-slate-900">
+            <%= pagination.page %>
+          </span>
+          dari
+          <span class="font-bold text-slate-900">
+            <%= pagination.totalPages %>
+          </span>
+        </div>
+
+        <!-- RIGHT CONTROLS -->
+        <div class="flex items-center gap-2">
+
+          <!-- PREV BUTTON -->
+          <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+          <%= pagination.hasPrev
+            ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+            : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Prev
+          </a>
+
+          <!-- NEXT BUTTON -->
+          <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+          <%= pagination.hasNext
+            ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+            : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
+            Next
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+
+        </div>
+
+      </div>
+      <% } %>
   </div>

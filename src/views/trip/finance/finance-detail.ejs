@@ -1,105 +1,100 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50 p-8">
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
     <div class="max-w-5xl mx-auto">
 
       <!-- BACK -->
-      <a href="/finance" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-6">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      <a href="/finance"
+        class="inline-flex items-center gap-2 text-[14px] font-bold text-slate-400 hover:text-slate-900 mb-6 uppercase tracking-widest transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
         Kembali
       </a>
 
       <!-- CARD -->
-      <div class="bg-white border rounded-2xl shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
         <!-- HEADER -->
-        <div class="px-8 py-6 border-b flex justify-between items-center">
-
+        <div class="p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 class="text-xl font-semibold text-slate-900">
+            <h1 class="text-2xl font-bold text-slate-900">
               <%= trip.title %>
             </h1>
-            <p class="text-sm text-slate-500">Finance Processing Panel</p>
+            <p class="text-[14px] text-slate-500 mt-1">
+              Finance Processing Panel
+            </p>
           </div>
 
           <!-- PAYMENT STATUS -->
-          <span class="text-xs px-3 py-1 rounded-full border font-medium
-          <%= trip.payment?.status === 'PAID'
-            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-            : trip.payment?.status === 'PROCESSING'
-              ? 'bg-amber-50 text-amber-600 border-amber-200'
-              : 'bg-blue-50 text-blue-600 border-blue-200'
-          %>">
-            <%= trip.payment?.status || 'PENDING' %>
-          </span>
-
+          <div>
+            <span class="px-3 py-1 text-xs rounded-full border font-bold uppercase tracking-wider block text-center
+            <%= trip.payment?.status === 'PAID'
+              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+              : trip.payment?.status === 'PROCESSING'
+                ? 'bg-amber-50 text-amber-600 border-amber-200'
+                : 'bg-blue-50 text-blue-600 border-blue-200'
+            %>">
+              <%= trip.payment?.status || 'PENDING' %>
+            </span>
+          </div>
         </div>
 
         <!-- BODY -->
-        <div class="p-8 space-y-10 text-sm text-slate-700">
+        <div class="p-8 space-y-6">
 
-          <!-- ========================= -->
-          <!-- CORE INFORMATION -->
-          <!-- ========================= -->
-          <div class="grid grid-cols-2 gap-6">
-
-            <div>
-              <div class="text-xs text-slate-400">Nama Pengaju</div>
-              <div class="font-semibold text-slate-900">
+          <!-- CORE INFORMATION GRID -->
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nama Pengaju</div>
+              <div class="text-[14px] font-bold text-slate-800">
                 <%= trip.userId?.username || '-' %>
               </div>
             </div>
-
-            <div>
-              <div class="text-xs text-slate-400">Destinasi</div>
-              <div class="font-semibold text-slate-900">
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Destinasi</div>
+              <div class="text-[14px] font-bold text-slate-800">
                 <%= trip.destination || '-' %>
               </div>
             </div>
-
-            <div>
-              <div class="text-xs text-slate-400">Budget</div>
-              <div class="font-semibold text-slate-900">
-                Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Budget</div>
+              <div class="text-[14px] font-bold text-slate-800">Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
               </div>
             </div>
-
-            <div>
-              <div class="text-xs text-slate-400">Status Approval</div>
-              <div class="font-semibold text-slate-900">
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Approval</div>
+              <div class="text-[14px] font-bold text-slate-800">
                 <%= trip.status==='APPROVED' ? 'Sudah Disetujui Pimpinan' : trip.status %>
               </div>
             </div>
-
           </div>
 
-          <!-- ========================= -->
           <!-- DESCRIPTION -->
-          <!-- ========================= -->
-          <div>
-            <div class="text-xs text-slate-400 mb-2">Deskripsi</div>
-            <div class="text-slate-800">
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700 block">Deskripsi</label>
+            <div
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-700 leading-relaxed">
               <%= trip.description || '-' %>
             </div>
           </div>
 
-          <!-- ========================= -->
           <!-- TIMELINE -->
-          <!-- ========================= -->
-          <div>
-            <div class="text-xs text-slate-400 mb-3">Timeline</div>
-
+          <div class="space-y-2">
+            <label class="text-[13px] font-bold text-slate-700 block">Timeline</label>
             <% if (!trip.timeline || trip.timeline.length===0) { %>
-              <div class="text-slate-400">Tidak ada timeline</div>
+              <div class="p-4 rounded-xl bg-slate-50 text-slate-400 text-[14px] border border-slate-200/60 text-center">
+                Tidak ada data timeline
+              </div>
               <% } else { %>
-                <div class="space-y-2">
+                <div class="space-y-3 pl-2">
                   <% trip.timeline.forEach(t=> { %>
-                    <div class="border-l-2 border-slate-200 pl-4">
-                      <div class="text-slate-800 font-medium">
+                    <div class="relative border-l-2 border-slate-200 pl-4 py-0.5">
+                      <div class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-slate-300"></div>
+                      <p class="text-[14px] text-slate-700 font-medium">
                         <%= t.address %>
-                      </div>
+                      </p>
                     </div>
                     <% }) %>
                 </div>
@@ -107,76 +102,178 @@
           </div>
 
           <!-- ========================= -->
-          <!-- FINANCE FLOW (STATE MACHINE UI) -->
+          <!-- FINANCE FLOW ACTIONS      -->
           <!-- ========================= -->
 
-          <!-- 1. PENDING -> PROCESS PAYMENT -->
+          <!-- 1. PROCESS PAYMENT -->
           <% if (trip.payment?.status==='PENDING' ) { %>
-            <form method="POST" action="/finance/<%= trip._id %>/process">
-              <button class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Process Payment
-              </button>
-            </form>
+            <div class="pt-6 border-t border-slate-100 flex justify-end">
+              <form method="POST" action="/finance/<%= trip._id %>/process">
+                <button type="submit"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-100 transition-all">
+                  Proses Pembayaran
+                </button>
+              </form>
+            </div>
             <% } %>
 
-              <!-- 2. PROCESSING -> UPLOAD PROOF -->
-              <% if (trip.payment?.status==='PROCESSING' && trip.payment?.proof?.filename) { %>
-                <form method="POST" action="/finance/<%= trip._id %>/upload-proof" enctype="multipart/form-data"
-                  class="space-y-3">
+              <!-- 2. UPLOAD PROOF (NO PROOF YET) -->
+              <% if (trip.payment?.status==='PROCESSING' && !trip.payment?.proof?.filename) { %>
+                <div class="pt-6 border-t border-slate-100 space-y-3">
+                  <label class="text-[13px] font-bold text-slate-700 block">
+                    Upload Bukti Pembayaran <span class="text-slate-400 font-normal">(Wajib)</span>
+                  </label>
 
-                  <div class="text-xs text-slate-400">Upload Bukti Pembayaran</div>
+                  <form method="POST" action="/finance/<%= trip._id %>/upload-proof" enctype="multipart/form-data"
+                    class="space-y-4">
+                    <div class="relative group">
+                      <input type="file" name="proof" id="file-input" required
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onchange="handleFileSelect(this)" />
 
-                  <input type="file" name="proof" required class="block w-full border rounded-lg p-2" />
+                      <!-- EMPTY STATE DROPZONE -->
+                      <div id="dropzone-empty"
+                        class="border-2 border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300 transition-all">
+                        <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <p class="text-sm text-slate-600 font-medium">Klik atau seret file bukti transfer di sini</p>
+                        <p class="text-xs text-slate-400 mt-1">PNG, JPG, PDF (maks 5MB)</p>
+                      </div>
 
-                  <button class="px-5 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">
-                    Upload Proof
-                  </button>
-                </form>
-                <% } %>
-
-                  <!-- 3. PROOF UPLOADED -> SHOW FILE + CONFIRM -->
-                  <% if (trip.payment?.status==='PROCESSING' && trip.payment?.proof) { %>
-
-                    <div class="p-4 border rounded-lg bg-slate-50 space-y-3">
-
-                      <div>
-                        <div class="text-xs text-slate-400">Bukti Upload</div>
-                        <div class="text-slate-800 font-medium">
-                          <%= trip.payment.proof.filename %>
+                      <!-- FILLED STATE PREVIEW -->
+                      <div id="dropzone-filled"
+                        class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                          <div
+                            class="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
+                            <img id="img-preview" class="w-full h-full object-cover hidden" />
+                            <div id="file-icon-placeholder"
+                              class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs bg-slate-100">
+                              DOC
+                            </div>
+                          </div>
+                          <div class="overflow-hidden">
+                            <p id="name-preview" class="text-sm font-bold text-slate-800 truncate max-w-[280px]">
+                              file_name.pdf</p>
+                            <p id="size-preview" class="text-xs text-slate-400">0.00 MB</p>
+                          </div>
                         </div>
+                        <button type="button" onclick="clearFile()"
+                          class="p-2 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-colors">
+                          ✕
+                        </button>
                       </div>
-
-                      <div class="flex gap-3">
-
-                        <a href="<%= trip.payment.proof.url %>" target="_blank"
-                          class="px-4 py-2 border rounded-lg hover:bg-slate-100">
-                          View File
-                        </a>
-
-                        <form method="POST" action="/finance/<%= trip._id %>/confirm">
-                          <button class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
-                            Mark as Paid
-                          </button>
-                        </form>
-
-                      </div>
-
                     </div>
 
+                    <div class="flex justify-end">
+                      <button type="submit"
+                        class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all">
+                        Kirim Bukti Transfer
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                <% } %>
+
+                  <!-- 3. PROOF EXISTS BUT NEED CONFIRMATION -->
+                  <% if (trip.payment?.status==='PROCESSING' && trip.payment?.proof?.filename) { %>
+                    <div class="pt-6 border-t border-slate-100 space-y-4">
+                      <label class="text-[13px] font-bold text-slate-700 block">Bukti Transfer Terupload</label>
+
+                      <div
+                        class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                          <div
+                            class="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 font-bold text-xs flex-shrink-0 shadow-sm">
+                            FI
+                          </div>
+                          <div class="overflow-hidden">
+                            <div class="text-[14px] font-bold text-slate-800 truncate max-w-[300px]">
+                              <%= trip.payment.proof.filename %>
+                            </div>
+                            <div class="text-xs text-slate-400">Menunggu konfirmasi final</div>
+                          </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                          <a href="<%= trip.payment.proof.url %>" target="_blank"
+                            class="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-all text-center">
+                            Lihat Berkas
+                          </a>
+
+                          <form method="POST" action="/finance/<%= trip._id %>/confirm" class="w-full sm:w-auto">
+                            <button type="submit"
+                              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-emerald-100 transition-all">
+                              Selesai / Mark as Paid
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
                     <% } %>
 
                       <!-- 4. PAID STATE -->
                       <% if (trip.payment?.status==='PAID' ) { %>
-                        <div class="p-4 rounded-lg bg-emerald-50 border border-emerald-200">
-                          <div class="font-semibold text-emerald-700">Payment Completed</div>
-                          <div class="text-xs text-emerald-600 mt-1">
-                            Paid at:
-                            <%= trip.payment.paidAt ? new Date(trip.payment.paidAt).toLocaleString('id-ID') : '-' %>
+                        <div class="pt-6 border-t border-slate-100">
+                          <div class="p-5 rounded-xl bg-emerald-50/60 border border-emerald-100 flex items-start gap-3">
+                            <div
+                              class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-sm shadow-emerald-200">
+                              ✓
+                            </div>
+                            <div>
+                              <div class="text-[14px] font-bold text-emerald-800">Selesai Dibayarkan</div>
+                              <div class="text-xs text-emerald-600 mt-1 font-medium">
+                                Waktu Transaksi: <%= trip.payment.paidAt ? new
+                                  Date(trip.payment.paidAt).toLocaleString('id-ID') : '-' %> WIB
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <% } %>
 
         </div>
       </div>
+
     </div>
   </div>
+
+  <script>
+    function handleFileSelect(input) {
+      if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+
+        document.getElementById("name-preview").textContent = file.name;
+        document.getElementById("size-preview").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+
+        const imgPreview = document.getElementById("img-preview");
+        const iconPlaceholder = document.getElementById("file-icon-placeholder");
+
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            imgPreview.src = e.target.result;
+            imgPreview.classList.remove("hidden");
+            iconPlaceholder.classList.add("hidden");
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imgPreview.classList.add("hidden");
+          iconPlaceholder.classList.remove("hidden");
+          // Berikan ekstensi teks singkat untuk file non-gambar (misal: PDF, DOC)
+          iconPlaceholder.textContent = file.name.split('.').pop().toUpperCase() || "DOC";
+        }
+
+        document.getElementById("dropzone-empty").classList.add("hidden");
+        document.getElementById("dropzone-filled").classList.remove("hidden");
+      }
+    }
+
+    function clearFile() {
+      document.getElementById("file-input").value = "";
+      document.getElementById("dropzone-empty").classList.remove("hidden");
+      document.getElementById("dropzone-filled").classList.add("hidden");
+    }
+  </script>

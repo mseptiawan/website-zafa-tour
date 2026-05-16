@@ -1,3 +1,5 @@
+import { getPagination, getPaginationMeta } from "../utils/pagination.js";
+
 import mongoose from "mongoose";
 
 import {
@@ -101,12 +103,6 @@ export const handleApproval = async (req, res) => {
     return res.status(err.status || 500).send(err.message);
   }
 };
-export const reportTripPage = async (req, res) => {
-  res.render("trip/report", {
-    title: "Report",
-    user: req.session.user,
-  });
-};
 
 export const delegateTripToHR = async (req, res) => {
   try {
@@ -123,11 +119,31 @@ export const delegateTripToHR = async (req, res) => {
 
 export const myTrips = async (req, res) => {
   try {
-    const trips = await getMyTripsService(req.session.user._id);
+    const { page, limit, skip } = getPagination({
+      page: req.query.page,
+      limit: 10,
+    });
+
+    const query = {
+      userId: req.session.user._id,
+    };
+
+    const [trips, total] = await Promise.all([
+      BusinessTrip.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+
+      BusinessTrip.countDocuments(query),
+    ]);
+
+    const pagination = getPaginationMeta({
+      page,
+      limit,
+      total,
+    });
 
     res.render("trip/user/my", {
       title: "Perjalanan Saya",
       trips,
+      pagination,
     });
   } catch (err) {
     console.log(err);
@@ -228,6 +244,84 @@ export const resubmit = async (req, res) => {
   }
 };
 
-/**
- * UPLOAD BUKTI TRANSFER
- */
+export const startTrip = async (req, res, next) => {
+  try {
+    const trip = await BusinessTrip.findById(req.params.id);
+
+    if (!trip) {
+      return res.status(404).send("Trip not found");
+    }
+
+    // hanya pemilik trip
+    if (trip.userId.toString() !== req.session.user._id.toString()) {
+      return res.status(403).send("Forbidden");
+    }
+
+    // hanya bisa mulai jika ready
+    if (trip.status !== "READY_TO_TRAVEL") {
+      return res.status(400).send("Trip belum siap dimulai");
+    }
+
+    trip.status = "ON_TRIP";
+    trip.startedAt = new Date();
+
+    await trip.save();
+
+    return res.redirect(`/trip/${trip._id}`);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const reportTripPage = async (req, res, next) => {
+  try {
+    const trip = await BusinessTrip.findById(req.params.id);
+
+    if (!trip) {
+      return res.status(404).send("Trip not found");
+    }
+
+    return res.render("trip/report", {
+      title: "Laporan Perjalanan",
+      trip,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const submitTripReport = async (req, res, next) => {
+  try {
+    const trip = await BusinessTrip.findById(req.params.id);
+
+    if (!trip) {
+      return res.status(404).send("Trip not found");
+    }
+
+    if (trip.status !== "ON_TRIP") {
+      return res.status(400).send("Trip belum dimulai");
+    }
+
+    const attachments = (req.files || []).map((file) => ({
+      filename: file.filename,
+      url: `/uploads/files/${file.filename}`,
+      mimetype: file.mimetype,
+      size: file.size,
+    }));
+
+    trip.tripReport = {
+      isSubmitted: true,
+      submittedAt: new Date(),
+      description: req.body.description,
+      attachments,
+    };
+
+    trip.status = "SUBMITTED";
+
+    await trip.save();
+
+    return res.redirect(`/trip/${trip._id}`);
+  } catch (err) {
+    next(err);
+  }
+};

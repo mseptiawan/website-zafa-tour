@@ -1,3 +1,4 @@
+import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import BusinessTrip from "../models/BusinessTrip.js";
 import { getFinanceTripDetailService } from "../services/finance.service.js";
 
@@ -58,14 +59,31 @@ export const confirmPayment = async (req, res, next) => {
       return res.status(404).send("Trip not found");
     }
 
-    // safety guard: harus ada proof dulu
-    if (!trip.payment?.proof) {
+    // ======================================================
+    // 1. SAFETY GUARD: HARUS ADA PROOF
+    // ======================================================
+    if (!trip.payment?.proof?.filename) {
       return res.status(400).send("Payment proof required");
     }
 
+    // ======================================================
+    // 2. SAFETY GUARD: CEGAH DOUBLE CONFIRM
+    // ======================================================
+    if (trip.payment?.status === "PAID") {
+      return res.status(400).send("Payment already confirmed");
+    }
+
+    // ======================================================
+    // 3. SET PAYMENT PAID
+    // ======================================================
     trip.payment.status = "PAID";
     trip.payment.paidAt = new Date();
     trip.payment.paidBy = req.user?._id;
+
+    // ======================================================
+    // 4. TRANSITION BUSINESS STATUS
+    // ======================================================
+    trip.status = "READY_TO_TRAVEL";
 
     await trip.save();
 
@@ -107,32 +125,102 @@ export const financeTripDetail = async (req, res, next) => {
  */
 export const financeTripPage = async (req, res, next) => {
   try {
-    const trips = await BusinessTrip.find({
+    const { page, limit, skip } = getPagination({
+      page: req.query.page,
+      limit: 10,
+    });
+
+    const query = {
       status: "APPROVED",
       "payment.status": {
         $in: ["PENDING", "PROCESSING", "FAILED"],
       },
-    })
-      .populate("userId", "username")
-      .sort({ createdAt: -1 });
+    };
+
+    const [trips, total] = await Promise.all([
+      BusinessTrip.find(query)
+        .populate("userId", "username")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+
+      BusinessTrip.countDocuments(query),
+    ]);
+
+    const pagination = getPaginationMeta({
+      page,
+      limit,
+      total,
+    });
 
     return res.render("trip/finance/index", {
       title: "Finance Trips",
       trips,
+      pagination,
     });
   } catch (err) {
     next(err);
   }
 };
-
 /**
  * PAYMENT HISTORY PAGE
  */
 export const paymentHistoryPage = async (req, res, next) => {
   try {
-    return res.render("trip/payment-history", {
+    const { page, limit, skip } = getPagination({
+      page: req.query.page,
+      limit: 10,
+    });
+
+    const query = {
+      "payment.status": "PAID",
+    };
+
+    const [trips, total] = await Promise.all([
+      BusinessTrip.find(query)
+        .populate("userId", "username roleId")
+        .populate("payment.paidBy", "username")
+        .sort({ "payment.paidAt": -1 })
+        .skip(skip)
+        .limit(limit),
+
+      BusinessTrip.countDocuments(query),
+    ]);
+
+    const pagination = getPaginationMeta({
+      page,
+      limit,
+      total,
+    });
+
+    return res.render("trip/finance/history", {
       title: "Payment History",
       user: req.session.user,
+      trips,
+      pagination,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+export const paymentHistoryDetail = async (req, res, next) => {
+  try {
+    const trip = await BusinessTrip.findById(req.params.id)
+      .populate("userId", "username email role")
+      .populate("payment.paidBy", "username");
+
+    if (!trip) {
+      return res.status(404).send("Not found");
+    }
+
+    if (trip.payment?.status !== "PAID") {
+      return res.status(400).send("Not a paid transaction");
+    }
+
+    return res.render("trip/finance/history-detail", {
+      title: "Payment Detail",
+      trip,
+      user: req.user,
     });
   } catch (err) {
     next(err);

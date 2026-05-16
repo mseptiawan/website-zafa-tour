@@ -9,10 +9,20 @@ export const getFinanceTripDetailService = async ({ id }) => {
     throw err;
   }
 
-  // validasi domain finance
+  // ======================================================
+  // FINANCE ACCESS RULE (UPDATED FLOW)
+  // ======================================================
+
+  const allowedTripStatus = [
+    "APPROVED",
+    "READY_TO_TRAVEL",
+    "ON_TRIP", // optional kalau mau lihat history finance saat perjalanan
+  ];
+
+  const allowedPaymentStatus = ["PENDING", "PROCESSING", "FAILED", "PAID"];
+
   const isFinanceEligible =
-    trip.status === "APPROVED" &&
-    ["PENDING", "PROCESSING", "FAILED", "PAID"].includes(trip.payment?.status);
+    allowedTripStatus.includes(trip.status) && allowedPaymentStatus.includes(trip.payment?.status);
 
   if (!isFinanceEligible) {
     const err = new Error("Trip tidak tersedia untuk finance");
@@ -22,7 +32,6 @@ export const getFinanceTripDetailService = async ({ id }) => {
 
   return trip;
 };
-
 export const uploadPaymentProofService = async ({ id, file }) => {
   const trip = await BusinessTrip.findById(id);
 

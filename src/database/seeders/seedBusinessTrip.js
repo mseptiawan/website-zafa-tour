@@ -8,14 +8,16 @@ dotenv.config();
 
 await mongoose.connect(process.env.MONGODB_URI);
 
-// =========================
+// ======================================================
 // TARGET USERS
-// =========================
+// ======================================================
+
 const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
 
-// =========================
-// SAMPLE DATA
-// =========================
+// ======================================================
+// MASTER DATA
+// ======================================================
+
 const titles = [
   "Kunjungan Sales Area",
   "Meeting Client Project",
@@ -43,49 +45,71 @@ const descriptions = [
 
 const purposes = ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"];
 
-const roles = ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"];
+const requesterRoles = ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"];
 
-// =========================
+// ======================================================
 // HELPERS
-// =========================
+// ======================================================
+
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+function randomBudget() {
+  return Math.floor(Math.random() * 25000000) + 1000000;
+}
+
 function randomDate() {
-  const start = new Date(2026, 3, 1);
-  const end = new Date(2026, 4, 30);
+  const start = new Date(2026, 0, 1);
+  const end = new Date(2026, 11, 31);
+
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-function fixDateRange() {
+function createDateRange() {
   const start = randomDate();
+
   const end = new Date(start);
+
   end.setDate(start.getDate() + Math.floor(Math.random() * 5) + 1);
-  return { start, end };
+
+  return {
+    start,
+    end,
+  };
 }
 
-// =========================
-// APPROVAL GENERATOR (UPDATED)
-// =========================
+// ======================================================
+// APPROVAL GENERATOR
+// ======================================================
+
 function generateApprovals(status) {
   const approvals = [];
 
+  // REJECT FLOW
   if (status === "REJECTED") {
-    return [
-      {
-        step: "MANAGER",
-        actor: "MANAGER",
-        userId: new mongoose.Types.ObjectId(),
-        status: "REJECTED",
-        date: randomDate(),
-        note: "Rejected by manager",
-      },
-    ];
+    approvals.push({
+      step: "MANAGER",
+      actor: "MANAGER",
+      userId: new mongoose.Types.ObjectId(),
+      status: "REJECTED",
+      date: randomDate(),
+      note: "Rejected by manager",
+    });
+
+    return approvals;
   }
 
+  // MANAGER APPROVAL
   if (
-    ["IN_REVIEW", "APPROVED", "PAYMENT_PROCESSING", "PAID", "ON_TRIP", "SUBMITTED"].includes(status)
+    [
+      "IN_REVIEW",
+      "APPROVED",
+      "PAYMENT_PROCESSING",
+      "READY_TO_TRAVEL",
+      "ON_TRIP",
+      "SUBMITTED",
+    ].includes(status)
   ) {
     approvals.push({
       step: "MANAGER",
@@ -97,129 +121,216 @@ function generateApprovals(status) {
     });
   }
 
-  if (["APPROVED", "PAYMENT_PROCESSING", "PAID", "ON_TRIP", "SUBMITTED"].includes(status)) {
-    const useDelegation = Math.random() > 0.7;
+  // PIMPINAN APPROVAL
+  if (
+    ["APPROVED", "PAYMENT_PROCESSING", "READY_TO_TRAVEL", "ON_TRIP", "SUBMITTED"].includes(status)
+  ) {
+    const delegated = Math.random() > 0.7;
 
     approvals.push({
       step: "PIMPINAN",
-      actor: useDelegation ? "HR" : "PIMPINAN",
+      actor: delegated ? "HR" : "PIMPINAN",
       userId: new mongoose.Types.ObjectId(),
       status: "APPROVED",
       date: randomDate(),
-      note: useDelegation ? "Approved via HR delegation" : "",
+      note: delegated ? "Approved via delegation" : "",
     });
   }
 
   return approvals;
 }
 
-// =========================
+// ======================================================
+// PAYMENT GENERATOR
+// ======================================================
+
+function generatePayment(status) {
+  // DEFAULT
+  const payment = {
+    status: "PENDING",
+    amount: randomBudget(),
+    proof: null,
+    paidAt: null,
+    paidBy: null,
+    note: "",
+  };
+
+  // PROCESSING
+  if (status === "PAYMENT_PROCESSING") {
+    payment.status = "PROCESSING";
+
+    return payment;
+  }
+
+  // READY / ON TRIP / SUBMITTED
+  if (["READY_TO_TRAVEL", "ON_TRIP", "SUBMITTED"].includes(status)) {
+    payment.status = "PAID";
+
+    payment.proof = {
+      filename: "payment-proof.pdf",
+      url: "/uploads/files/payment-proof.pdf",
+      uploadedAt: randomDate(),
+    };
+
+    payment.paidAt = randomDate();
+
+    payment.paidBy = new mongoose.Types.ObjectId();
+
+    return payment;
+  }
+
+  return payment;
+}
+
+// ======================================================
+// REPORT GENERATOR
+// ======================================================
+
+function generateTripReport(status) {
+  if (status !== "SUBMITTED") {
+    return {
+      isSubmitted: false,
+      submittedAt: null,
+      description: "",
+      attachments: [],
+    };
+  }
+
+  return {
+    isSubmitted: true,
+
+    submittedAt: randomDate(),
+
+    description: "Perjalanan berhasil dilakukan dan meeting berjalan dengan baik.",
+
+    attachments: [
+      {
+        filename: "laporan-perjalanan.pdf",
+        url: "/uploads/files/laporan-perjalanan.pdf",
+        mimetype: "application/pdf",
+        size: 245000,
+      },
+    ],
+  };
+}
+
+// ======================================================
 // MAIN SEED
-// =========================
+// ======================================================
+
 async function seed() {
-  const users = await User.find({
-    username: { $in: usernames },
-  });
+  try {
+    const users = await User.find({
+      username: {
+        $in: usernames,
+      },
+    });
 
-  if (!users.length) {
-    console.log("User tidak ditemukan");
-    process.exit();
-  }
-
-  await BusinessTrip.deleteMany({});
-
-  const statusPool = [
-    "PENDING",
-    "IN_REVIEW",
-    "APPROVED",
-    "REJECTED",
-    "PAYMENT_PROCESSING",
-    "PAID",
-    "ON_TRIP",
-    "SUBMITTED",
-  ];
-
-  const data = [];
-
-  for (const user of users) {
-    for (let i = 0; i < 30; i++) {
-      const status = randomItem(statusPool);
-      const { start, end } = fixDateRange();
-      const requesterRole = randomItem(roles);
-
-      const isDelegated = Math.random() > 0.8 && status !== "PENDING";
-
-      data.push({
-        userId: user._id,
-        requesterRole,
-
-        title: randomItem(titles),
-        purpose: randomItem(purposes),
-        meetWith: randomItem(meetWithList),
-
-        startDate: start,
-        endDate: end,
-
-        destination: randomItem(destinations),
-        description: randomItem(descriptions),
-
-        budget: Math.floor(Math.random() * 25000000) + 1000000,
-
-        timeline: [
-          {
-            address: randomItem(destinations),
-            order: 1,
-          },
-        ],
-
-        status,
-
-        currentStep: status === "PENDING" ? "MANAGER" : status === "IN_REVIEW" ? "PIMPINAN" : null,
-
-        approvals: generateApprovals(status),
-
-        delegation: isDelegated
-          ? {
-              active: true,
-              from: "PIMPINAN",
-              to: "HR",
-              delegatedBy: user._id,
-              delegatedAt: randomDate(),
-              note: "Auto seeded delegation",
-            }
-          : {
-              active: false,
-            },
-
-        tripReport: {
-          isSubmitted: status === "SUBMITTED",
-          submittedAt: status === "SUBMITTED" ? randomDate() : null,
-          description: status === "SUBMITTED" ? "Laporan perjalanan dinas" : "",
-          attachments: [],
-        },
-
-        payment: {
-          status:
-            status === "PAID" ? "PAID" : status === "PAYMENT_PROCESSING" ? "PROCESSING" : "PENDING",
-
-          amount: 0,
-
-          paidAt: status === "PAID" ? randomDate() : null,
-          paidBy: null,
-          note: "",
-        },
-
-        createdAt: randomDate(),
-        updatedAt: new Date(),
-      });
+    if (!users.length) {
+      console.log("User tidak ditemukan");
+      process.exit();
     }
+
+    await BusinessTrip.deleteMany({});
+
+    const statuses = [
+      "PENDING",
+      "IN_REVIEW",
+      "APPROVED",
+      "REJECTED",
+      "PAYMENT_PROCESSING",
+      "READY_TO_TRAVEL",
+      "ON_TRIP",
+      "SUBMITTED",
+    ];
+
+    const data = [];
+
+    for (const user of users) {
+      for (let i = 0; i < 30; i++) {
+        const status = randomItem(statuses);
+
+        const { start, end } = createDateRange();
+
+        const delegated =
+          Math.random() > 0.8 &&
+          ["APPROVED", "PAYMENT_PROCESSING", "READY_TO_TRAVEL", "ON_TRIP", "SUBMITTED"].includes(
+            status
+          );
+
+        data.push({
+          userId: user._id,
+
+          requesterRole: randomItem(requesterRoles),
+
+          title: randomItem(titles),
+
+          purpose: randomItem(purposes),
+
+          meetWith: randomItem(meetWithList),
+
+          startDate: start,
+
+          endDate: end,
+
+          destination: randomItem(destinations),
+
+          description: randomItem(descriptions),
+
+          budget: randomBudget(),
+
+          timeline: [
+            {
+              address: randomItem(destinations),
+              order: 1,
+            },
+            {
+              address: randomItem(destinations),
+              order: 2,
+            },
+          ],
+
+          status,
+
+          currentStep:
+            status === "PENDING" ? "MANAGER" : status === "IN_REVIEW" ? "PIMPINAN" : null,
+
+          approvals: generateApprovals(status),
+
+          delegation: delegated
+            ? {
+                active: true,
+                from: "PIMPINAN",
+                to: "HR",
+                delegatedBy: user._id,
+                delegatedAt: randomDate(),
+                note: "Auto delegation seeded",
+              }
+            : {
+                active: false,
+              },
+
+          tripReport: generateTripReport(status),
+
+          payment: generatePayment(status),
+
+          createdAt: randomDate(),
+
+          updatedAt: new Date(),
+        });
+      }
+    }
+
+    await BusinessTrip.insertMany(data);
+
+    console.log("Seeder BusinessTrip berhasil dibuat");
+
+    await mongoose.disconnect();
+  } catch (err) {
+    console.log(err);
+
+    await mongoose.disconnect();
   }
-
-  await BusinessTrip.insertMany(data);
-
-  console.log("Seeder updated sesuai schema terbaru");
-
-  await mongoose.disconnect();
 }
 
 seed();

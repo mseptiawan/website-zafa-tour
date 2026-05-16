@@ -59,6 +59,7 @@ const businessTripSchema = new mongoose.Schema(
         "APPROVED",
         "REJECTED",
         "PAYMENT_PROCESSING",
+        "READY_TO_TRAVEL",
         "PAID",
         "ON_TRIP",
         "SUBMITTED",

@@ -1,80 +1,158 @@
 <%- layout('layouts/main', { title }) %>
 
-<div style="margin-left:280px; padding:32px;">
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+    <div class="max-w-5xl mx-auto">
 
-  <h1 style="font-size:24px; font-weight:700;">
-    Riwayat Pembayaran Dinas Luar
-  </h1>
+      <!-- HEADER -->
+      <div class="mb-8">
+        <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+          <span>Finance</span>
+          <span class="text-slate-300">/</span>
+          <span class="text-slate-900">Payment History</span>
+        </nav>
 
-  <div style="
-    margin-top:24px;
-    background:#fff;
-    border-radius:14px;
-    overflow:hidden;
-    border:1px solid #e2e8f0;
-  ">
+        <h1 class="text-2xl font-bold text-slate-900">
+          Riwayat Pembayaran Dinas Luar
+        </h1>
+        <p class="text-[14px] text-slate-500 mt-1">
+          Daftar pelacakan riwayat pencairan dana dan transfer perjalanan dinas
+        </p>
+      </div>
 
-    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+      <!-- CARD / TABLE WRAPPER -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
 
-      <thead>
-        <tr style="background:#f8fafc;">
+          <table class="w-full text-sm min-w-[900px]">
 
-          <th style="padding:14px;">Pengaju</th>
-          <th style="padding:14px;">Role</th>
-          <th style="padding:14px;">Judul</th>
-          <th style="padding:14px;">Budget</th>
-          <th style="padding:14px;">Status Approval</th>
-          <th style="padding:14px;">Status Pembayaran</th>
-          <th style="padding:14px;">Dibayar Oleh</th>
-          <th style="padding:14px;">Tanggal Bayar</th>
+            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+              <tr>
+                <th class="text-left px-6 py-4">Pengaju</th>
+                <th class="text-left px-6 py-4">Judul</th>
+                <th class="text-left px-6 py-4">Budget</th>
+                <th class="text-left px-6 py-4">Status Pembayaran</th>
+                <th class="text-left px-6 py-4">Tanggal Bayar</th>
+                <th class="p-3 text-left">Action</th>
+              </tr>
+            </thead>
 
-        </tr>
-      </thead>
+            <tbody class="divide-y divide-slate-100">
+              <% if (trips.length===0) { %>
+                <tr>
+                  <td colspan="5" class="text-center py-10 text-slate-400">
+                    Belum ada data riwayat pembayaran
+                  </td>
+                </tr>
+                <% } %>
 
-      <tbody>
-        <% trips.forEach(t => { %>
+                  <% trips.forEach(t=> { %>
+                    <tr class="hover:bg-slate-50/80 transition-all">
 
-          <tr style="border-top:1px solid #f1f5f9;">
+                      <!-- PENGAJU -->
+                      <td class="px-6 py-4 text-slate-600">
+                        <div class="font-bold text-slate-800">
+                          <%= t.userId?.username || '-' %>
+                        </div>
 
-            <td style="padding:14px;">
-              <%= t.userId?.username || '-' %>
-            </td>
+                      </td>
 
-            <td style="padding:14px;">
-              <%= t.userId?.roleId?.name || '-' %>
-            </td>
+                      <!-- JUDUL -->
+                      <td class="px-6 py-4 font-medium text-slate-800">
+                        <%= t.title || '-' %>
+                      </td>
 
-            <td style="padding:14px;">
-              <%= t.title %>
-            </td>
+                      <!-- BUDGET -->
+                      <td class="px-6 py-4 font-bold text-slate-700">
+                        Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+                      </td>
 
-            <td style="padding:14px;">
-              Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
-            </td>
+                      <!-- STATUS PEMBAYARAN -->
+                      <td class="px-6 py-4">
+                        <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
+    <%= t.payment?.status === 'PAID'
+      ? 'bg-slate-50 text-slate-700 border-slate-200'
+      : t.payment?.status === 'PROCESSING'
+        ? 'bg-amber-50 text-amber-700 border-amber-200'
+        : 'bg-red-50 text-red-700 border-red-200'
+    %>">
+                          <%= t.payment?.status || 'UNPAID' %>
+                        </span>
+                      </td>
 
-            <td style="padding:14px;">
-              <%= t.status %>
-            </td>
+                      <!-- TANGGAL BAYAR -->
+                      <td class="px-6 py-4 text-slate-500 font-medium">
+                        <%= t.payment?.paidAt ? new Date(t.payment.paidAt).toLocaleDateString('id-ID', { day: '2-digit'
+                          , month: 'short' , year: 'numeric' }) : '-' %>
+                      </td>
+                      <td class="p-3">
+                        <a href="/finance/history/<%= t._id %>"
+                          class="inline-flex items-center text-blue-600 hover:text-blue-800" title="Detail">
 
-            <td style="padding:14px;">
-              <%= t.paymentStatus || 'UNPAID' %>
-            </td>
+                          <!-- eye icon (view/detail) -->
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
+                          </svg>
 
-            <td style="padding:14px;">
-              <%= t.paidBy?.username || '-' %>
-            </td>
+                        </a>
+                      </td>
+                    </tr>
 
-            <td style="padding:14px;">
-              <%= t.paidAt ? new Date(t.paidAt).toLocaleDateString('id-ID') : '-' %>
-            </td>
+                    <% }) %>
 
-          </tr>
+            </tbody>
 
-        <% }) %>
-      </tbody>
+          </table>
 
-    </table>
+        </div>
+      </div>
 
+    </div>
+    <% if (pagination.totalPages> 1) { %>
+      <div
+        class="flex items-center justify-between mt-6 px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[13px] antialiased">
+
+        <!-- LEFT INFO -->
+        <div class="text-slate-500 font-medium">
+          Menampilkan halaman
+          <span class="font-bold text-slate-900">
+            <%= pagination.page %>
+          </span>
+          dari
+          <span class="font-bold text-slate-900">
+            <%= pagination.totalPages %>
+          </span>
+        </div>
+
+        <!-- RIGHT CONTROLS -->
+        <div class="flex items-center gap-2">
+
+          <!-- PREV BUTTON -->
+          <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+          <%= pagination.hasPrev
+            ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+            : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Prev
+          </a>
+
+          <!-- NEXT BUTTON -->
+          <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+          <%= pagination.hasNext
+            ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+            : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
+            Next
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+
+        </div>
+
+      </div>
+      <% } %>
   </div>
-
-</div>

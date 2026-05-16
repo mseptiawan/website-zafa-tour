@@ -1,0 +1,178 @@
+<%- layout('layouts/main', { title }) %>
+
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+    <div class="max-w-5xl mx-auto">
+
+      <!-- BACK TO HISTORY / DASHBOARD -->
+      <a href="javascript:history.back()"
+        class="inline-flex items-center gap-2 text-[14px] font-bold text-slate-400 hover:text-slate-900 mb-6 uppercase tracking-widest transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Kembali
+      </a>
+
+      <!-- MAIN CARD -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+
+        <!-- HEADER -->
+        <div class="p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900">
+              Payment Detail
+            </h1>
+            <p class="text-[14px] text-slate-500 mt-1">
+              Detail transaksi dan pelacakan dana perjalanan dinas
+            </p>
+          </div>
+
+          <!-- PAYMENT STATUS BADGE -->
+          <div>
+            <span class="px-3 py-1 text-xs rounded-full border font-bold uppercase tracking-wider block text-center
+            <%= trip.payment?.status === 'PAID'
+              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+              : trip.payment?.status === 'PROCESSING'
+                ? 'bg-amber-50 text-amber-600 border-amber-200'
+                : 'bg-red-50 text-red-600 border-red-200'
+            %>">
+              <%= trip.payment?.status || 'UNPAID' %>
+            </span>
+          </div>
+        </div>
+
+        <!-- BODY content -->
+        <div class="p-8 space-y-8">
+
+          <!-- CORE INFORMATION GRID -->
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nama Pengaju</div>
+              <div class="text-[14px] font-bold text-slate-800">
+                <%= trip.userId?.username || '-' %>
+              </div>
+            </div>
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Destinasi</div>
+              <div class="text-[14px] font-bold text-slate-800">
+                <%= trip.destination || '-' %>
+              </div>
+            </div>
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Budget Dinas</div>
+              <div class="text-[14px] font-bold text-slate-900">Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
+              </div>
+            </div>
+            <div class="space-y-0.5">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Approval</div>
+              <div class="text-[14px] font-bold text-slate-800">
+                <%= trip.status==='APPROVED' ? 'Disetujui Pimpinan' : trip.status %>
+              </div>
+            </div>
+          </div>
+
+          <!-- TRIP TITLE & DESCRIPTION -->
+          <div class="space-y-4">
+            <div class="space-y-1">
+              <label class="text-[13px] font-bold text-slate-400 uppercase tracking-wider block">Judul
+                Perjalanan</label>
+              <div class="text-base font-bold text-slate-800">
+                <%= trip.title || '-' %>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="text-[13px] font-bold text-slate-700 block">Deskripsi / Keperluan</label>
+              <div
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-700 leading-relaxed">
+                <%= trip.description || '-' %>
+              </div>
+            </div>
+          </div>
+
+          <!-- TIMELINE -->
+          <div class="space-y-3">
+            <label class="text-[13px] font-bold text-slate-700 block">Rute / Timeline Kunjungan</label>
+            <% if (!trip.timeline || trip.timeline.length===0) { %>
+              <div class="p-4 rounded-xl bg-slate-50 text-slate-400 text-[14px] border border-slate-200/60 text-center">
+                Tidak ada data rute perjalanan
+              </div>
+              <% } else { %>
+                <div class="space-y-3 pl-2">
+                  <% trip.timeline.forEach(t=> { %>
+                    <div class="relative border-l-2 border-slate-200 pl-4 py-0.5">
+                      <div class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-slate-300"></div>
+                      <p class="text-[14px] text-slate-700 font-medium">
+                        <%= t.address %>
+                      </p>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } %>
+          </div>
+
+          <!-- PAYMENT PROOF & META SECTION -->
+          <div class="pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            <!-- LEFT: PROOF DOWNLOAD -->
+            <div class="space-y-2">
+              <label class="text-[13px] font-bold text-slate-700 block">Lampiran Bukti Transfer</label>
+
+              <% if (trip.payment?.proof?.url) { %>
+                <div
+                  class="p-4 border border-slate-200 rounded-xl bg-white flex items-center justify-between gap-4 shadow-sm hover:border-slate-300 transition-all">
+                  <div class="flex items-center gap-3 overflow-hidden">
+                    <div
+                      class="w-10 h-10 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center text-slate-400 font-bold text-xs flex-shrink-0">
+                      PDF / IMG
+                    </div>
+                    <div class="overflow-hidden">
+                      <div class="text-[14px] font-bold text-slate-800 truncate max-w-[220px]">
+                        <%= trip.payment.proof.filename || 'Bukti_Pembayaran.file' %>
+                      </div>
+                      <div class="text-xs text-slate-400">Klik tombol untuk mengunduh</div>
+                    </div>
+                  </div>
+
+                  <a href="<%= trip.payment.proof.url %>" target="_blank"
+                    class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold transition-all shadow-sm flex-shrink-0">
+                    View File
+                  </a>
+                </div>
+                <% } else { %>
+                  <div
+                    class="p-4 rounded-xl bg-slate-50 text-slate-400 text-[14px] border border-slate-200/60 border-dashed text-center">
+                    Belum ada bukti pembayaran yang diunggah
+                  </div>
+                  <% } %>
+            </div>
+
+            <!-- RIGHT: TRANSACTION METADATA -->
+            <div class="space-y-4 bg-slate-50/50 p-4 border border-slate-200/60 rounded-xl">
+              <label class="text-[12px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Informasi
+                Pemrosesan</label>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Diproses Oleh</div>
+                  <div class="text-[14px] font-bold text-slate-700">
+                    <%= trip.payment?.paidBy?.username || '-' %>
+                  </div>
+                </div>
+
+                <div class="space-y-0.5">
+                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Waktu Pembayaran</div>
+                  <div class="text-[13px] font-bold text-slate-700">
+                    <%= trip.payment?.paidAt ? new Date(trip.payment.paidAt).toLocaleString('id-ID') : '-' %> WIB
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>

@@ -5,6 +5,8 @@ import { uploadFile } from "../middlewares/uploadFile.js";
 import {
   financeTripPage,
   financeTripDetail,
+  paymentHistoryPage,
+  paymentHistoryDetail,
   processPayment,
   uploadPaymentProof,
   confirmPayment,
@@ -18,6 +20,9 @@ const router = express.Router();
 
 // list finance trips
 router.get("/", roleMiddleware("KEUANGAN"), financeTripPage);
+router.get("/history", roleMiddleware("KEUANGAN"), paymentHistoryPage);
+
+router.get("/history/:id", roleMiddleware("KEUANGAN"), paymentHistoryDetail);
 
 // detail finance trip
 router.get("/:id", roleMiddleware("KEUANGAN"), financeTripDetail);

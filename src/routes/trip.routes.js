@@ -1,3 +1,5 @@
+import { uploadFile } from "../middlewares/uploadFile.js";
+
 import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
@@ -6,6 +8,8 @@ import {
   show,
   approvalDetailPage,
   newForm,
+  startTrip,
+  submitTripReport,
   showEditForm,
   update,
   resubmit,
@@ -31,7 +35,9 @@ router.get("/:id/edit", showEditForm);
 router.put("/:id", update);
 
 router.post("/:id/resubmit", resubmit);
-
+router.post("/:id/start", authMiddleware, startTrip);
+router.get("/:id/report", authMiddleware, reportTripPage);
+router.post("/:id/report", authMiddleware, uploadFile.array("attachments"), submitTripReport);
 router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
 
 router.get("/approval/:id", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalDetailPage);

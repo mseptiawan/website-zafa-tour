@@ -1,0 +1,138 @@
+<%- layout('layouts/main', { title }) %>
+
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+
+    <div class="max-w-3xl mx-auto">
+
+      <!-- BACK -->
+      <a href="/trip" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6">
+        ← Kembali
+      </a>
+
+      <!-- CARD -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
+
+        <!-- HEADER -->
+        <div class="mb-6">
+          <h1 class="text-2xl font-semibold text-slate-800">
+            <%= trip.title %>
+          </h1>
+
+          <p class="text-sm text-slate-500 mt-2">
+            <%= trip.description || 'Tidak ada deskripsi' %>
+          </p>
+
+          <div class="mt-4">
+            <span class="
+            text-xs px-3 py-1 rounded-md border
+            <%= trip.status === 'APPROVED'
+              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+              : trip.status === 'REJECTED'
+                ? 'bg-red-50 text-red-600 border-red-200'
+                : 'bg-blue-50 text-blue-600 border-blue-200'
+            %>
+          ">
+              <%= trip.status %>
+            </span>
+          </div>
+        </div>
+
+        <!-- GRID INFO -->
+        <div class="grid grid-cols-2 gap-4 text-sm">
+
+          <div>
+            <div class="text-xs text-slate-400 uppercase">Tujuan</div>
+            <div class="text-slate-700">
+              <%= trip.destination || '-' %>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 uppercase">Bertemu Dengan</div>
+            <div class="text-slate-700">
+              <%= trip.meetWith || '-' %>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 uppercase">Budget</div>
+            <div class="text-slate-700">
+              Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs text-slate-400 uppercase">Mulai</div>
+            <div class="text-slate-700">
+              <%= new Date(trip.startDate).toLocaleDateString('id-ID') %>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs text-slate-400 uppercase">Selesai</div>
+            <div class="text-slate-700">
+              <%= new Date(trip.endDate).toLocaleDateString('id-ID') %>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 uppercase">
+              Tahap Validasi
+            </div>
+
+            <div class="text-slate-700">
+              <%= trip.currentStep || '-' %>
+            </div>
+          </div>
+          <% const rejectedApproval=trip.approvals ?.filter(a=> a.status === "REJECTED")
+            ?.slice(-1)[0];
+            %>
+
+            <div>
+              <div class="text-xs text-slate-400 uppercase">
+                Catatan Reject
+              </div>
+
+              <div class="text-slate-700">
+                <%= rejectedApproval?.note || '-' %>
+              </div>
+            </div>
+
+
+        </div>
+
+
+        <!-- NOTE -->
+        <% if (trip.note) { %>
+          <div class="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+            <div class="text-xs text-slate-400 uppercase mb-1">Catatan</div>
+            <div class="text-sm text-slate-700">
+              <%= trip.note %>
+            </div>
+          </div>
+          <% } %>
+
+            <!-- TIMELINE -->
+            <% if (trip.timeline && trip.timeline.length> 0) { %>
+              <div class="mt-6">
+                <div class="text-xs text-slate-400 uppercase mb-2">
+                  Timeline
+                </div>
+
+                <div class="space-y-2">
+                  <% trip.timeline.forEach((t, i)=> { %>
+                    <div class="flex gap-2 text-sm text-slate-700">
+                      <span class="text-slate-400">
+                        <%= i + 1 %>.
+                      </span>
+                      <span>
+                        <%= t.address %>
+                      </span>
+                    </div>
+                    <% }) %>
+                </div>
+              </div>
+              <% } %>
+
+      </div>
+
+    </div>
+
+  </div>
