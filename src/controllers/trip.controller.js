@@ -289,7 +289,6 @@ export const reportTripPage = async (req, res, next) => {
     next(err);
   }
 };
-
 export const submitTripReport = async (req, res, next) => {
   try {
     const trip = await BusinessTrip.findById(req.params.id);
@@ -302,12 +301,16 @@ export const submitTripReport = async (req, res, next) => {
       return res.status(400).send("Trip belum dimulai");
     }
 
-    const attachments = (req.files || []).map((file) => ({
-      filename: file.filename,
-      url: `/uploads/files/${file.filename}`,
-      mimetype: file.mimetype,
-      size: file.size,
-    }));
+    const attachments = req.file
+      ? [
+          {
+            filename: req.file.filename,
+            url: `/uploads/files/${req.file.filename}`,
+            mimetype: req.file.mimetype,
+            size: req.file.size,
+          },
+        ]
+      : [];
 
     trip.tripReport = {
       isSubmitted: true,
@@ -322,6 +325,7 @@ export const submitTripReport = async (req, res, next) => {
 
     return res.redirect(`/trip/${trip._id}`);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

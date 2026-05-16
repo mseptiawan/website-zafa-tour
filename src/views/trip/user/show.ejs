@@ -1,375 +1,366 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50 p-8">
+  <div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
+    <div class="max-w-4xl mx-auto">
 
-    <div class="max-w-5xl mx-auto">
-
-      <!-- BACK -->
-      <a href="/trip/my" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-6">
-
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      <!-- BACK BUTTON -->
+      <a href="/trip/my"
+        class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
+        <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
+          stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-
         Kembali
-
       </a>
 
       <!-- MAIN CARD -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div
+        class="bg-white border border-slate-200/60 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] overflow-hidden">
 
         <!-- HEADER -->
-        <div class="px-8 py-6 border-b border-slate-100 flex items-start justify-between">
-
+        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
           <div>
-
-            <h1 class="text-2xl font-bold text-slate-900">
+            <h1 class="text-xl font-semibold text-slate-900 tracking-tight">
               <%= trip.title %>
             </h1>
-
-            <p class="text-sm text-slate-500 mt-1">
-              Detail Perjalanan Dinas
+            <p class="text-[13px] text-slate-500 mt-0.5">
+              Detail Laporan Perjalanan Dinas
             </p>
-
           </div>
 
-          <!-- STATUS -->
+          <!-- STATUS BADGE -->
           <div>
-
-            <span class="px-3 py-1 rounded-full text-xs font-semibold border
-
-          <%= trip.status === 'PENDING'
-            ? 'bg-amber-50 text-amber-700 border-amber-200'
-            : trip.status === 'IN_REVIEW'
-            ? 'bg-blue-50 text-blue-700 border-blue-200'
-            : trip.status === 'APPROVED'
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-            : trip.status === 'READY_TO_TRAVEL'
-            ? 'bg-cyan-50 text-cyan-700 border-cyan-200'
-            : trip.status === 'ON_TRIP'
-            ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-            : trip.status === 'SUBMITTED'
-            ? 'bg-purple-50 text-purple-700 border-purple-200'
-            : 'bg-red-50 text-red-700 border-red-200'
+            <span class="text-[11px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider border
+          <%= trip.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200/50'
+            : trip.status === 'IN_REVIEW' ? 'bg-blue-50 text-blue-700 border-blue-200/50'
+            : trip.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
+            : trip.status === 'READY_TO_TRAVEL' ? 'bg-cyan-50 text-cyan-700 border-cyan-200/50'
+            : trip.status === 'ON_TRIP' ? 'bg-indigo-50 text-indigo-700 border-indigo-200/50'
+            : trip.status === 'SUBMITTED' ? 'bg-purple-50 text-purple-700 border-purple-200/50'
+            : 'bg-red-50 text-red-700 border-red-200/50'
           %>">
-
               <%= trip.status %>
-
             </span>
-
           </div>
-
         </div>
 
-        <!-- BODY -->
-        <div class="p-8 space-y-10">
+        <!-- BODY CONTAINER -->
+        <div class="p-8 space-y-8">
 
           <!-- ===================================== -->
-          <!-- EXECUTION ACTION AREA -->
+          <!-- EXECUTION ACTION AREA (READY TO TRAVEL)-->
           <!-- ===================================== -->
-
           <% if (trip.status==='READY_TO_TRAVEL' ) { %>
-
-            <div class="border border-cyan-200 bg-cyan-50 rounded-2xl p-6">
-
-              <div class="flex items-center justify-between">
-
-                <div>
-
-                  <h2 class="text-lg font-semibold text-cyan-900">
-                    Perjalanan Siap Dimulai
-                  </h2>
-
-                  <p class="text-sm text-cyan-700 mt-1">
-                    Dana perjalanan telah dicairkan dan perjalanan siap dilakukan.
-                  </p>
-
-                </div>
-
-                <form method="POST" action="/trip/<%= trip._id %>/start">
-
-                  <button class="px-5 py-2.5 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition">
-
-                    Mulai Perjalanan
-
-                  </button>
-
-                </form>
-
+            <div class="border border-cyan-100 bg-cyan-50/30 rounded-xl p-5 flex items-center justify-between">
+              <div>
+                <h2 class="text-sm font-semibold text-cyan-900">Perjalanan Siap Dimulai</h2>
+                <p class="text-[13px] text-cyan-700/90 mt-0.5">
+                  Dana perjalanan telah dicairkan dan operasional siap dilakukan.
+                </p>
               </div>
-
+              <form method="POST" action="/trip/<%= trip._id %>/start">
+                <button
+                  class="px-4 py-2 bg-cyan-600 text-white text-[13px] font-medium rounded-lg hover:bg-cyan-700 transition shadow-sm focus:ring-4 focus:ring-cyan-50">
+                  Mulai Perjalanan
+                </button>
+              </form>
             </div>
-
             <% } %>
 
               <!-- ===================================== -->
-              <!-- REPORT FORM -->
+              <!-- REPORT FORM (ON TRIP) -->
               <!-- ===================================== -->
-
               <% if (trip.status==='ON_TRIP' ) { %>
-
-                <div class="border border-indigo-200 bg-indigo-50 rounded-2xl p-6">
-
-                  <div class="mb-6">
-
-                    <h2 class="text-lg font-semibold text-indigo-900">
-                      Laporan Perjalanan
-                    </h2>
-
-                    <p class="text-sm text-indigo-700 mt-1">
-                      Isi hasil perjalanan dan upload dokumentasi pendukung.
+                <div class="border border-slate-100 bg-slate-50/40 rounded-xl p-6">
+                  <div class="mb-5">
+                    <h2 class="text-sm font-semibold text-slate-900">Laporan Hasil Perjalanan</h2>
+                    <p class="text-[13px] text-slate-500 mt-0.5">
+                      Isi rincian hasil aktivitas dinas serta lampirkan berkas bukti fisik pendukung.
                     </p>
-
                   </div>
 
                   <form method="POST" action="/trip/<%= trip._id %>/report" enctype="multipart/form-data"
-                    class="space-y-6">
-
-                    <!-- DESCRIPTION -->
+                    class="space-y-5">
+                    <!-- DESCRIPTION input -->
                     <div>
-
-                      <label class="block text-sm font-medium text-slate-700 mb-2">
-                        Hasil Perjalanan
-                      </label>
-
-                      <textarea name="description" rows="6" required
-                        class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                        placeholder="Tuliskan hasil meeting, survey, training, atau aktivitas perjalanan..."></textarea>
-
+                      <label class="block text-[13px] font-medium text-slate-700 mb-1.5">Hasil Perjalanan</label>
+                      <textarea name="description" rows="4" required
+                        class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:outline-none transition bg-white"
+                        placeholder="Tuliskan hasil meeting, temuan survey, materi training, atau poin penting lainnya..."></textarea>
                     </div>
 
-                    <!-- FILE -->
+                    <!-- FILE input -->
                     <div>
-
-                      <label class="block text-sm font-medium text-slate-700 mb-2">
+                      <label class="block text-[13px] font-medium text-slate-700 mb-1.5">
                         Lampiran Dokumentasi
                       </label>
 
-                      <input type="file" name="attachments" multiple
-                        class="block w-full border border-slate-300 rounded-xl px-4 py-3 bg-white" />
+                      <!-- upload box -->
+                      <div id="upload-box"
+                        class="relative w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
 
-                      <p class="text-xs text-slate-400 mt-2">
-                        PNG, JPG, PDF, DOCX diperbolehkan
-                      </p>
+                        <input type="file" name="attachments" id="attachments"
+                          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
 
+                        <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5"
+                          viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                        </svg>
+
+                        <span class="text-[13px] font-medium text-slate-600">
+                          Pilih Berkas atau Drop File Disini
+                        </span>
+
+                        <span class="text-xs text-slate-400 mt-0.5">
+                          PNG, JPG, PDF, atau DOCX
+                        </span>
+                      </div>
+
+                      <!-- preview -->
+                      <div id="preview-container" class="mt-3 hidden"></div>
                     </div>
 
-                    <!-- SUBMIT -->
-                    <div>
-
-                      <button class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition">
-
-                        Submit Laporan
-
+                    <!-- SUBMIT BUTTON -->
+                    <div class="pt-1">
+                      <button
+                        class="px-4 py-2 bg-indigo-600 text-white text-[13px] font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm focus:ring-4 focus:ring-indigo-500/10">
+                        Submit Laporan Resmi
                       </button>
-
                     </div>
-
                   </form>
-
                 </div>
-
                 <% } %>
 
                   <!-- ===================================== -->
-                  <!-- SUBMITTED REPORT -->
+                  <!-- SUBMITTED REPORT STATUS -->
                   <!-- ===================================== -->
-
                   <% if (trip.status==='SUBMITTED' ) { %>
-
-                    <div class="border border-emerald-200 bg-emerald-50 rounded-2xl p-6">
-
-                      <div class="flex items-center justify-between">
-
+                    <div class="border border-slate-200/70 bg-slate-50/30 rounded-xl p-6">
+                      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                         <div>
-
-                          <h2 class="text-lg font-semibold text-emerald-900">
-                            Laporan Perjalanan Telah Dikirim
-                          </h2>
-
-                          <p class="text-sm text-emerald-700 mt-1">
-                            Submitted at
-                            <%= trip.tripReport?.submittedAt ? new
-                              Date(trip.tripReport.submittedAt).toLocaleString('id-ID') : '-' %>
+                          <h2 class="text-sm font-semibold text-slate-900">Laporan Perjalanan Selesai Dikirim</h2>
+                          <p class="text-xs text-slate-400 mt-0.5">
+                            Dikirim pada: <%= trip.tripReport?.submittedAt ? new
+                              Date(trip.tripReport.submittedAt).toLocaleString('id-ID', {day: '2-digit' , month: 'short'
+                              , year: 'numeric' , hour: '2-digit' , minute:'2-digit'}) : '-' %>
                           </p>
-
                         </div>
-
-                        <div class="text-emerald-700 text-sm font-medium">
+                        <span
+                          class="text-[10px] px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 font-medium tracking-wider">
                           COMPLETED
-                        </div>
-
+                        </span>
                       </div>
 
-                      <!-- REPORT DESC -->
-                      <div class="mt-6">
-
-                        <div class="text-xs text-slate-400 mb-2">
-                          Hasil Perjalanan
-                        </div>
-
-                        <div class="text-slate-800 leading-relaxed">
+                      <!-- REPORT DESCRIPTION DISPLAY -->
+                      <div class="mt-4">
+                        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1.5">Ringkasan
+                          Hasil</div>
+                        <div
+                          class="text-sm text-slate-600 leading-relaxed bg-white border border-slate-100 p-4 rounded-xl shadow-[inner_0_1px_2px_rgba(0,0,0,0.01)]">
                           <%= trip.tripReport?.description || '-' %>
                         </div>
-
                       </div>
 
-                      <!-- ATTACHMENTS -->
+                      <!-- ATTACHMENTS DISPLAY -->
                       <% if (trip.tripReport?.attachments?.length> 0) { %>
-
-                        <div class="mt-6">
-
-                          <div class="text-xs text-slate-400 mb-3">
-                            Lampiran
-                          </div>
-
+                        <div class="mt-5">
+                          <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-2">Berkas
+                            Dokumen Pendukung</div>
                           <div class="space-y-2">
-
                             <% trip.tripReport.attachments.forEach(file=> { %>
+                              <div
+                                class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-white">
+                                <div class="flex items-center gap-3 min-w-0">
+                                  <!-- IMAGE PREVIEW -->
+                                  <% if (file.mimetype.startsWith('image/')) { %>
+                                    <img src="<%= file.url %>" alt="<%= file.filename %>"
+                                      class="w-12 h-12 object-cover rounded-lg border border-slate-100" />
+                                    <% } else { %>
+                                      <!-- FILE ICON -->
+                                      <div
+                                        class="w-12 h-12 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
+                                          stroke-width="1.5" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                        </svg>
+                                      </div>
+                                      <% } %>
 
-                              <a href="<%= file.url %>" target="_blank"
-                                class="flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white hover:bg-slate-50 transition">
-
-                                <div>
-
-                                  <div class="text-sm font-medium text-slate-800">
-                                    <%= file.filename %>
-                                  </div>
-
-                                  <div class="text-xs text-slate-400">
-                                    <%= file.mimetype %>
-                                  </div>
-
+                                        <!-- FILE INFO -->
+                                        <div class="min-w-0">
+                                          <div class="text-[13px] font-medium text-slate-700 truncate">
+                                            <%= file.filename %>
+                                          </div>
+                                          <div class="text-[11px] text-slate-400 uppercase mt-0.5">
+                                            <%= file.mimetype.split('/')[1] %>
+                                          </div>
+                                        </div>
                                 </div>
 
-                                <div class="text-sm text-blue-600">
-                                  View
-                                </div>
-
-                              </a>
-
+                                <!-- ACTION -->
+                                <a href="<%= file.url %>" target="_blank"
+                                  class="text-xs font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-50 hover:text-blue-700 px-2.5 py-1.5 rounded-lg transition">
+                                  View File
+                                </a>
+                              </div>
                               <% }) %>
-
                           </div>
-
                         </div>
-
                         <% } %>
-
                     </div>
-
                     <% } %>
 
                       <!-- ===================================== -->
-                      <!-- CORE INFORMATION -->
+                      <!-- CORE INFORMATION GRID -->
                       <!-- ===================================== -->
-
                       <div>
-
-                        <h2 class="text-lg font-semibold text-slate-900 mb-6">
-                          Informasi Perjalanan
+                        <h2 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3.5">
+                          Informasi Administrasi Utama
                         </h2>
 
-                        <div class="grid grid-cols-2 gap-6 text-sm">
-
+                        <div
+                          class="grid grid-cols-2 gap-x-8 gap-y-5 border border-slate-100 bg-slate-50/20 p-5 rounded-xl">
                           <div>
-                            <div class="text-slate-400 mb-1">Tujuan</div>
-                            <div class="font-medium text-slate-900">
+                            <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Kota /
+                              Lokasi Tujuan</div>
+                            <div class="text-[13px] font-medium text-slate-800">
                               <%= trip.destination || '-' %>
                             </div>
                           </div>
 
                           <div>
-                            <div class="text-slate-400 mb-1">Meet With</div>
-                            <div class="font-medium text-slate-900">
+                            <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Klien /
+                              Hubungan Kerja</div>
+                            <div class="text-[13px] font-medium text-slate-800">
                               <%= trip.meetWith || '-' %>
                             </div>
                           </div>
 
                           <div>
-                            <div class="text-slate-400 mb-1">Budget</div>
-                            <div class="font-medium text-slate-900">
+                            <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Total
+                              Anggaran (Budget)</div>
+                            <div class="text-[13px] font-semibold text-slate-900">
                               Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
                             </div>
                           </div>
 
                           <div>
-                            <div class="text-slate-400 mb-1">Purpose</div>
-                            <div class="font-medium text-slate-900">
+                            <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Kategori
+                              / Keperluan</div>
+                            <div class="text-[13px] font-medium text-slate-800">
                               <%= trip.purpose || '-' %>
                             </div>
                           </div>
 
                           <div>
-                            <div class="text-slate-400 mb-1">Tanggal Mulai</div>
-                            <div class="font-medium text-slate-900">
-                              <%= trip.startDate ? new Date(trip.startDate).toLocaleDateString('id-ID') : '-' %>
+                            <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal
+                              Mulai Dinas</div>
+                            <div class="text-[13px] font-medium text-slate-800">
+                              <%= trip.startDate ? new Date(trip.startDate).toLocaleDateString('id-ID', { day: '2-digit'
+                                , month: 'long' , year: 'numeric' }) : '-' %>
                             </div>
                           </div>
 
                           <div>
-                            <div class="text-slate-400 mb-1">Tanggal Selesai</div>
-                            <div class="font-medium text-slate-900">
-                              <%= trip.endDate ? new Date(trip.endDate).toLocaleDateString('id-ID') : '-' %>
+                            <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal
+                              Selesai Dinas</div>
+                            <div class="text-[13px] font-medium text-slate-800">
+                              <%= trip.endDate ? new Date(trip.endDate).toLocaleDateString('id-ID', { day: '2-digit' ,
+                                month: 'long' , year: 'numeric' }) : '-' %>
                             </div>
                           </div>
-
                         </div>
-
                       </div>
 
-                      <!-- DESCRIPTION -->
-                      <div>
-
-                        <div class="text-sm text-slate-400 mb-2">
-                          Deskripsi
-                        </div>
-
-                        <div class="text-slate-700 leading-relaxed">
+                      <!-- ===================================== -->
+                      <!-- ADDITIONAL DESCRIPTION -->
+                      <!-- ===================================== -->
+                      <div class="border-t border-slate-100 pt-6">
+                        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Deskripsi /
+                          Maksud Dinas</div>
+                        <div class="text-[13px] text-slate-600 leading-relaxed max-w-none">
                           <%= trip.description || '-' %>
                         </div>
-
                       </div>
 
-                      <!-- TIMELINE -->
-                      <div>
-
-                        <div class="text-sm text-slate-400 mb-4">
-                          Timeline
-                        </div>
+                      <!-- ===================================== -->
+                      <!-- TIMELINE MAP -->
+                      <!-- ===================================== -->
+                      <div class="border-t border-slate-100 pt-6">
+                        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Rute / Titik
+                          Lokasi Perjalanan</div>
 
                         <% if (!trip.timeline || trip.timeline.length===0) { %>
-
-                          <div class="text-sm text-slate-400">
-                            Tidak ada timeline
+                          <div
+                            class="text-xs text-slate-400 bg-slate-50/50 p-4 rounded-xl border border-dashed border-slate-200 text-center">
+                            Tidak ada data runtunan rute lokasi perjalanan dinas.
                           </div>
-
                           <% } else { %>
-
-                            <div class="space-y-3">
-
+                            <div
+                              class="relative pl-5 space-y-4 before:absolute before:left-[4px] before:top-1.5 before:bottom-1.5 before:w-[1px] before:bg-slate-200">
                               <% trip.timeline.forEach(t=> { %>
-
-                                <div class="border-l-2 border-slate-200 pl-4 py-1">
-
-                                  <div class="text-sm font-medium text-slate-800">
+                                <div class="relative group flex items-start">
+                                  <!-- Custom Indicator Dot -->
+                                  <div
+                                    class="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full border border-white bg-slate-300 group-hover:bg-slate-600 transition-colors shadow-sm ring-4 ring-white">
+                                  </div>
+                                  <div
+                                    class="text-[13px] text-slate-600 group-hover:text-slate-900 transition-colors pt-0.5">
                                     <%= t.address %>
                                   </div>
-
                                 </div>
-
                                 <% }) %>
-
                             </div>
-
                             <% } %>
-
                       </div>
 
         </div>
-
       </div>
 
     </div>
-
   </div>
+
+  <script>
+    const input = document.getElementById("attachments");
+    const uploadBox = document.getElementById("upload-box");
+    const previewContainer = document.getElementById("preview-container");
+
+    input.addEventListener("change", () => {
+      const file = input.files[0];
+      if (!file) return;
+
+      const fileUrl = URL.createObjectURL(file);
+      uploadBox.classList.add("hidden");
+      previewContainer.classList.remove("hidden");
+
+      previewContainer.innerHTML = `
+      <div class="flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
+        <div class="min-w-0 flex-1">
+          <div class="text-[13px] font-medium text-slate-700 truncate">
+            ${file.name}
+          </div>
+          <div class="text-xs text-slate-400 mt-0.5">
+            ${(file.size / 1024).toFixed(1)} KB
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 ml-4">
+          <a href="${fileUrl}" target="_blank"
+            class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">
+            View
+          </a>
+          <button type="button" id="change-file"
+            class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">
+            Ganti File
+          </button>
+        </div>
+      </div>
+    `;
+
+      document.getElementById("change-file").addEventListener("click", () => {
+        input.click();
+      });
+    });
+  </script>

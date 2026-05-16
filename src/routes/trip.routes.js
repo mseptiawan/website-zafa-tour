@@ -37,7 +37,7 @@ router.put("/:id", update);
 router.post("/:id/resubmit", resubmit);
 router.post("/:id/start", authMiddleware, startTrip);
 router.get("/:id/report", authMiddleware, reportTripPage);
-router.post("/:id/report", authMiddleware, uploadFile.array("attachments"), submitTripReport);
+router.post("/:id/report", authMiddleware, uploadFile.single("attachments"), submitTripReport);
 router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
 
 router.get("/approval/:id", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalDetailPage);
