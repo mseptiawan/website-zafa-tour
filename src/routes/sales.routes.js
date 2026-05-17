@@ -8,7 +8,6 @@ import {
   create,
   myVisits,
   report,
-  show,
   edit,
   update,
 } from "../controllers/sales.controller.js";
@@ -29,7 +28,5 @@ router.get("/report", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), report);
 router.get("/:id/edit", authMiddleware, edit);
 
 router.post("/:id/edit", authMiddleware, uploadFile.single("attachments"), update);
-
-router.get("/:id", show);
 
 export default router;

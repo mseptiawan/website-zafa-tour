@@ -39,22 +39,6 @@ export const myVisits = async (req, res, next) => {
     next(err);
   }
 };
-
-export const show = async (req, res, next) => {
-  try {
-    const visit = await salesService.findById(req.params.id);
-
-    if (!visit) return res.status(404).send("Data tidak ditemukan");
-
-    res.render("sales/show", {
-      title: "Detail Sales Visit",
-      visit,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
 export const report = async (req, res, next) => {
   try {
     const visits = await salesService.findAll();
