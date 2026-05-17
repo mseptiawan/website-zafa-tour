@@ -35,20 +35,27 @@ export const create = async (req, res) => {
     });
   }
 };
-
 export const myAssignments = async (req, res, next) => {
   try {
-    const assignments = await assignmentService.findMine(req.session.user._id);
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 5, 1);
+
+    const { data, meta } = await assignmentService.findMine({
+      userId: req.session.user._id,
+      page,
+      limit,
+    });
 
     res.render("assignment/my", {
       title: "Penugasan Saya",
-      assignments,
+      assignments: data,
+      pagination: meta,
+      query: req.query,
     });
   } catch (err) {
     next(err);
   }
 };
-
 export const index = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;

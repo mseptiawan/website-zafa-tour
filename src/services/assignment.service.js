@@ -1,30 +1,15 @@
+import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import Assignment from "../models/Assignment.js";
 import Employee from "../models/Employee.js";
 
 import { createAssignmentSchema } from "../validations/assignment/assignment.schema.js";
 
 const create = async ({ body, file, userId }) => {
-  const parsed = createAssignmentSchema.safeParse(body);
-
-  if (!parsed.success) {
-    throw new Error(parsed.error.errors[0].message);
-  }
-
-  const { title, description, type, location, startDate, endDate, employees } = parsed.data;
-
   return Assignment.create({
-    title,
-    description,
-    type,
-    location,
-    startDate,
-    endDate,
-
-    employees: Array.isArray(employees) ? employees : [employees],
-
+    ...body,
+    employees: body.employees,
     createdBy: userId,
-
-    attachment: file ? file.filename : null,
+    attachment: file?.filename || null,
   });
 };
 
@@ -34,20 +19,46 @@ const findEmployees = () => {
   });
 };
 
-const findMine = async (userId) => {
-  const employee = await Employee.findOne({
-    userId,
+const findMine = async ({ userId, page, limit }) => {
+  const employee = await Employee.findOne({ userId });
+
+  if (!employee) {
+    return {
+      data: [],
+      meta: getPaginationMeta({
+        page: 1,
+        limit,
+        total: 0,
+      }),
+    };
+  }
+
+  const {
+    skip,
+    limit: perPage,
+    page: currentPage,
+  } = getPagination({
+    page,
+    limit,
   });
 
-  if (!employee) return [];
-
-  return Assignment.find({
+  const filter = {
     employees: employee._id,
-  }).sort({
-    createdAt: -1,
-  });
-};
+  };
 
+  const total = await Assignment.countDocuments(filter);
+
+  const data = await Assignment.find(filter).sort({ createdAt: -1 }).skip(skip).limit(perPage);
+
+  return {
+    data,
+    meta: getPaginationMeta({
+      page: currentPage,
+      limit: perPage,
+      total,
+    }),
+  };
+};
 const findAll = async ({ page = 1, limit = 7 }) => {
   const skip = (page - 1) * limit;
 
