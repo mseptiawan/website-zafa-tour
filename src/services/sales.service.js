@@ -7,22 +7,26 @@ import { validateData } from "../utils/validateData.js";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
-const create = async ({ body, files, userId }) => {
+const create = async ({ body, file, userId }) => {
   const data = validateData(createSalesVisitSchema, body);
 
-  const attachments = (files || []).map((file) => {
+  let attachments = [];
+
+  if (file) {
     if (!allowedMimeTypes.includes(file.mimetype)) {
       throw new Error("Format file tidak valid (JPG, PNG, WEBP, PDF)");
     }
 
-    return {
-      filename: file.filename,
-      originalName: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-      path: `/uploads/files/${file.filename}`,
-    };
-  });
+    attachments = [
+      {
+        filename: file.filename,
+        originalName: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+        path: `/uploads/files/${file.filename}`,
+      },
+    ];
+  }
 
   return SalesVisit.create({
     userId,

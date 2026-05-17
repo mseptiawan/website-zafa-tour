@@ -93,18 +93,20 @@
                           </strong></span>
                       </div>
 
-                      <% if (v.attachments && v.attachments.length> 0) { %>
-                        <div
-                          class="flex items-center gap-1 inline-flex bg-slate-50 border border-slate-200/60 rounded-md px-2 py-0.5 text-[11px] font-semibold text-slate-500">
-                          <svg class="w-3 h-3 stroke-[2] text-slate-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                          </svg>
-                          <%= v.attachments.length %> File Lampiran
+                      <% if (v.attachments && v.attachments.length> 0 && v.attachments[0].filename) { %>
+                        <div class="flex items-center gap-1.5">
+                          <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                          <a href="/uploads/files/<%= v.attachments[0].filename %>" target="_blank"
+                            class="inline-flex items-center gap-1 bg-slate-50 hover:bg-blue-50 border border-slate-200/60 hover:border-blue-200/60 rounded-md px-2 py-0.5 text-[11px] font-semibold text-slate-500 hover:text-blue-600 transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
+                            <svg class="w-3 h-3 stroke-[2] text-slate-400" fill="none" stroke="currentColor"
+                              viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                            <span>Lihat Lampiran</span>
+                          </a>
                         </div>
                         <% } %>
-
                     </div>
 
                     <!-- SUMMARY RESULT REPORT -->

@@ -12,7 +12,7 @@ export const create = async (req, res) => {
   try {
     await salesService.create({
       body: req.body,
-      files: req.files,
+      file: req.file,
       userId: req.session.user._id,
     });
 
