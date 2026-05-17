@@ -1,206 +1,167 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-[#FCFCFD] p-8 antialiased">
+  <div class="ml-72 min-h-screen bg-[#FCFCFD] p-8 antialiased">
 
-  <div class="max-w-4xl mx-auto">
+    <div class="max-w-4xl mx-auto">
 
-    <!-- BACK -->
-    <a
-      href="/announcement"
-      class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6 transition-colors group"
-    >
-      <svg
-        class="w-4 h-4 transition-transform group-hover:-translate-x-1"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M15 19l-7-7 7-7"
-        />
-      </svg>
+      <!-- BACK -->
+      <a href="/announcement"
+        class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6 transition-colors group">
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
 
-      Kembali ke Daftar
-    </a>
+        Kembali ke Daftar
+      </a>
 
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <!-- CARD -->
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
 
-      <!-- HEADER -->
-      <div class="px-8 py-8 border-b border-slate-100">
+        <!-- HEADER -->
+        <div class="px-8 py-8 border-b border-slate-100">
 
-        <div class="flex flex-col gap-5">
+          <div class="flex flex-col gap-5">
 
-          <!-- CATEGORY -->
-          <div class="flex items-center gap-2">
+            <!-- CATEGORY -->
+            <div class="flex items-center gap-2">
 
-            <% if(announcement.category === "OFFICIAL") { %>
+              <% if(announcement.category==="OFFICIAL" ) { %>
 
-              <span class="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide">
-                Pengumuman Resmi
-              </span>
+                <span
+                  class="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide">
+                  Pengumuman Resmi
+                </span>
 
-            <% } else { %>
+                <% } else { %>
 
-              <span class="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide">
-                Pengumuman Ringan
-              </span>
+                  <span
+                    class="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide">
+                    Pengumuman Ringan
+                  </span>
 
-            <% } %>
-
-          </div>
-
-          <!-- TITLE -->
-          <h1 class="text-3xl font-semibold text-slate-800 leading-snug tracking-tight break-words">
-            <%= announcement.title %>
-          </h1>
-
-          <!-- META -->
-          <div class="flex items-center gap-3">
-
-            <div class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[12px] font-medium text-slate-500 uppercase">
-              <%= announcement.createdBy?.username
-                ? announcement.createdBy.username.charAt(0)
-                : '?' %>
-            </div>
-
-            <div class="flex flex-col">
-              <span class="text-sm font-medium text-slate-700">
-                <%= announcement.createdBy?.username || 'Unknown' %>
-              </span>
-
-              <span class="text-xs text-slate-400 mt-0.5">
-                Dipublikasikan
-                <%= new Date(announcement.publishDate || announcement.createdAt)
-                  .toLocaleDateString("id-ID", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric"
-                  }) %>
-              </span>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- CONTENT -->
-      <div class="px-8 py-10">
-
-        <article class="text-[15px] text-slate-600 leading-8 whitespace-pre-line break-words">
-          <%= announcement.content %>
-        </article>
-
-        <!-- ATTACHMENT -->
-        <% if(announcement.attachment) { %>
-
-          <div class="mt-12">
-
-            <div class="mb-4 flex items-center gap-2">
-
-              <svg
-                class="w-4 h-4 text-slate-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                />
-              </svg>
-
-              <h3 class="text-sm font-medium text-slate-700">
-                Lampiran
-              </h3>
+                  <% } %>
 
             </div>
 
-            <div class="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50">
+            <!-- TITLE -->
+            <h1 class="text-3xl font-semibold text-slate-800 leading-snug tracking-tight break-words">
+              <%= announcement.title %>
+            </h1>
 
-              <!-- IMAGE PREVIEW -->
-              <% if (
-                announcement.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-              ) { %>
+            <!-- META -->
+            <div class="flex items-center gap-3">
 
-                <div class="p-4 bg-slate-100 border-b border-slate-200">
+              <div
+                class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[12px] font-medium text-slate-500 uppercase">
+                <%= announcement.createdBy?.username ? announcement.createdBy.username.charAt(0) : '?' %>
+              </div>
 
-                  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                    <img
-                      src="/uploads/files/<%= announcement.attachment %>"
-                      alt="Lampiran"
-                      class="w-full max-h-[500px] object-contain"
-                    >
-                  </div>
+              <div class="flex flex-col">
+                <span class="text-sm font-medium text-slate-700">
+                  <%= announcement.createdBy?.username || 'Unknown' %>
+                </span>
 
-                </div>
-
-              <% } %>
-
-              <!-- FILE INFO -->
-              <div class="p-5 bg-white flex items-center justify-between gap-4">
-
-                <div class="flex items-center gap-4 min-w-0">
-
-                  <div class="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 flex-shrink-0">
-
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-
-                  </div>
-
-                  <div class="min-w-0">
-
-                    <p class="text-sm font-medium text-slate-700 truncate">
-                      <%= announcement.attachment %>
-                    </p>
-
-                    <p class="text-xs text-slate-400 mt-1">
-                      Dokumen lampiran pengumuman
-                    </p>
-
-                  </div>
-
-                </div>
-
-                <a
-                  href="/uploads/files/<%= announcement.attachment %>"
-                  target="_blank"
-                  class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors flex-shrink-0"
-                >
-                  Lihat File
-                </a>
-
+                <span class="text-xs text-slate-400 mt-0.5">
+                  Dipublikasikan
+                  <%= new Date(announcement.publishDate || announcement.createdAt) .toLocaleDateString("id-ID", {
+                    day: "2-digit" , month: "long" , year: "numeric" }) %>
+                </span>
               </div>
 
             </div>
 
           </div>
 
-        <% } %>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="px-8 py-10">
+
+          <article class="text-[15px] text-slate-600 leading-8">
+            <%= announcement.content.trim() %>
+          </article>
+
+          <!-- ATTACHMENT -->
+          <% if(announcement.attachment) { %>
+
+            <div class="mt-12">
+
+              <div class="mb-4 flex items-center gap-2">
+
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+
+                <h3 class="text-sm font-medium text-slate-700">
+                  Lampiran
+                </h3>
+
+              </div>
+
+              <div class="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50">
+
+                <!-- IMAGE PREVIEW -->
+                <% if ( announcement.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i) ) { %>
+
+                  <div class="p-4 bg-slate-100 border-b border-slate-200">
+
+                    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                      <img src="/uploads/files/<%= announcement.attachment %>" alt="Lampiran"
+                        class="w-full max-h-[500px] object-contain">
+                    </div>
+
+                  </div>
+
+                  <% } %>
+
+                    <!-- FILE INFO -->
+                    <div class="p-5 bg-white flex items-center justify-between gap-4">
+
+                      <div class="flex items-center gap-4 min-w-0">
+
+                        <div
+                          class="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 flex-shrink-0">
+
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+
+                        </div>
+
+                        <div class="min-w-0">
+
+                          <p class="text-sm font-medium text-slate-700 truncate">
+                            <%= announcement.attachment %>
+                          </p>
+
+                          <p class="text-xs text-slate-400 mt-1">
+                            Dokumen lampiran pengumuman
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      <a href="/uploads/files/<%= announcement.attachment %>" target="_blank"
+                        class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-5 py-2.5 text-[13px] font-medium transition-colors shadow-sm shadow-slate-100/50 flex-shrink-0 active:scale-[0.98]">
+                        Lihat File
+                      </a>
+
+                    </div>
+
+              </div>
+
+            </div>
+
+            <% } %>
+
+        </div>
 
       </div>
 
     </div>
 
   </div>
-
-</div>

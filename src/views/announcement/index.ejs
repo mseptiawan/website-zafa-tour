@@ -1,129 +1,120 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-[#FCFCFD] p-10 antialiased">
+  <div class="ml-72 min-h-screen bg-[#FCFCFD] p-10 antialiased">
 
-  <div class="max-w-6xl mx-auto">
+    <div class="max-w-6xl mx-auto">
 
-    <!-- HEADER -->
-    <div class="flex items-end justify-between mb-10">
-      <div>
-        <h1 class="text-3xl font-semibold text-slate-800 tracking-tight">
-          Pengumuman
-        </h1>
+      <!-- HEADER -->
+      <div class="flex items-end justify-between mb-10">
+        <div>
+          <h1 class="text-3xl font-semibold text-slate-800 tracking-tight">
+            Pengumuman
+          </h1>
 
-        <p class="text-slate-500 mt-2 text-sm flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-          Informasi internal terbaru
-        </p>
+          <p class="text-slate-500 mt-2 text-sm flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            Informasi internal terbaru
+          </p>
+        </div>
+
+        <a href="/announcement/new"
+          class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 border border-blue-700/30 shadow-sm shadow-blue-100/50 active:scale-[0.98]">
+          <svg class="w-4 h-4 text-white/90 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Buat Baru
+        </a>
       </div>
 
-      <a
-        href="/announcement/new"
-        class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 border border-slate-700"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
+      <!-- GRID -->
+      <% if(announcements.length> 0) { %>
 
-        Buat Baru
-      </a>
-    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-    <!-- GRID -->
-    <% if(announcements.length > 0) { %>
+          <% announcements.forEach(a=> { %>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <a href="/announcement/<%= a._id %>"
+              class="group block bg-white border border-slate-200 rounded-2xl p-5 transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 shadow-sm">
 
-        <% announcements.forEach(a => { %>
+              <div class="flex flex-col h-full">
 
-          <a
-            href="/announcement/<%= a._id %>"
-            class="group block bg-white border border-slate-200 rounded-2xl p-5 transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 shadow-sm"
-          >
+                <!-- BADGE -->
+                <div class="flex items-center gap-2 mb-4 flex-wrap">
 
-            <div class="flex flex-col h-full">
-
-              <!-- BADGE -->
-              <div class="flex items-center gap-2 mb-4 flex-wrap">
-
-                <% if(a.isPinned) { %>
-                  <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide border border-slate-200">
-                    Pinned
-                  </span>
-                <% } %>
-
-                <% if(a.category === "OFFICIAL") { %>
-                  <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide border border-slate-200">
-                    Official
-                  </span>
-                <% } %>
-
-              </div>
-
-              <!-- TITLE -->
-              <h2 class="text-[18px] font-medium text-slate-800 leading-relaxed break-words mb-3">
-                <%= a.title %>
-              </h2>
-
-              <!-- CONTENT -->
-              <p class="text-sm text-slate-500 leading-7 break-words whitespace-pre-line mb-6">
-                <%= a.content %>
-              </p>
-
-              <!-- FOOTER -->
-              <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-
-                <div class="flex items-center gap-3">
-
-                  <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[11px] font-medium text-slate-500 border border-slate-200">
-                    <%= a.createdBy?.username ? a.createdBy.username.charAt(0) : '?' %>
-                  </div>
-
-                  <div class="flex flex-col">
-                    <span class="text-xs font-medium text-slate-700">
-                      <%= a.createdBy?.username || 'Unknown' %>
+                  <% if(a.isPinned) { %>
+                    <span
+                      class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide border border-slate-200">
+                      Pinned
                     </span>
+                    <% } %>
 
-                    <span class="text-[11px] text-slate-400 mt-0.5">
-                      <%= new Date(a.createdAt).toLocaleDateString("id-ID", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric"
-                      }) %>
-                    </span>
-                  </div>
+                      <% if(a.category==="OFFICIAL" ) { %>
+                        <span
+                          class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[10px] font-medium uppercase tracking-wide border border-slate-200">
+                          Official
+                        </span>
+                        <% } %>
 
                 </div>
 
-                <svg
-                  class="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
+                <!-- TITLE -->
+                <h2 class="text-[18px] font-medium text-slate-800 leading-relaxed break-words mb-3">
+                  <%= a.title %>
+                </h2>
+
+                <!-- CONTENT -->
+                <p class="text-sm text-slate-500 leading-7 break-words whitespace-pre-line mb-6">
+                  <%= a.content %>
+                </p>
+
+                <!-- FOOTER -->
+                <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+
+                  <div class="flex items-center gap-3">
+
+                    <div
+                      class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[11px] font-medium text-slate-500 border border-slate-200">
+                      <%= a.createdBy?.username ? a.createdBy.username.charAt(0) : '?' %>
+                    </div>
+
+                    <div class="flex flex-col">
+                      <span class="text-xs font-medium text-slate-700">
+                        <%= a.createdBy?.username || 'Unknown' %>
+                      </span>
+
+                      <span class="text-[11px] text-slate-400 mt-0.5">
+                        <%= new Date(a.createdAt).toLocaleDateString("id-ID", { day: "2-digit" , month: "short" ,
+                          year: "numeric" }) %>
+                      </span>
+                    </div>
+
+                  </div>
+
+                  <svg class="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+
+                </div>
 
               </div>
 
-            </div>
+            </a>
 
-          </a>
+            <% }) %>
 
-        <% }) %>
+        </div>
 
-      </div>
+        <% } else { %>
 
-    <% } else { %>
+          <!-- EMPTY -->
+          <div class="bg-white border border-slate-200 rounded-2xl py-20 text-center">
+            <h3 class="text-base font-medium text-slate-500">
+              Belum ada pengumuman
+            </h3>
+          </div>
 
-      <!-- EMPTY -->
-      <div class="bg-white border border-slate-200 rounded-2xl py-20 text-center">
-        <h3 class="text-base font-medium text-slate-500">
-          Belum ada pengumuman
-        </h3>
-      </div>
+          <% } %>
 
-    <% } %>
-
+    </div>
   </div>
-</div>

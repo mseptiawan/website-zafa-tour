@@ -1,98 +1,112 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
     <div class="max-w-5xl mx-auto">
 
-      <!-- BACK -->
+      <!-- BACK TO LIST -->
       <a href="/finance"
-        class="inline-flex items-center gap-2 text-[14px] font-bold text-slate-400 hover:text-slate-900 mb-6 uppercase tracking-widest transition-all">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-400 hover:text-slate-800 mb-6 tracking-wide transition-colors group">
+        <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
+          stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Kembali
+        Kembali ke Dashboard Finance
       </a>
 
-      <!-- CARD -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <!-- MAIN PANEL CARD -->
+      <div class="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden">
 
-        <!-- HEADER -->
-        <div class="p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- PANEL HEADER -->
+        <div
+          class="p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-b from-slate-50/30 to-transparent">
           <div>
-            <h1 class="text-2xl font-bold text-slate-900">
+            <h1 class="text-xl font-semibold text-slate-900 tracking-tight">
               <%= trip.title %>
             </h1>
-            <p class="text-[14px] text-slate-500 mt-1">
+            <p class="text-[13px] text-slate-400 mt-1">
               Finance Processing Panel
             </p>
           </div>
 
-          <!-- PAYMENT STATUS -->
+          <!-- PAYMENT STATUS BADGE -->
           <div>
-            <span class="px-3 py-1 text-xs rounded-full border font-bold uppercase tracking-wider block text-center
+            <span class="inline-flex items-center px-3 py-1 text-[12px] rounded-full border font-medium tracking-wide
+          <%= trip.payment?.status === 'PAID'
+            ? 'bg-emerald-50/60 text-emerald-600 border-emerald-100'
+            : trip.payment?.status === 'PROCESSING'
+              ? 'bg-amber-50/60 text-amber-600 border-amber-100'
+              : 'bg-blue-50/60 text-blue-600 border-blue-100'
+          %>">
+              <span class="w-1.5 h-1.5 rounded-full mr-1.5 animate-pulse
             <%= trip.payment?.status === 'PAID'
-              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+              ? 'bg-emerald-500'
               : trip.payment?.status === 'PROCESSING'
-                ? 'bg-amber-50 text-amber-600 border-amber-200'
-                : 'bg-blue-50 text-blue-600 border-blue-200'
-            %>">
+                ? 'bg-amber-500'
+                : 'bg-blue-500'
+            %>"></span>
               <%= trip.payment?.status || 'PENDING' %>
             </span>
           </div>
         </div>
 
-        <!-- BODY -->
+        <!-- PANEL BODY -->
         <div class="p-8 space-y-6">
 
           <!-- CORE INFORMATION GRID -->
           <div
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
-            <div class="space-y-0.5">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nama Pengaju</div>
-              <div class="text-[14px] font-bold text-slate-800">
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50/70 p-5 rounded-xl border border-slate-200/50">
+            <div class="space-y-1">
+              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Nama Pengaju</div>
+              <div class="text-[13px] font-semibold text-slate-700">
                 <%= trip.userId?.username || '-' %>
               </div>
             </div>
-            <div class="space-y-0.5">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Destinasi</div>
-              <div class="text-[14px] font-bold text-slate-800">
+            <div class="space-y-1">
+              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Destinasi</div>
+              <div class="text-[13px] font-semibold text-slate-700">
                 <%= trip.destination || '-' %>
               </div>
             </div>
-            <div class="space-y-0.5">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Budget</div>
-              <div class="text-[14px] font-bold text-slate-800">Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
+            <div class="space-y-1">
+              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Anggaran</div>
+              <div class="text-[13px] font-semibold text-slate-800">
+                Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
               </div>
             </div>
-            <div class="space-y-0.5">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Approval</div>
-              <div class="text-[14px] font-bold text-slate-800">
-                <%= trip.status==='APPROVED' ? 'Sudah Disetujui Pimpinan' : trip.status %>
+            <div class="space-y-1">
+              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Status Approval</div>
+              <div class="text-[13px] font-semibold text-slate-700">
+                <%= trip.status==='APPROVED' ? 'Disetujui Pimpinan' : trip.status %>
               </div>
             </div>
           </div>
 
-          <!-- DESCRIPTION -->
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700 block">Deskripsi</label>
+          <!-- DESCRIPTION SECTION -->
+          <div class="space-y-2">
+            <label class="text-[13px] font-medium text-slate-500 block">Deskripsi Kegiatan</label>
             <div
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-700 leading-relaxed">
+              class="w-full bg-white border border-slate-200/60 rounded-xl px-4 py-3 text-[13px] text-slate-600 leading-relaxed shadow-inner shadow-slate-50">
               <%= trip.description || '-' %>
             </div>
           </div>
 
-          <!-- TIMELINE -->
-          <div class="space-y-2">
-            <label class="text-[13px] font-bold text-slate-700 block">Timeline</label>
+          <!-- TIMELINE SECTION -->
+          <div class="space-y-3">
+            <label class="text-[13px] font-medium text-slate-500 block">Rencana Perjalanan (Timeline)</label>
             <% if (!trip.timeline || trip.timeline.length===0) { %>
-              <div class="p-4 rounded-xl bg-slate-50 text-slate-400 text-[14px] border border-slate-200/60 text-center">
-                Tidak ada data timeline
+              <div
+                class="p-5 rounded-xl bg-slate-50/50 text-slate-400 text-[13px] border border-slate-200/60 text-center">
+                Tidak ada data rute perjalanan atau timeline
               </div>
               <% } else { %>
-                <div class="space-y-3 pl-2">
-                  <% trip.timeline.forEach(t=> { %>
-                    <div class="relative border-l-2 border-slate-200 pl-4 py-0.5">
-                      <div class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-slate-300"></div>
-                      <p class="text-[14px] text-slate-700 font-medium">
+                <div class="space-y-0 pl-1.5">
+                  <% trip.timeline.forEach((t, index)=> { %>
+                    <div class="relative border-l border-slate-200/80 pl-5 pb-4 last:pb-1">
+                      <!-- Indicator Node -->
+                      <div
+                        class="absolute -left-[4.5px] top-1.5 w-2 h-2 rounded-full border border-white bg-slate-300 ring-2 ring-slate-50">
+                      </div>
+                      <p class="text-[13px] text-slate-600 font-medium leading-none">
                         <%= t.address %>
                       </p>
                     </div>
@@ -101,27 +115,27 @@
                 <% } %>
           </div>
 
-          <!-- ========================= -->
-          <!-- FINANCE FLOW ACTIONS      -->
-          <!-- ========================= -->
+          <!-- ==================================== -->
+          <!--        FINANCE FLOW ACTIONS          -->
+          <!-- ==================================== -->
 
-          <!-- 1. PROCESS PAYMENT -->
+          <!-- STAGE 1: INITIATE PROCESS PAYMENT -->
           <% if (trip.payment?.status==='PENDING' ) { %>
             <div class="pt-6 border-t border-slate-100 flex justify-end">
               <form method="POST" action="/finance/<%= trip._id %>/process">
                 <button type="submit"
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-100 transition-all">
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm active:scale-[0.98]">
                   Proses Pembayaran
                 </button>
               </form>
             </div>
             <% } %>
 
-              <!-- 2. UPLOAD PROOF (NO PROOF YET) -->
+              <!-- STAGE 2: UPLOAD PROOF PANEL -->
               <% if (trip.payment?.status==='PROCESSING' && !trip.payment?.proof?.filename) { %>
                 <div class="pt-6 border-t border-slate-100 space-y-3">
-                  <label class="text-[13px] font-bold text-slate-700 block">
-                    Upload Bukti Pembayaran <span class="text-slate-400 font-normal">(Wajib)</span>
+                  <label class="text-[13px] font-medium text-slate-600 block">
+                    Upload Bukti Transfer Pembayaran <span class="text-slate-400 font-normal">(Wajib)</span>
                   </label>
 
                   <form method="POST" action="/finance/<%= trip._id %>/upload-proof" enctype="multipart/form-data"
@@ -133,63 +147,59 @@
 
                       <!-- EMPTY STATE DROPZONE -->
                       <div id="dropzone-empty"
-                        class="border-2 border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300 transition-all">
-                        <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="border border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50/50 group-hover:bg-slate-50 group-hover:border-slate-300 transition-all duration-200">
+                        <svg class="w-7 h-7 text-slate-400 mb-2 stroke-[1.5]" fill="none" stroke="currentColor"
+                          viewBox="0 0 24 24">
                           <path
                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <p class="text-sm text-slate-600 font-medium">Klik atau seret file bukti transfer di sini</p>
-                        <p class="text-xs text-slate-400 mt-1">PNG, JPG, PDF (maks 5MB)</p>
+                        <p class="text-[13px] text-slate-600 font-medium">Klik atau seret file bukti transfer ke area
+                          ini</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Mendukung format PNG, JPG, PDF (Maksimal 5MB)</p>
                       </div>
 
                       <!-- FILLED STATE PREVIEW -->
-                      <!-- FILLED STATE PREVIEW -->
                       <div id="dropzone-filled"
                         class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm">
-
                         <div class="flex items-center gap-3 overflow-hidden">
                           <div
-                            class="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
-
+                            class="w-11 h-11 rounded-lg overflow-hidden border border-slate-200/80 bg-slate-50 flex items-center justify-center flex-shrink-0">
                             <img id="img-preview" class="w-full h-full object-cover hidden" />
-
                             <div id="file-icon-placeholder"
-                              class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs bg-slate-100">
+                              class="text-slate-400 font-semibold text-[11px] uppercase tracking-wider">
                               DOC
                             </div>
                           </div>
 
                           <div class="overflow-hidden">
-                            <p id="name-preview" class="text-sm font-bold text-slate-800 truncate max-w-[280px]">
+                            <p id="name-preview"
+                              class="text-[13px] font-medium text-slate-700 truncate max-w-[240px] sm:max-w-[360px]">
                               file_name.pdf
                             </p>
-
-                            <p id="size-preview" class="text-xs text-slate-400">
+                            <p id="size-preview" class="text-[11px] text-slate-400 mt-0.5">
                               0.00 MB
                             </p>
                           </div>
                         </div>
 
-                        <div class="flex items-center gap-2 ml-4">
-                          <a id="view-file-btn" href="#"
-                            class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-3 py-2 rounded-lg transition">
-                            View
+                        <div class="flex items-center gap-2 ml-4 flex-shrink-0">
+                          <a id="view-file-btn" href="#" target="_blank"
+                            class="text-[12px] font-medium text-blue-600 bg-blue-50/60 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">
+                            Lihat
                           </a>
-
                           <button type="button" onclick="changeFile()"
-                            class="text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition">
+                            class="text-[12px] font-medium text-slate-500 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
                             Ganti File
                           </button>
-
-
                         </div>
                       </div>
                     </div>
 
+                    <!-- SUBMIT BUTTON -->
                     <div class="flex justify-end">
                       <button type="submit"
-                        class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all">
+                        class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm active:scale-[0.98]">
                         Kirim Bukti Transfer
                       </button>
                     </div>
@@ -197,36 +207,38 @@
                 </div>
                 <% } %>
 
-                  <!-- 3. PROOF EXISTS BUT NEED CONFIRMATION -->
+                  <!-- STAGE 3: VERIFY AND CONFIRM PAYMENT -->
                   <% if (trip.payment?.status==='PROCESSING' && trip.payment?.proof?.filename) { %>
-                    <div class="pt-6 border-t border-slate-100 space-y-4">
-                      <label class="text-[13px] font-bold text-slate-700 block">Bukti Transfer Terupload</label>
+                    <div class="pt-6 border-t border-slate-100 space-y-3">
+                      <label class="text-[13px] font-medium text-slate-500 block">Berkas Bukti Transfer
+                        Terupload</label>
 
                       <div
-                        class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                        class="p-4 border border-slate-200/60 rounded-xl bg-slate-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3 overflow-hidden">
                           <div
-                            class="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 font-bold text-xs flex-shrink-0 shadow-sm">
-                            FI
+                            class="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 font-semibold text-[11px] flex-shrink-0 shadow-sm">
+                            FILE
                           </div>
                           <div class="overflow-hidden">
-                            <div class="text-[14px] font-bold text-slate-800 truncate max-w-[300px]">
+                            <div class="text-[13px] font-medium text-slate-700 truncate max-w-[240px] sm:max-w-[320px]">
                               <%= trip.payment.proof.filename %>
                             </div>
-                            <div class="text-xs text-slate-400">Menunggu konfirmasi final</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">Menunggu verifikasi dan konfirmasi final
+                            </div>
                           </div>
                         </div>
 
-                        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
                           <a href="<%= trip.payment.proof.url %>" target="_blank"
-                            class="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-all text-center">
+                            class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[12px] font-medium text-slate-600 hover:bg-slate-50 transition-colors text-center shadow-sm">
                             Lihat Berkas
                           </a>
 
                           <form method="POST" action="/finance/<%= trip._id %>/confirm" class="w-full sm:w-auto">
                             <button type="submit"
-                              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-emerald-100 transition-all">
-                              Selesai / Mark as Paid
+                              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-[12px] font-medium transition-all shadow-sm active:scale-[0.98]">
+                              Konfirmasi Selesai (Paid)
                             </button>
                           </form>
                         </div>
@@ -234,17 +246,18 @@
                     </div>
                     <% } %>
 
-                      <!-- 4. PAID STATE -->
+                      <!-- STAGE 4: SUCCESS / PAID DISCLOSURE -->
                       <% if (trip.payment?.status==='PAID' ) { %>
                         <div class="pt-6 border-t border-slate-100">
-                          <div class="p-5 rounded-xl bg-emerald-50/60 border border-emerald-100 flex items-start gap-3">
+                          <div
+                            class="p-4 rounded-xl bg-emerald-50/40 border border-emerald-100/70 flex items-start gap-3">
                             <div
-                              class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-sm shadow-emerald-200">
+                              class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[11px] flex-shrink-0 mt-0.5 shadow-sm">
                               ✓
                             </div>
-                            <div>
-                              <div class="text-[14px] font-bold text-emerald-800">Selesai Dibayarkan</div>
-                              <div class="text-xs text-emerald-600 mt-1 font-medium">
+                            <div class="space-y-0.5">
+                              <div class="text-[13px] font-medium text-emerald-800">Selesai Dibayarkan</div>
+                              <div class="text-[11px] text-emerald-600/90 font-medium">
                                 Waktu Transaksi: <%= trip.payment.paidAt ? new
                                   Date(trip.payment.paidAt).toLocaleString('id-ID') : '-' %> WIB
                               </div>
@@ -258,57 +271,43 @@
 
     </div>
   </div>
+
   <script>
     function handleFileSelect(input) {
       if (input.files && input.files.length > 0) {
-
         document.getElementById("file-input").style.pointerEvents = "none";
-
         const file = input.files[0];
 
         document.getElementById("name-preview").textContent = file.name;
-
-        document.getElementById("size-preview").textContent =
-          (file.size / (1024 * 1024)).toFixed(2) + " MB";
+        document.getElementById("size-preview").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
 
         const imgPreview = document.getElementById("img-preview");
         const iconPlaceholder = document.getElementById("file-icon-placeholder");
-
         const fileUrl = URL.createObjectURL(file);
 
         document.getElementById("view-file-btn").href = fileUrl;
 
         if (file.type.startsWith("image/")) {
           const reader = new FileReader();
-
           reader.onload = (e) => {
             imgPreview.src = e.target.result;
-
             imgPreview.classList.remove("hidden");
             iconPlaceholder.classList.add("hidden");
           };
-
           reader.readAsDataURL(file);
-
         } else {
           imgPreview.classList.add("hidden");
           iconPlaceholder.classList.remove("hidden");
-
-          iconPlaceholder.textContent =
-            file.name.split(".").pop().toUpperCase() || "DOC";
+          iconPlaceholder.textContent = file.name.split(".").pop().toUpperCase() || "DOC";
         }
 
-        document.getElementById("dropzone-empty")
-          .classList.add("hidden");
-
-        document.getElementById("dropzone-filled")
-          .classList.remove("hidden");
+        document.getElementById("dropzone-empty").classList.add("hidden");
+        document.getElementById("dropzone-filled").classList.remove("hidden");
       }
     }
 
-
-
     function changeFile() {
+      document.getElementById("file-input").style.pointerEvents = "auto";
       document.getElementById("file-input").click();
     }
   </script>
