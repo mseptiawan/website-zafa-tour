@@ -19,7 +19,7 @@ const leaveSchema = new mongoose.Schema(
 
     reason: String,
 
-    file: String, // bukti sakit
+    file: String,
 
     status: {
       type: String,

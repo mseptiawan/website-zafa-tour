@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const DailyLogSchema = new mongoose.Schema(
   {
@@ -40,4 +40,4 @@ const DailyLogSchema = new mongoose.Schema(
 // Indexing agar pencarian berdasarkan user dan tanggal berjalan secepat kilat
 DailyLogSchema.index({ userId: 1, tanggal: 1 });
 
-module.exports = mongoose.model("DailyLog", DailyLogSchema);
+export default mongoose.model("DailyLog", DailyLogSchema);
