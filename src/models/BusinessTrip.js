@@ -8,7 +8,6 @@ const businessTripSchema = new mongoose.Schema(
       required: true,
     },
 
-    // SNAPSHOT penting (hindari dependency populate untuk rule bisnis)
     requesterRole: {
       type: String,
       enum: ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"],

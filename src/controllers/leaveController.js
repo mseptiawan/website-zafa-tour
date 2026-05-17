@@ -173,6 +173,8 @@ export const applyLeave = async (req, res) => {
 // ==========================
 // RIWAYAT CUTI
 // ==========================
+import { getPagination, getPaginationMeta } from "../utils/pagination.js";
+
 export const myLeave = async (req, res) => {
   try {
     const year = new Date().getFullYear();
@@ -182,34 +184,60 @@ export const myLeave = async (req, res) => {
       year,
     });
 
-    const leaves = await Leave.find({
+    const { page, limit, skip } = getPagination(req.query);
+
+    const query = {
       userId: req.session.user._id,
-    })
+    };
+
+    const total = await Leave.countDocuments(query);
+
+    const leaves = await Leave.find(query)
       .populate("type")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     const summary = {
-      total: leaves.length,
-
-      pending: leaves.filter((l) =>
-        ["Pending Manager", "Pending HR", "Pending Pimpinan"].includes(l.status)
-      ).length,
-
-      used: leaves
-        .filter((l) => l.status === "Approved")
-        .reduce((total, l) => total + l.totalDays, 0),
-
+      total,
+      pending: await Leave.countDocuments({
+        userId: req.session.user._id,
+        status: {
+          $in: ["Pending Manager", "Pending HR", "Pending Pimpinan"],
+        },
+      }),
+      used: await Leave.aggregate([
+        {
+          $match: {
+            userId: req.session.user._id,
+            status: "Approved",
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: "$totalDays" },
+          },
+        },
+      ]).then((r) => r[0]?.total || 0),
       remaining: balance ? balance.remaining : 12,
     };
+
+    const pagination = getPaginationMeta({
+      page,
+      limit,
+      total,
+    });
 
     res.render("leave/my-leave", {
       title: "Riwayat Cuti",
       leaves,
       summary,
+      pagination,
+      query: req.query,
     });
   } catch (err) {
     console.log(err);
-
     res.status(500).send(err.message);
   }
 };

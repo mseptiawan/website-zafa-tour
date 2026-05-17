@@ -32,8 +32,8 @@ const seedLeaveType = async () => {
         description: "Izin sakit",
       },
       {
-        name: "Keluarga",
-        maxDays: 3,
+        name: "Melahirkan",
+        maxDays: 90,
         requiresAttachment: false,
         isActive: true,
         description: "Urusan keluarga",
