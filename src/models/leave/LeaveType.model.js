@@ -5,49 +5,43 @@ const leaveTypeSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
-      trim: true,
     },
+
     code: {
       type: String,
-      required: true,
       unique: true,
-      uppercase: true,
-      trim: true,
     },
-    maxdays: {
+
+    maxDays: {
       type: Number,
-      required: true,
-      default: 0, // Maksimal hari yang boleh diambil untuk jenis cuti ini
+      default: 0,
     },
-    minadvancedays: {
+
+    minAdvanceDays: {
       type: Number,
-      required: true,
-      default: 0, // Minimal H-minus pengajuan sebelum tanggal mulai
+      default: 7,
     },
-    isdeductbalance: {
+
+    requiresAttachment: {
       type: Boolean,
-      required: true,
-      default: true, // true jika memotong kuota tahunan
+      default: false,
     },
-    requiresattachment: {
+
+    isDeductBalance: {
       type: Boolean,
-      required: true,
-      default: false, // true jika wajib unggah dokumen pendukung
+      default: true,
     },
-    deskription: {
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
+    description: {
       type: String,
-      trim: true,
-    },
-    isactive: {
-      type: Boolean,
-      required: true,
-      default: true, // Status aktif/nonaktif jenis cuti
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.model("LeaveType", leaveTypeSchema);

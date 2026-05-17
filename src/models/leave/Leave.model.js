@@ -7,45 +7,50 @@ const leaveSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     leaveTypeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "LeaveType",
       required: true,
     },
+
     startDate: {
       type: Date,
       required: true,
     },
+
     endDate: {
       type: Date,
       required: true,
     },
+
     totalDays: {
       type: Number,
-      required: true, // Durasi bersih hasil hitung getDay() tanpa hari Minggu/libur
+      required: true,
     },
+
     reason: {
       type: String,
       required: true,
-      trim: true,
     },
-    handoverUserId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true, // User ID rekan kerja yang menerima delegasi tugas
-    },
+
     documentPath: {
-      type: String, // Path url/file dokumen pendukung (jika ada)
+      type: String,
     },
+
     status: {
       type: String,
       enum: ["PENDING", "APPROVED", "REJECTED", "CANCELLED"],
-      default: "PENDING", // Status akumulatif akhir dari keseluruhan pengajuan
+      default: "PENDING",
+    },
+
+    handoverUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.model("Leave", leaveSchema);
