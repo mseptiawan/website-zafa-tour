@@ -60,34 +60,30 @@ const findMine = async ({ userId, page, limit }) => {
   };
 };
 const findAll = async ({ page = 1, limit = 7 }) => {
-  const skip = (page - 1) * limit;
+  const {
+    skip,
+    limit: perPage,
+    page: currentPage,
+  } = getPagination({
+    page,
+    limit,
+  });
 
-  const totalData = await Assignment.countDocuments();
+  const total = await Assignment.countDocuments();
 
   const assignments = await Assignment.find()
-    .populate([
-      {
-        path: "employees",
-      },
-      {
-        path: "createdBy",
-      },
-    ])
-    .sort({
-      createdAt: -1,
-    })
+    .populate([{ path: "employees" }, { path: "createdBy" }])
+    .sort({ createdAt: -1 })
     .skip(skip)
-    .limit(limit);
+    .limit(perPage);
 
   return {
     assignments,
-
-    pagination: {
-      page,
-      limit,
-      totalData,
-      totalPages: Math.ceil(totalData / limit),
-    },
+    pagination: getPaginationMeta({
+      page: currentPage,
+      limit: perPage,
+      total,
+    }),
   };
 };
 

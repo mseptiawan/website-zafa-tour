@@ -58,10 +58,12 @@ export const myAssignments = async (req, res, next) => {
 };
 export const index = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 5, 1);
 
     const result = await assignmentService.findAll({
       page,
+      limit,
     });
 
     res.render("assignment/index", {
