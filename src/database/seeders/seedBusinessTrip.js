@@ -43,7 +43,7 @@ const descriptions = [
   "Survey lokasi cabang baru",
 ];
 
-const purposes = ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"];
+const purposes = ["KUNJUNGAN_SALES", "RAPAT", "PELATIHAN", "SURVEI", "LAINNYA"];
 
 const requesterRoles = ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"];
 

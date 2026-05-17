@@ -7,10 +7,7 @@ import { validateData } from "../utils/validateData.js";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
-
-
-
-/////////const create = async ({ body, files, userId }) => {
+const create = async ({ body, files, userId }) => {
   const data = validateData(createSalesVisitSchema, body);
 
   const attachments = (files || []).map((file) => {

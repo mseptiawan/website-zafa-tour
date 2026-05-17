@@ -144,27 +144,46 @@
                       </div>
 
                       <!-- FILLED STATE PREVIEW -->
+                      <!-- FILLED STATE PREVIEW -->
                       <div id="dropzone-filled"
                         class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm">
+
                         <div class="flex items-center gap-3 overflow-hidden">
                           <div
                             class="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
+
                             <img id="img-preview" class="w-full h-full object-cover hidden" />
+
                             <div id="file-icon-placeholder"
                               class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs bg-slate-100">
                               DOC
                             </div>
                           </div>
+
                           <div class="overflow-hidden">
                             <p id="name-preview" class="text-sm font-bold text-slate-800 truncate max-w-[280px]">
-                              file_name.pdf</p>
-                            <p id="size-preview" class="text-xs text-slate-400">0.00 MB</p>
+                              file_name.pdf
+                            </p>
+
+                            <p id="size-preview" class="text-xs text-slate-400">
+                              0.00 MB
+                            </p>
                           </div>
                         </div>
-                        <button type="button" onclick="clearFile()"
-                          class="p-2 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-colors">
-                          ✕
-                        </button>
+
+                        <div class="flex items-center gap-2 ml-4">
+                          <a id="view-file-btn" href="#"
+                            class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-3 py-2 rounded-lg transition">
+                            View
+                          </a>
+
+                          <button type="button" onclick="changeFile()"
+                            class="text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition">
+                            Ganti File
+                          </button>
+
+
+                        </div>
                       </div>
                     </div>
 
@@ -239,41 +258,57 @@
 
     </div>
   </div>
-
   <script>
     function handleFileSelect(input) {
       if (input.files && input.files.length > 0) {
+
+        document.getElementById("file-input").style.pointerEvents = "none";
+
         const file = input.files[0];
 
         document.getElementById("name-preview").textContent = file.name;
-        document.getElementById("size-preview").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+
+        document.getElementById("size-preview").textContent =
+          (file.size / (1024 * 1024)).toFixed(2) + " MB";
 
         const imgPreview = document.getElementById("img-preview");
         const iconPlaceholder = document.getElementById("file-icon-placeholder");
 
+        const fileUrl = URL.createObjectURL(file);
+
+        document.getElementById("view-file-btn").href = fileUrl;
+
         if (file.type.startsWith("image/")) {
           const reader = new FileReader();
+
           reader.onload = (e) => {
             imgPreview.src = e.target.result;
+
             imgPreview.classList.remove("hidden");
             iconPlaceholder.classList.add("hidden");
           };
+
           reader.readAsDataURL(file);
+
         } else {
           imgPreview.classList.add("hidden");
           iconPlaceholder.classList.remove("hidden");
-          // Berikan ekstensi teks singkat untuk file non-gambar (misal: PDF, DOC)
-          iconPlaceholder.textContent = file.name.split('.').pop().toUpperCase() || "DOC";
+
+          iconPlaceholder.textContent =
+            file.name.split(".").pop().toUpperCase() || "DOC";
         }
 
-        document.getElementById("dropzone-empty").classList.add("hidden");
-        document.getElementById("dropzone-filled").classList.remove("hidden");
+        document.getElementById("dropzone-empty")
+          .classList.add("hidden");
+
+        document.getElementById("dropzone-filled")
+          .classList.remove("hidden");
       }
     }
 
-    function clearFile() {
-      document.getElementById("file-input").value = "";
-      document.getElementById("dropzone-empty").classList.remove("hidden");
-      document.getElementById("dropzone-filled").classList.add("hidden");
+
+
+    function changeFile() {
+      document.getElementById("file-input").click();
     }
   </script>

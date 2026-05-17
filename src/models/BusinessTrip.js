@@ -18,7 +18,7 @@ const businessTripSchema = new mongoose.Schema(
     title: String,
     purpose: {
       type: String,
-      enum: ["SALES_VISIT", "MEETING", "TRAINING", "SURVEY", "OTHER"],
+      enum: ["KUNJUNGAN_SALES", "RAPAT", "PELATIHAN", "SURVEI", "LAINNYA"],
     },
 
     meetWith: { type: String, required: true, maxlength: 100 },
