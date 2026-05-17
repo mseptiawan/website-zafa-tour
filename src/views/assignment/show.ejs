@@ -1,170 +1,124 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+    <div class="max-w-3xl mx-auto">
 
-  <div class="max-w-3xl mx-auto">
+      <!-- BACK ACTION BUTTON -->
+      <a href="/assignment"
+        class="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors mb-5 group">
+        <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform stroke-[2]" fill="none"
+          stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Kembali ke Daftar
+      </a>
 
-    <!-- BACK -->
-    <a
-      href="/assignment"
-      class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition mb-5"
-    >
-      <svg
-        class="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M15 19l-7-7 7-7"
-        />
-      </svg>
+      <!-- MAIN DETAIL CARD -->
+      <div class="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm shadow-slate-100/50">
 
-      Kembali
-    </a>
+        <!-- HEADER COMPONENT -->
+        <div class="flex items-start justify-between gap-5 pb-5 border-b border-slate-100/80">
+          <div class="min-w-0 space-y-2">
+            <h1 class="text-lg font-bold text-slate-900 tracking-tight break-words leading-snug">
+              <%= assignment.title %>
+            </h1>
+            <p class="text-[13px] text-slate-500 leading-relaxed break-words pr-2">
+              <%= assignment.description || 'Tidak ada deskripsi tambahan untuk penugasan ini.' %>
+            </p>
+          </div>
 
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
-
-      <!-- HEADER -->
-      <div class="flex items-start justify-between gap-4">
-
-        <div class="min-w-0">
-
-          <h1 class="text-2xl font-semibold text-slate-800 break-words">
-            <%= assignment.title %>
-          </h1>
-
-          <p class="text-sm text-slate-500 mt-2 leading-6 break-words">
-            <%= assignment.description || 'Tidak ada deskripsi' %>
-          </p>
-
+          <!-- MIKRO STATUS BADGE -->
+          <div class="flex-shrink-0">
+            <% if(assignment.endDate && new Date(assignment.endDate)>= new Date()) { %>
+              <span
+                class="inline-flex items-center px-2.5 py-1 text-[11px] rounded-lg border font-medium tracking-wide bg-emerald-50/60 text-emerald-600 border-emerald-100 whitespace-nowrap">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                Active
+              </span>
+              <% } else { %>
+                <span
+                  class="inline-flex items-center px-2.5 py-1 text-[11px] rounded-lg border font-medium tracking-wide bg-slate-50 text-slate-400 border-slate-200/60 whitespace-nowrap">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-1.5"></span>
+                  Completed
+                </span>
+                <% } %>
+          </div>
         </div>
 
-        <% if(assignment.endDate && new Date(assignment.endDate) >= new Date()) { %>
+        <!-- METADATA GRID DISPLAY -->
+        <div class="grid grid-cols-2 gap-x-6 gap-y-4 py-6 text-[13px]">
+          <div class="space-y-0.5">
+            <p class="text-slate-400 font-medium">Tipe Penugasan</p>
+            <p class="text-slate-800 font-semibold">
+              <%= assignment.type %>
+            </p>
+          </div>
 
-          <span class="bg-emerald-50 text-emerald-600 text-xs px-3 py-1 rounded-md whitespace-nowrap">
-            Active
-          </span>
+          <div class="space-y-0.5">
+            <p class="text-slate-400 font-medium">Lokasi Tujuan</p>
+            <p class="text-slate-800 font-semibold truncate">
+              <%= assignment.location || '-' %>
+            </p>
+          </div>
 
-        <% } else { %>
+          <div class="space-y-0.5">
+            <p class="text-slate-400 font-medium">Tanggal Mulai</p>
+            <p class="text-slate-700 font-medium">
+              <%= new Date(assignment.startDate).toLocaleDateString("id-ID", { day: 'numeric' , month: 'long' ,
+                year: 'numeric' }) %>
+            </p>
+          </div>
 
-          <span class="bg-slate-100 text-slate-500 text-xs px-3 py-1 rounded-md whitespace-nowrap">
-            Completed
-          </span>
-
-        <% } %>
-
-      </div>
-
-      <!-- INFO -->
-      <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
-
-        <div>
-          <p class="text-slate-400 mb-1">
-            Tipe
-          </p>
-
-          <p class="text-slate-700">
-            <%= assignment.type %>
-          </p>
+          <div class="space-y-0.5">
+            <p class="text-slate-400 font-medium">Tanggal Selesai</p>
+            <p class="text-slate-700 font-medium">
+              <%= new Date(assignment.endDate).toLocaleDateString("id-ID", { day: 'numeric' , month: 'long' ,
+                year: 'numeric' }) %>
+            </p>
+          </div>
         </div>
 
-        <div>
-          <p class="text-slate-400 mb-1">
-            Lokasi
-          </p>
-
-          <p class="text-slate-700">
-            <%= assignment.location || '-' %>
-          </p>
-        </div>
-
-        <div>
-          <p class="text-slate-400 mb-1">
-            Mulai
-          </p>
-
-          <p class="text-slate-700">
-            <%= new Date(assignment.startDate).toLocaleDateString("id-ID") %>
-          </p>
-        </div>
-
-        <div>
-          <p class="text-slate-400 mb-1">
-            Selesai
-          </p>
-
-          <p class="text-slate-700">
-            <%= new Date(assignment.endDate).toLocaleDateString("id-ID") %>
-          </p>
-        </div>
-
-      </div>
-
-      <!-- EMPLOYEE -->
-      <div class="mt-8 pt-5 border-t border-slate-100">
-
-        <h2 class="text-sm font-medium text-slate-700 mb-3">
-          Karyawan Ditugaskan
-        </h2>
-
-        <div class="flex flex-wrap gap-2">
-
-          <% assignment.employees.forEach(e => { %>
-
-            <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-md">
-              <%= e.fullName %>
-            </span>
-
-          <% }) %>
-
-        </div>
-
-      </div>
-
-      <!-- ATTACHMENT -->
-      <% if (assignment.attachment) { %>
-
-        <div class="mt-8 pt-5 border-t border-slate-100">
-
-          <h2 class="text-sm font-medium text-slate-700 mb-3">
-            Surat Penugasan
+        <!-- TEAM / EMPLOYEE ASSIGNED SECTION -->
+        <div class="pt-5 border-t border-slate-100/80">
+          <h2 class="text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-3">
+            Karyawan Ditugaskan
           </h2>
 
-          <a
-            href="/uploads/<%= assignment.attachment %>"
-            target="_blank"
-            class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-lg transition"
-          >
-
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-              />
-            </svg>
-
-            Lihat File
-
-          </a>
-
+          <div class="flex flex-wrap gap-2">
+            <% assignment.employees.forEach(e=> { %>
+              <span
+                class="inline-block bg-slate-50 border border-slate-200/60 text-slate-700 text-[12px] font-medium px-3 py-1.5 rounded-xl shadow-sm shadow-slate-100/30">
+                <%= e.fullName %>
+              </span>
+              <% }) %>
+          </div>
         </div>
 
-      <% } %>
+        <!-- PREMIUM GHOST BUTTON FOR ATTACHMENT -->
+        <% if (assignment.attachment) { %>
+          <div
+            class="mt-6 pt-5 border-t border-dashed border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-0.5">
+              <h2 class="text-[13px] font-semibold text-slate-800">
+                Surat Perintah Kerja (SPK)
+              </h2>
+              <p class="text-[11px] text-slate-400">
+                Dokumen resmi lampiran administrasi penugasan.
+              </p>
+            </div>
 
+            <a href="/uploads/files/<%= assignment.attachment %>" target="_blank"
+              class="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-4 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 flex-shrink-0 active:scale-[0.98]">
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 stroke-[2]" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l4.5-4.5a4.5 4.5 0 011.243-0.88m6.364 6.364l-.001-.001m1.036-1.036a4.5 4.5 0 001.24-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364l4.5 4.5a4.5 4.5 0 001.242.88" />
+              </svg>
+              Lihat File Lampiran
+            </a>
+          </div>
+          <% } %>
+
+      </div>
     </div>
-
   </div>
-
-</div>
