@@ -1,6 +1,6 @@
 import Announcement from "../models/Announcement.js";
 import { createAnnouncementSchema } from "../validations/announcement/announcement.schema.js";
-
+import { getPaginationMeta } from "../utils/pagination.js";
 const create = async (req) => {
   const parsed = createAnnouncementSchema.safeParse(req.body);
 
@@ -23,8 +23,16 @@ const create = async (req) => {
   });
 };
 
-const getAll = () => {
-  return Announcement.find().populate("createdBy").sort({ createdAt: -1 });
+const getAll = async ({ page, limit, skip }) => {
+  const [data, total] = await Promise.all([
+    Announcement.find().populate("createdBy").sort({ createdAt: -1 }).skip(skip).limit(limit),
+
+    Announcement.countDocuments(),
+  ]);
+
+  const meta = getPaginationMeta({ page, limit, total });
+
+  return { data, meta };
 };
 
 const getById = (id) => {

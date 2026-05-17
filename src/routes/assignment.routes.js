@@ -22,7 +22,7 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", index);
+router.get("/", roleMiddleware("PIMPINAN"), index);
 
 router.get("/new", newForm);
 

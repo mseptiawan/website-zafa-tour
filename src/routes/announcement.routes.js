@@ -11,7 +11,6 @@ router.use(authMiddleware);
 router.get("/", index);
 router.get("/new", newForm);
 router.post("/", uploadFile.single("attachment"), validate(createAnnouncementSchema), create);
-
 router.get("/:id", show);
 router.post("/:id/publish", publish);
 

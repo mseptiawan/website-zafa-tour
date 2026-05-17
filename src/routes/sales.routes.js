@@ -19,7 +19,7 @@ router.use(authMiddleware);
 
 // FORM + CREATE
 router.get("/new", newForm);
-router.post("/", uploadFile.array("attachments", 5), create);
+router.post("/", uploadFile.single("attachments"), create);
 
 // READ
 router.get("/my", myVisits);
@@ -28,7 +28,7 @@ router.get("/report", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), report);
 
 router.get("/:id/edit", authMiddleware, edit);
 
-router.post("/:id/edit", authMiddleware, uploadFile.array("attachments", 5), update);
+router.post("/:id/edit", authMiddleware, uploadFile.single("attachments"), update);
 
 router.get("/:id", show);
 

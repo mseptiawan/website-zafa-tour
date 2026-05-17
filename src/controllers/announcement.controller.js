@@ -1,3 +1,5 @@
+import { getPagination } from "../utils/pagination.js";
+
 import announcementService from "../services/announcement.service.js";
 
 export const newForm = (req, res) => {
@@ -25,18 +27,27 @@ export const create = async (req, res, next) => {
 
 export const index = async (req, res, next) => {
   try {
-    const announcements = await announcementService.getAll();
+    const { page, limit, skip } = getPagination({
+      page: req.query.page,
+      limit: 9,
+    });
+
+    const result = await announcementService.getAll({
+      page,
+      limit,
+      skip,
+    });
 
     res.render("announcement/index", {
       title: "Semua Pengumuman",
-      announcements,
+      announcements: result.data,
+      pagination: result.meta,
       user: req.session.user,
     });
   } catch (err) {
     next(err);
   }
 };
-
 export const show = async (req, res, next) => {
   try {
     const announcement = await announcementService.getById(req.params.id);

@@ -75,6 +75,7 @@ export function getPermissions(role) {
     report_attendance: false,
 
     assignment_my: false,
+    assignment_all: false,
 
     finance_request: false,
     finance_history: false,
@@ -243,6 +244,7 @@ export function getPermissions(role) {
       permissions.report_attendance = true;
 
       permissions.finance_history = true;
+      permissions.assignment_all = true;
 
       break;
 

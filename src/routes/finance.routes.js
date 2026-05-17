@@ -20,9 +20,13 @@ const router = express.Router();
 
 // list finance trips
 router.get("/", roleMiddleware("KEUANGAN"), financeTripPage);
-router.get("/history", roleMiddleware("KEUANGAN"), paymentHistoryPage);
+router.get("/history", roleMiddleware("KEUANGAN", "HR", "MANAGER", "PIMPINAN"), paymentHistoryPage);
 
-router.get("/history/:id", roleMiddleware("KEUANGAN"), paymentHistoryDetail);
+router.get(
+  "/history/:id",
+  roleMiddleware("KEUANGAN", "HR", "MANAGER", "PIMPINAN"),
+  paymentHistoryDetail
+);
 
 // detail finance trip
 router.get("/:id", roleMiddleware("KEUANGAN"), financeTripDetail);

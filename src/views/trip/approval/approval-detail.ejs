@@ -1,226 +1,291 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="ml-72 min-h-screen bg-slate-50/40 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+    <div class="max-w-3xl mx-auto">
 
-    <div class="max-w-4xl mx-auto">
-
-      <!-- BACK -->
+      <!-- BACK ACTION BUTTON -->
       <a href="/trip/approval"
-        class="inline-flex items-center gap-2 text-[14px] font-bold text-slate-400 hover:text-slate-900 mb-6 uppercase tracking-widest transition-all">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        class="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors mb-5 group">
+        <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform stroke-[2]" fill="none"
+          stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Kembali
+        Kembali ke Daftar
       </a>
-
-      <!-- CARD -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-
-        <!-- HEADER -->
-        <div class="p-8 border-b border-slate-100">
-
-          <div class="flex items-center gap-2 mb-2">
-            <span class="px-2.5 py-0.5 text-[11px] rounded-full border font-bold uppercase tracking-wider
-            <%= trip.status === 'APPROVED'
-              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-              : trip.status === 'REJECTED'
-              ? 'bg-red-50 text-red-600 border-red-200'
-              : 'bg-slate-50 text-slate-600 border-slate-200'
-            %>">
-              <%= trip.status %>
-            </span>
-
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Step: <%= trip.currentStep || 'SELESAI' %>
-            </span>
-          </div>
-
-          <h1 class="text-2xl font-bold text-slate-900">
-            <%= trip.title %>
-          </h1>
-
+      <!-- ERROR MESSAGE -->
+      <% if (error) { %>
+        <div class="mb-5 px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-red-700 text-[13px] font-medium">
+          <%= error %>
         </div>
+        <% } %>
+          <!-- MAIN DETAIL CARD -->
+          <div class="bg-white border border-slate-200/60 rounded-2xl shadow-sm shadow-slate-100/40 overflow-hidden">
 
-        <!-- BODY -->
-        <div class="p-8 space-y-6">
-
-          <!-- INFO GRID -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
-
-            <div class="space-y-0.5">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pengaju</div>
-              <div class="text-[14px] font-bold text-slate-800">
-                <%= trip.userId?.username || '-' %>
-              </div>
-            </div>
-
-            <div class="space-y-0.5">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Destinasi</div>
-              <div class="text-[14px] font-bold text-slate-800">
-                <%= trip.destination || '-' %>
-              </div>
-            </div>
-
-            <div class="space-y-0.5">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Budget</div>
-              <div class="text-[14px] font-bold text-slate-800">
-                Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- DESCRIPTION -->
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700 block">Deskripsi</label>
+            <!-- HEADER COMPONENT -->
             <div
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-700 leading-relaxed">
-              <%= trip.description || '-' %>
+              class="p-6 sm:p-7 border-b border-slate-100/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1.5">
+                <!-- BADGES CONTAINER -->
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded-md border uppercase
+              <%= trip.status === 'APPROVED'
+                ? 'bg-emerald-50/60 text-emerald-600 border-emerald-100'
+                : trip.status === 'REJECTED'
+                ? 'bg-red-50/60 text-red-600 border-red-100'
+                : 'bg-blue-50/60 text-blue-600 border-blue-100'
+              %>">
+                    <%= trip.status %>
+                  </span>
+
+                  <span
+                    class="inline-flex items-center px-2 py-0.5 text-[10.5px] font-semibold text-slate-400 border border-slate-200/60 bg-slate-50/50 rounded-md uppercase tracking-wider">
+                    Step: <%= trip.currentStep || 'SELESAI' %>
+                  </span>
+                </div>
+
+                <h1 class="text-lg font-semibold text-slate-900 tracking-tight leading-snug break-words pr-4">
+                  <%= trip.title %>
+                </h1>
+              </div>
             </div>
-          </div>
 
-          <!-- TIMELINE -->
-          <div class="space-y-2">
-            <label class="text-[13px] font-bold text-slate-700 block">Timeline Kunjungan</label>
+            <!-- BODY CONTENT -->
+            <div class="p-6 sm:p-7 space-y-6">
 
-            <div class="space-y-3 pl-2">
-              <% (trip.timeline || []).forEach(item=> { %>
-                <div class="relative border-l-2 border-slate-200 pl-4 py-0.5">
-                  <div class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-slate-300"></div>
-                  <p class="text-[14px] text-slate-700 font-medium">
-                    <%= item.address %>
+              <!-- CORE METADATA GRID -->
+              <div
+                class="grid grid-cols-1 sm:grid-cols-3 gap-y-4 gap-x-6 bg-slate-50/60 border border-slate-200/40 p-4.5 rounded-xl text-[13px]">
+                <div class="space-y-0.5">
+                  <p class="text-slate-400 font-medium">Pengaju</p>
+                  <p class="text-slate-800 font-semibold truncate">
+                    <%= trip.userId?.username || '-' %>
                   </p>
                 </div>
-                <% }) %>
-            </div>
-          </div>
 
-          <!-- APPROVAL HISTORY -->
-          <div class="space-y-3">
-            <label class="text-[13px] font-bold text-slate-700 block">History Approval</label>
+                <div class="space-y-0.5">
+                  <p class="text-slate-400 font-medium">Destinasi</p>
+                  <p class="text-slate-800 font-semibold truncate">
+                    <%= trip.destination || '-' %>
+                  </p>
+                </div>
 
-            <% if (!trip.approvals || trip.approvals.length===0) { %>
-              <div class="p-4 rounded-xl bg-slate-50 text-slate-400 text-[14px] border border-slate-200/60 text-center">
-                Belum ada data tracker approval
+                <div class="space-y-0.5">
+                  <p class="text-slate-400 font-medium">Alokasi Budget</p>
+                  <p class=" font-medium">Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
+                  </p>
+                </div>
               </div>
-              <% } %>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <% (trip.approvals || []).forEach(a=> { %>
-                    <div
-                      class="border border-slate-200 rounded-xl p-4 bg-white shadow-sm flex flex-col justify-between space-y-2">
-                      <div>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                          <%= a.step %> • <%= a.actor %>
-                        </div>
-                        <div class="text-[14px] font-bold text-slate-900 mt-0.5">
-                          <%= a.status %>
-                        </div>
+              <!-- DESCRIPTION COMPONENT -->
+              <div class="space-y-2">
+                <label class="text-[12px] font-medium text-slate-400 uppercase tracking-wider block">Deskripsi
+                  Perjalanan</label>
+                <div
+                  class="w-full bg-white border border-slate-200/70 rounded-xl px-4 py-3 text-[13px] text-slate-600 leading-relaxed break-words whitespace-pre-line shadow-inner shadow-slate-50">
+                  <%= trip.description || 'Tidak ada deskripsi tambahan.' %>
+                </div>
+              </div>
+
+              <!-- TIMELINE COMPONENT -->
+              <div class="space-y-3">
+                <label class="text-[12px] font-medium text-slate-400 uppercase tracking-wider block">Timeline
+                  Kunjungan</label>
+
+                <div class="space-y-3 pl-1.5">
+                  <% (trip.timeline || []).forEach((item, index)=> { %>
+                    <div class="relative border-l border-slate-200 pl-4 pb-0.5 last:pb-0">
+                      <!-- Dot Indicator -->
+                      <div
+                        class="absolute -left-[4.5px] top-2 w-2 h-2 rounded-full border border-white bg-slate-400 group-hover:bg-blue-500">
                       </div>
-                      <div class="text-[13px] text-slate-500 pt-2 border-t border-slate-100">
-                        <span class="font-medium text-slate-400">Catatan:</span>
-                        <%= a.note || '-' %>
-                      </div>
+                      <p class="text-[13px] text-slate-600 font-medium leading-normal break-words">
+                        <%= item.address %>
+                      </p>
                     </div>
                     <% }) %>
                 </div>
-          </div>
-
-          <!-- ACTION LOGIC (KEEP RULES) -->
-          <% const isFinal=['APPROVED', 'REJECTED' ].includes(trip.status); const isManagerStep=user.role==='MANAGER' &&
-            trip.currentStep==='MANAGER' && !isFinal; const isPimpinanStep=user.role==='PIMPINAN' &&
-            trip.currentStep==='PIMPINAN' && !isFinal; const isHrStep=user.role==='HR' && trip.currentStep==='PIMPINAN'
-            && trip.delegation?.active===true && trip.delegation?.to==='HR' && !isFinal; const canApprove=!isFinal &&
-            (isManagerStep || isPimpinanStep || isHrStep); const requesterIsHR=trip.requesterRole==='HR' ; const
-            canDelegate=user.role==='PIMPINAN' && trip.currentStep==='PIMPINAN' && !trip.delegation?.active && !isFinal
-            && !requesterIsHR; const isDelegatedToHR=trip.delegation?.active===true && trip.delegation?.to==='HR' ;
-            const isPimpinanBlocked=user.role==='PIMPINAN' && isDelegatedToHR && trip.currentStep==='PIMPINAN' ; %>
-
-            <!-- ===================== -->
-            <!-- ACTION BUTTONS        -->
-            <!-- ===================== -->
-            <% if (canApprove && !isPimpinanBlocked) { %>
-              <div
-                class="pt-6 border-t border-slate-100 flex flex-wrap gap-4 items-end justify-between bg-slate-50/50 -mx-8 -mb-8 p-8 border-b rounded-b-2xl">
-
-                <!-- REJECT FORM -->
-                <form method="POST" action="/trip/approval/<%= trip._id %>"
-                  class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end w-full md:w-auto order-2 md:order-1">
-                  <div class="space-y-1.5">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Alasan
-                      Penolakan</label>
-                    <input name="note" required placeholder="Berikan alasan jika menolak..."
-                      class="w-full sm:w-72 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-[14px] focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-                  </div>
-                  <input type="hidden" name="action" value="REJECT" />
-                  <button type="submit"
-                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-red-100 transition-all whitespace-nowrap">
-                    Tolak Pengajuan
-                  </button>
-                </form>
-
-                <!-- APPROVE FORM -->
-                <form method="POST" action="/trip/approval/<%= trip._id %>"
-                  class="w-full md:w-auto order-1 md:order-2 flex justify-end">
-                  <input type="hidden" name="action" value="APPROVE" />
-                  <button type="submit"
-                    class="w-full sm:w-auto bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all">
-                    Setujui Pengajuan
-                  </button>
-                </form>
-
               </div>
-              <% } %>
 
-                <!-- ===================== -->
-                <!-- STATUS TRACK TRACKER  -->
-                <!-- ===================== -->
-                <% if (!canApprove || isPimpinanBlocked) { %>
-                  <div class="flex justify-between items-center pt-6 border-t border-slate-100">
+              <!-- APPROVAL HISTORY FLOW -->
+              <div class="space-y-3 pt-2">
+                <label class="text-[12px] font-medium text-slate-400 uppercase tracking-wider block">Log Jejak
+                  Persetujuan</label>
 
-                    <div class="text-[14px] text-slate-500 font-medium">
-                      <% if (trip.status==='APPROVED' ) { %>
-                        <span class="text-emerald-600 font-bold">✓</span> Trip ini telah disetujui sepenuhnya
-                        <% } else if (trip.status==='REJECTED' ) { %>
-                          <span class="text-red-600 font-bold">✕</span> Pengajuan trip ini telah ditolak
-                          <% } else if (trip.delegation?.active) { %>
-                            <span class="text-amber-500 font-bold">ℹ</span> Delegasi aktif: HR sedang memproses berkas
-                            <% } else { %>
-                              <span class="text-blue-500 font-bold">•</span> Menunggu konfirmasi step saat ini
-                              <% } %>
+                <% if (!trip.approvals || trip.approvals.length===0) { %>
+                  <div
+                    class="p-4 rounded-xl bg-slate-50/50 text-slate-400 text-[12.5px] border border-slate-200/40 text-center">
+                    Belum ada riwayat tracker approval untuk pengajuan ini.
+                  </div>
+                  <% } %>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <% (trip.approvals || []).forEach(a=> { %>
+                        <div
+                          class="border border-slate-200/60 rounded-xl p-4 bg-white shadow-sm flex flex-col justify-between gap-3">
+                          <div>
+                            <div class="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider">
+                              <%= a.step %> • <%= a.actor %>
+                            </div>
+                            <div
+                              class="text-[13px] font-medium mt-1
+                    <%= a.status === 'APPROVED' ? 'text-emerald-600' : a.status === 'REJECTED' ? 'text-red-600' : 'text-slate-800' %>">
+                              <%= a.status %>
+                            </div>
+                          </div>
+                          <div class="text-[12px] text-slate-500 pt-2 border-t border-slate-100/80 break-words">
+                            <span class="font-medium text-slate-400">Catatan:</span>
+                            <%= a.note || '-' %>
+                          </div>
+                        </div>
+                        <% }) %>
                     </div>
+              </div>
 
-                    <span class="text-xs px-3 py-1 rounded-full border font-bold uppercase tracking-wider
+              <!-- KEEP INTERNAL ACTIONS SYSTEM LOGIC (NO MODIFICATION TO VARIABLES) -->
+              <% const isFinal=['APPROVED', 'REJECTED' ].includes(trip.status); const
+                isManagerStep=user.role==='MANAGER' && trip.currentStep==='MANAGER' && !isFinal; const
+                isPimpinanStep=user.role==='PIMPINAN' && trip.currentStep==='PIMPINAN' && !isFinal; const
+                isHrStep=user.role==='HR' && trip.currentStep==='PIMPINAN' && trip.delegation?.active===true &&
+                trip.delegation?.to==='HR' && !isFinal; const canApprove=!isFinal && (isManagerStep || isPimpinanStep ||
+                isHrStep); const requesterIsHR=trip.requesterRole==='HR' ; const canDelegate=user.role==='PIMPINAN' &&
+                trip.currentStep==='PIMPINAN' && !trip.delegation?.active && !isFinal && !requesterIsHR; const
+                isDelegatedToHR=trip.delegation?.active===true && trip.delegation?.to==='HR' ; const
+                isPimpinanBlocked=user.role==='PIMPINAN' && isDelegatedToHR && trip.currentStep==='PIMPINAN' ; %>
+
+                <!-- =================================== -->
+                <!-- PREMIUM RESPONSIVE ACTION CONTAINER -->
+                <!-- =================================== -->
+                <% if (canApprove && !isPimpinanBlocked) { %>
+                  <div class="pt-6 border-t border-slate-200/60 flex flex-col gap-4">
+
+                    <!-- FLOATING INPUT REJECT REASON (Hanya muncul rapi di atas baris tombol) -->
+                    <form method="POST" action="/trip/approval/<%= trip._id %>" id="action-master-form"
+                      class="space-y-4">
+
+                      <!-- INPUTAN ALASAN (Terisolasi penuh di baris atas) -->
+                      <div class="space-y-1.5">
+                        <label class="text-[12px] font-semibold text-slate-500 uppercase tracking-wider block pl-0.5">
+                          Catatan / Alasan Penolakan
+                        </label>
+                        <div class="relative w-full">
+                          <!-- Icon minimalis penanda catatan -->
+                          <div
+                            class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </div>
+                          <input type="text" name="note" id="approval-note-input"
+                            placeholder="Wajib diisi jika Anda menolak pengajuan ini..."
+                            class="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl pl-10 pr-4 py-2.5 text-[13px] text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 transition-all shadow-sm shadow-slate-100/30" />
+                        </div>
+                      </div>
+
+                      <!-- ACTION BUTTONS ROW (Berjejer rapi di sudut kanan bawah) -->
+                      <div class="flex items-center justify-end gap-3 pt-2">
+
+                        <!-- BUTTON: TOLAK (Gaya Ringkas Soft Red) -->
+                        <button type="button" onclick="submitWithAction('REJECT')"
+                          class="inline-flex items-center justify-center bg-red-50 hover:bg-red-100/80 text-red-600 border border-red-200/50 rounded-xl px-5 py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                          Tolak
+                        </button>
+
+                        <!-- BUTTON: SETUJUI (Gaya Solid Royal Blue Premium) -->
+                        <button type="button" onclick="submitWithAction('APPROVE')"
+                          class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[13px] font-medium transition-all border border-blue-700/30 shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                          Setujui Pengajuan
+                        </button>
+
+                        <!-- Hidden Input untuk menampung jenis aksi backend -->
+                        <input type="hidden" name="action" id="action-type-value" value="" />
+                      </div>
+
+                    </form>
+                  </div>
+                  <% } %>
+
+                    <!-- =================================== -->
+                    <!-- LIVE STATUS TRACK TRACKER BOTTOM    -->
+                    <!-- =================================== -->
+                    <% if (!canApprove || isPimpinanBlocked) { %>
+                      <div class="flex items-center justify-between pt-5 border-t border-slate-100/80 text-[13px]">
+                        <div class="text-slate-500 font-medium flex items-center gap-1.5">
+                          <% if (trip.status==='APPROVED' ) { %>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="text-slate-600">Trip ini telah disetujui sepenuhnya</span>
+                            <% } else if (trip.status==='REJECTED' ) { %>
+                              <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                              <span class="text-slate-600">Pengajuan dinas ditolak</span>
+                              <% } else if (trip.delegation?.active) { %>
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                <span class="text-slate-600">Delegasi aktif: Memerlukan validasi berkas oleh HR</span>
+                                <% } else { %>
+                                  <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                  <span class="text-slate-600">Menunggu konfirmasi pada langkah otoritas saat ini</span>
+                                  <% } %>
+                        </div>
+
+                        <span class="inline-flex items-center px-2.5 py-0.5 text-[10.5px] font-medium rounded-md border uppercase tracking-wider
               <%= trip.status === 'APPROVED'
-                ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                 : trip.status === 'REJECTED'
-                ? 'bg-red-50 text-red-600 border-red-200'
+                ? 'bg-red-50 text-red-600 border-red-100'
                 : trip.delegation?.active
                 ? 'bg-amber-50 text-amber-600 border-amber-200'
                 : 'bg-blue-50 text-blue-600 border-blue-200'
               %>">
-                      <%= trip.delegation?.active ? 'HR (DELEGATED)' : trip.currentStep %>
-                    </span>
-
-                  </div>
-                  <% } %>
-
-                    <!-- ===================== -->
-                    <!-- DELEGATION BUTTON     -->
-                    <!-- ===================== -->
-                    <% if (canDelegate) { %>
-                      <div class="mt-6 pt-6 border-t border-slate-100 flex justify-start">
-                        <form method="POST" action="/trip/<%= trip._id %>/delegate">
-                          <button type="submit"
-                            class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-amber-100 transition-all">
-                            Delegasikan Wewenang ke HR
-                          </button>
-                        </form>
+                          <%= trip.delegation?.active ? 'HR (DELEGATED)' : trip.currentStep %>
+                        </span>
                       </div>
                       <% } %>
 
-        </div>
-      </div>
+                        <!-- =================================== -->
+                        <!-- DELEGATION DRAWER INTERFACE CONTROL -->
+                        <!-- =================================== -->
+                        <% if (canDelegate) { %>
+                          <div
+                            class="mt-5 pt-5 border-t border-dashed border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="space-y-0.5">
+                              <h4 class="text-[13px] font-semibold text-slate-800">
+                                Pendelegasian Berkas Otoritas
+                              </h4>
+                              <p class="text-[11px] text-slate-400 leading-normal">
+                                Alihkan peninjauan data anggaran ke departemen HR untuk pemeriksaan berkas fisik.
+                              </p>
+                            </div>
 
+                            <form method="POST" action="/trip/<%= trip._id %>/delegate" class="flex-shrink-0">
+                              <button type="submit"
+                                class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-amber-50/50 text-amber-600 hover:text-amber-700 border border-amber-200 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all shadow-sm shadow-amber-50 active:scale-[0.98] cursor-pointer">
+                                Delegasikan ke HR
+                              </button>
+                            </form>
+                          </div>
+                          <% } %>
+
+            </div>
+          </div>
     </div>
   </div>
+
+  <script>
+    function submitWithAction(actionType) {
+      const form = document.getElementById('action-master-form');
+      const inputAction = document.getElementById('action-type-value');
+      const noteInput = document.getElementById('approval-note-input');
+
+      // Set value action sesuai tombol yang ditekan (APPROVE / REJECT)
+      inputAction.value = actionType;
+
+      // Validasi HTML5 bawaan: Jika REJECT, input teks alasan wajib diisi
+      if (actionType === 'REJECT' && !noteInput.value.trim()) {
+        noteInput.reportValidity();
+        noteInput.focus();
+        return;
+      }
+
+      // Eksekusi submit data ke backend
+      form.submit();
+    }
+  </script>

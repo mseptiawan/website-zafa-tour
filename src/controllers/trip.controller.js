@@ -77,6 +77,7 @@ export const approvalDetailPage = async (req, res) => {
       title: "Detail Persetujuan",
       trip,
       user: req.session.user,
+      error: null,
     });
   } catch (err) {
     return res.status(500).send(err.message);
@@ -99,11 +100,17 @@ export const handleApproval = async (req, res) => {
 
     return res.redirect(`/trip/approval/${id}`);
   } catch (err) {
-    console.error(err);
-    return res.status(err.status || 500).send(err.message);
+    const trip = await BusinessTrip.findById(req.params.id);
+
+    return res.status(err.status || 400).render("trip/approval/approval-detail", {
+      title: "Approval Trip",
+      user: req.session.user,
+      error: err.message,
+      id: req.params.id,
+      trip,
+    });
   }
 };
-
 export const delegateTripToHR = async (req, res) => {
   try {
     const trip = await delegateTripToHRService({
