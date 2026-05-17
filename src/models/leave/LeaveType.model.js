@@ -50,5 +50,4 @@ const leaveTypeSchema = new mongoose.Schema(
   }
 );
 
-const LeaveType = mongoose.model("LeaveType", leaveTypeSchema);
-export default LeaveType;
+export default mongoose.model("LeaveType", leaveTypeSchema);
