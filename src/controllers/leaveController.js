@@ -147,7 +147,14 @@ export const myLeave = async (req, res) => {
 
     const myHistory = await Leave.find({ userId })
       .populate("leaveTypeId", "name code")
-      .populate("handoverUserId", "name username")
+      .populate({
+        path: "handoverUserId", // Masuk ke field User
+        select: "username",
+        populate: {
+          path: "employeeData", // Panggil jalan virtual tadi ke tabel Employee
+          select: "name", // Ambil field 'name' dari tabel Employee
+        },
+      })
       .sort({ createdAt: -1 });
 
     res.render("leave/my-history", {

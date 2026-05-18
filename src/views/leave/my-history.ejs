@@ -78,7 +78,8 @@
                   <%= leave.totalDays %> Hari
                 </td>
                 <td class="py-4 px-6 text-slate-500">
-                  <%= leave.handoverUserId ? leave.handoverUserId.username : '-' %>
+                  <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ?
+                    leave.handoverUserId.employeeData.name : '-' %>
                 </td>
                 <td class="py-4 px-6">
                   <span
