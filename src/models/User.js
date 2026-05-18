@@ -35,9 +35,17 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+  },
+  {
+    toJSON: { virtuals: true }, // Pastikan virtuals aktif saat di-convert ke JSON/Object
+    toObject: { virtuals: true },
   }
 );
-
+userSchema.virtual("employeeData", {
+  ref: "Employee", // Nama model target
+  localField: "_id", // Field di model User saat ini
+  foreignField: "userId", // Field di model Employee yang nge-ref ke User id
+});
 const User = mongoose.model("User", userSchema);
 
 export default User;

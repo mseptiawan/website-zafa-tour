@@ -1,0 +1,53 @@
+<%- layout('layouts/main', { title }) %>
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-xl font-bold text-slate-900 mb-2">Permintaan Delegasi Pekerjaan</h1>
+      <p class="text-xs text-slate-500 mb-6">Konfirmasi kesediaan Anda untuk mem-backup tugas rekan kerja yang cuti</p>
+
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr
+              class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <th class="py-4 px-6">Rekan Kerja</th>
+              <th class="py-4 px-6">Jenis Cuti</th>
+              <th class="py-4 px-6">Durasi Tanggal</th>
+              <th class="py-4 px-6 text-right">Keputusan Anda</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-sm">
+            <% if (delegations.length===0) { %>
+              <tr>
+                <td colspan="4" class="py-8 text-center text-slate-400 italic text-xs">Tidak ada permintaan delegasi
+                  aktif</td>
+              </tr>
+              <% } %>
+                <% delegations.forEach(del=> { %>
+                  <tr>
+                    <td class="py-4 px-6 font-bold text-slate-800">
+                      <%= del.leaveId.userId.name %>
+                    </td>
+                    <td class="py-4 px-6 font-medium text-slate-600">
+                      <%= del.leaveId.leaveTypeId.name %>
+                    </td>
+                    <td class="py-4 px-6 text-xs text-slate-500">
+                      <%= del.leaveId.totalDays %> Hari (<%= new Date(del.leaveId.startDate).toLocaleDateString('id-ID')
+                          %>)
+                    </td>
+                    <td class="py-4 px-6 text-right space-x-1 whitespace-nowrap">
+                      <form action="/leave/delegation/approve/<%= del._id %>" method="POST" class="inline">
+                        <button
+                          class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-3 py-1.5 text-xs font-bold cursor-pointer">Terima</button>
+                      </form>
+                      <form action="/leave/delegation/reject/<%= del._id %>" method="POST" class="inline">
+                        <button
+                          class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg px-3 py-1.5 text-xs font-bold cursor-pointer">Tolak</button>
+                      </form>
+                    </td>
+                  </tr>
+                  <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

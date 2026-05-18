@@ -1,195 +1,101 @@
-<% layout('layouts/main') -%>
-
-<div class="ml-72 min-h-screen bg-slate-50/60 p-10">
-  <div class="max-w-4xl mx-auto">
-
-    <!-- HEADER -->
-    <div class="mb-10 text-center">
-      <h1 class="text-3xl font-bold text-slate-800 tracking-tight">
-        Detail Pengajuan Cuti
-      </h1>
-      <p class="text-slate-500 mt-2 text-sm font-medium">
-        Informasi lengkap pengajuan cuti karyawan
-      </p>
-    </div>
-
-    <!-- CARD -->
-    <div class="relative overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-[0_15px_40px_rgba(0,0,0,0.06)] p-8">
-
-      <!-- dekorasi -->
-      <div class="absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
-
-      <!-- GRID -->
-      <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8">
-
-        <!-- JENIS -->
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            Jenis Cuti
-          </p>
-          <h2 class="text-lg font-bold text-slate-800 mt-1">
-           <%= leave.type?.name || '-' %>
-          </h2>
-        </div>
-
-        <!-- STATUS -->
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            Status
-          </p>
-
-         <div class="mt-2">
-
-  <div class="flex items-center gap-2 text-sm">
-
-    <% if (leave.status === "Approved") { %>
-
-      <i
-        data-lucide="check-circle"
-        class="w-4 h-4 text-slate-500">
-      </i>
-
-      <span class="text-slate-600 font-medium">
-        Approved
-      </span>
-
-    <% } else if (leave.status === "Rejected") { %>
-
-      <i
-        data-lucide="x-circle"
-        class="w-4 h-4 text-slate-500">
-      </i>
-
-      <span class="text-slate-600 font-medium">
-        Rejected
-      </span>
-
-    <% } else { %>
-
-      <i
-        data-lucide="clock"
-        class="w-4 h-4 text-slate-500">
-      </i>
-
-      <span class="text-slate-600 font-medium">
-
-        <% if (leave.status === "Pending Manager") { %>
-          Menunggu Manager
-
-        <% } else if (leave.status === "Pending HR") { %>
-          Menunggu HR
-
-        <% } else if (leave.status === "Pending Pimpinan") { %>
-          Menunggu Pimpinan
-
-        <% } else { %>
-          <%= leave.status %>
-
-        <% } %>
-
-      </span>
-
-    <% } %>
-
-  </div>
-
-</div>
-        </div>
-
-        <!-- TANGGAL MULAI -->
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            Tanggal Mulai
-          </p>
-          <h2 class="text-slate-700 font-semibold mt-1">
-            <%= new Date(leave.startDate).toLocaleDateString("id-ID") %>
-          </h2>
-        </div>
-
-        <!-- TANGGAL SELESAI -->
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            Tanggal Selesai
-          </p>
-          <h2 class="text-slate-700 font-semibold mt-1">
-            <%= new Date(leave.endDate).toLocaleDateString("id-ID") %>
-          </h2>
-        </div>
-
-        <!-- DURASI -->
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            Durasi
-          </p>
-          <h2 class="text-slate-800 font-bold mt-1 text-lg">
-            <%= leave.totalDays %> Hari
-          </h2>
-        </div>
-
-        <!-- CREATED -->
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            Tanggal Pengajuan
-          </p>
-          <h2 class="text-slate-700 font-semibold mt-1">
-            <%= new Date(leave.createdAt).toLocaleDateString("id-ID") %>
-          </h2>
-        </div>
-
+<%- layout('layouts/main', { title }) %>
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-6 flex items-center gap-2">
+        <a href="/leave/my" class="text-xs font-bold text-blue-600 hover:underline">← Kembali ke Riwayat</a>
+        <% if (leave.status==='REJECTED' || leave.status==='CANCELLED' ) { %>
+          <a href="/leave/resubmit/<%= leave._id %>"
+            class="ml-auto inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H19M9 5a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Resubmit Pengajuan
+          </a>
+          <% } %>
       </div>
 
-      <!-- ALASAN -->
-      <div class="mt-10">
-        <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">
-          Alasan Cuti
-        </p>
-
-        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 text-slate-700 leading-relaxed text-sm">
-          <%= leave.reason %>
-        </div>
-      </div>
-
-      <!-- FILE -->
-      <% if (leave.file) { %>
-      <div class="mt-8">
-        <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">
-          Lampiran
-        </p>
-
-        <div class="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-2xl p-5">
-
+      <div class="grid grid-cols-3 gap-6">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4 h-max">
+          <h2 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3">Ringkasan Dokumen</h2>
           <div>
-            <p class="font-semibold text-slate-700 text-sm">
-              File Lampiran
-            </p>
-            <p class="text-xs text-slate-400 mt-1">
-              Dokumen pendukung pengajuan
+            <span class="text-[11px] font-bold text-slate-400 block uppercase">Tipe Cuti</span>
+            <span class="text-sm font-bold text-slate-800">
+              <%= leave.leaveTypeId.name %> (<%= leave.leaveTypeId.code %>)
+            </span>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 block uppercase">Durasi & Periode</span>
+            <span class="text-sm font-bold text-slate-800 block">
+              <%= leave.totalDays %> Hari Kerja
+            </span>
+            <span class="text-xs text-slate-500">
+              <%= new Date(leave.startDate).toLocaleDateString('id-ID') %> s/d <%= new
+                  Date(leave.endDate).toLocaleDateString('id-ID') %>
+            </span>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 block uppercase">Alasan Kepentingan</span>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <%= leave.reason %>
             </p>
           </div>
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 block uppercase mb-1">Lampiran Dokumen</span>
+            <% if (leave.documentPath) { %>
+              <a href="<%= leave.documentPath %>" target="_blank"
+                class="inline-flex text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg hover:bg-blue-100">Lihat
+                Berkas Lampiran</a>
+              <% } else { %>
+                <span class="text-xs text-slate-400 italic">Tidak ada lampiran terunggah</span>
+                <% } %>
+          </div>
+        </div>
 
-          <a
-            href="/uploads/<%= leave.file %>"
-            target="_blank"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition"
-          >
-            Lihat
-          </a>
-
+        <div class="col-span-2 bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+          <h2 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-6">Jejak Log Pemeriksaan
+            (Timeline)</h2>
+          <div
+            class="space-y-6 relative before:absolute before:top-0 before:bottom-0 before:left-3.5 before:w-0.5 before:bg-slate-100">
+            <% approvals.forEach(app=> { %>
+              <div class="flex gap-4 relative">
+                <div class="w-7 h-7 rounded-full border-2 flex items-center justify-center z-10 text-xs font-bold
+                <%= app.status === 'APPROVED' ? 'bg-emerald-500 border-emerald-500 text-white' : '' %>
+                <%= app.status === 'PENDING' ? 'bg-amber-400 border-amber-400 text-white' : '' %>
+                <%= app.status === 'REJECTED' ? 'bg-rose-500 border-rose-500 text-white' : '' %>">
+                  ✔
+                </div>
+                <div class="flex-1 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                      <%= app.step %>
+                    </span>
+                    <span class="text-[11px] text-slate-400 font-medium">
+                      <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID') : 'In Queue' %>
+                    </span>
+                  </div>
+                  <div class="mt-2 text-sm">
+                    <span class="font-bold text-slate-800">
+                      <%= app.approverId ? app.approverId.name : 'Sistem Otomatis' %>
+                    </span>
+                    <span class="text-xs text-slate-400">(<%= app.approverId ? app.approverId.role : app.step %>)</span>
+                  </div>
+                  <div class="mt-1 flex items-center gap-2">
+                    <span
+                      class="text-xs font-bold <%= app.status === 'APPROVED' ? 'text-emerald-600' : app.status === 'REJECTED' ? 'text-rose-600' : 'text-amber-600' %>">[
+                      <%= app.status %>]</span>
+                  </div>
+                  <% if (app.note) { %>
+                    <div class="mt-3 bg-white border border-slate-200/60 p-2.5 rounded-lg text-xs text-slate-600">
+                      <strong class="text-[10px] text-slate-400 block uppercase">Catatan Pemeriksa:</strong>
+                      <%= app.note %>
+                    </div>
+                    <% } %>
+                </div>
+              </div>
+              <% }) %>
+          </div>
         </div>
       </div>
-      <% } %>
-
-      <!-- BACK BUTTON -->
-      <div class="mt-10">
-        <a
-          href="/leave/my"
-          class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition"
-        >
-          ← Kembali
-        </a>
-      </div>
-
     </div>
   </div>
-</div>
