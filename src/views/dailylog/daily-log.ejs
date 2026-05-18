@@ -397,31 +397,45 @@
           console.error(err);
         }
       }
-
-      // 6. PUT: SUBMIT FORM EDIT LENGKAP
-      async function submitFormUpdate(event, id) {
+      async function submitFormCreate(event) {
         event.preventDefault();
-        const form = document.getElementById(`form-update-${id}`);
-        const formData = new FormData(form);
+
+        const form = document.getElementById('form-create-activity');
+
+        const formData = {
+          judul: document.getElementById('add-judul').value,
+          kategori: document.getElementById('add-kategori').value,
+          tanggal: document.getElementById('log-date').value
+        };
 
         try {
-          const response = await fetch(`/daily-log/api/${id}`, {
-            method: 'PUT',
-            body: formData
+          const response = await fetch('/daily-log/api/data', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
           });
+
           const result = await response.json();
 
           if (result.success) {
-            alert("Aktivitas berhasil diperbarui!");
+            alert("Aktivitas berhasil ditambahkan!");
+
+            form.reset();
+
+            document.getElementById('add-kategori').value = 'Core Task';
+
             loadDailyLog();
           } else {
-            alert(result.message);
+            alert(result.message || "Gagal menambahkan aktivitas");
           }
         } catch (err) {
           console.error(err);
-          alert("Gagal menyimpan perubahan.");
+          alert("Terjadi kesalahan server");
         }
       }
+
 
       function switchToEditFile(id) {
         const statusContainer = document.getElementById(`file-status-container-${id}`);

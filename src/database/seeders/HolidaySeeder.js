@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import Holiday from "../models/Holiday.js"; // Sesuaikan dengan path model lu
+import Holiday from "../../models/calender/Holiday.model.js"; // Sesuaikan dengan path model lu
 
 dotenv.config();
 
