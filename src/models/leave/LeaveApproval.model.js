@@ -10,7 +10,7 @@ const leaveApprovalSchema = new mongoose.Schema(
 
     step: {
       type: String,
-      enum: ["MANAGER", "HR", "PIMPINAN"],
+      enum: ["HANDOVER", "MANAGER", "HR", "PIMPINAN"],
       required: true,
     },
 

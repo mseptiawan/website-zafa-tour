@@ -24,8 +24,9 @@
               <% } %>
                 <% delegations.forEach(del=> { %>
                   <tr>
-                    <td class="py-4 px-6 font-bold text-slate-800">
-                      <%= del.leaveId.userId.name %>
+                    <td class="py-4 px-6 text-slate-900 font-medium">
+                      <%= (d.leaveId && d.leaveId.userId && d.leaveId.userId.employeeData) ?
+                        d.leaveId.userId.employeeData.fullName : '-' %>
                     </td>
                     <td class="py-4 px-6 font-medium text-slate-600">
                       <%= del.leaveId.leaveTypeId.name %>

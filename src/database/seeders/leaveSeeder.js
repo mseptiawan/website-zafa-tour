@@ -1,26 +1,18 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-// Import semua model yang dibutuhkan
 import User from "../../models/User.js";
 import Leave from "../../models/leave/Leave.model.js";
 import LeaveApproval from "../../models/leave/LeaveApproval.model.js";
 import LeaveBalance from "../../models/leave/LeaveBalance.model.js";
-import LeaveCancellation from "../../models/leave/LeaveCancellation.model.js";
 import LeaveType from "../../models/leave/LeaveType.model.js";
 
 dotenv.config();
 
 await mongoose.connect(process.env.MONGODB_URI);
 
-// ======================================================
-// TARGET USERS (Sesuai Akun Login yang Ada)
-// ======================================================
 const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
 
-// ======================================================
-// MASTER DATA POOL
-// ======================================================
 const leaveTypesMaster = [
   {
     name: "Cuti Tahunan",
@@ -30,7 +22,7 @@ const leaveTypesMaster = [
     requiresAttachment: false,
     isDeductBalance: true,
     isActive: true,
-    description: "Jatah jatah kuota cuti tahunan reguler karyawan.",
+    description: "Jatah kuota cuti tahunan reguler karyawan.",
   },
   {
     name: "Cuti Sakit",
@@ -40,63 +32,28 @@ const leaveTypesMaster = [
     requiresAttachment: true,
     isDeductBalance: false,
     isActive: true,
-    description: "Cuti karena kondisi medis/kesehatan kurang baik, wajib surat dokter.",
-  },
-  {
-    name: "Cuti Melahirkan",
-    code: "ML",
-    maxDays: 90,
-    minAdvanceDays: 30,
-    requiresAttachment: true,
-    isDeductBalance: false,
-    isActive: true,
-    description: "Cuti khusus persalinan bagi karyawan perempuan.",
-  },
-  {
-    name: "Cuti Urusan Penting",
-    code: "EL",
-    maxDays: 3,
-    minAdvanceDays: 2,
-    requiresAttachment: false,
-    isDeductBalance: true,
-    isActive: true,
-    description: "Cuti mendesak seperti pernikahan, musibah, atau keperluan keluarga.",
+    description: "Cuti sakit, wajib surat dokter.",
   },
 ];
 
 const leaveReasons = [
-  "Acara perhelatan keluarga besar di luar kota",
-  "Kondisi badan demam tinggi dan butuh istirahat total",
-  "Menghadiri pernikahan saudara kandung",
-  "Mengurus perpanjangan berkas dokumen negara yang tidak bisa diwakilkan",
-  "Sakit flu berat dan batuk, disarankan istirahat oleh tim medis",
-  "Keperluan mudik hari raya lebih awal menghindari macet",
+  "Acara pernikahan keluarga di luar kota",
+  "Kondisi badan demam tinggi dan butuh istirahat",
+  "Menghadiri wisuda adik kandung",
+  "Keperluan mudik hari raya lebih awal",
 ];
 
 const rejectionNotes = [
-  "Ditolak karena operasional tim sedang high-load / kekurangan orang.",
-  "Mohon ganti tanggal pelaksanaan, di tanggal tersebut ada rilis sistem besar.",
-  "Dokumen pendukung / lampiran berkas belum valid atau buram.",
-  "Ditolak, silakan diskusikan kembali pembagian tugas handover dengan rekan unit.",
+  "Operasional tim sedang high-load, kekurangan orang.",
+  "Silakan diskusikan pembagian tugas handover dengan rekan unit.",
 ];
 
 const approvalNotes = [
-  "Pekerjaan operasional sudah didelegasikan dengan aman.",
-  "Silakan dilanjutkan ke tahap berikutnya.",
-  "Berkas lengkap, disetujui untuk diproses.",
-  "Rekomendasi disetujui sesuai dengan sisa jatah jatah kuota.",
+  "Pekerjaan operasional aman untuk didelegasikan.",
+  "Berkas sesuai ketentuan, disetujui.",
+  "Rekomendasi disetujui untuk tahap selanjutnya.",
 ];
 
-const cancelReasons = [
-  "Acara keluarga besar dibatalkan secara mendadak",
-  "Tiket transportasi dan jadwal di-reschedule oleh pihak maskapai",
-  "Kondisi urusan penting sudah selesai lebih cepat dari perkiraan",
-  "Batal pergi karena ada kendala operasional mendadak di lapangan",
-];
-
-// ======================================================
-// HELPERS
-// ======================================================
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -107,20 +64,16 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-// Menghitung hari efektif cuti (Mengabaikan Hari Minggu sesuai getDay)
 function createLeaveDateRangeAndDuration() {
   const startDate = randomDate();
-  const durationDays = Math.floor(Math.random() * 4) + 1; // Durasi rentang 1-4 hari
+  const durationDays = Math.floor(Math.random() * 4) + 1;
 
-  let endDate = new Date(startDate);
   let totalDays = 0;
   let currentLoopDate = new Date(startDate);
 
-  // Looping untuk mencari endDate dan totalDays bersih tanpa hari Minggu
   let daysAdded = 0;
   while (daysAdded < durationDays) {
     if (currentLoopDate.getDay() !== 0) {
-      // Jika BUKAN Hari Minggu
       totalDays++;
       daysAdded++;
     }
@@ -128,76 +81,62 @@ function createLeaveDateRangeAndDuration() {
       currentLoopDate.setDate(currentLoopDate.getDate() + 1);
     }
   }
-  endDate = currentLoopDate;
-
+  const endDate = currentLoopDate;
   return { startDate, endDate, totalDays };
 }
 
-// ======================================================
-// MAIN SEED ENGINE
-// ======================================================
 async function seed() {
   try {
-    // 1. Validasi User Eksis
     const users = await User.find({ username: { $in: usernames } });
     if (!users.length) {
-      console.log(
-        "Error: Target users tidak ditemukan di database. Jalankan seeder User terlebih dahulu."
-      );
+      console.log("Error: Target users tidak ditemukan di database.");
       process.exit();
     }
 
-    // 2. Bersihkan Data Lama Modul Cuti
     await LeaveType.deleteMany({});
     await LeaveBalance.deleteMany({});
     await Leave.deleteMany({});
     await LeaveApproval.deleteMany({});
-    await LeaveCancellation.deleteMany({});
 
     console.log("✔ Master tabel modul cuti berhasil dibersihkan.");
 
-    // 3. Seed Master LeaveType
     const createdLeaveTypes = await LeaveType.insertMany(leaveTypesMaster);
     console.log(`✔ Berhasil memuat ${createdLeaveTypes.length} Master Jenis Cuti.`);
 
-    // 4. Seed LeaveBalance untuk Seluruh Target User (Tahun 2026)
     const balanceData = [];
     for (const user of users) {
       balanceData.push({
         userId: user._id,
         year: 2026,
         totalQuota: 12,
-        used: 0, // Akan dihitung akumulasinya di bawah secara acak
+        used: 0,
         remaining: 12,
       });
     }
     await LeaveBalance.insertMany(balanceData);
-    console.log("✔ Berhasil memuat Master Saldo Cuti awal seluruh karyawan.");
+    console.log("✔ Berhasil memuat Master Saldo Cuti awal.");
 
-    // Container data massal transaksional
     const leavesToInsert = [];
     const approvalsToInsert = [];
-    const cancellationsToInsert = [];
-
     const statuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"];
 
-    // 5. Loop Pembuatan Data Transaksi Cuti
     for (const user of users) {
-      // Dapatkan daftar user lain untuk dijadikan target handoverUserId dan approverId
       const otherUsers = users.filter((u) => u._id.toString() !== user._id.toString());
 
-      // Berikan perkiraan 15 records riwayat cuti per karyawan agar bervariasi
+      // Cari user spesifik berdasarkan role untuk approver lanjutan
+      const managerUser = users.find((u) => u.role === "MANAGER") || otherUsers[0];
+      const hrUser = users.find((u) => u.role === "HR") || otherUsers[1];
+      const pimpinanUser = users.find((u) => u.role === "PIMPINAN") || otherUsers[2];
+
       for (let i = 0; i < 15; i++) {
         const status = randomItem(statuses);
         const leaveType = randomItem(createdLeaveTypes);
-        const handoverUser = randomItem(otherUsers);
-        const managerUser = randomItem(otherUsers);
-        const hrUser =
-          otherUsers.find((u) => u._id.toString() !== managerUser._id.toString()) || otherUsers[0];
+
+        // Aturan Handover Opsional (Peluang 70% pakai handover, 30% tanpa handover)
+        const hasHandover = Math.random() > 0.3;
+        const handoverUser = hasHandover ? randomItem(otherUsers) : null;
 
         const { startDate, endDate, totalDays } = createLeaveDateRangeAndDuration();
-
-        // Siapkan Object Dokumen Cuti Utama
         const leaveId = new mongoose.Types.ObjectId();
 
         leavesToInsert.push({
@@ -208,32 +147,107 @@ async function seed() {
           endDate,
           totalDays,
           reason: randomItem(leaveReasons),
-          documentPath: leaveType.requiresAttachment
-            ? "/uploads/documents/surat-keterangan.pdf"
-            : null,
+          documentPath: leaveType.requiresAttachment ? "/uploads/documents/surat.pdf" : null,
           status,
-          handoverUserId: handoverUser._id,
+          handoverUserId: handoverUser ? handoverUser._id : null,
           createdAt: startDate,
           updatedAt: startDate,
         });
 
-        // ======================================================
-        // LOGIKA GENERATE LOG APPROVAL BERDASARKAN STATUS
-        // ======================================================
-        if (status === "PENDING") {
-          // Jika status global masih PENDING, tandanya baru masuk tahap MANAGER atau HR
-          const currentStep = Math.random() > 0.5 ? "MANAGER" : "HR";
+        // =================================================================
+        // SKENARIO FLOW APPROVAL BERTINGKAT SESUAI RULE
+        // =================================================================
 
-          if (currentStep === "MANAGER") {
+        // Tentukan jalur hierarki awal berdasarkan role pengaju jika tanpa handover
+        let baseStep = "MANAGER";
+        let baseApprover = managerUser;
+
+        if (user.role === "HR") {
+          baseStep = "PIMPINAN";
+          baseApprover = pimpinanUser;
+        } else if (user.role === "MANAGER") {
+          baseStep = "HR";
+          baseApprover = hrUser;
+        }
+
+        // --- KONDISI 1: STATUS PENDING ---
+        if (status === "PENDING") {
+          if (handoverUser) {
+            // Kasus A: Mandek di persetujuan rekan handover
+            if (Math.random() > 0.5) {
+              approvalsToInsert.push({
+                leaveId,
+                step: "HANDOVER",
+                approverId: handoverUser._id,
+                status: "PENDING",
+                note: "",
+              });
+            } else {
+              // Kasus B: Handover beres, mandek di hierarki utama
+              approvalsToInsert.push(
+                {
+                  leaveId,
+                  step: "HANDOVER",
+                  approverId: handoverUser._id,
+                  status: "APPROVED",
+                  note: randomItem(approvalNotes),
+                  actionDate: startDate,
+                },
+                {
+                  leaveId,
+                  step: baseStep,
+                  approverId: baseApprover._id,
+                  status: "PENDING",
+                  note: "",
+                }
+              );
+            }
+          } else {
+            // Tanpa handover, langsung mandek di hierarki utama
             approvalsToInsert.push({
               leaveId,
-              step: "MANAGER",
-              approverId: managerUser._id,
+              step: baseStep,
+              approverId: baseApprover._id,
               status: "PENDING",
               note: "",
             });
+          }
+        }
+
+        // --- KONDISI 2: STATUS APPROVED ---
+        else if (status === "APPROVED") {
+          if (handoverUser) {
+            approvalsToInsert.push({
+              leaveId,
+              step: "HANDOVER",
+              approverId: handoverUser._id,
+              status: "APPROVED",
+              note: randomItem(approvalNotes),
+              actionDate: startDate,
+            });
+          }
+
+          // Eksekusi urutan jalur manajerial sampai selesai
+          if (user.role === "HR") {
+            approvalsToInsert.push({
+              leaveId,
+              step: "PIMPINAN",
+              approverId: pimpinanUser._id,
+              status: "APPROVED",
+              note: randomItem(approvalNotes),
+              actionDate: startDate,
+            });
+          } else if (user.role === "MANAGER") {
+            approvalsToInsert.push({
+              leaveId,
+              step: "HR",
+              approverId: hrUser._id,
+              status: "APPROVED",
+              note: randomItem(approvalNotes),
+              actionDate: startDate,
+            });
           } else {
-            // Berarti Manager sudah lolos APPROVED, sekarang tertahan di HR PENDING
+            // Karyawan Biasa: Lewat MANAGER -> Lewat HR
             approvalsToInsert.push(
               {
                 leaveId,
@@ -247,33 +261,14 @@ async function seed() {
                 leaveId,
                 step: "HR",
                 approverId: hrUser._id,
-                status: "PENDING",
-                note: "",
+                status: "APPROVED",
+                note: randomItem(approvalNotes),
+                actionDate: startDate,
               }
             );
           }
-        } else if (status === "APPROVED") {
-          // Lolos verifikasi penuh dari Manager dan HRD
-          approvalsToInsert.push(
-            {
-              leaveId,
-              step: "MANAGER",
-              approverId: managerUser._id,
-              status: "APPROVED",
-              note: randomItem(approvalNotes),
-              actionDate: startDate,
-            },
-            {
-              leaveId,
-              step: "HR",
-              approverId: hrUser._id,
-              status: "APPROVED",
-              note: randomItem(approvalNotes),
-              actionDate: new Date(startDate.getTime() + 3600000 * 2), // +2 Jam setelah manager
-            }
-          );
 
-          // Update akumulasi kuota pada data saldo array balanceData lokal
+          // Kalkulasi pengurangan jatah cuti tahunan
           if (leaveType.isDeductBalance) {
             const userBalance = balanceData.find(
               (b) => b.userId.toString() === user._id.toString()
@@ -283,101 +278,71 @@ async function seed() {
               userBalance.remaining = Math.max(0, userBalance.totalQuota - userBalance.used);
             }
           }
-        } else if (status === "REJECTED") {
-          // Kasus penolakan bisa terjadi langsung di meja Manager, atau lolos Manager tapi ditolak HR
-          const rejectAtStep = Math.random() > 0.5 ? "MANAGER" : "HR";
+        }
 
-          if (rejectAtStep === "MANAGER") {
+        // --- KONDISI 3: STATUS REJECTED ---
+        else if (status === "REJECTED") {
+          // Kasus A: Ditolak oleh Handover langsung (jika ada handover)
+          if (handoverUser && Math.random() > 0.6) {
             approvalsToInsert.push({
               leaveId,
-              step: "MANAGER",
-              approverId: managerUser._id,
+              step: "HANDOVER",
+              approverId: handoverUser._id,
               status: "REJECTED",
               note: randomItem(rejectionNotes),
               actionDate: startDate,
             });
           } else {
-            approvalsToInsert.push(
-              {
+            // Lolos handover (jika ada), tapi ditolak di hierarki utama
+            if (handoverUser) {
+              approvalsToInsert.push({
                 leaveId,
-                step: "MANAGER",
-                approverId: managerUser._id,
+                step: "HANDOVER",
+                approverId: handoverUser._id,
                 status: "APPROVED",
                 note: randomItem(approvalNotes),
                 actionDate: startDate,
-              },
-              {
-                leaveId,
-                step: "HR",
-                approverId: hrUser._id,
-                status: "REJECTED",
-                note: randomItem(rejectionNotes),
-                actionDate: new Date(startDate.getTime() + 3600000 * 3),
-              }
-            );
-          }
-        } else if (status === "CANCELLED") {
-          // Kasus pembatalan: Harus di-APPROVED dulu secara sistem reguler, baru diajukan transaksi pembatalan
-          approvalsToInsert.push(
-            {
+              });
+            }
+
+            approvalsToInsert.push({
               leaveId,
-              step: "MANAGER",
-              approverId: managerUser._id,
-              status: "APPROVED",
-              note: randomItem(approvalNotes),
+              step: baseStep,
+              approverId: baseApprover._id,
+              status: "REJECTED",
+              note: randomItem(rejectionNotes),
               actionDate: startDate,
-            },
-            {
-              leaveId,
-              step: "HR",
-              approverId: hrUser._id,
-              status: "APPROVED",
-              note: randomItem(approvalNotes),
-              actionDate: new Date(startDate.getTime() + 3600000),
-            }
-          );
-
-          // Buat record pelengkap dokumen pembatalan di tabel LeaveCancellation
-          const cancelStatus = randomItem(["PENDING", "APPROVED", "REJECTED"]);
-          cancellationsToInsert.push({
-            leaveId,
-            requestedBy: user._id,
-            cancelReason: randomItem(cancelReasons),
-            status: cancelStatus,
-            processedBy: cancelStatus !== "PENDING" ? hrUser._id : null,
-            processAt: cancelStatus !== "PENDING" ? new Date(startDate.getTime() + 86400000) : null, // +1 Hari
-            note:
-              cancelStatus === "REJECTED"
-                ? randomItem(rejectionNotes)
-                : cancelStatus === "APPROVED"
-                  ? "Pembatalan disetujui, saldo dikembalikan."
-                  : "",
-          });
-
-          // JIKA pembatalan ditolak/masih pending, jatah kuota tetap terhitung hangus (terpotong)
-          if (
-            (cancelStatus === "PENDING" || cancelStatus === "REJECTED") &&
-            leaveType.isDeductBalance
-          ) {
-            const userBalance = balanceData.find(
-              (b) => b.userId.toString() === user._id.toString()
-            );
-            if (userBalance) {
-              userBalance.used += totalDays;
-              userBalance.remaining = Math.max(0, userBalance.totalQuota - userBalance.used);
-            }
+            });
           }
-          // Jika cancelStatus APPROVED -> Tidak memotong kuota (Rollback berhasil dilakukan)
+        }
+
+        // --- KONDISI 4: STATUS CANCELLED ---
+        else if (status === "CANCELLED") {
+          // Dianggap dibatalkan sepihak oleh pemohon sebelum diproses penuh oleh siapapun
+          if (handoverUser) {
+            approvalsToInsert.push({
+              leaveId,
+              step: "HANDOVER",
+              approverId: handoverUser._id,
+              status: "PENDING",
+              note: "Dibatalkan oleh pemohon",
+            });
+          } else {
+            approvalsToInsert.push({
+              leaveId,
+              step: baseStep,
+              approverId: baseApprover._id,
+              status: "PENDING",
+              note: "Dibatalkan oleh pemohon",
+            });
+          }
         }
       }
     }
 
-    // 6. Jalankan Bulk Update Massal ke Database MongoDB
     await Leave.insertMany(leavesToInsert);
     await LeaveApproval.insertMany(approvalsToInsert);
-    await LeaveCancellation.insertMany(cancellationsToInsert);
 
-    // 7. Perbarui dokumen tabel saldo kuota di MongoDB sesuai kalkulasi simulasi di atas
     for (const updatedBalance of balanceData) {
       await LeaveBalance.updateOne(
         { userId: updatedBalance.userId, year: updatedBalance.year },
@@ -385,11 +350,10 @@ async function seed() {
       );
     }
 
-    console.log(`✔ Sukses menggenerasikan data transaksi ke database:`);
+    console.log(`✔ Sukses melakukan sinkronisasi seeder data transaksi baru:`);
     console.log(`   - ${leavesToInsert.length} Dokumen Pengajuan Cuti (Leave)`);
-    console.log(`   - ${approvalsToInsert.length} Log History Persetujuan (LeaveApproval)`);
-    console.log(`   - ${cancellationsToInsert.length} Form Dokumen Pembatalan (LeaveCancellation)`);
-    console.log(`\n=== PROSES SEEDER TRANSAKSI CUTI SELESAI DAN KOKOH ===`);
+    console.log(`   - ${approvalsToInsert.length} Log Langkah Persetujuan (LeaveApproval)`);
+    console.log(`\n=== PROSES UPDATE SEEDER BERHASIL DAN BERSIH ===`);
 
     await mongoose.disconnect();
   } catch (err) {

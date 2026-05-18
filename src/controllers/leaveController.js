@@ -1,125 +1,84 @@
 import Leave from "../models/leave/Leave.model.js";
+import LeaveApproval from "../models/leave/LeaveApproval.model.js";
 import LeaveType from "../models/leave/LeaveType.model.js";
-import LeaveBalance from "../models/leave/LeaveBalance.model.js";
 import User from "../models/User.js";
 import Holiday from "../models/calender/Holiday.model.js";
-import LeaveApproval from "../models/leave/LeaveApproval.model.js";
-
-const determineNextStep = (role) => {
-  if (role === "KARYAWAN" || role === "KEUANGAN") return "MANAGER";
-  if (role === "MANAGER") return "HR";
-  if (role === "HR") return "PIMPINAN";
-  return "PIMPINAN";
-};
+import LeaveBalance from "../models/leave/LeaveBalance.model.js";
 
 export const showApplyLeave = async (req, res) => {
   try {
     const userId = req.user._id;
     const currentYear = new Date().getFullYear();
-    const leaveTypes = await LeaveType.find({ isActive: true });
-    const employees = await User.find({ _id: { $ne: userId } }).select("name username");
-    const leaveBalance = await LeaveBalance.findOne({ userId, year: currentYear });
+
+    const [leaveTypes, employees, leaveBalance] = await Promise.all([
+      LeaveType.find({ isActive: true }),
+      User.find({ _id: { $ne: userId } }).populate("employeeData", "fullName"),
+      LeaveBalance.findOne({ userId, year: currentYear }),
+    ]);
 
     res.render("leave/create", {
-      title: "Pengajuan Cuti Baru",
+      title: "Pengajuan Cuti",
       leaveTypes,
       employees,
       leaveBalance: leaveBalance || { totalQuota: 12, used: 0, remaining: 12 },
-      oldData: undefined,
+      mode: "CREATE",
+      leave: null,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).render("error", { message: error.message });
   }
 };
 
 export const applyLeave = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const { leaveTypeId, startDate, endDate, reason, handoverUserId } = req.body;
-    const currentYear = new Date(startDate).getFullYear();
-
-    const leaveType = await LeaveType.findById(leaveTypeId);
-    if (!leaveType || !leaveType.isActive) {
-      return res.status(404).json({ success: false, message: "Jenis cuti tidak valid." });
-    }
-
-    if (leaveType.requiresAttachment && !req.file) {
-      return res.status(400).json({ success: false, message: "Wajib unggah dokumen pendukung!" });
-    }
-
-    const documentPath = req.file ? `/uploads/documents/${req.file.filename}` : null;
-    let start = new Date(startDate);
-    let end = new Date(endDate);
-
-    if (start > end) {
-      return res.status(400).json({ success: false, message: "Tanggal tidak valid." });
-    }
-
-    const holidays = await Holiday.find({ date: { $gte: start, $lte: end } });
-    const holidayStrings = holidays.map((h) => h.date.toISOString().split("T")[0]);
-
-    let totalDays = 0;
-    let companyHolidayDays = 0;
-    let currentLoopDate = new Date(start);
-
-    while (currentLoopDate <= end) {
-      const isSunday = currentLoopDate.getDay() === 0;
-      const dateString = currentLoopDate.toISOString().split("T")[0];
-      const foundHoliday = holidays.find((h) => h.date.toISOString().split("T")[0] === dateString);
-
-      if (!isSunday) {
-        if (foundHoliday) {
-          if (foundHoliday.isDeductLeave) {
-            companyHolidayDays++;
-            totalDays++;
-          }
-        } else {
-          totalDays++;
-        }
-      }
-      currentLoopDate.setDate(currentLoopDate.getDate() + 1);
-    }
-
-    if (totalDays === 0) {
-      return res.status(400).json({ success: false, message: "Durasi cuti 0 hari." });
-    }
-
-    if (leaveType.isDeductBalance) {
-      const balance = await LeaveBalance.findOne({ userId, year: currentYear });
-      if (!balance || totalDays > balance.remaining) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Sisa jatah saldo cuti tidak mencukupi." });
-      }
-    }
-
-    const firstStep = determineNextStep(req.user.role);
+    const { leaveTypeId, startDate, endDate, totalDays, reason, handoverUserId } = req.body;
+    const requester = req.user;
 
     const newLeave = await Leave.create({
-      userId,
+      userId: requester._id,
       leaveTypeId,
-      startDate: start,
-      endDate: end,
+      startDate,
+      endDate,
       totalDays,
       reason,
-      documentPath,
-      handoverUserId,
-      status: "PENDING",
-      currentApprovalStep: firstStep,
-    });
-
-    await LeaveApproval.create({
-      leaveId: newLeave._id,
-      step: "HANDOVER",
-      approverId: handoverUserId,
+      handoverUserId: handoverUserId || null,
       status: "PENDING",
     });
 
-    res
-      .status(201)
-      .json({ success: true, message: "Berhasil diajukan, menunggu konfirmasi handover." });
+    let currentStep = "";
+    let approverId = null;
+
+    if (handoverUserId) {
+      currentStep = "HANDOVER";
+      approverId = handoverUserId;
+    } else {
+      if (requester.role === "HR") {
+        currentStep = "PIMPINAN";
+        const pimpinanUser = await User.findOne({ role: "PIMPINAN" });
+        approverId = pimpinanUser ? pimpinanUser._id : null;
+      } else if (requester.role === "MANAGER") {
+        currentStep = "HR";
+        const hrUser = await User.findOne({ role: "HR" });
+        approverId = hrUser ? hrUser._id : null;
+      } else {
+        currentStep = "MANAGER";
+        const managerUser = await User.findOne({ role: "MANAGER" });
+        approverId = managerUser ? managerUser._id : null;
+      }
+    }
+
+    if (approverId) {
+      await LeaveApproval.create({
+        leaveId: newLeave._id,
+        step: currentStep,
+        approverId,
+        status: "PENDING",
+      });
+    }
+
+    res.redirect("/leave/my-history");
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).render("error", { message: error.message });
   }
 };
 
@@ -128,38 +87,33 @@ export const myLeave = async (req, res) => {
     const userId = req.user._id;
     const currentYear = new Date().getFullYear();
 
-    const leaves = await Leave.find({ userId });
-    const balance = (await LeaveBalance.findOne({ userId, year: currentYear })) || {
-      totalQuota: 12,
-      used: 0,
-      remaining: 12,
-    };
+    const [leaves, balance, holidays] = await Promise.all([
+      Leave.find({ userId })
+        .populate("leaveTypeId", "name code")
+        .populate({
+          path: "handoverUserId",
+          populate: { path: "employeeData", select: "fullName" },
+        })
+        .sort({ createdAt: -1 }),
+      LeaveBalance.findOne({ userId, year: currentYear }) || {
+        totalQuota: 12,
+        used: 0,
+        remaining: 12,
+      },
+      Holiday.find({
+        date: { $gte: new Date(`${currentYear}-01-01`), $lte: new Date(`${currentYear}-12-31`) },
+      }),
+    ]);
 
-    const holidays = await Holiday.find({
-      date: { $gte: new Date(`${currentYear}-01-01`), $lte: new Date(`${currentYear}-12-31`) },
-    });
     const totalCompanyHolidays = holidays.filter((h) => h.isDeductLeave).length;
-
     const pendingApprovalCount = await Leave.countDocuments({ userId, status: "PENDING" });
     const usedPrivateCuti = leaves
       .filter((l) => l.status === "APPROVED")
       .reduce((acc, curr) => acc + curr.totalDays, 0);
 
-    const myHistory = await Leave.find({ userId })
-      .populate("leaveTypeId", "name code")
-      .populate({
-        path: "handoverUserId", // Masuk ke field User
-        select: "username",
-        populate: {
-          path: "employeeData", // Panggil jalan virtual tadi ke tabel Employee
-          select: "name", // Ambil field 'name' dari tabel Employee
-        },
-      })
-      .sort({ createdAt: -1 });
-
     res.render("leave/my-history", {
-      title: "Riwayat Cuti Saya",
-      leaves: myHistory,
+      title: "Riwayat Cuti",
+      leaves,
       summary: {
         totalQuota: balance.totalQuota,
         companyHolidays: totalCompanyHolidays,
@@ -169,28 +123,22 @@ export const myLeave = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).render("error", { message: error.message });
   }
 };
 
 export const getLeaveDetail = async (req, res) => {
   try {
-    const { id } = req.params;
-    const leave = await Leave.findById(id)
-      .populate("leaveTypeId", "name code requiresAttachment")
-      .populate("handoverUserId", "name");
+    const leave = await Leave.findById(req.params.id)
+      .populate("leaveTypeId", "name")
+      .populate({ path: "userId", populate: { path: "employeeData", select: "fullName" } })
+      .populate({ path: "handoverUserId", populate: { path: "employeeData", select: "fullName" } });
 
-    if (!leave) return res.status(404).render("error", { message: "Data tidak ditemukan" });
-
-    const approvals = await LeaveApproval.find({ leaveId: id })
-      .populate("approverId", "name role")
+    const workflows = await LeaveApproval.find({ leaveId: req.params.id })
+      .populate({ path: "approverId", populate: { path: "employeeData", select: "fullName" } })
       .sort({ createdAt: 1 });
 
-    res.render("leave/detail", {
-      title: "Detail & Timeline Status Cuti",
-      leave,
-      approvals,
-    });
+    res.render("leave/detail", { title: "Detail Pengajuan Cuti", leave, workflows });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
   }
@@ -198,26 +146,27 @@ export const getLeaveDetail = async (req, res) => {
 
 export const editLeave = async (req, res) => {
   try {
-    const { id } = req.params;
-    const leave = await Leave.findById(id);
+    const userId = req.user._id;
+    const currentYear = new Date().getFullYear();
+
+    const [leave, leaveTypes, employees, leaveBalance] = await Promise.all([
+      Leave.findById(req.params.id),
+      LeaveType.find({ isActive: true }),
+      User.find({ _id: { $ne: userId } }).populate("employeeData", "fullName"),
+      LeaveBalance.findOne({ userId, year: currentYear }),
+    ]);
 
     if (!leave || leave.status !== "PENDING") {
-      return res.status(400).render("error", { message: "Berkas tidak dapat diedit." });
+      return res.status(400).render("error", { message: "Cuti tidak bisa diubah." });
     }
 
-    const leaveTypes = await LeaveType.find({ isActive: true });
-    const employees = await User.find({ _id: { $ne: req.user._id } }).select("name username");
-    const leaveBalance = await LeaveBalance.findOne({
-      userId: req.user._id,
-      year: new Date().getFullYear(),
-    });
-
-    res.render("leave/create", {
-      title: "Edit Pengajuan Cuti",
+    res.render("leave/form-page", {
+      title: "Edit Cuti",
       leaveTypes,
       employees,
       leaveBalance: leaveBalance || { totalQuota: 12, used: 0, remaining: 12 },
-      oldData: leave,
+      mode: "EDIT",
+      leave,
     });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
@@ -226,64 +175,73 @@ export const editLeave = async (req, res) => {
 
 export const updateLeave = async (req, res) => {
   try {
-    const { id } = req.params;
-    const leave = await Leave.findById(id);
+    const { leaveTypeId, startDate, endDate, totalDays, reason, handoverUserId } = req.body;
+    const requester = req.user;
 
+    const leave = await Leave.findById(req.params.id);
     if (!leave || leave.status !== "PENDING") {
-      return res.status(400).json({ success: false, message: "Pengajuan tidak bisa diubah." });
-    }
-
-    const { leaveTypeId, startDate, endDate, reason, handoverUserId } = req.body;
-
-    let start = new Date(startDate);
-    let end = new Date(endDate);
-    const holidays = await Holiday.find({ date: { $gte: start, $lte: end } });
-    const holidayStrings = holidays.map((h) => h.date.toISOString().split("T")[0]);
-
-    let totalDays = 0;
-    let currentLoopDate = new Date(start);
-    while (currentLoopDate <= end) {
-      const isSunday = currentLoopDate.getDay() === 0;
-      if (!isSunday && !holidayStrings.includes(currentLoopDate.toISOString().split("T")[0])) {
-        totalDays++;
-      }
-      currentLoopDate.setDate(currentLoopDate.getDate() + 1);
+      return res.status(400).render("error", { message: "Gagal update data." });
     }
 
     leave.leaveTypeId = leaveTypeId;
-    leave.startDate = start;
-    leave.endDate = end;
+    leave.startDate = startDate;
+    leave.endDate = endDate;
     leave.totalDays = totalDays;
     leave.reason = reason;
-    leave.handoverUserId = handoverUserId;
-    if (req.file) {
-      leave.documentPath = `/uploads/documents/${req.file.filename}`;
+    leave.handoverUserId = handoverUserId || null;
+    await leave.save();
+
+    await LeaveApproval.deleteMany({ leaveId: leave._id });
+
+    let currentStep = "";
+    let approverId = null;
+
+    if (handoverUserId) {
+      currentStep = "HANDOVER";
+      approverId = handoverUserId;
+    } else {
+      if (requester.role === "HR") {
+        currentStep = "PIMPINAN";
+        const pimpinanUser = await User.findOne({ role: "PIMPINAN" });
+        approverId = pimpinanUser ? pimpinanUser._id : null;
+      } else if (requester.role === "MANAGER") {
+        currentStep = "HR";
+        const hrUser = await User.findOne({ role: "HR" });
+        approverId = hrUser ? hrUser._id : null;
+      } else {
+        currentStep = "MANAGER";
+        const managerUser = await User.findOne({ role: "MANAGER" });
+        approverId = managerUser ? managerUser._id : null;
+      }
     }
 
-    await leave.save();
-    await LeaveApproval.deleteMany({ leaveId: id });
-    await LeaveApproval.create({
-      leaveId: id,
-      step: "HANDOVER",
-      approverId: handoverUserId,
-      status: "PENDING",
-    });
+    if (approverId) {
+      await LeaveApproval.create({
+        leaveId: leave._id,
+        step: currentStep,
+        approverId,
+        status: "PENDING",
+      });
+    }
 
-    res.status(200).json({ success: true, message: "Pengajuan berhasil diperbarui." });
+    res.redirect("/leave/my-history");
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).render("error", { message: error.message });
   }
 };
 
 export const cancelPendingLeave = async (req, res) => {
   try {
-    const leave = await Leave.findOne({ _id: req.params.id, userId: req.user._id });
+    const leave = await Leave.findById(req.params.id);
     if (!leave || leave.status !== "PENDING") {
-      return res.status(400).render("error", { message: "Gagal membatalkan berkas." });
+      return res.status(400).render("error", { message: "Pembatalan gagal." });
     }
+
     leave.status = "CANCELLED";
     await leave.save();
-    res.redirect("/leave/my");
+    await LeaveApproval.deleteMany({ leaveId: leave._id });
+
+    res.redirect("/leave/my-history");
   } catch (error) {
     res.status(500).render("error", { message: error.message });
   }
@@ -291,25 +249,23 @@ export const cancelPendingLeave = async (req, res) => {
 
 export const requestCancelApprovedLeave = async (req, res) => {
   try {
-    const leave = await Leave.findOne({ _id: req.params.id, userId: req.user._id });
+    const leave = await Leave.findById(req.params.id);
     if (!leave || leave.status !== "APPROVED") {
-      return res
-        .status(400)
-        .render("error", { message: "Hanya dokumen approved yang bisa dibatalkan." });
+      return res.status(400).render("error", { message: "Status cuti tidak valid." });
     }
 
-    leave.status = "CANCELLATION_PENDING";
-    leave.currentApprovalStep = "PIMPINAN";
+    leave.status = "CANCELLED";
     await leave.save();
 
-    await LeaveApproval.create({
-      leaveId: leave._id,
-      step: "PIMPINAN",
-      status: "PENDING",
-      note: "Permohonan pembatalan cuti oleh karyawan.",
-    });
+    const currentYear = new Date(leave.startDate).getFullYear();
+    const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
+    if (balance) {
+      balance.used -= leave.totalDays;
+      balance.remaining += leave.totalDays;
+      await balance.save();
+    }
 
-    res.redirect("/leave/my");
+    res.redirect("/leave/my-history");
   } catch (error) {
     res.status(500).render("error", { message: error.message });
   }
@@ -317,30 +273,27 @@ export const requestCancelApprovedLeave = async (req, res) => {
 
 export const showResubmitLeave = async (req, res) => {
   try {
-    const oldLeave = await Leave.findById(req.params.id);
-    if (!oldLeave || (oldLeave.status !== "REJECTED" && oldLeave.status !== "CANCELLED")) {
-      return res.status(400).render("error", { message: "Dokumen tidak bisa di-resubmit." });
+    const userId = req.user._id;
+    const currentYear = new Date().getFullYear();
+
+    const [leave, leaveTypes, employees, leaveBalance] = await Promise.all([
+      Leave.findById(req.params.id),
+      LeaveType.find({ isActive: true }),
+      User.find({ _id: { $ne: userId } }).populate("employeeData", "fullName"),
+      LeaveBalance.findOne({ userId, year: currentYear }),
+    ]);
+
+    if (!leave || leave.status !== "REJECTED") {
+      return res.status(400).render("error", { message: "Cuti tidak berstatus ditolak." });
     }
 
-    const lastRejectApproval = await LeaveApproval.findOne({
-      leaveId: oldLeave._id,
-      status: "REJECTED",
-    }).sort({ createdAt: -1 });
-
-    const leaveTypes = await LeaveType.find({ isActive: true });
-    const employees = await User.find({ _id: { $ne: req.user._id } }).select("name username");
-    const leaveBalance = await LeaveBalance.findOne({
-      userId: req.user._id,
-      year: new Date().getFullYear(),
-    });
-
-    res.render("leave/create", {
-      title: "Resubmit Pengajuan Cuti",
+    res.render("leave/form-page", {
+      title: "Ajukan Ulang Cuti",
       leaveTypes,
       employees,
       leaveBalance: leaveBalance || { totalQuota: 12, used: 0, remaining: 12 },
-      oldData: oldLeave,
-      rejectNote: lastRejectApproval ? lastRejectApproval.note : "Dibatalkan oleh karyawan.",
+      mode: "RESUBMIT",
+      leave,
     });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
@@ -356,10 +309,11 @@ export const myDelegations = async (req, res) => {
     }).populate({
       path: "leaveId",
       populate: [
-        { path: "userId", select: "name" },
+        { path: "userId", populate: { path: "employeeData", select: "fullName" } },
         { path: "leaveTypeId", select: "name" },
       ],
     });
+
     res.render("leave/delegation", { title: "Delegasi Tugas Saya", delegations });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
@@ -368,65 +322,90 @@ export const myDelegations = async (req, res) => {
 
 export const approveDelegation = async (req, res) => {
   try {
-    const approval = await LeaveApproval.findOne({ _id: req.params.id, approverId: req.user._id });
-    if (!approval)
-      return res.status(404).json({ success: false, message: "Data tidak ditemukan." });
+    const approval = await LeaveApproval.findOne({
+      _id: req.params.id,
+      approverId: req.user._id,
+      step: "HANDOVER",
+    });
+    if (!approval) return res.status(404).render("error", { message: "Data tidak ditemukan." });
 
     approval.status = "APPROVED";
     approval.actionDate = new Date();
     await approval.save();
 
     const leave = await Leave.findById(approval.leaveId).populate("userId");
-    const nextStep = leave.currentApprovalStep;
+    const requester = leave.userId;
 
-    await LeaveApproval.create({
-      leaveId: leave._id,
-      step: nextStep,
-      status: "PENDING",
-    });
+    let nextStep = "";
+    let nextApproverId = null;
 
-    res.redirect("/leave/delegation");
+    if (requester.role === "HR") {
+      nextStep = "PIMPINAN";
+      const pimpinanUser = await User.findOne({ role: "PIMPINAN" });
+      nextApproverId = pimpinanUser ? pimpinanUser._id : null;
+    } else if (requester.role === "MANAGER") {
+      nextStep = "HR";
+      const hrUser = await User.findOne({ role: "HR" });
+      nextApproverId = hrUser ? hrUser._id : null;
+    } else {
+      nextStep = "MANAGER";
+      const managerUser = await User.findOne({ role: "MANAGER" });
+      nextApproverId = managerUser ? managerUser._id : null;
+    }
+
+    if (nextApproverId) {
+      await LeaveApproval.create({
+        leaveId: leave._id,
+        step: nextStep,
+        approverId: nextApproverId,
+        status: "PENDING",
+      });
+    }
+
+    res.redirect("/leave/my-delegations");
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).render("error", { message: error.message });
   }
 };
 
 export const rejectDelegation = async (req, res) => {
   try {
-    const approval = await LeaveApproval.findOne({ _id: req.params.id, approverId: req.user._id });
-    if (!approval)
-      return res.status(404).json({ success: false, message: "Data tidak ditemukan." });
+    const { note } = req.body;
+    const approval = await LeaveApproval.findOne({
+      _id: req.params.id,
+      approverId: req.user._id,
+      step: "HANDOVER",
+    });
+    if (!approval) return res.status(404).render("error", { message: "Data tidak ditemukan." });
 
     approval.status = "REJECTED";
+    approval.note = note;
     approval.actionDate = new Date();
     await approval.save();
 
     await Leave.findByIdAndUpdate(approval.leaveId, { status: "REJECTED" });
-    res.redirect("/leave/delegation");
+
+    res.redirect("/leave/my-delegations");
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).render("error", { message: error.message });
   }
 };
 
 export const showApprovals = async (req, res) => {
   try {
-    const userRole = req.user.role;
-    if (userRole === "KARYAWAN" || userRole === "KEUANGAN") {
-      return res.status(403).render("error", { message: "Akses ditolak." });
-    }
-
-    const pendingApprovals = await LeaveApproval.find({
-      step: userRole,
+    const approvals = await LeaveApproval.find({
+      approverId: req.user._id,
+      step: { $in: ["MANAGER", "HR", "PIMPINAN"] },
       status: "PENDING",
     }).populate({
       path: "leaveId",
       populate: [
-        { path: "userId", select: "name role" },
+        { path: "userId", populate: { path: "employeeData", select: "fullName" } },
         { path: "leaveTypeId", select: "name" },
       ],
     });
 
-    res.render("leave/approvals", { title: "Manajemen Approval Cuti", pendingApprovals });
+    res.render("leave/approvals", { title: "Persetujuan Cuti Karyawan", approvals });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
   }
@@ -437,18 +416,18 @@ export const processApproval = async (req, res) => {
     const { status, note } = req.body;
     const approval = await LeaveApproval.findOne({
       _id: req.params.id,
-      step: req.user.role,
+      approverId: req.user._id,
       status: "PENDING",
     });
-    if (!approval)
-      return res.status(404).json({ success: false, message: "Data transaksi tidak ditemukan." });
+    if (!approval) return res.status(404).render("error", { message: "Data tidak ditemukan." });
 
     approval.status = status;
     approval.note = note;
     approval.actionDate = new Date();
     await approval.save();
 
-    const leave = await Leave.findById(approval.leaveId);
+    const leave = await Leave.findById(approval.leaveId).populate("userId");
+    const requester = leave.userId;
 
     if (status === "REJECTED") {
       leave.status = "REJECTED";
@@ -456,39 +435,54 @@ export const processApproval = async (req, res) => {
       return res.redirect("/leave/approvals");
     }
 
-    if (leave.status === "CANCELLATION_PENDING") {
-      if (req.user.role === "PIMPINAN" && status === "APPROVED") {
-        leave.status = "CANCELLED";
+    let nextStep = "";
+    let nextApproverId = null;
+
+    if (approval.step === "MANAGER") {
+      nextStep = "HR";
+      const hrUser = await User.findOne({ role: "HR" });
+      nextApproverId = hrUser ? hrUser._id : null;
+    } else if (approval.step === "HR") {
+      if (requester.role === "HR") {
+        nextStep = "PIMPINAN";
+        const pimpinanUser = await User.findOne({ role: "PIMPINAN" });
+        nextApproverId = pimpinanUser ? pimpinanUser._id : null;
+      } else {
+        leave.status = "APPROVED";
         await leave.save();
-        await LeaveBalance.findOneAndUpdate(
-          { userId: leave.userId, year: new Date(leave.startDate).getFullYear() },
-          { $inc: { remaining: leave.totalDays, used: -leave.totalDays } }
-        );
+
+        const currentYear = new Date(leave.startDate).getFullYear();
+        const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
+        if (balance) {
+          balance.used += leave.totalDays;
+          balance.remaining -= leave.totalDays;
+          await balance.save();
+        }
       }
-      return res.redirect("/leave/approvals");
-    }
-
-    const currentStep = req.user.role;
-    let nextStep = null;
-
-    if (currentStep === "MANAGER") nextStep = "HR";
-    if (currentStep === "HR") nextStep = "PIMPINAN";
-
-    if (nextStep) {
-      leave.currentApprovalStep = nextStep;
-      await leave.save();
-      await LeaveApproval.create({ leaveId: leave._id, step: nextStep, status: "PENDING" });
-    } else {
+    } else if (approval.step === "PIMPINAN") {
       leave.status = "APPROVED";
       await leave.save();
-      await LeaveBalance.findOneAndUpdate(
-        { userId: leave.userId, year: new Date(leave.startDate).getFullYear() },
-        { $inc: { remaining: -leave.totalDays, used: leave.totalDays } }
-      );
+
+      const currentYear = new Date(leave.startDate).getFullYear();
+      const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
+      if (balance) {
+        balance.used += leave.totalDays;
+        balance.remaining -= leave.totalDays;
+        await balance.save();
+      }
+    }
+
+    if (nextApproverId) {
+      await LeaveApproval.create({
+        leaveId: leave._id,
+        step: nextStep,
+        approverId: nextApproverId,
+        status: "PENDING",
+      });
     }
 
     res.redirect("/leave/approvals");
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).render("error", { message: error.message });
   }
 };

@@ -1,95 +1,190 @@
 <%- layout('layouts/main', { title }) %>
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-    <div class="max-w-3xl mx-auto">
-      <div class="mb-6">
-        <a href="/leave/my" class="text-xs font-bold text-blue-600 hover:underline">← Batal dan Kembali</a>
-        <h1 class="text-xl font-bold text-slate-900 mt-2">
-          <%= title %>
-        </h1>
+
+  <div class="ml-72 min-h-screen bg-slate-50/50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-2xl mx-auto">
+
+      <!-- Breadcrumb Navigasi Mini -->
+      <div class="flex items-center space-x-2 text-xs text-slate-400 mb-4">
+        <a href="/leave/my-history" class="hover:text-blue-600 transition">Riwayat Cuti</a>
+        <span>/</span>
+        <span class="text-slate-600 font-medium">
+          <%= mode==='CREATE' ? 'Form Pengajuan' : (mode==='EDIT' ? 'Ubah Pengajuan' : 'Ajukan Ulang' ) %>
+        </span>
       </div>
 
-      <% if (typeof rejectNote !=='undefined' && rejectNote) { %>
-        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 mb-6">
-          <h4 class="text-xs font-bold text-rose-800 uppercase tracking-wider">Alasan Penolakan Sebelumnya:</h4>
-          <p class="text-xs text-rose-700 mt-1 italic">"<%= rejectNote %>"</p>
-        </div>
-        <% } %>
+      <!-- Main Card Container -->
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-100/40 overflow-hidden">
 
-          <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
-            <form id="leaveForm" enctype="multipart/form-data" class="space-y-4">
-              <div>
-                <label class="text-[11px] font-bold text-slate-400 uppercase">Pilih Kategori Cuti</label>
+        <!-- Header Section -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-8 text-white relative">
+          <div class="absolute top-0 right-0 p-4 opacity-10">
+            <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight">
+            <% if (mode==='CREATE' ) { %> Formulir Pengajuan Cuti <% } else if (mode==='EDIT' ) { %> Perbarui Data Cuti
+                <% } else if (mode==='RESUBMIT' ) { %> Ajukan Ulang Permohonan Cuti <% } %>
+          </h2>
+          <p class="text-blue-100 text-sm mt-1">Pastikan informasi rentang tanggal dan sisa kuota Anda telah sesuai
+            sebelum mengirimkan form.</p>
+        </div>
+
+        <!-- Info Banner: Sisa Kuota Cuti -->
+        <div
+          class="mx-6 mt-6 p-4 bg-emerald-50/60 border border-emerald-100 rounded-xl flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-emerald-500 rounded-lg text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-emerald-700 font-medium uppercase tracking-wider">Hak Kuota Cuti Anda</p>
+              <p class="text-sm text-slate-500">Tahun Periode Berjalan</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-2xl font-black text-emerald-600">
+              <%= leaveBalance.remaining %>
+            </span>
+            <span class="text-xs font-semibold text-emerald-700/80 ml-0.5">Hari Tersisa</span>
+          </div>
+        </div>
+
+        <% let formAction="/leave/apply" ; if (mode==='EDIT' ) formAction="/leave/update/" + leave._id; if
+          (mode==='RESUBMIT' ) formAction="/leave/apply" ; %>
+
+          <!-- Form Utama -->
+          <form action="<%= formAction %>" method="POST" class="p-6 space-y-6">
+
+            <!-- Input Jenis Cuti -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kategori / Tipe Cuti <span
+                  class="text-rose-500">*</span></label>
+              <div class="relative">
                 <select name="leaveTypeId" required
-                  class="w-full mt-1 border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-blue-600">
+                  class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl appearance-none text-slate-700 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none">
+                  <option value="" disabled selected class="text-slate-400">-- Silahkan pilih jenis cuti --</option>
                   <% leaveTypes.forEach(type=> { %>
-                    <option value="<%= type._id %>" <%=(typeof oldData !=='undefined' &&
-                      oldData.leaveTypeId.toString()===type._id.toString()) ? 'selected' : '' %>><%= type.name %>
+                    <option value="<%= type._id %>" <%=(leave && leave.leaveTypeId.toString()===type._id.toString())
+                      ? 'selected' : '' %>><%= type.name %>
                     </option>
                     <% }) %>
                 </select>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="text-[11px] font-bold text-slate-400 uppercase">Tanggal Mulai</label>
-                  <input type="date" name="startDate" required
-                    value="<%= typeof oldData !== 'undefined' ? oldData.startDate.toISOString().split('T')[0] : '' %>"
-                    class="w-full mt-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-blue-600">
-                </div>
-                <div>
-                  <label class="text-[11px] font-bold text-slate-400 uppercase">Tanggal Selesai</label>
-                  <input type="date" name="endDate" required
-                    value="<%= typeof oldData !== 'undefined' ? oldData.endDate.toISOString().split('T')[0] : '' %>"
-                    class="w-full mt-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-blue-600">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
                 </div>
               </div>
+            </div>
 
+            <!-- Rentang Tanggal Pengajuan -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="text-[11px] font-bold text-slate-400 uppercase">Alasan Pengajuan</label>
-                <textarea name="reason" rows="3" required
-                  class="w-full mt-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-blue-600"><%= typeof oldData !== 'undefined' ? oldData.reason : '' %></textarea>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal Mulai <span
+                    class="text-rose-500">*</span></label>
+                <input type="date" id="startDate" name="startDate" required
+                  class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                  value="<%= leave ? new Date(leave.startDate).toISOString().split('T')[0] : '' %>">
               </div>
-
               <div>
-                <label class="text-[11px] font-bold text-slate-400 uppercase">Personel Handover (Delegasi Tugas)</label>
-                <select name="handoverUserId" required
-                  class="w-full mt-1 border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-blue-600">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal Selesai <span
+                    class="text-rose-500">*</span></label>
+                <input type="date" id="endDate" name="endDate" required
+                  class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                  value="<%= leave ? new Date(leave.endDate).toISOString().split('T')[0] : '' %>">
+              </div>
+            </div>
+
+            <!-- Kalkulasi Total Hari Cuti -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Durasi Pengajuan Cuti</label>
+              <div class="relative flex items-center">
+                <input type="number" id="totalDays" name="totalDays" readonly required
+                  class="w-full pl-4 pr-16 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-800 outline-none select-none"
+                  value="<%= leave ? leave.totalDays : 0 %>">
+                <span class="absolute right-4 text-xs font-bold uppercase tracking-wider text-slate-400">Hari
+                  Kerja</span>
+              </div>
+            </div>
+
+            <!-- Dropdown Handover Tugas (Optional) -->
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="block text-sm font-semibold text-slate-700">Delegasi Pengganti / Handover</label>
+                <span
+                  class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full uppercase tracking-wide">Opsional</span>
+              </div>
+              <div class="relative">
+                <select name="handoverUserId"
+                  class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl appearance-none text-slate-700 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none">
+                  <option value="">-- Tanpa Delegasi Tugas --</option>
                   <% employees.forEach(emp=> { %>
-                    <option value="<%= emp._id %>" <%=(typeof oldData !=='undefined' && oldData.handoverUserId &&
-                      oldData.handoverUserId.toString()===emp._id.toString()) ? 'selected' : '' %>><%= emp.name %> (@<%=
-                          emp.username %>)</option>
-                    <% }) %>
+                    <% if (emp.employeeData) { %>
+                      <option value="<%= emp._id %>" <%=(leave && leave.handoverUserId &&
+                        leave.handoverUserId.toString()===emp._id.toString()) ? 'selected' : '' %>><%=
+                          emp.employeeData.fullName %> (@<%= emp.username %>)</option>
+                      <% } %>
+                        <% }) %>
                 </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
               </div>
+              <p class="text-[11px] text-slate-400 mt-1">Jika memilih rekan handover, sistem memerlukan persetujuan dari
+                mereka sebelum diteruskan ke alur otorisasi manajerial.</p>
+            </div>
 
-              <div>
-                <label class="text-[11px] font-bold text-slate-400 uppercase">Dokumen Lampiran (Opsional)</label>
-                <input type="file" name="file"
-                  class="w-full mt-1 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-              </div>
+            <!-- Alasan Pengajuan -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Alasan atau Keterangan Tambahan <span
+                  class="text-rose-500">*</span></label>
+              <textarea name="reason" rows="4"
+                placeholder="Tuliskan detail alasan pengajuan komparasi cuti Anda di sini secara detail..." required
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none resize-none"><%= leave ? leave.reason : '' %></textarea>
+            </div>
 
+            <!-- Garis Batas Form & Panel Aksi -->
+            <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+              <a href="/leave/my-history"
+                class="w-full sm:w-auto text-center px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition">
+                Kembali
+              </a>
               <button type="submit"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2.5 font-bold text-sm transition shadow-sm cursor-pointer">Kirim
-                Berkas Pengajuan</button>
-            </form>
-          </div>
+                class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-500/20 hover:bg-blue-700 active:transform active:scale-[0.98] transition">
+                <%= mode==='CREATE' ? 'Kirim Pengajuan' : (mode==='EDIT' ? 'Simpan Perubahan' : 'Kirim Ulang Form' ) %>
+              </button>
+            </div>
+          </form>
+      </div>
     </div>
   </div>
 
   <script>
-    document.getElementById('leaveForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const isEdit = '<%= typeof oldData !== "undefined" && oldData && title !== "Resubmit Pengajuan Cuti" %>' === 'true';
-      const url = isEdit ? '/leave/edit/<%= typeof oldData !== "undefined" && oldData ? oldData._id : "" %>' : '/leave/apply';
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    const totalInput = document.getElementById('totalDays');
 
-      const res = await fetch(url, { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        alert(data.message);
-        window.location.href = '/leave/my';
-      } else {
-        alert(data.message);
+    function calculateDays() {
+      if (startInput.value && endInput.value) {
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+        const diffTime = end - start;
+        if (diffTime >= 0) {
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+          totalInput.value = diffDays;
+        } else {
+          totalInput.value = 0;
+        }
       }
-    });
+    }
+
+    startInput.addEventListener('change', calculateDays);
+    endInput.addEventListener('change', calculateDays);
   </script>
