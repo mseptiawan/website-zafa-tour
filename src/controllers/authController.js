@@ -5,7 +5,7 @@ import User from "../models/User.js";
 import crypto from "crypto";
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
-import Leave from "../models/Leave.js";
+// import Leave from "../models/Leave.js";
 import BusinessTrip from "../models/BusinessTrip.js";
 import Announcement from "../models/Announcement.js";
 /* ======================
@@ -71,90 +71,11 @@ export const login = async (req, res) => {
    DASHBOARD
 ====================== */
 
-export const dashboard = async (req, res) => {
-  try {
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
-
-    // =========================
-    // SUMMARY
-    // =========================
-    const totalEmployee = await Employee.countDocuments();
-
-    const hadir = await Attendance.countDocuments({
-      checkIn: { $gte: today },
-
-      status: {
-        $in: ["HADIR", "TELAT"],
-      },
-    });
-
-    const cuti = await Leave.countDocuments({
-      status: "APPROVED",
-    });
-
-    const trip = await BusinessTrip.countDocuments({
-      status: {
-        $in: ["PENDING", "APPROVED_MANAGER", "APPROVED_DIRECTOR"],
-      },
-    });
-
-    // =========================
-    // ATTENDANCE TODAY
-    // =========================
-    const todayAttendance = await Attendance.find({
-      checkIn: { $gte: today },
-    })
-      .populate("userId")
-      .sort({
-        checkIn: -1,
-      });
-
-    // 🔥 inject employee
-    for (const attendance of todayAttendance) {
-      const employee = await Employee.findOne({
-        userId: attendance.userId?._id,
-      });
-
-      attendance.employee = employee;
-    }
-
-    // =========================
-    // ANNOUNCEMENT
-    // =========================
-    const announcements = await Announcement.find({
-      status: "PUBLISHED",
-    })
-      .populate("createdBy")
-      .sort({
-        isPinned: -1,
-        createdAt: -1,
-      })
-      .limit(5);
-
-    // =========================
-    // RENDER
-    // =========================
-    res.render("dashboard/index", {
-      title: "Dashboard",
-
-      user: req.session.user,
-
-      totalEmployee,
-      hadir,
-      cuti,
-      trip,
-
-      todayAttendance,
-
-      announcements,
-    });
-  } catch (err) {
-    console.log(err);
-
-    res.status(500).send("Dashboard error");
-  }
+export const dashboard = (req, res) => {
+  res.render("dashboard/index", {
+    title: "Dashboard",
+    error: null,
+  });
 };
 /* ======================
    LOGOUT (FIXED)

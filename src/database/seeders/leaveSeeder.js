@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 
 // Import semua model yang dibutuhkan
 import User from "../../models/User.js";
-import Leave from "../../models/Leave.js";
-import LeaveApproval from "../../models/LeaveApproval.js";
-import LeaveBalance from "../../models/LeaveBalance.js";
-import LeaveCancellation from "../../models/LeaveCancellation.js";
-import LeaveType from "../../models/LeaveType.js";
+import Leave from "../../models/leave/Leave.model.js";
+import LeaveApproval from "../../models/leave/LeaveApproval.model.js";
+import LeaveBalance from "../../models/leave/LeaveBalance.model.js";
+import LeaveCancellation from "../../models/leave/LeaveCancellation.model.js";
+import LeaveType from "../../models/leave/LeaveType.model.js";
 
 dotenv.config();
 

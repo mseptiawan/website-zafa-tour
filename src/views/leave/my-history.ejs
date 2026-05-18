@@ -1,0 +1,103 @@
+<%- layout('layouts/main', { title }) %>
+
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+    <div class="max-w-5xl mx-auto">
+
+      <!-- HEADER & ACTIONS -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+            <span>Workspace</span>
+            <span class="text-slate-300">/</span>
+            <span class="text-slate-900">Manajemen Cuti</span>
+          </nav>
+          <h1 class="text-2xl font-bold text-slate-900">Riwayat Cuti Saya</h1>
+          <p class="text-[14px] text-slate-500 mt-1">Pantau status pengajuan berkas dan sisa jatah libur kerja Anda</p>
+        </div>
+
+        <div>
+          <a href="/leave/apply"
+            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98]">
+            + Ajukan Cuti Baru
+          </a>
+        </div>
+      </div>
+
+      <!-- TABLE CARD CONTAINER -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="py-4 px-6">Kategori / Kode</th>
+                <th class="py-4 px-6">Rentang Tanggal</th>
+                <th class="py-4 px-6">Durasi</th>
+                <th class="py-4 px-6">Handover</th>
+                <th class="py-4 px-6">Status Akhir</th>
+                <th class="py-4 px-6 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-[14px]">
+              <% if (leaves.length===0) { %>
+                <tr>
+                  <td colspan="6" class="py-12 text-center text-slate-400 font-medium">
+                    Belum ada rekaman jejak pengajuan cuti dalam sistem.
+                  </td>
+                </tr>
+                <% } %>
+
+                  <% leaves.forEach(leave=> { %>
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="py-4 px-6">
+                        <span class="font-bold text-slate-800 block">
+                          <%= leave.leaveTypeId.name %>
+                        </span>
+                        <span
+                          class="text-[11px] font-mono font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded mt-0.5 inline-block">
+                          <%= leave.leaveTypeId.code %>
+                        </span>
+                      </td>
+                      <td class="py-4 px-6 text-slate-600 font-medium">
+                        <%= new Date(leave.startDate).toLocaleDateString('id-ID', {day: '2-digit' , month: 'short' ,
+                          year: 'numeric' }) %>
+                          <span class="text-slate-300 mx-1">→</span>
+                          <%= new Date(leave.endDate).toLocaleDateString('id-ID', {day: '2-digit' , month: 'short' ,
+                            year: 'numeric' }) %>
+                      </td>
+                      <td class="py-4 px-6 font-bold text-slate-900">
+                        <%= leave.totalDays %> Hari
+                      </td>
+                      <td class="py-4 px-6 text-slate-500 font-medium">
+                        <%= leave.handoverUserId ? leave.handoverUserId.name : '-' %>
+                      </td>
+                      <td class="py-4 px-6">
+                        <% if (leave.status==='PENDING' ) { %>
+                          <span
+                            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100">PENDING</span>
+                          <% } else if (leave.status==='APPROVED' ) { %>
+                            <span
+                              class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">APPROVED</span>
+                            <% } else if (leave.status==='REJECTED' ) { %>
+                              <span
+                                class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-100">REJECTED</span>
+                              <% } else { %>
+                                <span
+                                  class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-50 text-slate-500 border border-slate-200">CANCELLED</span>
+                                <% } %>
+                      </td>
+                      <td class="py-4 px-6 text-right">
+                        <a href="/leave/<%= leave._id %>"
+                          class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold transition shadow-sm">
+                          Lihat Progress
+                        </a>
+                      </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
