@@ -255,13 +255,30 @@ export const updateLeave = async (req, res) => {
 export const cancelPendingLeave = async (req, res) => {
   try {
     const leave = await Leave.findById(req.params.id);
+
+    // Sesuaikan pengecekan status (pastikan string-nya seragam "PENDING")
     if (!leave || leave.status !== "PENDING") {
-      return res.status(400).render("error", { message: "Pembatalan gagal." });
+      return res
+        .status(400)
+        .render("error", {
+          message: "Pembatalan gagal. Pengajuan tidak ditemukan atau sudah diproses.",
+        });
     }
 
-    leave.status = "CANCELLED";
+    // 1. Ubah status induk menjadi CANCELED (Gunakan single 'L' agar singkron dengan filter backend)
+    leave.status = "CANCELED";
     await leave.save();
-    await LeaveApproval.deleteMany({ leaveId: leave._id });
+
+    // 2. PERBAIKAN UTAMA: Jangan di-delete, tapi perbarui status approval-nya
+    // Ini agar jejak di timeline tetap terbaca dengan status CANCELED
+    await LeaveApproval.updateMany(
+      { leaveId: leave._id, status: "PENDING" },
+      {
+        status: "CANCELED",
+        note: "Dibatalkan oleh pemohon",
+        actionDate: new Date(),
+      }
+    );
 
     res.redirect("/leave/my-history");
   } catch (error) {
@@ -324,7 +341,8 @@ export const showResubmitLeave = async (req, res) => {
 
 export const myDelegations = async (req, res) => {
   try {
-    const delegations = await LeaveApproval.find({
+    // 1. Ambil data approval yang ditujukan ke user saat ini
+    const rawDelegations = await LeaveApproval.find({
       approverId: req.user._id,
       step: "HANDOVER",
       status: "PENDING",
@@ -336,7 +354,17 @@ export const myDelegations = async (req, res) => {
       ],
     });
 
-    res.render("leave/delegation", { title: "Delegasi Tugas Saya", delegations });
+    // 2. PROSES FILTER SINKRONISASI:
+    // Pastikan data leaveId ada (tidak null) DAN status cuti utamanya masih benar-benar "PENDING"
+    const filteredDelegations = rawDelegations.filter((del) => {
+      return del.leaveId && del.leaveId.status === "PENDING";
+    });
+
+    // 3. Kirim hasil filter yang sudah bersih ke file EJS lo
+    res.render("leave/delegation", {
+      title: "Delegasi Tugas Saya",
+      delegations: filteredDelegations,
+    });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
   }
