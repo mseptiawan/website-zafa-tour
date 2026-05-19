@@ -21,11 +21,11 @@ import {
 const router = express.Router();
 
 router.get("/leave/apply", authMiddleware, showApplyLeave);
-router.post("/leave/apply", authMiddleware, uploadFile.single("file"), applyLeave);
-router.get("/leave/my", authMiddleware, myLeave);
+router.post("/leave/apply", authMiddleware, uploadFile.single("attachments"), applyLeave);
+router.get("/leave/my-history", authMiddleware, myLeave);
 router.get("/leave/detail/:id", authMiddleware, getLeaveDetail);
 router.get("/leave/edit/:id", authMiddleware, editLeave);
-router.post("/leave/edit/:id", authMiddleware, uploadFile.single("file"), updateLeave);
+router.post("/leave/edit/:id", authMiddleware, uploadFile.single("attachments"), updateLeave);
 router.post("/leave/cancel-pending/:id", authMiddleware, cancelPendingLeave);
 router.post("/leave/request-cancel/:id", authMiddleware, requestCancelApprovedLeave);
 router.get("/leave/resubmit/:id", authMiddleware, showResubmitLeave);

@@ -33,7 +33,7 @@ export const applyLeave = async (req, res) => {
   try {
     const { leaveTypeId, startDate, endDate, totalDays, reason, handoverUserId } = req.body;
     const requester = req.user;
-
+    const documentPath = req.file ? `/uploads/files/${req.file.filename}` : null;
     const newLeave = await Leave.create({
       userId: requester._id,
       leaveTypeId,
@@ -41,6 +41,7 @@ export const applyLeave = async (req, res) => {
       endDate,
       totalDays,
       reason,
+      documentPath,
       handoverUserId: handoverUserId || null,
       status: "PENDING",
     });
@@ -78,7 +79,10 @@ export const applyLeave = async (req, res) => {
 
     res.redirect("/leave/my-history");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
