@@ -123,7 +123,12 @@ export const myLeave = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 

@@ -1,123 +1,186 @@
 <%- layout('layouts/main', { title }) %>
+
   <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+
     <div class="max-w-6xl mx-auto">
-      <div class="flex items-center justify-between mb-8">
+
+      <!-- HEADER -->
+      <div class="flex items-start justify-between mb-8">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Riwayat & Status Cuti</h1>
-          <p class="text-xs text-slate-500 mt-1">Pantau penggunaan hak cuti kerja tahunan Anda</p>
+          <h1 class="text-2xl font-semibold text-slate-800">
+            Riwayat & Status Cuti
+          </h1>
+          <p class="text-sm text-slate-500 mt-1">
+            Pantau penggunaan hak cuti kerja tahunan Anda
+          </p>
         </div>
-        <a href="/leave/apply"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm">+ Ajukan
-          Cuti Baru</a>
+
+        <a href="/leave/apply" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-3 rounded-xl transition shadow-sm shadow-blue-100/50 active:scale-[0.98]">
+          + Ajukan Cuti Baru
+        </a>
       </div>
 
-      <div class="grid grid-cols-5 gap-4 mb-8">
-        <div class="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase">Hak Cuti Awal</span>
-          <span class="text-2xl font-black text-slate-800 mt-1 block">
-            <%= summary.totalQuota %> Hari
+      <!-- SUMMARY STATS GRID -->
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Hak Cuti Awal</span>
+          <span class="text-2xl font-bold text-slate-800 mt-1 block tabular-nums">
+            <%= summary.totalQuota %> <span class="text-xs font-medium text-slate-500">Hari</span>
           </span>
         </div>
-        <div class="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase">Cuti Bersama</span>
-          <span class="text-2xl font-black text-slate-800 mt-1 block">
-            <%= summary.companyHolidays %> Hari
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Bersama</span>
+          <span class="text-2xl font-bold text-slate-800 mt-1 block tabular-nums">
+            <%= summary.companyHolidays %> <span class="text-xs font-medium text-slate-500">Hari</span>
           </span>
         </div>
-        <div class="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase">Cuti Mandiri Terpakai</span>
-          <span class="text-2xl font-black text-slate-800 mt-1 block">
-            <%= summary.usedPrivate %> Hari
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Mandiri Terpakai</span>
+          <span class="text-2xl font-bold text-slate-800 mt-1 block tabular-nums">
+            <%= summary.usedPrivate %> <span class="text-xs font-medium text-slate-500">Hari</span>
           </span>
         </div>
-        <div class="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase">Pending Approval</span>
-          <span class="text-2xl font-black text-amber-600 mt-1 block">
-            <%= summary.pending %> Berkas
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Pending Approval</span>
+          <span class="text-2xl font-bold text-amber-600 mt-1 block tabular-nums">
+            <%= summary.pending %> <span class="text-xs font-medium text-amber-500">Berkas</span>
           </span>
         </div>
-        <div class="bg-white p-4 border border-slate-900 bg-slate-900 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase">Sisa Cuti</span>
-          <span class="text-2xl font-black text-white mt-1 block">
-            <%= summary.remaining %> Hari
+        <div class="bg-slate-900 p-5 border border-slate-900 rounded-2xl shadow-sm">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Sisa Cuti</span>
+          <span class="text-2xl font-bold text-white mt-1 block tabular-nums">
+            <%= summary.remaining %> <span class="text-xs font-medium text-slate-300">Hari</span>
           </span>
         </div>
       </div>
 
+      <!-- CARD TABLE CONTAINER -->
       <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr
-              class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              <th class="py-4 px-6">Kode & Jenis Cuti</th>
-              <th class="py-4 px-6">Periode Pelaksanaan</th>
-              <th class="py-4 px-6">Durasi</th>
-              <th class="py-4 px-6">Handover</th>
-              <th class="py-4 px-6">Status Akhir</th>
-              <th class="py-4 px-6 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 text-[13px]">
-            <% leaves.forEach(leave=> { %>
-              <tr class="hover:bg-slate-50/50">
-                <td class="py-4 px-6">
-                  <span class="font-bold text-slate-800">
-                    <%= leave.leaveTypeId.name %>
-                  </span>
-                  <span
-                    class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded block w-max mt-0.5">
-                    <%= leave.leaveTypeId.code %>
-                  </span>
-                </td>
-                <td class="py-4 px-6 font-medium text-slate-600">
-                  <%= new Date(leave.startDate).toLocaleDateString('id-ID', {day: '2-digit' , month: 'short' }) %> - <%=
-                      new Date(leave.endDate).toLocaleDateString('id-ID', {day: '2-digit' , month: 'short' ,
-                      year: 'numeric' }) %>
-                </td>
-                <td class="py-4 px-6 font-bold text-slate-900">
-                  <%= leave.totalDays %> Hari
-                </td>
-                <td class="py-4 px-6 text-slate-500">
-                  <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ?
-                    leave.handoverUserId.employeeData.fullName : '-' %>
-                </td>
-                <td class="py-4 px-6">
-                  <span
-                    class="px-2.5 py-1 rounded-lg text-[11px] font-bold border 
-                  <%= leave.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' : '' %>
-                  <%= leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : '' %>
-                  <%= leave.status === 'REJECTED' ? 'bg-rose-50 text-rose-600 border-rose-100' : '' %>
-                  <%= leave.status === 'CANCELLED' ? 'bg-slate-100 text-slate-500 border-slate-200' : '' %>
-                  <%= leave.status === 'CANCELLATION_PENDING' ? 'bg-purple-50 text-purple-600 border-purple-100' : '' %>">
-                    <%= leave.status %>
-                  </span>
-                </td>
-                <td class="py-4 px-6 text-right space-x-1 whitespace-nowrap">
-                  <a href="/leave/detail/<%= leave._id %>"
-                    class="bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-lg px-2.5 py-1.5 font-bold transition shadow-sm">Lihat
-                    Progress</a>
 
-                  <% if (leave.status==='PENDING' ) { %>
-                    <a href="/leave/edit/<%= leave._id %>"
-                      class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg px-2.5 py-1.5 font-bold transition shadow-sm">Edit</a>
-                    <form action="/leave/cancel-pending/<%= leave._id %>" method="POST" class="inline">
-                      <button
-                        class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg px-2.5 py-1.5 font-bold transition shadow-sm cursor-pointer">Batalkan</button>
-                    </form>
-                    <% } %>
+        <div class="overflow-x-auto">
 
-                      <% if (leave.status==='APPROVED' ) { %>
-                        <form action="/leave/request-cancel/<%= leave._id %>" method="POST" class="inline">
-                          <button
-                            class="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-2.5 py-1.5 font-bold transition shadow-sm cursor-pointer">Ajukan
-                            Pembatalan</button>
-                        </form>
-                        <% } %>
-                </td>
+          <table class="w-full text-sm min-w-[1000px]">
+
+            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+              <tr>
+                <th class="text-left px-6 py-4">Kode & Jenis Cuti</th>
+                <th class="text-left px-6 py-4">Periode Pelaksanaan</th>
+                <th class="text-left px-6 py-4">Durasi</th>
+                <th class="text-left px-6 py-4">Handover</th>
+                <th class="text-left px-6 py-4">Status Akhir</th>
+                <th class="text-right px-6 py-4">Aksi</th>
               </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-100">
+
+              <% if (leaves.length === 0) { %>
+                <tr>
+                  <td colspan="6" class="text-center py-12 text-slate-400">
+                    Belum ada riwayat pengajuan cuti
+                  </td>
+                </tr>
+              <% } %>
+
+              <% leaves.forEach(leave => { %>
+                <tr class="hover:bg-slate-50/50 transition">
+
+                  <!-- KODE & JENIS CUTI -->
+                  <td class="px-6 py-4">
+                    <span class="font-semibold text-slate-800 block">
+                      <%= leave.leaveTypeId.name %>
+                    </span>
+                    <span class="text-[10px] font-mono bg-slate-50 border border-slate-200/60 text-slate-500 px-1.5 py-0.5 rounded inline-block mt-1">
+                      <%= leave.leaveTypeId.code %>
+                    </span>
+                  </td>
+
+                  <!-- PERIODE -->
+                  <td class="px-6 py-4 text-slate-500 font-medium">
+                    <%= new Date(leave.startDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) %> - <%= new Date(leave.endDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+                  </td>
+
+                  <!-- DURASI -->
+                  <td class="px-6 py-4 font-semibold text-slate-700 tabular-nums">
+                    <%= leave.totalDays %> Hari
+                  </td>
+
+                  <!-- HANDOVER -->
+                  <td class="px-6 py-4 text-slate-500">
+                    <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ? leave.handoverUserId.employeeData.fullName : '-' %>
+                  </td>
+
+                  <!-- STATUS BADGE -->
+                  <td class="px-6 py-4">
+                    <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
+                      <%= leave.status === 'PENDING' ? 'bg-amber-50/50 text-amber-700 border-amber-200/60' : '' %>
+                      <%= leave.status === 'APPROVED' ? 'bg-emerald-50/50 text-emerald-700 border-emerald-200/60' : '' %>
+                      <%= leave.status === 'REJECTED' ? 'bg-rose-50/50 text-rose-700 border-rose-200/60' : '' %>
+                      <%= leave.status === 'CANCELLED' ? 'bg-slate-50 text-slate-500 border-slate-200' : '' %>
+                      <%= leave.status === 'CANCELLATION_PENDING' ? 'bg-purple-50/50 text-purple-700 border-purple-200/60' : '' %>">
+                      <%= leave.status %>
+                    </span>
+                  </td>
+
+                  <!-- AKSI BUTTON GRID -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center justify-end gap-2">
+                      
+                      <!-- LIHAT PROGRESS (DETAIL) -->
+                      <a href="/leave/detail/<%= leave._id %>" title="Lihat Progress" 
+                        class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition active:scale-[0.95]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                      </a>
+
+                      <% if (leave.status === 'PENDING') { %>
+                        <!-- EDIT -->
+                        <a href="/leave/edit/<%= leave._id %>" title="Edit Pengajuan" 
+                          class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-amber-200 bg-amber-50/40 text-amber-600 hover:bg-amber-50 hover:text-amber-700 transition active:scale-[0.95]">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                          </svg>
+                        </a>
+
+                        <!-- BATALKAN (PENDING STATE) -->
+                        <form action="/leave/cancel-pending/<%= leave._id %>" method="POST" class="inline">
+                          <button type="submit" title="Batalkan Pengajuan" 
+                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-rose-200 bg-rose-50/40 text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer active:scale-[0.95]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                          </button>
+                        </form>
+                      <% } %>
+
+                      <% if (leave.status === 'APPROVED') { %>
+                        <!-- AJUKAN PEMBATALAN (APPROVED STATE) -->
+                        <form action="/leave/request-cancel/<%= leave._id %>" method="POST" class="inline">
+                          <button type="submit" title="Ajukan Pembatalan Cuti" 
+                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition cursor-pointer active:scale-[0.95]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                          </button>
+                        </form>
+                      <% } %>
+
+                    </div>
+                  </td>
+
+                </tr>
               <% }) %>
-          </tbody>
-        </table>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
       </div>
+
     </div>
+
   </div>
