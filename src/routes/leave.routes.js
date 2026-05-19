@@ -30,7 +30,7 @@ router.post("/leave/cancel-pending/:id", authMiddleware, cancelPendingLeave);
 router.post("/leave/request-cancel/:id", authMiddleware, requestCancelApprovedLeave);
 router.get("/leave/resubmit/:id", authMiddleware, showResubmitLeave);
 
-router.get("/leave/delegation", authMiddleware, myDelegations);
+router.get("/leave/my-delegations", authMiddleware, myDelegations);
 router.post("/leave/delegation/approve/:id", authMiddleware, approveDelegation);
 router.post("/leave/delegation/reject/:id", authMiddleware, rejectDelegation);
 
