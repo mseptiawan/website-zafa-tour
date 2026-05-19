@@ -9,7 +9,6 @@ import LeaveType from "../../models/leave/LeaveType.model.js";
 
 dotenv.config();
 
-await mongoose.connect(process.env.MONGODB_URI);
 
 const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
 
@@ -85,12 +84,11 @@ function createLeaveDateRangeAndDuration() {
   return { startDate, endDate, totalDays };
 }
 
-async function seed() {
+export default async function leaveSeeder() {
   try {
     const users = await User.find({ username: { $in: usernames } });
     if (!users.length) {
       console.log("Error: Target users tidak ditemukan di database.");
-      process.exit();
     }
 
     await LeaveType.deleteMany({});
@@ -355,11 +353,8 @@ async function seed() {
     console.log(`   - ${approvalsToInsert.length} Log Langkah Persetujuan (LeaveApproval)`);
     console.log(`\n=== PROSES UPDATE SEEDER BERHASIL DAN BERSIH ===`);
 
-    await mongoose.disconnect();
   } catch (err) {
     console.error("X Terjadi kegagalan proses pembuatan data seeder:", err);
-    await mongoose.disconnect();
   }
 }
 
-seed();

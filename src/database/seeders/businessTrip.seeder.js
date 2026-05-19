@@ -6,7 +6,6 @@ import User from "../../models/User.js";
 
 dotenv.config();
 
-await mongoose.connect(process.env.MONGODB_URI);
 
 // ======================================================
 // TARGET USERS
@@ -218,7 +217,7 @@ function generateTripReport(status) {
 // MAIN SEED
 // ======================================================
 
-async function seed() {
+export default async function businessTripSeeder() {
   try {
     const users = await User.find({
       username: {
@@ -228,7 +227,6 @@ async function seed() {
 
     if (!users.length) {
       console.log("User tidak ditemukan");
-      process.exit();
     }
 
     await BusinessTrip.deleteMany({});
@@ -325,12 +323,8 @@ async function seed() {
 
     console.log("Seeder BusinessTrip berhasil dibuat");
 
-    await mongoose.disconnect();
   } catch (err) {
     console.log(err);
-
-    await mongoose.disconnect();
   }
 }
 
-seed();

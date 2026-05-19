@@ -47,7 +47,7 @@ const leaveSchema = new mongoose.Schema(
     handoverUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }

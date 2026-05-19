@@ -8,7 +8,7 @@ import {
   createActivity, // Tambahkan import ini
   updateActivity,
   carryOverTasks,
-} from "../controllers/dailyLog.controller.js";
+} from "../controllers/dailylog.controller.js";
 
 const router = express.Router();
 

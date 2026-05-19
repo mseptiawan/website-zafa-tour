@@ -1,12 +1,9 @@
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import SalesVisit from "../../models/SalesVisit.js";
 import User from "../../models/User.js";
 
 dotenv.config();
-
-await mongoose.connect(process.env.MONGODB_URI);
 
 // =========================
 // TARGET USERS
@@ -97,7 +94,7 @@ function randomDate() {
 // =========================
 // MAIN SEED
 // =========================
-async function seed() {
+export default async function salesVisitSeeder() {
   try {
     const users = await User.find({
       username: { $in: usernames },
@@ -105,7 +102,7 @@ async function seed() {
 
     if (!users.length) {
       console.log("User tidak ditemukan");
-      process.exit();
+      return;
     }
 
     // hapus data lama
@@ -141,12 +138,8 @@ async function seed() {
     await SalesVisit.insertMany(data);
 
     console.log("Seeder SalesVisit COMPLETE");
-
-    mongoose.disconnect();
   } catch (err) {
     console.error(err);
-    mongoose.disconnect();
   }
 }
 
-seed();

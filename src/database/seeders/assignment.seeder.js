@@ -7,7 +7,6 @@ import Employee from "../../models/Employee.js";
 
 dotenv.config();
 
-await mongoose.connect(process.env.MONGODB_URI);
 
 // =========================
 // SAMPLE DATA
@@ -85,7 +84,7 @@ function randomEmployees(arr) {
 // =========================
 // MAIN SEED
 // =========================
-async function seed() {
+export default async function assignmentSeeder() {
   try {
     const users = await User.find({
       username: { $in: usernames },
@@ -95,12 +94,12 @@ async function seed() {
 
     if (!users.length) {
       console.log("User tidak ditemukan");
-      process.exit();
+      return ;
     }
 
     if (!employees.length) {
       console.log("Employee tidak ditemukan");
-      process.exit();
+      return;
     }
 
     // hapus data lama
@@ -147,11 +146,9 @@ async function seed() {
 
     console.log("Seeder Assignment COMPLETE");
 
-    mongoose.disconnect();
   } catch (err) {
     console.error(err);
-    mongoose.disconnect();
   }
 }
 
-seed();
+// seed();

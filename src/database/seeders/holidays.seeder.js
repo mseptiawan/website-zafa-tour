@@ -1,8 +1,5 @@
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Holiday from "../../models/calender/Holiday.model.js"; // Sesuaikan dengan path model lu
-
-dotenv.config();
 
 const holidays = [
   {
@@ -107,12 +104,10 @@ const holidays = [
   },
 ];
 
-const seedHolidays = async () => {
+const holidaysSeeder = async () => {
   try {
     // 1. Hubungkan ke database MongoDB
     // Pastikan MONGO_URI ada di file .env lu
-    await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/hris_db");
-    console.log("⚡ MongoDB Connected for Seeding...");
 
     console.log("⏳ Sedang menyuntikkan data hari libur...");
 
@@ -135,14 +130,12 @@ const seedHolidays = async () => {
     console.log("-----------------------------------------");
 
     // 3. Putuskan koneksi setelah selesai
-    await mongoose.disconnect();
-    console.log("🔌 MongoDB Connection Closed.");
-    process.exit(0);
   } catch (error) {
     console.error("❌ Seeding Gagal:", error);
-    process.exit(1);
   }
 };
 
 // Eksekusi fungsi seeder
-seedHolidays();
+// seedHolidays();
+
+export default holidaysSeeder;

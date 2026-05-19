@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import Overtime from "../../models/Overtime.js";
@@ -7,7 +6,6 @@ import User from "../../models/User.js";
 
 dotenv.config();
 
-await mongoose.connect(process.env.MONGODB_URI);
 
 const descriptions = [
   "Menyelesaikan laporan bulanan",
@@ -36,13 +34,13 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-async function seed() {
+export default async function overtimeSeeder() {
   const employees = await Employee.find().populate("userId");
 
   if (employees.length === 0) {
     console.log("Employee tidak ditemukan");
 
-    process.exit();
+    return;
   }
 
   await Overtime.deleteMany();
@@ -93,7 +91,5 @@ async function seed() {
 
   console.log("Seeder lembur berhasil");
 
-  mongoose.disconnect();
 }
 
-seed();

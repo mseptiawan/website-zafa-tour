@@ -6,7 +6,6 @@ import User from "../../models/User.js";
 
 dotenv.config();
 
-await mongoose.connect(process.env.MONGODB_URI);
 
 // ======================================================
 // TARGET USERS
@@ -200,20 +199,19 @@ function randomDate() {
 // MAIN SEED
 // ======================================================
 
-async function seed() {
+
+
+export default async function announcementSeeder() {
   try {
     const users = await User.find({
-      username: {
-        $in: usernames,
-      },
+      username: { $in: usernames },
     });
 
     if (!users.length) {
       console.log("User tidak ditemukan");
-      process.exit();
+      return;
     }
 
-    // hapus data lama
     await Announcement.deleteMany({});
 
     const data = [];
@@ -228,21 +226,13 @@ async function seed() {
 
         data.push({
           title: item.title,
-
           content: item.content.trim(),
-
           category: item.category,
-
           createdBy: user._id,
-
           attachment: randomItem(attachments),
-
           signedBy: signedByUser?._id || null,
-
           publishDate: createdAt,
-
           createdAt,
-
           updatedAt: new Date(),
         });
       }
@@ -252,12 +242,8 @@ async function seed() {
 
     console.log("Seeder Announcement berhasil dibuat");
 
-    await mongoose.disconnect();
   } catch (err) {
     console.error(err);
-
-    await mongoose.disconnect();
+    throw err;
   }
 }
-
-seed();
