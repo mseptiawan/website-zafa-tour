@@ -4,7 +4,7 @@
     <div class="max-w-4xl mx-auto">
 
       <!-- BACK BUTTON -->
-      <a href="/leave/my"
+      <a href="/leave/my-history"
         class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
         <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
           stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -14,8 +14,7 @@
       </a>
 
       <!-- MAIN CARD -->
-      <div
-        class="bg-white border border-slate-200/60 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] overflow-hidden">
+      <div class="bg-white border border-slate-200/60 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] overflow-hidden">
 
         <!-- HEADER -->
         <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
@@ -34,7 +33,7 @@
               <%= leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200/50'
                 : leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
                 : leave.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200/50'
-                : leave.status === 'CANCELLED' ? 'bg-slate-50 text-slate-500 border-slate-200'
+                : leave.status === 'CANCELED' ? 'bg-slate-50 text-slate-500 border-slate-200'
                 : 'bg-purple-50 text-purple-700 border-purple-200/50'
               %>">
               <%= leave.status %>
@@ -49,187 +48,239 @@
           <!-- RESUBMIT ACTION AREA (IF REJECTED)    -->
           <!-- ===================================== -->
           <% if ((leave.status === 'REJECTED' || leave.status === 'CANCELED') && leave.userId && leave.userId._id.toString() === user._id.toString()) { %>
-  <div class="border border-blue-100 bg-blue-50/30 rounded-xl p-5 flex items-center justify-between">
-    <div>
-      <h2 class="text-sm font-semibold text-blue-900">Pengajuan Dihentikan</h2>
-      <p class="text-[13px] text-blue-700/90 mt-0.5">
-        Anda dapat melakukan penyesuaian data dan mengirim ulang berkas ini kembali.
-      </p>
-    </div>
-    <a href="/leave/resubmit/<%= leave._id %>"
-       class="px-4 py-2 bg-blue-600 text-white text-[13px] font-medium rounded-lg hover:bg-blue-700 transition shadow-sm focus:ring-4 focus:ring-blue-50">
-      Resubmit Pengajuan
-    </a>
-  </div>
-<% } %>
-
-              <!-- ===================================== -->
-              <!-- CORE INFORMATION GRID                 -->
-              <!-- ===================================== -->
+            <div class="border border-blue-100 bg-blue-50/30 rounded-xl p-5 flex items-center justify-between">
               <div>
-                <h2 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3.5">
-                  Informasi Administrasi Utama
-                </h2>
+                <h2 class="text-sm font-semibold text-blue-900">Pengajuan Dihentikan</h2>
+                <p class="text-[13px] text-blue-700/90 mt-0.5">
+                  Anda dapat melakukan penyesuaian data dan mengirim ulang berkas ini kembali.
+                </p>
+              </div>
+              <a href="/leave/resubmit/<%= leave._id %>"
+                 class="px-4 py-2 bg-blue-600 text-white text-[13px] font-medium rounded-lg hover:bg-blue-700 transition shadow-sm focus:ring-4 focus:ring-blue-50">
+                Resubmit Pengajuan
+              </a>
+            </div>
+          <% } %>
 
-                <div class="grid grid-cols-2 gap-x-8 gap-y-5 border border-slate-100 bg-slate-50/20 p-5 rounded-xl">
-                  <div>
-                    <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tipe / Jenis Cuti
-                    </div>
-                    <div class="text-[13px] font-medium text-slate-800">
-                      <%= leave.leaveTypeId.name %> 
-                    </div>
-                  </div>
+          <!-- ===================================== -->
+          <!-- CORE INFORMATION GRID                 -->
+          <!-- ===================================== -->
+          <div>
+            <h2 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3.5">
+              Informasi Administrasi Utama
+            </h2>
 
-                  <div>
-                    <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Total Durasi
-                    </div>
-                    <div class="text-[13px] font-semibold text-slate-900">
-                      <%= leave.totalDays %> Hari Kerja
-                    </div>
-                  </div>
-
-                  <div>
-                    <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal Mulai
-                      Cuti</div>
-                    <div class="text-[13px] font-medium text-slate-800">
-                      <%= leave.startDate ? new Date(leave.startDate).toLocaleDateString('id-ID', { day: '2-digit' ,
-                        month: 'long' , year: 'numeric' }) : '-' %>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal Selesai
-                      Cuti</div>
-                    <div class="text-[13px] font-medium text-slate-800">
-                      <%= leave.endDate ? new Date(leave.endDate).toLocaleDateString('id-ID', { day: '2-digit' ,
-                        month: 'long' , year: 'numeric' }) : '-' %>
-                    </div>
-                  </div>
-
-                  <!-- FIELD HANDOVER USER -->
-                  <div class="col-span-2 border-t border-slate-100/70 pt-3 mt-1">
-                    <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Delegasi Tugas
-                      (Handover To)</div>
-                    <div class="text-[13px] font-medium text-slate-800 flex items-center gap-1.5">
-                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                      </svg>
-                      <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ?
-                        leave.handoverUserId.employeeData.fullName : 'Tidak ada delegasi tugas' %>
-                    </div>
-                  </div>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-5 border border-slate-100 bg-slate-50/20 p-5 rounded-xl">
+              <div>
+                <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tipe / Jenis Cuti</div>
+                <div class="text-[13px] font-medium text-slate-800">
+                  <%= leave.leaveTypeId.name %> 
                 </div>
               </div>
 
-              <!-- ===================================== -->
-              <!-- ADDITIONAL DESCRIPTION                -->
-              <!-- ===================================== -->
-              <div class="border-t border-slate-100 pt-6">
-                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Alasan / Kepentingan
-                  Cuti</div>
-                <div
-                  class="text-[13px] text-slate-600 leading-relaxed max-w-none bg-slate-50/40 border border-slate-100 p-4 rounded-xl">
-                  <%= leave.reason || '-' %>
+              <div>
+                <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Total Durasi</div>
+                <div class="text-[13px] font-semibold text-slate-900">
+                  <%= leave.totalDays %> Hari Kerja
                 </div>
               </div>
 
-              <!-- ===================================== -->
-              <!-- DOCUMENT ATTACHMENT DISPLAY           -->
-              <!-- ===================================== -->
-              <div class="border-t border-slate-100 pt-6">
-                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Lampiran Dokumen
-                  Pendukung</div>
-                <% if (leave.documentPath) { %>
-                  <div
-                    class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-white max-w-xl">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <div
-                        class="w-12 h-12 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5"
-                          viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                        </svg>
-                      </div>
-                      <div class="min-w-0">
-                        <div class="text-[13px] font-medium text-slate-700 truncate">
-                          Berkas_Lampiran_Cuti.pdf
-                        </div>
-                        <div class="text-[11px] text-slate-400 uppercase mt-0.5">
-                          Dokumen Fisik
-                        </div>
-                      </div>
-                    </div>
-                    <a href="<%= leave.documentPath %>" target="_blank"
-                      class="text-xs font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-50 hover:text-blue-700 px-2.5 py-1.5 rounded-lg transition">
-                      View File
-                    </a>
+              <div>
+                <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal Mulai Cuti</div>
+                <div class="text-[13px] font-medium text-slate-800">
+                  <%= leave.startDate ? new Date(leave.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal Selesai Cuti</div>
+                <div class="text-[13px] font-medium text-slate-800">
+                  <%= leave.endDate ? new Date(leave.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %>
+                </div>
+              </div>
+
+              <!-- FIELD HANDOVER USER -->
+              <div class="col-span-2 border-t border-slate-100/70 pt-3 mt-1">
+                <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Delegasi Tugas (Handover To)</div>
+                <div class="text-[13px] font-medium text-slate-800 flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ? leave.handoverUserId.employeeData.fullName : 'Tidak ada delegasi tugas' %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===================================== -->
+          <!-- ADDITIONAL DESCRIPTION                -->
+          <!-- ===================================== -->
+          <div class="border-t border-slate-100 pt-6">
+            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Alasan / Kepentingan Cuti</div>
+            <div class="text-[13px] text-slate-600 leading-relaxed max-w-none bg-slate-50/40 border border-slate-100 p-4 rounded-xl">
+              <%= leave.reason || '-' %>
+            </div>
+          </div>
+
+          <!-- ===================================== -->
+          <!-- DOCUMENT ATTACHMENT DISPLAY           -->
+          <!-- ===================================== -->
+          <div class="border-t border-slate-100 pt-6">
+            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Lampiran Dokumen Pendukung</div>
+            <% if (leave.documentPath) { %>
+              <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-white max-w-xl">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-12 h-12 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
                   </div>
-                  <% } else { %>
-                    <div
-                      class="text-xs text-slate-400 bg-slate-50/50 p-4 rounded-xl border border-dashed border-slate-200 text-center max-w-xl">
-                      Tidak ada berkas dokumen pendukung yang diunggah.
-                    </div>
-                    <% } %>
+                  <div class="min-w-0">
+                    <div class="text-[13px] font-medium text-slate-700 truncate">Berkas_Lampiran_Cuti.pdf</div>
+                    <div class="text-[11px] text-slate-400 uppercase mt-0.5">Dokumen Fisik</div>
+                  </div>
+                </div>
+                <a href="<%= leave.documentPath %>" target="_blank"
+                  class="text-xs font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-50 hover:text-blue-700 px-2.5 py-1.5 rounded-lg transition">
+                  View File
+                </a>
               </div>
+            <% } else { %>
+              <div class="text-xs text-slate-400 bg-slate-50/50 p-4 rounded-xl border border-dashed border-slate-200 text-center max-w-xl">
+                Tidak ada berkas dokumen pendukung yang diunggah.
+              </div>
+            <% } %>
+          </div>
 
-              <!-- ===================================== -->
-              <!-- JEJAK LOG TIMELINE                    -->
-              <!-- ===================================== -->
-              <div class="border-t border-slate-100 pt-6">
-                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Jejak Log
-                  Pemeriksaan (Timeline)</div>
+          <!-- ===================================== -->
+          <!-- DYNAMIC APPROVER ACTION PANEL         -->
+          <!-- ===================================== -->
+          <% 
+            // Cari log pending yang hak-nya sesuai dengan user yang sedang login saat ini
+            const activeApproval = approvals.find(app => {
+  if (app.status !== 'PENDING') return false;
 
-                <div
-                  class="relative pl-5 space-y-5 before:absolute before:left-[4px] before:top-1.5 before:bottom-1.5 before:w-[1px] before:bg-slate-200">
-                  <% approvals.forEach(app=> { %>
-                    <div class="relative group flex flex-col gap-1.5 pb-2">
+  // HANDOVER flow (FIX di sini)
+  if (app.step === 'HANDOVER') {
+    return (
+      leave.handoverUserId &&
+      leave.handoverUserId._id &&
+      leave.handoverUserId._id.toString() === user._id.toString()
+    );
+  }
 
-                      <!-- Custom Indicator Dot -->
-                      <div
-                        class="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full border border-white shadow-sm ring-4 ring-white transition-colors
-          <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
-                      </div>
+  // role-based flow
+  return (app.step || '').toUpperCase() === (user.role || '').toUpperCase();
+});
+          %>
 
-                      <!-- Timeline Metadata -->
-                      <div class="flex items-center gap-3 text-[13px]">
-                        <span class="font-medium text-slate-800">
-                          <!-- Mengambil fullName dari virtual employeeData milik User model -->
-                          <%= (app.approverId && app.approverId.employeeData) ? app.approverId.employeeData.fullName
-                            : 'Sistem Otomatis' %>
-                        </span>
-                        <span class="text-xs text-slate-400 font-normal">
-                          <!-- Menampilkan Step sebagai info Role/Jabatan -->
-                          (<%= app.step %>)
-                        </span>
-                        <span
-                          class="text-[11px] font-medium tracking-wide px-1.5 py-0.5 rounded
-            <%= app.status === 'APPROVED' ? 'bg-emerald-50/60 text-emerald-700' : app.status === 'REJECTED' ? 'bg-rose-50/60 text-rose-700' : 'bg-amber-50/60 text-amber-700' %>">
-                          <%= app.status %>
-                        </span>
-                        <span class="text-[11px] text-slate-400 font-normal ml-auto">
-                          <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit' ,
-                            month: 'short' , year: 'numeric' , hour: '2-digit' , minute:'2-digit'}) : 'Dalam Antrean' %>
-                        </span>
-                      </div>
+          <% if (activeApproval) { %>
+            <div class="border-t border-slate-100 pt-6">
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                <div class="flex items-center gap-2 mb-4">
+                  <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-900">Form Evaluasi & Persetujuan</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Berikan keputusan peninjauan berkas pengajuan selaku <span class="font-bold text-slate-700"><%= activeApproval.step %></span></p>
+                  </div>
+                </div>
 
-                      <!-- Optional Note Display -->
-                      <% if (app.note) { %>
-                        <div
-                          class="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-3 rounded-lg max-w-2xl mt-0.5">
-                          <span
-                            class="text-[10px] font-medium text-slate-400 block uppercase tracking-wider mb-0.5">Catatan
-                            Pemeriksa:</span>
-                          <%= app.note %>
-                        </div>
-                        <% } %>
+                <!-- Input Catatan tunggal yang dibagikan untuk kedua form -->
+                <div class="mb-5">
+                  <label for="reviewNote" class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Catatan Pemeriksa / Alasan (Opsional)
+                  </label>
+                  <textarea 
+                    id="reviewNote" 
+                    name="note" 
+                    rows="3" 
+                    placeholder="Masukkan alasan disetujui atau ditolak..."
+                    class="w-full text-sm text-slate-800 bg-white border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow resize-none"
+                    oninput="document.querySelectorAll('.sync-note').forEach(input => input.value = this.value)"
+                  ></textarea>
+                </div>
 
-                    </div>
-                    <% }) %>
+                <!-- Tombol Aksi Terima dan Tolak Berdampingan -->
+                <div class="flex items-center gap-3">
+                  <!-- Form Terima -->
+                  <% 
+                    // Menentukan endpoint URL secara dinamis berdasarkan jenis alur approval
+                    const approveUrl = activeApproval.step === 'HANDOVER' 
+                      ? `/leave/delegation/approve/${activeApproval._id}` 
+                      : `/leave/approval/approve/${activeApproval._id}`;
+                    
+                    const rejectUrl = activeApproval.step === 'HANDOVER' 
+                      ? `/leave/delegation/reject/${activeApproval._id}` 
+                      : `/leave/approval/reject/${activeApproval._id}`;
+                  %>
+
+                  <form action="<%= approveUrl %>" method="POST" class="inline">
+                    <input type="hidden" name="note" class="sync-note" value="">
+                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer">
+                      Terima & Setujui
+                    </button>
+                  </form>
+
+                  <!-- Form Tolak -->
+                  <form action="<%= rejectUrl %>" method="POST" class="inline">
+                    <input type="hidden" name="note" class="sync-note" value="">
+                    <button type="submit" class="px-5 py-2.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold rounded-xl transition cursor-pointer">
+                      Tolak Pengajuan
+                    </button>
+                  </form>
                 </div>
               </div>
+            </div>
+          <% } %>
+
+          <!-- ===================================== -->
+          <!-- JEJAK LOG TIMELINE                    -->
+          <!-- ===================================== -->
+          <div class="border-t border-slate-100 pt-6">
+            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Jejak Log Pemeriksaan (Timeline)</div>
+
+            <div class="relative pl-5 space-y-5 before:absolute before:left-[4px] before:top-1.5 before:bottom-1.5 before:w-[1px] before:bg-slate-200">
+              <% approvals.forEach(app => { %>
+                <div class="relative group flex flex-col gap-1.5 pb-2">
+
+                  <!-- Custom Indicator Dot -->
+                  <div class="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full border border-white shadow-sm ring-4 ring-white transition-colors
+                    <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
+                  </div>
+
+                  <!-- Timeline Metadata -->
+                  <div class="flex items-center gap-3 text-[13px]">
+                    <span class="font-medium text-slate-800">
+                      <%= (app.approverId && app.approverId.employeeData) ? app.approverId.employeeData.fullName : 'Sistem Otomatis' %>
+                    </span>
+                    <span class="text-xs text-slate-400 font-normal">
+                      (<%= app.step %>)
+                    </span>
+                    <span class="text-[11px] font-medium tracking-wide px-1.5 py-0.5 rounded
+                      <%= app.status === 'APPROVED' ? 'bg-emerald-50/60 text-emerald-700' : app.status === 'REJECTED' ? 'bg-rose-50/60 text-rose-700' : 'bg-amber-50/60 text-amber-700' %>">
+                      <%= app.status %>
+                    </span>
+                    <span class="text-[11px] text-slate-400 font-normal ml-auto">
+                      <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'Dalam Antrean' %>
+                    </span>
+                  </div>
+
+                  <!-- Optional Note Display -->
+                  <% if (app.note) { %>
+                    <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-3 rounded-lg max-w-2xl mt-0.5">
+                      <span class="text-[10px] font-medium text-slate-400 block uppercase tracking-wider mb-0.5">Catatan Pemeriksa:</span>
+                      <%= app.note %>
+                    </div>
+                  <% } %>
+
+                </div>
+              <% }) %>
+            </div>
+          </div>
 
         </div>
       </div>

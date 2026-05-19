@@ -103,19 +103,20 @@
           </div>
 
           <!-- TOTAL HARI (READONLY) -->
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">
-              Durasi Pengajuan Cuti
-            </label>
-            <div class="relative flex items-center">
-              <input type="number" id="totalDays" name="totalDays" readonly required
-                class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-4 pr-24 py-3 text-[14px] font-bold text-slate-800 outline-none select-none"
-                value="<%= leave ? leave.totalDays : 0 %>" />
-              <span class="absolute right-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                Hari Kerja
-              </span>
-            </div>
-          </div>
+<div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">
+    Durasi Pengajuan Cuti
+  </label>
+  <div class="relative flex items-center">
+    <input type="number" id="totalDays" name="totalDays" readonly required
+      class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-4 pr-24 py-3 text-[14px] font-bold text-slate-800 outline-none select-none"
+      value="<%= leave ? leave.totalDays : 0 %>" />
+    <!-- Tambahkan id="duration-label-text" di bawah ini -->
+    <span id="duration-label-text" class="absolute right-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+      Hari Kerja
+    </span>
+  </div>
+</div>
 
           <!-- HANDOVER USER -->
           <div class="space-y-1.5">
@@ -240,104 +241,166 @@
     </div>
   </div>
 
-  <script>
-    const startInput = document.getElementById('startDate');
-    const endInput = document.getElementById('endDate');
-    const totalInput = document.getElementById('totalDays');
-    const fileInput = document.getElementById('file-input');
-    const leaveSelect = document.getElementById('leaveTypeId');
+ <script>
+  const startInput = document.getElementById('startDate');
+  const endInput = document.getElementById('endDate');
+  const totalInput = document.getElementById('totalDays');
+  const fileInput = document.getElementById('file-input');
+  const leaveSelect = document.getElementById('leaveTypeId');
 
-    let currentFileUrl = null;
+  let currentFileUrl = null;
 
-    // 1. Logic Hitung Durasi Hari Kerja
-    function calculateDays() {
-      if (startInput.value && endInput.value) {
-        const start = new Date(startInput.value);
-        const end = new Date(endInput.value);
-        const diffTime = end - start;
-        if (diffTime >= 0) {
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-          totalInput.value = diffDays;
-        } else {
-          totalInput.value = 0;
-        }
-      }
+  // 1. Logic Hitung Durasi Hari Kerja (Di-enhance untuk membedakan Cuti Melahirkan)
+  function calculateDays() {
+    const selectedOption = leaveSelect.options[leaveSelect.selectedIndex];
+    const typeName = selectedOption ? (selectedOption.getAttribute('data-name') || '') : '';
+
+    // Jika tipenya melahirkan, biarkan fungsi khusus melahirkan yang menghitungnya
+    if (typeName.includes('melahirkan')) {
+      calculateMaternityDuration();
+      return;
     }
 
-    startInput.addEventListener('change', calculateDays);
-    endInput.addEventListener('change', calculateDays);
-
-    // 2. Logic Cek Apakah Jenis Cuti Adalah "Sakit"
-    function handleLeaveTypeChange(selectElement) {
-      const selectedOption = selectElement.options[selectElement.selectedIndex];
-      const typeName = selectedOption.getAttribute('data-name') || '';
-
-      const starLabel = document.getElementById('label-required-star');
-      const optionalLabel = document.getElementById('label-optional-text');
-
-      if (typeName.includes('sakit')) {
-        // Jika belum ada file terpilih, buat jadi required
-        if (!fileInput.files || fileInput.files.length === 0) {
-          fileInput.required = true;
-        }
-        starLabel.classList.remove('hidden');
-        optionalLabel.classList.add('hidden');
+    // Jalankan kalkulasi normal bawaan lo untuk tipe cuti lainnya
+    if (startInput.value && endInput.value) {
+      const start = new Date(startInput.value);
+      const end = new Date(endInput.value);
+      const diffTime = end - start;
+      if (diffTime >= 0) {
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        totalInput.value = diffDays;
       } else {
-        fileInput.required = false;
-        starLabel.classList.add('hidden');
-        optionalLabel.classList.remove('hidden');
+        totalInput.value = 0;
       }
     }
+  }
 
-    // Jalankan pengecekan saat halaman load pertama kali (untuk mode EDIT)
-    document.addEventListener("DOMContentLoaded", () => {
-      if(leaveSelect.value) {
-        handleLeaveTypeChange(leaveSelect);
-      }
-    });
+  // Fungsi khusus pendukung perhitungan otomatis 90 Hari Kalender Cuti Melahirkan
+  function calculateMaternityDuration() {
+    if (startInput.value) {
+      const start = new Date(startInput.value);
+      
+      // Tambahkan 90 hari kalender (Aturan UU Ketenagakerjaan)
+      const end = new Date(start);
+      end.setDate(start.getDate() + 90 - 1); // -1 agar hari pertama dihitung sebagai hari ke-1
 
-    // 3. Logic File Upload Viewer & Component State Toggle
-    function handleFileSelect(input) {
-      if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-
-        if (currentFileUrl) {
-          URL.revokeObjectURL(currentFileUrl);
-        }
-
-        currentFileUrl = URL.createObjectURL(file);
-        document.getElementById("view-file-btn").href = currentFileUrl;
-        document.getElementById("name-preview").textContent = file.name;
-
-        const fileSizeInKB = file.size / 1024;
-        if (fileSizeInKB < 1024) {
-          document.getElementById("size-preview").textContent = fileSizeInKB.toFixed(1) + " KB";
-        } else {
-          document.getElementById("size-preview").textContent = (fileSizeInKB / 1024).toFixed(2) + " MB";
-        }
-
-        const imgPreview = document.getElementById("img-preview");
-        const fileIconFallback = document.getElementById("file-icon-fallback");
-
-        if (file.type.startsWith("image/")) {
-          imgPreview.src = currentFileUrl;
-          imgPreview.classList.remove("hidden");
-          fileIconFallback.classList.add("hidden");
-        } else {
-          imgPreview.src = "";
-          imgPreview.classList.add("hidden");
-          fileIconFallback.classList.remove("hidden");
-        }
-
-        document.getElementById("dropzone-empty").classList.add("hidden");
-        document.getElementById("dropzone-filled").classList.remove("hidden");
-        
-        // Sembunyikan star required jika file sudah masuk
-        document.getElementById('label-required-star').classList.add('hidden');
-      }
+      // Format ke YYYY-MM-DD supaya cocok dengan elemen input HTML type="date"
+      endInput.value = end.toISOString().split('T')[0];
+      totalInput.value = 90;
+    } else {
+      endInput.value = '';
+      totalInput.value = 0;
     }
+  }
 
-    function triggerChangeFile() {
-      fileInput.click();
+  startInput.addEventListener('change', calculateDays);
+  endInput.addEventListener('change', calculateDays);
+
+  // 2. Logic Cek Jenis Cuti (Di-enhance untuk menangani Sakit DAN Melahirkan)
+  function handleLeaveTypeChange(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const typeName = selectedOption.getAttribute('data-name') || '';
+
+    const starLabel = document.getElementById('label-required-star');
+    const optionalLabel = document.getElementById('label-optional-text');
+    const durationLabelText = document.getElementById('duration-label-text');
+
+    // KONDISI A: JIKA CUTI MELAHIRKAN
+    if (typeName.includes('melahirkan')) {
+      // Ubah UI label durasi menjadi Hari Kalender
+      if (durationLabelText) durationLabelText.textContent = "Hari Kalender";
+      
+      // Kunci input tanggal selesai dan isi placeholder-nya
+      endInput.readOnly = true;
+      endInput.classList.add('bg-slate-100', 'select-none');
+      endInput.classList.remove('bg-slate-50');
+
+      // Jalankan kalkulasi otomatis
+      calculateMaternityDuration();
+
+      // Urusan lampiran dikembalikan ke opsional (Bukan required)
+      fileInput.required = false;
+      starLabel.classList.add('hidden');
+      optionalLabel.classList.remove('hidden');
+
+    } 
+    // KONDISI B: JIKA CUTI SAKIT (Logika bawaan lo tetap aman di sini)
+    else if (typeName.includes('sakit')) {
+      resetMaternityFormState(durationLabelText);
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        fileInput.required = true;
+      }
+      starLabel.classList.remove('hidden');
+      optionalLabel.classList.add('hidden');
+    } 
+    // KONDISI C: CUTI NORMAL LAINNYA
+    else {
+      resetMaternityFormState(durationLabelText);
+
+      fileInput.required = false;
+      starLabel.classList.add('hidden');
+      optionalLabel.classList.remove('hidden');
+      calculateDays();
     }
-  </script>
+  }
+
+  // Fungsi pembantu untuk mengembalikan form ke setelan normal untuk non-melahirkan
+  function resetMaternityFormState(durationLabelText) {
+    if (durationLabelText) durationLabelText.textContent = "Hari Kerja";
+    endInput.readOnly = false;
+    endInput.classList.remove('bg-slate-100', 'select-none');
+    endInput.classList.add('bg-slate-50');
+  }
+
+  // Jalankan pengecekan saat halaman load pertama kali (untuk mode EDIT / RESUBMIT)
+  document.addEventListener("DOMContentLoaded", () => {
+    if(leaveSelect.value) {
+      handleLeaveTypeChange(leaveSelect);
+    }
+  });
+
+  // 3. Logic File Upload Viewer & Component State Toggle (Tetap fungsi asli lo 100%)
+  function handleFileSelect(input) {
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      if (currentFileUrl) {
+        URL.revokeObjectURL(currentFileUrl);
+      }
+
+      currentFileUrl = URL.createObjectURL(file);
+      document.getElementById("view-file-btn").href = currentFileUrl;
+      document.getElementById("name-preview").textContent = file.name;
+
+      const fileSizeInKB = file.size / 1024;
+      if (fileSizeInKB < 1024) {
+        document.getElementById("size-preview").textContent = fileSizeInKB.toFixed(1) + " KB";
+      } else {
+        document.getElementById("size-preview").textContent = (fileSizeInKB / 1024).toFixed(2) + " MB";
+      }
+
+      const imgPreview = document.getElementById("img-preview");
+      const fileIconFallback = document.getElementById("file-icon-fallback");
+
+      if (file.type.startsWith("image/")) {
+        imgPreview.src = currentFileUrl;
+        imgPreview.classList.remove("hidden");
+        fileIconFallback.classList.add("hidden");
+      } else {
+        imgPreview.src = "";
+        imgPreview.classList.add("hidden");
+        fileIconFallback.classList.remove("hidden");
+      }
+
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
+      
+      document.getElementById('label-required-star').classList.add('hidden');
+    }
+  }
+
+  function triggerChangeFile() {
+    fileInput.click();
+  }
+</script>
