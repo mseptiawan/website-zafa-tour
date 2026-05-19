@@ -140,7 +140,15 @@ export const getLeaveDetail = async (req, res) => {
       .populate({ path: "handoverUserId", populate: { path: "employeeData", select: "fullName" } });
 
     const workflows = await LeaveApproval.find({ leaveId: req.params.id })
-      .populate({ path: "approverId", populate: { path: "employeeData", select: "fullName" } })
+      .populate({
+        path: "approverId",
+        // Isi populate untuk virtual employeeData
+        populate: {
+          path: "employeeData",
+          model: "Employee", // Tegaskan nama model target virtualnya
+          select: "fullName",
+        },
+      })
       .sort({ createdAt: 1 });
 
     // UBAH workflows MENJADI approvals: workflows DI SINI
