@@ -9,7 +9,6 @@ import LeaveType from "../../models/leave/LeaveType.model.js";
 
 dotenv.config();
 
-
 const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
 
 const leaveTypesMaster = [
@@ -33,6 +32,16 @@ const leaveTypesMaster = [
     isActive: true,
     description: "Cuti sakit, wajib surat dokter.",
   },
+  {
+    name: "Cuti Melahirkan",
+    code: "ML", // Ditambahkan code ML agar mudah diidentifikasi logic seeder
+    maxDays: 90,
+    minAdvanceDays: 0,
+    requiresAttachment: false,
+    isDeductBalance: false,
+    isActive: true,
+    description: "Cuti melahirkan diberi waktu 3 bulan.",
+  },
 ];
 
 const leaveReasons = [
@@ -40,6 +49,7 @@ const leaveReasons = [
   "Kondisi badan demam tinggi dan butuh istirahat",
   "Menghadiri wisuda adik kandung",
   "Keperluan mudik hari raya lebih awal",
+  "Persiapan persalinan dan masa nifas", // Tambahan alasan rasional
 ];
 
 const rejectionNotes = [
@@ -63,9 +73,11 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-function createLeaveDateRangeAndDuration() {
+// Menambahkan parameter maxDays untuk menangani kasus durasi panjang khusus
+function createLeaveDateRangeAndDuration(maxDays = null) {
   const startDate = randomDate();
-  const durationDays = Math.floor(Math.random() * 4) + 1;
+  // Jika maxDays di atas 14 hari (seperti cuti melahirkan), set langsung fix durasinya
+  const durationDays = maxDays && maxDays > 14 ? maxDays : Math.floor(Math.random() * 4) + 1;
 
   let totalDays = 0;
   let currentLoopDate = new Date(startDate);
@@ -89,6 +101,7 @@ export default async function leaveSeeder() {
     const users = await User.find({ username: { $in: usernames } });
     if (!users.length) {
       console.log("Error: Target users tidak ditemukan di database.");
+      return;
     }
 
     await LeaveType.deleteMany({});
@@ -121,7 +134,6 @@ export default async function leaveSeeder() {
     for (const user of users) {
       const otherUsers = users.filter((u) => u._id.toString() !== user._id.toString());
 
-      // Cari user spesifik berdasarkan role untuk approver lanjutan
       const managerUser = users.find((u) => u.role === "MANAGER") || otherUsers[0];
       const hrUser = users.find((u) => u.role === "HR") || otherUsers[1];
       const pimpinanUser = users.find((u) => u.role === "PIMPINAN") || otherUsers[2];
@@ -130,11 +142,14 @@ export default async function leaveSeeder() {
         const status = randomItem(statuses);
         const leaveType = randomItem(createdLeaveTypes);
 
-        // Aturan Handover Opsional (Peluang 70% pakai handover, 30% tanpa handover)
+        // Handover dibuat flexible (opsional) sesuai dengan schema rules Anda
         const hasHandover = Math.random() > 0.3;
         const handoverUser = hasHandover ? randomItem(otherUsers) : null;
 
-        const { startDate, endDate, totalDays } = createLeaveDateRangeAndDuration();
+        // PERBAIKAN LOGIC: Mengirimkan maxDays master data ke generator tanggal
+        const { startDate, endDate, totalDays } = createLeaveDateRangeAndDuration(
+          leaveType.maxDays
+        );
         const leaveId = new mongoose.Types.ObjectId();
 
         leavesToInsert.push({
@@ -144,7 +159,10 @@ export default async function leaveSeeder() {
           startDate,
           endDate,
           totalDays,
-          reason: randomItem(leaveReasons),
+          reason:
+            leaveType.code === "ML"
+              ? "Persiapan persalinan dan masa nifas"
+              : randomItem(leaveReasons),
           documentPath: leaveType.requiresAttachment ? "/uploads/documents/surat.pdf" : null,
           status,
           handoverUserId: handoverUser ? handoverUser._id : null,
@@ -153,10 +171,8 @@ export default async function leaveSeeder() {
         });
 
         // =================================================================
-        // SKENARIO FLOW APPROVAL BERTINGKAT SESUAI RULE
+        // SKENARIO FLOW APPROVAL BERTINGKAT
         // =================================================================
-
-        // Tentukan jalur hierarki awal berdasarkan role pengaju jika tanpa handover
         let baseStep = "MANAGER";
         let baseApprover = managerUser;
 
@@ -171,7 +187,6 @@ export default async function leaveSeeder() {
         // --- KONDISI 1: STATUS PENDING ---
         if (status === "PENDING") {
           if (handoverUser) {
-            // Kasus A: Mandek di persetujuan rekan handover
             if (Math.random() > 0.5) {
               approvalsToInsert.push({
                 leaveId,
@@ -181,7 +196,6 @@ export default async function leaveSeeder() {
                 note: "",
               });
             } else {
-              // Kasus B: Handover beres, mandek di hierarki utama
               approvalsToInsert.push(
                 {
                   leaveId,
@@ -201,7 +215,6 @@ export default async function leaveSeeder() {
               );
             }
           } else {
-            // Tanpa handover, langsung mandek di hierarki utama
             approvalsToInsert.push({
               leaveId,
               step: baseStep,
@@ -225,7 +238,6 @@ export default async function leaveSeeder() {
             });
           }
 
-          // Eksekusi urutan jalur manajerial sampai selesai
           if (user.role === "HR") {
             approvalsToInsert.push({
               leaveId,
@@ -245,7 +257,6 @@ export default async function leaveSeeder() {
               actionDate: startDate,
             });
           } else {
-            // Karyawan Biasa: Lewat MANAGER -> Lewat HR
             approvalsToInsert.push(
               {
                 leaveId,
@@ -266,7 +277,6 @@ export default async function leaveSeeder() {
             );
           }
 
-          // Kalkulasi pengurangan jatah cuti tahunan
           if (leaveType.isDeductBalance) {
             const userBalance = balanceData.find(
               (b) => b.userId.toString() === user._id.toString()
@@ -280,7 +290,6 @@ export default async function leaveSeeder() {
 
         // --- KONDISI 3: STATUS REJECTED ---
         else if (status === "REJECTED") {
-          // Kasus A: Ditolak oleh Handover langsung (jika ada handover)
           if (handoverUser && Math.random() > 0.6) {
             approvalsToInsert.push({
               leaveId,
@@ -291,7 +300,6 @@ export default async function leaveSeeder() {
               actionDate: startDate,
             });
           } else {
-            // Lolos handover (jika ada), tapi ditolak di hierarki utama
             if (handoverUser) {
               approvalsToInsert.push({
                 leaveId,
@@ -302,7 +310,6 @@ export default async function leaveSeeder() {
                 actionDate: startDate,
               });
             }
-
             approvalsToInsert.push({
               leaveId,
               step: baseStep,
@@ -316,7 +323,6 @@ export default async function leaveSeeder() {
 
         // --- KONDISI 4: STATUS CANCELLED ---
         else if (status === "CANCELLED") {
-          // Dianggap dibatalkan sepihak oleh pemohon sebelum diproses penuh oleh siapapun
           if (handoverUser) {
             approvalsToInsert.push({
               leaveId,
@@ -352,9 +358,7 @@ export default async function leaveSeeder() {
     console.log(`   - ${leavesToInsert.length} Dokumen Pengajuan Cuti (Leave)`);
     console.log(`   - ${approvalsToInsert.length} Log Langkah Persetujuan (LeaveApproval)`);
     console.log(`\n=== PROSES UPDATE SEEDER BERHASIL DAN BERSIH ===`);
-
   } catch (err) {
     console.error("X Terjadi kegagalan proses pembuatan data seeder:", err);
   }
 }
-
