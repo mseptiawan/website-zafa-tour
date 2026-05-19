@@ -160,6 +160,7 @@ export const getLeaveDetail = async (req, res) => {
       title: "Detail Pengajuan Cuti",
       leave,
       approvals: workflows, // EJS lo bakal ngebaca ini sebagai 'approvals'
+      user: req.user,
     });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
@@ -189,6 +190,7 @@ export const editLeave = async (req, res) => {
       leaveBalance: leaveBalance || { totalQuota: 12, used: 0, remaining: 12 },
       mode: "EDIT",
       leave,
+      error: null,
     });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
@@ -258,11 +260,9 @@ export const cancelPendingLeave = async (req, res) => {
 
     // Sesuaikan pengecekan status (pastikan string-nya seragam "PENDING")
     if (!leave || leave.status !== "PENDING") {
-      return res
-        .status(400)
-        .render("error", {
-          message: "Pembatalan gagal. Pengajuan tidak ditemukan atau sudah diproses.",
-        });
+      return res.status(400).render("error", {
+        message: "Pembatalan gagal. Pengajuan tidak ditemukan atau sudah diproses.",
+      });
     }
 
     // 1. Ubah status induk menjadi CANCELED (Gunakan single 'L' agar singkron dengan filter backend)

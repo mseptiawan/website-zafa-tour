@@ -13,7 +13,7 @@
                 <th class="py-4 px-6">Jenis Cuti</th>
                 <th class="py-4 px-6">Durasi & Tanggal</th>
                 <th class="py-4 px-6">Status Anda</th>
-                <th class="py-4 px-6 text-right">Aksi</th>
+                <th class="py-4 px-6 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-sm">
@@ -37,7 +37,7 @@
                     <%= (del.leaveId && del.leaveId.leaveTypeId) ? del.leaveId.leaveTypeId.name : '-' %>
                   </td>
                   
-                  <!-- Kolom Durasi & Tanggal (Formatted) -->
+                  <!-- Kolom Durasi & Tanggal -->
                   <td class="py-4 px-6 text-xs text-slate-500">
                     <span class="font-semibold text-slate-700 block mb-0.5">
                       <%= del.leaveId ? del.leaveId.totalDays : 0 %> Hari Kerja
@@ -61,28 +61,20 @@
                     </span>
                   </td>
                   
-                  <!-- Kolom Aksi Dinamis -->
-                  <td class="py-4 px-6 text-right space-x-1 whitespace-nowrap">
-                    <!-- Tombol Detail (Bisa diakses kapan saja) -->
+                  <!-- Kolom Aksi (Hanya Icon Tinjau / Mata) -->
+                  <td class="py-4 px-6 text-center whitespace-nowrap">
                     <% if (del.leaveId) { %>
                       <a href="/leave/detail/<%= del.leaveId._id %>" 
-                         class="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold inline-block transition shadow-sm">
-                        Detail
+                         title="Tinjau Permintaan"
+                         class="inline-flex items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 transition shadow-sm group">
+                        <!-- Icon Eye / Tinjau -->
+                        <svg class="w-4 h-4 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                       </a>
-                    <% } %>
-
-                    <!-- Tombol Persetujuan (Hanya muncul jika status masih PENDING) -->
-                    <% if (del.status === 'PENDING') { %>
-                      <form action="/leave/delegation/approve/<%= del._id %>" method="POST" class="inline">
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-2.5 py-1.5 text-xs font-bold cursor-pointer transition shadow-sm">
-                          Terima
-                        </button>
-                      </form>
-                      <form action="/leave/delegation/reject/<%= del._id %>" method="POST" class="inline">
-                        <button type="submit" class="bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 rounded-lg px-2.5 py-1.5 text-xs font-bold cursor-pointer transition shadow-sm">
-                          Tolak
-                        </button>
-                      </form>
+                    <% } else { %>
+                      <span class="text-xs text-slate-400">-</span>
                     <% } %>
                   </td>
                 </tr>

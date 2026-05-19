@@ -48,20 +48,20 @@
           <!-- ===================================== -->
           <!-- RESUBMIT ACTION AREA (IF REJECTED)    -->
           <!-- ===================================== -->
-          <% if (leave.status==='REJECTED' || leave.status==='CANCELLED' ) { %>
-            <div class="border border-blue-100 bg-blue-50/30 rounded-xl p-5 flex items-center justify-between">
-              <div>
-                <h2 class="text-sm font-semibold text-blue-900">Pengajuan Dihentikan</h2>
-                <p class="text-[13px] text-blue-700/90 mt-0.5">
-                  Anda dapat melakukan penyesuaian data dan mengirim ulang berkas ini kembali.
-                </p>
-              </div>
-              <a href="/leave/resubmit/<%= leave._id %>"
-                class="px-4 py-2 bg-blue-600 text-white text-[13px] font-medium rounded-lg hover:bg-blue-700 transition shadow-sm focus:ring-4 focus:ring-blue-50">
-                Resubmit Pengajuan
-              </a>
-            </div>
-            <% } %>
+          <% if ((leave.status === 'REJECTED' || leave.status === 'CANCELED') && leave.userId && leave.userId._id.toString() === user._id.toString()) { %>
+  <div class="border border-blue-100 bg-blue-50/30 rounded-xl p-5 flex items-center justify-between">
+    <div>
+      <h2 class="text-sm font-semibold text-blue-900">Pengajuan Dihentikan</h2>
+      <p class="text-[13px] text-blue-700/90 mt-0.5">
+        Anda dapat melakukan penyesuaian data dan mengirim ulang berkas ini kembali.
+      </p>
+    </div>
+    <a href="/leave/resubmit/<%= leave._id %>"
+       class="px-4 py-2 bg-blue-600 text-white text-[13px] font-medium rounded-lg hover:bg-blue-700 transition shadow-sm focus:ring-4 focus:ring-blue-50">
+      Resubmit Pengajuan
+    </a>
+  </div>
+<% } %>
 
               <!-- ===================================== -->
               <!-- CORE INFORMATION GRID                 -->
