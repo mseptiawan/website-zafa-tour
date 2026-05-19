@@ -132,7 +132,7 @@ export const myLeave = async (req, res) => {
   }
 };
 
-export const getLeaveDetail = async (req, res) => {
+eexport const getLeaveDetail = async (req, res) => {
   try {
     const leave = await Leave.findById(req.params.id)
       .populate("leaveTypeId", "name")
@@ -143,7 +143,12 @@ export const getLeaveDetail = async (req, res) => {
       .populate({ path: "approverId", populate: { path: "employeeData", select: "fullName" } })
       .sort({ createdAt: 1 });
 
-    res.render("leave/detail", { title: "Detail Pengajuan Cuti", leave, workflows });
+    // UBAH workflows MENJADI approvals: workflows DI SINI
+    res.render("leave/detail", { 
+      title: "Detail Pengajuan Cuti", 
+      leave, 
+      approvals: workflows // EJS lo bakal ngebaca ini sebagai 'approvals'
+    });
   } catch (error) {
     res.status(500).render("error", { message: error.message });
   }
