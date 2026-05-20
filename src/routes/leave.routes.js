@@ -19,6 +19,8 @@ import {
   approveLeave,
   rejectLeave,
   getHolidaysPage,
+  updateHoliday,
+  toggleHolidayStatus,
   createHoliday,
   deleteHoliday,
 } from "../controllers/leaveController.js";
@@ -47,8 +49,11 @@ router.get("/leave/manage-calendar", getHolidaysPage);
 // SOLUSI ERROR: Route POST untuk handle submit form tambah hari libur
 router.post("/leave/manage-calendar/create", createHoliday);
 
-// Route DELETE untuk hapus hari libur
-router.delete("/leave/manage-calendar/delete/:id", deleteHoliday);
+// Ganti router.delete lama menjadi patch/post untuk archive
+router.patch("/manage-calendar/toggle/:id", toggleHolidayStatus);
+
+// Tambahkan route POST untuk update data hasil edit
+router.post("/manage-calendar/update/:id", updateHoliday);
 
 // router.get("/leave/approvals", authMiddleware, showApprovals);
 router.post("/leave/approval/approve/:id", authMiddleware, approveLeave);

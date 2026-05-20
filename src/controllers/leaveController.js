@@ -84,6 +84,60 @@ export const createHoliday = async (req, res) => {
   }
 };
 
+export const updateHoliday = async (req, res) => {
+  try {
+    if (req.user.role !== "HR") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Akses ditolak. Hanya HR yang dapat mengubah kalender." });
+    }
+
+    const { id } = req.params;
+    const { name, date, endDate, type, isDeductLeave, isRecurring, description } = req.body;
+
+    const parsedDate = new Date(date);
+    const year = parsedDate.getFullYear();
+
+    await Holiday.findByIdAndUpdate(id, {
+      name,
+      date: parsedDate,
+      endDate: endDate ? new Date(endDate) : null,
+      type,
+      isDeductLeave: isDeductLeave === "true" || isDeductLeave === true,
+      isRecurring: isRecurring === "true" || isRecurring === true,
+      description,
+      year,
+    });
+
+    res.redirect("/leave/manage-calendar?tab=calendar");
+  } catch (error) {
+    res.status(500).render("error", { message: error.message });
+  }
+};
+
+export const toggleHolidayStatus = async (req, res) => {
+  try {
+    if (req.user.role !== "HR") {
+      return res.status(403).json({ success: false, message: "Akses ditolak." });
+    }
+
+    const holiday = await Holiday.findById(req.params.id);
+    if (!holiday) {
+      return res.status(404).json({ success: false, message: "Data tidak ditemukan." });
+    }
+
+    // Toggle status (Jika true jadi false, jika false jadi true)
+    holiday.isActive = !holiday.isActive;
+    await holiday.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Hari libur berhasil ${holiday.isActive ? "diaktifkan kembali" : "dinonaktifkan (diarsipkan)"}.`,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 // Menghapus data hari libur
 export const deleteHoliday = async (req, res) => {
   try {

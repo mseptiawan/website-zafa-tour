@@ -39,6 +39,10 @@ const holidaySchema = new mongoose.Schema(
     year: {
       type: Number,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
