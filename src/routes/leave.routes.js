@@ -12,6 +12,7 @@ import {
   requestCancelApprovedLeave,
   showResubmitLeave,
   myDelegations,
+  getManageLeavePage,
   approveDelegation,
   rejectDelegation,
   showApprovals,
@@ -35,7 +36,8 @@ router.get("/leave/my-delegations", authMiddleware, myDelegations);
 router.post("/leave/delegation/approve/:id", authMiddleware, approveDelegation);
 router.post("/leave/delegation/reject/:id", authMiddleware, rejectDelegation);
 
-router.get("/leave/approvals", authMiddleware, showApprovals);
+router.get("/leave/manage-requests", authMiddleware, getManageLeavePage);
+// router.get("/leave/approvals", authMiddleware, showApprovals);
 router.post("/leave/approval/approve/:id", authMiddleware, approveLeave);
 
 router.post("/leave/approval/reject/:id", authMiddleware, rejectLeave);

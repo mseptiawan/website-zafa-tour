@@ -580,3 +580,33 @@ export const rejectLeave = async (req, res) => {
     res.status(500).render("error", { message: error.message });
   }
 };
+
+// Menampilkan Halaman Manajemen Cuti (Untuk HR dan Manager)
+export const getManageLeavePage = async (req, res) => {
+  try {
+    const userRole = req.user.role;
+    let query = {};
+
+    // Manager dan HR hanya melihat pengajuan yang butuh tindakan mereka atau yang sudah diproses oleh mereka
+    if (userRole === "MANAGER" || userRole === "HR" || userRole === "PIMPINAN") {
+      // Mengambil data approval aktif dan riwayat yang melibatkan user saat ini
+      const structuralApprovals = await LeaveApproval.find({ approverId: req.user._id });
+      const leaveIds = structuralApprovals.map((app) => app.leaveId);
+      query = { _id: { $in: leaveIds } };
+    }
+
+    const allLeaves = await Leave.find(query)
+      .populate("leaveTypeId", "name")
+      .populate({ path: "userId", populate: { path: "employeeData", select: "fullName" } })
+      .sort({ createdAt: -1 });
+
+    res.render("leave/manage-requests", {
+      title: "Manajemen Cuti Karyawan",
+      user: req.user,
+      allLeaves,
+      currentTab: "requests",
+    });
+  } catch (error) {
+    res.status(500).render("error", { message: error.message });
+  }
+};
