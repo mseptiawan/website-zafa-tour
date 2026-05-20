@@ -110,6 +110,31 @@ export function getPermissions(role) {
 
       break;
 
+    case "GENERAL_MANAGER":
+      permissions.leave_request = true;
+      permissions.leave_my = true;
+
+      permissions.overtime_request = true;
+      permissions.overtime_my = true;
+
+      permissions.trip_request = true;
+      permissions.trip_my = true;
+
+      permissions.claim_request = true;
+
+      permissions.kasbon_request = true;
+
+      permissions.attendance_input = true;
+      permissions.attendance_view_my = true;
+      permissions.attendance_correction_view_my = true;
+      permissions.attendance_correction_request = true;
+
+      permissions.task_create = true;
+      permissions.task_view_my = true;
+      permissions.assignment_my = true;
+
+      break;
+
     case "KEUANGAN":
       permissions.leave_request = true;
       permissions.leave_my = true;

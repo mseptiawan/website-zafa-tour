@@ -5,7 +5,7 @@ import User from "../models/User.js";
 import Holiday from "../models/calender/Holiday.model.js";
 import LeaveBalance from "../models/leave/LeaveBalance.model.js";
 import Role from "../models/Role.js";
-
+import LeaveCancellation from "../models/leave/LeaveCancellation.model.js";
 // Definisi Alur Persetujuan berdasarkan Role Pemohon
 const WORKFLOW = {
   STAFF: ["MANAGER", "HR"],
@@ -14,6 +14,71 @@ const WORKFLOW = {
   GENERAL_MANAGER: ["HR"],
   HR: ["PIMPINAN"],
   PIMPINAN: [],
+};
+const calculateWorkDays = async (start, end) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  // Validasi dasar
+  if (endDate < startDate) return 0;
+
+  // 1. Ambil semua libur dari DB dalam rentang tanggal tersebut
+  const holidays = await Holiday.find({
+    date: { $gte: startDate, $lte: endDate },
+  });
+
+  // Ubah format ke string YYYY-MM-DD agar mudah dibandingkan
+  const holidayDates = holidays.map((h) => h.date.toISOString().split("T")[0]);
+
+  let count = 0;
+  let curDate = new Date(startDate);
+
+  while (curDate <= endDate) {
+    const dateStr = curDate.toISOString().split("T")[0];
+    const dayOfWeek = curDate.getDay(); // 0 = Minggu, 6 = Sabtu
+
+    // Kondisi:
+    // - BUKAN hari Minggu (dayOfWeek !== 0)
+    // - BUKAN tanggal yang ada di list hari libur nasional
+    // - (Sabtu/6 tetap dihitung karena PT kamu masuk)
+    const isHoliday = holidayDates.includes(dateStr);
+
+    if (dayOfWeek !== 0 && !isHoliday) {
+      count++;
+    }
+
+    // Geser ke hari berikutnya
+    curDate.setDate(curDate.getDate() + 1);
+  }
+
+  return count;
+};
+
+export const calculateLeaveDays = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Parameter tanggal tidak lengkap",
+      });
+    }
+
+    // Panggil helper di atas
+    const totalDays = await calculateWorkDays(startDate, endDate);
+
+    return res.status(200).json({
+      success: true,
+      totalDays: totalDays,
+    });
+  } catch (error) {
+    console.error("Error calculating leave days:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };
 export const getHolidaysPage = async (req, res) => {
   try {
@@ -220,34 +285,48 @@ export const showApplyLeave = async (req, res) => {
     res.status(500).render("error", { title: "show apply leave error", message: error.message });
   }
 };
-
 export const applyLeave = async (req, res) => {
   try {
-    const { leaveTypeId, startDate, endDate, totalDays, reason, handoverUserId } = req.body;
+    const { leaveTypeId, startDate, endDate, reason, handoverUserId } = req.body;
     const requester = req.session.user;
     const documentPath = req.file ? `/uploads/files/${req.file.filename}` : null;
 
+    // 1. HITUNG ULANG totalDays di sisi Server (Single Source of Truth)
+    // Gunakan fungsi calculateWorkDays yang sudah kamu buat sebelumnya
+    const finalTotalDays = await calculateWorkDays(startDate, endDate);
+
+    // 2. Validasi: Pastikan saldo cukup sebelum create apapun
+    const currentYear = new Date(startDate).getFullYear();
+    const balance = await LeaveBalance.findOne({ userId: requester._id, year: currentYear });
+
+    if (!balance || balance.remaining < finalTotalDays) {
+      return res.status(400).json({
+        success: false,
+        message: "Saldo cuti tidak mencukupi untuk durasi tersebut.",
+      });
+    }
+
+    // 3. Create Leave dengan totalDays yang sudah divalidasi server
     const newLeave = await Leave.create({
       userId: requester._id,
       leaveTypeId,
       startDate,
       endDate,
-      totalDays,
+      totalDays: finalTotalDays, // PENTING: Pakai hasil hitung server, bukan dari req.body
       reason,
       documentPath,
       handoverUserId: handoverUserId || null,
       status: "PENDING",
     });
 
+    // ... (sisa logika workflow kamu tetap sama)
     let currentStep = "";
     let approverId = null;
 
-    // Jika ada tugas mandatoris penyerahan berkas (Handover)
     if (handoverUserId) {
       currentStep = "HANDOVER";
       approverId = handoverUserId;
     } else {
-      // Jika tanpa handover, langsung cari tahapan pertama berdasarkan rule WORKFLOW
       const { nextStep, nextApproverId } = await getNextApprover(requester.role, null);
       currentStep = nextStep;
       approverId = nextApproverId;
@@ -261,22 +340,18 @@ export const applyLeave = async (req, res) => {
         status: "PENDING",
       });
     } else {
-      // Skenario khusus jika role tersebut tidak butuh persetujuan sama sekali (ex: PIMPINAN)
       newLeave.status = "APPROVED";
       await newLeave.save();
 
-      const currentYear = new Date(startDate).getFullYear();
-      const balance = await LeaveBalance.findOne({ userId: requester._id, year: currentYear });
-      if (balance) {
-        balance.used += Number(totalDays);
-        balance.remaining -= Number(totalDays);
-        await balance.save();
-      }
+      // Gunakan finalTotalDays untuk potong saldo
+      balance.used += Number(finalTotalDays);
+      balance.remaining -= Number(finalTotalDays);
+      await balance.save();
     }
 
     res.redirect("/leave/my-history");
   } catch (error) {
-    console.error(error);
+    console.error("Error pada applyLeave:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -480,34 +555,75 @@ export const cancelPendingLeave = async (req, res) => {
 
 export const requestCancelApprovedLeave = async (req, res) => {
   try {
-    const leave = await Leave.findById(req.params.id);
-    if (!leave || leave.status !== "APPROVED") {
-      return res
-        .status(400)
-        .render("error", { title: "request cancel error", message: "Status cuti tidak valid." });
+    const { reason } = req.body;
+    const sessionUser = req.session.user;
+
+    if (!sessionUser) {
+      return res.redirect("/?error=SESSION_EXPIRED");
     }
 
-    leave.status = "CANCELLED";
+    // 1. Cari data cuti utama yang statusnya APPROVED
+    const leave = await Leave.findOne({
+      _id: req.params.id,
+      userId: sessionUser._id,
+      status: "APPROVED",
+    });
+
+    if (!leave) {
+      return res.status(404).render("error", {
+        title: "Error",
+        message: "Data cuti tidak ditemukan atau tidak valid untuk dibatalkan.",
+      });
+    }
+
+    // 2. Ubah status induk cuti menjadi CANCELLATION_PENDING (Pastikan enum di model Leave sudah ditambah)
+    leave.status = "CANCELLATION_PENDING";
     await leave.save();
 
-    const currentYear = new Date(leave.startDate).getFullYear();
-    const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
-    if (balance) {
-      balance.used -= leave.totalDays;
-      balance.remaining += leave.totalDays;
-      await balance.save();
+    // 3. Simpan data detail pembatalan ke tabel baru (LeaveCancellation) untuk log audit
+    await LeaveCancellation.create({
+      leaveId: leave._id,
+      requestedBy: sessionUser._id,
+      cancelReason: reason || "Mengajukan pembatalan cuti.",
+      status: "PENDING",
+    });
+
+    // 4. Tentukan target step workflow (HR atau PIMPINAN)
+    // Ingat: properti role di sessionUser diambil sesuai implementasi login kamu (contoh: sessionUser.role atau tembus via roleId)
+    let targetStep = "HR";
+    if (sessionUser.role === "HR" || (sessionUser.roleId && sessionUser.roleId.name === "HR")) {
+      targetStep = "PIMPINAN";
     }
 
-    res.redirect("/leave/my-history");
-  } catch (error) {
-    // PERBAIKAN: Tambahkan title di block catch error
-    return res.status(500).render("error", {
-      title: "Error Sistem",
-      message: error.message,
+    const roleDoc = await Role.findOne({ name: targetStep });
+    if (!roleDoc) {
+      return res
+        .status(500)
+        .render("error", { title: "Error", message: `Role ${targetStep} tidak ditemukan.` });
+    }
+
+    const targetApprover = await User.findOne({ roleId: roleDoc._id });
+    if (!targetApprover) {
+      return res.status(404).render("error", {
+        title: "Error",
+        message: `Akun untuk ${targetStep} belum terdaftar di sistem.`,
+      });
+    }
+
+    // 5. Masukkan ke antrean approval agar muncul di menu kelola milik HR / PIMPINAN
+    await LeaveApproval.create({
+      leaveId: leave._id,
+      step: targetStep,
+      approverId: targetApprover._id,
+      status: "PENDING",
+      note: reason || "Mengajukan pembatalan cuti.",
     });
+
+    return res.redirect("/leave/my-requests");
+  } catch (error) {
+    res.status(500).render("error", { title: "Error", message: error.message });
   }
 };
-
 export const showResubmitLeave = async (req, res) => {
   try {
     const userId = req.user._id;

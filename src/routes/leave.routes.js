@@ -19,6 +19,7 @@ import {
   approveLeave,
   rejectLeave,
   getHolidaysPage,
+  calculateLeaveDays,
   updateHoliday,
   toggleHolidayStatus,
   createHoliday,
@@ -42,6 +43,8 @@ router.post("/leave/delegation/approve/:id", authMiddleware, approveDelegation);
 router.post("/leave/delegation/reject/:id", authMiddleware, rejectDelegation);
 
 router.get("/leave/manage-requests", authMiddleware, getManageLeavePage);
+
+router.get("/api/leave/calculate-days", authMiddleware, calculateLeaveDays);
 
 // Route untuk menampilkan halaman kalender
 router.get("/leave/manage-calendar", getHolidaysPage);
