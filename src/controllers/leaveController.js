@@ -341,8 +341,8 @@ export const showResubmitLeave = async (req, res) => {
 
 export const myDelegations = async (req, res) => {
   try {
-    // 1. Ambil data approval yang ditujukan ke user saat ini
-    const rawDelegations = await LeaveApproval.find({
+    // 1. Ambil data approval AKTIF (PENDING) yang ditujukan ke user saat ini
+    const rawActiveDelegations = await LeaveApproval.find({
       approverId: req.user._id,
       step: "HANDOVER",
       status: "PENDING",
@@ -354,16 +354,35 @@ export const myDelegations = async (req, res) => {
       ],
     });
 
-    // 2. PROSES FILTER SINKRONISASI:
-    // Pastikan data leaveId ada (tidak null) DAN status cuti utamanya masih benar-benar "PENDING"
-    const filteredDelegations = rawDelegations.filter((del) => {
+    // 2. Ambil data RIWAYAT (APPROVED / REJECTED) yang ditujukan ke user saat ini
+    const rawHistoryDelegations = await LeaveApproval.find({
+      approverId: req.user._id,
+      step: "HANDOVER",
+      status: { $in: ["APPROVED", "REJECTED"] },
+    }).populate({
+      path: "leaveId",
+      populate: [
+        { path: "userId", populate: { path: "employeeData", select: "fullName" } },
+        { path: "leaveTypeId", select: "name" },
+      ],
+    });
+
+    // 3. PROSES FILTER SINKRONISASI (Fungsi asli tetap dipertahankan):
+    // Pastikan data leaveId ada (not null) DAN status cuti utamanya sesuai
+    const filteredActive = rawActiveDelegations.filter((del) => {
       return del.leaveId && del.leaveId.status === "PENDING";
     });
 
-    // 3. Kirim hasil filter yang sudah bersih ke file EJS lo
+    // Untuk riwayat, validasi data leaveId tetap ada
+    const filteredHistory = rawHistoryDelegations.filter((del) => {
+      return del.leaveId;
+    });
+
+    // 4. Kirim kedua data hasil filter ke file EJS
     res.render("leave/delegation", {
       title: "Delegasi Tugas Saya",
-      delegations: filteredDelegations,
+      delegations: filteredActive,
+      historyDelegations: filteredHistory,
     });
   } catch (error) {
     res.status(500).render("error", { message: error.message });

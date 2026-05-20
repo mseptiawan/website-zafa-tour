@@ -85,7 +85,7 @@ export function getPermissions(role) {
     // =========================
     // STAFF (KARYAWAN)
     // =========================
-    case "KARYAWAN":
+    case "STAFF":
       permissions.leave_request = true;
       permissions.leave_my = true;
 
