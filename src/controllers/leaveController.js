@@ -552,7 +552,6 @@ export const cancelPendingLeave = async (req, res) => {
     });
   }
 };
-
 export const requestCancelApprovedLeave = async (req, res) => {
   try {
     const { reason } = req.body;
@@ -562,7 +561,7 @@ export const requestCancelApprovedLeave = async (req, res) => {
       return res.redirect("/?error=SESSION_EXPIRED");
     }
 
-    // 1. Cari data cuti utama yang statusnya APPROVED
+    // 1. Cari data cuti utama yang statusnya APPROVED milik user yang sedang login
     const leave = await Leave.findOne({
       _id: req.params.id,
       userId: sessionUser._id,
@@ -571,16 +570,16 @@ export const requestCancelApprovedLeave = async (req, res) => {
 
     if (!leave) {
       return res.status(404).render("error", {
-        title: "Error",
+        title: "Error Pembatalan",
         message: "Data cuti tidak ditemukan atau tidak valid untuk dibatalkan.",
       });
     }
 
-    // 2. Ubah status induk cuti menjadi CANCELLATION_PENDING (Pastikan enum di model Leave sudah ditambah)
+    // 2. Ubah status induk cuti menjadi CANCELLATION_PENDING
     leave.status = "CANCELLATION_PENDING";
     await leave.save();
 
-    // 3. Simpan data detail pembatalan ke tabel baru (LeaveCancellation) untuk log audit
+    // 3. Simpan data detail pembatalan ke tabel LeaveCancellation untuk log audit
     await LeaveCancellation.create({
       leaveId: leave._id,
       requestedBy: sessionUser._id,
@@ -588,29 +587,37 @@ export const requestCancelApprovedLeave = async (req, res) => {
       status: "PENDING",
     });
 
-    // 4. Tentukan target step workflow (HR atau PIMPINAN)
-    // Ingat: properti role di sessionUser diambil sesuai implementasi login kamu (contoh: sessionUser.role atau tembus via roleId)
-    let targetStep = "HR";
-    if (sessionUser.role === "HR" || (sessionUser.roleId && sessionUser.roleId.name === "HR")) {
-      targetStep = "PIMPINAN";
+    // 4. PEMBENTUKAN WORKFLOW PEMBATALAN SESUAI KEBUTUHAN KAMU
+    let targetStep = "HR"; // Default target untuk MANAGER dan GENERAL_MANAGER
+
+    // Ambil string role dan normalkan (contoh: "STAFF", "KEUANGAN", "HR")
+    const userRole = (sessionUser.role || "").toString().trim().toUpperCase();
+
+    if (userRole === "STAFF" || userRole === "KEUANGAN") {
+      targetStep = "MANAGER"; // Staff & Keuangan wajib disetujui Manager dulu
+    } else if (userRole === "HR") {
+      targetStep = "PIMPINAN"; // Jika HR yang cuti, lempar langsung ke Pimpinan
     }
 
+    // 5. Cari dokumen Role berdasarkan nama targetStep
     const roleDoc = await Role.findOne({ name: targetStep });
     if (!roleDoc) {
-      return res
-        .status(500)
-        .render("error", { title: "Error", message: `Role ${targetStep} tidak ditemukan.` });
-    }
-
-    const targetApprover = await User.findOne({ roleId: roleDoc._id });
-    if (!targetApprover) {
-      return res.status(404).render("error", {
-        title: "Error",
-        message: `Akun untuk ${targetStep} belum terdaftar di sistem.`,
+      return res.status(500).render("error", {
+        title: "Error Sistem Workflow",
+        message: `Struktur Role tingkat ${targetStep} tidak ditemukan di database.`,
       });
     }
 
-    // 5. Masukkan ke antrean approval agar muncul di menu kelola milik HR / PIMPINAN
+    // 6. Cari user yang menjabat role tersebut untuk ditugaskan sebagai approver
+    const targetApprover = await User.findOne({ roleId: roleDoc._id });
+    if (!targetApprover) {
+      return res.status(404).render("error", {
+        title: "Approver Tidak Ditemukan",
+        message: `Akun penanggung jawab untuk posisi ${targetStep} belum terdaftar di sistem.`,
+      });
+    }
+
+    // 7. Masukkan berkas pembatalan ke antrean LeaveApproval target
     await LeaveApproval.create({
       leaveId: leave._id,
       step: targetStep,
@@ -619,9 +626,11 @@ export const requestCancelApprovedLeave = async (req, res) => {
       note: reason || "Mengajukan pembatalan cuti.",
     });
 
-    return res.redirect("/leave/my-requests");
+    // 8. Redirect kembali ke riwayat cuti saya
+    return res.redirect("/leave/my-history");
   } catch (error) {
-    res.status(500).render("error", { title: "Error", message: error.message });
+    console.error("Error pada requestCancelApprovedLeave:", error);
+    return res.status(500).render("error", { title: "Error Sistem", message: error.message });
   }
 };
 export const showResubmitLeave = async (req, res) => {
