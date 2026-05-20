@@ -14,7 +14,85 @@ const WORKFLOW = {
   HR: ["PIMPINAN"],
   PIMPINAN: [],
 };
+export const getHolidaysPage = async (req, res) => {
+  try {
+    const userRole = req.user.role;
+    let query = {};
 
+    // Filter data pengajuan agar approver hanya melihat data yang melibatkan mereka
+    if (["MANAGER", "HR", "PIMPINAN"].includes(userRole)) {
+      const structuralApprovals = await LeaveApproval.find({ approverId: req.user._id });
+      const leaveIds = structuralApprovals.map((app) => app.leaveId);
+      query = { _id: { $in: leaveIds } };
+    }
+
+    // 1. Ambil data pengajuan cuti masal
+    const allLeaves = await Leave.find(query)
+      .populate("leaveTypeId", "name")
+      .populate({ path: "userId", populate: { path: "employeeData", select: "fullName" } })
+      .sort({ createdAt: -1 });
+
+    // Pisahkan data pengajuan aktif vs selesai
+    const activeLeaves = allLeaves.filter((leave) => leave.status === "PENDING");
+    const historyLeaves = allLeaves.filter((leave) => leave.status !== "PENDING");
+
+    // 2. Ambil data Kalender Libur (untuk tahun ini)
+    const currentYear = new Date().getFullYear();
+    const selectedYear = req.query.year ? parseInt(req.query.year) : currentYear;
+
+    const holidays = await Holiday.find({
+      $or: [{ year: selectedYear }, { isRecurring: true }],
+    }).sort({ date: 1 });
+
+    // SOLUSI: Arahkan ke file views/leave/manage-center.ejs yang menyatukan semua tab
+    res.render("leave/manage-center", {
+      title: "Pusat Manajemen Cuti",
+      user: req.user,
+      activeLeaves,
+      historyLeaves,
+      holidays,
+      selectedYear,
+    });
+  } catch (error) {
+    res.status(500).render("error", { message: error.message });
+  }
+};
+
+// Menambahkan Hari Libur / Cuti Bersama baru
+export const createHoliday = async (req, res) => {
+  try {
+    const { name, date, endDate, type, isDeductLeave, isRecurring, description } = req.body;
+
+    const parsedDate = new Date(date);
+    const year = parsedDate.getFullYear();
+
+    await Holiday.create({
+      name,
+      date: parsedDate,
+      endDate: endDate ? new Date(endDate) : null,
+      type,
+      isDeductLeave: isDeductLeave === "true" || isDeductLeave === true,
+      isRecurring: isRecurring === "true" || isRecurring === true,
+      description,
+      year,
+    });
+
+    // SOLUSI: Setelah submit form, kembalikan (redirect) ke endpoint utama halaman pusat manajemen
+    res.redirect("/leave/manage-calendar");
+  } catch (error) {
+    res.status(500).render("error", { message: error.message });
+  }
+};
+
+// Menghapus data hari libur
+export const deleteHoliday = async (req, res) => {
+  try {
+    await Holiday.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: "Hari libur berhasil dihapus." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 // Helper untuk mencari langkah persetujuan berikutnya setelah langkah saat ini selesai
 async function getNextApprover(requesterRole, currentStep) {
   const steps = WORKFLOW[requesterRole] || [];
@@ -580,31 +658,44 @@ export const rejectLeave = async (req, res) => {
     res.status(500).render("error", { message: error.message });
   }
 };
-
-// Menampilkan Halaman Manajemen Cuti (Untuk HR dan Manager)
 export const getManageLeavePage = async (req, res) => {
   try {
     const userRole = req.user.role;
     let query = {};
 
-    // Manager dan HR hanya melihat pengajuan yang butuh tindakan mereka atau yang sudah diproses oleh mereka
-    if (userRole === "MANAGER" || userRole === "HR" || userRole === "PIMPINAN") {
-      // Mengambil data approval aktif dan riwayat yang melibatkan user saat ini
+    // Filter data pengajuan agar approver hanya melihat data yang melibatkan mereka
+    if (["MANAGER", "HR", "PIMPINAN"].includes(userRole)) {
       const structuralApprovals = await LeaveApproval.find({ approverId: req.user._id });
       const leaveIds = structuralApprovals.map((app) => app.leaveId);
       query = { _id: { $in: leaveIds } };
     }
 
+    // 1. Ambil data pengajuan cuti masal
     const allLeaves = await Leave.find(query)
       .populate("leaveTypeId", "name")
       .populate({ path: "userId", populate: { path: "employeeData", select: "fullName" } })
       .sort({ createdAt: -1 });
 
-    res.render("leave/manage-requests", {
-      title: "Manajemen Cuti Karyawan",
+    // Pisahkan data pengajuan aktif vs selesai
+    const activeLeaves = allLeaves.filter((leave) => leave.status === "PENDING");
+    const historyLeaves = allLeaves.filter((leave) => leave.status !== "PENDING");
+
+    // 2. Ambil data Kalender Libur (untuk tahun ini)
+    const currentYear = new Date().getFullYear();
+    const selectedYear = req.query.year ? parseInt(req.query.year) : currentYear;
+
+    const holidays = await Holiday.find({
+      $or: [{ year: selectedYear }, { isRecurring: true }],
+    }).sort({ date: 1 });
+
+    // 3. Render satu halaman tunggal membawa seluruh payload data
+    res.render("leave/manage-center", {
+      title: "Pusat Manajemen Cuti",
       user: req.user,
-      allLeaves,
-      currentTab: "requests",
+      activeLeaves,
+      historyLeaves,
+      holidays,
+      selectedYear,
     });
   } catch (error) {
     res.status(500).render("error", { message: error.message });

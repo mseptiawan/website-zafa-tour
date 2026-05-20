@@ -168,40 +168,17 @@
                               cuti</a>
                             <% } %>
 
-                              <!-- APPROVAL MANAGER -->
-                              <% if (user.role==='MANAGER' ) { %>
-                                <a href="/leave/approval/manager"
-                                  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                  Approval Cuti
-                                </a>
-                                <% } %>
 
 
-                                  <!-- APPROVAL HR -->
-                                  <% if (user.role==='HR' ) { %>
-                                    <a href="/leave/approval/hr"
-                                      class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                      Approval Cuti
-                                    </a>
-                                    <% } %>
                                       <a href="/leave/my-delegations"
                                         class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
                                         Delegasi Saya
                                       </a>
 
-                                      <% if (user.role==='PIMPINAN' ) { %>
-                                        <a href="/leave/approval/pimpinan"
+                                        <a href="/leave/manage-requests"
                                           class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                          Approval Cuti
+                                          Manajemen Cuti
                                         </a>
-                                        <% } %>
-                                          <% if (user.permissions.leave_all) { %>
-
-                                            <a href="/leave/all"
-                                              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                              Semua Pengajuan
-                                            </a>
-                                            <% } %>
                     </div>
                   </details>
 

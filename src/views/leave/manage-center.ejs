@@ -1,0 +1,316 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header Utama -->
+    <div class="mb-6">
+      <h1 class="text-xl font-bold text-slate-900 mb-1">Pusat Administrasi Cuti</h1>
+      <p class="text-xs text-slate-500">Persetujuan permohonan staf, arsip riwayat, beserta konfigurasi hari libur nasional secara terpusat.</p>
+    </div>
+
+    <!-- TAB NAVIGATION COMPONENT (Single Page Tab) -->
+    <div class="flex items-center gap-2 mb-6 border-b border-slate-200/60 pb-px">
+      <button type="button" onclick="switchTab('active')" id="tab-btn-active"
+        class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5">
+        Permintaan Aktif
+        <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-blue-50 text-blue-600 rounded-md tabular-nums font-bold">
+          <%= activeLeaves.length %>
+        </span>
+      </button>
+
+      <button type="button" onclick="switchTab('history')" id="tab-btn-history"
+        class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5">
+        Riwayat Persetujuan
+        <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">
+          <%= historyLeaves.length %>
+        </span>
+      </button>
+
+      <button type="button" onclick="switchTab('calendar')" id="tab-btn-calendar"
+        class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5">
+        <i class="fa-solid fa-calendar-days text-[11px] text-slate-400"></i> Kelola Kalender
+        <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">
+          <%= holidays.length %>
+        </span>
+      </button>
+    </div>
+
+    <!-- ================== ZONE TAB 1: PERMINTAAN AKTIF ================== -->
+    <div id="tab-content-active" class="tab-pane block">
+      <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-[13px] font-bold text-slate-800">Menunggu Review Anda</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+                <th class="px-5 py-3">Nama Karyawan</th>
+                <th class="px-5 py-3">Tipe Cuti</th>
+                <th class="px-5 py-3">Tanggal Pelaksanaan</th>
+                <th class="px-5 py-3 text-center">Durasi</th>
+                <th class="px-5 py-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+              <% if (activeLeaves.length === 0) { %>
+                <tr>
+                  <td colspan="5" class="px-5 py-12 text-center text-slate-400">
+                    <i class="fa-regular fa-circle-check text-3xl mb-2 block text-slate-300"></i>
+                    Bersih! Tidak ada permohonan cuti aktif yang memerlukan tindakan Anda.
+                  </td>
+                </tr>
+              <% } else { %>
+                <% activeLeaves.forEach(leave => { %>
+                  <tr class="hover:bg-slate-50/50 transition duration-150">
+                    <td class="px-5 py-4 font-bold text-slate-900">
+                      <%= leave.userId && leave.userId.employeeData ? leave.userId.employeeData.fullName : "Karyawan" %>
+                    </td>
+                    <td class="px-5 py-4">
+                      <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600"><%= leave.leaveTypeId.name %></span>
+                    </td>
+                    <td class="px-5 py-4 text-slate-500">
+                      <%= new Date(leave.startDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) %> 
+                      <span class="text-slate-300 mx-1">s/d</span> 
+                      <%= new Date(leave.endDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+                    </td>
+                    <td class="px-5 py-4 text-center font-bold text-blue-600 tabular-nums"><%= leave.totalDays %> Hari</td>
+                    <td class="px-5 py-4 text-center">
+                      <a href="/leave/detail/<%= leave._id %>" class="inline-flex items-center gap-1 px-2.5 py-1.5 border border-slate-200 text-[11px] font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition duration-150">
+                        <i class="fa-solid fa-signature text-slate-400"></i> Periksa Cuti
+                      </a>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== ZONE TAB 2: RIWAYAT PERSETUJUAN ================== -->
+    <div id="tab-content-history" class="tab-pane hidden">
+      <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-[13px] font-bold text-slate-800">Arsip Pengajuan Selesai</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+                <th class="px-5 py-3">Nama Karyawan</th>
+                <th class="px-5 py-3">Tipe Cuti</th>
+                <th class="px-5 py-3">Tanggal Pelaksanaan</th>
+                <th class="px-5 py-3 text-center">Durasi</th>
+                <th class="px-5 py-3">Status Final</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+              <% if (historyLeaves.length === 0) { %>
+                <tr>
+                  <td colspan="5" class="px-5 py-12 text-center text-slate-400">
+                    <i class="fa-regular fa-folder text-3xl mb-2 block text-slate-300"></i>
+                    Belum ada riwayat arsip pemrosesan dokumen cuti.
+                  </td>
+                </tr>
+              <% } else { %>
+                <% historyLeaves.forEach(leave => { %>
+                  <tr class="hover:bg-slate-50/50 transition duration-150">
+                    <td class="px-5 py-4 font-bold text-slate-900">
+                      <%= leave.userId && leave.userId.employeeData ? leave.userId.employeeData.fullName : "Karyawan" %>
+                    </td>
+                    <td class="px-5 py-4">
+                      <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600"><%= leave.leaveTypeId.name %></span>
+                    </td>
+                    <td class="px-5 py-4 text-slate-500">
+                      <%= new Date(leave.startDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) %> 
+                      <span class="text-slate-300 mx-1">s/d</span> 
+                      <%= new Date(leave.endDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+                    </td>
+                    <td class="px-5 py-4 text-center font-medium text-slate-600 tabular-nums"><%= leave.totalDays %> Hari</td>
+                    <td class="px-5 py-4">
+                      <% if(leave.status === 'APPROVED') { %>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60"><i class="fa-solid fa-circle-check text-[10px]"></i> Disetujui</span>
+                      <% } else { %>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60"><i class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== ZONE TAB 3: KELOLA KALENDER ================== -->
+    <div id="tab-content-calendar" class="tab-pane hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- FORM INPUT HARI LIBUR BARU (KHUSUS HR) -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200/60 shadow-sm">
+          <h3 class="text-[13px] font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus text-blue-600"></i> Tambah Hari Libur
+          </h3>
+          
+          <% if (user.role !== 'HR') { %>
+            <div class="p-3 bg-amber-50/70 rounded-lg text-[11px] text-amber-800 border border-amber-200/50 mb-3">
+              <i class="fa-solid fa-circle-info text-amber-600"></i> Form dinonaktifkan. Hanya divisi/role <strong>HR</strong> yang memiliki hak modifikasi kalender perusahaan.
+            </div>
+          <% } %>
+
+          <form action="/leave/manage-calendar/create" method="POST" class="space-y-3.5">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Nama Hari Libur / Agenda</label>
+              <input type="text" name="name" required placeholder="Contoh: Cuti Bersama Lebaran" 
+                class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none placeholder-slate-400 text-slate-800" <%= user.role !== 'HR' ? 'disabled' : '' %>>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Mulai Tanggal</label>
+                <input type="date" name="date" required 
+                  class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800" <%= user.role !== 'HR' ? 'disabled' : '' %>>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Selesai (Opsional)</label>
+                <input type="date" name="endDate" 
+                  class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800" <%= user.role !== 'HR' ? 'disabled' : '' %>>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Kategori Libur</label>
+              <select name="type" required 
+                class="w-full rounded-lg border-slate-200 border p-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800" <%= user.role !== 'HR' ? 'disabled' : '' %>>
+                <option value="NATIONAL">Nasional (Tanggal Merah)</option>
+                <option value="COMPANY">Internal Perusahaan</option>
+                <option value="RELIGIOUS">Keagamaan</option>
+              </select>
+            </div>
+
+            <div class="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-100 text-xs">
+              <label class="flex items-center gap-2 text-slate-700 cursor-pointer font-medium">
+                <input type="checkbox" name="isDeductLeave" value="true" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20" <%= user.role !== 'HR' ? 'disabled' : '' %>>
+                <span>Potong Kuota Cuti Tahunan?</span>
+              </label>
+              <label class="flex items-center gap-2 text-slate-700 cursor-pointer font-medium">
+                <input type="checkbox" name="isRecurring" value="true" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20" <%= user.role !== 'HR' ? 'disabled' : '' %>>
+                <span>Berulang Setiap Tahun?</span>
+              </label>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Keterangan</label>
+              <textarea name="description" rows="2" placeholder="Catatan opsional..." 
+                class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none placeholder-slate-400 text-slate-800" <%= user.role !== 'HR' ? 'disabled' : '' %>></textarea>
+            </div>
+
+            <button type="submit" 
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs shadow-sm transition duration-150 flex items-center justify-center gap-1.5" <%= user.role !== 'HR' ? 'disabled' : 'style=cursor:pointer' %>>
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Agenda
+            </button>
+          </form>
+        </div>
+
+        <!-- LIST HARI LIBUR AKTIF -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200/60 shadow-sm lg:col-span-2">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-[13px] font-bold text-slate-800">Agenda Terdaftar Tahun <%= selectedYear %></h3>
+            
+            <form method="GET" action="/leave/manage-requests">
+              <select name="year" onchange="this.form.submit()" class="border border-slate-200 rounded-lg py-1 px-2 text-xs font-bold text-slate-700 bg-white focus:outline-none cursor-pointer">
+                <% const yr = new Date().getFullYear(); %>
+                <option value="<%= yr %>" <%= selectedYear === yr ? 'selected' : '' %>><%= yr %></option>
+                <option value="<%= yr + 1 %>" <%= selectedYear === (yr + 1) ? 'selected' : '' %>><%= yr + 1 %></option>
+              </select>
+            </form>
+          </div>
+
+          <div class="space-y-2">
+            <% if (holidays.length === 0) { %>
+              <div class="text-center py-10 text-slate-400 text-xs">Belum ada agenda libur terdaftar.</div>
+            <% } else { %>
+              <% holidays.forEach(h => { %>
+                <div class="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-slate-200/80 bg-slate-50/40 transition duration-150">
+                  <div class="flex items-center gap-3.5">
+                    <div class="p-2 rounded-lg text-center font-bold text-[13px] min-w-[52px] tabular-nums <%= h.isDeductLeave ? 'bg-rose-50 text-rose-700 border border-rose-100' : 'bg-blue-50 text-blue-700 border border-blue-100' %>">
+                      <%= new Date(h.date).toLocaleDateString('id-ID', { day: '2-digit' }) %>
+                      <span class="block text-[9px] font-bold uppercase tracking-wide"><%= new Date(h.date).toLocaleDateString('id-ID', { month: 'short' }) %></span>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-slate-800 text-xs"><%= h.name %></h4>
+                      <p class="text-[11px] text-slate-400 mt-0.5"><%= h.description || 'Tidak ada deskripsi tambahan' %></p>
+                      <div class="flex gap-1.5 mt-1">
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-200/70 text-slate-600 uppercase tracking-wider"><%= h.type %></span>
+                        <% if(h.isDeductLeave) { %>
+                          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-100/70 text-rose-600"><i class="fa-solid fa-scissors mr-0.5"></i> Potong Cuti</span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <% if (user.role === 'HR') { %>
+                    <button type="button" onclick="deleteHoliday('<%= h._id %>')" class="text-slate-300 hover:text-rose-600 p-1.5 rounded-md hover:bg-rose-50 transition duration-150 cursor-pointer">
+                      <i class="fa-regular fa-trash-can text-sm"></i>
+                  </button>
+                  <% } %>
+                </div>
+              <% }) %>
+            <% } %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CLIENT JS CONTROL FOR SINGLE-PAGE TABBING -->
+<script>
+  function switchTab(tabName) {
+    // 1. Sembunyikan semua pane konten
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.replace('block', 'hidden');
+    });
+    
+    // 2. Reset semua styling element button tab ke mode inactive
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
+      btn.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+    });
+
+    // 3. Tampilkan kontainer pane yang dipilih oleh user
+    const targetPane = document.getElementById(`tab-content-${tabName}`);
+    if (targetPane) targetPane.classList.replace('hidden', 'block');
+
+    // 4. Set tombol tab yang aktif saat ini menjadi berwarna biru terang
+    const targetBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (targetBtn) {
+      targetBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
+      targetBtn.classList.add('border-blue-600', 'text-blue-600', 'font-bold');
+    }
+  }
+
+  // Integrasi Delete Asinkronus Kalender khusus HR
+  async function deleteHoliday(id) {
+    if (!confirm("Apakah Anda yakin ingin menghapus hari libur ini dari kalender sistem?")) return;
+    
+    try {
+      const response = await fetch(`/leave/manage-calendar/delete/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (result.success) {
+        // Reload page untuk mem-fetch pembaruan data array MongoDB teranyar
+        window.location.reload();
+      } else {
+        alert("Gagal menghapus: " + result.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kegagalan komunikasi dengan cluster MongoDB server.");
+    }
+  }
+</script>

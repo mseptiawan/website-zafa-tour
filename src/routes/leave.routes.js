@@ -18,6 +18,9 @@ import {
   showApprovals,
   approveLeave,
   rejectLeave,
+  getHolidaysPage,
+  createHoliday,
+  deleteHoliday,
 } from "../controllers/leaveController.js";
 
 const router = express.Router();
@@ -37,6 +40,16 @@ router.post("/leave/delegation/approve/:id", authMiddleware, approveDelegation);
 router.post("/leave/delegation/reject/:id", authMiddleware, rejectDelegation);
 
 router.get("/leave/manage-requests", authMiddleware, getManageLeavePage);
+
+// Route untuk menampilkan halaman kalender
+router.get("/leave/manage-calendar", getHolidaysPage);
+
+// SOLUSI ERROR: Route POST untuk handle submit form tambah hari libur
+router.post("/leave/manage-calendar/create", createHoliday);
+
+// Route DELETE untuk hapus hari libur
+router.delete("/leave/manage-calendar/delete/:id", deleteHoliday);
+
 // router.get("/leave/approvals", authMiddleware, showApprovals);
 router.post("/leave/approval/approve/:id", authMiddleware, approveLeave);
 
