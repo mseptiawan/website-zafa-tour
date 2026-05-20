@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import User from "../../models/User.js";
+import Role from "../../models/Role.js";
 import Leave from "../../models/leave/Leave.model.js";
 import LeaveApproval from "../../models/leave/LeaveApproval.model.js";
 import LeaveBalance from "../../models/leave/LeaveBalance.model.js";
@@ -9,7 +10,7 @@ import LeaveType from "../../models/leave/LeaveType.model.js";
 
 dotenv.config();
 
-const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
+// KITA HAPUS: const usernames = [...] (Tidak diperlukan lagi agar mencakup semua orang)
 
 const leaveTypesMaster = [
   {
@@ -34,7 +35,7 @@ const leaveTypesMaster = [
   },
   {
     name: "Cuti Melahirkan",
-    code: "ML", // Ditambahkan code ML agar mudah diidentifikasi logic seeder
+    code: "ML",
     maxDays: 90,
     minAdvanceDays: 0,
     requiresAttachment: false,
@@ -49,7 +50,7 @@ const leaveReasons = [
   "Kondisi badan demam tinggi dan butuh istirahat",
   "Menghadiri wisuda adik kandung",
   "Keperluan mudik hari raya lebih awal",
-  "Persiapan persalinan dan masa nifas", // Tambahan alasan rasional
+  "Persiapan persalinan dan masa nifas",
 ];
 
 const rejectionNotes = [
@@ -73,10 +74,8 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-// Menambahkan parameter maxDays untuk menangani kasus durasi panjang khusus
 function createLeaveDateRangeAndDuration(maxDays = null) {
   const startDate = randomDate();
-  // Jika maxDays di atas 14 hari (seperti cuti melahirkan), set langsung fix durasinya
   const durationDays = maxDays && maxDays > 14 ? maxDays : Math.floor(Math.random() * 4) + 1;
 
   let totalDays = 0;
@@ -98,9 +97,12 @@ function createLeaveDateRangeAndDuration(maxDays = null) {
 
 export default async function leaveSeeder() {
   try {
-    const users = await User.find({ username: { $in: usernames } });
+    // KUNCI PERUBAHAN: Hapus filter query { username: { $in: usernames } }
+    // Ambil SEMUA user yang terdaftar di database tanpa terkecuali
+    const users = await User.find({}).populate("roleId");
+
     if (!users.length) {
-      console.log("Error: Target users tidak ditemukan di database.");
+      console.log("Error: Tidak ada user sama sekali di database.");
       return;
     }
 
@@ -125,7 +127,7 @@ export default async function leaveSeeder() {
       });
     }
     await LeaveBalance.insertMany(balanceData);
-    console.log("✔ Berhasil memuat Master Saldo Cuti awal.");
+    console.log(`✔ Berhasil memuat Master Saldo Cuti awal untuk ${users.length} user.`);
 
     const leavesToInsert = [];
     const approvalsToInsert = [];
@@ -134,19 +136,30 @@ export default async function leaveSeeder() {
     for (const user of users) {
       const otherUsers = users.filter((u) => u._id.toString() !== user._id.toString());
 
-      const managerUser = users.find((u) => u.role === "MANAGER") || otherUsers[0];
-      const hrUser = users.find((u) => u.role === "HR") || otherUsers[1];
-      const pimpinanUser = users.find((u) => u.role === "PIMPINAN") || otherUsers[2];
+      // Fallback handling jika di database tidak ditemukan role tertentu agar script tidak crash
+      const managerUser =
+        users.find((u) => u.roleId && u.roleId.name === "MANAGER") ||
+        (otherUsers.length ? otherUsers[0] : user);
+      const hrUser =
+        users.find((u) => u.roleId && u.roleId.name === "HR") ||
+        (otherUsers.length ? otherUsers[1] : user);
+      const pimpinanUser =
+        users.find((u) => u.roleId && u.roleId.name === "PIMPINAN") ||
+        (otherUsers.length ? otherUsers[2] : user);
 
-      for (let i = 0; i < 15; i++) {
+      const userRoleName = user.roleId ? user.roleId.name : "STAFF";
+
+      // Kurangi jumlah loop per orang (misal dari 15 jadi 5) jika data user Anda sangat banyak agar proses seed tidak berat
+      const loopsPerUser = 8;
+
+      for (let i = 0; i < loopsPerUser; i++) {
         const status = randomItem(statuses);
         const leaveType = randomItem(createdLeaveTypes);
 
-        // Handover dibuat flexible (opsional) sesuai dengan schema rules Anda
-        const hasHandover = Math.random() > 0.3;
+        // Pastikan ada orang lain untuk dijadikan handover
+        const hasHandover = otherUsers.length > 0 && Math.random() > 0.3;
         const handoverUser = hasHandover ? randomItem(otherUsers) : null;
 
-        // PERBAIKAN LOGIC: Mengirimkan maxDays master data ke generator tanggal
         const { startDate, endDate, totalDays } = createLeaveDateRangeAndDuration(
           leaveType.maxDays
         );
@@ -170,16 +183,13 @@ export default async function leaveSeeder() {
           updatedAt: startDate,
         });
 
-        // =================================================================
-        // SKENARIO FLOW APPROVAL BERTINGKAT
-        // =================================================================
         let baseStep = "MANAGER";
         let baseApprover = managerUser;
 
-        if (user.role === "HR") {
+        if (userRoleName === "HR") {
           baseStep = "PIMPINAN";
           baseApprover = pimpinanUser;
-        } else if (user.role === "MANAGER") {
+        } else if (userRoleName === "MANAGER") {
           baseStep = "HR";
           baseApprover = hrUser;
         }
@@ -238,7 +248,7 @@ export default async function leaveSeeder() {
             });
           }
 
-          if (user.role === "HR") {
+          if (userRoleName === "HR") {
             approvalsToInsert.push({
               leaveId,
               step: "PIMPINAN",
@@ -247,7 +257,7 @@ export default async function leaveSeeder() {
               note: randomItem(approvalNotes),
               actionDate: startDate,
             });
-          } else if (user.role === "MANAGER") {
+          } else if (userRoleName === "MANAGER") {
             approvalsToInsert.push({
               leaveId,
               step: "HR",
@@ -355,6 +365,7 @@ export default async function leaveSeeder() {
     }
 
     console.log(`✔ Sukses melakukan sinkronisasi seeder data transaksi baru:`);
+    console.log(`   - Total User Terproses: ${users.length} Orang`);
     console.log(`   - ${leavesToInsert.length} Dokumen Pengajuan Cuti (Leave)`);
     console.log(`   - ${approvalsToInsert.length} Log Langkah Persetujuan (LeaveApproval)`);
     console.log(`\n=== PROSES UPDATE SEEDER BERHASIL DAN BERSIH ===`);
