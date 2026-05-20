@@ -58,40 +58,43 @@
               <% } %>
 
                 <!-- KATEGORI CUTI -->
-                <div class="space-y-1.5">
-                  <label class="text-[13px] font-bold text-slate-700">
-                    Kategori / Tipe Cuti <span class="text-red-500">*</span>
-                  </label>
+               <div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">
+    Kategori / Tipe Cuti <span class="text-red-500">*</span>
+  </label>
 
-                  <div class="relative w-full" id="leave-dropdown">
-                    <!-- Hidden Input untuk dikirim ke backend -->
-                    <input type="hidden" name="leaveTypeId" id="leaveTypeId" value="<%= leave?.leaveTypeId || '' %>"
-                      required>
+  <div class="relative w-full" id="leave-dropdown">
+    <!-- Hidden Input: Jika mode EDIT, isi dengan ID dari leaveTypeId yang sudah di-populate -->
+    <input type="hidden" name="leaveTypeId" id="leaveTypeId" 
+      value="<%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId._id : '' %>" required>
 
-                    <!-- Trigger Button -->
-                    <button type="button" onclick="toggleLeaveDropdown()"
-                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
-                      <span id="leave-label" class="text-slate-600">
-                        <%= leave ? 'Jenis Cuti Terpilih' : '-- Silahkan pilih jenis cuti --' %>
-                      </span>
-                      <svg id="leave-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none"
-                        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </button>
+    <!-- Trigger Button -->
+    <button type="button" onclick="toggleLeaveDropdown()"
+      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
+      
+      <!-- Label Tombol: Jika mode EDIT, langsung tampilkan nama kategorinya -->
+      <span id="leave-label" class="<%= (mode === 'EDIT' && leave.leaveTypeId) ? 'text-slate-800 font-semibold' : 'text-slate-600' %>">
+        <%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId.name : '-- Silahkan pilih jenis cuti --' %>
+      </span>
 
-                    <!-- Dropdown Menu -->
-                    <div id="leave-menu"
-                      class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
-                      <% leaveTypes.forEach(type=> { %>
-                        <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>')"
-                          class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-                          <%= type.name %>
-                        </button>
-                        <% }) %>
-                    </div>
-                  </div>
-                </div>
+      <svg id="leave-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none"
+        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div id="leave-menu"
+      class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
+      <% leaveTypes.forEach(type => { %>
+        <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>')"
+          class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
+          <%= type.name %>
+        </button>
+      <% }) %>
+    </div>
+  </div>
+</div>
                 <!-- RENTANG TANGGAL -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div class="space-y-1.5">
@@ -210,74 +213,84 @@
                     class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-800 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none resize-none transition-all"><%= leave ? leave.reason : '' %></textarea>
                 </div>
 
-                <!-- DYNAMIC LAMPIRAN DENGAN CONDITIONAL REQUIRED SAKIT -->
-                <div class="space-y-1.5">
-                  <label class="block text-[13px] font-bold text-slate-700">
-                    Surat Keterangan / Lampiran <span id="label-required-star" class="text-red-500 hidden">*</span>
-                    <span id="label-optional-text" class="text-slate-400 font-normal ml-0.5">(Opsional)</span>
-                  </label>
+              <div class="space-y-1.5">
+  <label class="block text-[13px] font-bold text-slate-700">
+    Surat Keterangan / Lampiran <span id="label-required-star" class="text-red-500 hidden">*</span>
+    <span id="label-optional-text" class="text-slate-400 font-normal ml-0.5">(Opsional)</span>
+  </label>
 
-                  <!-- EMPTY STATE -->
-                  <div id="dropzone-empty"
-                    class="relative w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
+  <!-- EMPTY STATE: Sembunyikan jika dalam mode EDIT dan file attachment ada -->
+  <div id="dropzone-empty"
+    class="<%= (mode === 'EDIT' && leave.documentPath) ? 'hidden' : 'relative' %> w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
 
-                    <input type="file" name="attachments" id="file-input" accept="image/*,.pdf,.docx"
-                      class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      onchange="handleFileSelect(this)" />
+    <input type="file" name="attachments" id="file-input" accept="image/*,.pdf,.docx"
+      class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      onchange="handleFileSelect(this)" />
 
-                    <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5"
-                      viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                    </svg>
+    <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5"
+      viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+    </svg>
 
-                    <span class="text-[13px] font-medium text-slate-600">
-                      Pilih Berkas atau Drop File Disini
-                    </span>
+    <span class="text-[13px] font-medium text-slate-600">
+      Pilih Berkas atau Drop File Disini
+    </span>
 
-                    <span class="text-xs text-slate-400 mt-0.5">
-                      PNG, JPG, PDF, atau DOCX (maks 5MB)
-                    </span>
-                  </div>
+    <span class="text-xs text-slate-400 mt-0.5">
+      PNG, JPG, PDF, atau DOCX (maks 5MB)
+    </span>
+  </div>
 
-                  <!-- FILLED STATE -->
-                  <div id="dropzone-filled"
-                    class="hidden flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
+  <!-- FILLED STATE: Munculkan langsung jika dalam mode EDIT dan file attachment ada -->
+  <div id="dropzone-filled"
+    class="<%= (mode === 'EDIT' && leave.documentPath) ? 'flex' : 'hidden' %> items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
 
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                      <div
-                        class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
-                        <img id="img-preview" class="w-full h-full object-cover hidden" />
-                        <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
-                          stroke-width="1.5" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                        </svg>
-                      </div>
+    <div class="flex items-center gap-3 min-w-0 flex-1">
+      <div
+        class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
+        
+        <!-- Cek tipe file dari field leave.documentPath -->
+        <% 
+          let isImage = false;
+          if (mode === 'EDIT' && leave.documentPath) {
+            const ext = leave.documentPath.split('.').pop().toLowerCase();
+            isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
+          }
+        %>
+        
+        <img id="img-preview" src="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '' %>" 
+          class="w-full h-full object-cover <%= isImage ? '' : 'hidden' %>" />
+        
+        <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400 <%= isImage ? 'hidden' : '' %>" fill="none" stroke="currentColor"
+          stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+        </svg>
+      </div>
 
-                      <div class="min-w-0 flex-1">
-                        <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
-                          file_name.jpg
-                        </div>
-                        <div id="size-preview" class="text-xs text-slate-400 mt-0.5">
-                          0 KB
-                        </div>
-                      </div>
-                    </div>
+      <div class="min-w-0 flex-1">
+        <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
+          <%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath.split('/').pop() : 'file_name.jpg' %>
+        </div>
+        <div id="size-preview" class="text-xs text-slate-400 mt-0.5">
+          <%= (mode === 'EDIT' && leave.documentPath) ? 'Berkas Tersimpan' : '0 KB' %>
+        </div>
+      </div>
+    </div>
 
-                    <div class="flex items-center gap-2 ml-4 flex-shrink-0">
-                      <a id="view-file-btn" href="#" target="_blank"
-                        class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">
-                        View
-                      </a>
-                      <button type="button" onclick="triggerChangeFile()"
-                        class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">
-                        Ganti File
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
+    <div class="flex items-center gap-2 ml-4 flex-shrink-0">
+      <a id="view-file-btn" href="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '#' %>" target="_blank"
+        class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">
+        View
+      </a>
+      <button type="button" onclick="triggerChangeFile()"
+        class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">
+        Ganti File
+      </button>
+    </div>
+  </div>
+</div>
                 <!-- BUTTON PANELS -->
                 <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
                   <a href="/leave/my-history"
@@ -389,16 +402,24 @@
       arrow.classList.toggle('rotate-180');
     }
 
-    function selectLeave(id, name) {
-      document.getElementById('leaveTypeId').value = id;
-      const label = document.getElementById('leave-label');
-      label.textContent = name;
-      label.classList.remove('text-slate-400');
-      label.classList.add('text-slate-800');
+   function selectLeave(id, name) {
+  // 1. Set ID ke hidden input untuk dikirim ke backend
+  document.getElementById('leaveTypeId').value = id;
+  
+  // 2. Ambil element label button
+  const label = document.getElementById('leave-label');
+  label.textContent = name;
+  
+  // 3. Sesuaikan warna teks (Hapus text-slate-600 bawaan placeholder, ganti ke text-slate-800)
+  label.classList.remove('text-slate-600');
+  label.classList.add('text-slate-800', 'font-semibold'); // Ditambah font-semibold supaya tegas seperti saat mode EDIT
 
-      toggleLeaveDropdown();
-      handleLeaveTypeChange(name); // Trigger perubahan UI berdasarkan nama cuti
-    }
+  // 4. Tutup menu dropdown
+  toggleLeaveDropdown();
+  
+  // 5. Jalankan logic dynamic UI bawaanmu (misal memunculkan input upload jika Cuti Sakit, dll.)
+  handleLeaveTypeChange(name); 
+}
 
     // Tutup dropdown jika klik di luar
     window.addEventListener('click', function (e) {
@@ -490,5 +511,36 @@
       validateDateGap();
       calculateDays();
     });
+function triggerChangeFile() {
+  // 1. Reset input file agar kosong kembali
+  const fileInput = document.getElementById('file-input');
+  fileInput.value = '';
 
+  // 2. Tukar class visibility dropzone
+  const emptyZone = document.getElementById('dropzone-empty');
+  const filledZone = document.getElementById('dropzone-filled');
+
+  emptyZone.classList.remove('hidden');
+  emptyZone.classList.add('relative'); // Mengembalikan properti relative untuk input click-layer
+
+
+  // 3. Kembalikan preview gambar & icon ke mode basic default
+  document.getElementById('img-preview').classList.add('hidden');
+  document.getElementById('file-icon-fallback').classList.remove('hidden');
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const hasAttachment = "<%= (leave && leave.documentPath) ? '1' : '0' %>";
+
+  if (hasAttachment === "1") {
+    document.getElementById("dropzone-empty").classList.add("hidden");
+    document.getElementById("dropzone-filled").classList.remove("hidden");
+
+    const fileUrl = "<%= leave ? leave.documentPath : '' %>";
+    const fileName = fileUrl.split('/').pop();
+
+    document.getElementById("view-file-btn").href = fileUrl;
+    document.getElementById("name-preview").textContent = fileName;
+    document.getElementById("size-preview").textContent = "Berkas Tersimpan";
+  }
+});
   </script>

@@ -54,7 +54,11 @@ export const getHolidaysPage = async (req, res) => {
       selectedYear,
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    // PERBAIKAN: Tambahkan properti title agar tidak crash saat error
+    return res.status(500).render("error", {
+      title: "Kalender Manajemen - Error",
+      message: error.message,
+    });
   }
 };
 
@@ -80,7 +84,11 @@ export const createHoliday = async (req, res) => {
     // SOLUSI: Setelah submit form, kembalikan (redirect) ke endpoint utama halaman pusat manajemen
     res.redirect("/leave/manage-calendar");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    // PERBAIKAN UTAMA: Tambahkan title agar layout main.ejs tidak crash saat error database/input
+    return res.status(500).render("error", {
+      title: "Tambah Agenda - Error",
+      message: error.message,
+    });
   }
 };
 
@@ -111,7 +119,7 @@ export const updateHoliday = async (req, res) => {
 
     res.redirect("/leave/manage-calendar?tab=calendar");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "update holiday error", message: error.message });
   }
 };
 
@@ -193,14 +201,14 @@ export const showApplyLeave = async (req, res) => {
       leave: null,
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "show apply leave error", message: error.message });
   }
 };
 
 export const applyLeave = async (req, res) => {
   try {
     const { leaveTypeId, startDate, endDate, totalDays, reason, handoverUserId } = req.body;
-    const requester = req.user;
+    const requester = req.session.user;
     const documentPath = req.file ? `/uploads/files/${req.file.filename}` : null;
 
     const newLeave = await Leave.create({
@@ -331,7 +339,7 @@ export const getLeaveDetail = async (req, res) => {
       user: req.user,
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "get leave detail err", message: error.message });
   }
 };
 
@@ -340,18 +348,21 @@ export const editLeave = async (req, res) => {
     const userId = req.user._id;
     const currentYear = new Date().getFullYear();
 
+    // Tambahkan .populate() pada Leave.findById agar relasi tipe cutinya terbawa
     const [leave, leaveTypes, employees, leaveBalance] = await Promise.all([
-      Leave.findById(req.params.id),
+      Leave.findById(req.params.id).populate("leaveTypeId"), // <-- Ubah bagian ini
       LeaveType.find({ isActive: true }),
       User.find({ _id: { $ne: userId } }).populate("employeeData", "fullName"),
       LeaveBalance.findOne({ userId, year: currentYear }),
     ]);
 
     if (!leave || leave.status !== "PENDING") {
-      return res.status(400).render("error", { message: "Cuti tidak bisa diubah." });
+      return res
+        .status(400)
+        .render("error", { title: "edit leave", message: "Cuti tidak bisa diubah." });
     }
 
-    res.render("leave/form-page", {
+    res.render("leave/create", {
       title: "Edit Cuti",
       leaveTypes,
       employees,
@@ -361,10 +372,9 @@ export const editLeave = async (req, res) => {
       error: null,
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "edit leave", message: error.message });
   }
 };
-
 export const updateLeave = async (req, res) => {
   try {
     const { leaveTypeId, startDate, endDate, totalDays, reason, handoverUserId } = req.body;
@@ -372,7 +382,9 @@ export const updateLeave = async (req, res) => {
 
     const leave = await Leave.findById(req.params.id);
     if (!leave || leave.status !== "PENDING") {
-      return res.status(400).render("error", { message: "Gagal update data." });
+      return res
+        .status(400)
+        .render("error", { title: "update leave", message: "Gagal update data." });
     }
 
     leave.leaveTypeId = leaveTypeId;
@@ -409,7 +421,11 @@ export const updateLeave = async (req, res) => {
 
     res.redirect("/leave/my-history");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    // PERBAIKAN UTAMA: Tambahkan title agar layout main.ejs tidak crash saat error database/input
+    return res.status(500).render("error", {
+      title: "Tambah Agenda - Error",
+      message: error.message,
+    });
   }
 };
 
@@ -419,17 +435,18 @@ export const cancelPendingLeave = async (req, res) => {
 
     if (!leave || leave.status !== "PENDING") {
       return res.status(400).render("error", {
+        title: "cancel pending error",
         message: "Pembatalan gagal. Pengajuan tidak ditemukan atau sudah diproses.",
       });
     }
 
-    leave.status = "CANCELED";
+    leave.status = "CANCELLED";
     await leave.save();
 
     await LeaveApproval.updateMany(
       { leaveId: leave._id, status: "PENDING" },
       {
-        status: "CANCELED",
+        status: "CANCELLED",
         note: "Dibatalkan oleh pemohon",
         actionDate: new Date(),
       }
@@ -437,7 +454,11 @@ export const cancelPendingLeave = async (req, res) => {
 
     res.redirect("/leave/my-history");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    // FIX: Tambahkan title juga di sini
+    return res.status(500).render("error", {
+      title: "Error Sistem", // <-- WAJIB ADA
+      message: error.message,
+    });
   }
 };
 
@@ -445,7 +466,9 @@ export const requestCancelApprovedLeave = async (req, res) => {
   try {
     const leave = await Leave.findById(req.params.id);
     if (!leave || leave.status !== "APPROVED") {
-      return res.status(400).render("error", { message: "Status cuti tidak valid." });
+      return res
+        .status(400)
+        .render("error", { title: "request cancel error", message: "Status cuti tidak valid." });
     }
 
     leave.status = "CANCELLED";
@@ -461,7 +484,11 @@ export const requestCancelApprovedLeave = async (req, res) => {
 
     res.redirect("/leave/my-history");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    // PERBAIKAN: Tambahkan title di block catch error
+    return res.status(500).render("error", {
+      title: "Error Sistem",
+      message: error.message,
+    });
   }
 };
 
@@ -478,10 +505,13 @@ export const showResubmitLeave = async (req, res) => {
     ]);
 
     if (!leave || leave.status !== "REJECTED") {
-      return res.status(400).render("error", { message: "Cuti tidak berstatus ditolak." });
+      return res.status(400).render("error", {
+        title: "show resubmit error",
+        message: "Cuti tidak berstatus ditolak.",
+      });
     }
 
-    res.render("leave/form-page", {
+    res.render("leave/create", {
       title: "Ajukan Ulang Cuti",
       leaveTypes,
       employees,
@@ -490,51 +520,85 @@ export const showResubmitLeave = async (req, res) => {
       leave,
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    // PERBAIKAN UTAMA: Tambahkan title di block catch error
+    return res.status(500).render("error", {
+      title: "Ajukan Ulang - Error",
+      message: error.message,
+    });
   }
 };
-
 export const myDelegations = async (req, res) => {
   try {
-    const rawActiveDelegations = await LeaveApproval.find({
+    const baseQuery = {
       approverId: req.user._id,
       step: "HANDOVER",
-      status: "PENDING",
-    }).populate({
-      path: "leaveId",
-      populate: [
-        { path: "userId", populate: { path: "employeeData", select: "fullName" } },
-        { path: "leaveTypeId", select: "name" },
-      ],
-    });
+    };
 
-    const rawHistoryDelegations = await LeaveApproval.find({
-      approverId: req.user._id,
-      step: "HANDOVER",
-      status: { $in: ["APPROVED", "REJECTED"] },
-    }).populate({
-      path: "leaveId",
-      populate: [
-        { path: "userId", populate: { path: "employeeData", select: "fullName" } },
-        { path: "leaveTypeId", select: "name" },
-      ],
-    });
+    const [active, history] = await Promise.all([
+      LeaveApproval.find({
+        ...baseQuery,
+        status: "PENDING",
+      }).populate({
+        path: "leaveId",
+        populate: [
+          {
+            path: "userId",
+            model: "User",
+            select: "username employeeData",
+            populate: {
+              path: "employeeData",
+              model: "Employee",
+              select: "fullName",
+            },
+          },
+          {
+            path: "leaveTypeId",
+            model: "LeaveType",
+            select: "name",
+          },
+        ],
+      }),
 
-    const filteredActive = rawActiveDelegations.filter(
-      (del) => del.leaveId && del.leaveId.status === "PENDING"
-    );
-    const filteredHistory = rawHistoryDelegations.filter((del) => del.leaveId);
+      LeaveApproval.find({
+        ...baseQuery,
+        status: { $in: ["APPROVED", "REJECTED"] },
+      }).populate({
+        path: "leaveId",
+        populate: [
+          {
+            path: "userId",
+            model: "User",
+            select: "username employeeData",
+            populate: {
+              path: "employeeData",
+              model: "Employee",
+              select: "fullName",
+            },
+          },
+          {
+            path: "leaveTypeId",
+            model: "LeaveType",
+            select: "name",
+          },
+        ],
+      }),
+    ]);
 
-    res.render("leave/delegation", {
+    const delegations = active.filter((d) => d.leaveId);
+    const historyDelegations = history.filter((d) => d.leaveId);
+    console.log(JSON.stringify(delegations[0], null, 2));
+    return res.render("leave/delegation", {
       title: "Delegasi Tugas Saya",
-      delegations: filteredActive,
-      historyDelegations: filteredHistory,
+      delegations,
+      historyDelegations,
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    return res.status(500).render("error", {
+      title: "Delegasi Error",
+      message: error.message,
+    });
   }
 };
-
 export const approveDelegation = async (req, res) => {
   try {
     const { note } = req.body;
@@ -547,7 +611,9 @@ export const approveDelegation = async (req, res) => {
     });
 
     if (!approval) {
-      return res.status(404).render("error", { message: "Data tidak ditemukan." });
+      return res
+        .status(404)
+        .render("error", { title: "approve delegeation error", message: "Data tidak ditemukan." });
     }
 
     approval.status = "APPROVED";
@@ -584,7 +650,7 @@ export const approveDelegation = async (req, res) => {
 
     res.redirect("/leave/my-delegations");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "approve delegation error", message: error.message });
   }
 };
 
@@ -597,7 +663,10 @@ export const rejectDelegation = async (req, res) => {
       step: "HANDOVER",
       status: "PENDING",
     });
-    if (!approval) return res.status(404).render("error", { message: "Data tidak ditemukan." });
+    if (!approval)
+      return res
+        .status(404)
+        .render("error", { title: "reject delegation", message: "Data tidak ditemukan." });
 
     approval.status = "REJECTED";
     approval.note = note || "";
@@ -608,7 +677,7 @@ export const rejectDelegation = async (req, res) => {
 
     res.redirect("/leave/my-delegations");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "reject delegation error", message: error.message });
   }
 };
 
@@ -628,7 +697,7 @@ export const showApprovals = async (req, res) => {
 
     res.render("leave/approvals", { title: "Persetujuan Cuti Karyawan", approvals });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "show approval error", message: error.message });
   }
 };
 
@@ -643,7 +712,9 @@ export const approveLeave = async (req, res) => {
     });
 
     if (!approval)
-      return res.status(404).render("error", { message: "Data persetujuan tidak ditemukan." });
+      return res
+        .status(404)
+        .render("error", { title: "approve leave", message: "Data persetujuan tidak ditemukan." });
 
     approval.status = "APPROVED";
     approval.note = note || "";
@@ -681,7 +752,7 @@ export const approveLeave = async (req, res) => {
 
     res.redirect("/leave/approvals");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "approve leave", message: error.message });
   }
 };
 
@@ -696,7 +767,9 @@ export const rejectLeave = async (req, res) => {
     });
 
     if (!approval)
-      return res.status(404).render("error", { message: "Data persetujuan tidak ditemukan." });
+      return res
+        .status(404)
+        .render("error", { title: "reject leave", message: "Data persetujuan tidak ditemukan." });
 
     // 1. Ubah status step approval saat ini menjadi REJECTED
     approval.status = "REJECTED";
@@ -709,7 +782,7 @@ export const rejectLeave = async (req, res) => {
 
     res.redirect("/leave/approvals");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", { title: "err", message: error.message });
   }
 };
 export const getManageLeavePage = async (req, res) => {
@@ -720,28 +793,80 @@ export const getManageLeavePage = async (req, res) => {
       return res.redirect("/?error=UNAUTHORIZED");
     }
 
-    // NORMALISASI ROLE (WAJIB)
     const normalizedRole = (sessionUser.role || "").toString().trim().toUpperCase();
-
     sessionUser.role = normalizedRole;
 
-    let query = {};
-
-    // Role yang bisa melihat data berdasarkan approval flow
     const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "GENERAL_MANAGER"];
 
-    if (APPROVER_ROLES.includes(normalizedRole)) {
-      const structuralApprovals = await LeaveApproval.find({
-        approverId: sessionUser._id,
-      });
-
-      const leaveIds = structuralApprovals.map((app) => app.leaveId);
-
-      query = { _id: { $in: leaveIds } };
+    if (!APPROVER_ROLES.includes(normalizedRole)) {
+      return res.redirect("/?error=FORBIDDEN");
     }
 
-    // Ambil data leave
-    const allLeaves = await Leave.find(query)
+    // 1. Ambil SEMUA data approval milik user ini berdasarkan approverId atau role-nya (selain HANDOVER)
+    const myStructuralApprovals = await LeaveApproval.find({
+      $or: [
+        { approverId: sessionUser._id },
+        { step: normalizedRole }, // Jaga-jaga jika approverId belum di-set di awal, kita filter via step/role
+      ],
+      step: { $ne: "HANDOVER" },
+    });
+
+    const activeLeaveIds = [];
+    const historyLeaveIds = [];
+
+    // 2. Lakukan validasi antrean berantai secara ketat
+    for (const app of myStructuralApprovals) {
+      if (app.status === "PENDING") {
+        // --- GERBANG 1: JIKA SAYA MANAGER, CEK HANDOVER ---
+        if (app.step === "MANAGER") {
+          const handoverCheck = await LeaveApproval.findOne({
+            leaveId: app.leaveId,
+            step: "HANDOVER",
+          });
+
+          // hanya blok kalau handover ADA tapi belum approve
+          if (handoverCheck && handoverCheck.status !== "APPROVED") {
+            continue;
+          }
+        }
+
+        // --- GERBANG 2: JIKA SAYA HR, CEK MANAGER ---
+        if (app.step === "HR") {
+          const managerCheck = await LeaveApproval.findOne({
+            leaveId: app.leaveId,
+            step: "MANAGER",
+          });
+          // Jika manager belum approve (atau reject), HR belum boleh lihat
+          if (managerCheck && managerCheck.status !== "APPROVED") {
+            continue;
+          }
+        }
+
+        // --- GERBANG 3: JIKA SAYA PIMPINAN / GM, CEK HR ---
+        if (app.step === "PIMPINAN" || app.step === "GENERAL_MANAGER") {
+          const hrCheck = await LeaveApproval.findOne({
+            leaveId: app.leaveId,
+            step: "HR",
+          });
+          // Jika HR belum approve, Pimpinan/GM belum boleh lihat
+          if (hrCheck && hrCheck.status !== "APPROVED") {
+            continue;
+          }
+        }
+
+        // Jika lolos semua sensor antrean di atas, baru masuk ke tab Aktif
+        activeLeaveIds.push(app.leaveId);
+      } else {
+        // Jika statusnya sudah APPROVED/REJECTED oleh user ini, langsung masuk ke riwayat
+        historyLeaveIds.push(app.leaveId);
+      }
+    }
+
+    // 3. Ambil data Leave untuk Tab Aktif (Hanya yang lolos sensor antrean)
+    const activeLeaves = await Leave.find({
+      _id: { $in: activeLeaveIds },
+      status: "PENDING", // Memastikan cutinya sendiri memang belum konklusi/selesai
+    })
       .populate("leaveTypeId", "name")
       .populate({
         path: "userId",
@@ -749,8 +874,16 @@ export const getManageLeavePage = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    const activeLeaves = allLeaves.filter((l) => l.status === "PENDING");
-    const historyLeaves = allLeaves.filter((l) => l.status !== "PENDING");
+    // 4. Ambil data Leave untuk Tab Riwayat
+    const historyLeaves = await Leave.find({
+      _id: { $in: historyLeaveIds },
+    })
+      .populate("leaveTypeId", "name")
+      .populate({
+        path: "userId",
+        populate: { path: "employeeData", select: "fullName" },
+      })
+      .sort({ createdAt: -1 });
 
     // Kalender
     const currentYear = new Date().getFullYear();
@@ -770,7 +903,7 @@ export const getManageLeavePage = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).render("error", {
-      title: "Error Sistem",
+      title: "Pusat Manajemen Cuti - Error",
       message: error.message,
     });
   }

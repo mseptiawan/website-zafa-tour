@@ -7,7 +7,7 @@ import unitSeeder from "./unit.seeder.js";
 import userSeeder from "./user.seeder.js";
 import positionSeeder from "./position.seeder.js";
 import employeeSeeder from "./employee.seeder.js";
-import leaveSeeder from "./leave.seeder.js";
+// import leaveSeeder from "./inactiveleave.seeder.js";
 import holidaySeeder from "./holidays.seeder.js";
 import assignmentSeeder from "./assignment.seeder.js";
 import announcementSeeder from "./announcement.seeder.js";
@@ -34,8 +34,7 @@ const seeders = [
 
   // leave
   holidaySeeder,
-  leaveSeeder,
-
+  // leaveSeeder,
 
   // aktivitas
   assignmentSeeder,
@@ -63,7 +62,6 @@ const runSeeder = async () => {
 
     console.log("All seeders success");
     process.exit(0);
-
   } catch (error) {
     console.error("Seeder error:", error);
     process.exit(1);

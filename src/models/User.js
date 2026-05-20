@@ -35,9 +35,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-  {
-    toJSON: { virtuals: true }, // Pastikan virtuals aktif saat di-convert ke JSON/Object
+    toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );

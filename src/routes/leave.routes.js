@@ -32,7 +32,7 @@ router.post("/leave/apply", authMiddleware, uploadFile.single("attachments"), ap
 router.get("/leave/my-history", authMiddleware, myLeave);
 router.get("/leave/detail/:id", authMiddleware, getLeaveDetail);
 router.get("/leave/edit/:id", authMiddleware, editLeave);
-router.post("/leave/edit/:id", authMiddleware, uploadFile.single("attachments"), updateLeave);
+router.post("/leave/update/:id", authMiddleware, uploadFile.single("attachments"), updateLeave);
 router.post("/leave/cancel-pending/:id", authMiddleware, cancelPendingLeave);
 router.post("/leave/request-cancel/:id", authMiddleware, requestCancelApprovedLeave);
 router.get("/leave/resubmit/:id", authMiddleware, showResubmitLeave);

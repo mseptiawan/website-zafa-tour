@@ -268,15 +268,15 @@
               <h3 class="text-[13px] font-bold text-slate-800">Agenda Terdaftar Tahun <%= selectedYear %>
               </h3>
               <form method="GET" action="/leave/manage-requests">
-                <select name="year" onchange="this.form.submit()"
-                  class="border border-slate-200 rounded-lg py-1 px-2 text-xs font-bold text-slate-700 bg-white focus:outline-none cursor-pointer">
-                  <% const yr=new Date().getFullYear(); %>
-                    <option value="<%= yr %>" <%=selectedYear===yr ? 'selected' : '' %>><%= yr %>
-                    </option>
-                    <option value="<%= yr + 1 %>" <%=selectedYear===(yr + 1) ? 'selected' : '' %>><%= yr + 1 %>
-                    </option>
-                </select>
-              </form>
+  <!-- Pasang hidden input ini agar saat submit pilih tahun, browser tahu harus kembali ke tab calendar -->
+  <input type="hidden" name="tab" value="calendar"> 
+  <select name="year" onchange="this.form.submit()"
+    class="border border-slate-200 rounded-lg py-1 px-2 text-xs font-bold text-slate-700 bg-white focus:outline-none cursor-pointer">
+    <% const yr = new Date().getFullYear(); %>
+    <option value="<%= yr %>" <%= selectedYear === yr ? 'selected' : '' %>><%= yr %></option>
+    <option value="<%= yr + 1 %>" <%= selectedYear === (yr + 1) ? 'selected' : '' %>><%= yr + 1 %></option>
+  </select>
+</form>
             </div>
 
             <div class="space-y-2">
