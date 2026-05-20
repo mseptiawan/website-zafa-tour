@@ -6,7 +6,6 @@ import User from "../../models/User.js";
 
 dotenv.config();
 
-
 // ======================================================
 // TARGET USERS
 // ======================================================
@@ -44,7 +43,7 @@ const descriptions = [
 
 const purposes = ["KUNJUNGAN_SALES", "RAPAT", "PELATIHAN", "SURVEI", "LAINNYA"];
 
-const requesterRoles = ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"];
+const requesterRoles = ["STAFF", "MANAGER", "HR", "KEUANGAN"];
 
 // ======================================================
 // HELPERS
@@ -322,9 +321,7 @@ export default async function businessTripSeeder() {
     await BusinessTrip.insertMany(data);
 
     console.log("Seeder BusinessTrip berhasil dibuat");
-
   } catch (err) {
     console.log(err);
   }
 }
-

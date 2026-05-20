@@ -10,7 +10,7 @@ const businessTripSchema = new mongoose.Schema(
 
     requesterRole: {
       type: String,
-      enum: ["KARYAWAN", "MANAGER", "HR", "KEUANGAN"],
+      enum: ["STAFF", "MANAGER", "HR", "KEUANGAN"],
       required: true,
     },
 

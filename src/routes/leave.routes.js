@@ -15,7 +15,8 @@ import {
   approveDelegation,
   rejectDelegation,
   showApprovals,
-  processApproval,
+  approveLeave,
+  rejectLeave,
 } from "../controllers/leaveController.js";
 
 const router = express.Router();
@@ -35,6 +36,8 @@ router.post("/leave/delegation/approve/:id", authMiddleware, approveDelegation);
 router.post("/leave/delegation/reject/:id", authMiddleware, rejectDelegation);
 
 router.get("/leave/approvals", authMiddleware, showApprovals);
-router.post("/leave/approvals/process/:id", authMiddleware, processApproval);
+router.post("/leave/approval/approve/:id", authMiddleware, approveLeave);
+
+router.post("/leave/approval/reject/:id", authMiddleware, rejectLeave);
 
 export default router;

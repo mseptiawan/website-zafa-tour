@@ -116,15 +116,15 @@ const employeeSeeder = async () => {
       userId: duwihartati._id,
       fullName: "Duwi Hartati",
 
-      positionId: generalManager._id,
+      positionId: wakilDirektur._id,
       unitId: null,
       bidangId: null,
     },
     {
       userId: ronaldrizky._id,
-      fullName: "Ronaldrizky",
+      fullName: "Ronald Rizky",
 
-      positionId: manager._id,
+      positionId: generalManager._id,
       unitId: null,
       bidangId: null,
     },
@@ -141,7 +141,7 @@ const employeeSeeder = async () => {
       fullName: "Fadhilah",
 
       positionId: staff._id,
-      unitId: pengeluaranOperasional,
+      unitId: pengeluaranOperasional._id,
       bidangId: keuangan._id,
     },
 

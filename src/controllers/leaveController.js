@@ -372,18 +372,30 @@ export const myDelegations = async (req, res) => {
 
 export const approveDelegation = async (req, res) => {
   try {
+    const { note } = req.body;
+
     const approval = await LeaveApproval.findOne({
       _id: req.params.id,
       approverId: req.user._id,
       step: "HANDOVER",
     });
-    if (!approval) return res.status(404).render("error", { message: "Data tidak ditemukan." });
+
+    if (!approval) {
+      return res.status(404).render("error", {
+        message: "Data tidak ditemukan.",
+      });
+    }
 
     approval.status = "APPROVED";
     approval.actionDate = new Date();
+
+    // simpan catatan
+    approval.note = note || "";
+
     await approval.save();
 
     const leave = await Leave.findById(approval.leaveId).populate("userId");
+
     const requester = leave.userId;
 
     let nextStep = "";
@@ -391,16 +403,28 @@ export const approveDelegation = async (req, res) => {
 
     if (requester.role === "HR") {
       nextStep = "PIMPINAN";
-      const pimpinanUser = await User.findOne({ role: "PIMPINAN" });
-      nextApproverId = pimpinanUser ? pimpinanUser._id : null;
+
+      const pimpinanUser = await User.findOne({
+        role: "PIMPINAN",
+      });
+
+      nextApproverId = pimpinanUser?._id;
     } else if (requester.role === "MANAGER") {
       nextStep = "HR";
-      const hrUser = await User.findOne({ role: "HR" });
-      nextApproverId = hrUser ? hrUser._id : null;
+
+      const hrUser = await User.findOne({
+        role: "HR",
+      });
+
+      nextApproverId = hrUser?._id;
     } else {
       nextStep = "MANAGER";
-      const managerUser = await User.findOne({ role: "MANAGER" });
-      nextApproverId = managerUser ? managerUser._id : null;
+
+      const managerUser = await User.findOne({
+        role: "MANAGER",
+      });
+
+      nextApproverId = managerUser?._id;
     }
 
     if (nextApproverId) {
@@ -414,7 +438,9 @@ export const approveDelegation = async (req, res) => {
 
     res.redirect("/leave/my-delegations");
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    res.status(500).render("error", {
+      message: error.message,
+    });
   }
 };
 
@@ -536,3 +562,10 @@ export const showApprovals = async (req, res) => {
 //     res.status(500).render("error", { message: error.message });
 //   }
 // };
+export const approveLeave = async (req, res) => {
+  // logic approve
+};
+
+export const rejectLeave = async (req, res) => {
+  // logic reject
+};

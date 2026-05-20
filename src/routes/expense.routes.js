@@ -33,14 +33,14 @@ router.get(
 router.get(
   "/expense/approval/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER", "GENERAL MANAGER"]),
+  roleMiddleware(["MANAGER"]),
   approvalManagerExpense
 );
 
 router.post(
   "/expense/:id/approve/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER", "GENERAL MANAGER"]),
+  roleMiddleware(["MANAGER"]),
   approveManagerExpense
 );
 
