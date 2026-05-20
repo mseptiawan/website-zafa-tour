@@ -3247,6 +3247,13 @@
       }
     }
   }
+  .hover\:text-amber-800 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-amber-800);
+      }
+    }
+  }
   .hover\:text-blue-600 {
     &:hover {
       @media (hover: hover) {
@@ -3272,6 +3279,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-emerald-600);
+      }
+    }
+  }
+  .hover\:text-emerald-800 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-emerald-800);
       }
     }
   }

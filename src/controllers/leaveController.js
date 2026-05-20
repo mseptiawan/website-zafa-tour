@@ -714,27 +714,45 @@ export const rejectLeave = async (req, res) => {
 };
 export const getManageLeavePage = async (req, res) => {
   try {
-    const userRole = req.user.role;
+    const sessionUser = req.session.user;
+
+    if (!sessionUser) {
+      return res.redirect("/?error=UNAUTHORIZED");
+    }
+
+    // NORMALISASI ROLE (WAJIB)
+    const normalizedRole = (sessionUser.role || "").toString().trim().toUpperCase();
+
+    sessionUser.role = normalizedRole;
+
     let query = {};
 
-    // Filter data pengajuan agar approver hanya melihat data yang melibatkan mereka
-    if (["MANAGER", "HR", "PIMPINAN"].includes(userRole)) {
-      const structuralApprovals = await LeaveApproval.find({ approverId: req.user._id });
+    // Role yang bisa melihat data berdasarkan approval flow
+    const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "GENERAL_MANAGER"];
+
+    if (APPROVER_ROLES.includes(normalizedRole)) {
+      const structuralApprovals = await LeaveApproval.find({
+        approverId: sessionUser._id,
+      });
+
       const leaveIds = structuralApprovals.map((app) => app.leaveId);
+
       query = { _id: { $in: leaveIds } };
     }
 
-    // 1. Ambil data pengajuan cuti masal
+    // Ambil data leave
     const allLeaves = await Leave.find(query)
       .populate("leaveTypeId", "name")
-      .populate({ path: "userId", populate: { path: "employeeData", select: "fullName" } })
+      .populate({
+        path: "userId",
+        populate: { path: "employeeData", select: "fullName" },
+      })
       .sort({ createdAt: -1 });
 
-    // Pisahkan data pengajuan aktif vs selesai
-    const activeLeaves = allLeaves.filter((leave) => leave.status === "PENDING");
-    const historyLeaves = allLeaves.filter((leave) => leave.status !== "PENDING");
+    const activeLeaves = allLeaves.filter((l) => l.status === "PENDING");
+    const historyLeaves = allLeaves.filter((l) => l.status !== "PENDING");
 
-    // 2. Ambil data Kalender Libur (untuk tahun ini)
+    // Kalender
     const currentYear = new Date().getFullYear();
     const selectedYear = req.query.year ? parseInt(req.query.year) : currentYear;
 
@@ -742,16 +760,18 @@ export const getManageLeavePage = async (req, res) => {
       $or: [{ year: selectedYear }, { isRecurring: true }],
     }).sort({ date: 1 });
 
-    // 3. Render satu halaman tunggal membawa seluruh payload data
-    res.render("leave/manage-center", {
+    return res.render("leave/manage-center", {
       title: "Pusat Manajemen Cuti",
-      user: req.user,
+      user: sessionUser,
       activeLeaves,
       historyLeaves,
       holidays,
       selectedYear,
     });
   } catch (error) {
-    res.status(500).render("error", { message: error.message });
+    return res.status(500).render("error", {
+      title: "Error Sistem",
+      message: error.message,
+    });
   }
 };
