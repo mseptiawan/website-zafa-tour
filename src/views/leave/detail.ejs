@@ -14,7 +14,10 @@
   });
 
   // Tentukan arah link kembali secara dinamis
-  const backLink = isApproverView ? '/leave/my-delegations' : '/leave/my-history';
+  // Jaga-jaga jika diakses dari halaman Pusat Manajemen Cuti (HR/Manager/Pimpinan)
+  const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "GENERAL_MANAGER"];
+  const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
+  const backLink = isManagement ? '/leave/manage-requests' : (isApproverView ? '/leave/my-delegations' : '/leave/my-history');
 %>
 
 <a href="<%= backLink %>"
@@ -51,8 +54,7 @@
           
           <!-- MAIN CARD: INFORMATION -->
           <div class="bg-white border border-slate-200/60 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] overflow-hidden">
-            <!-- HEADER -->
-            <!-- HEADER CARD BARU -->
+            <!-- HEADER CARD -->
 <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
   <div class="flex items-center gap-3">
     <!-- Avatar Icon -->
@@ -62,23 +64,30 @@
       </svg>
     </div>
     <div>
-      <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-none">
+      <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-none mb-1.5">
         <%= (leave.userId && leave.userId.employeeData) ? leave.userId.employeeData.fullName : 'Detail Pengajuan Cuti' %>
       </h1>
-     
+      <!-- INFORMASI JALUR AKSI YANG SEDANG BERJALAN -->
+      <p class="text-[11px] text-slate-400 font-medium">
+        Tujuan Dokumen: 
+        <span class="font-bold <%= leave.status === 'CANCELLATION_PENDING' ? 'text-amber-600' : 'text-blue-600' %>">
+          <%= leave.status === 'CANCELLATION_PENDING' ? 'Permohonan Pembatalan Cuti' : 'Permohonan Cuti Baru' %>
+        </span>
+      </p>
     </div>
   </div>
 
   <!-- STATUS BADGE -->
   <div>
-    <span class="text-[10px] px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider border
+    <span class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border
       <%= leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200/50'
+        : leave.status === 'CANCELLATION_PENDING' ? 'bg-orange-50 text-orange-700 border-orange-200/50'
         : leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
         : leave.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200/50'
-        : leave.status === 'CANCELED' ? 'bg-slate-50 text-slate-500 border-slate-200'
+        : leave.status === 'CANCELLED' || leave.status === 'CANCELED' ? 'bg-slate-100 text-slate-600 border-slate-300'
         : 'bg-purple-50 text-purple-700 border-purple-200/50'
       %>">
-      <%= leave.status %>
+      <%= leave.status === 'CANCELLATION_PENDING' ? 'MINTA BATAL' : leave.status %>
     </span>
   </div>
 </div>
@@ -186,13 +195,15 @@
           <% if (activeApproval) { %>
             <div class="bg-white border border-slate-200 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] p-6">
               <div class="flex items-center gap-2 mb-4">
-                <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                <div class="p-1.5 <%= leave.status === 'CANCELLATION_PENDING' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600' %> rounded-lg">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-sm font-bold text-slate-900">Form Evaluasi & Persetujuan</h3>
+                  <h3 class="text-sm font-bold text-slate-900">
+                    <%= leave.status === 'CANCELLATION_PENDING' ? 'Form Tinjauan Pembatalan Cuti' : 'Form Evaluasi & Persetujuan' %>
+                  </h3>
                   <p class="text-xs text-slate-500 mt-0.5">Bertindak selaku: <span class="font-bold text-slate-700"><%= activeApproval.step %></span></p>
                 </div>
               </div>
@@ -205,7 +216,7 @@
                   id="reviewNote" 
                   name="note" 
                   rows="3" 
-                  placeholder="Masukkan alasan disetujui atau ditolak..."
+                  placeholder="<%= leave.status === 'CANCELLATION_PENDING' ? 'Masukkan alasan menyetujui atau menolak pembatalan cuti...' : 'Masukkan alasan disetujui atau ditolak...' %>"
                   class="w-full text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none focus:bg-white"
                   oninput="document.querySelectorAll('.sync-note').forEach(input => input.value = this.value)"
                 ></textarea>
@@ -216,17 +227,19 @@
                   const approveUrl = activeApproval.step === 'HANDOVER' ? `/leave/delegation/approve/${activeApproval._id}` : `/leave/approval/approve/${activeApproval._id}`;
                   const rejectUrl = activeApproval.step === 'HANDOVER' ? `/leave/delegation/reject/${activeApproval._id}` : `/leave/approval/reject/${activeApproval._id}`;
                 %>
+                <!-- TOMBOL SETUJU (ADAPTIF TEKS BERDASARKAN STATUS PEMBATALAN) -->
                 <form action="<%= approveUrl %>" method="POST" class="inline">
                   <input type="hidden" name="note" class="sync-note" value="">
                   <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer">
-                    Terima & Setujui
+                    <%= leave.status === 'CANCELLATION_PENDING' ? 'Setujui Pembatalan' : 'Terima & Setujui' %>
                   </button>
                 </form>
 
+                <!-- TOMBOL TOLAK (ADAPTIF TEKS BERDASARKAN STATUS PEMBATALAN) -->
                 <form action="<%= rejectUrl %>" method="POST" class="inline">
                   <input type="hidden" name="note" class="sync-note" value="">
                   <button type="submit" class="px-5 py-2.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold rounded-xl transition cursor-pointer">
-                    Tolak Pengajuan
+                    <%= leave.status === 'CANCELLATION_PENDING' ? 'Tolak Pembatalan (Tetap Cuti)' : 'Tolak Pengajuan' %>
                   </button>
                 </form>
               </div>
