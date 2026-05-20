@@ -742,57 +742,90 @@ export const approveLeave = async (req, res) => {
   try {
     const { note } = req.body;
 
+    // 1. Ambil data user login dari session (bukan req.user)
+    const sessionUser = req.session.user;
+
+    if (!sessionUser) {
+      return res.status(401).render("error", {
+        title: "Error",
+        message: "Sesi Anda telah berakhir. Silakan login kembali.",
+      });
+    }
+
+    // 2. Cari data antrean persetujuan (bisa step MANAGER, HR, dll)
     const approval = await LeaveApproval.findOne({
       _id: req.params.id,
-      approverId: req.user._id,
+      approverId: sessionUser._id, // FIX: Pakai sessionUser
       status: "PENDING",
     });
 
-    if (!approval)
-      return res
-        .status(404)
-        .render("error", { title: "approve leave", message: "Data persetujuan tidak ditemukan." });
+    if (!approval) {
+      return res.status(404).render("error", {
+        title: "approve leave",
+        message: "Data persetujuan tidak ditemukan atau sudah diproses.",
+      });
+    }
 
+    // 3. Update status antrean saat ini menjadi APPROVED
     approval.status = "APPROVED";
     approval.note = note || "";
     approval.actionDate = new Date();
     await approval.save();
 
-    const leave = await Leave.findById(approval.leaveId).populate("userId");
+    // 4. FIX POPULATE: Lakukan deep populate sampai ke roleId milik pemohon
+    const leave = await Leave.findById(approval.leaveId).populate({
+      path: "userId",
+      populate: { path: "roleId" },
+    });
+
     const requester = leave.userId;
 
-    // Cari langkah berikutnya berdasarkan fungsi helper WORKFLOW kita
-    const { nextStep, nextApproverId } = await getNextApprover(requester.role, approval.step);
+    // 5. FIX NAMA FIELD: Ambil string nama role dari roleId (contoh: "STAFF")
+    const requesterRoleName =
+      requester.roleId && requester.roleId.name
+        ? requester.roleId.name.toString().trim().toUpperCase()
+        : "";
+
+    console.log(
+      `DEBUG APPROVE LEAVE - Pemohon: ${requester.username} (${requesterRoleName}), Step Saat Ini: ${approval.step}`
+    );
+
+    // 6. Cari tahapan berikutnya di objek WORKFLOW
+    // Jika requesterRoleName = "STAFF" dan approval.step = "MANAGER", nextStep harusnya jadi "HR"
+    const { nextStep, nextApproverId } = await getNextApprover(requesterRoleName, approval.step);
 
     if (nextApproverId) {
-      // Jika ada approver selanjutnya, buat record baru bertipe PENDING
+      // Jika ditemukan approver untuk step berikutnya (misal: user dengan role HR), buat antrean baru
       await LeaveApproval.create({
         leaveId: leave._id,
         step: nextStep,
         approverId: nextApproverId,
         status: "PENDING",
       });
+
+      console.log(`DEBUG WORKFLOW - Berhasil melempar persetujuan ke tahap: ${nextStep}`);
     } else {
-      // Jika sudah tidak ada langkah lagi di objek WORKFLOW, ubah status induk menjadi APPROVED
+      // Jika sudah mencapai ujung alur WORKFLOW (misal selesai di PIMPINAN)
       leave.status = "APPROVED";
       await leave.save();
 
-      // Potong kuota cuti tahunan milik user
+      // Potong kuota cuti tahunan milik user pemohon
       const currentYear = new Date(leave.startDate).getFullYear();
-      const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
+      const balance = await LeaveBalance.findOne({ userId: requester._id, year: currentYear });
       if (balance) {
         balance.used += leave.totalDays;
         balance.remaining -= leave.totalDays;
         await balance.save();
       }
+
+      console.log(`DEBUG WORKFLOW - Alur selesai. Cuti otomatis FINAL APPROVED.`);
     }
 
-    res.redirect("/leave/approvals");
+    res.redirect("/leave/manage-requests");
   } catch (error) {
     res.status(500).render("error", { title: "approve leave", message: error.message });
   }
 };
-
 export const rejectLeave = async (req, res) => {
   try {
     const { note } = req.body;
