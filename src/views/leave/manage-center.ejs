@@ -70,6 +70,22 @@
                             : "Karyawan" %>
                         </td>
                         <td class="px-5 py-4">
+                          <% if (leave.status === 'CANCELLATION_PENDING') { %>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60">
+                              <i class="fa-solid fa-ban text-[9px]"></i> Minta Batal
+                            </span>
+                          <% } else { %>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
+                              <i class="fa-solid fa-file-circle-plus text-[9px]"></i> Cuti Baru
+                            </span>
+                          <% } %>
+                        </td>
+                        <td class="px-5 py-4">
+                          <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600">
+                            <%= leave.leaveTypeId.name %>
+                          </span>
+                        </td>
+                        <td class="px-5 py-4">
                           <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600">
                             <%= leave.leaveTypeId.name %>
                           </span>
@@ -85,9 +101,10 @@
                           <%= leave.totalDays %> Hari
                         </td>
                         <td class="px-5 py-4 text-center">
-                          <a href="/leave/detail/<%= leave._id %>"
+                         <a href="/leave/detail/<%= leave._id %>"
                             class="inline-flex items-center gap-1 px-2.5 py-1.5 border border-slate-200 text-[11px] font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition duration-150">
-                            <i class="fa-solid fa-signature text-slate-400"></i> Periksa Cuti
+                            <i class="fa-solid fa-signature text-slate-400"></i> 
+                            <%= leave.status === 'CANCELLATION_PENDING' ? 'Periksa Pembatalan' : 'Periksa Cuti' %>
                           </a>
                         </td>
                       </tr>
@@ -148,15 +165,19 @@
                           <%= leave.totalDays %> Hari
                         </td>
                         <td class="px-5 py-4">
-                          <% if(leave.status==='APPROVED' ) { %>
-                            <span
-                              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60"><i
-                                class="fa-solid fa-circle-check text-[10px]"></i> Disetujui</span>
-                            <% } else { %>
-                              <span
-                                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60"><i
-                                  class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak</span>
-                              <% } %>
+                         <% if(leave.status === 'APPROVED') { %>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                              <i class="fa-solid fa-circle-check text-[10px]"></i> Disetujui
+                            </span>
+                          <% } else if(leave.status === 'CANCELLED') { %>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-300">
+                              <i class="fa-solid fa-ban text-[10px]"></i> Dibatalkan
+                            </span>
+                          <% } else { %>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">
+                              <i class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak
+                            </span>
+                          <% } %>
                         </td>
                       </tr>
                       <% }) %>
@@ -186,7 +207,8 @@
               <% } %>
 
                 <!-- Form action akan diubah via JavaScript jika dalam mode Edit -->
-                <form id="holiday-form" action="/leave/manage-calendar/create" method="POST" class="space-y-3.5">
+                <!-- Tambahkan ?tab=calendar di ujung action bawaan -->
+<form id="holiday-form" action="/leave/manage-calendar/create?tab=calendar" method="POST" class="space-y-3.5">
                   <div>
                     <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Nama Hari
                       Libur / Agenda</label>
@@ -394,50 +416,47 @@
     }
 
   function prepareEditHoliday(holidayDataRaw) {
-      // Decode data URI component terlebih dahulu sebelum di-parse ke JSON
-      const holiday = JSON.parse(decodeURIComponent(holidayDataRaw));
+  const holiday = JSON.parse(decodeURIComponent(holidayDataRaw));
 
-      // Ubah Title Form & Tombol Submit
-      document.getElementById('form-calendar-title').innerHTML = '<i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Hari Libur';
-      document.getElementById('holiday-form').action = `/leave/manage-calendar/update/${holiday._id}`;
-      document.getElementById('form-submit-btn').innerHTML = '<i class="fa-solid fa-check"></i> Simpan Perubahan';
-      document.getElementById('form-cancel-btn').classList.remove('hidden');
+  document.getElementById('form-calendar-title').innerHTML = '<i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Hari Libur';
+  
+  // SISIPI ?tab=calendar DI ACTION UPDATE
+  document.getElementById('holiday-form').action = `/leave/manage-calendar/update/${holiday._id}?tab=calendar`;
+  
+  document.getElementById('form-submit-btn').innerHTML = '<i class="fa-solid fa-check"></i> Simpan Perubahan';
+  document.getElementById('form-cancel-btn').classList.remove('hidden');
 
-      // Isi Value Form-nya
-      document.getElementById('form-name').value = holiday.name;
+  // ... (sisa kode pengisian value form tetap sama) ...
+  document.getElementById('form-name').value = holiday.name;
+  document.getElementById('form-date').value = new Date(holiday.date).toISOString().split('T')[0];
+  if (holiday.endDate) {
+    document.getElementById('form-enddate').value = new Date(holiday.endDate).toISOString().split('T')[0];
+  } else {
+    document.getElementById('form-enddate').value = '';
+  }
+  document.getElementById('form-type').value = holiday.type;
+  document.getElementById('form-deduct').checked = holiday.isDeductLeave;
+  document.getElementById('form-recurring').checked = holiday.isRecurring;
+  document.getElementById('form-description').value = holiday.description || '';
 
-      // Format Date ke YYYY-MM-DD agar dibaca oleh input type="date"
-      document.getElementById('form-date').value = new Date(holiday.date).toISOString().split('T')[0];
-      if (holiday.endDate) {
-        document.getElementById('form-enddate').value = new Date(holiday.endDate).toISOString().split('T')[0];
-      } else {
-        document.getElementById('form-enddate').value = '';
-      }
+  document.getElementById('holiday-form').scrollIntoView({ behavior: 'smooth' });
+}
 
-      document.getElementById('form-type').value = holiday.type;
-      document.getElementById('form-deduct').checked = holiday.isDeductLeave;
-      document.getElementById('form-recurring').checked = holiday.isRecurring;
-      document.getElementById('form-description').value = holiday.description || '';
+function resetFormToCreate() {
+  document.getElementById('form-calendar-title').innerHTML = '<i class="fa-solid fa-calendar-plus text-blue-600"></i> Tambah Hari Libur';
+  
+  // SISIPI ?tab=calendar DI ACTION CREATE SEMULA
+  document.getElementById('holiday-form').action = '/leave/manage-calendar/create?tab=calendar';
+  
+  document.getElementById('form-submit-btn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Agenda';
+  document.getElementById('form-cancel-btn').classList.add('hidden');
+  document.getElementById('holiday-form').reset();
+}
 
-      // Scroll form ke atas (opsional agar UX mulus di mobile)
-      document.getElementById('holiday-form').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Mengembalikan state form dari mode Edit ke mode Tambah Baru semula
-    function resetFormToCreate() {
-      document.getElementById('form-calendar-title').innerHTML = '<i class="fa-solid fa-calendar-plus text-blue-600"></i> Tambah Hari Libur';
-      document.getElementById('holiday-form').action = '/leave/manage-calendar/create';
-      document.getElementById('form-submit-btn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Agenda';
-      
-      // Perbaikan typo classList di baris ini
-      document.getElementById('form-cancel-btn').classList.add('hidden');
-
-      // Clear semua value field
-      document.getElementById('holiday-form').reset();
-    }
+    
 
     // Menggantikan fungsi Delete lama menjadi status Toggle Archive (PATCH)
-    async function toggleHolidayStatus(id, currentStatus) {
+   async function toggleHolidayStatus(id, currentStatus) {
       const message = currentStatus
         ? "Apakah Anda yakin ingin mengarsipkan hari libur ini? Data tidak akan terhapus namun dinonaktifkan dari sistem berjalan."
         : "Aktifkan kembali hari libur yang telah diarsipkan ini?";
@@ -451,7 +470,8 @@
         });
         const result = await response.json();
         if (result.success) {
-          window.location.reload();
+          // MODIFIKASI: Reload halaman dengan memaksa parameter tab=calendar agar tidak lompat ke tab 1
+          window.location.href = window.location.pathname + '?tab=calendar';
         } else {
           alert("Gagal memproses data: " + result.message);
         }
@@ -460,10 +480,14 @@
         alert("Gagal menghubungi server database.");
       }
     }
-
-    // Tambahkan pengecekan parameter tab di URL saat reload agar tab kalender tetap stay terbuka setelah update data
-    const currentUrlParams = new URLSearchParams(window.location.search);
-    if (currentUrlParams.get('tab') === 'calendar' || currentUrlParams.has('year')) {
-      switchTab('calendar');
-    }
+document.addEventListener("DOMContentLoaded", function() {
+      const currentUrlParams = new URLSearchParams(window.location.search);
+      const activeTab = currentUrlParams.get('tab');
+      
+      if (activeTab) {
+        switchTab(activeTab);
+      } else if (currentUrlParams.has('year')) {
+        switchTab('calendar');
+      }
+    });
   </script>

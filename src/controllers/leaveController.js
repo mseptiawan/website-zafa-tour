@@ -867,7 +867,7 @@ export const approveLeave = async (req, res) => {
   try {
     const { note } = req.body;
 
-    // 1. Ambil data user login dari session (bukan req.user)
+    // 1. Ambil data user login dari session
     const sessionUser = req.session.user;
 
     if (!sessionUser) {
@@ -877,10 +877,10 @@ export const approveLeave = async (req, res) => {
       });
     }
 
-    // 2. Cari data antrean persetujuan (bisa step MANAGER, HR, dll)
+    // 2. Cari data antrean persetujuan yang sedang PENDING
     const approval = await LeaveApproval.findOne({
       _id: req.params.id,
-      approverId: sessionUser._id, // FIX: Pakai sessionUser
+      approverId: sessionUser._id,
       status: "PENDING",
     });
 
@@ -897,7 +897,7 @@ export const approveLeave = async (req, res) => {
     approval.actionDate = new Date();
     await approval.save();
 
-    // 4. FIX POPULATE: Lakukan deep populate sampai ke roleId milik pemohon
+    // 4. FIX POPULATE: Deep populate sampai ke roleId milik pemohon
     const leave = await Leave.findById(approval.leaveId).populate({
       path: "userId",
       populate: { path: "roleId" },
@@ -905,7 +905,7 @@ export const approveLeave = async (req, res) => {
 
     const requester = leave.userId;
 
-    // 5. FIX NAMA FIELD: Ambil string nama role dari roleId (contoh: "STAFF")
+    // 5. Ambil string nama role dari roleId pemohon
     const requesterRoleName =
       requester.roleId && requester.roleId.name
         ? requester.roleId.name.toString().trim().toUpperCase()
@@ -915,12 +915,70 @@ export const approveLeave = async (req, res) => {
       `DEBUG APPROVE LEAVE - Pemohon: ${requester.username} (${requesterRoleName}), Step Saat Ini: ${approval.step}`
     );
 
-    // 6. Cari tahapan berikutnya di objek WORKFLOW
-    // Jika requesterRoleName = "STAFF" dan approval.step = "MANAGER", nextStep harusnya jadi "HR"
+    // ====================================================================
+    // INTERSEPSI LOGIKA KHUSUS: MENANGANI PEMBATALAN (CANCELLATION_PENDING)
+    // ====================================================================
+    if (leave.status === "CANCELLATION_PENDING") {
+      // JIKA YANG BARU APPROVE ADALAH MANAGER (Artinya cancel milik Staff/Keuangan lolos tahap 1)
+      if (approval.step === "MANAGER") {
+        // Cari dokumen Role HR di database
+        const hrRoleDoc = await Role.findOne({ name: "HR" });
+        if (!hrRoleDoc) throw new Error("Struktur Role HR tidak ditemukan di database.");
+
+        // Cari user dengan jabatan HR untuk dijadikan target berikutnya
+        const hrUser = await User.findOne({ roleId: hrRoleDoc._id });
+        if (!hrUser) throw new Error("Akun penanggung jawab HR belum terdaftar di sistem.");
+
+        // Lempar antrean baru ke meja HR (Estafet Tahap 2)
+        await LeaveApproval.create({
+          leaveId: leave._id,
+          step: "HR",
+          approverId: hrUser._id,
+          status: "PENDING",
+          note: "Persetujuan pembatalan disetujui oleh Manager, menunggu verifikasi akhir HR.",
+        });
+
+        console.log(
+          `DEBUG CANCEL WORKFLOW - Berhasil melempar pembatalan ${requesterRoleName} dari MANAGER ke HR.`
+        );
+      }
+      // JIKA YANG APPROVE ADALAH TAHAP AKHIR (HR untuk staff/keuangan/mgr/gm, atau PIMPINAN untuk kasus user HR)
+      else if (approval.step === "HR" || approval.step === "PIMPINAN") {
+        // 1. Ubah status induk dokumen cuti final menjadi CANCELLED
+        leave.status = "CANCELLED";
+        await leave.save();
+
+        // 2. Sinkronkan status di tabel audit log (LeaveCancellation) menjadi APPROVED
+        await LeaveCancellation.findOneAndUpdate(
+          { leaveId: leave._id, status: "PENDING" },
+          { status: "APPROVED" }
+        );
+
+        // 3. PROSES ROLLBACK / PENGEMBALIAN SALDO CUTI
+        const currentYear = new Date(leave.startDate).getFullYear();
+        const balance = await LeaveBalance.findOne({ userId: requester._id, year: currentYear });
+
+        if (balance) {
+          balance.used -= Number(leave.totalDays); // Kurangi angka terpakai
+          balance.remaining += Number(leave.totalDays); // Kembalikan sisa kuota cuti
+          await balance.save();
+        }
+
+        console.log(
+          `DEBUG CANCEL WORKFLOW - Pembatalan FINAL APPROVED. Saldo milik ${requester.username} dikembalikan.`
+        );
+      }
+
+      // Selesai memproses seluruh alur pembatalan, langsung redirect dan potong komando di sini
+      return res.redirect("/leave/manage-requests");
+    }
+    // ====================================================================
+
+    // 6. CARI TAHAPAN BERIKUTNYA DI OBJEK WORKFLOW (UNTUK PENGAJUAN CUTI BARU)
     const { nextStep, nextApproverId } = await getNextApprover(requesterRoleName, approval.step);
 
     if (nextApproverId) {
-      // Jika ditemukan approver untuk step berikutnya (misal: user dengan role HR), buat antrean baru
+      // Jika ditemukan approver untuk step berikutnya, buat antrean baru
       await LeaveApproval.create({
         leaveId: leave._id,
         step: nextStep,
@@ -930,7 +988,7 @@ export const approveLeave = async (req, res) => {
 
       console.log(`DEBUG WORKFLOW - Berhasil melempar persetujuan ke tahap: ${nextStep}`);
     } else {
-      // Jika sudah mencapai ujung alur WORKFLOW (misal selesai di PIMPINAN)
+      // Jika sudah mencapai ujung alur WORKFLOW pengajuan biasa
       leave.status = "APPROVED";
       await leave.save();
 
@@ -946,9 +1004,10 @@ export const approveLeave = async (req, res) => {
       console.log(`DEBUG WORKFLOW - Alur selesai. Cuti otomatis FINAL APPROVED.`);
     }
 
-    res.redirect("/leave/manage-requests");
+    return res.redirect("/leave/manage-requests");
   } catch (error) {
-    res.status(500).render("error", { title: "approve leave", message: error.message });
+    console.error("Error pada approveLeave:", error);
+    return res.status(500).render("error", { title: "approve leave", message: error.message });
   }
 };
 export const rejectLeave = async (req, res) => {
@@ -1078,7 +1137,7 @@ export const getManageLeavePage = async (req, res) => {
     // 3. Ambil data Leave untuk Tab Aktif (Hanya yang lolos sensor antrean)
     const activeLeaves = await Leave.find({
       _id: { $in: activeLeaveIds },
-      status: "PENDING", // Memastikan cutinya sendiri memang belum konklusi/selesai
+      status: { $in: ["PENDING", "CANCELLATION_PENDING"] }, // Memastikan cutinya sendiri memang belum konklusi/selesai
     })
       .populate("leaveTypeId", "name")
       .populate({
