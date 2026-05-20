@@ -4,6 +4,7 @@ import LeaveType from "../models/leave/LeaveType.model.js";
 import User from "../models/User.js";
 import Holiday from "../models/calender/Holiday.model.js";
 import LeaveBalance from "../models/leave/LeaveBalance.model.js";
+import Role from "../models/Role.js";
 
 // Definisi Alur Persetujuan berdasarkan Role Pemohon
 const WORKFLOW = {
@@ -155,29 +156,44 @@ export const deleteHoliday = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-// Helper untuk mencari langkah persetujuan berikutnya setelah langkah saat ini selesai
-async function getNextApprover(requesterRole, currentStep) {
-  const steps = WORKFLOW[requesterRole] || [];
+async function getNextApprover(requesterRoleName, currentStep) {
+  // Pastikan requesterRoleName berupa string nama rolenya (ex: "STAFF")
+  const steps = WORKFLOW[requesterRoleName] || [];
 
-  // Jika saat ini belum masuk ke workflow struktural (misal baru kelar HANDOVER), ambil langkah pertama
   if (!currentStep || currentStep === "HANDOVER") {
     if (steps.length > 0) {
-      const nextStep = steps[0];
-      const approver = await User.findOne({ role: nextStep });
+      const nextStep = steps[0]; // Contoh: "MANAGER"
+
+      // 1. Cari dulu dokumen Role-nya berdasarkan nama string-nya
+      const roleDoc = await Role.findOne({ name: nextStep });
+      if (!roleDoc) return { nextStep: null, nextApproverId: null };
+
+      // 2. FIX: Ubah 'role' menjadi 'roleId' sesuai skema model User kamu
+      const approver = await User.findOne({ roleId: roleDoc._id });
+
+      console.log(
+        `DEBUG WORKFLOW - Langkah Berikutnya: ${nextStep}, ID Approver:`,
+        approver ? approver._id : "TIDAK KETEMU"
+      );
+
       return { nextStep, nextApproverId: approver ? approver._id : null };
     }
     return { nextStep: null, nextApproverId: null };
   }
 
-  // Jika sedang berjalan di dalam roda WORKFLOW, cari indeks langkah berikutnya
   const currentIndex = steps.indexOf(currentStep);
   if (currentIndex !== -1 && currentIndex < steps.length - 1) {
     const nextStep = steps[currentIndex + 1];
-    const approver = await User.findOne({ role: nextStep });
+
+    // Lakukan hal yang sama untuk pencarian step berikutnya
+    const roleDoc = await Role.findOne({ name: nextStep });
+    if (!roleDoc) return { nextStep: null, nextApproverId: null };
+
+    // 2. FIX JUGA DI SINI: Ubah 'role' menjadi 'roleId'
+    const approver = await User.findOne({ roleId: roleDoc._id });
     return { nextStep, nextApproverId: approver ? approver._id : null };
   }
 
-  // Jika sudah berada di ujung array langkah persetujuan
   return { nextStep: null, nextApproverId: null };
 }
 
@@ -602,32 +618,53 @@ export const myDelegations = async (req, res) => {
 export const approveDelegation = async (req, res) => {
   try {
     const { note } = req.body;
+    const sessionUser = req.session.user;
 
+    if (!sessionUser) {
+      return res
+        .status(401)
+        .render("error", { title: "Error", message: "Sesi Anda telah berakhir." });
+    }
+
+    // 1. Cari data antrean handover yang sedang PENDING
     const approval = await LeaveApproval.findOne({
       _id: req.params.id,
-      approverId: req.user._id,
+      approverId: sessionUser._id,
       step: "HANDOVER",
       status: "PENDING",
     });
 
     if (!approval) {
-      return res
-        .status(404)
-        .render("error", { title: "approve delegeation error", message: "Data tidak ditemukan." });
+      return res.status(404).render("error", { title: "Error", message: "Data tidak ditemukan." });
     }
 
+    // 2. Setujui tahap Handover
     approval.status = "APPROVED";
     approval.actionDate = new Date();
     approval.note = note || "";
     await approval.save();
 
-    const leave = await Leave.findById(approval.leaveId).populate("userId");
+    // 3. Ambil data cuti dan populate field 'roleId' milik pemohon
+    const leave = await Leave.findById(approval.leaveId).populate({
+      path: "userId",
+      populate: { path: "roleId" },
+    });
+
     const requester = leave.userId;
 
-    // Setelah HANDOVER disetujui, tentukan langkah struktural pertama berdasarkan role pemohon
-    const { nextStep, nextApproverId } = await getNextApprover(requester.role, "HANDOVER");
+    // PERBAIKAN UTAMA: Gunakan 'roleId' bukan 'role' karena field skema kamu adalah roleId
+    const requesterRoleName =
+      requester.roleId && requester.roleId.name
+        ? requester.roleId.name.toString().trim().toUpperCase()
+        : "";
+
+    console.log("DEBUG - BERHASIL MENDAPATKAN ROLE STRUKTURAL:", requesterRoleName);
+
+    // 4. Cari tahapan atasan pertama (misal: MANAGER) setelah HANDOVER sukses
+    const { nextStep, nextApproverId } = await getNextApprover(requesterRoleName, "HANDOVER");
 
     if (nextApproverId) {
+      // Jika ditemukan (misal akun Manager ada di database), buat antrean baru
       await LeaveApproval.create({
         leaveId: leave._id,
         step: nextStep,
@@ -635,12 +672,13 @@ export const approveDelegation = async (req, res) => {
         status: "PENDING",
       });
     } else {
-      // Jika ternyata role pemohon tidak punya alur lanjutan setelah handover
+      // Jalur pengaman jika memang role tersebut adalah kasta tertinggi (tanpa atasan lagi)
       leave.status = "APPROVED";
       await leave.save();
 
       const currentYear = new Date(leave.startDate).getFullYear();
-      const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
+      // Menggunakan requester._id karena leave.userId sudah berbentuk objek terpopulasi
+      const balance = await LeaveBalance.findOne({ userId: requester._id, year: currentYear });
       if (balance) {
         balance.used += leave.totalDays;
         balance.remaining -= leave.totalDays;
@@ -650,10 +688,9 @@ export const approveDelegation = async (req, res) => {
 
     res.redirect("/leave/my-delegations");
   } catch (error) {
-    res.status(500).render("error", { title: "approve delegation error", message: error.message });
+    res.status(500).render("error", { title: "Error", message: error.message });
   }
 };
-
 export const rejectDelegation = async (req, res) => {
   try {
     const { note } = req.body;
