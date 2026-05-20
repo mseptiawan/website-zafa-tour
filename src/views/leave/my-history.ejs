@@ -15,7 +15,7 @@
           </p>
         </div>
 
-        <a href="/leave/apply" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-3 rounded-xl transition shadow-sm shadow-blue-100/50 active:scale-[0.98]">
+        <a href="/leave/apply" class="font-semibold bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-3 rounded-xl transition shadow-sm shadow-blue-100/50 active:scale-[0.98]">
           + Ajukan Cuti Baru
         </a>
       </div>
@@ -106,21 +106,44 @@
                   </td>
 
                   <!-- HANDOVER -->
-                  <td class="px-6 py-4 text-slate-500">
-                    <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ? leave.handoverUserId.employeeData.fullName : '-' %>
-                  </td>
+<td class="px-6 py-4 text-[13px] text-slate-500">
+  <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ? leave.handoverUserId.employeeData.fullName : '-' %>
+</td>
 
-                  <!-- STATUS BADGE -->
-                  <td class="px-6 py-4">
-                    <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
-                      <%= leave.status === 'PENDING' ? 'bg-amber-50/50 text-amber-700 border-amber-200/60' : '' %>
-                      <%= leave.status === 'APPROVED' ? 'bg-emerald-50/50 text-emerald-700 border-emerald-200/60' : '' %>
-                      <%= leave.status === 'REJECTED' ? 'bg-rose-50/50 text-rose-700 border-rose-200/60' : '' %>
-                      <%= leave.status === 'CANCELLED' ? 'bg-slate-50 text-slate-500 border-slate-200' : '' %>
-                      <%= leave.status === 'CANCELLATION_PENDING' ? 'bg-purple-50/50 text-purple-700 border-purple-200/60' : '' %>">
-                      <%= leave.status %>
-                    </span>
-                  </td>
+<!-- STATUS BADGE (FIXED INLINE MAPPING) -->
+<td class="px-6 py-4 whitespace-nowrap">
+  <% 
+    // Deklarasi lokal langsung di dalam baris agar anti-error "not defined"
+    const textStyles = {
+      'PENDING': 'text-amber-600',
+      'APPROVED': 'text-emerald-600',
+      'REJECTED': 'text-rose-600',
+      'CANCELLED': 'text-slate-500',
+      'CANCELLATION_PENDING': 'text-purple-600'
+    };
+
+    const dotStyles = {
+      'PENDING': 'bg-amber-500 ring-amber-500/20',
+      'APPROVED': 'bg-emerald-500 ring-emerald-500/20',
+      'REJECTED': 'bg-rose-500 ring-rose-500/20',
+      'CANCELLED': 'bg-slate-400 ring-slate-400/20',
+      'CANCELLATION_PENDING': 'bg-purple-500 ring-purple-500/20'
+    };
+
+    const statusLabels = {
+      'PENDING': 'Pending',
+      'APPROVED': 'Approved',
+      'REJECTED': 'Rejected',
+      'CANCELLED': 'Cancelled',
+      'CANCELLATION_PENDING': 'Cancel Pending'
+    };
+  %>
+  <div class="inline-flex items-center gap-2 text-[12px] font-medium tracking-tight <%= textStyles[leave.status] || 'text-slate-500' %>">
+    <!-- Dot dengan efek ring luar halus -->
+    <span class="w-1.5 h-1.5 rounded-full ring-4 <%= dotStyles[leave.status] || 'bg-slate-400 ring-slate-400/20' %>"></span>
+    <span><%= statusLabels[leave.status] || leave.status %></span>
+  </div>
+</td>
 
                   <!-- AKSI BUTTON GRID -->
                   <td class="px-6 py-4">
@@ -137,12 +160,14 @@
 
                       <% if (leave.status === 'PENDING') { %>
                         <!-- EDIT -->
-                        <a href="/leave/edit/<%= leave._id %>" title="Edit Pengajuan" 
-                          class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-amber-200 bg-amber-50/40 text-amber-600 hover:bg-amber-50 hover:text-amber-700 transition active:scale-[0.95]">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                          </svg>
-                        </a>
+                   <a href="/leave/edit/<%= leave._id %>" title="Edit Pengajuan" 
+  class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95]">
+  
+  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+      d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
+  </svg>
+</a>
 
                         <!-- BATALKAN (PENDING STATE) -->
                         <form action="/leave/cancel-pending/<%= leave._id %>" method="POST" class="inline">

@@ -3,16 +3,28 @@
   <div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
     <div class="max-w-6xl mx-auto"> <!-- Diperlebar ke max-w-6xl agar layout 2 kolom lebih leluasa -->
 
-      <!-- BACK BUTTON -->
-      <a href="/leave/my-history"
-        class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
-        <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
-          stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        Kembali
-      </a>
+  <% 
+  // Cek apakah user saat ini adalah orang yang harus memproses persetujuan (approver / delegasi)
+  const isApproverView = approvals.some(app => {
+    if (app.status !== 'PENDING') return false;
+    if (app.step === 'HANDOVER') {
+      return leave.handoverUserId && leave.handoverUserId._id && leave.handoverUserId._id.toString() === user._id.toString();
+    }
+    return (app.step || '').toUpperCase() === (user.role || '').toUpperCase();
+  });
 
+  // Tentukan arah link kembali secara dinamis
+  const backLink = isApproverView ? '/leave/my-delegations' : '/leave/my-history';
+%>
+
+<a href="<%= backLink %>"
+  class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
+  <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
+    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+  Kembali
+</a>
       <!-- RESUBMIT ACTION AREA (IF REJECTED) - Tetap Full Width di Atas -->
       <% if ((leave.status === 'REJECTED' || leave.status === 'CANCELED') && leave.userId && leave.userId._id.toString() === user._id.toString()) { %>
         <div class="border border-blue-100 bg-blue-50/30 rounded-xl p-5 flex items-center justify-between mb-6 shadow-[0_1px_3px_rgba(15,23,42,0.03)]">

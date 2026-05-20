@@ -64,17 +64,43 @@
                         Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
                       </td>
 
-                      <td class="px-6 py-4">
-                        <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
-    <%= t.status === 'APPROVED'
-      ? 'bg-emerald-50/50 text-emerald-700 border-emerald-200/60'
-      : t.status === 'REJECTED'
-        ? 'bg-red-50/50 text-red-700 border-red-200/60'
-        : 'bg-slate-50 text-slate-600 border-slate-200'
-    %>">
-                          <%= t.status %>
-                        </span>
-                      </td>
+                     <td class="px-6 py-4 whitespace-nowrap">
+  <% 
+    const textStyles = {
+      'PENDING': 'text-amber-600',
+      'APPROVED': 'text-emerald-600',
+      'REJECTED': 'text-rose-600',
+      'CANCELLED': 'text-slate-500'
+    };
+
+    const dotStyles = {
+      'PENDING': 'bg-amber-500 ring-amber-500/20',
+      'APPROVED': 'bg-emerald-500 ring-emerald-500/20',
+      'REJECTED': 'bg-rose-500 ring-rose-500/20',
+      'CANCELLED': 'bg-slate-400 ring-slate-400/20'
+    };
+
+    const statusLabels = {
+      'PENDING': 'Pending',
+      'APPROVED': 'Approved',
+      'REJECTED': 'Rejected',
+      'CANCELLED': 'Cancelled'
+    };
+  %>
+
+  <div class="inline-flex items-center gap-2 text-[12px] font-medium tracking-tight
+      <%= textStyles[t.status] || 'text-slate-500' %>">
+
+    <span class="w-1.5 h-1.5 rounded-full ring-4
+      <%= dotStyles[t.status] || 'bg-slate-400 ring-slate-400/20' %>">
+    </span>
+
+    <span>
+      <%= statusLabels[t.status] || t.status %>
+    </span>
+
+  </div>
+</td>
 
                       <td class="px-6 py-4 flex items-center gap-2">
 

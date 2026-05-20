@@ -461,78 +461,78 @@ export const showApprovals = async (req, res) => {
   }
 };
 
-export const processApproval = async (req, res) => {
-  try {
-    const { status, note } = req.body;
-    const approval = await LeaveApproval.findOne({
-      _id: req.params.id,
-      approverId: req.user._id,
-      status: "PENDING",
-    });
-    if (!approval) return res.status(404).render("error", { message: "Data tidak ditemukan." });
+// export const processApproval = async (req, res) => {
+//   try {
+//     const { status, note } = req.body;
+//     const approval = await LeaveApproval.findOne({
+//       _id: req.params.id,
+//       approverId: req.user._id,
+//       status: "PENDING",
+//     });
+//     if (!approval) return res.status(404).render("error", { message: "Data tidak ditemukan." });
 
-    approval.status = status;
-    approval.note = note;
-    approval.actionDate = new Date();
-    await approval.save();
+//     approval.status = status;
+//     approval.note = note;
+//     approval.actionDate = new Date();
+//     await approval.save();
 
-    const leave = await Leave.findById(approval.leaveId).populate("userId");
-    const requester = leave.userId;
+//     const leave = await Leave.findById(approval.leaveId).populate("userId");
+//     const requester = leave.userId;
 
-    if (status === "REJECTED") {
-      leave.status = "REJECTED";
-      await leave.save();
-      return res.redirect("/leave/approvals");
-    }
+//     if (status === "REJECTED") {
+//       leave.status = "REJECTED";
+//       await leave.save();
+//       return res.redirect("/leave/approvals");
+//     }
 
-    let nextStep = "";
-    let nextApproverId = null;
+//     let nextStep = "";
+//     let nextApproverId = null;
 
-    if (approval.step === "MANAGER") {
-      nextStep = "HR";
-      const hrUser = await User.findOne({ role: "HR" });
-      nextApproverId = hrUser ? hrUser._id : null;
-    } else if (approval.step === "HR") {
-      if (requester.role === "HR") {
-        nextStep = "PIMPINAN";
-        const pimpinanUser = await User.findOne({ role: "PIMPINAN" });
-        nextApproverId = pimpinanUser ? pimpinanUser._id : null;
-      } else {
-        leave.status = "APPROVED";
-        await leave.save();
+//     if (approval.step === "MANAGER") {
+//       nextStep = "HR";
+//       const hrUser = await User.findOne({ role: "HR" });
+//       nextApproverId = hrUser ? hrUser._id : null;
+//     } else if (approval.step === "HR") {
+//       if (requester.role === "HR") {
+//         nextStep = "PIMPINAN";
+//         const pimpinanUser = await User.findOne({ role: "PIMPINAN" });
+//         nextApproverId = pimpinanUser ? pimpinanUser._id : null;
+//       } else {
+//         leave.status = "APPROVED";
+//         await leave.save();
 
-        const currentYear = new Date(leave.startDate).getFullYear();
-        const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
-        if (balance) {
-          balance.used += leave.totalDays;
-          balance.remaining -= leave.totalDays;
-          await balance.save();
-        }
-      }
-    } else if (approval.step === "PIMPINAN") {
-      leave.status = "APPROVED";
-      await leave.save();
+//         const currentYear = new Date(leave.startDate).getFullYear();
+//         const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
+//         if (balance) {
+//           balance.used += leave.totalDays;
+//           balance.remaining -= leave.totalDays;
+//           await balance.save();
+//         }
+//       }
+//     } else if (approval.step === "PIMPINAN") {
+//       leave.status = "APPROVED";
+//       await leave.save();
 
-      const currentYear = new Date(leave.startDate).getFullYear();
-      const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
-      if (balance) {
-        balance.used += leave.totalDays;
-        balance.remaining -= leave.totalDays;
-        await balance.save();
-      }
-    }
+//       const currentYear = new Date(leave.startDate).getFullYear();
+//       const balance = await LeaveBalance.findOne({ userId: leave.userId, year: currentYear });
+//       if (balance) {
+//         balance.used += leave.totalDays;
+//         balance.remaining -= leave.totalDays;
+//         await balance.save();
+//       }
+//     }
 
-    if (nextApproverId) {
-      await LeaveApproval.create({
-        leaveId: leave._id,
-        step: nextStep,
-        approverId: nextApproverId,
-        status: "PENDING",
-      });
-    }
+//     if (nextApproverId) {
+//       await LeaveApproval.create({
+//         leaveId: leave._id,
+//         step: nextStep,
+//         approverId: nextApproverId,
+//         status: "PENDING",
+//       });
+//     }
 
-    res.redirect("/leave/approvals");
-  } catch (error) {
-    res.status(500).render("error", { message: error.message });
-  }
-};
+//     res.redirect("/leave/approvals");
+//   } catch (error) {
+//     res.status(500).render("error", { message: error.message });
+//   }
+// };
