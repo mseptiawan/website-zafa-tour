@@ -830,29 +830,47 @@ export const rejectLeave = async (req, res) => {
   try {
     const { note } = req.body;
 
+    // 1. Ambil data user login dari session (bukan req.user)
+    const sessionUser = req.session.user;
+
+    if (!sessionUser) {
+      return res.status(401).render("error", {
+        title: "Error",
+        message: "Sesi Anda telah berakhir. Silakan login kembali.",
+      });
+    }
+
+    // 2. Cari data antrean persetujuan yang ditujukan ke user login saat ini
     const approval = await LeaveApproval.findOne({
       _id: req.params.id,
-      approverId: req.user._id,
+      approverId: sessionUser._id, // FIX: Pakai sessionUser
       status: "PENDING",
     });
 
-    if (!approval)
-      return res
-        .status(404)
-        .render("error", { title: "reject leave", message: "Data persetujuan tidak ditemukan." });
+    if (!approval) {
+      return res.status(404).render("error", {
+        title: "Reject Leave",
+        message: "Data persetujuan tidak ditemukan atau sudah diproses.",
+      });
+    }
 
-    // 1. Ubah status step approval saat ini menjadi REJECTED
+    // 3. Ubah status step approval saat ini menjadi REJECTED
     approval.status = "REJECTED";
     approval.note = note || "";
     approval.actionDate = new Date();
     await approval.save();
 
-    // 2. Gagalkan status utama pengajuan (induk) langsung tanpa lanjut alur berikutnya
+    // 4. Gagalkan status utama pengajuan (induk) langsung di tabel Leave
     await Leave.findByIdAndUpdate(approval.leaveId, { status: "REJECTED" });
 
-    res.redirect("/leave/approvals");
+    console.log(
+      `DEBUG REJECT LEAVE - Pengajuan Cuti ID: ${approval.leaveId} berhasil DITOLAK oleh ${sessionUser.username} pada tahap ${approval.step}`
+    );
+
+    // 5. FIX REDIRECT: Alihkan ke halaman kelola request yang baru
+    return res.redirect("/leave/manage-requests");
   } catch (error) {
-    res.status(500).render("error", { title: "err", message: error.message });
+    res.status(500).render("error", { title: "Error", message: error.message });
   }
 };
 export const getManageLeavePage = async (req, res) => {
