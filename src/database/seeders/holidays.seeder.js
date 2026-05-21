@@ -1,14 +1,19 @@
+import mongoose from "mongoose";
 import dotenv from "dotenv";
-import Holiday from "../../models/calender/Holiday.model.js"; // Sesuaikan dengan path model lu
+import Holiday from "../../models/calender/Holiday.model.js"; // Sesuaikan dengan path model lo
+
+dotenv.config();
 
 const holidays = [
+  // =========================================================================
+  // 1. DAFTAR HARI LIBUR NASIONAL 2026 (isDeductLeave: false)
+  // =========================================================================
   {
     name: "Tahun Baru 2026 Masehi",
     date: new Date("2026-01-01"),
     type: "NATIONAL",
     isDeductLeave: false,
     description: "Libur nasional memperingati Tahun Baru Masehi.",
-    isRecurring: true,
     year: 2026,
   },
   {
@@ -17,7 +22,6 @@ const holidays = [
     type: "RELIGIOUS",
     isDeductLeave: false,
     description: "Libur keagamaan Tahun Baru Imlek.",
-    isRecurring: false,
     year: 2026,
   },
   {
@@ -26,7 +30,6 @@ const holidays = [
     type: "RELIGIOUS",
     isDeductLeave: false,
     description: "Libur keagamaan Hari Raya Nyepi umat Hindu.",
-    isRecurring: false,
     year: 2026,
   },
   {
@@ -35,7 +38,6 @@ const holidays = [
     type: "RELIGIOUS",
     isDeductLeave: false,
     description: "Libur keagamaan Hari Raya Idul Fitri.",
-    isRecurring: false,
     year: 2026,
   },
   {
@@ -44,17 +46,6 @@ const holidays = [
     type: "RELIGIOUS",
     isDeductLeave: false,
     description: "Libur keagamaan Hari Raya Idul Fitri hari kedua.",
-    isRecurring: false,
-    year: 2026,
-  },
-  {
-    name: "Cuti Bersama Perusahaan (Lebaran)",
-    date: new Date("2026-03-23"),
-    endDate: new Date("2026-03-25"), // Contoh libur rentang tanggal (3 hari)
-    type: "COMPANY",
-    isDeductLeave: true, // Mengurangi kuota cuti tahunan karyawan
-    description: "Cuti bersama instansi/perusahaan, memotong jatah cuti tahunan.",
-    isRecurring: false,
     year: 2026,
   },
   {
@@ -63,7 +54,6 @@ const holidays = [
     type: "RELIGIOUS",
     isDeductLeave: false,
     description: "Libur keagamaan memperingati Wafat Yesus Kristus.",
-    isRecurring: false,
     year: 2026,
   },
   {
@@ -72,7 +62,6 @@ const holidays = [
     type: "NATIONAL",
     isDeductLeave: false,
     description: "Peringatan Hari Buruh Internasional May Day.",
-    isRecurring: true,
     year: 2026,
   },
   {
@@ -81,7 +70,6 @@ const holidays = [
     type: "NATIONAL",
     isDeductLeave: false,
     description: "Peringatan Hari Lahir Pancasila.",
-    isRecurring: true,
     year: 2026,
   },
   {
@@ -90,7 +78,6 @@ const holidays = [
     type: "NATIONAL",
     isDeductLeave: false,
     description: "Hari Ulang Tahun Kemerdekaan RI.",
-    isRecurring: true,
     year: 2026,
   },
   {
@@ -99,22 +86,87 @@ const holidays = [
     type: "RELIGIOUS",
     isDeductLeave: false,
     description: "Libur keagamaan Hari Raya Natal.",
-    isRecurring: true,
+    year: 2026,
+  },
+
+  // =========================================================================
+  // 2. DAFTAR CUTI BERSAMA RESMI 2026 (isDeductLeave: true)
+  // TOTAL: 8 HARI SESUAI SKB 3 MENTERI
+  // =========================================================================
+  {
+    name: "Cuti Bersama Tahun Baru Imlek 2577 Kongzili",
+    date: new Date("2026-02-16"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Imlek, memotong jatah cuti tahunan karyawan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Suci Nyepi",
+    date: new Date("2026-03-18"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Hari Raya Nyepi, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Pascalebaran 1)",
+    date: new Date("2026-03-20"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Idul Fitri, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Pascalebaran 2)",
+    date: new Date("2026-03-23"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Idul Fitri, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Pascalebaran 3)",
+    date: new Date("2026-03-24"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Idul Fitri, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Kenaikan Yesus Kristus",
+    date: new Date("2026-05-15"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Kenaikan Yesus Kristus, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Raya Idul Adha 1447 H",
+    date: new Date("2026-05-28"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Idul Adha, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Raya Natal",
+    date: new Date("2026-12-24"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Natal, memotong jatah cuti tahunan.",
     year: 2026,
   },
 ];
 
 const holidaysSeeder = async () => {
   try {
-    // 1. Hubungkan ke database MongoDB
-    // Pastikan MONGO_URI ada di file .env lu
+    console.log("⏳ Sedang memproses data hari libur dan cuti bersama 2026...");
 
-    console.log("⏳ Sedang menyuntikkan data hari libur...");
-
-    // 2. Gunakan BulkWrite dengan operasi Upsert agar tidak duplikat saat dijalankan ulang
+    // Menggunakan BulkWrite Upsert supaya jika data di-run berkali-kali tidak bikin row double
     const operations = holidays.map((holiday) => ({
       updateOne: {
-        filter: { name: holiday.name, date: holiday.date }, // Kunci unik penentu data sudah ada/belum
+        filter: { name: holiday.name, date: holiday.date },
         update: { $set: holiday },
         upsert: true,
       },
@@ -123,19 +175,15 @@ const holidaysSeeder = async () => {
     const result = await Holiday.bulkWrite(operations);
 
     console.log("-----------------------------------------");
-    console.log(`✅ Seeding Selesai!`);
-    console.log(` Matched: ${result.matchedCount} data`);
-    console.log(` Inserted (Baru): ${result.upsertedCount} data`);
-    console.log(` Modified (Update): ${result.modifiedCount} data`);
+    console.log(`✅ Seeding Kalender SKB 2026 Selesai!`);
+    console.log(`   - Total Terbaca  : ${holidays.length} Hari`);
+    console.log(`   - Match Berhasil : ${result.matchedCount} data`);
+    console.log(`   - Baru Disuntik  : ${result.upsertedCount} data`);
+    console.log(`   - Data Terupdate : ${result.modifiedCount} data`);
     console.log("-----------------------------------------");
-
-    // 3. Putuskan koneksi setelah selesai
   } catch (error) {
-    console.error("❌ Seeding Gagal:", error);
+    console.error("❌ Proses seeding kalender gagal total:", error);
   }
 };
-
-// Eksekusi fungsi seeder
-// seedHolidays();
 
 export default holidaysSeeder;

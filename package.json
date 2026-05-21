@@ -14,7 +14,7 @@
     "seed:overtime": "node src/database/seeders/seedOvertime.js",
     "seed:leave": "node src/database/seeders/leaveSeeder.js",
     "seed:leavebalance": "node src/database/seeders/leaveBalance.seeder.js",
-    "seed:holiday": "node src/database/seeders/HolidaySeeder.js",
+    "seed:holiday": "node runHolidaysSeeder.js",
     "seed": "node src/database/seeders/index.js",
     "seed:role": "node src/database/seeders/roleSeeder.js",
     "seed:absen": "node src/database/seeders/attendanceSeeder.js",

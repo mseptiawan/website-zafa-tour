@@ -31,11 +31,6 @@ const holidaySchema = new mongoose.Schema(
       type: String,
     },
 
-    isRecurring: {
-      type: Boolean,
-      default: false,
-    },
-
     year: {
       type: Number,
     },

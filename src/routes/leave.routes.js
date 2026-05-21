@@ -16,6 +16,7 @@ import {
   approveDelegation,
   rejectDelegation,
   showApprovals,
+  generateOrResetLeaveBalance,
   approveLeave,
   rejectLeave,
   getHolidaysPage,
@@ -57,6 +58,7 @@ router.patch("/leave/manage-calendar/toggle/:id", toggleHolidayStatus);
 
 // Tambahkan route POST untuk update data hasil edit
 router.post("/leave/manage-calendar/update/:id", updateHoliday);
+router.post("/leave/manage-requests/generate-balances", generateOrResetLeaveBalance);
 
 // router.get("/leave/approvals", authMiddleware, showApprovals);
 router.post("/leave/approval/approve/:id", authMiddleware, approveLeave);

@@ -128,29 +128,61 @@ export const getHolidaysPage = async (req, res) => {
   }
 };
 
-// Menambahkan Hari Libur / Cuti Bersama baru
 export const createHoliday = async (req, res) => {
   try {
-    const { name, date, endDate, type, isDeductLeave, isRecurring, description } = req.body;
+    const { name, date, endDate, type, isDeductLeave, description } = req.body;
 
     const parsedDate = new Date(date);
     const year = parsedDate.getFullYear();
 
-    await Holiday.create({
+    // ======================================================================
+    // 1. ATURAN PENGETATAN BACKEND: Validasi Paksa Nilai isDeductLeave
+    // ======================================================================
+    let finalIsDeductLeave = false;
+
+    if (type === "COMPANY") {
+      // Internal Perusahaan WAJIB mutlak memotong jatah cuti karyawan
+      finalIsDeductLeave = true;
+    } else if (type === "NATIONAL") {
+      // Nasional HARAM memotong jatah cuti karyawan
+      finalIsDeductLeave = false;
+    } else if (type === "RELIGIOUS") {
+      // Keagamaan mengikuti kiriman data dari checkbox UI Admin (karena opsional)
+      finalIsDeductLeave = isDeductLeave === "true" || isDeductLeave === true;
+    }
+
+    // 2. Simpan agenda baru ke database MongoDB
+    const newHoliday = await Holiday.create({
       name,
       date: parsedDate,
       endDate: endDate ? new Date(endDate) : null,
       type,
-      isDeductLeave: isDeductLeave === "true" || isDeductLeave === true,
-      isRecurring: isRecurring === "true" || isRecurring === true,
+      isDeductLeave: finalIsDeductLeave,
       description,
       year,
     });
 
-    // SOLUSI: Setelah submit form, kembalikan (redirect) ke endpoint utama halaman pusat manajemen
-    res.redirect("/leave/manage-calendar");
+    // ======================================================================
+    // 3. TRIGGER MASSAL: Potong Saldo Karyawan jika Agenda Memotong Cuti
+    // ======================================================================
+    if (finalIsDeductLeave === true) {
+      console.log(
+        `⚠️ Mendeteksi Cuti Baru [${name}] memotong kuota. Memperbarui saldo seluruh karyawan tahun ${year}...`
+      );
+
+      // Kurangi sisa kuota (remaining) dan naikkan jatah terpakai (used) sebanyak 1 hari
+      await LeaveBalance.updateMany(
+        { year: year },
+        {
+          $inc: { remaining: -1, used: 1 },
+        }
+      );
+    }
+
+    // Kembali ke halaman utama manajemen kalender dengan mempertahankan tab aktif via query
+    return res.redirect("/leave/manage-calendar?tab=calendar");
   } catch (error) {
-    // PERBAIKAN UTAMA: Tambahkan title agar layout main.ejs tidak crash saat error database/input
+    console.error("Error Create Holiday:", error);
     return res.status(500).render("error", {
       title: "Tambah Agenda - Error",
       message: error.message,
@@ -219,6 +251,92 @@ export const deleteHoliday = async (req, res) => {
     res.status(200).json({ success: true, message: "Hari libur berhasil dihapus." });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const generateOrResetLeaveBalance = async (req, res) => {
+  try {
+    // Tahun diambil dari query / form terselect, default ke tahun berjalan jika kosong
+    const selectedYear = req.body.year ? parseInt(req.body.year) : new Date().getFullYear();
+    const DEFAULT_LEAVE_QUOTA = 12; // Standar jatah cuti tahunan perusahaan
+
+    console.log(
+      `♻️ Memulai proses Generate/Reset Saldo Cuti untuk seluruh karyawan di tahun ${selectedYear}...`
+    );
+
+    // 1. Ambil semua karyawan aktif yang berhak mendapatkan jatah cuti
+    const activeEmployees = await User.find({ isActive: true });
+
+    if (activeEmployees.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Tidak ada karyawan aktif ditemukan." });
+    }
+
+    // 2. HITUNG BEBAN CUTI BERSAMA: Cari semua agenda internal (COMPANY) aktif di tahun tersebut
+    const companyHolidays = await Holiday.find({
+      year: selectedYear,
+      type: "COMPANY",
+      isActive: true,
+    });
+
+    let totalDeductedDays = 0;
+    companyHolidays.forEach((h) => {
+      const start = new Date(h.date);
+      start.setHours(0, 0, 0, 0);
+      const end = h.endDate ? new Date(h.endDate) : new Date(h.date);
+      end.setHours(0, 0, 0, 0);
+
+      const diffTime = Math.abs(end - start);
+      const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      totalDeductedDays += days;
+    });
+
+    console.log(
+      `📊 Ditemukan total ${totalDeductedDays} hari cuti bersama terdaftar di tahun ${selectedYear}.`
+    );
+
+    // 3. PROSES MASSAL: Looping eksekusi menggunakan Promise.all agar performa cepat dan non-blocking
+    await Promise.all(
+      activeEmployees.map(async (employee) => {
+        // Kalkulasi jatah akhir setelah dikurangi akumulasi cuti bersama yang sudah lewat/terdaftar
+        const initialRemaining = DEFAULT_LEAVE_QUOTA - totalDeductedDays;
+        const initialUsed = totalDeductedDays;
+
+        // Upsert Logic: Jika sudah ada maka di-overwrite (Reset), jika belum ada maka di-insert (Generate)
+        await LeaveBalance.findOneAndUpdate(
+          {
+            user: employee._id,
+            year: selectedYear,
+          },
+          {
+            $set: {
+              user: employee._id,
+              year: selectedYear,
+              allocated: DEFAULT_LEAVE_QUOTA,
+              remaining: initialRemaining >= 0 ? initialRemaining : 0, // Proteksi jangan sampai minus
+              used: initialUsed,
+              updatedAt: new Date(),
+            },
+          },
+          {
+            upsert: true, // Membuat data baru jika kombinasi user + year belum ada
+            new: true,
+          }
+        );
+      })
+    );
+
+    console.log(`✅ Sukses generate/reset saldo cuti untuk ${activeEmployees.length} karyawan.`);
+
+    // Kembalikan ke halaman manajemen dengan indikator sukses via query string
+    return res.redirect(`/leave/manage-requests?tab=balances&status=success&year=${selectedYear}`);
+  } catch (error) {
+    console.error("Error Generate/Reset Leave Balance:", error);
+    return res.status(500).render("error", {
+      title: "Reset Saldo - Error",
+      message: error.message,
+    });
   }
 };
 async function getNextApprover(requesterRoleName, currentStep) {
