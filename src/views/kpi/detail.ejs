@@ -1,0 +1,35 @@
+<div class="ml-72 p-8">
+  <div class="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-sm border">
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <h1 class="text-2xl font-bold"><%= kpi.employeeId.fullName %></h1>
+        <p class="text-slate-500">Periode: <%= kpi.periode %> | Status: <%= kpi.status %></p>
+      </div>
+      <div class="text-center p-4 bg-indigo-50 rounded-2xl">
+        <div class="text-xs uppercase text-indigo-400 font-bold">Skor Akhir</div>
+        <div class="text-4xl font-extrabold text-indigo-600"><%= kpi.totalKpiScore %></div>
+      </div>
+    </div>
+
+    <table class="w-full text-sm border">
+      <tr class="bg-slate-100 uppercase text-xs text-slate-500">
+        <th class="p-3 text-left">Indikator</th>
+        <th class="p-3 text-center">Bobot</th>
+        <th class="p-3 text-center">Nilai Input</th>
+        <th class="p-3 text-center">Skor</th>
+      </tr>
+      <% kpi.results.forEach(res => { %>
+      <tr class="border-b">
+        <td class="p-3 font-medium"><%= res.indikator %></td>
+        <td class="p-3 text-center"><%= res.bobot %>%</td>
+        <td class="p-3 text-center font-bold text-blue-600"><%= res.score %></td>
+        <td class="p-3 text-center font-bold"><%= res.finalScore %></td>
+      </tr>
+      <% }) %>
+    </table>
+
+    <div class="mt-6 flex justify-end">
+      <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-lg">Cetak PDF</button>
+    </div>
+  </div>
+</div>
