@@ -1,153 +1,122 @@
-<%- layout('layouts/main', { title }) %>
+<%- layout('layouts/main', { title: 'Ajukan Klaim Beban' }) %>
 
-<script>
-  function toggleReceiptMode() {
-    const noReceipt = document.getElementById("noReceipt").checked;
-
-    const fileSection = document.getElementById("fileSection");
-    const reasonSection = document.getElementById("reasonSection");
-    const declarationSection = document.getElementById("declarationSection");
-
-    const fileInput = document.getElementById("proofFile");
-    const reasonInput = document.getElementById("noReceiptReason");
-    const declarationInput = document.getElementById("selfDeclaration");
-
-    if (noReceipt) {
-      fileSection.style.opacity = "0.4";
-      fileInput.disabled = true;
-      fileInput.value = "";
-
-      reasonSection.style.display = "block";
-      declarationSection.style.display = "block";
-    } else {
-      fileSection.style.opacity = "1";
-      fileInput.disabled = false;
-
-      reasonSection.style.display = "none";
-      declarationSection.style.display = "none";
-
-      reasonInput.value = "";
-      declarationInput.checked = false;
-    }
-  }
-</script>
-
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
-  <div class="max-w-3xl mx-auto">
-
-    <div class="mb-6">
-      <h1 class="text-[24px] font-medium text-slate-800">
-        Ajukan Klaim Beban
-      </h1>
-      <p class="text-[13px] text-slate-500 mt-1">
-        Input pengeluaran operasional dan upload bukti transaksi
-      </p>
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-2xl mx-auto">
+    
+    <div class="mb-8">
+      <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+        <span>Finance</span>
+        <span class="text-slate-300">/</span>
+        <span class="text-slate-900">Expense Claim</span>
+      </nav>
+      <h1 class="text-2xl font-bold text-slate-900">Ajukan Klaim Beban</h1>
+      <p class="text-slate-500 mt-1">Input pengeluaran operasional dan lampirkan bukti transaksi</p>
     </div>
 
-    <div class="bg-white border rounded-2xl p-6">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+      <form action="/expense/claim" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
-      <form method="POST" enctype="multipart/form-data" class="space-y-5">
-
-        <!-- BASIC INPUTS -->
-        <input name="title" placeholder="Judul Pengeluaran" class="input" required />
-
-        <select name="category" class="input">
-          <option>TRANSPORT</option>
-          <option>MEAL</option>
-          <option>PARKING</option>
-          <option>HOTEL</option>
-          <option>OPERASIONAL</option>
-          <option>LAINNYA</option>
-        </select>
-
-        <input type="number" name="amount" placeholder="Nominal" class="input" required />
-
-        <input type="date" name="expenseDate" class="input" required />
-
-        <!-- FILE UPLOAD (PRIMARY) -->
-        <div id="fileSection" class="space-y-2">
-          <label class="text-[12px] text-slate-600">Upload Bukti</label>
-
-          <input
-            id="proofFile"
-            type="file"
-            name="proofFile"
-            class="input"
-          />
-
-          <p class="text-[10px] text-slate-400">
-            Upload struk / invoice / bukti pembayaran
-          </p>
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Judul Pengeluaran</label>
+          <input type="text" name="title" required placeholder="Contoh: Bensin Perjalanan Dinas" 
+                 class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
         </div>
 
-        <!-- SECONDARY OPTION (UX CORRECT POSITION) -->
-        <label class="flex items-center gap-3 bg-slate-50 border p-3 rounded-lg">
-          <input
-            type="checkbox"
-            id="noReceipt"
-            name="noReceipt"
-            onchange="toggleReceiptMode()"
-          />
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Kategori</label>
+            <select name="category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 transition-all">
+              <option value="TRANSPORT">Transport</option>
+              <option value="MEAL">Meal</option>
+              <option value="PARKING">Parking</option>
+              <option value="HOTEL">Hotel</option>
+              <option value="OPERASIONAL">Operasional</option>
+              <option value="LAINNYA">Lainnya</option>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Tanggal Transaksi</label>
+            <input type="date" name="expenseDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 transition-all" />
+          </div>
+        </div>
 
-          <span class="text-[12px] text-slate-600">
-            Tidak ada bukti transaksi
-          </span>
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nominal</label>
+          <input type="number" name="amount" required placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 transition-all" />
+        </div>
+
+        <div id="fileSection" class="space-y-1.5 transition-opacity duration-300">
+          <label class="text-[13px] font-bold text-slate-700">Bukti Transaksi</label>
+          
+          <div id="dropzone-empty" class="relative w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center cursor-pointer">
+            <input type="file" name="proofFile" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
+            <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/></svg>
+            <span class="text-[13px] font-medium text-slate-600">Pilih Berkas atau Drop File</span>
+          </div>
+
+          <div id="dropzone-filled" class="hidden flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
+            <div class="text-[13px] font-medium text-slate-700" id="name-preview">file.jpg</div>
+            <button type="button" onclick="resetFile()" class="text-xs text-rose-600 font-medium">Ganti</button>
+          </div>
+        </div>
+
+        <label class="flex items-center gap-3 bg-slate-50 border border-slate-100 p-4 rounded-xl cursor-pointer">
+          <input type="checkbox" id="noReceipt" name="noReceipt" onchange="toggleReceiptMode()" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+          <span class="text-[13px] font-medium text-slate-600">Tidak ada bukti transaksi (Self Declaration)</span>
         </label>
 
-        <!-- REASON -->
-        <div id="reasonSection" style="display:none;">
-          <label class="text-[12px] text-slate-600">
-            Alasan Tidak Ada Bukti
-          </label>
-
-          <textarea
-            id="noReceiptReason"
-            name="noReceiptReason"
-            class="input"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <!-- DECLARATION (ONLY WHEN NO RECEIPT) -->
-        <div id="declarationSection" style="display:none;">
-          <label class="flex items-start gap-3 bg-slate-50 border p-3 rounded-lg">
-
-            <input
-              type="checkbox"
-              id="selfDeclaration"
-              name="selfDeclaration"
-            />
-
+        <div id="extraSections" class="hidden space-y-4">
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Alasan Tidak Ada Bukti</label>
+            <textarea name="noReceiptReason" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs outline-none focus:bg-white"></textarea>
+          </div>
+          
+          <label class="flex items-start gap-3 bg-blue-50/50 border border-blue-100 p-4 rounded-xl">
+            <input type="checkbox" name="selfDeclaration" class="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600" />
             <div>
-              <p class="text-[13px] text-slate-700">
-                Pernyataan Pengajuan
-              </p>
-
-              <p class="text-[11px] text-slate-400">
-                Saya menyatakan pengeluaran ini benar dan dapat dipertanggungjawabkan.
-              </p>
+              <p class="text-[13px] font-bold text-slate-800">Pernyataan Pengajuan</p>
+              <p class="text-[11px] text-slate-500">Saya menyatakan pengeluaran ini benar dan dapat dipertanggungjawabkan.</p>
             </div>
-
           </label>
         </div>
 
-        <button class="bg-slate-900 text-white px-4 py-2 rounded-lg">
-          Submit Klaim
-        </button>
-
+        <div class="pt-6 border-t border-slate-100 flex justify-end gap-3">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50">Submit Klaim</button>
+        </div>
       </form>
-
     </div>
   </div>
 </div>
 
-<style>
-  .input {
-    width: 100%;
-    border: 1px solid #e2e8f0;
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-top: 6px;
+<script>
+  function toggleReceiptMode() {
+    const isChecked = document.getElementById("noReceipt").checked;
+    const fileSection = document.getElementById("fileSection");
+    const extraSections = document.getElementById("extraSections");
+    const fileInput = document.getElementById("file-input");
+
+    if (isChecked) {
+      fileSection.style.opacity = "0.3";
+      fileInput.disabled = true;
+      extraSections.classList.remove("hidden");
+    } else {
+      fileSection.style.opacity = "1";
+      fileInput.disabled = false;
+      extraSections.classList.add("hidden");
+    }
   }
-</style>
+
+  function handleFileSelect(input) {
+    if (input.files.length > 0) {
+      document.getElementById("name-preview").textContent = input.files[0].name;
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
+    }
+  }
+
+  function resetFile() {
+    document.getElementById("file-input").value = "";
+    document.getElementById("dropzone-empty").classList.remove("hidden");
+    document.getElementById("dropzone-filled").classList.add("hidden");
+  }
+</script>

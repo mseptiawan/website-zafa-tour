@@ -1,151 +1,87 @@
-<%- layout('layouts/main', { title }) %>
+<%- layout('layouts/main', { title: 'Approval Klaim Manager' }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-6xl mx-auto">
 
-  <!-- HEADER -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-semibold">
-      Approval Klaim Manager
-    </h1>
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-slate-900">Approval Klaim Manager</h1>
+      <p class="text-sm text-slate-500 mt-1">Tinjau dan setujui pengajuan klaim beban karyawan</p>
+    </div>
 
-    <p class="text-sm text-slate-500 mt-1">
-      Persetujuan klaim beban di atas Rp 200.000
-    </p>
-  </div>
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[1000px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-4 text-left">Karyawan</th>
+              <th class="px-6 py-4 text-left">Detail Klaim</th>
+              <th class="px-6 py-4 text-left">Kategori</th>
+              <th class="px-6 py-4 text-left">Nominal</th>
+              <th class="px-6 py-4 text-left">Tanggal</th>
+              <th class="px-6 py-4 text-left">Bukti</th>
+              <th class="px-6 py-4 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% if (expenses.length === 0) { %>
+              <tr><td colspan="7" class="text-center py-12 text-slate-400">Tidak ada pengajuan menunggu approval</td></tr>
+            <% } %>
 
-  <!-- TABLE -->
-  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+            <% expenses.forEach(e => { %>
+              <tr class="hover:bg-slate-50/50 transition">
+                
+                <td class="px-6 py-4">
+                  <div class="font-semibold text-slate-800"><%= e.employeeId?.fullName %></div>
+                  <div class="text-[11px] text-slate-400 font-medium uppercase"><%= e.employeeId?.position || '-' %></div>
+                </td>
 
-    <table class="w-full text-sm">
+                <td class="px-6 py-4">
+                  <div class="font-medium text-slate-800"><%= e.title %></div>
+                  <div class="text-xs text-slate-500 truncate max-w-[200px]"><%= e.description || '-' %></div>
+                </td>
 
-      <thead class="bg-slate-50 text-slate-500">
-        <tr>
-          <th class="p-3 text-left">Karyawan</th>
-          <th class="p-3 text-left">Judul</th>
-          <th class="p-3 text-left">Kategori</th>
-          <th class="p-3 text-left">Nominal</th>
-          <th class="p-3 text-left">Tanggal</th>
-          <th class="p-3 text-left">Bukti</th>
-          <th class="p-3 text-left">Status</th>
-          <th class="p-3 text-left">Aksi</th>
-        </tr>
-      </thead>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center px-2 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wide">
+                    <%= e.category %>
+                  </span>
+                </td>
 
-      <tbody class="text-slate-700">
+                <td class="px-6 py-4 font-mono font-medium text-slate-700">Rp <%= e.amount.toLocaleString('id-ID') %></td>
 
-        <% expenses.forEach(e => { %>
+                <td class="px-6 py-4 text-slate-500"><%= new Date(e.expenseDate).toLocaleDateString('id-ID') %></td>
 
-          <tr class="border-t border-slate-100 hover:bg-slate-50">
+                <td class="px-6 py-4">
+                  <% if (e.proofFile) { %>
+                    <% const isImage = ['jpg','jpeg','png','webp'].includes(e.proofFile.split('.').pop().toLowerCase()); %>
+                    <a href="/uploads/<%= e.proofFile %>" target="_blank" class="block group">
+                      <% if (isImage) { %>
+                        <img src="/uploads/<%= e.proofFile %>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm transition group-hover:scale-105" />
+                      <% } else { %>
+                        <span class="text-blue-600 underline text-[11px]">Download File</span>
+                      <% } %>
+                    </a>
+                  <% } else { %>
+                    <div class="flex flex-col">
+                      <span class="text-[10px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full w-fit font-bold">SELF DECLARATION</span>
+                      <span class="text-[10px] text-slate-400 mt-1 max-w-[150px] truncate"><%= e.noReceiptReason || '-' %></span>
+                    </div>
+                  <% } %>
+                </td>
 
-            <!-- KARYAWAN -->
-            <td class="p-3">
-              <div class="font-medium">
-                <%= e.employeeId?.fullName %>
-              </div>
+                <td class="px-6 py-4 text-center">
+                  <form action="/expense/<%= e._id %>/approve/manager" method="POST">
+                    <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold uppercase rounded-lg transition shadow-sm shadow-blue-200">
+                      Approve
+                    </button>
+                  </form>
+                </td>
 
-              <div class="text-xs text-slate-400">
-                <%= e.employeeId?.position || '' %>
-              </div>
-            </td>
-
-            <!-- JUDUL -->
-            <td class="p-3">
-              <div class="font-medium">
-                <%= e.title %>
-              </div>
-
-              <div class="text-xs text-slate-400 mt-1">
-                <%= e.description || '-' %>
-              </div>
-            </td>
-
-            <!-- KATEGORI -->
-            <td class="p-3">
-              <span class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700">
-                <%= e.category %>
-              </span>
-            </td>
-
-            <!-- NOMINAL -->
-            <td class="p-3 font-semibold">
-              Rp <%= e.amount.toLocaleString('id-ID') %>
-            </td>
-
-            <!-- TANGGAL -->
-            <td class="p-3 text-xs">
-              <%= new Date(e.expenseDate).toLocaleDateString('id-ID') %>
-            </td>
-
-            <!-- BUKTI -->
-            <td class="p-3">
-
-              <% if (e.proofFile) { 
-                const file = e.proofFile;
-                const ext = file.split('.').pop().toLowerCase();
-                const isImage = ['jpg','jpeg','png','webp'].includes(ext);
-              %>
-
-                <% if (isImage) { %>
-
-                  <a href="/uploads/<%= file %>" target="_blank">
-                    <img
-                      src="/uploads/<%= file %>"
-                      class="w-12 h-12 object-cover rounded border"
-                    />
-                  </a>
-
-                <% } else { %>
-
-                  <a
-                    href="/uploads/<%= file %>"
-                    download
-                    class="text-indigo-500 text-xs underline"
-                  >
-                    Download Bukti
-                  </a>
-
-                <% } %>
-
-              <% } else { %>
-
-                <div class="text-xs text-amber-500">
-                  Self Declaration
-                </div>
-
-                <div class="text-[11px] text-slate-400 mt-1">
-                  <%= e.noReceiptReason || '-' %>
-                </div>
-
-              <% } %>
-
-            </td>
-
-            <!-- STATUS -->
-            <td class="p-3">
-              <span class="px-2 py-1 text-xs rounded-md bg-amber-100 text-amber-700">
-                Menunggu Manager
-              </span>
-            </td>
-
-            <!-- AKSI -->
-            <td class="p-3">
-              <form action="/expense/<%= e._id %>/approve/manager" method="POST">
-                <button
-                  class="px-3 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-xs rounded-lg"
-                >
-                  Approve
-                </button>
-              </form>
-            </td>
-
-          </tr>
-
-        <% }) %>
-
-      </tbody>
-
-    </table>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
   </div>
-
 </div>

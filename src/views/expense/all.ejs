@@ -1,127 +1,68 @@
-<%- layout('layouts/main', { title }) %>
+<%- layout('layouts/main', { title: 'Semua Klaim Beban' }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-6xl mx-auto">
 
-  <!-- HEADER -->
-  <div class="mb-6">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-slate-900">Semua Klaim Beban</h1>
+      <p class="text-sm text-slate-500 mt-1">Monitoring seluruh data pengajuan klaim karyawan</p>
+    </div>
 
-    <h1 class="text-2xl font-semibold">
-      Semua Klaim Beban
-    </h1>
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[1000px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-4 text-left">Karyawan</th>
+              <th class="px-6 py-4 text-left">Judul Klaim</th>
+              <th class="px-6 py-4 text-left">Kategori</th>
+              <th class="px-6 py-4 text-left">Nominal</th>
+              <th class="px-6 py-4 text-left">Tanggal</th>
+              <th class="px-6 py-4 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% if (expenses.length === 0) { %>
+              <tr><td colspan="6" class="text-center py-12 text-slate-400">Belum ada data klaim</td></tr>
+            <% } %>
 
-    <p class="text-sm text-slate-500 mt-1">
-      Monitoring seluruh expense claim
-    </p>
+            <% 
+              const statusConfig = {
+                'PAID': { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'PAID' },
+                'PENDING_MANAGER': { bg: 'bg-amber-50', text: 'text-amber-700', label: 'MNG PENDING' },
+                'PENDING_FINANCE': { bg: 'bg-blue-50', text: 'text-blue-700', label: 'FIN PENDING' },
+                'REJECTED': { bg: 'bg-rose-50', text: 'text-rose-700', label: 'REJECTED' }
+              };
+            %>
 
-  </div>
-
-  <!-- TABLE -->
-  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-
-    <table class="w-full text-sm">
-
-      <thead class="bg-slate-50 text-slate-500">
-
-        <tr>
-          <th class="p-3 text-left">Karyawan</th>
-          <th class="p-3 text-left">Judul</th>
-          <th class="p-3 text-left">Kategori</th>
-          <th class="p-3 text-left">Nominal</th>
-          <th class="p-3 text-left">Tanggal</th>
-          <th class="p-3 text-left">Status</th>
-        </tr>
-
-      </thead>
-
-      <tbody>
-
-        <% expenses.forEach(e => { %>
-
-          <tr class="border-t border-slate-100 hover:bg-slate-50">
-
-            <!-- KARYAWAN -->
-            <td class="p-3">
-
-              <div class="font-medium">
-                <%= e.employeeId?.fullName %>
-              </div>
-
-
-            </td>
-
-            <!-- JUDUL -->
-            <td class="p-3">
-
-              <div class="font-medium">
-                <%= e.title %>
-              </div>
-
-              <div class="text-xs text-slate-400 mt-1">
-                <%= e.description || '-' %>
-              </div>
-
-            </td>
-
-            <!-- KATEGORI -->
-            <td class="p-3">
-
-              <span
-                class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700"
-              >
-                <%= e.category %>
-              </span>
-
-            </td>
-
-            <!-- NOMINAL -->
-            <td class="p-3 font-semibold">
-              Rp <%= e.amount.toLocaleString() %>
-            </td>
-
-            <!-- TANGGAL -->
-            <td class="p-3 text-slate-500">
-              <%= new Date(e.expenseDate).toLocaleDateString() %>
-            </td>
-
-            <!-- STATUS -->
-            <td class="p-3">
-
-              <% if(e.status === 'PAID') { %>
-
-                <span
-                  class="px-2 py-1 text-xs rounded-md bg-emerald-100 text-emerald-700"
-                >
-                  PAID
-                </span>
-
-              <% } else if(e.status === 'PENDING_MANAGER') { %>
-
-                <span
-                  class="px-2 py-1 text-xs rounded-md bg-amber-100 text-amber-700"
-                >
-                  PENDING MANAGER
-                </span>
-
-              <% } else { %>
-
-                <span
-                  class="px-2 py-1 text-xs rounded-md bg-slate-100 text-slate-700"
-                >
-                  <%= e.status %>
-                </span>
-
-              <% } %>
-
-            </td>
-
-          </tr>
-
-        <% }) %>
-
-      </tbody>
-
-    </table>
+            <% expenses.forEach(e => { %>
+              <tr class="hover:bg-slate-50/50 transition">
+                <td class="px-6 py-4">
+                  <div class="font-semibold text-slate-800"><%= e.employeeId?.fullName %></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="font-medium text-slate-800"><%= e.title %></div>
+                  <div class="text-[11px] text-slate-400 truncate max-w-[200px]"><%= e.description || '-' %></div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex px-2 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wide">
+                    <%= e.category %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 font-mono font-medium text-slate-700">Rp <%= e.amount.toLocaleString('id-ID') %></td>
+                <td class="px-6 py-4 text-slate-500"><%= new Date(e.expenseDate).toLocaleDateString('id-ID') %></td>
+                <td class="px-6 py-4 text-center">
+                  <% const s = statusConfig[e.status] || { bg: 'bg-slate-50', text: 'text-slate-600', label: e.status }; %>
+                  <span class="inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-transparent <%= s.bg %> <%= s.text %>">
+                    <%= s.label %>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
   </div>
-
 </div>

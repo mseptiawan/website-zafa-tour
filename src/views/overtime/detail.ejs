@@ -1,114 +1,78 @@
-<% layout('layouts/main') -%>
+<%- layout('layouts/main', { title: 'Detail Lembur' }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
+<div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
+  <div class="max-w-4xl mx-auto">
 
-  <div class="max-w-3xl mx-auto">
+    <a href="javascript:history.back()"
+      class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
+      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      Kembali
+    </a>
 
-    <!-- HEADER -->
-    <div class="mb-6">
-      <h1 class="text-xl font-medium text-slate-800">
-        Detail Lembur
-      </h1>
-
-      <p class="text-sm text-slate-500 mt-1">
-        Informasi pengajuan lembur karyawan
-      </p>
-    </div>
-
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-
-      <!-- CONTENT -->
-      <div class="divide-y divide-slate-100">
-
-        <!-- TANGGAL -->
-        <div class="grid grid-cols-3 px-5 py-4">
-          <div class="text-xs text-slate-500">
-            Tanggal
-          </div>
-
-          <div class="col-span-2 text-sm text-slate-700">
-            <%= new Date(overtime.date).toLocaleDateString("id-ID") %>
-          </div>
+    <div class="bg-white border border-slate-200/60 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] overflow-hidden">
+      
+      <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
+        <div>
+          <h1 class="text-xl font-semibold text-slate-900 tracking-tight">Detail Lembur</h1>
+          <p class="text-[13px] text-slate-500 mt-0.5">Informasi lengkap pengajuan lembur karyawan</p>
         </div>
 
-        <!-- JAM -->
-        <div class="grid grid-cols-3 px-5 py-4">
-          <div class="text-xs text-slate-500">
-            Jam Lembur
-          </div>
-
-          <div class="col-span-2 text-sm text-slate-700">
-            <%= overtime.startTime %> - <%= overtime.endTime %>
-          </div>
-        </div>
-
-        <!-- TOTAL -->
-        <div class="grid grid-cols-3 px-5 py-4">
-          <div class="text-xs text-slate-500">
-            Total Jam
-          </div>
-
-          <div class="col-span-2 text-sm text-slate-700">
-            <%= overtime.totalHours %> jam
-          </div>
-        </div>
-
-        <!-- PEKERJAAN -->
-        <div class="grid grid-cols-3 px-5 py-4">
-          <div class="text-xs text-slate-500">
-            Pekerjaan
-          </div>
-
-          <div class="col-span-2 text-sm text-slate-700 leading-relaxed">
-            <%= overtime.workDescription %>
-          </div>
-        </div>
-
-        <!-- HASIL -->
-        <div class="grid grid-cols-3 px-5 py-4">
-          <div class="text-xs text-slate-500">
-            Hasil
-          </div>
-
-          <div class="col-span-2 text-sm text-slate-700 leading-relaxed">
-            <%= overtime.result || '-' %>
-          </div>
-        </div>
-
-        <!-- FILE -->
-        <% if (overtime.proofFile) { %>
-          <div class="grid grid-cols-3 px-5 py-4 items-start">
-            <div class="text-xs text-slate-500">
-              Bukti
-            </div>
-
-            <div class="col-span-2">
-              <img
-                src="/uploads/files/<%= overtime.proofFile %>"
-                class="max-w-md rounded-lg border border-slate-200"
-              >
-            </div>
-          </div>
-        <% } %>
-
-        <!-- STATUS -->
-        <div class="grid grid-cols-3 px-5 py-4 items-center">
-          <div class="text-xs text-slate-500">
-            Status
-          </div>
-
-          <div class="col-span-2">
-            <span class="inline-block text-xs px-2 py-1 rounded bg-slate-100 text-slate-700">
-              <%= overtime.status %>
-            </span>
-          </div>
-        </div>
-
+        <% 
+          const statusConfig = {
+            'Approved': 'bg-emerald-50 text-emerald-700 border-emerald-200/50',
+            'Rejected': 'bg-red-50 text-red-700 border-red-200/50',
+            'Pending Manager': 'bg-amber-50 text-amber-700 border-amber-200/50'
+          };
+        %>
+        <span class="text-[11px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider border <%= statusConfig[overtime.status] || 'bg-slate-50 text-slate-600 border-slate-200' %>">
+          <%= overtime.status %>
+        </span>
       </div>
 
+      <div class="p-8 space-y-8">
+        
+        <div>
+          <h2 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3.5">Informasi Lembur</h2>
+          <div class="grid grid-cols-2 gap-x-8 gap-y-5 border border-slate-100 bg-slate-50/20 p-5 rounded-xl">
+            <div>
+              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal</div>
+              <div class="text-[13px] font-medium text-slate-800"><%= new Date(overtime.date).toLocaleDateString("id-ID", {day: '2-digit', month: 'long', year: 'numeric'}) %></div>
+            </div>
+            <div>
+              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Jam Lembur</div>
+              <div class="text-[13px] font-medium text-slate-800"><%= overtime.startTime %> - <%= overtime.endTime %></div>
+            </div>
+            <div>
+              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Total Durasi</div>
+              <div class="text-[13px] font-semibold text-slate-900"><%= overtime.totalHours %> Jam</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="border-t border-slate-100 pt-6">
+            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Pekerjaan</div>
+            <div class="text-[13px] text-slate-600 leading-relaxed"><%= overtime.workDescription %></div>
+          </div>
+
+          <div class="border-t border-slate-100 pt-6">
+            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Hasil Pekerjaan</div>
+            <div class="text-[13px] text-slate-600 leading-relaxed"><%= overtime.result || '-' %></div>
+          </div>
+        </div>
+
+        <% if (overtime.proofFile) { %>
+        <div class="border-t border-slate-100 pt-6">
+          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Bukti Pendukung</div>
+          <img src="/uploads/files/<%= overtime.proofFile %>" alt="Bukti Lembur"
+               class="max-w-sm rounded-xl border border-slate-200 shadow-sm transition hover:opacity-90">
+        </div>
+        <% } %>
+
+      </div>
     </div>
 
   </div>
-
 </div>
