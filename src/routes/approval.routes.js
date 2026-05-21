@@ -1,6 +1,10 @@
 import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
-import { listPendingApprovals, approvePHK } from "../controllers/approval.controller.js";
+import {
+  listPendingApprovals,
+  listHistoryPHK,
+  approvePHK,
+} from "../controllers/approval.controller.js";
 
 const router = express.Router();
 
@@ -12,5 +16,5 @@ router.get("/pending", listPendingApprovals);
 
 // Pimpinan menyetujui pengajuan PHK berdasarkan ID
 router.post("/:terminationId/approve", approvePHK);
-
+router.get("/history", listHistoryPHK);
 export default router;

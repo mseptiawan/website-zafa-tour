@@ -1,10 +1,11 @@
-<%- layout('layouts/main') -%>
+<%- layout('layouts/main', { title: "Data Karyawan" }) %>
 
 <div class="ml-72 p-8 bg-slate-50 min-h-screen">
+  <!-- HEADER UTAMA -->
   <div class="flex items-center justify-between mb-8">
     <div>
       <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Data Karyawan</h1>
-      <p class="text-sm text-slate-500 mt-1">Kelola informasi dan peran seluruh anggota organisasi.</p>
+      <p class="text-sm text-slate-500 mt-1">Kelola informasi, peran, dan lacak status keanggotaan seluruh organisasi.</p>
     </div>
 
     <a href="/employee/create"
@@ -16,6 +17,7 @@
     </a>
   </div>
 
+  <!-- CONTAINER DATA TABLE -->
   <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
@@ -24,76 +26,172 @@
             <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Karyawan</th>
             <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Posisi / Bidang</th>
             <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Unit Kerja</th>
-            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Status / Aksi</th>
           </tr>
         </thead>
 
         <tbody class="divide-y divide-slate-100">
-          <% employees.forEach(e => { %>
-            <tr class="hover:bg-slate-50/80 transition-colors group">
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm border border-indigo-200">
-                    <%= e.fullName.charAt(0) %>
-                  </div>
-                  <div>
-                    <div class="font-semibold text-slate-800"><%= e.fullName %></div>
-                    <div class="text-xs text-slate-500 font-medium tracking-tight">
-                      @<%= e.userId?.username || 'user' %>
+          <% if (employees && employees.length > 0) { %>
+            <% employees.forEach(e => { %>
+              <!-- LOGIK CHECK STATUS: Jika status false, tandai sebagai non-aktif -->
+           <% let isNonActive = e.userId && e.userId.isActive === false; %>
+              <tr class="transition-all duration-200 <%= isNonActive ? 'bg-red-50/30 opacity-80 hover:bg-red-50/50' : 'hover:bg-slate-50/80 group' %>">
+                
+                <!-- 1. INFORMASI UTAMA KARYAWAN -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <!-- Avatar Lingkaran Inisial Nama -->
+                    <div class="h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm border <%= isNonActive ? 'bg-slate-200 text-slate-500 border-slate-300' : 'bg-indigo-50 text-indigo-700 border-indigo-100' %>">
+                      <%= e.fullName ? e.fullName.charAt(0).toUpperCase() : '?' %>
                     </div>
-                  </div>    
-                </div>
-              </td>
+                    <div>
+                      <div class="font-semibold text-sm <%= isNonActive ? 'text-slate-500 line-through decoration-slate-400' : 'text-slate-800' %>">
+                        <%= e.fullName %>
+                      </div>
+                      <div class="text-xs text-slate-500 font-medium tracking-tight flex items-center gap-2">
+                        @<%= e.userId?.username || 'user' %>
+                        <% if (isNonActive) { %>
+                          <span class="px-1.5 py-0.5 bg-red-100 text-red-700 font-bold text-[9px] rounded border border-red-200 uppercase tracking-wider animate-pulse">Non-Aktif</span>
+                        <% } %>
+                      </div>
+                    </div>    
+                  </div>
+                </td>
 
-              <td class="px-6 py-4">
-                <div class="text-sm text-slate-700 font-medium"><%= e.positionId?.name || '-' %></div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">Bidang: <%= e.bidangId?.name || '-' %></div>
-              </td>
+                <!-- 2. JABATAN / BIDANG -->
+                <td class="px-6 py-4">
+                  <div class="text-sm font-medium <%= isNonActive ? 'text-slate-400' : 'text-slate-700' %>">
+                    <%= e.positionId?.name || '-' %>
+                  </div>
+                  <div class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">
+                    Bidang: <%= e.bidangId?.name || '-' %>
+                  </div>
+                </td>
 
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                  <%= e.unitId?.name || 'Unassigned' %>
-                </span>
-              </td>
+                <!-- 3. UNIT KERJA -->
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= isNonActive ? 'bg-slate-100 text-slate-500 border border-slate-200' : 'bg-blue-50 text-blue-700 border border-blue-100' %>">
+                    <%= e.unitId?.name || 'Unassigned' %>
+                  </span>
+                </td>
 
-              <td class="px-6 py-4 text-right">
-                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <a href="/employee/edit/<%= e._id %>" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                <!-- 4. MENU OPERASIONAL / TOMBOL AKSI (IKON DIJAMIN KELIATAN JELAS) -->
+                <td class="px-6 py-4 text-right">
+                  <% if (isNonActive) { %>
+                    <!-- Jika karyawan sudah di-PHK, tampilkan tombol cepat log riwayat arsip -->
+                    <button type="button" 
+                            onclick="showHistoryModal('<%= e.fullName %>', '<%= e.terminationInfo?.reason || 'Alasan tidak ditemukan' %>', '<%= e.terminationInfo?.approvedBy || 'Pimpinan' %>', '<%= e.terminationInfo?.date || '-' %>')"
+                            class="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 bg-white hover:bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 shadow-sm transition-all cursor-pointer">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                   </a>
-                   <button type="button" 
-             onclick="openPhkModal('<%= e._id %>', '<%= e.fullName %>')"
-             class="p-2 text-slate-400 hover:text-red-600 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-     </button>
-                </div>
+                      Arsip PHK
+                    </button>
+                  <% } else { %>
+                    <!-- Jika aktif, menu operasional tampil stabil berbentuk box tombol tanpa sembunyi -->
+                    <div class="flex items-center justify-end gap-2">
+                       <!-- Tombol Edit Data -->
+                       <a href="/employee/edit/<%= e._id %>" 
+                          class="p-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-sm transition-all"
+                          title="Edit Data">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                       </a>
+                       
+                       <!-- Tombol Ajukan PHK / Keluar -->
+<button type="button" 
+        onclick="openPhkModal('<%= e._id %>', '<%= e.fullName %>')"
+        class="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50/50 shadow-sm transition-all cursor-pointer"
+        title="Non-Aktifkan Karyawan">
+   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+   </svg>
+</button>
+                    </div>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <!-- State Jika Array Data Kosong -->
+            <tr>
+              <td colspan="4" class="px-6 py-12 text-center text-sm font-medium text-slate-400 bg-slate-50/30">
+                Tidak ada data karyawan yang ditemukan.
               </td>
             </tr>
-          <% }) %>
+          <% } %>
         </tbody>
       </table>
     </div>
     
+    <!-- FOOTER INFORMASI TOTAL DATA -->
     <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30">
-      <p class="text-xs text-slate-500">Menampilkan <%= employees.length %> karyawan</p>
+      <p class="text-xs text-slate-500">Menampilkan <%= employees ? employees.length : 0 %> karyawan</p>
     </div>
   </div>
 </div>
-<div id="phkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-  <form id="phkForm" action="/employee/phk" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl w-96">
-    <h3 class="font-bold text-lg mb-4">Ajukan PHK: <span id="empName"></span></h3>
+
+<!-- MODAL 1: FORM PENGAJUAN PHK -->
+<div id="phkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  <form id="phkForm" action="/employee/phk" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl w-96 shadow-xl border border-slate-100">
+    <h3 class="font-bold text-base text-slate-800 mb-2">Ajukan Pemutusan Hubungan Kerja</h3>
+    <p class="text-xs text-slate-400 mb-4">Pengajuan ini akan dikirim ke Pusat Otorisasi Pimpinan untuk divalidasi.</p>
+    
+    <div class="mb-4 bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 text-xs font-semibold text-slate-700">
+      Karyawan: <span id="empName" class="text-indigo-600 font-bold"></span>
+    </div>
+
     <input type="hidden" name="employeeId" id="employeeId">
-    <textarea name="reason" required placeholder="Alasan PHK..." class="w-full border rounded-lg p-2 mb-4"></textarea>
-    <input type="file" name="document" accept=".pdf,.jpg,.png" required class="w-full mb-4">
-    <div class="flex justify-end gap-2">
-      <button type="button" onclick="closePhkModal()" class="px-4 py-2 text-slate-500">Batal</button>
-      <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg">Kirim Pengajuan</button>
+    
+    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Alasan Pengajuan</label>
+    <textarea name="reason" required placeholder="Tuliskan alasan penghentian hak kerja secara detail..." class="w-full border border-slate-200 rounded-xl p-3 text-xs mb-4 focus:outline-none focus:border-indigo-500 min-h-[80px]"></textarea>
+    
+    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Berkas Pendukung (.pdf, .jpg, .png)</label>
+    <input type="file" name="document" accept=".pdf,.jpg,.png" required class="w-full border border-slate-100 bg-slate-50 rounded-lg p-2 text-xs mb-5">
+    
+    <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+      <button type="button" onclick="closePhkModal()" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors">Batal</button>
+      <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors">Kirim Pengajuan</button>
     </div>
   </form>
+</div>
+
+<!-- MODAL 2: PREVIEW ARSIP RIWAYAT PHK -->
+<div id="historyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  <div class="bg-white p-6 rounded-2xl w-96 shadow-xl border border-slate-100">
+    <div class="flex items-center gap-2 text-slate-800 mb-3">
+      <div class="h-7 w-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h3 class="font-bold text-sm">Detail Dokumen Arsip Keluar</h3>
+    </div>
+    
+    <div class="space-y-3 my-4 bg-slate-50 p-4 rounded-xl border border-slate-200/40 text-xs">
+      <div>
+        <span class="block text-[10px] text-slate-400 font-bold uppercase">Nama Mantan Karyawan</span>
+        <span id="histName" class="font-bold text-slate-700"></span>
+      </div>
+      <div>
+        <span class="block text-[10px] text-slate-400 font-bold uppercase">Disahkan Oleh</span>
+        <span id="histAdmin" class="font-bold text-slate-800"></span>
+      </div>
+      <div>
+        <span class="block text-[10px] text-slate-400 font-bold uppercase">Tanggal Penonaktifan</span>
+        <span id="histDate" class="font-medium text-slate-600"></span>
+      </div>
+      <div class="pt-2 border-t border-slate-200/60">
+        <span class="block text-[10px] text-slate-400 font-bold uppercase mb-0.5">Alasan Resmi PHK</span>
+        <p id="histReason" class="text-slate-600 leading-relaxed italic bg-white p-2 rounded border border-slate-200/40 break-words"></p>
+      </div>
+    </div>
+
+    <div class="flex justify-end pt-2">
+      <button type="button" onclick="closeHistoryModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl shadow-sm transition-all">Tutup Dokumen</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -103,4 +201,13 @@
     document.getElementById('phkModal').classList.remove('hidden');
   }
   function closePhkModal() { document.getElementById('phkModal').classList.add('hidden'); }
+
+  function showHistoryModal(name, reason, approvedBy, date) {
+    document.getElementById('histName').innerText = name;
+    document.getElementById('histReason').innerText = reason;
+    document.getElementById('histAdmin').innerText = approvedBy.startsWith('@') ? approvedBy : `@${approvedBy}`;
+    document.getElementById('histDate').innerText = date;
+    document.getElementById('historyModal').classList.remove('hidden');
+  }
+  function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
 </script>

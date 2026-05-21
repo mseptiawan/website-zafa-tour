@@ -9,25 +9,47 @@ import Bidang from "../models/Bidang.js";
 /* =========================
    LIST EMPLOYEE
 ========================= */
-export const listEmployee = async (req, res) => {
+export const getAllEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find()
+    // 1. Ambil seluruh data karyawan beserta user statusnya
+    let employeesData = await Employee.find()
       .populate("userId")
       .populate("positionId")
-      .populate("unitId")
       .populate("bidangId")
-      .sort({ createdAt: -1 });
+      .populate("unitId");
 
-    res.render("employee/index", {
-      title: "Data Karyawan",
-      employees,
+    // 2. Ambil data PHK yang sudah disetujui pimpinan untuk dicocokkan
+    const approvedTerminations = await Termination.find({ status: "Approved" }).populate(
+      "approvedBy",
+      "username"
+    );
+
+    // 3. Gabungkan informasi PHK ke dalam list karyawan agar EJS tinggal pakai
+    const employees = employeesData.map((emp) => {
+      const empObj = emp.toObject();
+      const termInfo = approvedTerminations.find(
+        (t) => t.employeeId.toString() === emp._id.toString()
+      );
+
+      if (termInfo) {
+        empObj.terminationInfo = {
+          reason: termInfo.reason,
+          approvedBy: termInfo.approvedBy?.username || "System",
+          date: new Date(termInfo.updatedAt).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+        };
+      }
+      return empObj;
     });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error");
+
+    res.render("employee/index", { title: "Data Karyawan", employees });
+  } catch (error) {
+    res.status(500).send("Error loading employees dashboard");
   }
 };
-
 /* =========================
    FORM CREATE
 ========================= */
@@ -144,6 +166,100 @@ export const ajukanPHK = async (req, res) => {
     res.status(500).json({
       message: "Gagal mengajukan PHK",
       error_asli: error.message,
+    });
+  }
+};
+export const renderEditForm = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Ambil data employee beserta data akun User-nya
+    const employee = await Employee.findById(id).populate("userId");
+    if (!employee) {
+      return res.status(404).render("errors/404", { message: "Karyawan tidak ditemukan" });
+    }
+
+    // Ambil semua data master untuk opsi select-box
+    const positions = await Position.find();
+    const bidang = await Bidang.find();
+    const units = await Unit.find();
+
+    res.render("employee/edit", {
+      title: "Edit Karyawan",
+      employee,
+      positions,
+      bidang,
+      units,
+      error: null,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+// 2. Memproses Perubahan Data (POST)
+export const updateEmployee = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const {
+      fullName,
+      positionId,
+      unitId,
+      bidangId,
+      employmentStatus,
+      gender,
+      phoneNumber,
+      address,
+      baseSalary,
+    } = req.body;
+
+    // 1. Cari data employee terlebih dahulu
+    const employee = await Employee.findById(id);
+    if (!employee) {
+      return res.status(404).send("Karyawan tidak ditemukan");
+    }
+
+    // CATATAN: Proses update User (email & isActive) dihapus dari sini
+    // karena field tersebut sudah diset readonly/dihapus di tampilan EJS.
+
+    // 2. Update data Profil (Employee Model)
+    employee.fullName = fullName;
+    employee.positionId = positionId;
+    employee.unitId = unitId || null;
+    employee.bidangId = bidangId || null;
+    employee.employmentStatus = employmentStatus;
+    employee.gender = gender;
+    employee.phoneNumber = phoneNumber;
+    employee.address = address;
+    employee.baseSalary = Number(baseSalary) || 0;
+
+    // Jika ada upload foto baru
+    if (req.file) {
+      employee.profilePhoto = req.file.filename;
+    }
+
+    await employee.save();
+
+    // Redirect kembali ke halaman daftar karyawan setelah sukses
+    res.redirect("/employee");
+  } catch (error) {
+    // Tampilkan detail error asli di terminal untuk mempermudah tracking berikutnya
+    console.error("Error Update Employee:", error);
+
+    // Jika gagal, render ulang form dengan pesan error yang sesuai
+    const employee = await Employee.findById(id).populate("userId");
+    const positions = await Position.find();
+    const bidang = await Bidang.find();
+    const units = await Unit.find();
+
+    res.render("employee/edit", {
+      title: "Edit Karyawan",
+      employee,
+      positions,
+      bidang,
+      units,
+      error: "Gagal memperbarui data profil karyawan. Silakan periksa kembali inputan Anda.",
     });
   }
 };

@@ -1,0 +1,193 @@
+<%- layout('layouts/main', { title: "Persetujuan PHK" }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Header Utama -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-xl font-bold text-slate-800">Pusat Otorisasi & Transaksi PHK</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Evaluasi pengajuan pemutusan hubungan kerja dari HR, penonaktifan akun, beserta arsip keputusan pimpinan.</p>
+      </div>
+    </div>
+
+    <!-- TAB NAVIGATION COMPONENT (Single Page Tab) -->
+    <div class="flex items-center gap-2 mb-6 border-b border-slate-200/60 pb-px">
+      <button type="button" onclick="switchTab('active')" id="tab-btn-active"
+        class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5">
+        Permintaan Aktif
+        <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-blue-50 text-blue-600 rounded-md tabular-nums font-bold">
+          <%= pendingList.length %>
+        </span>
+      </button>
+
+      <button type="button" onclick="switchTab('history')" id="tab-btn-history"
+        class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5">
+        Riwayat Persetujuan
+        <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">
+          <%= historyList.length %>
+        </span>
+      </button>
+    </div>
+
+    <!-- ================== ZONE TAB 1: PERMINTAAN AKTIF ================== -->
+    <div id="tab-content-active" class="tab-pane block">
+      <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-[13px] font-bold text-slate-800">Menunggu Review & Persetujuan Anda</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+                <th class="px-5 py-3">Nama Karyawan</th>
+                <th class="px-5 py-3">Posisi / Bidang</th>
+                <th class="px-5 py-3">Alasan Pengajuan</th>
+                <th class="px-5 py-3 text-center">Dokumen Berkas</th>
+                <th class="px-5 py-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+              <% if (pendingList.length === 0) { %>
+                <tr>
+                  <td colspan="5" class="px-5 py-12 text-center text-slate-400">
+                    <i class="fa-regular fa-circle-check text-3xl mb-2 block text-slate-300"></i>
+                    Bersih! Tidak ada permohonan PHK aktif yang memerlukan tindakan Anda.
+                  </td>
+                </tr>
+              <% } else { %>
+                <% pendingList.forEach(t => { %>
+                  <tr class="hover:bg-slate-50/50 transition duration-150">
+                    <td class="px-5 py-4">
+                      <div class="font-bold text-slate-900"><%= t.employeeId?.fullName || 'N/A' %></div>
+                      <div class="text-[10px] text-slate-400 mt-0.5">@<%= t.employeeId?.userId?.username || 'user' %></div>
+                    </td>
+                    <td class="px-5 py-4">
+                      <div class="font-medium text-slate-700"><%= t.employeeId?.positionId?.name || '-' %></div>
+                      <div class="text-[10px] text-slate-400 uppercase tracking-wide mt-0.5">Bidang: <%= t.employeeId?.bidangId?.name || '-' %></div>
+                    </td>
+                    <td class="px-5 py-4">
+                      <p class="max-w-xs break-words line-clamp-2 text-slate-600" title="<%= t.reason %>">
+                        <%= t.reason %>
+                      </p>
+                    </td>
+                    <td class="px-5 py-4 text-center">
+                      <% if (t.documentPath) { %>
+                        <a href="/uploads/files/<%= t.documentPath.split('/').pop() %>" target="_blank"
+                          class="inline-flex items-center gap-1 px-2 py-1 border border-slate-200 text-[11px] font-bold rounded-lg text-indigo-600 bg-white hover:bg-indigo-50 shadow-sm transition duration-150">
+                          <i class="fa-solid fa-file-pdf text-[10px] text-indigo-400"></i> Lihat Berkas
+                        </a>
+                      <% } else { %>
+                        <span class="text-slate-400 italic">Tidak ada file</span>
+                      <% } %>
+                    </td>
+                    <td class="px-5 py-4 text-center">
+                      <form action="/approvals/<%= t._id %>/approve" method="POST" 
+                            onsubmit="return confirm('Apakah Anda yakin menyetujui PHK untuk karyawan ini? Tindakan ini akan menonaktifkan akun mereka secara permanen.');"
+                            class="inline-block">
+                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-sm transition duration-150 cursor-pointer">
+                          <i class="fa-solid fa-check text-[10px]"></i> Setujui
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== ZONE TAB 2: RIWAYAT PERSETUJUAN ================== -->
+    <div id="tab-content-history" class="tab-pane hidden">
+      <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-[13px] font-bold text-slate-800">Arsip Transaksi PHK Selesai</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+                <th class="px-5 py-3">Nama Karyawan</th>
+                <th class="px-5 py-3">Posisi / Bidang</th>
+                <th class="px-5 py-3">Alasan Resmi</th>
+                <th class="px-5 py-3">Disetujui Oleh</th>
+                <th class="px-5 py-3">Tanggal Keluar</th>
+                <th class="px-5 py-3 text-center">Status Final</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+              <% if (historyList.length === 0) { %>
+                <tr>
+                  <td colspan="6" class="px-5 py-12 text-center text-slate-400">
+                    <i class="fa-regular fa-folder text-3xl mb-2 block text-slate-300"></i>
+                    Belum ada riwayat arsip pemrosesan keputusan PHK.
+                  </td>
+                </tr>
+              <% } else { %>
+                <% historyList.forEach(leave => { %>
+                  <tr class="hover:bg-slate-50/50 transition duration-150">
+                    <td class="px-5 py-4">
+                      <div class="font-bold text-slate-700 line-through decoration-slate-400"><%= leave.employeeId?.fullName || 'N/A' %></div>
+                      <div class="text-[10px] bg-red-50 text-red-600 font-bold px-1.5 py-0.5 rounded border border-red-100 inline-block mt-0.5">Non-Aktif</div>
+                    </td>
+                    <td class="px-5 py-4">
+                      <div class="font-medium text-slate-600"><%= leave.employeeId?.positionId?.name || '-' %></div>
+                      <div class="text-[10px] text-slate-400 uppercase mt-0.5">Bidang: <%= leave.employeeId?.bidangId?.name || '-' %></div>
+                    </td>
+                    <td class="px-5 py-4">
+                      <p class="max-w-xs break-words line-clamp-2 text-slate-500" title="<%= leave.reason %>">
+                        <%= leave.reason %>
+                      </p>
+                    </td>
+                    <td class="px-5 py-4">
+                      <div class="font-bold text-slate-800">@<%= leave.approvedBy?.username || 'System' %></div>
+                      <div class="text-[10px] text-slate-400 mt-0.5"><%= leave.approvedBy?.email || '' %></div>
+                    </td>
+                    <td class="px-5 py-4 text-slate-500 font-medium">
+                      <%= new Date(leave.updatedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                    </td>
+                    <td class="px-5 py-4 text-center">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                        <i class="fa-solid fa-circle-check text-[10px]"></i> Disahkan
+                      </span>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CLIENT JS CONTROL FOR SINGLE-PAGE TABBING -->
+<script>
+  function switchTab(tabName) {
+    // 1. Sembunyikan semua pane konten
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.replace('block', 'hidden');
+    });
+
+    // 2. Reset semua styling element button tab ke mode inactive
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
+      btn.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+    });
+
+    // 3. Tampilkan kontainer pane yang dipilih oleh user
+    const targetPane = document.getElementById(`tab-content-${tabName}`);
+    if (targetPane) targetPane.classList.replace('hidden', 'block');
+
+    // 4. Set tombol tab yang aktif saat ini menjadi berwarna biru terang
+    const targetBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (targetBtn) {
+      targetBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
+      targetBtn.classList.add('border-blue-600', 'text-blue-600', 'font-bold');
+    }
+  }
+</script>
