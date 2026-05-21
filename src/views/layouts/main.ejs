@@ -12,14 +12,15 @@
       rel="stylesheet"
     />
   </head>
-
-  <body class="bg-slate-100 text-slate-800">
+  <body
+    class="bg-[#f1f5f9] text-slate-800 antialiased selection:bg-indigo-50 selection:text-indigo-600"
+  >
     <div class="flex min-h-screen">
       <!-- SIDEBAR -->
       <%- include('../partials/sidebar') %>
 
       <!-- CONTENT -->
-      <main class="flex-1 p-10"><%- body -%></main>
+      <main class="flex-1 px-8 py-7 overflow-x-hidden"><%- body -%></main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/js/sweetalert-handler.js"></script>

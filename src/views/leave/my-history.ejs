@@ -20,39 +20,69 @@
         </a>
       </div>
 
-      <!-- SUMMARY STATS GRID -->
-      <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-8">
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Hak Cuti Awal</span>
-          <span class="text-2xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= summary.totalQuota %> <span class="text-xs font-medium text-slate-500">Hari</span>
-          </span>
-        </div>
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Bersama</span>
-          <span class="text-2xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= summary.companyHolidays %> <span class="text-xs font-medium text-slate-500">Hari</span>
-          </span>
-        </div>
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Mandiri Terpakai</span>
-          <span class="text-2xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= summary.usedPrivate %> <span class="text-xs font-medium text-slate-500">Hari</span>
-          </span>
-        </div>
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Pending Approval</span>
-          <span class="text-2xl font-bold text-amber-600 mt-1 block tabular-nums">
-            <%= summary.pending %> <span class="text-xs font-medium text-amber-500">Berkas</span>
-          </span>
-        </div>
-        <div class="bg-slate-900 p-5 border border-slate-900 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Sisa Cuti</span>
-          <span class="text-2xl font-bold text-white mt-1 block tabular-nums">
-            <%= summary.remaining %> <span class="text-xs font-medium text-slate-300">Hari</span>
-          </span>
-        </div>
-      </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+  
+  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Hak Cuti Awal</span>
+      <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
+        <%= summary.totalQuota %> <span class="text-xs font-medium text-slate-500">Hari</span>
+      </span>
+    </div>
+    <div class="text-slate-400 mt-0.5">
+      <i class="fa-solid fa-calendar-check text-xs"></i>
+    </div>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Bersama</span>
+      <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
+        <%= summary.companyHolidays %> <span class="text-xs font-medium text-slate-500">Hari</span>
+      </span>
+    </div>
+    <div class="text-slate-400 mt-0.5">
+      <i class="fa-solid fa-building text-xs"></i>
+    </div>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Mandiri Terpakai</span>
+      <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
+        <%= summary.usedPrivate %> <span class="text-xs font-medium text-slate-500">Hari</span>
+      </span>
+    </div>
+    <div class="text-slate-400 mt-0.5">
+      <i class="fa-solid fa-user-clock text-xs"></i>
+    </div>
+  </div>
+
+  <div class="bg-amber-50/50 border border-amber-200/70 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-amber-600 block uppercase tracking-wider">Pending Approval</span>
+      <span class="text-xl font-bold text-amber-700 mt-1 block tabular-nums">
+        <%= summary.pending %> <span class="text-xs font-medium text-amber-600">Berkas</span>
+      </span>
+    </div>
+    <div class="text-amber-500 mt-0.5">
+      <i class="fa-solid fa-hourglass-half text-xs"></i>
+    </div>
+  </div>
+
+  <div class="bg-slate-50 border border-slate-300 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Sisa Cuti</span>
+      <span class="text-xl font-bold text-slate-900 mt-1 block tabular-nums">
+        <%= summary.remaining %> <span class="text-xs font-medium text-slate-600">Hari</span>
+      </span>
+    </div>
+    <div class="text-slate-500 mt-0.5">
+      <i class="fa-solid fa-wallet text-xs"></i>
+    </div>
+  </div>
+
+</div>
 
       <!-- CARD TABLE CONTAINER -->
       <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
