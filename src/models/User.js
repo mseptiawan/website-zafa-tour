@@ -45,6 +45,13 @@ userSchema.virtual("employeeData", {
   foreignField: "userId", // Field di model Employee yang nge-ref ke User id
   justOne: true,
 });
+
+userSchema.virtual("leaveBalanceData", {
+  ref: "LeaveBalance",
+  localField: "_id",
+  foreignField: "userId",
+  justOne: true,
+});
 const User = mongoose.model("User", userSchema);
 
 export default User;

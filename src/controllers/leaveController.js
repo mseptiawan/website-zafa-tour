@@ -666,14 +666,19 @@ export const getLeaveDetail = async (req, res) => {
       .populate("leaveTypeId", "name")
       .populate({
         path: "userId",
-        populate: {
-          path: "employeeData",
-          select: "fullName unitId",
-          populate: {
-            path: "unitId",
-            select: "name",
+        populate: [
+          {
+            path: "employeeData",
+            select: "fullName unitId",
+            populate: {
+              path: "unitId",
+              select: "name",
+            },
           },
-        },
+          {
+            path: "leaveBalanceData",
+          },
+        ],
       })
       .populate({
         path: "handoverUserId",

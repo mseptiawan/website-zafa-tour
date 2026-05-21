@@ -89,9 +89,9 @@
     <span class="text-slate-500 flex items-center gap-1">
       <i class="fa-solid fa-clock-rotate-left text-slate-400 text-[10px]"></i>
       Sisa Kuota: 
-      <span class="px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-700 tabular-nums">
-        <%= (leave.userId && leave.userId.leaveBalance) ? leave.userId.leaveBalance : '0' %> Hari
-      </span>
+     <span class="px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-700 tabular-nums">
+  <%= (leave.userId && leave.userId.leaveBalanceData) ? leave.userId.leaveBalanceData.remaining : '0' %> Hari
+</span>
     </span>
   </div>
 </div>
