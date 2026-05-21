@@ -9,24 +9,32 @@ import unitKpiMapping from "../models/UnitKpiMapping.js"; // mapping unit + posi
 
 export const kpiEmployeeList = async (req, res) => {
   try {
-    // 1. Ambil data karyawan
-    const employees = await Employee.find()
+    // 1. Daftar nama atasan yang tidak perlu dinilai
+    const atasan = [
+      "Rafika Fitrianti",
+      "Duwi Hartati",
+      "Ronald Rizky",
+      "Gusti Diansyah",
+      "Willy Cauza",
+    ];
+
+    // 2. Ambil data karyawan selain yang ada di daftar atasan
+    const employees = await Employee.find({ fullName: { $nin: atasan } })
       .populate("userId")
       .populate("unitId")
       .populate("bidangId");
 
-    // 2. Tentukan periode berjalan (Format: YYYY-MM)
-    const now = new Date();
-    // const currentPeriode = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    // 3. Periode penilaian (Simulasi testMonth = 6)
     const testMonth = 6;
     const currentPeriode = `2026-${String(testMonth).padStart(2, "0")}`;
+
     const existingKpis = await Kpi.find({ periode: currentPeriode });
     const evaluatedIds = existingKpis.map((k) => k.employeeId.toString());
 
-    // 4. Kirim data ke view
+    // 4. Render ke view
     res.render("kpi/input-list", {
       employees,
-      evaluatedIds, // <--- Ini yang membuat error sebelumnya hilang
+      evaluatedIds,
       user: req.session.user,
       title: "Input KPI Karyawan",
     });
