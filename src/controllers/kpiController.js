@@ -147,6 +147,21 @@ export const getKpiList = async (req, res) => {
     res.status(500).send("Error memuat daftar KPI");
   }
 };
+
+export const getKpiDetail = async (req, res) => {
+  try {
+    const { employeeId, periode } = req.params;
+    const kpi = await Kpi.findOne({ employeeId, periode })
+      .populate("employeeId", "fullName")
+      .populate("evaluatedBy", "name"); // Asumsi ada model User untuk HR
+
+    if (!kpi) return res.status(404).send("Data tidak ditemukan");
+
+    res.render("kpi/detail", { kpi });
+  } catch (error) {
+    res.status(500).send("Error memuat detail KPI");
+  }
+};
 // =============================
 // KELOLA KPI
 // =============================
