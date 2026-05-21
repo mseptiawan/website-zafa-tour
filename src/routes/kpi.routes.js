@@ -3,8 +3,10 @@ import roleMiddleware from "../middlewares/roleMiddleware.js";
 import {
   kpiEmployeeList,
   kpiForm,
+  getKpiDetail,
   submitKpi,
   kpiManage,
+  getKpiList,
   kpiReport,
 } from "../controllers/kpiController.js";
 
