@@ -16,7 +16,7 @@
           </p>
         </div>
 
-        <a href="/trip/new" class="bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-3 rounded-xl transition">
+        <a href="/trip/new" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-3 rounded-xl transition">
           + Buat Pengajuan
         </a>
 
@@ -64,35 +64,87 @@
                         Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
                       </td>
 
-                     <td class="px-6 py-4 whitespace-nowrap">
+               <td class="px-6 py-4 whitespace-nowrap align-middle">
   <% 
+    // 1. MAPPING WARNA TEKS (Tonalitas Adem/Soft Premium)
     const textStyles = {
       'PENDING': 'text-amber-600',
+      'IN_REVIEW': 'text-indigo-600',
       'APPROVED': 'text-emerald-600',
       'REJECTED': 'text-rose-600',
+      'PAYMENT_PROCESSING': 'text-purple-600',
+      'READY_TO_TRAVEL': 'text-teal-600',
+      'PAID': 'text-emerald-700',
+      'ON_TRIP': 'text-sky-600',
+      'SUBMITTED': 'text-blue-600',
       'CANCELLED': 'text-slate-500'
     };
 
+    // 2. MAPPING BULATAN / DOT INDICATOR (Dengan Ring Transparan)
     const dotStyles = {
       'PENDING': 'bg-amber-500 ring-amber-500/20',
+      'IN_REVIEW': 'bg-indigo-500 ring-indigo-500/20',
       'APPROVED': 'bg-emerald-500 ring-emerald-500/20',
       'REJECTED': 'bg-rose-500 ring-rose-500/20',
+      'PAYMENT_PROCESSING': 'bg-purple-500 ring-purple-500/20',
+      'READY_TO_TRAVEL': 'bg-teal-500 ring-teal-500/20',
+      'PAID': 'bg-emerald-600 ring-emerald-600/20',
+      'ON_TRIP': 'bg-sky-500 ring-sky-500/20',
+      'SUBMITTED': 'bg-blue-500 ring-blue-500/20',
       'CANCELLED': 'bg-slate-400 ring-slate-400/20'
     };
 
+    // 3. MAPPING BACKGROUND TINT SOFT
+    const bgStyles = { 
+      'PENDING': 'bg-amber-50/70', 
+      'IN_REVIEW': 'bg-indigo-50/70',
+      'APPROVED': 'bg-emerald-50/70', 
+      'REJECTED': 'bg-rose-50/70', 
+      'PAYMENT_PROCESSING': 'bg-purple-50/70',
+      'READY_TO_TRAVEL': 'bg-teal-50/70',
+      'PAID': 'bg-emerald-50/40',
+      'ON_TRIP': 'bg-sky-50/70',
+      'SUBMITTED': 'bg-blue-50/70',
+      'CANCELLED': 'bg-slate-50'
+    };
+
+    // 4. MAPPING BORDER TRANSMEDIUM
+    const borderStyles = { 
+      'PENDING': 'border-amber-200/50', 
+      'IN_REVIEW': 'border-indigo-200/50',
+      'APPROVED': 'border-emerald-200/50', 
+      'REJECTED': 'border-rose-200/50', 
+      'PAYMENT_PROCESSING': 'border-purple-200/50',
+      'READY_TO_TRAVEL': 'border-teal-200/50',
+      'PAID': 'border-emerald-200/60',
+      'ON_TRIP': 'border-sky-200/50',
+      'SUBMITTED': 'border-blue-200/50',
+      'CANCELLED': 'border-slate-200'
+    };
+
+    // 5. MAPPING LABEL DISPLAY HUMAN-READABLE
     const statusLabels = {
       'PENDING': 'Pending',
+      'IN_REVIEW': 'In Review',
       'APPROVED': 'Approved',
       'REJECTED': 'Rejected',
+      'PAYMENT_PROCESSING': 'Payment Processing',
+      'READY_TO_TRAVEL': 'Ready to Travel',
+      'PAID': 'Paid',
+      'ON_TRIP': 'On Trip',
+      'SUBMITTED': 'Submitted',
       'CANCELLED': 'Cancelled'
     };
   %>
 
-  <div class="inline-flex items-center gap-2 text-[12px] font-medium tracking-tight
-      <%= textStyles[t.status] || 'text-slate-500' %>">
+  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200
+      <%= textStyles[t.status] || 'text-slate-500' %>
+      <%= bgStyles[t.status] || 'bg-slate-50' %>
+      <%= borderStyles[t.status] || 'border-slate-200' %>">
 
     <span class="w-1.5 h-1.5 rounded-full ring-4
-      <%= dotStyles[t.status] || 'bg-slate-400 ring-slate-400/20' %>">
+      <%= dotStyles[t.status] || 'bg-slate-400 ring-slate-400/20' %> 
+      <%= (t.status === 'APPROVED' || t.status === 'ON_TRIP') ? 'animate-pulse' : '' %>">
     </span>
 
     <span>

@@ -217,14 +217,19 @@
   </div>
 </div>
           <!-- SUBMIT -->
-          <div class="pt-4 border-t border-slate-100">
+          <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
+  
+  <a href="/trip/my" 
+    class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
+    Batal
+  </a>
 
-            <button type="submit"
-              class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl text-sm font-medium transition-all">
-              Ajukan Perjalanan
-            </button>
+  <button type="submit" 
+    class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
+    <%= typeof mode !== 'undefined' ? (mode === 'CREATE' ? 'Ajukan Perjalanan' : (mode === 'EDIT' ? 'Simpan Perubahan' : 'Kirim Ulang Form')) : 'Ajukan Perjalanan' %>
+  </button>
 
-          </div>
+</div>
 
         </form>
 
