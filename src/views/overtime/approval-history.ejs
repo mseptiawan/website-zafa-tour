@@ -1,190 +1,98 @@
-<% layout('layouts/main') -%>
+<%- layout('layouts/main', { title: 'Riwayat Approval Lembur' }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
-
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
   <div class="max-w-6xl mx-auto">
 
-    <!-- HEADER -->
-    <div class="mb-6 text-center">
-      <h1 class="text-xl font-medium text-slate-800">
-        Riwayat Approval Lembur
-      </h1>
-      <p class="text-sm text-slate-500 mt-1">
-        Semua data lembur yang sudah diproses
-      </p>
+    <div class="flex items-start justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-semibold text-slate-800">Riwayat Approval Lembur</h1>
+        <p class="text-sm text-slate-500 mt-1">Data historis seluruh pengajuan lembur yang telah diproses</p>
+      </div>
     </div>
 
-    <!-- FILTER -->
-    <form method="GET"
-      class="bg-white border border-slate-200 rounded-xl p-4 mb-5">
+    <form method="GET" class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm flex flex-col md:flex-row gap-3">
+      <input type="text" name="search" value="<%= query?.search || '' %>" placeholder="Cari nama karyawan..." 
+             class="flex-1 border border-slate-200 px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none">
+      
+      <select name="status" class="w-full md:w-40 border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none">
+        <option value="">Semua Status</option>
+        <option value="Approved" <%= query?.status === 'Approved' ? 'selected' : '' %>>Approved</option>
+        <option value="Rejected" <%= query?.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+      </select>
 
-      <div class="flex flex-col md:flex-row gap-3">
+      <select name="sort" class="w-full md:w-40 border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none">
+        <option value="desc" <%= query?.sort === 'desc' ? 'selected' : '' %>>Terbaru</option>
+        <option value="asc" <%= query?.sort === 'asc' ? 'selected' : '' %>>Terlama</option>
+      </select>
 
-        <!-- SEARCH -->
-        <div class="flex-1">
-          <input
-            type="text"
-            name="search"
-            value="<%= query?.search || '' %>"
-            placeholder="Cari nama karyawan..."
-            class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm
-            focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-          />
-        </div>
-
-        <!-- STATUS -->
-        <div class="w-full md:w-48">
-          <select
-            name="status"
-            class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm"
-          >
-            <option value="">Semua Status</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-        </div>
-
-        <!-- SORT -->
-        <div class="w-full md:w-40">
-          <select
-            name="sort"
-            class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm"
-          >
-            <option value="desc">Terbaru</option>
-            <option value="asc">Terlama</option>
-          </select>
-        </div>
-
-        <!-- BUTTON -->
-        <div class="flex gap-2">
-          <button
-            class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm hover:bg-indigo-700"
-          >
-            Filter
-          </button>
-
-          <a href="/overtime/approval/history"
-            class="px-4 py-2.5 text-sm border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
-          >
-            Reset
-          </a>
-        </div>
-
+      <div class="flex gap-2">
+        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition">Filter</button>
+        <a href="/overtime/approval/history" class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">Reset</a>
       </div>
     </form>
 
-    <!-- TABLE -->
-    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
-
-        <table class="w-full text-sm">
-
-          <!-- THEAD (simple clean style) -->
-          <thead class="bg-slate-100 border-b border-slate-200">
-            <tr class="text-left text-xs text-slate-600">
-              <th class="px-3 py-3 font-medium">Karyawan</th>
-              <th class="px-3 py-3 font-medium">Tanggal</th>
-              <th class="px-3 py-3 font-medium">Jam</th>
-              <th class="px-3 py-3 font-medium">Total</th>
-              <th class="px-3 py-3 font-medium">Status</th>
-              <th class="px-3 py-3 font-medium text-center">Dibuat</th>
+        <table class="w-full text-sm min-w-[900px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-4 text-left">Karyawan</th>
+              <th class="px-6 py-4 text-left">Tanggal</th>
+              <th class="px-6 py-4 text-left">Jam</th>
+              <th class="px-6 py-4 text-left">Total</th>
+              <th class="px-6 py-4 text-center">Status</th>
+              <th class="px-6 py-4 text-center">Dibuat</th>
             </tr>
           </thead>
-
           <tbody class="divide-y divide-slate-100">
-
             <% if (overtimes.length === 0) { %>
-              <tr>
-                <td colspan="6" class="text-center py-6 text-slate-400">
-                  Tidak ada data
-                </td>
-              </tr>
+              <tr><td colspan="6" class="text-center py-12 text-slate-400">Belum ada data riwayat lembur</td></tr>
             <% } %>
 
             <% overtimes.forEach(o => { %>
-              <tr class="hover:bg-slate-50">
-
-                <td class="px-3 py-3 text-slate-700">
-                  <%= o.employeeName %>
-                </td>
-
-                <td class="px-3 py-3 text-slate-600">
-                  <%= new Date(o.date).toLocaleDateString("id-ID") %>
-                </td>
-
-                <td class="px-3 py-3 text-slate-600">
-                  <%= o.startTime %> - <%= o.endTime %>
-                </td>
-
-                <td class="px-3 py-3 text-slate-600">
-                  <%= o.totalHours %> jam
-                </td>
-
-                <!-- STATUS SIMPLE (ICON + TEXT, NO WARNA RAMAI) -->
-                <td class="px-3 py-3">
-                  <div class="flex items-center gap-2 text-xs">
-
-                    <% if (o.status === "Approved") { %>
-
-                      <i data-lucide="check-circle" class="w-4 h-4 text-slate-500"></i>
-                      <span class="text-slate-600">Approved</span>
-
-                    <% } else if (o.status === "Rejected") { %>
-
-                      <i data-lucide="x-circle" class="w-4 h-4 text-slate-500"></i>
-                      <span class="text-slate-600">Rejected</span>
-
-                    <% } else { %>
-
-                      <i data-lucide="clock" class="w-4 h-4 text-slate-500"></i>
-                      <span class="text-slate-600">Pending</span>
-
-                    <% } %>
-
+              <tr class="hover:bg-slate-50/50 transition">
+                <td class="px-6 py-4 font-semibold text-slate-800"><%= o.employeeName %></td>
+                <td class="px-6 py-4 text-slate-500"><%= new Date(o.date).toLocaleDateString("id-ID") %></td>
+                <td class="px-6 py-4 text-slate-500 font-mono text-xs"><%= o.startTime %> - <%= o.endTime %></td>
+                <td class="px-6 py-4 font-medium text-slate-700"><%= o.totalHours %> Jam</td>
+                
+                <td class="px-6 py-4 text-center">
+                  <% 
+                    const statusConfig = {
+                      'Approved': { bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },
+                      'Rejected': { bg: 'bg-rose-50', text: 'text-rose-600', dot: 'bg-rose-500' },
+                      'Pending': { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500' }
+                    };
+                    const config = statusConfig[o.status] || { bg: 'bg-slate-50', text: 'text-slate-600', dot: 'bg-slate-400' };
+                  %>
+                  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-200/50 text-[10px] font-medium <%= config.bg %> <%= config.text %>">
+                    <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
+                    <%= o.status %>
                   </div>
                 </td>
 
-                <td class="px-3 py-3 text-center text-xs text-slate-500">
-                  <%= new Date(o.createdAt).toLocaleString("id-ID") %>
+                <td class="px-6 py-4 text-center text-xs text-slate-400">
+                  <%= new Date(o.createdAt).toLocaleString("id-ID", {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) %>
                 </td>
-
               </tr>
             <% }) %>
-
           </tbody>
-
         </table>
-
       </div>
-
     </div>
 
-    <!-- PAGINATION (20 DATA / PAGE UI) -->
-    <div class="mt-4 flex items-center justify-between text-sm text-slate-600">
-
-      <div>
-        Page <%= pagination.page %> / <%= pagination.totalPages %>
-      </div>
-
+    <div class="mt-6 flex items-center justify-between text-xs text-slate-500">
+      <span>Halaman <%= pagination.page %> dari <%= pagination.totalPages %></span>
       <div class="flex gap-2">
-
         <% if (pagination.page > 1) { %>
-          <a href="?page=<%= pagination.page - 1 %>"
-            class="px-3 py-1 border rounded-lg hover:bg-slate-100">
-            Prev
-          </a>
+          <a href="?page=<%= pagination.page - 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" 
+             class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Prev</a>
         <% } %>
-
         <% if (pagination.page < pagination.totalPages) { %>
-          <a href="?page=<%= pagination.page + 1 %>"
-            class="px-3 py-1 border rounded-lg hover:bg-slate-100">
-            Next
-          </a>
+          <a href="?page=<%= pagination.page + 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" 
+             class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Next</a>
         <% } %>
-
       </div>
-
     </div>
 
   </div>

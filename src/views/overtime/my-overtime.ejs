@@ -1,453 +1,293 @@
-<% layout('layouts/main') -%>
+<%- layout('layouts/main', { title: 'Riwayat Lembur' }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
-
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-5xl mx-auto">
 
-    <!-- HEADER -->
-    <div class="mb-6 text-center">
-      <h1 class="text-xl font-medium text-slate-800">
-        Riwayat Lembur
-      </h1>
+    <div class="flex items-start justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-semibold text-slate-800">
+          Riwayat Lembur
+        </h1>
+        <p class="text-sm text-slate-500 mt-1">
+          Daftar lengkap pengajuan aktivitas lembur
+        </p>
+      </div>
 
-      <p class="text-sm text-slate-500 mt-1">
-        Catatan aktivitas lembur kamu
-      </p>
+      <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-bold text-slate-400 uppercase">
+          Total
+        </span>
+        <span class="text-sm font-bold text-slate-800">
+          <%= overtimes.length %>
+        </span>
+      </div>
     </div>
 
-    <!-- TABLE CARD -->
-   <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
       <% if (overtimes.length > 0) { %>
 
-        <div class="overflow-x-auto">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[700px]">
 
-            <table class="w-full text-sm border-collapse">
+          <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider">
+            <tr>
+              <th class="px-6 py-4 text-left">Tanggal</th>
+              <th class="px-6 py-4 text-left">Jam</th>
+              <th class="px-6 py-4 text-left">Total</th>
+              <th class="px-6 py-4 text-center">Status</th>
+              <th class="px-6 py-4 text-center">Aksi</th>
+            </tr>
+          </thead>
 
-            <!-- HEADER -->
-      <thead class="bg-slate-100 border-b border-slate-200">
-            <tr class="text-left text-xs text-slate-600">
+          <tbody class="divide-y divide-slate-100">
 
-                <th class="py-3 px-3 font-medium">
-                  Tanggal
-                </th>
+            <% overtimes.forEach(o=> { %>
 
-                <th class="py-3 px-3 font-medium">
-                  Jam
-                </th>
+            <tr class="hover:bg-slate-50/50 transition">
 
-                <th class="py-3 px-3 font-medium">
-                  Total
-                </th>
+              <td class="px-6 py-4 font-medium text-slate-700">
+                <%= new Date(o.date).toLocaleDateString("id-ID") %>
+              </td>
 
-                <th class="py-3 px-3 font-normal">
-                  Status
-                </th>
+              <td class="px-6 py-4 text-slate-500 font-mono text-xs">
+                <%= o.startTime %> - <%= o.endTime %>
+              </td>
 
-                <th class="py-3 px-3 font-medium">
-                  Aksi
-                </th>
+              <td class="px-6 py-4 text-slate-600">
+                <%= o.totalHours %> Jam
+              </td>
 
-              </tr>
-            </thead>
+              <td class="px-6 py-4 text-center">
 
-            <!-- BODY -->
-            <tbody class="divide-y divide-slate-100">
+                <%
+                let color='bg-slate-100 text-slate-600 border-slate-200' ;
 
-              <% overtimes.forEach(o => { %>
+                if (o.status==='Approved' )
+                color='bg-emerald-50 text-emerald-600 border-emerald-100' ;
 
-                <tr class="hover:bg-slate-50 transition">
+                if (o.status==='Rejected' )
+                color='bg-rose-50 text-rose-600 border-rose-100' ;
+                %>
 
-                  <!-- TANGGAL -->
-                  <td class="py-3 px-3 text-slate-700">
-                    <%= new Date(o.date).toLocaleDateString("id-ID") %>
-                  </td>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium <%= color %>">
 
-                  <!-- JAM -->
-                  <td class="py-3 px-3 text-slate-600">
-                    <%= o.startTime %> - <%= o.endTime %>
-                  </td>
+                  <span class="w-1.5 h-1.5 rounded-full
+                    <%= o.status === 'Approved'
+                    ? 'bg-emerald-500'
+                    : o.status === 'Rejected'
+                    ? 'bg-rose-500'
+                    : 'bg-slate-400'
+                    %>">
+                  </span>
 
-                  <!-- TOTAL -->
-                  <td class="py-3 px-3 text-slate-600">
-                    <%= o.totalHours %> jam
-                  </td>
+                  <%= o.status %>
+                </span>
 
-                  <!-- STATUS -->
-               <td class="py-3 px-3">
+              </td>
 
-  <div class="flex items-center gap-2 text-xs">
+              <td class="px-6 py-4 text-center">
 
-    <% if (o.status === "Approved") { %>
+                <button
+                  class="openModal text-slate-400 hover:text-indigo-600 transition"
+                  type="button"
 
-      <i data-lucide="check-circle" class="w-4 h-4 text-slate-500"></i>
-      <span class="text-slate-600">Approved</span>
+                  data-date="<%= new Date(o.date).toLocaleDateString('id-ID') %>"
+                  data-time="<%= o.startTime %> - <%= o.endTime %>"
+                  data-total="<%= o.totalHours %> Jam"
+                  data-status="<%= o.status %>"
+                  data-description="<%= o.workDescription %>"
+                  data-result="<%= o.result || '-' %>"
+                  data-created="<%= new Date(o.createdAt).toLocaleString('id-ID') %>"
+                  data-proof="<%= o.proofFile || '' %>"
+                >
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
 
-    <% } else if (o.status === "Rejected") { %>
+              </td>
 
-      <i data-lucide="x-circle" class="w-4 h-4 text-slate-500"></i>
-      <span class="text-slate-600">Rejected</span>
+            </tr>
 
-    <% } else { %>
+            <% }) %>
 
-      <i data-lucide="clock" class="w-4 h-4 text-slate-500"></i>
-      <span class="text-slate-600">Pending</span>
-
-    <% } %>
-
-  </div>
-
-</td>
-
-            <td class="py-3 px-3 ">
-
-  <button
-    class="openModal inline-flex items-center justify-center w-8 h-8
-           text-slate-400 hover:text-slate-600 transition"
-    data-date="<%= new Date(o.date).toLocaleDateString('id-ID') %>"
-    data-time="<%= o.startTime %> - <%= o.endTime %>"
-    data-total="<%= o.totalHours %> jam"
-    data-status="<%= o.status %>"
-    data-description="<%= o.workDescription %>"
-    data-result="<%= o.result || '-' %>"
-    data-created="<%= new Date(o.createdAt).toLocaleString('id-ID') %>"
-    data-proof="<%= o.proofFile || '' %>"
-  >
-
-    <i data-lucide="eye" class="w-4 h-4"></i>
-
-  </button>
-
-</td>
-
-                </tr>
-
-              <% }) %>
-
-            </tbody>
-
-          </table>
-
-        </div>
-          <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-slate-600">
-
-      <div>
-        Page <%= pagination.page %> / <%= pagination.totalPages %>
+          </tbody>
+        </table>
       </div>
 
-      <div class="flex gap-2">
-
-        <% if (pagination.page > 1) { %>
-          <a href="?page=<%= pagination.page - 1 %>"
-             class="px-3 py-1 border rounded-lg hover:bg-slate-100">
-            Prev
-          </a>
-        <% } %>
-
-        <% if (pagination.page < pagination.totalPages) { %>
-          <a href="?page=<%= pagination.page + 1 %>"
-             class="px-3 py-1 border rounded-lg hover:bg-slate-100">
-            Next
-          </a>
-        <% } %>
-
-      </div>
-
-    </div>
       <% } else { %>
 
-        <!-- EMPTY STATE -->
-        <div class="py-16 text-center">
-
-          <div class="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4">
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6 text-slate-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                d="M9 17v-6h13v6M9 5h13v6M3 5h.01M3 11h.01M3 17h.01"
-              />
-            </svg>
-
-          </div>
-
-          <h2 class="text-sm font-medium text-slate-700">
-            Belum ada riwayat lembur
-          </h2>
-
-          <p class="text-sm text-slate-500 mt-1">
-            Data pengajuan lembur kamu akan muncul di sini
-          </p>
-
-        </div>
+      <div class="py-16 text-center text-slate-400">
+        <i data-lucide="folder-open" class="w-8 h-8 mx-auto mb-2"></i>
+        <p>Belum ada riwayat lembur</p>
+      </div>
 
       <% } %>
 
     </div>
-
   </div>
+</div>
 
 
 <!-- MODAL -->
-<!-- MODAL -->
-<div
-  id="detailModal"
-  class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4"
->
 
-  <!-- BOX -->
-  <div
-    class="bg-white w-full max-w-2xl rounded-2xl shadow-xl relative overflow-hidden max-h-[90vh] flex flex-col"
-  >
+<div id="detailModal"
+class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
 
-    <!-- HEADER -->
-    <div class="px-6 py-5 border-b border-slate-100 flex items-start justify-between shrink-0">
+  <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl">
 
-      <div>
-        <h2 class="text-xl font-semibold text-slate-800">
-          Detail Lembur
-        </h2>
+    <div class="px-6 py-4 border-b flex justify-between">
 
-        <p class="text-sm text-slate-500 mt-1">
-          Informasi lengkap pengajuan lembur
-        </p>
-      </div>
+      <h3 class="font-semibold text-slate-800">
+        Detail Lembur
+      </h3>
 
-      <button
-        id="closeModal"
-        class="text-slate-400 hover:text-slate-600 text-lg"
-      >
-        ✕
+      <button id="closeModal">
+        <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
     </div>
 
-    <!-- SCROLL AREA -->
-    <div class="overflow-y-auto p-6">
+    <div class="p-6 space-y-5">
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+      <div class="grid grid-cols-2 gap-4">
 
-        <!-- TANGGAL -->
         <div>
-          <p class="text-xs uppercase text-slate-400">
-            Tanggal
-          </p>
-
-          <p id="modalDate"
-             class="mt-1 font-medium text-slate-700">
-          </p>
+          <p class="text-xs text-slate-400 uppercase">Tanggal</p>
+          <p id="modalDate"></p>
         </div>
 
-        <!-- JAM -->
         <div>
-          <p class="text-xs uppercase text-slate-400">
-            Jam
-          </p>
-
-          <p id="modalTime"
-             class="mt-1 font-medium text-slate-700">
-          </p>
+          <p class="text-xs text-slate-400 uppercase">Jam</p>
+          <p id="modalTime"></p>
         </div>
 
-        <!-- TOTAL -->
         <div>
-          <p class="text-xs uppercase text-slate-400">
-            Total Lembur
-          </p>
-
-          <p id="modalTotal"
-             class="mt-1 font-medium text-slate-700">
-          </p>
+          <p class="text-xs text-slate-400 uppercase">Total</p>
+          <p id="modalTotal"></p>
         </div>
 
-        <!-- STATUS -->
         <div>
-          <p class="text-xs uppercase text-slate-400">
-            Status
-          </p>
-
-          <p id="modalStatus"
-             class="mt-1 font-medium text-slate-700">
-          </p>
-        </div>
-
-        <!-- DESKRIPSI -->
-        <div class="md:col-span-2">
-          <p class="text-xs uppercase text-slate-400">
-            Deskripsi Pekerjaan
-          </p>
-
-          <p id="modalDescription"
-             class="mt-1 text-slate-600 leading-relaxed">
-          </p>
-        </div>
-
-        <!-- HASIL -->
-        <div class="md:col-span-2">
-          <p class="text-xs uppercase text-slate-400">
-            Hasil Pekerjaan
-          </p>
-
-          <p id="modalResult"
-             class="mt-1 text-slate-600 leading-relaxed">
-          </p>
-        </div>
-
-        <!-- FILE -->
-        <div class="md:col-span-2">
-
-          <p class="text-xs uppercase text-slate-400">
-            Bukti Lembur
-          </p>
-
-          <div id="proofWrapper" class="mt-3 flex justify-center">
-
-            <img
-              id="modalProof"
-              src=""
-              alt="Bukti Lembur"
-              class="w-56 rounded-xl border border-slate-200 shadow-sm"
-            />
-
-          </div>
-
-          <div
-            id="proofEmpty"
-            class="hidden mt-3 border border-dashed border-slate-200 rounded-xl p-6 text-center text-sm text-slate-400"
-          >
-            Tidak ada file bukti
-          </div>
-
-        </div>
-
-        <!-- DIBUAT -->
-        <div class="md:col-span-2">
-          <p class="text-xs uppercase text-slate-400">
-            Dibuat
-          </p>
-
-          <p id="modalCreated"
-             class="mt-1 text-slate-600">
-          </p>
+          <p class="text-xs text-slate-400 uppercase">Status</p>
+          <p id="modalStatus"></p>
         </div>
 
       </div>
 
+      <div>
+        <p class="text-xs text-slate-400 uppercase">
+          Deskripsi
+        </p>
+        <p id="modalDescription"></p>
+      </div>
+
+      <div>
+        <p class="text-xs text-slate-400 uppercase">
+          Hasil
+        </p>
+        <p id="modalResult"></p>
+      </div>
+
+      <div>
+        <p class="text-xs text-slate-400 uppercase">
+          Dibuat
+        </p>
+        <p id="modalCreated"></p>
+      </div>
+
+      <div id="proofWrapper" class="hidden">
+
+        <p class="text-xs text-slate-400 uppercase mb-2">
+          Bukti
+        </p>
+
+        <img
+          id="modalProof"
+          class="w-full rounded-lg border"
+        >
+
+      </div>
+
+      <div id="proofEmpty" class="hidden text-sm text-slate-400">
+        Tidak ada bukti file
+      </div>
+
     </div>
 
-    <!-- FOOTER -->
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-end shrink-0">
-
+    <div class="px-6 py-4 border-t flex justify-end">
       <button
         id="closeModalFooter"
-        class="px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition"
+        class="px-4 py-2 rounded-lg bg-indigo-600 text-white"
       >
         Tutup
       </button>
-
     </div>
 
   </div>
 
 </div>
-<!-- SCRIPT -->
+
+<script src="https://unpkg.com/lucide@latest"></script>
 <script>
 
-  const modal = document.getElementById("detailModal");
+lucide.createIcons();
 
-  const closeModal =
-    document.getElementById("closeModal");
+const modal = document.getElementById("detailModal");
 
-  const closeModalFooter =
-    document.getElementById("closeModalFooter");
+document.querySelectorAll(".openModal").forEach(btn=>{
 
-  const buttons =
-    document.querySelectorAll(".openModal");
+    btn.addEventListener("click",()=>{
 
-  buttons.forEach((btn) => {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
 
-    btn.addEventListener("click", () => {
+        modalDate.textContent = btn.dataset.date;
+        modalTime.textContent = btn.dataset.time;
+        modalTotal.textContent = btn.dataset.total;
+        modalStatus.textContent = btn.dataset.status;
+        modalDescription.textContent = btn.dataset.description;
+        modalResult.textContent = btn.dataset.result;
+        modalCreated.textContent = btn.dataset.created;
 
-      document.getElementById("modalDate").textContent =
-        btn.dataset.date;
+        const proof = btn.dataset.proof;
 
-      document.getElementById("modalTime").textContent =
-        btn.dataset.time;
+        if(proof){
 
-      document.getElementById("modalTotal").textContent =
-        btn.dataset.total;
+            modalProof.src=`/uploads/files/${proof}`;
 
-      document.getElementById("modalStatus").textContent =
-        btn.dataset.status;
+            proofWrapper.classList.remove("hidden");
+            proofEmpty.classList.add("hidden");
 
-      document.getElementById("modalDescription").textContent =
-        btn.dataset.description;
+        }else{
 
-      document.getElementById("modalResult").textContent =
-        btn.dataset.result;
+            proofWrapper.classList.add("hidden");
+            proofEmpty.classList.remove("hidden");
 
-      document.getElementById("modalCreated").textContent =
-        btn.dataset.created;
-
-      // IMAGE
-      const proof = btn.dataset.proof;
-
-      const proofImage =
-        document.getElementById("modalProof");
-
-      const proofWrapper =
-        document.getElementById("proofWrapper");
-
-      const proofEmpty =
-        document.getElementById("proofEmpty");
-
-      if (proof && proof !== "null") {
-
-        proofImage.src = `/uploads/files/${proof}`;
-
-        proofWrapper.classList.remove("hidden");
-
-        proofEmpty.classList.add("hidden");
-
-      } else {
-
-        proofWrapper.classList.add("hidden");
-
-        proofEmpty.classList.remove("hidden");
-
-      }
-
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
+        }
 
     });
 
-  });
+});
 
-  function hideModal() {
+
+function hideModal(){
 
     modal.classList.add("hidden");
     modal.classList.remove("flex");
 
-  }
+}
 
-  closeModal.addEventListener("click", hideModal);
+closeModal.addEventListener("click",hideModal);
 
-  closeModalFooter.addEventListener("click", hideModal);
+closeModalFooter.addEventListener("click",hideModal);
 
-  modal.addEventListener("click", (e) => {
+modal.addEventListener("click",(e)=>{
 
-    if (e.target === modal) {
-      hideModal();
+    if(e.target===modal){
+
+        hideModal();
+
     }
 
-  });
+});
 
 </script>
