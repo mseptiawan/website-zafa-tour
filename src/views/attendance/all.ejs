@@ -1,17 +1,20 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-8">
-  <div class="max-w-6xl mx-auto">
-    <div class="mb-8">
-      <h1 class="text-xl font-medium text-slate-800">Dashboard Kehadiran</h1>
-      <p class="text-sm text-slate-400 mt-0.5">Monitoring real-time kehadiran karyawan - <%= new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) %></p>
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+  <div class="max-w-5xl mx-auto">
+    
+    <div class="flex items-start justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-semibold text-slate-800">Dashboard Kehadiran</h1>
+        <p class="text-sm text-slate-500 mt-1">Monitoring real-time kehadiran karyawan - <%= new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) %></p>
+      </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-4 mb-6">
-      <input type="text" id="searchInput" placeholder="Cari karyawan..." 
-        class="flex-1 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-300 transition-all">
-      <select id="statusFilter" 
-        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-300">
+    <div class="flex items-center gap-3 mb-6">
+      <input type="text" id="searchInput" placeholder="Cari berdasarkan nama..." 
+        class="w-full sm:w-64 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none shadow-sm">
+      
+      <select id="statusFilter" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none shadow-sm text-slate-600">
         <option value="ALL">Semua Status</option>
         <option value="BELUM ABSEN">Belum Absen</option>
         <option value="HADIR">Hadir</option>
@@ -19,48 +22,54 @@
       </select>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="text-slate-400 border-b border-slate-100">
-            <th class="px-6 py-4 font-normal text-left">Nama Karyawan</th>
-            <th class="px-6 py-4 font-normal text-left">Status</th>
-            <th class="px-6 py-4 font-normal text-left">Check In</th>
-            <th class="px-6 py-4 font-normal text-left">Check Out</th>
-            <th class="px-6 py-4 font-normal text-left">Tipe</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-50" id="attendanceTable">
-          <% data.forEach(row => { %>
-            <tr class="hover:bg-slate-50/50 transition-colors" data-status="<%= row.status %>">
-              <td class="px-6 py-4 text-slate-700 font-medium"><%= row.name %></td>
-              <td class="px-6 py-4">
-                <span class="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 rounded-md
-                  <%= row.status === 'BELUM ABSEN' ? 'bg-slate-100 text-slate-500' : 
-                      row.status === 'HADIR' ? 'bg-emerald-50 text-emerald-600' : 
-                      'bg-amber-50 text-amber-600' %>">
-                  <%= row.status %>
-                </span>
-              </td>
-              <td class="px-6 py-4 text-slate-500 font-mono">
-                <%= row.attendance?.checkIn ? new Date(row.attendance.checkIn).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
-              </td>
-              <td class="px-6 py-4 text-slate-500 font-mono">
-                <%= row.attendance?.checkOut ? new Date(row.attendance.checkOut).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
-              </td>
-              <td class="px-6 py-4 text-slate-500">
-                <%= row.attendance ? row.attendance.type : '-' %>
-              </td>
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[700px]">
+          <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-6 py-4">Nama Karyawan</th>
+              <th class="text-center px-6 py-4">Status</th>
+              <th class="text-center px-6 py-4">Check In</th>
+              <th class="text-center px-6 py-4">Check Out</th>
+              <th class="text-center px-6 py-4">Tipe</th>
             </tr>
-          <% }) %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="divide-y divide-slate-100" id="attendanceTable">
+            <% data.forEach(row => { %>
+              <tr class="hover:bg-slate-50/50 transition" data-status="<%= row.status %>">
+                <td class="px-6 py-4 font-medium text-slate-800"><%= row.name %></td>
+                
+                <td class="px-6 py-4 text-center">
+                  <% 
+                    let color = 'bg-slate-100 text-slate-600 border-slate-200';
+                    if (row.status === 'HADIR') color = 'bg-emerald-50 text-emerald-600 border-emerald-100';
+                    if (row.status === 'TELAT') color = 'bg-amber-50 text-amber-600 border-amber-100';
+                  %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium <%= color %>">
+                    <span class="w-1.5 h-1.5 rounded-full <%= row.status === 'HADIR' ? 'bg-emerald-500' : row.status === 'TELAT' ? 'bg-amber-500' : 'bg-slate-400' %>"></span>
+                    <%= row.status %>
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 text-center text-slate-500 font-mono text-xs">
+                  <%= row.attendance?.checkIn ? new Date(row.attendance.checkIn).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
+                </td>
+                <td class="px-6 py-4 text-center text-slate-500 font-mono text-xs">
+                  <%= row.attendance?.checkOut ? new Date(row.attendance.checkOut).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
+                </td>
+                <td class="px-6 py-4 text-center text-slate-500 text-xs italic">
+                  <%= row.attendance?.type || '-' %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-  // Filter & Search Logic (Dioptimalkan)
   const filterTable = () => {
     const status = document.getElementById('statusFilter').value;
     const term = document.getElementById('searchInput').value.toLowerCase();

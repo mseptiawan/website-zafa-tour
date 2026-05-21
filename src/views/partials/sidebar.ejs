@@ -89,18 +89,7 @@
             </div>
 
           </details>
-
-
-        </div>
-      </section>
-      <% } %>
-        <!-- GROUP: KINERJA -->
-        <% if ( user.role==='HR' ) { %>
-          <section>
-            <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-              Kinerja & Tugas
-            </p>
-            <div class="space-y-1">
+ <div class="space-y-1">
               <details class="group outline-none" data-menu="kpi">
                 <summary
                   class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
@@ -128,8 +117,56 @@
                 </div>
               </details>
             </div>
-          </section>
-          <% } %>
+<details class="group outline-none" data-menu="assignment">
+                    <summary
+                      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
+                      <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
+                          stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
+                        </svg>
+
+                        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
+                          Penugasan
+                        </span>
+                      </div>
+
+                      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </summary>
+
+                    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+                      <!-- BUAT PENUGASAN (pimpinan) -->
+                      <% if ( user.role==='PIMPINAN' ) { %>
+                        <a href="/assignment/new"
+                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
+                          Buat Penugasan
+                        </a>
+                        <% } %>
+                          <!-- PENUGASAN SAYA -->
+                          <% if (user.permissions.assignment_my) { %>
+                            <a href="/assignment/my"
+                              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
+                              Penugasan Saya
+                            </a>
+                            <% } %>
+
+                              <% if (user.permissions.assignment_all) { %>
+
+                                <a href="/assignment/"
+                                  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
+                                  Semua Penugasan
+                                </a>
+                                <% } %>
+
+                    </div>
+                  </details>
+        </div>
+      </section>
+      <% } %>
             <!-- GROUP: ABSENSI -->
             <% if (user.role !=="ssasasad" ) { %>
 
@@ -332,17 +369,7 @@
                     </div>
                   </details>
                 </div>
-              </section>
-              <% } %>
-                <!-- GROUP: FIELD OPERATION -->
-                <section>
-                  <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-                    Field Operation
-                  </p>
-
-                  <div class="space-y-1">
-                    <!-- DINAS LUAR -->
-                    <details class="group outline-none" data-menu="trip">
+                <details class="group outline-none" data-menu="trip">
                       <summary
                         class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
                         <div class="flex items-center gap-3">
@@ -408,6 +435,17 @@
 
                       </div>
                     </details>
+              </section>
+              <% } %>
+                <!-- GROUP: FIELD OPERATION -->
+                <section>
+                  <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
+                    Aktivitas lapangan
+                  </p>
+
+                  <div class="space-y-1">
+                    <!-- DINAS LUAR -->
+                   
 
                     <!-- SALES VISIT -->
                     <% if (user.role !=="PIMPINAN" ) { %>
