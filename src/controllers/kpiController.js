@@ -69,17 +69,71 @@ export const kpiForm = async (req, res) => {
 // SUBMIT KPI
 // =============================
 export const submitKpi = async (req, res) => {
-  const { employeeId } = req.params;
+  try {
+    const { employeeId } = req.params;
+    const { periode, kpiTemplateId, scores } = req.body;
 
-  const data = req.body; // array nilai KPI
+    // 1. Validasi duplikasi input di periode yang sama
+    const existingKpi = await Kpi.findOne({ employeeId, periode });
+    if (existingKpi) {
+      return res
+        .status(400)
+        .send("KPI untuk karyawan ini pada periode tersebut sudah pernah di-input!");
+    }
 
-  // nanti disimpan ke collection KPI (history)
-  // simple dulu
-  console.log(employeeId, data);
+    // 2. Ambil detail indikator asli dari DB
+    const templateDetails = await KpiTemplateDetail.find({ kpiTemplateId });
 
-  res.redirect("/kpi/input");
+    // Hitung total semua bobot yang ada di template ini untuk pembagi rumus proporsional
+    const totalBobotTemplate = templateDetails.reduce((sum, item) => sum + item.bobot, 0);
+
+    let totalKpiScore = 0;
+    const results = [];
+
+    // 3. Looping dan hitung skor tertimbang
+    for (const detail of templateDetails) {
+      // Ambil data berdasarkan ID detail
+      const detailId = detail._id.toString();
+      const inputData = scores[detailId];
+
+      // PENTING: Karena input form name kita adalah scores[id][score],
+      // maka inputData akan berbentuk { score: "80" }
+      const scoreInput = inputData && inputData.score ? Number(inputData.score) : 0;
+
+      // Rumus proporsional tertimbang
+      const finalScore = scoreInput * (detail.bobot / totalBobotTemplate);
+      totalKpiScore += finalScore;
+
+      results.push({
+        kpiTemplateDetailId: detail._id,
+        areaKinerja: detail.areaKinerja,
+        indikator: detail.indikator,
+        bobot: detail.bobot,
+        target: detail.target,
+        realisasi: "Manual Input",
+        score: scoreInput,
+        finalScore: Number(finalScore.toFixed(2)),
+      });
+    }
+
+    // 4. Simpan hasil final ke database
+    await Kpi.create({
+      employeeId,
+      periode,
+      kpiTemplateId,
+      results,
+      totalKpiScore: Number(totalKpiScore.toFixed(2)), // Hasil akhir di skala 0-100
+      evaluatedBy: req.session.user?._id,
+      status: "Approved",
+    });
+
+    // 5. Kembalikan ke halaman list utama
+    res.redirect("/kpi/input");
+  } catch (error) {
+    console.error("Error submitKpi:", error);
+    res.status(500).send("Gagal menyimpan penilaian KPI");
+  }
 };
-
 // =============================
 // KELOLA KPI
 // =============================
