@@ -306,21 +306,21 @@ export const generateOrResetLeaveBalance = async (req, res) => {
         // Upsert Logic: Jika sudah ada maka di-overwrite (Reset), jika belum ada maka di-insert (Generate)
         await LeaveBalance.findOneAndUpdate(
           {
-            user: employee._id,
+            userId: employee._id,
             year: selectedYear,
           },
           {
             $set: {
-              user: employee._id,
+              userId: employee._id,
               year: selectedYear,
               allocated: DEFAULT_LEAVE_QUOTA,
-              remaining: initialRemaining >= 0 ? initialRemaining : 0, // Proteksi jangan sampai minus
+              remaining: initialRemaining >= 0 ? initialRemaining : 0,
               used: initialUsed,
               updatedAt: new Date(),
             },
           },
           {
-            upsert: true, // Membuat data baru jika kombinasi user + year belum ada
+            upsert: true,
             new: true,
           }
         );
