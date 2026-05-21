@@ -134,6 +134,19 @@ export const submitKpi = async (req, res) => {
     res.status(500).send("Gagal menyimpan penilaian KPI");
   }
 };
+
+export const getKpiList = async (req, res) => {
+  try {
+    // Mencari semua data KPI dan meng-populate data karyawan
+    const kpiList = await Kpi.find({})
+      .populate("employeeId", "fullName unitId") // Ambil nama & unit
+      .sort({ createdAt: -1 });
+
+    res.render("kpi/list", { kpiList });
+  } catch (error) {
+    res.status(500).send("Error memuat daftar KPI");
+  }
+};
 // =============================
 // KELOLA KPI
 // =============================
