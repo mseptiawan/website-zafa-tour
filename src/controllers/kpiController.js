@@ -142,7 +142,7 @@ export const getKpiList = async (req, res) => {
       .populate("employeeId", "fullName unitId") // Ambil nama & unit
       .sort({ createdAt: -1 });
 
-    res.render("kpi/list", { kpiList });
+    res.render("kpi/list", { title: "daftar kpi karyawan", kpiList });
   } catch (error) {
     res.status(500).send("Error memuat daftar KPI");
   }
@@ -157,7 +157,7 @@ export const getKpiDetail = async (req, res) => {
 
     if (!kpi) return res.status(404).send("Data tidak ditemukan");
 
-    res.render("kpi/detail", { kpi });
+    res.render("kpi/detail", { title: "Daftar detail kpi", kpi });
   } catch (error) {
     res.status(500).send("Error memuat detail KPI");
   }
