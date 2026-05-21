@@ -1550,6 +1550,12 @@
       background-color: color-mix(in oklab, var(--color-emerald-50) 60%, transparent);
     }
   }
+  .bg-emerald-50\/70 {
+    background-color: color-mix(in srgb, oklch(97.9% 0.021 166.113) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-emerald-50) 70%, transparent);
+    }
+  }
   .bg-emerald-100 {
     background-color: var(--color-emerald-100);
   }
@@ -1588,6 +1594,12 @@
   }
   .bg-purple-50 {
     background-color: var(--color-purple-50);
+  }
+  .bg-purple-50\/70 {
+    background-color: color-mix(in srgb, oklch(97.7% 0.014 308.299) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-purple-50) 70%, transparent);
+    }
   }
   .bg-purple-500 {
     background-color: var(--color-purple-500);
@@ -1629,6 +1641,12 @@
     background-color: color-mix(in srgb, oklch(96.9% 0.015 12.422) 60%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-rose-50) 60%, transparent);
+    }
+  }
+  .bg-rose-50\/70 {
+    background-color: color-mix(in srgb, oklch(96.9% 0.015 12.422) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-rose-50) 70%, transparent);
     }
   }
   .bg-rose-100 {
@@ -2080,6 +2098,9 @@
   }
   .text-right {
     text-align: right;
+  }
+  .align-middle {
+    vertical-align: middle;
   }
   .font-mono {
     font-family: var(--font-mono);

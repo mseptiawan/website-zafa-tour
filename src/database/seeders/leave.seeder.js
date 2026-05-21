@@ -7,7 +7,7 @@ import Leave from "../../models/leave/Leave.model.js";
 import LeaveApproval from "../../models/leave/LeaveApproval.model.js";
 import LeaveBalance from "../../models/leave/LeaveBalance.model.js";
 import LeaveType from "../../models/leave/LeaveType.model.js";
-import LeaveCancellation from "../../models/leave/LeaveCancellation.model.js"; // Import model pembatalan baru
+import LeaveCancellation from "../../models/leave/LeaveCancellation.model.js";
 
 dotenv.config();
 
@@ -140,13 +140,23 @@ export default async function leaveSeeder() {
     const approvalsToInsert = [];
     const cancellationsToInsert = [];
 
-    // Memasukkan variasi status baru CANCELLATION_PENDING
     const statuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED", "CANCELLATION_PENDING"];
+
+    // 🌟 DAFTAR USERNAME PRIORITAS YANG MAU DIBUATKAN MASING-MASING 30 DATA
+    const targetUsernames = [
+      "basoherman",
+      "ongkidwi",
+      "sarwanto",
+      "duwihartati",
+      "ronaldrizky",
+      "fadhilah",
+      "meltisundari",
+      "fajarjaniko",
+    ];
 
     for (const user of users) {
       const otherUsers = users.filter((u) => u._id.toString() !== user._id.toString());
 
-      // Fallback structural roles
       const managerUser =
         users.find((u) => u.roleId && u.roleId.name === "MANAGER") ||
         (otherUsers.length ? otherUsers[0] : user);
@@ -158,7 +168,11 @@ export default async function leaveSeeder() {
         (otherUsers.length ? otherUsers[2] : user);
 
       const userRoleName = (user.roleId ? user.roleId.name : "STAFF").toUpperCase();
-      const loopsPerUser = 6;
+
+      // 🌟 KONDISIONAL LOOP: Jika terdaftar di target dapat 30 data, jika user lain (jika ada) default 6 data
+      // Pastikan field pencocokan menggunakan nama field yang tepat di model User lo (di sini diasumsikan 'username')
+      const currentUsername = user.username ? user.username.toLowerCase().trim() : "";
+      const loopsPerUser = targetUsernames.includes(currentUsername) ? 30 : 6;
 
       for (let i = 0; i < loopsPerUser; i++) {
         const status = randomItem(statuses);
@@ -172,7 +186,6 @@ export default async function leaveSeeder() {
         );
         const leaveId = new mongoose.Types.ObjectId();
 
-        // 1. Tentukan Hirarki Alur Approval Berdasarkan Siapa yang Mengajukan Cuti
         let approvalSteps = [];
 
         if (handoverUser) {
@@ -187,21 +200,16 @@ export default async function leaveSeeder() {
         } else if (userRoleName === "HR") {
           approvalSteps.push({ step: "PIMPINAN", approver: pimpinanUser });
         } else {
-          // Jika pimpinan/role lain mengajukan cuti, langsung ditinjau HR / Pimpinan lain
           approvalSteps.push({ step: "HR", approver: hrUser });
         }
 
-        // 2. Olah Data Berdasarkan Status Target Pengajuan
-
         // --- KONDISI A: PENDING (Sedang Berjalan) ---
         if (status === "PENDING") {
-          // Buat agar langkah pertama APPROVED, langkah kedua PENDING (realistis di lapangan)
           let currentStepApproved = true;
 
           approvalSteps.forEach((flow, idx) => {
             if (currentStepApproved) {
               if (idx === 0 && Math.random() > 0.5) {
-                // Langkah pertama langsung tertahan PENDING
                 approvalsToInsert.push({
                   leaveId,
                   step: flow.step,
@@ -211,7 +219,6 @@ export default async function leaveSeeder() {
                 });
                 currentStepApproved = false;
               } else if (idx === approvalSteps.length - 1) {
-                // Jika sampai langkah akhir belum diputus, jadikan langkah terakhir ini PENDING
                 approvalsToInsert.push({
                   leaveId,
                   step: flow.step,
@@ -221,7 +228,6 @@ export default async function leaveSeeder() {
                 });
                 currentStepApproved = false;
               } else {
-                // Langkah antara disetujui
                 approvalsToInsert.push({
                   leaveId,
                   step: flow.step,
@@ -235,7 +241,7 @@ export default async function leaveSeeder() {
           });
         }
 
-        // --- KONDISI B: APPROVED (Semua Langkah Rampung) ---
+        // --- KONDISI B: APPROVED ---
         else if (status === "APPROVED") {
           approvalSteps.forEach((flow) => {
             approvalsToInsert.push({
@@ -248,7 +254,6 @@ export default async function leaveSeeder() {
             });
           });
 
-          // Kurangi kuota balance jika tipenya memotong kuota
           if (leaveType.isDeductBalance) {
             const userBalance = balanceData.find(
               (b) => b.userId.toString() === user._id.toString()
@@ -260,12 +265,11 @@ export default async function leaveSeeder() {
           }
         }
 
-        // --- KONDISI C: REJECTED (Salah Satu Menolak) ---
+        // --- KONDISI C: REJECTED ---
         else if (status === "REJECTED") {
           let hasRejected = false;
           approvalSteps.forEach((flow, idx) => {
             if (!hasRejected) {
-              // Acak step mana yang menjadi eksekutor penolakan berkas
               const operationalReject = idx === approvalSteps.length - 1 || Math.random() > 0.5;
               if (operationalReject) {
                 approvalsToInsert.push({
@@ -276,7 +280,7 @@ export default async function leaveSeeder() {
                   note: randomItem(rejectionNotes),
                   actionDate: startDate,
                 });
-                hasRejected = true; // Hentikan step berikutnya karena berkas sudah mati
+                hasRejected = true;
               } else {
                 approvalsToInsert.push({
                   leaveId,
@@ -291,9 +295,8 @@ export default async function leaveSeeder() {
           });
         }
 
-        // --- KONDISI D: CANCELLED (Pembatalan Mutlak Selesai Disetujui) ---
+        // --- KONDISI D: CANCELLED ---
         else if (status === "CANCELLED") {
-          // Anggap pengajuan awalnya sudah FULL APPROVED
           approvalSteps.forEach((flow) => {
             approvalsToInsert.push({
               leaveId,
@@ -305,7 +308,6 @@ export default async function leaveSeeder() {
             });
           });
 
-          // Masuk ke log pembatalan yang disetujui HR
           cancellationsToInsert.push({
             leaveId,
             requestedBy: user._id,
@@ -315,13 +317,10 @@ export default async function leaveSeeder() {
             processAt: startDate,
             note: "Pembatalan disetujui, kuota karyawan tidak dipotong.",
           });
-
-          // Saldo balance aman (tidak bertambah/terpotong karena dicancel)
         }
 
-        // --- KONDISI E: CANCELLATION_PENDING (Sedang Mengajukan Batal) ---
+        // --- KONDISI E: CANCELLATION_PENDING ---
         else if (status === "CANCELLATION_PENDING") {
-          // Langkah pengajuan cuti awal tentu sudah disetujui semua
           approvalSteps.forEach((flow) => {
             approvalsToInsert.push({
               leaveId,
@@ -333,16 +332,14 @@ export default async function leaveSeeder() {
             });
           });
 
-          // Tambah antrean approval baru khusus untuk pembatalan di log transaksi utama
           approvalsToInsert.push({
             leaveId,
-            step: userRoleName === "MANAGER" ? "HR" : "MANAGER", // Manager minta batal diverifikasi HR, staff diuji Manager dulu
+            step: userRoleName === "MANAGER" ? "HR" : "MANAGER",
             approverId: userRoleName === "MANAGER" ? hrUser._id : managerUser._id,
             status: "PENDING",
             note: "Persetujuan pembatalan disetujui oleh Manager, menunggu verifikasi akhir HR.",
           });
 
-          // Masukkan entry data ke koleksi LeaveCancellation
           cancellationsToInsert.push({
             leaveId,
             requestedBy: user._id,
@@ -351,7 +348,6 @@ export default async function leaveSeeder() {
             note: "Menunggu verifikasi atasan.",
           });
 
-          // Kuota awalnya sempat terpotong karena status sempat disetujui sebelum minta batal
           if (leaveType.isDeductBalance) {
             const userBalance = balanceData.find(
               (b) => b.userId.toString() === user._id.toString()
@@ -363,7 +359,6 @@ export default async function leaveSeeder() {
           }
         }
 
-        // Push data cuti induk
         leavesToInsert.push({
           _id: leaveId,
           userId: user._id,
@@ -384,14 +379,12 @@ export default async function leaveSeeder() {
       }
     }
 
-    // Eksekusi insert massal ke database
     await Leave.insertMany(leavesToInsert);
     await LeaveApproval.insertMany(approvalsToInsert);
     if (cancellationsToInsert.length > 0) {
       await LeaveCancellation.insertMany(cancellationsToInsert);
     }
 
-    // Simpan sinkronisasi saldo akhir
     for (const updatedBalance of balanceData) {
       await LeaveBalance.updateOne(
         { userId: updatedBalance.userId, year: updatedBalance.year },
