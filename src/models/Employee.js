@@ -59,8 +59,14 @@ const employeeSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
+employeeSchema.virtual("terminationHistory", {
+  ref: "Termination",
+  localField: "_id",
+  foreignField: "employeeId",
+  justOne: false,
+});
 
 const Employee = mongoose.model("Employee", employeeSchema);
 

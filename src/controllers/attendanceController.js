@@ -1,7 +1,7 @@
 import Employee from "../models/Employee.js";
 import AttendanceCorrection from "../models/AttendanceCorrection.js";
 import Attendance from "../models/Attendance.js";
-
+import User from "../models/User.js";
 /**
  * RANGE HARI INI
  */
@@ -116,9 +116,8 @@ export const checkIn = async (req, res) => {
       });
     }
 
-    const OFFICE_LAT = -2.930177;
-    const OFFICE_LNG = 104.763741;
-
+    const OFFICE_LAT = -2.930156;
+    const OFFICE_LNG = 104.763686;
     const distance = haversineDistance(OFFICE_LAT, OFFICE_LNG, lat, lng);
 
     if (type === "KANTOR" && distance > 500) {
@@ -234,119 +233,158 @@ export const allAttendance = async (req, res) => {
     res.status(500).send("Error ambil data");
   }
 };
+export const getAttendanceDashboard = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
+    // 1. Ambil User dan POPULATE employeeData agar fullName bisa diakses
+    const users = await User.find().populate("employeeData");
+
+    // 2. Ambil absensi hari ini
+    const attendances = await Attendance.find({
+      createdAt: { $gte: today, $lt: tomorrow },
+    });
+
+    // 3. Gabungkan data
+    const dashboardData = users.map((user) => {
+      const attendance = attendances.find((a) => a.userId.toString() === user._id.toString());
+
+      return {
+        // Ambil fullName dari employeeData, fallback ke username jika null
+        name: user.employeeData ? user.employeeData.fullName : user.username,
+        attendance: attendance || null,
+        status: attendance ? attendance.status : "BELUM ABSEN",
+      };
+    });
+
+    // 4. Sorting: BELUM ABSEN selalu di atas
+    dashboardData.sort((a, b) => {
+      if (a.status === "BELUM ABSEN" && b.status !== "BELUM ABSEN") return -1;
+      if (a.status !== "BELUM ABSEN" && b.status === "BELUM ABSEN") return 1;
+      return 0;
+    });
+
+    res.render("attendance/all", { title: "Dashboard Absensi HR", data: dashboardData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Terjadi kesalahan server");
+  }
+};
 /**
  * EDIT FORM (HR)
  */
-export const editForm = async (req, res) => {
-  const data = await Attendance.findById(req.params.id);
+// export const editForm = async (req, res) => {
+//   const data = await Attendance.findById(req.params.id);
 
-  res.render("attendance/edit", {
-    title: "Edit Absensi",
-    data,
-  });
-};
+//   res.render("attendance/edit", {
+//     title: "Edit Absensi",
+//     data,
+//   });
+// };
 
 /**
  * UPDATE (HR ONLY)
  */
-export const updateAttendance = async (req, res) => {
-  try {
-    const admin = req.session.user;
+// export const updateAttendance = async (req, res) => {
+//   try {
+//     const admin = req.session.user;
 
-    if (!admin || admin.role !== "HR") {
-      return res.status(403).send("Access denied");
-    }
+//     if (!admin || admin.role !== "HR") {
+//       return res.status(403).send("Access denied");
+//     }
 
-    const { checkIn, checkOut, status, type, note } = req.body;
+//     const { checkIn, checkOut, status, type, note } = req.body;
 
-    await Attendance.findByIdAndUpdate(req.params.id, {
-      checkIn,
-      checkOut,
-      status,
-      type,
-      note,
-      editedBy: admin._id,
-      editedAt: new Date(),
-    });
+//     await Attendance.findByIdAndUpdate(req.params.id, {
+//       checkIn,
+//       checkOut,
+//       status,
+//       type,
+//       note,
+//       editedBy: admin._id,
+//       editedAt: new Date(),
+//     });
 
-    res.redirect("/attendance/all");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error update");
-  }
-};
+//     res.redirect("/attendance/all");
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send("Error update");
+//   }
+// };
 
 /**
  * MANUAL FORM HR
  */
-export const manualForm = async (req, res) => {
-  try {
-    const employees = await Employee.find().populate("userId").sort({ fullName: 1 });
+// export const manualForm = async (req, res) => {
+//   try {
+//     const employees = await Employee.find().populate("userId").sort({ fullName: 1 });
 
-    res.render("attendance/manual", {
-      title: "Input Absensi Manual",
-      employees,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error load form manual");
-  }
-};
+//     res.render("attendance/manual", {
+//       title: "Input Absensi Manual",
+//       employees,
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send("Error load form manual");
+//   }
+// };
 
 /**
  * CREATE MANUAL HR
  */
-export const createManual = async (req, res) => {
-  try {
-    const { userId, checkIn, checkOut, type, status, note } = req.body;
+// export const createManual = async (req, res) => {
+//   try {
+//     const { userId, checkIn, checkOut, type, status, note } = req.body;
 
-    const inTime = new Date(checkIn);
-    const outTime = checkOut ? new Date(checkOut) : null;
+//     const inTime = new Date(checkIn);
+//     const outTime = checkOut ? new Date(checkOut) : null;
 
-    let workDuration = 0;
+//     let workDuration = 0;
 
-    if (outTime) {
-      workDuration = (outTime - inTime) / (1000 * 60);
-    }
+//     if (outTime) {
+//       workDuration = (outTime - inTime) / (1000 * 60);
+//     }
 
-    await Attendance.create({
-      userId,
-      checkIn: inTime,
-      checkOut: outTime,
-      type,
-      status,
-      note,
-      workDuration,
-    });
+//     await Attendance.create({
+//       userId,
+//       checkIn: inTime,
+//       checkOut: outTime,
+//       type,
+//       status,
+//       note,
+//       workDuration,
+//     });
 
-    res.redirect("/attendance/all");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error manual input");
-  }
-};
+//     res.redirect("/attendance/all");
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send("Error manual input");
+//   }
+// };
 
-export const getCorrectionDetail = async (req, res) => {
-  try {
-    const { id } = req.params;
+// export const getCorrectionDetail = async (req, res) => {
+//   try {
+//     const { id } = req.params;
 
-    const data = await AttendanceCorrection.findById(id).populate("userId"); // pastikan field ini benar
+//     const data = await AttendanceCorrection.findById(id).populate("userId"); // pastikan field ini benar
 
-    if (!data) {
-      return res.status(404).send("Data tidak ditemukan");
-    }
+//     if (!data) {
+//       return res.status(404).send("Data tidak ditemukan");
+//     }
 
-    return res.render("attendance/correction-detail", {
-      title: "Detail Koreksi Absensi",
-      data,
-    });
-  } catch (err) {
-    console.error("ERROR getCorrectionDetail:", err);
+//     return res.render("attendance/correction-detail", {
+//       title: "Detail Koreksi Absensi",
+//       data,
+//     });
+//   } catch (err) {
+//     console.error("ERROR getCorrectionDetail:", err);
 
-    return res.status(500).send({
-      message: "Server error",
-      error: err.message,
-    });
-  }
-};
+//     return res.status(500).send({
+//       message: "Server error",
+//       error: err.message,
+//     });
+//   }
+// };

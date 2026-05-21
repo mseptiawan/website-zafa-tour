@@ -7,12 +7,13 @@ import {
   index,
   checkIn,
   checkOut,
+  getAttendanceDashboard,
   allAttendance,
-  editForm,
-  manualForm,
-  createManual,
-  updateAttendance,
-  getCorrectionDetail,
+  // editForm,
+  // manualForm,
+  // createManual,
+  // updateAttendance,
+  // getCorrectionDetail,
   history,
 } from "../controllers/attendanceController.js";
 
@@ -29,13 +30,14 @@ router.post("/attendance/checkout", checkOut);
 /* ADMIN */
 router.get("/attendance/all", authMiddleware, roleMiddleware(["HR"]), allAttendance);
 
+router.get("/attendance/getall", authMiddleware, roleMiddleware("HR"), getAttendanceDashboard);
 /* EDIT */
-router.get("/attendance/edit/:id", authMiddleware, roleMiddleware(["HR"]), editForm);
-router.post("/attendance/edit/:id", authMiddleware, roleMiddleware(["HR"]), updateAttendance);
+// router.get("/attendance/edit/:id", authMiddleware, roleMiddleware(["HR"]), editForm);
+// router.post("/attendance/edit/:id", authMiddleware, roleMiddleware(["HR"]), updateAttendance);
 
 /* MANUAL */
-router.get("/attendance/create-manual", authMiddleware, roleMiddleware(["HR"]), manualForm);
-router.post("/attendance/create-manual", authMiddleware, roleMiddleware(["HR"]), createManual);
+// router.get("/attendance/create-manual", authMiddleware, roleMiddleware(["HR"]), manualForm);
+// router.post("/attendance/create-manual", authMiddleware, roleMiddleware(["HR"]), createManual);
 
 /* CORRECTION */
 // router.get("/attendance/correction", formCorrection);
@@ -50,7 +52,7 @@ router.post("/attendance/create-manual", authMiddleware, roleMiddleware(["HR"]),
 // );
 
 /* DETAIL (HARUS DI ATAS STATUS ROUTE) */
-router.get("/attendance/correction/:id", authMiddleware, getCorrectionDetail);
+// router.get("/attendance/correction/:id", authMiddleware, getCorrectionDetail);
 
 /* STATUS ACTION */
 // router.get(

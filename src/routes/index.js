@@ -12,16 +12,20 @@ import announcementRoutes from "./announcement.routes.js";
 import expenseRoutes from "./expense.routes.js";
 import dailylog from "./dailylog.route.js";
 import finance from "./finance.routes.js";
+import approvalRoutes from "./approval.routes.js";
+import Employee from "./employee.routes.js";
 const router = express.Router();
 
 router.use("/", authRoutes);
 router.use("/", leaveRoutes);
 router.use("/", overtimeRoutes);
 router.use("/", attendanceRoutes);
+router.use("/", Employee);
+
 router.use("/", kpiRoutes);
 router.use("/trip", tripRoutes);
 router.use("/daily-log", dailylog);
-
+router.use("/approvals", approvalRoutes);
 router.use("/finance", finance);
 router.use("/sales", salesRoutes);
 router.use("/assignment", assignmentRoutes);

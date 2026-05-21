@@ -1,5 +1,6 @@
 import Employee from "../models/Employee.js";
 import User from "../models/User.js";
+import Termination from "../models/Termination.js"; // Sesuaikan dengan path folder model kamu
 import bcrypt from "bcrypt";
 import Role from "../models/Role.js";
 import Position from "../models/Position.js";
@@ -110,5 +111,39 @@ export const detailEmployee = async (req, res) => {
     });
   } catch (err) {
     res.status(500).send(err.message);
+  }
+};
+
+export const ajukanPHK = async (req, res) => {
+  try {
+    const { employeeId, reason } = req.body;
+
+    // 🔍 Cek 1: Apakah file benar-benar masuk dari form?
+    if (!req.file) {
+      return res.status(400).json({
+        message:
+          "Gagal: File dokumen tidak terbaca oleh sistem. Pastikan input file di EJS bernama 'document'",
+      });
+    }
+
+    // Ambil path atau filename sesuai konfigurasi multer kamu
+    const documentPath = req.file.path || req.file.filename;
+
+    const newTermination = new Termination({
+      employeeId,
+      reason,
+      documentPath,
+      status: "Waiting",
+    });
+
+    await newTermination.save();
+    res.redirect("/employee");
+  } catch (error) {
+    // 🔍 Cek 2: Tampilkan error spesifik dari MongoDB/Node ke respon browser
+    console.error(error);
+    res.status(500).json({
+      message: "Gagal mengajukan PHK",
+      error_asli: error.message,
+    });
   }
 };

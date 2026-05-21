@@ -108,6 +108,7 @@ const employeeSeeder = async () => {
     {
       userId: rafikafitrianti._id,
       fullName: "Rafika Fitrianti",
+      gender: "Perempuan",
       positionId: direkturUtama._id,
       unitId: null,
       bidangId: null,
@@ -115,7 +116,7 @@ const employeeSeeder = async () => {
     {
       userId: duwihartati._id,
       fullName: "Duwi Hartati",
-
+      gender: "Perempuan",
       positionId: wakilDirektur._id,
       unitId: null,
       bidangId: null,
@@ -123,7 +124,7 @@ const employeeSeeder = async () => {
     {
       userId: ronaldrizky._id,
       fullName: "Ronald Rizky",
-
+      gender: "Laki-Laki",
       positionId: generalManager._id,
       unitId: null,
       bidangId: null,
@@ -131,7 +132,7 @@ const employeeSeeder = async () => {
     {
       userId: meltisundari._id,
       fullName: "Melti Sundari",
-
+      gender: "Perempuan",
       positionId: manager._id,
       unitId: manajemenAdministrasi._id,
       bidangId: administrasi._id,
@@ -139,7 +140,7 @@ const employeeSeeder = async () => {
     {
       userId: fadhilah._id,
       fullName: "Fadhilah",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: pengeluaranOperasional._id,
       bidangId: keuangan._id,
@@ -152,7 +153,7 @@ const employeeSeeder = async () => {
     {
       userId: gustidiansyah._id,
       fullName: "Gusti Diansyah",
-
+      gender: "Laki-Laki",
       positionId: komisaris._id,
       unitId: null,
       bidangId: null,
@@ -160,7 +161,7 @@ const employeeSeeder = async () => {
     {
       userId: willycauza._id,
       fullName: "Willy Cauza",
-
+      gender: "Laki-Laki",
       positionId: generalManager._id,
       unitId: null,
       bidangId: null,
@@ -168,7 +169,7 @@ const employeeSeeder = async () => {
     {
       userId: mriskywindinata._id,
       fullName: "Mrisky Windinata",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: ticketingHajiKhusus._id,
       bidangId: administrasi._id,
@@ -176,7 +177,7 @@ const employeeSeeder = async () => {
     {
       userId: lilymustikasari._id,
       fullName: "Lily Mustikasari",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: cs._id,
       bidangId: administrasi._id,
@@ -189,7 +190,7 @@ const employeeSeeder = async () => {
     {
       userId: febriansyah._id,
       fullName: "Febriansyah",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: pelaporanUmrahTransportasi._id,
       bidangId: administrasi._id,
@@ -197,7 +198,7 @@ const employeeSeeder = async () => {
     {
       userId: adindarismayani._id,
       fullName: "Adinda Rismayani",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: onlineCustomerCare._id,
       bidangId: administrasi._id,
@@ -205,7 +206,7 @@ const employeeSeeder = async () => {
     {
       userId: fajarjaniko._id,
       fullName: "Fajar Janiko",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: cs._id,
       bidangId: administrasi._id,
@@ -213,7 +214,7 @@ const employeeSeeder = async () => {
     {
       userId: rendijalil._id,
       fullName: "Rendi Jalil",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: visaHotel._id,
       bidangId: hajiUmrah._id,
@@ -226,7 +227,7 @@ const employeeSeeder = async () => {
     {
       userId: abdulaziz._id,
       fullName: "Abdul Aziz",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: pelayananSaudi._id,
       bidangId: hajiUmrah._id,
@@ -234,7 +235,7 @@ const employeeSeeder = async () => {
     {
       userId: basoherman._id,
       fullName: "Baso Herman",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: pendidikanPelatihan._id,
       bidangId: hajiUmrah._id,
@@ -242,7 +243,7 @@ const employeeSeeder = async () => {
     {
       userId: ongkidwi._id,
       fullName: "Ongki Dwi",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: multimedia._id,
       bidangId: it._id,
@@ -255,7 +256,7 @@ const employeeSeeder = async () => {
     {
       userId: sarwanto._id,
       fullName: "Sarwanto",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: multimedia._id,
       bidangId: it._id,
@@ -268,7 +269,7 @@ const employeeSeeder = async () => {
     {
       userId: dirasuhada._id,
       fullName: "Dira Suhada",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: accounting._id,
       bidangId: keuangan._id,
@@ -276,7 +277,7 @@ const employeeSeeder = async () => {
     {
       userId: muliaeka._id,
       fullName: "Mulia Eka",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: pengeluaranCOGS._id,
       bidangId: keuangan._id,
@@ -289,7 +290,7 @@ const employeeSeeder = async () => {
     {
       userId: dinaanggraini._id,
       fullName: "Dina Anggraini",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: penerimaanPenagihan._id,
       bidangId: keuangan._id,
@@ -297,7 +298,7 @@ const employeeSeeder = async () => {
     {
       userId: nurul._id,
       fullName: "Nurul",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: penerimaanStoran._id,
       bidangId: keuangan._id,
@@ -310,7 +311,7 @@ const employeeSeeder = async () => {
     {
       userId: arifsuprastiyo._id,
       fullName: "Arif Suprastiyo",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: marketingUnit._id,
       bidangId: marketing._id,
@@ -318,7 +319,7 @@ const employeeSeeder = async () => {
     {
       userId: deckycaprianus._id,
       fullName: "Decky Caprianus",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: marketingUnit._id,
       bidangId: marketing._id,
@@ -326,7 +327,7 @@ const employeeSeeder = async () => {
     {
       userId: adikurniadi._id,
       fullName: "Adi Kurniadi",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: marketingUnit._id,
       bidangId: marketing._id,
@@ -334,7 +335,7 @@ const employeeSeeder = async () => {
     {
       userId: nicoyudhira._id,
       fullName: "Nico Yudhira",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: perlengkapan._id,
       bidangId: umum._id,
@@ -342,7 +343,7 @@ const employeeSeeder = async () => {
     {
       userId: mariani._id,
       fullName: "Mariani",
-
+      gender: "Perempuan",
       positionId: staff._id,
       unitId: perlengkapan._id,
       bidangId: umum._id,
@@ -350,7 +351,7 @@ const employeeSeeder = async () => {
     {
       userId: adipuja._id,
       fullName: "Adi Puja",
-
+      gender: "Laki-Laki",
       positionId: staff._id,
       unitId: perlengkapan._id,
       bidangId: umum._id,

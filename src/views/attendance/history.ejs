@@ -1,328 +1,135 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-6">
-
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-5xl mx-auto">
 
-    <!-- HEADER -->
-    <div class="mb-6 flex justify-between items-end">
-
+    <div class="flex items-start justify-between mb-8">
       <div>
-        <h1 class="text-2xl font-semibold text-slate-800">
-          Riwayat Absensi
-        </h1>
-
-        <p class="text-sm text-slate-500 mt-1">
-          Pantau catatan kehadiran karyawan
-        </p>
+        <h1 class="text-2xl font-semibold text-slate-800">Riwayat Absensi</h1>
+        <p class="text-sm text-slate-500 mt-1">Pantau seluruh catatan kehadiran karyawan</p>
       </div>
-
-      <div class="text-sm text-slate-500 bg-white border rounded-lg px-3 py-1">
-        Total: <%= data.length %>
+      <div class="text-sm text-slate-500 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm">
+        Total: <span class="font-bold text-slate-900"><%= data.length %></span>
       </div>
-
     </div>
 
-    <!-- TABLE -->
-    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
-
-        <table class="w-full text-sm">
-
-          <thead class="bg-slate-100 border-b border-slate-200">
-            <tr class="text-left text-xs text-slate-600">
-              <th class="px-4 py-3">Tanggal</th>
-              <th class="px-4 py-3">Check In</th>
-              <th class="px-4 py-3">Check Out</th>
-              <th class="px-4 py-3">Status</th>
-              <th class="px-4 py-3 text-center">Foto</th>
-              <th class="px-4 py-3">Aksi</th>
+        <table class="w-full text-sm min-w-[700px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-6 py-4">Tanggal</th>
+              <th class="text-left px-6 py-4">Masuk</th>
+              <th class="text-left px-6 py-4">Keluar</th>
+              <th class="text-left px-6 py-4">Status</th>
+              <th class="text-center px-6 py-4">Foto</th>
+              <th class="text-center px-6 py-4">Aksi</th>
             </tr>
           </thead>
-
           <tbody class="divide-y divide-slate-100">
-
-            <% if (data.length > 0) { %>
-
-              <% data.forEach(d => { %>
-                <tr class="hover:bg-slate-50 transition">
-
-                  <td class="px-4 py-3">
-                    <%= new Date(d.createdAt).toLocaleDateString("id-ID") %>
-                  </td>
-
-                  <td class="px-4 py-3">
-                    <%= d.checkIn ? new Date(d.checkIn).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
-                  </td>
-
-                  <td class="px-4 py-3">
-                    <%= d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
-                  </td>
-
-                  <td class="px-4 py-3">
-                    <% if (d.status === "TELAT") { %>
-                      <span class="text-slate-600">Telat</span>
-                    <% } else { %>
-                      <span class="text-slate-600"><%= d.status %></span>
-                    <% } %>
-                  </td>
-
-                  <td class="px-4 py-3 text-center">
-
-                    <% if (d.photo) { %>
-                      <img
-                        src="<%= d.photo %>"
-                        class="w-10 h-10 mx-auto rounded-lg object-cover border"
-                      />
-                    <% } else { %>
-                      <span class="text-xs text-slate-400">-</span>
-                    <% } %>
-
-                  </td>
-
-                  <td class="px-4 py-3">
-
-                <button
-  class="openModal"
-  data-date="<%= d.createdAt.toLocaleDateString('id-ID') %>"
-  data-status="<%= d.status %>"
-data-checkin="<%= d.checkIn ? new Date(d.checkIn).toLocaleString('id-ID') : '-' %>"
-data-checkout="<%= d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '-' %>"
-  data-type="<%= d.type %>"
-  data-note="<%= d.note || '-' %>"
-  data-workduration="<%= d.workDuration %>"
-  data-address="<%= d.location?.address || '-' %>"
-  data-lat="<%= d.location?.lat || '' %>"
-  data-lng="<%= d.location?.lng || '' %>"
-  data-useragent="<%= d.deviceInfo?.userAgent || '-' %>"
-  data-platform="<%= d.deviceInfo?.platform || '-' %>"
-  data-photo="<%= d.photo || '' %>"
->
-  Detail
-</button>
-
-                  </td>
-
-                </tr>
-              <% }) %>
-
-            <% } else { %>
-
+            <% if (data.length === 0) { %>
               <tr>
-                <td colspan="6" class="text-center py-10 text-slate-400">
-                  Belum ada data absensi
-                </td>
+                <td colspan="6" class="text-center py-10 text-slate-400">Belum ada data absensi</td>
               </tr>
-
             <% } %>
 
+            <% data.forEach(d => { 
+                const statusColors = {
+                  'HADIR': 'text-emerald-600 bg-emerald-50/70 border-emerald-200/50',
+                  'TELAT': 'text-amber-600 bg-amber-50/70 border-amber-200/50',
+                  'ALPHA': 'text-rose-600 bg-rose-50/70 border-rose-200/50'
+                };
+            %>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="px-6 py-4 font-medium text-slate-800">
+                  <%= new Date(d.createdAt).toLocaleDateString("id-ID") %>
+                </td>
+                <td class="px-6 py-4 text-slate-600">
+                  <%= d.checkIn ? new Date(d.checkIn).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
+                </td>
+                <td class="px-6 py-4 text-slate-600">
+                  <%= d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium uppercase tracking-wide <%= statusColors[d.status] || 'text-slate-500 bg-slate-50 border-slate-200' %>">
+                    <%= d.status %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <% if (d.photo) { %>
+                    <img src="<%= d.photo %>" class="w-10 h-10 mx-auto rounded-lg object-cover border border-slate-200" />
+                  <% } else { %>
+                    <span class="text-slate-400">-</span>
+                  <% } %>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <button class="openModal inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition"
+                    data-date="<%= new Date(d.createdAt).toLocaleDateString('id-ID') %>"
+                    data-status="<%= d.status %>"
+                    data-checkin="<%= d.checkIn ? new Date(d.checkIn).toLocaleString('id-ID') : '-' %>"
+                    data-checkout="<%= d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '-' %>"
+                    data-duration="<%= d.workDuration || 0 %>"
+                    data-photo="<%= d.photo || '' %>"
+                    data-type="<%= d.type %>">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg>
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
           </tbody>
-
         </table>
-
       </div>
     </div>
   </div>
 </div>
 
-<!-- ================= MODAL ================= -->
-<div id="detailModal"
-  class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
-
-  <!-- BOX -->
-  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-100">
-
-    <!-- HEADER -->
-    <div class="p-5 border-b border-slate-100 flex justify-between items-center shrink-0 bg-slate-50">
-      <div>
-        <h2 class="font-semibold text-slate-800 text-base">
-          Detail Absensi
-        </h2>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Informasi lengkap kehadiran karyawan
-        </p>
-      </div>
-
-      <button onclick="closeModal()"
-        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition">
-        ✕
-      </button>
+<div id="detailModal" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+  <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <h2 class="font-semibold text-slate-800 text-sm">Detail Absensi</h2>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition">✕</button>
     </div>
 
-    <!-- BODY -->
-    <div class="p-5 space-y-5 text-sm overflow-y-auto">
+    <div class="p-5 space-y-4 text-sm">
+      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Tanggal</span><span class="font-medium text-slate-700" id="mDate"></span></div>
+      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Status</span><span class="font-medium text-slate-700" id="mStatus"></span></div>
+      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Tipe</span><span class="font-medium text-slate-700 uppercase" id="mType"></span></div>
+      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Masuk</span><span class="font-medium text-slate-700" id="mIn"></span></div>
+      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Keluar</span><span class="font-medium text-slate-700" id="mOut"></span></div>
+      <div class="flex justify-between"><span class="text-slate-400">Durasi</span><span class="font-medium text-slate-700"><span id="mDuration"></span> menit</span></div>
 
-      <!-- GRID INFO -->
-      <div class="grid grid-cols-2 gap-4">
-
-        <div>
-          <p class="text-xs text-slate-400 uppercase">Tanggal</p>
-          <p class="text-slate-700 font-medium mt-1" id="mDate"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400 uppercase">Status</p>
-          <p class="text-slate-700 font-medium mt-1" id="mStatus"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400 uppercase">Check In</p>
-          <p class="text-slate-700 font-medium mt-1" id="mIn"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400 uppercase">Check Out</p>
-          <p class="text-slate-700 font-medium mt-1" id="mOut"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400 uppercase">Type</p>
-          <p class="text-slate-700 font-medium mt-1" id="mType"></p>
-        </div>
-
-        <div>
-          <p class="text-xs text-slate-400 uppercase">Durasi</p>
-          <p class="text-slate-700 font-medium mt-1">
-            <span id="mDuration"></span> menit
-          </p>
-        </div>
-
+      <div id="photoBox" class="hidden pt-2">
+        <img id="mPhoto" class="w-full h-48 object-cover rounded-xl border border-slate-200 shadow-sm">
       </div>
-
-      <!-- NOTE -->
-      <div class="border-t border-slate-100 pt-4">
-        <p class="text-xs text-slate-400 uppercase mb-1">Catatan</p>
-        <p id="mNote" class="text-slate-600 leading-relaxed"></p>
-      </div>
-
-      <!-- ADDRESS -->
-      <div>
-        <p class="text-xs text-slate-400 uppercase mb-1">Lokasi</p>
-        <p id="mAddress" class="text-slate-600 leading-relaxed"></p>
-      </div>
-
-      <!-- PHOTO -->
-      <div id="photoBox" class="hidden">
-        <p class="text-xs text-slate-400 uppercase mb-2">Foto</p>
-        <img id="mPhoto"
-          class="w-44 h-44 object-cover rounded-xl border border-slate-200 shadow-sm">
-      </div>
-
-      <!-- DEVICE INFO -->
-      <div class="bg-slate-50 border border-slate-100 p-4 rounded-xl text-xs text-slate-600 space-y-1">
-
-        <p class="font-semibold text-slate-700 mb-2">Device Info</p>
-
-        <p class="truncate">User Agent: <span id="mUA"></span></p>
-        <p>Platform: <span id="mPlatform"></span></p>
-
-      </div>
-
-      <!-- LAT LNG -->
-      <div class="text-xs text-slate-500 flex gap-4">
-        <p>Lat: <span id="mLat"></span></p>
-        <p>Lng: <span id="mLng"></span></p>
-      </div>
-
     </div>
-
-    <!-- FOOTER -->
-    <div class="p-4 border-t border-slate-100 text-right shrink-0 bg-white">
-      <button onclick="closeModal()"
-        class="px-4 py-2 bg-slate-900 text-white text-sm rounded-lg hover:bg-slate-800 transition">
-        Tutup
-      </button>
-    </div>
-
   </div>
 </div>
-<!-- ================= SCRIPT ================= -->
+
 <script>
-
 const modal = document.getElementById("detailModal");
-
-/**
- * OPEN MODAL
- */
 document.querySelectorAll(".openModal").forEach(btn => {
-  btn.addEventListener("click", () => {
-
-    // BASIC INFO
-    document.getElementById("mDate").textContent = btn.dataset.date || "-";
-    document.getElementById("mIn").textContent = btn.dataset.checkin || "-";
-    document.getElementById("mOut").textContent = btn.dataset.checkout || "-";
-    document.getElementById("mStatus").textContent = btn.dataset.status || "-";
-    document.getElementById("mType").textContent = btn.dataset.type || "-";
-
-    document.getElementById("mNote").textContent =
-      btn.dataset.note || "-";
-
-    document.getElementById("mDuration").textContent =
-      btn.dataset.duration || "0";
-
-    /**
-     * ADDRESS (HASIL GEO / NOMINATIM)
-     */
-    document.getElementById("mAddress").textContent =
-      btn.dataset.address || "Lokasi tidak tersedia";
-
-    /**
-     * LAT LNG
-     */
-    const lat = btn.dataset.lat;
-    const lng = btn.dataset.lng;
-
-    document.getElementById("mLat").textContent = lat || "-";
-    document.getElementById("mLng").textContent = lng || "-";
-
-    /**
-     * DEVICE INFO
-     */
-    document.getElementById("mUA").textContent =
-      btn.dataset.ua || "-";
-
-    document.getElementById("mPlatform").textContent =
-      btn.dataset.platform || "-";
-
-    /**
-     * PHOTO
-     */
-    if (btn.dataset.photo) {
-      document.getElementById("photoBox").classList.remove("hidden");
-      document.getElementById("mPhoto").src = btn.dataset.photo;
+  btn.addEventListener("click", (e) => {
+    const dataset = e.currentTarget.dataset;
+    document.getElementById("mDate").textContent = dataset.date || "-";
+    document.getElementById("mStatus").textContent = dataset.status || "-";
+    document.getElementById("mType").textContent = dataset.type || "-";
+    document.getElementById("mIn").textContent = dataset.checkin || "-";
+    document.getElementById("mOut").textContent = dataset.checkout || "-";
+    document.getElementById("mDuration").textContent = dataset.duration || "0";
+    
+    const photoBox = document.getElementById("photoBox");
+    const mPhoto = document.getElementById("mPhoto");
+    if (dataset.photo && dataset.photo !== "") {
+      photoBox.classList.remove("hidden");
+      mPhoto.src = dataset.photo;
     } else {
-      document.getElementById("photoBox").classList.add("hidden");
+      photoBox.classList.add("hidden");
     }
-
-    /**
-     * SHOW MODAL
-     */
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   });
 });
 
-/**
- * CLOSE MODAL
- */
-function closeModal() {
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-}
-
-/**
- * CLOSE ON OUTSIDE CLICK
- */
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) closeModal();
-});
-
-/**
- * ESC KEY CLOSE
- */
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeModal();
-});
-
+function closeModal() { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 </script>

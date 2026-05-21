@@ -1,297 +1,115 @@
 <%- layout('layouts/main', { title: title }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50 p-8">
-  <div class="max-w-3xl mx-auto">
-
-    <!-- HEADER -->
+  <div class="max-w-xl mx-auto">
     <div class="mb-8 text-center">
-      <h1 class="text-lg font-medium text-slate-800">
-        Absensi Kamera
-      </h1>
-      <p class="text-sm text-slate-500 mt-1">
-        Pastikan wajah terlihat jelas sebelum absen
-      </p>
+      <h1 class="text-xl font-semibold text-slate-800">Absensi Kamera</h1>
+      <p class="text-sm text-slate-400 mt-1">Pastikan posisi wajah sudah tepat</p>
     </div>
 
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
-
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
       <% if (already) { %>
-
-        <!-- SUDAH ABSEN -->
-        <div class="text-center space-y-4 py-8">
-
-          <div class="w-12 h-12 mx-auto flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-            ✔
-          </div>
-
-          <h2 class="text-sm font-medium text-slate-800">
-            Sudah Absen Hari Ini
-          </h2>
-
+        <div class="text-center py-6 space-y-4">
+          <div class="w-12 h-12 mx-auto flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600">✔</div>
+          <h2 class="text-sm font-medium text-slate-800">Sudah Absen Hari Ini</h2>
           <% if (!hasCheckedOut) { %>
             <form action="/attendance/checkout" method="POST">
-              <button class="px-4 py-2 text-sm rounded-lg bg-slate-900 text-white hover:bg-slate-800">
-                Pulang
-              </button>
+              <button class="px-6 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Pulang</button>
             </form>
           <% } else { %>
-            <p class="text-sm text-slate-500">Sudah checkout hari ini</p>
+            <p class="text-xs text-slate-400">Sudah checkout</p>
           <% } %>
-
         </div>
-
       <% } else { %>
-
-        <!-- FORM ABSENSI -->
-        <form class="space-y-5">
-
-          <!-- CAMERA -->
-          <div class="relative bg-slate-900 rounded-2xl overflow-hidden aspect-video">
+        <form id="attendance-form" class="space-y-5">
+          <div class="relative bg-slate-100 rounded-xl overflow-hidden aspect-video border border-slate-200">
             <video id="video" autoplay playsinline muted class="w-full h-full object-cover"></video>
             <canvas id="canvas" class="hidden"></canvas>
           </div>
 
-          <!-- TYPE -->
-<div>
-  <label class="text-xs text-slate-500">Kategori</label>
+          <div>
+            <label class="text-xs font-medium text-slate-400 uppercase tracking-wide">Kategori</label>
+            <div class="mt-2 grid grid-cols-2 gap-3">
+              <label class="flex items-center justify-center p-2 border rounded-lg cursor-pointer hover:border-blue-500 transition">
+                <input type="radio" name="type" value="KANTOR" checked class="peer sr-only">
+                <span class="text-sm text-slate-600 peer-checked:text-blue-600 font-medium">Kantor</span>
+              </label>
+              <label class="flex items-center justify-center p-2 border rounded-lg cursor-pointer hover:border-blue-500 transition">
+                <input type="radio" name="type" value="LUAR KANTOR" class="peer sr-only">
+                <span class="text-sm text-slate-600 peer-checked:text-blue-600 font-medium">Luar Kantor</span>
+              </label>
+            </div>
+          </div>
 
-  <div class="mt-2 space-y-2">
-
-    <label class="flex items-center gap-2 text-sm text-slate-700">
-      <input type="radio" name="type" value="KANTOR" checked>
-      Kantor
-    </label>
-
-    <label class="flex items-center gap-2 text-sm text-slate-700">
-      <input type="radio" name="type" value="LUAR KANTOR">
-      Luar Kantor
-    </label>
-
-  </div>
-</div>
-
-
-          <!-- BUTTON -->
-         <button type="button"
-  onclick="takePhoto(event)"
-            class="w-full py-3 bg-slate-900 text-white rounded-lg">
+          <button type="button" onclick="handleAbsen(event)"
+            class="w-full py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
             Ambil Foto & Absen
           </button>
-
         </form>
-
       <% } %>
-
     </div>
   </div>
 </div>
 
-<!-- MAP LIB -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- MODAL MAP CONFIRM -->
-<div id="mapModal" class="hidden fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
-  <div class="bg-white w-full max-w-xl rounded-xl p-4">
-    <div id="map" class="h-64 rounded-lg"></div>
-
-    <button onclick="submitAbsensi()"
-      class="mt-4 w-full bg-black text-white py-2 rounded-lg">
-      Konfirmasi Absen
-    </button>
-  </div>
-</div>
-
 <script>
-let stream = null;
-let lat = null;
-let lng = null;
-let pendingBlob = null;
+let stream = null, lat = null, lng = null, pendingBlob = null;
+const video = document.getElementById("video"), canvas = document.getElementById("canvas");
 
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
+// Fungsi utama ambil absen langsung
+async function handleAbsen(event) {
+  const btn = event.target;
+  btn.disabled = true; btn.innerText = "Memproses...";
 
-window.APP_STATE = <%- JSON.stringify({ already, hasCheckedOut }) %>;
-const { already } = window.APP_STATE;
+  try {
+    const pos = await getLocation();
+    lat = pos.lat; lng = pos.lng;
+    
+    // Ambil foto
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise(r => canvas.toBlob(r, "image/jpeg", 0.8));
+    
+    // Kirim langsung
+    const formData = new FormData();
+    formData.append("photo", blob, "selfie.jpg");
+    formData.append("lat", lat);
+    formData.append("lng", lng);
+    formData.append("type", document.querySelector('input[name="type"]:checked').value);
 
-/**
- * GPS
- */
-function getLocation() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject("GPS not supported");
+    const res = await fetch("/attendance/checkin", { method: "POST", body: formData });
+    const data = await res.json();
+    
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message);
+      btn.disabled = false; btn.innerText = "Ambil Foto & Absen";
     }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        resolve({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
-      },
-      (err) => {
-        reject(err);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
-  });
+  } catch (e) { 
+    alert("Pastikan GPS aktif & izin kamera diberikan"); 
+    btn.disabled = false; btn.innerText = "Ambil Foto & Absen"; 
+  }
 }
 
-/**
- * CAMERA
- */
-async function startCamera() {
-  if (already) return;
+async function getLocation() {
+  return new Promise((res, rej) => navigator.geolocation.getCurrentPosition(
+    p => res({lat: p.coords.latitude, lng: p.coords.longitude}), rej, {enableHighAccuracy: true}
+  ));
+}
 
-  stream = await navigator.mediaDevices.getUserMedia({ video: true });
-  video.srcObject = stream;
+async function startCamera() {
+  if (<%- already %>) return;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+  } catch (err) { console.error("Kamera tidak diizinkan", err); }
 }
 
 function stopCamera() {
   if (!stream) return;
   stream.getTracks().forEach(t => t.stop());
-  video.srcObject = null;
-  stream = null;
 }
 
-/**
- * INIT
- */
-(async () => {
-  await startCamera();
-
-  try {
-    const loc = await getLocation();
-    lat = loc.lat;
-    lng = loc.lng;
-  } catch (e) {
-    alert("GPS tidak aktif");
-  }
-})();
-
-/**
- * TAKE PHOTO
- */
-let isProcessing = false;
-
-async function takePhoto(event) {
-  if (isProcessing) return;
-
-  isProcessing = true;
-
-  const btn = event.target; // FIX: ambil button yang diklik
-
-  const originalText = btn.innerText;
-
-  btn.disabled = true;
-  btn.innerText = "Memproses...";
-
-  try {
-    const position = await getLocation();
-
-    const formData = new FormData();
-const canvas = document.getElementById("canvas");
-const context = canvas.getContext("2d");
-
-if (!video.videoWidth) {
-  alert("Kamera belum siap");
-  return;
-}
-canvas.height = video.videoHeight;
-
-context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-const blob = await new Promise((resolve, reject) => {
-  canvas.toBlob((b) => {
-    if (!b) reject("Gagal ambil foto");
-    else resolve(b);
-  }, "image/jpeg", 0.8);
-});
-formData.append("photo", blob, "selfie.jpg");
-    formData.append("lat", position.lat);
-    formData.append("lng", position.lng);
-    formData.append("type", document.getElementById("type").value);
-
-    const res = await fetch("/attendance/checkin", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      btn.innerText = "Berhasil ✓";
-
-      stopCamera();
-
-      setTimeout(() => {
-        location.reload();
-      }, 800);
-    } else {
-      alert(data.message || "Gagal absen");
-    }
-
-  } catch (err) {
-    alert("GPS belum siap / error");
-  } finally {
-    isProcessing = false;
-
-    btn.disabled = false;
-    btn.innerText = originalText;
-  }
-}
-/**
- * MAP CONFIRM
- */
-function openMap(lat, lng) {
-  document.getElementById("mapModal").classList.remove("hidden");
-  document.getElementById("mapModal").classList.add("flex");
-
-  const map = L.map("map").setView([lat, lng], 16);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-  L.marker([lat, lng]).addTo(map).bindPopup("Lokasi Absen").openPopup();
-}
-
-/**
- * SUBMIT ABSENSI
- */
-async function submitAbsensi() {
-  const form = new FormData();
-
-  form.append("photo", pendingBlob, "selfie.jpg");
-  form.append("type", document.getElementById("type").value);
-  form.append("lat", lat);
-  form.append("lng", lng);
-
-  const res = await fetch("/attendance/checkin", {
-    method: "POST",
-    body: form
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    alert("Absen berhasil");
-    stopCamera();
-    location.reload();
-  } else {
-    alert(data.message);
-  }
-}
-
-/**
- * AUTO STOP CAMERA TAB
- */
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) stopCamera();
-  else if (!already) startCamera();
-});
+startCamera();
+document.addEventListener("visibilitychange", () => document.hidden ? stopCamera() : startCamera());
 </script>
