@@ -64,17 +64,37 @@
       </svg>
     </div>
     <div>
-      <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-none mb-1.5">
-        <%= (leave.userId && leave.userId.employeeData) ? leave.userId.employeeData.fullName : 'Detail Pengajuan Cuti' %>
-      </h1>
-      <!-- INFORMASI JALUR AKSI YANG SEDANG BERJALAN -->
-      <p class="text-[11px] text-slate-400 font-medium">
-        Tujuan Dokumen: 
-        <span class="font-bold <%= leave.status === 'CANCELLATION_PENDING' ? 'text-amber-600' : 'text-blue-600' %>">
-          <%= leave.status === 'CANCELLATION_PENDING' ? 'Permohonan Pembatalan Cuti' : 'Permohonan Cuti Baru' %>
-        </span>
-      </p>
-    </div>
+  <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-none mb-1.5">
+    <%= (leave.userId && leave.userId.employeeData) ? leave.userId.employeeData.fullName : 'Detail Pengajuan Cuti' %>
+  </h1>
+  
+  <p class="text-[11px] text-slate-400 font-medium mb-1.5">
+    Tujuan Dokumen: 
+    <span class="font-bold <%= leave.status === 'CANCELLATION_PENDING' ? 'text-amber-600' : 'text-blue-600' %>">
+      <%= leave.status === 'CANCELLATION_PENDING' ? 'Permohonan Pembatalan Cuti' : 'Permohonan Cuti Baru' %>
+    </span>
+  </p>
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium">
+    <span class="text-slate-500 flex items-center gap-1">
+  <i class="fa-solid fa-briefcase text-slate-400 text-[10px]"></i>
+  Unit: 
+  <span class="text-slate-700 font-semibold">
+    <%= (leave.userId && leave.userId.employeeData && leave.userId.employeeData.unitId) ? leave.userId.employeeData.unitId.name : 'Tidak Ada' %>
+  </span>
+</span>
+
+    <span class="text-slate-300 hidden sm:inline">•</span>
+
+    <span class="text-slate-500 flex items-center gap-1">
+      <i class="fa-solid fa-clock-rotate-left text-slate-400 text-[10px]"></i>
+      Sisa Kuota: 
+      <span class="px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-700 tabular-nums">
+        <%= (leave.userId && leave.userId.leaveBalance) ? leave.userId.leaveBalance : '0' %> Hari
+      </span>
+    </span>
+  </div>
+</div>
   </div>
 
   <!-- STATUS BADGE -->

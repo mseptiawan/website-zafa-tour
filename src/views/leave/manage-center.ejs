@@ -60,6 +60,7 @@
                 <tr
                   class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
                   <th class="px-5 py-3">Nama Karyawan</th>
+                  <th class="px-5 py-3 text-left">Jenis Pengajuan</th>
                   <th class="px-5 py-3">Tipe Cuti</th>
                   <th class="px-5 py-3">Tanggal Pelaksanaan</th>
                   <th class="px-5 py-3 text-center">Durasi</th>
@@ -93,11 +94,6 @@
                                 <i class="fa-solid fa-file-circle-plus text-[9px]"></i> Cuti Baru
                               </span>
                               <% } %>
-                        </td>
-                        <td class="px-5 py-4">
-                          <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600">
-                            <%= leave.leaveTypeId.name %>
-                          </span>
                         </td>
                         <td class="px-5 py-4">
                           <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600">
@@ -178,24 +174,33 @@
                         <td class="px-5 py-4 text-center font-medium text-slate-600 tabular-nums">
                           <%= leave.totalDays %> Hari
                         </td>
-                        <td class="px-5 py-4">
-                          <% if(leave.status==='APPROVED' ) { %>
-                            <span
-                              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                              <i class="fa-solid fa-circle-check text-[10px]"></i> Disetujui
-                            </span>
-                            <% } else if(leave.status==='CANCELLED' ) { %>
-                              <span
-                                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-300">
-                                <i class="fa-solid fa-ban text-[10px]"></i> Dibatalkan
-                              </span>
-                              <% } else { %>
-                                <span
-                                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">
-                                  <i class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak
-                                </span>
-                                <% } %>
-                        </td>
+                 <td class="px-5 py-4">
+  <% if (leave.status === 'APPROVED') { %>
+    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+      <i class="fa-solid fa-circle-check text-[10px]"></i> Disetujui
+    </span>
+
+  <% } else if (leave.status === 'PENDING') { %>
+    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+      <i class="fa-solid fa-circle-check text-[10px]"></i> Disetujui
+    </span>
+
+  <% } else if (leave.status === 'CANCELLATION_PENDING') { %>
+    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60">
+      <i class="fa-solid fa-ban text-[10px]"></i> Minta Batal
+    </span>
+
+  <% } else if (leave.status === 'CANCELLED') { %>
+    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-300">
+      <i class="fa-solid fa-ban text-[10px]"></i> Dibatalkan
+    </span>
+
+  <% } else { %>
+    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">
+      <i class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak
+    </span>
+  <% } %>
+</td>
                       </tr>
                       <% }) %>
                         <% } %>

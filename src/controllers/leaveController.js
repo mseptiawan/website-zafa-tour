@@ -16,20 +16,47 @@ const WORKFLOW = {
   PIMPINAN: [],
 };
 const calculateWorkDays = async (start, end) => {
+  // 1. Cleansing Jam agar komparasi objek Date akurat 100%
   const startDate = new Date(start);
-  const endDate = new Date(end);
+  startDate.setHours(0, 0, 0, 0);
 
-  // Validasi dasar
+  const endDate = new Date(end);
+  endDate.setHours(0, 0, 0, 0);
+
   if (endDate < startDate) return 0;
 
-  // 1. Ambil semua libur dari DB dalam rentang tanggal tersebut
+  // 2. Ambil semua agenda libur AKTIF yang tumpang tindih dengan rentang tanggal pengajuan cuti
   const holidays = await Holiday.find({
-    date: { $gte: startDate, $lte: endDate },
+    isActive: true, // Pastikan yang aktif (tidak diarsip)
+    $or: [
+      // Kondisi A: Tanggal libur berada di dalam rentang pengajuan cuti
+      { date: { $gte: startDate, $lte: endDate } },
+      // Kondisi B: Selesai libur berada di dalam rentang pengajuan cuti
+      { endDate: { $gte: startDate, $lte: endDate } },
+      // Kondisi C: Rentang libur membungkus penuh rentang pengajuan cuti
+      { date: { $lte: startDate }, endDate: { $gte: endDate } },
+    ],
   });
 
-  // Ubah format ke string YYYY-MM-DD agar mudah dibandingkan
-  const holidayDates = holidays.map((h) => h.date.toISOString().split("T")[0]);
+  // 3. Petakan semua tanggal libur ke dalam format Set string 'YYYY-MM-DD' untuk lookup cepat
+  const holidayDatesSet = new Set();
 
+  holidays.forEach((h) => {
+    const hStart = new Date(h.date);
+    hStart.setHours(0, 0, 0, 0);
+
+    // Jika tidak ada endDate (libur cuma 1 hari), jadikan hStart sebagai batas akhirnya
+    const hEnd = h.endDate ? new Date(h.endDate) : new Date(h.date);
+    hEnd.setHours(0, 0, 0, 0);
+
+    let loopDate = new Date(hStart);
+    while (loopDate <= hEnd) {
+      holidayDatesSet.add(loopDate.toISOString().split("T")[0]);
+      loopDate.setDate(loopDate.getDate() + 1);
+    }
+  });
+
+  // 4. Hitung Hari Kerja Bersih
   let count = 0;
   let curDate = new Date(startDate);
 
@@ -37,17 +64,15 @@ const calculateWorkDays = async (start, end) => {
     const dateStr = curDate.toISOString().split("T")[0];
     const dayOfWeek = curDate.getDay(); // 0 = Minggu, 6 = Sabtu
 
-    // Kondisi:
-    // - BUKAN hari Minggu (dayOfWeek !== 0)
-    // - BUKAN tanggal yang ada di list hari libur nasional
-    // - (Sabtu/6 tetap dihitung karena PT kamu masuk)
-    const isHoliday = holidayDates.includes(dateStr);
+    // Evaluasi aturan filter
+    const isSunday = dayOfWeek === 0; // Minggu libur (Sabtu tetap masuk)
+    const isHoliday = holidayDatesSet.has(dateStr);
 
-    if (dayOfWeek !== 0 && !isHoliday) {
+    // Kriteria hari kerja: Bukan hari minggu DAN bukan tanggal cuti bersama/libur nasional
+    if (!isSunday && !isHoliday) {
       count++;
     }
 
-    // Geser ke hari berikutnya
     curDate.setDate(curDate.getDate() + 1);
   }
 
@@ -199,25 +224,94 @@ export const updateHoliday = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { name, date, endDate, type, isDeductLeave, isRecurring, description } = req.body;
+    const { name, date, endDate, type, isDeductLeave, description } = req.body;
 
-    const parsedDate = new Date(date);
-    const year = parsedDate.getFullYear();
+    // 1. Ambil data lama sebelum di-update untuk keperluan pengecekan saldo
+    const oldHoliday = await Holiday.findById(id);
+    if (!oldHoliday) {
+      return res
+        .status(404)
+        .render("error", { title: "Error", message: "Agenda tidak ditemukan." });
+    }
 
+    // 2. Cleansing Tanggal Baru & Hitung Jumlah Hari Baru
+    const parsedStartDate = new Date(date);
+    parsedStartDate.setHours(0, 0, 0, 0);
+    const year = parsedStartDate.getFullYear();
+
+    const parsedEndDate = endDate ? new Date(endDate) : new Date(date);
+    parsedEndDate.setHours(0, 0, 0, 0);
+
+    const diffTimeNew = Math.abs(parsedEndDate - parsedStartDate);
+    const totalDaysNew = Math.ceil(diffTimeNew / (1000 * 60 * 60 * 24)) + 1;
+
+    // 3. Hitung Jumlah Hari Lama (Dari Data Database)
+    const oldStart = new Date(oldHoliday.date);
+    const oldEnd = oldHoliday.endDate ? new Date(oldHoliday.endDate) : new Date(oldHoliday.date);
+    const diffTimeOld = Math.abs(oldEnd - oldStart);
+    const totalDaysOld = Math.ceil(diffTimeOld / (1000 * 60 * 60 * 24)) + 1;
+
+    // 4. Aturan Pengetatan Kategori Cuti Baru
+    let finalIsDeductLeave = false;
+    if (type === "COMPANY") {
+      finalIsDeductLeave = true;
+    } else if (type === "NATIONAL") {
+      finalIsDeductLeave = false;
+    } else if (type === "RELIGIOUS") {
+      finalIsDeductLeave = isDeductLeave === "true" || isDeductLeave === true;
+    }
+
+    // ======================================================================
+    // 5. INTEGRASI LOGIC SALDO (BANDINGKAN KONDISI LAMA VS BARU)
+    // ======================================================================
+    // Catatan: Sinkronisasi saldo hanya berjalan jika agenda ini berstatus AKTIF (tidak diarsip)
+    if (oldHoliday.isActive) {
+      const wasDeduct = oldHoliday.isDeductLeave === true;
+      const isNowDeduct = finalIsDeductLeave === true;
+
+      if (!wasDeduct && isNowDeduct) {
+        // Skenario A: Tadinya tidak memotong, sekarang memotong -> Potong jatah massal sebesar hari baru
+        await LeaveBalance.updateMany(
+          { year: year },
+          { $inc: { remaining: -totalDaysNew, used: totalDaysNew } }
+        );
+      } else if (wasDeduct && !isNowDeduct) {
+        // Skenario B: Tadinya memotong, sekarang tidak memotong -> Refund jatah massal sebesar hari lama
+        await LeaveBalance.updateMany(
+          { year: oldHoliday.year },
+          { $inc: { remaining: totalDaysOld, used: -totalDaysOld } }
+        );
+      } else if (wasDeduct && isNowDeduct) {
+        // Skenario C: Tetap memotong, tapi kemungkinan jumlah harinya berubah (misal dari 1 hari jadi 3 hari)
+        // Hitung selisih harinya: (Lama - Baru)
+        // Jika dari 1 hari jadi 3 hari -> (1 - 3 = -2), jatah sisa berkurang 2 hari. Pas!
+        const dayDifference = totalDaysOld - totalDaysNew;
+        if (dayDifference !== 0) {
+          await LeaveBalance.updateMany(
+            { year: year },
+            { $inc: { remaining: dayDifference, used: -dayDifference } }
+          );
+        }
+      }
+    }
+
+    // 6. Eksekusi Update ke Database (isRecurring resmi dihapus)
     await Holiday.findByIdAndUpdate(id, {
       name,
-      date: parsedDate,
-      endDate: endDate ? new Date(endDate) : null,
+      date: parsedStartDate,
+      endDate: endDate ? parsedEndDate : null,
       type,
-      isDeductLeave: isDeductLeave === "true" || isDeductLeave === true,
-      isRecurring: isRecurring === "true" || isRecurring === true,
+      isDeductLeave: finalIsDeductLeave,
       description,
       year,
     });
 
-    res.redirect("/leave/manage-calendar?tab=calendar");
+    return res.redirect("/leave/manage-calendar?tab=calendar");
   } catch (error) {
-    res.status(500).render("error", { title: "update holiday error", message: error.message });
+    console.error("Error Update Holiday:", error);
+    return res
+      .status(500)
+      .render("error", { title: "update holiday error", message: error.message });
   }
 };
 
@@ -232,16 +326,52 @@ export const toggleHolidayStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: "Data tidak ditemukan." });
     }
 
-    // Toggle status (Jika true jadi false, jika false jadi true)
-    holiday.isActive = !holiday.isActive;
+    // 1. Hitung total hari dari agenda ini
+    const start = new Date(holiday.date);
+    const end = holiday.endDate ? new Date(holiday.endDate) : new Date(holiday.date);
+    const diffTime = Math.abs(end - start);
+    const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    // Tentukan status target setelah di-toggle
+    const targetStatus = !holiday.isActive;
+
+    // ======================================================================
+    // 2. LOGIC INTEGRASI SALDO MASSAL SAAT ARSIP / RESTORE
+    // ======================================================================
+    // Proses refund atau pemotongan hanya dilakukan jika agenda ini bernilai memotong cuti (isDeductLeave: true)
+    if (holiday.isDeductLeave === true) {
+      if (holiday.isActive === true && targetStatus === false) {
+        // Skenario A: Agenda aktif diarsipkan -> Balikin (Refund) saldo ke karyawan massal
+        console.log(
+          `♻️ Mengarsipkan agenda [${holiday.name}]. Me-refund ${totalDays} hari ke karyawan...`
+        );
+        await LeaveBalance.updateMany(
+          { year: holiday.year },
+          { $inc: { remaining: totalDays, used: -totalDays } }
+        );
+      } else if (holiday.isActive === false && targetStatus === true) {
+        // Skenario B: Agenda arsip diaktifkan kembali -> Potong kembali jatah saldo karyawan massal
+        console.log(
+          `⚠️ Mengaktifkan kembali [${holiday.name}]. Memotong kembali ${totalDays} hari dari karyawan...`
+        );
+        await LeaveBalance.updateMany(
+          { year: holiday.year },
+          { $inc: { remaining: -totalDays, used: totalDays } }
+        );
+      }
+    }
+
+    // 3. Simpan perubahan status aktif agenda ke database
+    holiday.isActive = targetStatus;
     await holiday.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: `Hari libur berhasil ${holiday.isActive ? "diaktifkan kembali" : "dinonaktifkan (diarsipkan)"}.`,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error Toggle Holiday Status:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 // Menghapus data hari libur
@@ -409,9 +539,17 @@ export const applyLeave = async (req, res) => {
     const requester = req.session.user;
     const documentPath = req.file ? `/uploads/files/${req.file.filename}` : null;
 
-    // 1. HITUNG ULANG totalDays di sisi Server (Single Source of Truth)
-    // Gunakan fungsi calculateWorkDays yang sudah kamu buat sebelumnya
+    // 1. HITUNG ULANG totalDays di sisi Server (Anti Double-Deduct)
     const finalTotalDays = await calculateWorkDays(startDate, endDate);
+
+    // Validasi: Jika tanggal yang dipilih semuanya berisi hari libur/cuti bersama
+    if (finalTotalDays === 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Pengajuan ditolak. Semua tanggal yang Anda pilih adalah hari libur atau cuti bersama.",
+      });
+    }
 
     // 2. Validasi: Pastikan saldo cukup sebelum create apapun
     const currentYear = new Date(startDate).getFullYear();
@@ -424,20 +562,20 @@ export const applyLeave = async (req, res) => {
       });
     }
 
-    // 3. Create Leave dengan totalDays yang sudah divalidasi server
+    // 3. Create Leave dengan totalDays hasil kalkulasi bersih server
     const newLeave = await Leave.create({
       userId: requester._id,
       leaveTypeId,
-      startDate,
-      endDate,
-      totalDays: finalTotalDays, // PENTING: Pakai hasil hitung server, bukan dari req.body
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      totalDays: finalTotalDays,
       reason,
       documentPath,
       handoverUserId: handoverUserId || null,
       status: "PENDING",
     });
 
-    // ... (sisa logika workflow kamu tetap sama)
+    // ... (Logika workflow approval kamu)
     let currentStep = "";
     let approverId = null;
 
@@ -461,19 +599,18 @@ export const applyLeave = async (req, res) => {
       newLeave.status = "APPROVED";
       await newLeave.save();
 
-      // Gunakan finalTotalDays untuk potong saldo
+      // Potong saldo jika pengajuan langsung AUTO-APPROVED (tidak ada approver)
       balance.used += Number(finalTotalDays);
       balance.remaining -= Number(finalTotalDays);
       await balance.save();
     }
 
-    res.redirect("/leave/my-history");
+    return res.redirect("/leave/my-history");
   } catch (error) {
     console.error("Error pada applyLeave:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
 export const myLeave = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -527,9 +664,24 @@ export const getLeaveDetail = async (req, res) => {
   try {
     const leave = await Leave.findById(req.params.id)
       .populate("leaveTypeId", "name")
-      .populate({ path: "userId", populate: { path: "employeeData", select: "fullName" } })
-      .populate({ path: "handoverUserId", populate: { path: "employeeData", select: "fullName" } });
-
+      .populate({
+        path: "userId",
+        populate: {
+          path: "employeeData",
+          select: "fullName unitId",
+          populate: {
+            path: "unitId",
+            select: "name",
+          },
+        },
+      })
+      .populate({
+        path: "handoverUserId",
+        populate: {
+          path: "employeeData",
+          select: "fullName",
+        },
+      });
     const workflows = await LeaveApproval.find({ leaveId: req.params.id })
       .populate({
         path: "approverId",
