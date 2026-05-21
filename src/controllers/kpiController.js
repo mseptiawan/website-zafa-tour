@@ -8,16 +8,32 @@ import unitKpiMapping from "../models/UnitKpiMapping.js"; // mapping unit + posi
 // =============================
 
 export const kpiEmployeeList = async (req, res) => {
-  const employees = await Employee.find()
-    .populate("userId")
-    .populate("unitId")
-    .populate("bidangId");
+  try {
+    // 1. Ambil data karyawan
+    const employees = await Employee.find()
+      .populate("userId")
+      .populate("unitId")
+      .populate("bidangId");
 
-  res.render("kpi/input-list", {
-    employees,
-    user: req.session.user,
-    title: "Input KPI Karyawan",
-  });
+    // 2. Tentukan periode berjalan (Format: YYYY-MM)
+    const now = new Date();
+    // const currentPeriode = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const testMonth = 6;
+    const currentPeriode = `2026-${String(testMonth).padStart(2, "0")}`;
+    const existingKpis = await Kpi.find({ periode: currentPeriode });
+    const evaluatedIds = existingKpis.map((k) => k.employeeId.toString());
+
+    // 4. Kirim data ke view
+    res.render("kpi/input-list", {
+      employees,
+      evaluatedIds, // <--- Ini yang membuat error sebelumnya hilang
+      user: req.session.user,
+      title: "Input KPI Karyawan",
+    });
+  } catch (error) {
+    console.error("Error kpiEmployeeList:", error);
+    res.status(500).send("Gagal memuat daftar karyawan.");
+  }
 };
 
 // =============================
@@ -73,38 +89,28 @@ export const submitKpi = async (req, res) => {
     const { employeeId } = req.params;
     const { periode, kpiTemplateId, scores } = req.body;
 
-    // 1. Validasi duplikasi input di periode yang sama
-    const existingKpi = await Kpi.findOne({ employeeId, periode });
-    if (existingKpi) {
-      return res
-        .status(400)
-        .send("KPI untuk karyawan ini pada periode tersebut sudah pernah di-input!");
+    // 1. Validasi periode (Maret, Juni, Sept, Des)
+    const bulan = periode.split("-")[1];
+    const isTesting = true;
+    if (!["03", "06", "09", "12"].includes(bulan) && !isTesting) {
+      return res.status(400).send("Penilaian hanya bisa dilakukan pada bulan 03, 06, 09, atau 12.");
     }
 
-    // 2. Ambil detail indikator asli dari DB
-    const templateDetails = await KpiTemplateDetail.find({ kpiTemplateId });
+    // 2. Validasi duplikasi
+    const existingKpi = await Kpi.findOne({ employeeId, periode });
+    if (existingKpi) return res.status(400).send("KPI periode ini sudah ada.");
 
-    // Hitung total semua bobot yang ada di template ini untuk pembagi rumus proporsional
-    const totalBobotTemplate = templateDetails.reduce((sum, item) => sum + item.bobot, 0);
+    // 3. Proses perhitungan
+    const templateDetails = await KpiTemplateDetail.find({ kpiTemplateId });
+    const totalBobot = templateDetails.reduce((sum, item) => sum + item.bobot, 0);
 
     let totalKpiScore = 0;
-    const results = [];
-
-    // 3. Looping dan hitung skor tertimbang
-    for (const detail of templateDetails) {
-      // Ambil data berdasarkan ID detail
-      const detailId = detail._id.toString();
-      const inputData = scores[detailId];
-
-      // PENTING: Karena input form name kita adalah scores[id][score],
-      // maka inputData akan berbentuk { score: "80" }
-      const scoreInput = inputData && inputData.score ? Number(inputData.score) : 0;
-
-      // Rumus proporsional tertimbang
-      const finalScore = scoreInput * (detail.bobot / totalBobotTemplate);
+    const results = templateDetails.map((detail) => {
+      const scoreInput = Number(scores[detail._id]?.score) || 0;
+      const finalScore = scoreInput * (detail.bobot / totalBobot);
       totalKpiScore += finalScore;
 
-      results.push({
+      return {
         kpiTemplateDetailId: detail._id,
         areaKinerja: detail.areaKinerja,
         indikator: detail.indikator,
@@ -113,25 +119,24 @@ export const submitKpi = async (req, res) => {
         realisasi: "Manual Input",
         score: scoreInput,
         finalScore: Number(finalScore.toFixed(2)),
-      });
-    }
+      };
+    });
 
-    // 4. Simpan hasil final ke database
+    // 4. Simpan ke database
     await Kpi.create({
       employeeId,
       periode,
       kpiTemplateId,
       results,
-      totalKpiScore: Number(totalKpiScore.toFixed(2)), // Hasil akhir di skala 0-100
+      totalKpiScore: Number(totalKpiScore.toFixed(2)),
       evaluatedBy: req.session.user?._id,
       status: "Approved",
     });
 
-    // 5. Kembalikan ke halaman list utama
     res.redirect("/kpi/input");
   } catch (error) {
-    console.error("Error submitKpi:", error);
-    res.status(500).send("Gagal menyimpan penilaian KPI");
+    console.error(error);
+    res.status(500).send("Gagal menyimpan data.");
   }
 };
 
