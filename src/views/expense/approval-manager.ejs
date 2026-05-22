@@ -103,13 +103,22 @@
                         Rp <%= e.amount.toLocaleString('id-ID') %>
                       </td>
                       <td class="px-5 py-4 text-center">
-                        <form action="/expense/<%= e._id %>/approve/manager" method="POST"
-                              onsubmit="return confirm('Apakah Anda yakin setuju untuk meloloskan berkas klaim pengeluaran ini?');">
-                          <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-lg shadow-sm transition duration-150 cursor-pointer whitespace-nowrap">
-                            <i class="fa-solid fa-circle-check"></i> Approve
-                          </button>
-                        </form>
-                      </td>
+  <div class="flex items-center justify-center gap-2">
+    <form action="/expense/<%= e._id %>/approve/manager" method="POST"
+          onsubmit="return confirm('Apakah Anda yakin setuju untuk meloloskan berkas klaim pengeluaran ini?');">
+      <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-lg shadow-sm transition duration-150 cursor-pointer whitespace-nowrap">
+        <i class="fa-solid fa-circle-check"></i> Approve
+      </button>
+    </form>
+
+    <form action="/expense/<%= e._id %>/reject/manager" method="POST"
+          onsubmit="return confirm('Apakah Anda yakin ingin MENOLAK pengajuan klaim ini?');">
+      <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-lg shadow-sm transition duration-150 cursor-pointer whitespace-nowrap">
+        <i class="fa-solid fa-circle-xmark"></i> Tolak
+      </button>
+    </form>
+  </div>
+</td>
                     </tr>
                   <% }) %>
                 <% } %>
