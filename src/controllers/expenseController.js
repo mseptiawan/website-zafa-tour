@@ -1,22 +1,12 @@
 import ExpenseClaim from "../models/ExpenseClaim.js";
 import Employee from "../models/Employee.js";
 
-/*
-|--------------------------------------------------------------------------
-| FORM CREATE
-|--------------------------------------------------------------------------
-*/
 export const formExpense = (req, res) => {
   res.render("expense/create", {
     title: "Ajukan Klaim Beban",
   });
 };
 
-/*
-|--------------------------------------------------------------------------
-| CREATE CLAIM
-|--------------------------------------------------------------------------
-*/
 export const createExpense = async (req, res) => {
   try {
     const {
@@ -43,9 +33,6 @@ export const createExpense = async (req, res) => {
     const isNoReceipt = noReceipt === "on";
     const hasFile = !!req.file;
 
-    // =========================
-    // VALIDASI BUSINESS RULE
-    // =========================
     if (!isNoReceipt && !hasFile) {
       return res
         .status(400)
@@ -60,20 +47,12 @@ export const createExpense = async (req, res) => {
       return res.status(400).send("Alasan tidak ada bukti wajib diisi");
     }
 
-    // optional (kalau masih dipakai di sistem lain)
     await Employee.findOne({ userId: user._id });
 
-    // =========================
-    // AUTO FLOW STATUS
-    // =========================
     let status = "PENDING_FINANCE";
     if (Number(amount) > 200000) {
       status = "PENDING_MANAGER";
     }
-
-    // =========================
-    // CREATE DATA
-    // =========================
     await ExpenseClaim.create({
       userId: user._id,
       employeeId: employee._id,
@@ -82,7 +61,6 @@ export const createExpense = async (req, res) => {
       amount,
       expenseDate,
 
-      // hanya dipakai jika no receipt
       noReceiptReason: isNoReceipt ? noReceiptReason : null,
 
       selfDeclaration: isNoReceipt ? true : false,
@@ -99,11 +77,6 @@ export const createExpense = async (req, res) => {
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| MY CLAIM
-|--------------------------------------------------------------------------
-*/
 export const myExpenses = async (req, res) => {
   try {
     const user = req.session.user;
@@ -122,11 +95,6 @@ export const myExpenses = async (req, res) => {
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| ALL CLAIM
-|--------------------------------------------------------------------------
-*/
 export const allExpenses = async (req, res) => {
   try {
     const expenses = await ExpenseClaim.find().populate("userId").sort({ createdAt: -1 });
@@ -141,11 +109,6 @@ export const allExpenses = async (req, res) => {
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| APPROVAL MANAGER
-|--------------------------------------------------------------------------
-*/
 export const approvalManagerExpense = async (req, res) => {
   try {
     const expenses = await ExpenseClaim.find()
@@ -162,11 +125,6 @@ export const approvalManagerExpense = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-/*
-|--------------------------------------------------------------------------
-| APPROVE MANAGER
-|--------------------------------------------------------------------------
-*/
 export const approveManagerExpense = async (req, res) => {
   try {
     await ExpenseClaim.findByIdAndUpdate(req.params.id, {
@@ -181,14 +139,8 @@ export const approveManagerExpense = async (req, res) => {
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| FINANCE VALIDATION
-|--------------------------------------------------------------------------
-*/
 export const financeExpensePage = async (req, res) => {
   try {
-    // Tarik semua data yang berstatus verifikasi aktif maupun yang sudah selesai (riwayat)
     const expenses = await ExpenseClaim.find({
       status: {
         $in: ["PENDING_FINANCE", "PAID", "REJECTED"],
@@ -196,7 +148,7 @@ export const financeExpensePage = async (req, res) => {
     })
       .populate("userId")
       .populate("employeeId")
-      .sort({ createdAt: -1 }); // Opsional: Urutkan dari yang paling terbaru
+      .sort({ createdAt: -1 });
 
     res.render("expense/finance", {
       title: "Validasi Finance",
@@ -222,5 +174,18 @@ export const payExpense = async (req, res) => {
   } catch (err) {
     console.log("Payment error:", err);
     res.status(500).send("Payment error");
+  }
+};
+export const rejectManagerExpense = async (req, res) => {
+  try {
+    await ExpenseClaim.findByIdAndUpdate(req.params.id, {
+      status: "REJECTED",
+      managerApprovedBy: req.session.user._id, // Mencatat siapa manager yang menolak
+    });
+
+    res.redirect("/expense/approval/manager");
+  } catch (err) {
+    console.log("Reject manager error:", err);
+    res.status(500).send("Reject manager error");
   }
 };

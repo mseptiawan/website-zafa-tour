@@ -6,6 +6,7 @@ import { uploadFile } from "../middlewares/uploadFile.js";
 import {
   formExpense,
   createExpense,
+  rejectManagerExpense,
   myExpenses,
   allExpenses,
   approvalManagerExpense,
@@ -40,7 +41,12 @@ router.post(
   roleMiddleware(["MANAGER"]),
   approveManagerExpense
 );
-
+router.post(
+  "/expense/:id/reject/manager",
+  authMiddleware,
+  roleMiddleware(["MANAGER"]),
+  rejectManagerExpense
+);
 router.get("/expense/finance", authMiddleware, roleMiddleware("KEUANGAN"), financeExpensePage);
 router.post(
   "/expense/:id/pay",
