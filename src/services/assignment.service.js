@@ -5,12 +5,36 @@ import Employee from "../models/Employee.js";
 import { createAssignmentSchema } from "../validations/assignment/assignment.schema.js";
 
 const create = async ({ body, file, userId }) => {
-  return Assignment.create({
+  const assignment = await Assignment.create({
     ...body,
     employees: body.employees,
     createdBy: userId,
     attachment: file?.filename || null,
   });
+
+  try {
+    const creator = await Employee.findById(userId);
+    const creatorName = creator ? creator.name : "Manager";
+
+    const employeeIds = Array.isArray(body.employees) ? body.employees : [body.employees];
+
+    const notifPromises = employeeIds.map((empId) => {
+      return notificationService.createNotification({
+        userId: empId,
+        type: "assignment",
+        title: "Penugasan Baru",
+        text: `${creatorName} memberikan Anda tugas baru: "${body.taskName || body.title}"`,
+        module: "assignment",
+        referenceId: assignment._id,
+      });
+    });
+
+    await Promise.all(notifPromises);
+  } catch (notifError) {
+    console.error("Notification Error on Assignment Creation:", notifError);
+  }
+
+  return assignment;
 };
 
 const findEmployees = () => {
