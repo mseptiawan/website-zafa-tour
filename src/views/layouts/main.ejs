@@ -20,8 +20,23 @@
       <%- include('../partials/sidebar') %>
 
       <!-- CONTENT -->
-      <main class="flex-1 px-8 py-7 overflow-x-hidden"><%- body -%></main>
+      <main class="flex-1 px-8 py-5 overflow-x-hidden flex flex-col">
+        <div class="w-full flex justify-end items-center mb-2 py-1.5">
+          <a
+            href="/notifications"
+            class="relative p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-white border border-transparent hover:border-slate-200/50 flex items-center justify-center"
+          >
+            <i class="fa-regular fa-bell text-base"></i>
+            <span
+              class="absolute top-1 right-1 block h-1.5 w-1.5 rounded-full ring-1 ring-white bg-amber-500"
+            ></span>
+          </a>
+        </div>
+
+        <div class="flex-1"><%- body -%></div>
+      </main>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/js/sweetalert-handler.js"></script>
   </body>

@@ -72,12 +72,6 @@ export const login = async (req, res) => {
    DASHBOARD
 ====================== */
 
-export const dashboard = (req, res) => {
-  res.render("dashboard/index", {
-    title: "Dashboard",
-    error: null,
-  });
-};
 /* ======================
    LOGOUT (FIXED)
 ====================== */

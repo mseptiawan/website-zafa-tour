@@ -21,7 +21,8 @@
     "seed:leaveType": "node src/database/seeders/leaveTypeSeeder.js",
     "seed:bidang": "node src/database/seeders/bidangSeeder.js",
     "seed:unit": "node src/database/seeders/unitSeeder.js",
-    "seed:user": "node src/database/seeders/userSeeder.js"
+    "seed:user": "node src/database/seeders/userSeeder.js",
+    "seed:expense": "node src/database/seeders/expenseSeeder.js"
   },
   "keywords": [],
   "author": "",

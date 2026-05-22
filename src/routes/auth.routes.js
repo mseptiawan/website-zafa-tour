@@ -2,7 +2,6 @@ import express from "express";
 import {
   showLogin,
   login,
-  dashboard,
   logout,
   showForgotPassword,
   requestPasswordReset,
@@ -23,7 +22,5 @@ router.post("/forgot-password", requestPasswordReset);
 
 router.get("/reset-password", showResetPasswordPage);
 router.post("/reset-password", handleResetPassword);
-
-router.get("/dashboard", authMiddleware, dashboard);
 
 export default router;
