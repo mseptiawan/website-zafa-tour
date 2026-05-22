@@ -1,23 +1,45 @@
-import Notification from "./notification.model.js";
+import mongoose from "mongoose";
+import Notification from "../models/notification.model.js";
 
 class NotificationService {
   async createNotification({ userId, type, title, text, module, referenceId }) {
     return await Notification.create({
-      userId,
+      userId: new mongoose.Types.ObjectId(userId),
       type,
       title,
       text,
       module,
-      referenceId,
+      referenceId: new mongoose.Types.ObjectId(referenceId),
     });
   }
+
   async getMyNotifications(userId) {
-    return await Notification.find({ userId }).sort({ createdAt: -1 }).limit(10);
+    try {
+      console.log("🗄️ DEBUG SERVICE: Menerima ID ->", userId);
+      if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+        console.log("❌ DEBUG SERVICE: Format ID tidak valid untuk MongoDB!");
+        return [];
+      }
+
+      const queryId = new mongoose.Types.ObjectId(userId);
+      const data = await Notification.find({ userId: queryId }).sort({ createdAt: -1 }).limit(10);
+
+      console.log("📄 DEBUG SERVICE: Isi dokumen mentah dari MongoDB ->", data);
+      return data;
+    } catch (error) {
+      console.error("💥 DEBUG SERVICE CRASH:", error);
+      return [];
+    }
   }
 
   async markAllAsRead(userId) {
-    return await Notification.updateMany({ userId, isUnread: true }, { isUnread: false });
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) return null;
+
+    return await Notification.updateMany(
+      { userId: new mongoose.Types.ObjectId(userId), isUnread: true },
+      { isUnread: false }
+    );
   }
 }
-
-export default new NotificationService();
+const notificationService = new NotificationService();
+export default notificationService;

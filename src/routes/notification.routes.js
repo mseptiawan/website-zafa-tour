@@ -3,7 +3,8 @@ import * as notificationController from "../controllers/notification.controller.
 
 const router = express.Router();
 
-router.get("/api/notifications", notificationController.getNotifications);
-router.post("/api/notifications/mark-all-read", notificationController.markAllRead);
+// Hapus tulisan /api di depannya agar rapi
+router.get("/notifications", notificationController.getNotifications);
+router.post("/notifications/mark-all-read", notificationController.markAllRead);
 
 export default router;

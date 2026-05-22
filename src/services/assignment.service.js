@@ -1,7 +1,8 @@
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import Assignment from "../models/Assignment.js";
 import Employee from "../models/Employee.js";
-
+import notificationService from "./notification.service.js";
+import Notification from "../models/notification.model.js";
 import { createAssignmentSchema } from "../validations/assignment/assignment.schema.js";
 
 const create = async ({ body, file, userId }) => {
@@ -14,22 +15,27 @@ const create = async ({ body, file, userId }) => {
 
   try {
     const creator = await Employee.findById(userId);
-    const creatorName = creator ? creator.name : "Manager";
+    const creatorName = creator ? creator.name : "Pimpinan";
 
-    const employeeIds = Array.isArray(body.employees) ? body.employees : [body.employees];
+    let employeeIds = [];
+    if (body.employees) {
+      employeeIds = Array.isArray(body.employees) ? body.employees : [body.employees];
+    }
 
-    const notifPromises = employeeIds.map((empId) => {
-      return notificationService.createNotification({
-        userId: empId,
-        type: "assignment",
-        title: "Penugasan Baru",
-        text: `${creatorName} memberikan Anda tugas baru: "${body.taskName || body.title}"`,
-        module: "assignment",
-        referenceId: assignment._id,
+    if (employeeIds.length > 0 && employeeIds[0]) {
+      const notifPromises = employeeIds.map((empId) => {
+        return notificationService.createNotification({
+          userId: empId,
+          type: "assignment",
+          title: "Penugasan Baru",
+          text: `${creatorName} memberikan Anda tugas baru: "${body.title || body.taskName || "Tanpa Judul"}"`,
+          module: "assignment",
+          referenceId: assignment._id,
+        });
       });
-    });
 
-    await Promise.all(notifPromises);
+      await Promise.all(notifPromises);
+    }
   } catch (notifError) {
     console.error("Notification Error on Assignment Creation:", notifError);
   }
@@ -83,6 +89,7 @@ const findMine = async ({ userId, page, limit }) => {
     }),
   };
 };
+
 const findAll = async ({ page = 1, limit = 7 }) => {
   const {
     skip,

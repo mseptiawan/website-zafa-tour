@@ -6,31 +6,77 @@
     <link rel="stylesheet" href="/css/output.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
   </head>
+
   <body
     class="bg-[#f1f5f9] text-slate-800 antialiased selection:bg-indigo-50 selection:text-indigo-600"
   >
     <div class="flex min-h-screen">
-      <!-- SIDEBAR -->
       <%- include('../partials/sidebar') %>
 
-      <!-- CONTENT -->
-      <main class="flex-1 px-8 py-5 overflow-x-hidden flex flex-col">
-        <div class="w-full flex justify-end items-center mb-2 py-1.5">
-          <a
-            href="/notifications"
-            class="relative p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-white border border-transparent hover:border-slate-200/50 flex items-center justify-center"
+      <main class="flex-1 px-8 py-5 overflow-x-hidden flex flex-col pt-20">
+        <div class="fixed top-5 right-8 z-[100]" id="notificationDropdown">
+          <button
+            id="notifButton"
+            class="relative p-2 bg-white rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 transition focus:outline-none"
           >
-            <i class="fa-regular fa-bell text-base"></i>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="text-slate-600"
+            >
+              <path d="M18 8a6 6 0 10-12 0v5l-2 2h16l-2-2V8z" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
             <span
-              class="absolute top-1 right-1 block h-1.5 w-1.5 rounded-full ring-1 ring-white bg-amber-500"
+              id="notifBadge"
+              class="hidden absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-500 ring-2 ring-white"
             ></span>
-          </a>
+          </button>
+
+          <div
+            id="notifMenu"
+            class="hidden absolute right-0 mt-2 w-96 bg-white rounded-2xl border border-slate-200 shadow-xl z-[100] flex flex-col origin-top-right transition-all duration-200"
+          >
+            <div
+              class="p-4 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-2xl"
+            >
+              <h1 class="text-sm font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                Notifications
+                <span
+                  id="notifCountText"
+                  class="hidden inline-flex items-center justify-center bg-slate-950 text-white font-semibold text-[10px] px-1.5 py-0.5 rounded-full"
+                >
+                  0
+                </span>
+              </h1>
+              <button
+                id="markAllReadBtn"
+                class="text-[11px] font-semibold text-slate-900 underline hover:text-slate-600 transition-colors"
+              >
+                Mark all as read
+              </button>
+            </div>
+
+            <div
+              id="notifContainer"
+              class="divide-y divide-slate-100 max-h-[380px] overflow-y-auto"
+            >
+              <div class="p-4 text-center text-xs text-slate-400">Memuat notifikasi...</div>
+            </div>
+          </div>
         </div>
 
         <div class="flex-1"><%- body -%></div>
@@ -40,73 +86,179 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/js/sweetalert-handler.js"></script>
   </body>
-  <script>
-    const currentPath = window.location.pathname;
-
-    const links = document.querySelectorAll(".sidebar-link");
-    const detailsMenus = document.querySelectorAll("details[data-menu]");
-    const sidebarNav = document.getElementById("sidebarNav");
-
-    // restore scroll sidebar
-    const savedScroll = localStorage.getItem("sidebarScroll");
-
-    if (savedScroll) {
-      sidebarNav.scrollTop = savedScroll;
-    }
-
-    // simpan scroll sidebar
-    sidebarNav.addEventListener("scroll", () => {
-      localStorage.setItem("sidebarScroll", sidebarNav.scrollTop);
-    });
-
-    // restore menu aktif
-    const activeMenu = localStorage.getItem("activeMenu");
-
-    if (activeMenu) {
-      const activeDetails = document.querySelector(`details[data-menu="${activeMenu}"]`);
-
-      if (activeDetails) {
-        activeDetails.open = true;
-      }
-    }
-
-    // active link
-    links.forEach((link) => {
-      const href = link.getAttribute("href");
-
-      if (currentPath === href) {
-        link.classList.remove("text-slate-500");
-
-        link.classList.add("text-indigo-500", "font-semibold", "bg-indigo-50", "rounded-lg");
-
-        const parentDetails = link.closest("details");
-
-        if (parentDetails) {
-          parentDetails.open = true;
-        }
-      }
-    });
-
-    // hanya satu submenu terbuka
-    detailsMenus.forEach((menu) => {
-      menu.addEventListener("toggle", () => {
-        if (menu.open) {
-          detailsMenus.forEach((otherMenu) => {
-            if (otherMenu !== menu) {
-              otherMenu.open = false;
-            }
-          });
-
-          localStorage.setItem("activeMenu", menu.dataset.menu);
-        }
-      });
-    });
-  </script>
-  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      lucide.createIcons();
+      const currentPath = window.location.pathname;
+      const sidebarNav = document.getElementById("sidebarNav");
+
+      if (!sidebarNav) return;
+
+      const links = sidebarNav.querySelectorAll("a");
+      const detailsMenus = sidebarNav.querySelectorAll("details[data-menu]");
+
+      // Restore scroll position
+      const savedScroll = localStorage.getItem("sidebarScroll");
+      if (savedScroll) {
+        sidebarNav.scrollTop = savedScroll;
+      }
+
+      sidebarNav.addEventListener("scroll", () => {
+        localStorage.setItem("sidebarScroll", sidebarNav.scrollTop);
+      });
+
+      links.forEach((link) => {
+        const href = link.getAttribute("href");
+        if (currentPath === href) {
+          const parentDetails = link.closest("details");
+
+          if (parentDetails) {
+            link.classList.remove("text-slate-500");
+            link.classList.add("text-indigo-500", "font-semibold", "bg-indigo-50", "rounded-lg");
+            parentDetails.open = true;
+            localStorage.setItem("activeMenu", parentDetails.dataset.menu);
+          } else {
+            link.classList.remove("hover:bg-slate-50");
+            link.classList.add("bg-indigo-50", "border-indigo-100");
+            const spanText = link.querySelector("span");
+            const svgIcon = link.querySelector("svg");
+            if (spanText) spanText.classList.add("text-indigo-600", "font-semibold");
+            if (svgIcon) svgIcon.classList.add("text-indigo-500");
+
+            localStorage.removeItem("activeMenu");
+          }
+        }
+      });
+
+      const activeMenu = localStorage.getItem("activeMenu");
+      if (activeMenu) {
+        const activeDetails = sidebarNav.querySelector(`details[data-menu="${activeMenu}"]`);
+        if (activeDetails) {
+          activeDetails.open = true;
+        }
+      }
+
+      detailsMenus.forEach((menu) => {
+        menu.addEventListener("toggle", () => {
+          if (menu.open) {
+            detailsMenus.forEach((otherMenu) => {
+              if (otherMenu !== menu) {
+                otherMenu.open = false;
+              }
+            });
+            localStorage.setItem("activeMenu", menu.dataset.menu);
+          }
+        });
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const notifButton = document.getElementById("notifButton");
+      const notifMenu = document.getElementById("notifMenu");
+      const notifContainer = document.getElementById("notifContainer");
+      const notifBadge = document.getElementById("notifBadge");
+      const notifCountText = document.getElementById("notifCountText");
+      const markAllReadBtn = document.getElementById("markAllReadBtn");
+
+      fetchNotifications();
+
+      notifButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notifMenu.classList.toggle("hidden");
+        if (!notifMenu.classList.contains("hidden")) {
+          fetchNotifications();
+        }
+      });
+
+      window.addEventListener("click", (e) => {
+        const dropdown = document.getElementById("notificationDropdown");
+        if (dropdown && !dropdown.contains(e.target)) {
+          notifMenu.classList.add("hidden");
+        }
+      });
+
+      async function fetchNotifications() {
+        try {
+          const response = await fetch("/api/notifications");
+          const resData = await response.json();
+          if (resData.success) {
+            renderNotifications(resData.notifications, resData.unreadCount);
+          }
+        } catch (error) {
+          console.error("Gagal memuat data notifikasi:", error);
+          notifContainer.innerHTML = `
+          <div class="p-4 text-center text-xs text-red-500">Gagal memuat notifikasi.</div>
+        `;
+        }
+      }
+
+      function renderNotifications(notifications, unreadCount) {
+        if (unreadCount > 0) {
+          notifBadge.classList.remove("hidden");
+          notifCountText.classList.remove("hidden");
+          notifCountText.innerText = unreadCount;
+        } else {
+          notifBadge.classList.add("hidden");
+          notifCountText.classList.add("hidden");
+        }
+
+        if (!notifications || notifications.length === 0) {
+          notifContainer.innerHTML = `
+          <div class="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi baru.</div>
+        `;
+          return;
+        }
+
+        let htmlContent = "";
+
+        notifications.forEach((item) => {
+          const rowBackground = item.isUnread
+            ? "bg-slate-50/70 hover:bg-slate-100/80"
+            : "bg-white hover:bg-slate-50";
+
+          const targetUrl = item.module === "assignment" ? `/assignment/${item.referenceId}` : "#";
+          const avatarStyle =
+            item.type === "assignment"
+              ? "bg-indigo-100 text-indigo-700"
+              : "bg-slate-200 text-slate-600";
+
+          htmlContent += `
+          <a href="${targetUrl}" class="p-3.5 flex gap-3 items-start transition-colors block ${rowBackground}" data-id="${item._id}">
+            <div class="shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full ${avatarStyle} flex items-center justify-center text-[10px] font-bold tracking-wider">
+                ${item.type === "assignment" ? "TASK" : "NOTE"}
+              </div>
+            </div>
+            <div class="min-w-0 flex-1 text-[11px]">
+              <p class="text-slate-600 font-medium leading-normal">
+                <span class="font-semibold text-slate-900">${item.title}</span>: ${item.text}
+              </p>
+              <div class="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400 font-medium">
+                <span>Baru saja</span>
+                <span>•</span>
+                <span class="text-indigo-500 font-semibold capitalize">${item.module}</span>
+              </div>
+            </div>
+          </a>
+        `;
+        });
+
+        notifContainer.innerHTML = htmlContent;
+      }
+
+      markAllReadBtn.addEventListener("click", async () => {
+        try {
+          const response = await fetch("/api/notifications/mark-all-read", { method: "POST" });
+          const resData = await response.json();
+          if (resData.success) {
+            fetchNotifications();
+          }
+        } catch (error) {
+          console.error("Gagal memperbarui status baca:", error);
+        }
+      });
     });
   </script>
 </html>
