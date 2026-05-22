@@ -25,7 +25,6 @@ router.use("/", leaveRoutes);
 router.use("/", overtimeRoutes);
 router.use("/", attendanceRoutes);
 router.use("/", Employee);
-
 router.use("/", kpiRoutes);
 router.use("/trip", tripRoutes);
 router.use("/daily-log", dailylog);

@@ -1,7 +1,7 @@
-import Employee from "../models/Employee.js";
+import Employee from "../models/employee/Employee.model.js";
 import AttendanceCorrection from "../models/AttendanceCorrection.js";
 import Attendance from "../models/Attendance.js";
-import User from "../models/User.js";
+import User from "../models/basic/User.js";
 /**
  * RANGE HARI INI
  */

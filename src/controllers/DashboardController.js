@@ -3,7 +3,7 @@ import Attendance from "../models/Attendance.js";
 import DailyLog from "../models/DailyLog.js";
 import BusinessTrip from "../models/BusinessTrip.js";
 import Overtime from "../models/Overtime.js";
-import Kpi from "../models/Kpi.js";
+import Kpi from "../models/kpi/Kpi.js";
 import Holiday from "../models/calender/Holiday.model.js";
 
 export const index = async (req, res, next) => {

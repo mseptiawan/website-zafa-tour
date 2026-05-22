@@ -14,18 +14,13 @@ import {
   approvalOvertimeHistory,
 } from "../controllers/overtimeController.js";
 
-import { getReportPage, exportExcel, exportPDF } from "../controllers/overtimeReportController.js";
-
 const router = express.Router();
 
-/* APPLY */
 router.get("/overtime/apply", authMiddleware, showApplyOvertime);
 router.post("/overtime/apply", authMiddleware, uploadFile.single("proofFile"), applyOvertime);
 
-/* LIST */
 router.get("/overtime/my", authMiddleware, myOvertime);
 
-/* APPROVAL */
 router.get(
   "/overtime/approval/history",
   authMiddleware,
@@ -52,12 +47,10 @@ router.post(
   rejectOvertime
 );
 
-/* REPORT (HARUS DI ATAS /:id) */
-router.get("/report/overtime", authMiddleware, getReportPage);
-router.get("/report/overtime/export/excel", authMiddleware, exportExcel);
-router.get("/report/overtime/export/pdf", authMiddleware, exportPDF);
+// router.get("/report/overtime", authMiddleware, getReportPage);
+// router.get("/report/overtime/export/excel", authMiddleware, exportExcel);
+// router.get("/report/overtime/export/pdf", authMiddleware, exportPDF);
 
-/* DETAIL (PALING BAWAH) */
 router.get("/overtime/:id", authMiddleware, detailOvertime);
 
 export default router;

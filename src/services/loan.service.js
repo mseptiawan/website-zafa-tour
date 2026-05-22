@@ -1,5 +1,5 @@
 import Loan from "../models/loan/Loan.model.js";
-import Employee from "../models/Employee.js";
+import Employee from "../models/employee/Employee.model.js";
 import LoanApproval from "../models/loan/LoanApproval.model.js";
 
 class LoanService {

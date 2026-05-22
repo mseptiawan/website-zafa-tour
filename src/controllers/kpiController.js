@@ -1,8 +1,8 @@
-import Employee from "../models/Employee.js";
-import KpiTemplateDetail from "../models/KpiTemplateDetail.js";
-import KpiTemplate from "../models/KpiTemplate.js";
-import Kpi from "../models/Kpi.js"; // hasil penilaian (kalau belum ada, nanti aku bantu bikin)
-import unitKpiMapping from "../models/UnitKpiMapping.js"; // mapping unit + posisi ke template  (nanti aku bantu bikin juga)
+import Employee from "../models/employee/Employee.model.js";
+import KpiTemplateDetail from "../models/kpi/KpiTemplateDetail.js";
+import KpiTemplate from "../models/kpi/KpiTemplate.js";
+import Kpi from "../models/kpi/Kpi.js"; // hasil penilaian (kalau belum ada, nanti aku bantu bikin)
+import unitKpiMapping from "../models/kpi/UnitKpiMapping.js"; // mapping unit + posisi ke template  (nanti aku bantu bikin juga)
 // =============================
 // LIST EMPLOYEE (INPUT KPI)
 // =============================

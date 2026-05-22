@@ -22,7 +22,8 @@
     "seed:bidang": "node src/database/seeders/bidangSeeder.js",
     "seed:unit": "node src/database/seeders/unitSeeder.js",
     "seed:user": "node src/database/seeders/userSeeder.js",
-    "seed:expense": "node src/database/seeders/expenseSeeder.js"
+    "seed:expense": "node src/database/seeders/expenseSeeder.js",
+    "seed:salary": "node src/database/seeders/employeeSalary.seeder.js"
   },
   "keywords": [],
   "author": "",

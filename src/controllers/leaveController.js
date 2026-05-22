@@ -1,10 +1,10 @@
 import Leave from "../models/leave/Leave.model.js";
 import LeaveApproval from "../models/leave/LeaveApproval.model.js";
 import LeaveType from "../models/leave/LeaveType.model.js";
-import User from "../models/User.js";
+import User from "../models/basic/User.js";
 import Holiday from "../models/calender/Holiday.model.js";
 import LeaveBalance from "../models/leave/LeaveBalance.model.js";
-import Role from "../models/Role.js";
+import Role from "../models/basic/Role.js";
 import LeaveCancellation from "../models/leave/LeaveCancellation.model.js";
 // Definisi Alur Persetujuan berdasarkan Role Pemohon
 const WORKFLOW = {

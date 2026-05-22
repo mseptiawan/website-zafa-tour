@@ -1,11 +1,11 @@
-import Employee from "../models/Employee.js";
-import User from "../models/User.js";
+import Employee from "../models/employee/Employee.model.js";
+import User from "../models/basic/User.js";
 import Termination from "../models/Termination.js"; // Sesuaikan dengan path folder model kamu
 import bcrypt from "bcrypt";
-import Role from "../models/Role.js";
-import Position from "../models/Position.js";
-import Unit from "../models/Unit.js";
-import Bidang from "../models/Bidang.js";
+import Role from "../models/basic/Role.js";
+import Position from "../models/basic/Position.js";
+import Unit from "../models/basic/Unit.js";
+import Bidang from "../models/basic/Bidang.js";
 /* =========================
    LIST EMPLOYEE
 ========================= */

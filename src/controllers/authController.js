@@ -1,10 +1,10 @@
 import { redisClient } from "../config/redis.js";
 import transporter from "../config/mailer.js";
 import bcrypt from "bcrypt";
-import User from "../models/User.js";
+import User from "../models/basic/User.js";
 import crypto from "crypto";
 import Attendance from "../models/Attendance.js";
-import Employee from "../models/Employee.js";
+import Employee from "../models/employee/Employee.model.js";
 // import Leave from "../models/Leave.js";
 import BusinessTrip from "../models/BusinessTrip.js";
 import Announcement from "../models/Announcement.js";

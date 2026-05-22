@@ -1,5 +1,5 @@
 import ExpenseClaim from "../models/ExpenseClaim.js";
-import Employee from "../models/Employee.js";
+import Employee from "../models/employee/Employee.model.js";
 
 export const formExpense = (req, res) => {
   res.render("expense/create", {

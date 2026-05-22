@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import ExpenseClaim from "../../models/ExpenseClaim.js";
-import User from "../../models/User.js";
-import Employee from "../../models/Employee.js";
+import User from "../../models/basic/User.js";
+import Employee from "../../models/employee/Employee.model.js";
 
 // =========================
 // CONFIG & TARGET USERS

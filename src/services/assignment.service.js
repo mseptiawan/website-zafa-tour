@@ -1,6 +1,6 @@
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import Assignment from "../models/Assignment.js";
-import Employee from "../models/Employee.js";
+import Employee from "../models/employee/Employee.model.js";
 import notificationService from "./notification.service.js";
 import Notification from "../models/notification.model.js";
 import { createAssignmentSchema } from "../validations/assignment/assignment.schema.js";
