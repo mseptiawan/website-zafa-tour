@@ -48,7 +48,6 @@
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
                   <th class="px-5 py-3">Karyawan</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
-                  <th class="px-5 py-3">Kategori</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Lampiran</th>
                   <th class="px-5 py-3 text-right">Nominal Klaim</th>
@@ -68,16 +67,10 @@
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
                         <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
-                        <div class="text-[10px] text-slate-400 font-medium mt-0.5"><%= e.userId?.email || '' %></div>
                       </td>
                       <td class="px-5 py-4">
                         <div class="font-semibold text-slate-800"><%= e.title %></div>
                         <div class="text-[11px] text-slate-400 mt-0.5 max-w-[220px] truncate" title="<%= e.description %>"><%= e.description || '-' %></div>
-                      </td>
-                      <td class="px-5 py-4">
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600 uppercase tracking-wide">
-                          <%= e.category %>
-                        </span>
                       </td>
                       <td class="px-5 py-4 text-slate-500 whitespace-nowrap">
                         <%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
@@ -139,7 +132,6 @@
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
                   <th class="px-5 py-3">Karyawan</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
-                  <th class="px-5 py-3">Kategori</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Nota</th>
                   <th class="px-5 py-3 text-right">Nominal Klaim</th>
@@ -159,23 +151,18 @@
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
                         <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
-                        <div class="text-[10px] text-slate-400 font-medium mt-0.5"><%= e.userId?.email || '' %></div>
+                       
                       </td>
                       <td class="px-5 py-4">
                         <div class="font-semibold text-slate-800"><%= e.title %></div>
                         <div class="text-[11px] text-slate-400 mt-0.5 max-w-[220px] truncate" title="<%= e.description %>"><%= e.description || '-' %></div>
-                      </td>
-                      <td class="px-5 py-4">
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600 uppercase tracking-wide">
-                          <%= e.category %>
-                        </span>
                       </td>
                       <td class="px-5 py-4 text-slate-500 whitespace-nowrap">
                         <%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
                       </td>
                       <td class="px-5 py-4 text-center">
                         <% if (!e.proofFile) { %>
-                          <span class="text-[10px] text-slate-400 italic">No File</span>
+                          <span class="text-[10px] text-slate-400 italic">Cash</span>
                         <% } else { 
                           const file = e.proofFile;
                           const ext = file.split('.').pop().toLowerCase();
@@ -195,21 +182,50 @@
                       <td class="px-5 py-4 text-right font-bold text-slate-900 tabular-nums text-[13px]">
                         Rp <%= e.amount.toLocaleString('id-ID') %>
                       </td>
-                      <td class="px-5 py-4">
-                        <% if (e.status === 'PENDING_FINANCE') { %>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
-                            <i class="fa-solid fa-circle-arrow-right text-[10px]"></i> Lolos ke Finance
-                          </span>
-                        <% } else if (e.status === 'PAID') { %>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                            <i class="fa-solid fa-circle-check text-[10px]"></i> Selesai & Lunas
-                          </span>
-                        <% } else if (e.status === 'REJECTED') { %>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">
-                            <i class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak
-                          </span>
-                        <% } %>
-                      </td>
+                    <td class="px-5 py-4 whitespace-nowrap align-middle">
+  <% 
+    // Mengubah total status klaim ke style standar bulat + dot (Sama persis!)
+    const textStyles = { 
+      'PENDING_FINANCE': 'text-blue-600', 
+      'PAID': 'text-emerald-600', 
+      'REJECTED': 'text-rose-600'
+    };
+
+    const dotStyles = { 
+      'PENDING_FINANCE': 'bg-blue-500', 
+      'PAID': 'bg-emerald-500', 
+      'REJECTED': 'bg-rose-500'
+    };
+
+    const bgStyles = { 
+      'PENDING_FINANCE': 'bg-blue-50/70', 
+      'PAID': 'bg-emerald-50/70', 
+      'REJECTED': 'bg-rose-50/70'
+    };
+
+    const borderStyles = { 
+      'PENDING_FINANCE': 'border-blue-200/50', 
+      'PAID': 'border-emerald-200/50', 
+      'REJECTED': 'border-rose-200/50'
+    };
+
+    const statusLabels = { 
+      'PENDING_FINANCE': 'Menunggu Finance', 
+      'PAID': 'Selesai & Lunas', 
+      'REJECTED': 'Ditolak'
+    }; 
+  %>
+
+  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200
+    <%= textStyles[e.status] || 'text-slate-500' %> 
+    <%= bgStyles[e.status] || 'bg-slate-50' %> 
+    <%= borderStyles[e.status] || 'border-slate-200' %>">
+
+    <!-- Bulatan dot kecil dengan efek pulse khusus untuk status PAID -->
+    <span class="w-1.5 h-1.5 rounded-full <%= dotStyles[e.status] || 'bg-slate-400' %> <%= e.status === 'PAID' ? 'animate-pulse' : '' %>"></span>
+    <span><%= statusLabels[e.status] || e.status %></span>
+  </div>
+</td>
                     </tr>
                   <% }) %>
                 <% } %>

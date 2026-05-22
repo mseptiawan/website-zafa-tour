@@ -191,7 +191,7 @@ export const financeExpensePage = async (req, res) => {
     // Tarik semua data yang berstatus verifikasi aktif maupun yang sudah selesai (riwayat)
     const expenses = await ExpenseClaim.find({
       status: {
-        $in: ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"],
+        $in: ["PENDING_FINANCE", "PAID", "REJECTED"],
       },
     })
       .populate("userId")
@@ -211,14 +211,11 @@ export const payExpense = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!req.file) {
-      return res.status(400).send("Gagal: Bukti pencairan/transfer wajib diunggah.");
-    }
     await ExpenseClaim.findByIdAndUpdate(id, {
       status: "PAID",
       financeApprovedBy: req.session.user._id,
       paidAt: new Date(),
-      transferProofFile: req.file.filename,
+      transferProofFile: req.file ? req.file.filename : null,
     });
 
     res.redirect("/expense/finance");

@@ -6,7 +6,7 @@ import Employee from "../../models/Employee.js";
 // =========================
 // CONFIG & TARGET USERS
 // =========================
-const MONGO_URI = "mongodb://localhost:27017/hris_zafa_tour"; // Sesuaikan
+const MONGO_URI = "mongodb://localhost:27017/hris_zafa_tour";
 const usernames = [
   "basoherman",
   "ongkidwi",
@@ -20,6 +20,7 @@ const usernames = [
 ];
 
 const categories = ["TRANSPORT", "MEAL", "HOTEL", "PARKING", "OPERASIONAL", "LAINNYA"];
+const finalStatuses = ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"];
 
 // =========================
 // HELPERS
@@ -64,6 +65,9 @@ const seedExpenses = async () => {
         const amount = Math.floor(Math.random() * 500000) + 50000;
         const date = randomDate();
 
+        // Membagi variasi status secara acak agar kedua Tab (Verifikasi & Riwayat) terisi seimbang
+        const status = randomItem(finalStatuses);
+
         data.push({
           userId: user._id,
           employeeId: employee ? employee._id : null,
@@ -71,8 +75,20 @@ const seedExpenses = async () => {
           category: randomItem(categories),
           amount: amount,
           expenseDate: date,
-          status: amount > 200000 ? "PENDING_MANAGER" : "PENDING_FINANCE",
-          selfDeclaration: false,
+          status: status,
+          selfDeclaration: amount < 100000, // Jika di bawah 100rb, anggap klaim mandiri tanpa nota bawaan
+          proofFile: amount >= 100000 ? "nota-kredit.png" : null,
+
+          // ==========================================
+          // ATURAN BARU: KONDISIONAL BUKTI TRANSFER
+          // ==========================================
+          // Jika statusnya PAID, kita simulasikan 50% dibayar transfer (ada file)
+          // dan 50% dibayar tunai/cash (transferProofFile bernilai null)
+          transferProofFile:
+            status === "PAID" && Math.random() > 0.5 ? "file-1779435027076.jpeg" : null,
+          paidAt: status === "PAID" ? date : null,
+          financeApprovedBy: status === "PAID" ? user._id : null, // Dummy approver
+
           createdAt: date,
           updatedAt: new Date(),
         });

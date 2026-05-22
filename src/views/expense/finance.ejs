@@ -48,7 +48,6 @@
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
                   <th class="px-5 py-3">Karyawan</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
-                  <th class="px-5 py-3">Kategori</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Nota</th>
                   <th class="px-5 py-3">Status Dokumen</th>
@@ -69,14 +68,9 @@
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
                         <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
-                        <div class="text-[10px] text-slate-400 font-medium mt-0.5"><%= e.userId?.email || '' %></div>
                       </td>
                       <td class="px-5 py-4 font-semibold text-slate-800"><%= e.title %></td>
-                      <td class="px-5 py-4">
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600 uppercase tracking-wide">
-                          <%= e.category %>
-                        </span>
-                      </td>
+                     
                       <td class="px-5 py-4 text-slate-500 whitespace-nowrap">
                         <%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
                       </td>
@@ -105,7 +99,7 @@
                       <td class="px-5 py-4">
                         <% if (e.status === 'PENDING_FINANCE') { %>
                           <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60">
-                            <i class="fa-solid fa-hourglass-half text-[10px]"></i> Selesai Manager (Ke Finance)
+                            <i class="fa-solid fa-hourglass-half text-[10px]"></i> Finance
                           </span>
                         <% } else { %>
                           <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60">
@@ -119,30 +113,29 @@
                       <td class="px-5 py-4 text-center">
                         <div class="flex items-center justify-center">
                           <% if (e.status === 'PENDING_FINANCE') { %>
-                            <!-- Form Multipart untuk mendukung upload single file bukti transfer -->
+                            <!-- Form Multipart tanpa validasi required pada file -->
                             <form action="/expense/<%= e._id %>/pay" method="POST" enctype="multipart/form-data" 
-                                  onsubmit="return confirm('Apakah Anda yakin dana reimbursement ini sudah dicairkan dan file bukti transfer sudah benar?');"
+                                  onsubmit="return confirm('Apakah Anda yakin dana reimbursement ini sudah dicairkan (via cash/transfer)?');"
                                   class="flex items-center gap-2">
                               
-                              <!-- INPUT FILE BUKTI TRANSFER KUSTOM -->
+                              <!-- INPUT FILE BUKTI TRANSFER KUSTOM (SEKARANG OPSIONAL) -->
                               <div class="relative flex items-center">
                                 <label for="transferProof-<%= e._id %>" 
                                        class="inline-flex items-center gap-1 px-2 py-1.5 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-600 text-[11px] font-medium rounded-lg shadow-sm cursor-pointer transition duration-150 whitespace-nowrap">
                                   <i class="fa-solid fa-cloud-arrow-up text-slate-400 text-[10px]"></i>
-                                  <span id="label-text-<%= e._id %>">Bukti Transfer</span>
+                                  <span id="label-text-<%= e._id %>">Bukti Dokumen</span>
                                 </label>
                                 <input type="file" 
                                        id="transferProof-<%= e._id %>" 
                                        name="transferProof" 
                                        accept="image/*,application/pdf" 
-                                       required
                                        onchange="updateFileName(this, '<%= e._id %>')"
                                        class="absolute inset-0 opacity-0 w-full h-full cursor-pointer hidden" />
                               </div>
 
                               <!-- TOMBOL SUBMIT BAYAR -->
                               <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-sm transition duration-150 cursor-pointer whitespace-nowrap">
-                                <i class="fa-solid fa-money-bill-transfer"></i> Bayar
+                                <i class="fa-solid fa-money-bill-transfer"></i> Mark as Paid
                               </button>
                             </form>
                           <% } else if (e.status === 'PENDING_MANAGER') { %>
@@ -173,10 +166,9 @@
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
                   <th class="px-5 py-3">Karyawan</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
-                  <th class="px-5 py-3">Kategori</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Nota</th>
-                  <th class="px-5 py-3 text-center">Bukti TF Finance</th>
+                  <th class="px-5 py-3 text-center">Bukti Pencairan</th>
                   <th class="px-5 py-3 text-right">Nominal Klaim</th>
                   <th class="px-5 py-3">Status Final</th>
                 </tr>
@@ -194,14 +186,9 @@
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
                         <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
-                        <div class="text-[10px] text-slate-400 font-medium mt-0.5"><%= e.userId?.email || '' %></div>
                       </td>
                       <td class="px-5 py-4 font-semibold text-slate-800"><%= e.title %></td>
-                      <td class="px-5 py-4">
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600 uppercase tracking-wide">
-                          <%= e.category %>
-                        </span>
-                      </td>
+                      
                       <td class="px-5 py-4 text-slate-500 whitespace-nowrap">
                         <%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
                       </td>
@@ -227,10 +214,12 @@
                         <% } %>
                       </td>
 
-                      <!-- BUKTI TRANSFER FINANCE -->
+                      <!-- BUKTI TRANSFER/CASH FINANCE -->
                       <td class="px-5 py-4 text-center">
                         <% if (!e.transferProofFile) { %>
-                          <span class="text-[10px] text-slate-400 italic">-</span>
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-600 border border-slate-200/40">
+                            Cash 
+                          </span>
                         <% } else { 
                           const tfFile = e.transferProofFile;
                           const tfExt = tfFile.split('.').pop().toLowerCase();
@@ -251,17 +240,44 @@
                       <td class="px-5 py-4 text-right font-bold text-slate-900 tabular-nums text-[13px]">
                         Rp <%= e.amount.toLocaleString('id-ID') %>
                       </td>
-                      <td class="px-5 py-4">
-                        <% if (e.status === 'PAID') { %>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                            <i class="fa-solid fa-circle-check text-[10px]"></i> Lunas Dibayar
-                          </span>
-                        <% } else { %>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">
-                            <i class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak
-                          </span>
-                        <% } %>
-                      </td>
+                <td class="px-5 py-4">
+                    <% 
+                      // Menggunakan format mapping objek standar bulat + dot (Sama persis)
+                      const textStyles = { 
+                        'PAID': 'text-emerald-700', 
+                        'REJECTED': 'text-rose-700' 
+                      };
+
+                      const dotStyles = { 
+                        'PAID': 'bg-emerald-500', 
+                        'REJECTED': 'bg-rose-500' 
+                      };
+
+                      const bgStyles = { 
+                        'PAID': 'bg-emerald-50', 
+                        'REJECTED': 'bg-rose-50' 
+                      };
+
+                      const borderStyles = { 
+                        'PAID': 'border-emerald-200/60', 
+                        'REJECTED': 'border-rose-200/60' 
+                      };
+
+                      const statusLabels = { 
+                        'PAID': 'Lunas Dibayar', 
+                        'REJECTED': 'Ditolak' 
+                      }; 
+                    %>
+
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200
+                      <%= textStyles[e.status] || 'text-slate-500' %> 
+                      <%= bgStyles[e.status] || 'bg-slate-50' %> 
+                      <%= borderStyles[e.status] || 'border-slate-200' %>">
+
+                      <span class="w-1.5 h-1.5 rounded-full <%= dotStyles[e.status] || 'bg-slate-400' %> <%= e.status === 'PAID' ? 'animate-pulse' : '' %>"></span>
+                      <span><%= statusLabels[e.status] || e.status %></span>
+                    </div>
+                  </td>
                     </tr>
                   <% }) %>
                 <% } %>
@@ -276,25 +292,22 @@
 
   <!-- CLIENT JS CONTROL FOR SINGLE-PAGE TABBING & INTERACTION -->
   <script>
-    // Fungsi untuk memperbarui teks label tombol upload saat file dipilih secara real-time
     function updateFileName(input, id) {
       const labelText = document.getElementById(`label-text-${id}`);
       if (input.files && input.files.length > 0) {
         const fileName = input.files[0].name;
-        // Memotong nama file jika terlalu panjang agar tombol tidak merusak tata letak row tabel
         labelText.innerText = fileName.length > 12 ? fileName.substring(0, 10) + '...' : fileName;
         labelText.parentElement.classList.replace('text-slate-600', 'text-emerald-600');
         labelText.parentElement.classList.replace('border-slate-200', 'border-emerald-200');
         labelText.parentElement.classList.add('bg-emerald-50/50');
       } else {
-        labelText.innerText = "Bukti Transfer";
+        labelText.innerText = "Bukti Dokumen";
         labelText.parentElement.classList.replace('text-emerald-600', 'text-slate-600');
         labelText.parentElement.classList.replace('border-emerald-200', 'border-slate-200');
         labelText.parentElement.classList.remove('bg-emerald-50/50');
       }
     }
 
-    // Fungsi navigasi tab halaman tunggal (Single Page Tab Controller)
     function switchTab(tabName) {
       document.querySelectorAll('.tab-pane').forEach(pane => {
         pane.classList.replace('block', 'hidden');
