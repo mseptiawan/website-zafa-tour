@@ -148,22 +148,20 @@ export const allExpenses = async (req, res) => {
 */
 export const approvalManagerExpense = async (req, res) => {
   try {
-    const expenses = await ExpenseClaim.find({
-      status: "PENDING_MANAGER",
-    })
+    const expenses = await ExpenseClaim.find()
       .populate("userId")
-      .populate("employeeId");
+      .populate("employeeId")
+      .sort({ createdAt: -1 });
 
     res.render("expense/approval-manager", {
-      title: "Approval Klaim",
+      title: "Approval Klaim Manager",
       expenses,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error");
+    console.log("Error approvalManagerExpense:", err);
+    res.status(500).send("Internal Server Error");
   }
 };
-
 /*
 |--------------------------------------------------------------------------
 | APPROVE MANAGER
