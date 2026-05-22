@@ -56,16 +56,13 @@ export const index = async (req, res, next) => {
       // 4. Perjalanan Dinas Saya (Ambil 3 terakhir)
       BusinessTrip.find({ userId }).sort({ createdAt: -1 }).limit(3),
 
-      // 5. KPI Terakhir karyawan
       Kpi.findOne({ employeeId: user.employeeData?._id || userId }).sort({ periode: -1 }),
 
-      // 6. Libur Kalender Terdekat
       Holiday.findOne({
         date: { $gte: startToday },
         $or: [{ year: currentYear }, { isRecurring: true }],
       }).sort({ date: 1 }),
 
-      // 7. Antrean Approval Lembur (Hanya ditarik jika user adalah MANAGER)
       user.role === "MANAGER"
         ? Overtime.find({ status: "Pending Manager", userId: { $ne: userId } })
             .populate("userId")
@@ -73,7 +70,6 @@ export const index = async (req, res, next) => {
             .limit(5)
         : [],
 
-      // 8. Antrean Approval Dinas Luar (Sesuai role pendukung di trip service)
       ["MANAGER", "HR", "PIMPINAN"].includes(user.role)
         ? BusinessTrip.find({ status: "PENDING_APPROVAL" }) // Sesuai logika getApprovalTripsService(user.role)
             .populate("userId")
@@ -82,25 +78,14 @@ export const index = async (req, res, next) => {
         : [],
     ]);
 
-    /*
-    |--------------------------------------------------------------------------
-    | AGGREGATION & KONTROL DATA
-    |--------------------------------------------------------------------------
-    */
     const hadirCount = monthlyAttendance.filter((a) => a.status === "HADIR").length;
     const telatCount = monthlyAttendance.filter((a) => a.status === "TELAT").length;
     const alpaCount = monthlyAttendance.filter((a) => a.status === "ALPA").length;
 
-    /*
-    |--------------------------------------------------------------------------
-    | RENDER DATA TO VIEW
-    |--------------------------------------------------------------------------
-    */
     return res.render("dashboard/main", {
       title: "HRIS Control Center",
       user,
 
-      // Absensi
       attendance: attendanceToday,
       already: !!attendanceToday,
       hasCheckedOut: !!attendanceToday?.checkOut,

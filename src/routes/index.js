@@ -15,6 +15,7 @@ import finance from "./finance.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
 import approvalRoutes from "./approval.routes.js";
 import Employee from "./employee.routes.js";
+import loanRoutes from "./loan.routes.js";
 import notificationRoutes from "./notification.routes.js";
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.use("/sales", salesRoutes);
 router.use("/assignment", assignmentRoutes);
 router.use("/announcement", announcementRoutes);
 router.use("/", expenseRoutes);
+router.use("/loan", loanRoutes);
 router.use("/api", notificationRoutes);
 
 export default router;

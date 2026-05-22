@@ -50,11 +50,6 @@ const employeeSchema = new mongoose.Schema(
       ref: "Unit",
     },
 
-    baseSalary: {
-      type: Number,
-      default: 0,
-    },
-
     profilePhoto: String,
   },
   {
@@ -67,6 +62,16 @@ employeeSchema.virtual("terminationHistory", {
   foreignField: "employeeId",
   justOne: false,
 });
+
+employeeSchema.virtual("salaryDetail", {
+  ref: "EmployeeSalary",
+  localField: "_id",
+  foreignField: "employeeId",
+  justOne: true,
+});
+
+employeeSchema.set("toObject", { virtuals: true });
+employeeSchema.set("toJSON", { virtuals: true });
 
 const Employee = mongoose.model("Employee", employeeSchema);
 

@@ -7,6 +7,8 @@ export const newForm = async (req, res, next) => {
     res.render("loans/new", {
       title: "Form Pengajuan Pinjaman",
       employee,
+      error: null,
+      old: null,
     });
   } catch (error) {
     next(error);
