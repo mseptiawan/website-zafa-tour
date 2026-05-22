@@ -88,6 +88,58 @@
             </div>
 
           </details>
+          <!-- MENU PEMINJAMAN UANG -->
+                  <details class="group outline-none" data-menu="loan">
+                    <summary
+                      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
+                      <div class="flex items-center gap-3">
+                        <!-- Icon Simpel (Bank / Money) -->
+                        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
+                          stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+
+                        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
+                          Peminjaman Uang
+                        </span>
+                      </div>
+
+                      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </summary>
+
+                    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+                      
+                      <!-- BUAT PENGAJUAN (Bisa diakses oleh Karyawan/HR) -->
+                      <% if (user.role !== 'PIMPINAN') { %>
+                        <a href="/loan/new"
+                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
+                          Buat Pengajuan
+                        </a>
+                      <% } %>
+
+                      <!-- RIWAYAT PENGAJUAN (Melihat pinjaman milik diri sendiri) -->
+                      <% if (user.permissions.loan_my || user.role !== 'PIMPINAN') { %>
+                        <a href="/loan/my"
+                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
+                          Riwayat Pengajuan
+                        </a>
+                      <% } %>
+
+                      <!-- MANAJEMEN PINJAMAN (Khusus HR, Pimpinan, Keuangan untuk approval/pencairan) -->
+                      <% if (user.role === 'PIMPINAN' || user.role === 'HR' || user.role === 'KEUANGAN' || user.permissions.loan_all) { %>
+                        <a href="/loan"
+                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
+                          Manajemen Pinjaman
+                        </a>
+                      <% } %>
+
+                    </div>
+                  </details>
+                  
  <div class="space-y-1">
               <details class="group outline-none" data-menu="kpi">
                 <summary
