@@ -190,37 +190,42 @@ export const approveManagerExpense = async (req, res) => {
 */
 export const financeExpensePage = async (req, res) => {
   try {
+    // Tarik semua data yang berstatus verifikasi aktif maupun yang sudah selesai (riwayat)
     const expenses = await ExpenseClaim.find({
-      status: "PENDING_FINANCE",
+      status: {
+        $in: ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"],
+      },
     })
       .populate("userId")
-      .populate("employeeId");
+      .populate("employeeId")
+      .sort({ createdAt: -1 }); // Opsional: Urutkan dari yang paling terbaru
 
     res.render("expense/finance", {
       title: "Validasi Finance",
       expenses,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error");
+    console.error("Error pada financeExpensePage:", err);
+    res.status(500).send("Internal Server Error");
   }
 };
-/*
-|--------------------------------------------------------------------------
-| MARK AS PAID
-|--------------------------------------------------------------------------
-*/
 export const payExpense = async (req, res) => {
   try {
-    await ExpenseClaim.findByIdAndUpdate(req.params.id, {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).send("Gagal: Bukti pencairan/transfer wajib diunggah.");
+    }
+    await ExpenseClaim.findByIdAndUpdate(id, {
       status: "PAID",
       financeApprovedBy: req.session.user._id,
       paidAt: new Date(),
+      transferProofFile: req.file.filename,
     });
 
     res.redirect("/expense/finance");
   } catch (err) {
-    console.log(err);
+    console.log("Payment error:", err);
     res.status(500).send("Payment error");
   }
 };

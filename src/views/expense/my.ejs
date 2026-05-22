@@ -22,7 +22,6 @@
               <th class="px-6 py-4 text-left">Nominal</th>
               <th class="px-6 py-4 text-left">Tanggal</th>
               <th class="px-6 py-4 text-left">Status</th>
-              <th class="px-6 py-4 text-center">Approval</th>
               <th class="px-6 py-4 text-center">Bukti</th>
             </tr>
           </thead>
@@ -35,7 +34,7 @@
               const statusConfig = {
                 'PENDING_MANAGER': { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Menunggu Manager' },
                 'PENDING_FINANCE': { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Menunggu Finance' },
-                'PAID': { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Dibayar' },
+                'PAID': { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Sudah Dibayar' },
                 'REJECTED': { bg: 'bg-rose-50', text: 'text-rose-700', label: 'Ditolak' }
               };
             %>
@@ -56,21 +55,16 @@
                   </span>
                 </td>
 
-                <td class="px-6 py-4 text-center">
-                  <div class="flex justify-center gap-4 text-[10px] font-bold uppercase">
-                    <span class="<%= e.managerApprovedBy ? 'text-emerald-600' : 'text-slate-300' %>">Mgr</span>
-                    <span class="<%= e.financeApprovedBy ? 'text-emerald-600' : 'text-slate-300' %>">Fin</span>
-                  </div>
-                </td>
+             
 
                 <td class="px-6 py-4 text-center">
                   <% if (!e.proofFile) { %>
                     <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-full">Declaration</span>
                   <% } else { %>
                     <% const isImage = ['jpg','jpeg','png','webp'].includes(e.proofFile.split('.').pop().toLowerCase()); %>
-                    <a href="/uploads/<%= e.proofFile %>" target="_blank" class="block group">
+                    <a href="/uploads/files/<%= e.proofFile %>" target="_blank" class="block group">
                       <% if (isImage) { %>
-                        <img src="/uploads/<%= e.proofFile %>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm transition group-hover:scale-105" />
+                        <img src="/uploads/files/<%= e.proofFile %>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm transition group-hover:scale-105" />
                       <% } else { %>
                         <span class="text-blue-600 underline text-[11px]">Download</span>
                       <% } %>

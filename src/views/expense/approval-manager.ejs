@@ -32,7 +32,6 @@
                 
                 <td class="px-6 py-4">
                   <div class="font-semibold text-slate-800"><%= e.employeeId?.fullName %></div>
-                  <div class="text-[11px] text-slate-400 font-medium uppercase"><%= e.employeeId?.position || '-' %></div>
                 </td>
 
                 <td class="px-6 py-4">
@@ -53,9 +52,9 @@
                 <td class="px-6 py-4">
                   <% if (e.proofFile) { %>
                     <% const isImage = ['jpg','jpeg','png','webp'].includes(e.proofFile.split('.').pop().toLowerCase()); %>
-                    <a href="/uploads/<%= e.proofFile %>" target="_blank" class="block group">
+                    <a href="/uploads/files/<%= e.proofFile %>" target="_blank" class="block group">
                       <% if (isImage) { %>
-                        <img src="/uploads/<%= e.proofFile %>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm transition group-hover:scale-105" />
+                        <img src="/uploads/files/<%= e.proofFile %>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm transition group-hover:scale-105" />
                       <% } else { %>
                         <span class="text-blue-600 underline text-[11px]">Download File</span>
                       <% } %>

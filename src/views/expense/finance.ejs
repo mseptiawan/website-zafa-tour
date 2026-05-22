@@ -1,157 +1,317 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50 p-8">
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Header Utama -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-xl font-bold text-slate-800">Validasi & Pencairan Klaim</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Persetujuan dana klaim pengeluaran (reimbursement) staf dan rekam jejak pembayaran finansial terpusat.</p>
+        </div>
+      </div>
 
-  <!-- HEADER -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-semibold">
-      Validasi Finance
-    </h1>
+      <% 
+        // Memisahkan data expenses berdasarkan status untuk kebutuhan Tab
+        const activeExpenses = expenses.filter(e => e.status === 'PENDING_FINANCE' || e.status === 'PENDING_MANAGER');
+        const historyExpenses = expenses.filter(e => e.status === 'PAID' || e.status === 'REJECTED');
+      %>
 
-    <p class="text-sm text-slate-500 mt-1">
-      Klaim yang siap dicairkan
-    </p>
-  </div>
+      <!-- TAB NAVIGATION COMPONENT (Single Page Tab) -->
+      <div class="flex items-center gap-2 mb-6 border-b border-slate-200/60 pb-px">
+        <button type="button" onclick="switchTab('active')" id="tab-btn-active"
+          class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5">
+          Perlu Verifikasi
+          <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-blue-50 text-blue-600 rounded-md tabular-nums font-bold">
+            <%= activeExpenses.length %>
+          </span>
+        </button>
 
-  <!-- TABLE -->
-  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <button type="button" onclick="switchTab('history')" id="tab-btn-history"
+          class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5">
+          Riwayat Pencairan
+          <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">
+            <%= historyExpenses.length %>
+          </span>
+        </button>
+      </div>
 
-    <table class="w-full text-sm">
-
-      <thead class="bg-slate-50 text-slate-500">
-
-        <tr>
-          <th class="p-3 text-left">Karyawan</th>
-          <th class="p-3 text-left">Judul</th>
-          <th class="p-3 text-left">Kategori</th>
-          <th class="p-3 text-left">Nominal</th>
-          <th class="p-3 text-left">Tanggal</th>
-          <th class="p-3 text-left">Bukti</th>
-          <th class="p-3 text-left">Status</th>
-          <th class="p-3 text-left">Aksi</th>
-        </tr>
-
-      </thead>
-
-      <tbody class="text-slate-700">
-
-        <% expenses.forEach(e => { %>
-
-          <tr class="border-t border-slate-100 hover:bg-slate-50">
-
-            <!-- KARYAWAN -->
-            <td class="p-3">
-
-              <div class="font-medium"> 
-      <%= e.employeeId?.fullName || '-' %>
-              </div>
-
-              <div class="text-xs text-slate-400">
-                <%= e.userId?.email || '' %>
-              </div>
-
-            </td>
-
-            <!-- JUDUL -->
-            <td class="p-3 font-medium">
-              <%= e.title %>
-            </td>
-
-            <!-- KATEGORI -->
-            <td class="p-3">
-              <%= e.category %>
-            </td>
-
-            <!-- NOMINAL -->
-            <td class="p-3 font-semibold">
-              Rp <%= e.amount.toLocaleString('id-ID') %>
-            </td>
-
-            <!-- TANGGAL -->
-            <td class="p-3">
-              <%= new Date(e.expenseDate).toLocaleDateString('id-ID') %>
-            </td>
-
-            <!-- BUKTI -->
-            <td class="p-3">
-
-              <% if (!e.proofFile) { %>
-
-                <span class="text-xs text-amber-500">
-                  Self Declaration
-                </span>
-
-              <% } else { 
-                const file = e.proofFile;
-                const ext = file.split('.').pop().toLowerCase();
-                const isImage = ['jpg','jpeg','png','webp'].includes(ext);
-              %>
-
-                <% if (isImage) { %>
-
-                  <a href="/uploads/<%= file %>" target="_blank">
-                    <img
-                      src="/uploads/<%= file %>"
-                      class="w-12 h-12 object-cover rounded border"
-                    />
-                  </a>
-
+      <!-- ================== ZONE TAB 1: PERLU VERIFIKASI ================== -->
+      <div id="tab-content-active" class="tab-pane block">
+        <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="text-[13px] font-bold text-slate-800">Menunggu Review & Pembayaran</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+                  <th class="px-5 py-3">Karyawan</th>
+                  <th class="px-5 py-3">Detail Pengajuan</th>
+                  <th class="px-5 py-3">Kategori</th>
+                  <th class="px-5 py-3">Tanggal</th>
+                  <th class="px-5 py-3 text-center">Bukti Nota</th>
+                  <th class="px-5 py-3">Status Dokumen</th>
+                  <th class="px-5 py-3 text-right">Nominal Klaim</th>
+                  <th class="px-5 py-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+                <% if (activeExpenses.length === 0) { %>
+                  <tr>
+                    <td colspan="8" class="px-5 py-12 text-center text-slate-400">
+                      <i class="fa-regular fa-circle-check text-3xl mb-2 block text-slate-300"></i>
+                      Bersih! Tidak ada klaim reimbursement aktif yang memerlukan pencairan dana.
+                    </td>
+                  </tr>
                 <% } else { %>
+                  <% activeExpenses.forEach(e => { %>
+                    <tr class="hover:bg-slate-50/50 transition duration-150">
+                      <td class="px-5 py-4">
+                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
+                        <div class="text-[10px] text-slate-400 font-medium mt-0.5"><%= e.userId?.email || '' %></div>
+                      </td>
+                      <td class="px-5 py-4 font-semibold text-slate-800"><%= e.title %></td>
+                      <td class="px-5 py-4">
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600 uppercase tracking-wide">
+                          <%= e.category %>
+                        </span>
+                      </td>
+                      <td class="px-5 py-4 text-slate-500 whitespace-nowrap">
+                        <%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                      </td>
+                      <td class="px-5 py-4 text-center">
+                        <% if (!e.proofFile) { %>
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200/40">
+                            Self Declaration
+                          </span>
+                        <% } else { 
+                          const file = e.proofFile;
+                          const ext = file.split('.').pop().toLowerCase();
+                          const isImage = ['jpg','jpeg','png','webp'].includes(ext);
+                        %>
+                          <% if (isImage) { %>
+                            <a href="/uploads/files/<%= file %>" target="_blank" class="inline-block relative group">
+                              <img src="/uploads/files/<%= file %>" class="w-9 h-9 object-cover rounded-lg border border-slate-200 shadow-sm group-hover:brightness-90 transition" />
+                              <div class="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 rounded-lg transition text-white text-[9px]"><i class="fa-solid fa-eye"></i></div>
+                            </a>
+                          <% } else { %>
+                            <a href="/uploads/files/<%= file %>" download class="inline-flex items-center gap-1 px-2 py-1 border border-slate-200 rounded-md text-[11px] font-medium text-indigo-600 bg-white hover:bg-indigo-50 transition shadow-sm">
+                              <i class="fa-solid fa-file-arrow-down text-indigo-400"></i> Unduh
+                            </a>
+                          <% } %>
+                        <% } %>
+                      </td>
+                      <td class="px-5 py-4">
+                        <% if (e.status === 'PENDING_FINANCE') { %>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60">
+                            <i class="fa-solid fa-hourglass-half text-[10px]"></i> Selesai Manager (Ke Finance)
+                          </span>
+                        <% } else { %>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60">
+                            <i class="fa-solid fa-user-tie text-[10px]"></i> Review Manager
+                          </span>
+                        <% } %>
+                      </td>
+                      <td class="px-5 py-4 text-right font-bold text-slate-900 tabular-nums text-[13px]">
+                        Rp <%= e.amount.toLocaleString('id-ID') %>
+                      </td>
+                      <td class="px-5 py-4 text-center">
+                        <div class="flex items-center justify-center">
+                          <% if (e.status === 'PENDING_FINANCE') { %>
+                            <!-- Form Multipart untuk mendukung upload single file bukti transfer -->
+                            <form action="/expense/<%= e._id %>/pay" method="POST" enctype="multipart/form-data" 
+                                  onsubmit="return confirm('Apakah Anda yakin dana reimbursement ini sudah dicairkan dan file bukti transfer sudah benar?');"
+                                  class="flex items-center gap-2">
+                              
+                              <!-- INPUT FILE BUKTI TRANSFER KUSTOM -->
+                              <div class="relative flex items-center">
+                                <label for="transferProof-<%= e._id %>" 
+                                       class="inline-flex items-center gap-1 px-2 py-1.5 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-600 text-[11px] font-medium rounded-lg shadow-sm cursor-pointer transition duration-150 whitespace-nowrap">
+                                  <i class="fa-solid fa-cloud-arrow-up text-slate-400 text-[10px]"></i>
+                                  <span id="label-text-<%= e._id %>">Bukti Transfer</span>
+                                </label>
+                                <input type="file" 
+                                       id="transferProof-<%= e._id %>" 
+                                       name="transferProof" 
+                                       accept="image/*,application/pdf" 
+                                       required
+                                       onchange="updateFileName(this, '<%= e._id %>')"
+                                       class="absolute inset-0 opacity-0 w-full h-full cursor-pointer hidden" />
+                              </div>
 
-                  <a
-                    href="/uploads/<%= file %>"
-                    download
-                    class="text-indigo-500 text-xs underline"
-                  >
-                    Download File
-                  </a>
-
+                              <!-- TOMBOL SUBMIT BAYAR -->
+                              <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-sm transition duration-150 cursor-pointer whitespace-nowrap">
+                                <i class="fa-solid fa-money-bill-transfer"></i> Bayar
+                              </button>
+                            </form>
+                          <% } else if (e.status === 'PENDING_MANAGER') { %>
+                            <span class="text-[10px] text-slate-400 italic font-medium">Menunggu Approval Manager</span>
+                          <% } else { %>
+                            <span class="text-[10px] text-slate-400 italic font-medium">-</span>
+                          <% } %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
                 <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-              <% } %>
+      <!-- ================== ZONE TAB 2: RIWAYAT PENCAIRAN ================== -->
+      <div id="tab-content-history" class="tab-pane hidden">
+        <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="text-[13px] font-bold text-slate-800">Arsip Pencairan Dana Selesai</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+                  <th class="px-5 py-3">Karyawan</th>
+                  <th class="px-5 py-3">Detail Pengajuan</th>
+                  <th class="px-5 py-3">Kategori</th>
+                  <th class="px-5 py-3">Tanggal</th>
+                  <th class="px-5 py-3 text-center">Bukti Nota</th>
+                  <th class="px-5 py-3 text-center">Bukti TF Finance</th>
+                  <th class="px-5 py-3 text-right">Nominal Klaim</th>
+                  <th class="px-5 py-3">Status Final</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+                <% if (historyExpenses.length === 0) { %>
+                  <tr>
+                    <td colspan="8" class="px-5 py-12 text-center text-slate-400">
+                      <i class="fa-regular fa-folder text-3xl mb-2 block text-slate-300"></i>
+                      Belum ada arsip riwayat pencairan dana yang tercatat.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% historyExpenses.forEach(e => { %>
+                    <tr class="hover:bg-slate-50/50 transition duration-150">
+                      <td class="px-5 py-4">
+                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
+                        <div class="text-[10px] text-slate-400 font-medium mt-0.5"><%= e.userId?.email || '' %></div>
+                      </td>
+                      <td class="px-5 py-4 font-semibold text-slate-800"><%= e.title %></td>
+                      <td class="px-5 py-4">
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600 uppercase tracking-wide">
+                          <%= e.category %>
+                        </span>
+                      </td>
+                      <td class="px-5 py-4 text-slate-500 whitespace-nowrap">
+                        <%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                      </td>
+                      
+                      <!-- BUKTI NOTA STAF -->
+                      <td class="px-5 py-4 text-center">
+                        <% if (!e.proofFile) { %>
+                          <span class="text-[10px] text-slate-400 italic">No File</span>
+                        <% } else { 
+                          const file = e.proofFile;
+                          const ext = file.split('.').pop().toLowerCase();
+                          const isImage = ['jpg','jpeg','png','webp'].includes(ext);
+                        %>
+                          <% if (isImage) { %>
+                            <a href="/uploads/files/<%= file %>" target="_blank" class="inline-block">
+                              <img src="/uploads/files/<%= file %>" class="w-8 h-8 object-cover rounded border border-slate-200" />
+                            </a>
+                          <% } else { %>
+                            <a href="/uploads/files/<%= file %>" download class="text-indigo-500 text-[11px] font-medium underline">
+                              Unduh
+                            </a>
+                          <% } %>
+                        <% } %>
+                      </td>
 
-            </td>
+                      <!-- BUKTI TRANSFER FINANCE -->
+                      <td class="px-5 py-4 text-center">
+                        <% if (!e.transferProofFile) { %>
+                          <span class="text-[10px] text-slate-400 italic">-</span>
+                        <% } else { 
+                          const tfFile = e.transferProofFile;
+                          const tfExt = tfFile.split('.').pop().toLowerCase();
+                          const isTfImage = ['jpg','jpeg','png','webp'].includes(tfExt);
+                        %>
+                          <% if (isTfImage) { %>
+                            <a href="/uploads/files/<%= tfFile %>" target="_blank" class="inline-block">
+                              <img src="/uploads/files/<%= tfFile %>" class="w-8 h-8 object-cover rounded border border-slate-200 shadow-sm" />
+                            </a>
+                          <% } else { %>
+                            <a href="/uploads/files/<%= tfFile %>" download class="inline-flex items-center gap-0.5 text-emerald-600 text-[11px] font-medium hover:underline">
+                              <i class="fa-solid fa-file-pdf text-[10px]"></i> Lihat Dokumen
+                            </a>
+                          <% } %>
+                        <% } %>
+                      </td>
 
-            <!-- STATUS -->
-            <td class="p-3">
+                      <td class="px-5 py-4 text-right font-bold text-slate-900 tabular-nums text-[13px]">
+                        Rp <%= e.amount.toLocaleString('id-ID') %>
+                      </td>
+                      <td class="px-5 py-4">
+                        <% if (e.status === 'PAID') { %>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <i class="fa-solid fa-circle-check text-[10px]"></i> Lunas Dibayar
+                          </span>
+                        <% } else { %>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">
+                            <i class="fa-solid fa-circle-xmark text-[10px]"></i> Ditolak
+                          </span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-              <% 
-                let statusLabel = e.status;
-                if (e.status === "PENDING_FINANCE") statusLabel = "Menunggu Finance";
-                if (e.status === "PENDING_MANAGER") statusLabel = "Menunggu Manager";
-                if (e.status === "PAID") statusLabel = "Dibayar";
-                if (e.status === "REJECTED") statusLabel = "Ditolak";
-              %>
-
-              <span class="px-2 py-1 text-xs rounded-md bg-amber-100 text-amber-700">
-                <%= statusLabel %>
-              </span>
-
-            </td>
-
-            <!-- AKSI -->
-            <td class="p-3">
-
-              <form action="/expense/<%= e._id %>/pay" method="POST">
-
-                <button
-                  class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg"
-                >
-                  Cairkan
-                </button>
-
-              </form>
-
-            </td>
-
-          </tr>
-
-        <% }) %>
-
-      </tbody>
-
-    </table>
-
+    </div>
   </div>
 
-</div>
+  <!-- CLIENT JS CONTROL FOR SINGLE-PAGE TABBING & INTERACTION -->
+  <script>
+    // Fungsi untuk memperbarui teks label tombol upload saat file dipilih secara real-time
+    function updateFileName(input, id) {
+      const labelText = document.getElementById(`label-text-${id}`);
+      if (input.files && input.files.length > 0) {
+        const fileName = input.files[0].name;
+        // Memotong nama file jika terlalu panjang agar tombol tidak merusak tata letak row tabel
+        labelText.innerText = fileName.length > 12 ? fileName.substring(0, 10) + '...' : fileName;
+        labelText.parentElement.classList.replace('text-slate-600', 'text-emerald-600');
+        labelText.parentElement.classList.replace('border-slate-200', 'border-emerald-200');
+        labelText.parentElement.classList.add('bg-emerald-50/50');
+      } else {
+        labelText.innerText = "Bukti Transfer";
+        labelText.parentElement.classList.replace('text-emerald-600', 'text-slate-600');
+        labelText.parentElement.classList.replace('border-emerald-200', 'border-slate-200');
+        labelText.parentElement.classList.remove('bg-emerald-50/50');
+      }
+    }
+
+    // Fungsi navigasi tab halaman tunggal (Single Page Tab Controller)
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.replace('block', 'hidden');
+      });
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
+        btn.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+      });
+
+      const targetPane = document.getElementById(`tab-content-${tabName}`);
+      if (targetPane) targetPane.classList.replace('hidden', 'block');
+
+      const targetBtn = document.getElementById(`tab-btn-${tabName}`);
+      if (targetBtn) {
+        targetBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
+        targetBtn.classList.add('border-blue-600', 'text-blue-600', 'font-bold');
+      }
+    }
+  </script>

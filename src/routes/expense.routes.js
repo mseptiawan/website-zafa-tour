@@ -16,11 +16,9 @@ import {
 
 const router = express.Router();
 
-/* CREATE */
 router.get("/expense/create", authMiddleware, formExpense);
 router.post("/expense/create", authMiddleware, uploadFile.single("proofFile"), createExpense);
 
-/* LIST */
 router.get("/expense/my", authMiddleware, myExpenses);
 router.get(
   "/expense/all",
@@ -29,7 +27,6 @@ router.get(
   allExpenses
 );
 
-/* APPROVAL */
 router.get(
   "/expense/approval/manager",
   authMiddleware,
@@ -44,8 +41,13 @@ router.post(
   approveManagerExpense
 );
 
-/* FINANCE */
 router.get("/expense/finance", authMiddleware, roleMiddleware("KEUANGAN"), financeExpensePage);
-router.post("/expense/:id/pay", authMiddleware, roleMiddleware("KEUANGAN"), payExpense);
+router.post(
+  "/expense/:id/pay",
+  authMiddleware,
+  roleMiddleware("KEUANGAN"),
+  uploadFile.single("transferProof"),
+  payExpense
+);
 
 export default router;

@@ -57,7 +57,10 @@ const expenseClaimSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-
+    transferProofFile: {
+      type: String,
+      default: null,
+    },
     paidAt: Date,
   },
   {
