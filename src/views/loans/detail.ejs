@@ -9,7 +9,7 @@
         });
         const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "KEUANGAN", "GENERAL_MANAGER"];
         const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
-        const backLink = isManagement ? '/loans/manage-requests' : '/loans/my';
+        const backLink = isManagement ? '/loans/manage-center' : '/loans/my';
       %>
 
       <a href="<%= backLink %>"
@@ -134,73 +134,101 @@
   });
 %>
 
-  <% if (activeApproval) { %>
-   <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
+ <% if (activeApproval) { %>
+  <!-- Form disembunyikan, tidak merusak desain -->
+  <form id="reject-form" action="/loans/approval/reject/<%= activeApproval._id %>" method="POST">
+    <input type="hidden" name="note" id="hidden-note-reject">
+  </form>
+  
+  <form id="approve-form" action="/loans/approval/approve/<%= activeApproval._id %>" method="POST"></form>
+
+  <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
     
     <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
-            <i class="fa-solid fa-check-double text-emerald-600"></i>
+        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+            <i class="fa-solid fa-check-double text-blue-700"></i>
         </div>
         Evaluasi Pinjaman
     </h3>
 
+    <!-- Textarea ini sekarang terhubung ke 'approve-form' via atribut 'form' -->
+    <!-- 'oninput' akan menyalin teks ke input hidden form tolak secara otomatis -->
     <textarea
         name="note"
+        form="approve-form"
+        oninput="document.getElementById('hidden-note-reject').value = this.value"
         rows="4"
         class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
         placeholder="Masukkan catatan evaluasi..."
     ></textarea>
 
-    <div class="flex gap-3">
+    <div class="flex items-center justify-end gap-3 mt-4 w-full">
+        <!-- Tombol menggunakan atribut 'form' untuk men-trigger form yang sesuai -->
+        <button type="submit" form="reject-form" class="cursor-pointer px-5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition active:scale-[0.98] focus:outline-none">
+            Tolak
+        </button>
 
-        <form action="/loans/approval/approve/<%= activeApproval._id %>" method="POST">
-            <button class="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-500 text-white text-sm font-medium shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition">
-                Terima
-            </button>
-        </form>
-
-        <form action="/loans/approval/reject/<%= activeApproval._id %>" method="POST">
-            <button class="px-6 py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
-                Tolak
-            </button>
-        </form>
-
+        <button type="submit" form="approve-form" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/10 transition active:scale-[0.98] focus:outline-none">
+            Terima
+        </button>
     </div>
-
-</div>
-  <% } %>
+  </div>
+<% } %>
 </div>
 
        <div class="space-y-6">
 
 
-  <div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
-    <h2 class="text-xs font-semibold text-slate-800 uppercase tracking-wider mb-6">Alur Persetujuan</h2>
-    
-    <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
-      <% approvals.forEach((app, index) => { %>
-        <div class="relative">
-          <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center
-            <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
-            <span class="text-[8px] text-white font-semibold"><%= index + 1 %></span>
+<div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
+  <!-- Header dengan Kalimat Jejak Log -->
+  <div class="mb-8">
+    <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h2>
+    <p class="text-[10px] text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
+  </div>
+
+  <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
+    <% approvals.forEach((app, index) => { %>
+      <div class="relative">
+        <!-- Bulatan Indikator -->
+        <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center
+          <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
+          <span class="text-[8px] text-white font-bold"><%= index + 1 %></span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <!-- Baris Atas: Step & Status -->
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase"><%= app.step %></span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border
+              <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                : 'bg-amber-50 text-amber-700 border-amber-200' %>">
+              <%= app.status %>
+            </span>
           </div>
 
-          <div class="flex flex-col gap-0.5">
-            <div class="text-[11px] font-semibold text-slate-900"><%= app.step %></div>
-            <div class="text-[10px] text-slate-500 font-medium">
-              <%= app.status === 'PENDING' ? 'Menunggu antrean...' : (app.approverId?.username || 'Sistem') %>
-            </div>
-            
-            <% if (app.status !== 'PENDING') { %>
-              <div class="mt-2 text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100 text-slate-600 italic">
-                "<%= app.note || 'Tidak ada catatan tambahan.' %>"
-              </div>
-            <% } %>
+          <!-- Info Pemeriksa & Tanggal -->
+          <div class="flex items-center gap-2 text-[10px] text-slate-500">
+            <span class="font-semibold text-slate-700">
+              <%= app.approverId ? (app.approverId.employeeData.fullName || app.approverId.username) : 'Sistem' %>
+            </span>
+            <span class="text-slate-300">|</span>
+            <span>
+              <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Menunggu' %>
+            </span>
           </div>
+
+          <!-- Catatan -->
+          <% if (app.status !== 'PENDING' && app.note) { %>
+            <div class="mt-2 text-[10px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic">
+              "<%= app.note %>"
+            </div>
+          <% } %>
         </div>
-      <% }) %>
-    </div>
+      </div>
+    <% }) %>
   </div>
+</div>
 
 </div>
 

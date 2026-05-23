@@ -120,13 +120,17 @@
                         <td class="px-5 py-4 text-center font-bold text-blue-600 tabular-nums">
                           <%= leave.totalDays %> Hari
                         </td>
-                        <td class="px-5 py-4 text-center">
-                          <a href="/leave/detail/<%= leave._id %>"
-                            class="inline-flex items-center gap-1 px-2.5 py-1.5 border border-slate-200 text-[11px] font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition duration-150">
-                            <i class="fa-solid fa-signature text-slate-400"></i>
-                            <%= leave.status==='CANCELLATION_PENDING' ? 'Periksa Pembatalan' : 'Periksa Cuti' %>
-                          </a>
-                        </td>
+                       <td class="px-5 py-4 text-right">
+  <a href="/leave/detail/<%= leave._id %>"
+    class="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 text-[11.5px] font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50 transition duration-150 active:scale-[0.97]">
+    
+    <%= leave.status === 'CANCELLATION_PENDING' ? 'Periksa Pembatalan' : 'Periksa Cuti' %>
+    
+    <svg class="w-3.5 h-3.5 text-slate-400 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  </a>
+</td>
                       </tr>
                       <% }) %>
                         <% } %>

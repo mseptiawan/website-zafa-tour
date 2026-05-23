@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const notifCountText = document.getElementById("notifCountText");
   const markAllReadBtn = document.getElementById("markAllReadBtn");
 
-  if (!notifButton) return; // Guard clause jika element tidak di-render
+  if (!notifButton) return; 
 
   fetchNotifications();
 

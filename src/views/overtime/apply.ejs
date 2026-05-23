@@ -38,24 +38,18 @@
 
           <!-- JAM (GRID) -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label class="text-[13px] font-bold text-slate-700">
-                Jam Mulai
-              </label>
-              <input type="time" name="startTime" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-              focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-              outline-none transition-all" />
-            </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Jam Mulai</label>
+    <input type="text" id="startTime" name="startTime" required placeholder="08:00"
+      class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
+  </div>
 
-            <div class="space-y-1.5">
-              <label class="text-[13px] font-bold text-slate-700">
-                Jam Selesai
-              </label>
-              <input type="time" name="endTime" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-              focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-              outline-none transition-all" />
-            </div>
-          </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Jam Selesai</label>
+    <input type="text" id="endTime" name="endTime" required placeholder="17:00"
+      class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
+  </div>
+</div>
 
           <!-- DESKRIPSI PEKERJAAN -->
           <div class="space-y-1.5">
@@ -211,4 +205,13 @@
     function triggerChangeFile() {
       document.getElementById("file-input").click();
     }
+
   </script>
+  <script>
+  flatpickr(".timepicker", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true
+  });
+</script>
