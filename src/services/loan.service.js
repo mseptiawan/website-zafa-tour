@@ -185,6 +185,34 @@ class LoanService {
 
     return await loan.save();
   }
+
+  async cancelLoan(loanId, userId) {
+    const employee = await Employee.findOne({ userId });
+    if (!employee) throw new Error("Data karyawan tidak ditemukan");
+
+    const loan = await Loan.findOne({ _id: loanId, employeeId: employee._id });
+    if (!loan) throw new Error("Data pengajuan tidak ditemukan");
+
+    if (loan.status === "CANCELED") {
+      throw new Error("Pengajuan ini sudah dibatalkan sebelumnya");
+    }
+
+    if (loan.status === "REJECTED") {
+      throw new Error("Pengajuan sudah ditolak, tidak perlu dibatalkan");
+    }
+
+    if (loan.paymentProof || loan.disbursementDate) {
+      throw new Error("Pengajuan tidak bisa dibatalkan karena dana sudah dicairkan oleh keuangan");
+    }
+
+    const hasPayments = await LoanPayment.exists({ loanId });
+    if (hasPayments) {
+      throw new Error("Pengajuan tidak bisa dibatalkan karena skema cicilan sudah berjalan");
+    }
+
+    loan.status = "CANCELED";
+    return await loan.save();
+  }
 }
 
 export default new LoanService();
