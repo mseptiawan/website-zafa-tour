@@ -31,13 +31,14 @@ export const create = async (req, res, next) => {
     });
   }
 };
-
 export const myLoans = async (req, res, next) => {
   try {
-    const loans = await loanService.getEmployeeLoanHistory(req.user._id);
+    const { loans, summary } = await loanService.getEmployeeLoanHistory(req.user._id);
+
     res.render("loans/my", {
       title: "Riwayat Pinjaman Saya",
       loans,
+      summary,
     });
   } catch (error) {
     next(error);
