@@ -10,6 +10,7 @@ import {
   edit,
   update,
   getManageLoanPage,
+  getDetail,
   approveLoan,
   rejectLoan,
 } from "../controllers/loan.controller.js";
@@ -22,9 +23,9 @@ router.get("/new", newForm);
 router.post("/", create);
 
 router.get("/my", myLoans);
-
-router.get("/:id/edit", edit);
-router.post("/:id/edit", uploadFile.single("attachments"), update);
+router.get("/detail/:id", getDetail);
+router.get("/edit/:id", edit);
+router.post("/update/:id", update);
 
 router.get("/manage-center", roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]), getManageLoanPage);
 

@@ -112,36 +112,69 @@ class LoanService {
       },
     };
   }
+  async getLoanDetailData(loanId) {
+    const loan = await Loan.findById(loanId).populate({
+      path: "employeeId",
+      populate: { path: "unitId" },
+    });
+    if (!loan) throw new Error("Data pengajuan pinjaman tidak ditemukan");
+
+    const approvals = await LoanApproval.find({ loanId })
+      .populate("approverId")
+      .sort({ createdAt: 1 });
+    const payments = await LoanPayment.find({ loanId }).sort({ installmentNumber: 1 });
+
+    return { loan, approvals, payments };
+  }
 
   async getLoanForEdit(loanId, userId) {
     const employee = await Employee.findOne({ userId });
-    const loan = await Loan.findOne({ _id: loanId, employeeId: employee._id });
+    if (!employee) throw new Error("Data karyawan tidak ditemukan");
 
+    const loan = await Loan.findOne({ _id: loanId, employeeId: employee._id });
     if (!loan) throw new Error("Data pengajuan tidak ditemukan");
-    if (loan.status !== "PENDING")
+
+    if (loan.status !== "PENDING") {
       throw new Error("Pengajuan yang sudah diproses tidak dapat diubah");
+    }
+
+    const hrApproval = await LoanApproval.findOne({ loanId, step: "HR" });
+    if (hrApproval && hrApproval.status !== "PENDING") {
+      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh HR");
+    }
 
     return loan;
   }
 
   async updateLoan(loanId, userId, updateData) {
     const employee = await Employee.findOne({ userId });
-    const loan = await Loan.findOne({ _id: loanId, employeeId: employee._id });
+    if (!employee) throw new Error("Data karyawan tidak ditemukan");
 
+    const loan = await Loan.findOne({ _id: loanId, employeeId: employee._id });
     if (!loan) throw new Error("Data pengajuan tidak ditemukan");
-    if (loan.status !== "PENDING")
+
+    if (loan.status !== "PENDING") {
       throw new Error("Pengajuan yang sudah diproses tidak dapat diubah");
+    }
+
+    const hrApproval = await LoanApproval.findOne({ loanId, step: "HR" });
+    if (hrApproval && hrApproval.status !== "PENDING") {
+      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh HR");
+    }
 
     const salary = await EmployeeSalary.findOne({ employeeId: employee._id });
     const basicSalary = salary ? salary.basicSalary : 0;
 
-    const { amountRequested, tenorMonths, reason } = updateData;
-    const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
+    const amountRequested = Number(updateData.amountRequested);
+    const tenorMonths = Number(updateData.tenorMonths);
+    const reason = updateData.reason;
 
+    const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
     const maxDeduction = basicSalary * 0.1;
+
     if (monthlyDeduction > maxDeduction) {
       throw new Error(
-        `Cicilan baru (Rp ${monthlyDeduction.toLocaleString()}) melebihi batas 10% gaji pokok.`
+        `Cicilan baru (Rp ${monthlyDeduction.toLocaleString("id-ID")}) melebihi batas 10% gaji pokok.`
       );
     }
 

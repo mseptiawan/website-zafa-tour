@@ -45,12 +45,30 @@ export const myLoans = async (req, res, next) => {
   }
 };
 
+export const getDetail = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { loan, approvals, payments } = await loanService.getLoanDetailData(id);
+
+    res.render("loans/detail", {
+      title: "Detail Pengajuan Pinjaman",
+      loan,
+      approvals,
+      payments,
+      user: req.session.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const edit = async (req, res, next) => {
   try {
     const loan = await loanService.getLoanForEdit(req.params.id, req.user._id);
-    res.render("loans/edit", {
+    res.render("loans/new", {
       title: "Edit Pengajuan Pinjaman",
       loan,
+      errorMessage: null,
     });
   } catch (error) {
     res.status(400).redirect("/loans/my");
@@ -62,14 +80,18 @@ export const update = async (req, res, next) => {
     await loanService.updateLoan(req.params.id, req.user._id, req.body);
     res.redirect("/loans/my");
   } catch (error) {
-    res.status(400).render("loans/edit", {
+    res.status(400).render("loans/new", {
       title: "Edit Pengajuan Pinjaman",
       errorMessage: error.message,
-      loan: { _id: req.params.id, ...req.body },
+      loan: {
+        _id: req.params.id,
+        amountRequested: req.body.amountRequested,
+        tenorMonths: req.body.tenorMonths,
+        reason: req.body.reason,
+      },
     });
   }
 };
-
 export const getManageLoanPage = async (req, res) => {
   try {
     const sessionUser = req.session.user;
