@@ -210,3 +210,130 @@
 
     </div>
   </div>
+
+  <div id="custom-confirm-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 antialiased">
+  <div id="modal-overlay" class="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] transition-opacity"></div>
+  
+  <div class="relative bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-200 ease-out flex flex-col items-center text-center">
+    
+    <button id="modal-close-x" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-lg p-1 hover:bg-slate-50 transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <div id="modal-icon-container" class="w-14 h-14 rounded-full flex items-center justify-center mb-4">
+      <svg id="modal-icon-danger" class="w-7 h-7 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+      </svg>
+      <svg id="modal-icon-success" class="w-7 h-7 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+
+    <h3 id="modal-title" class="text-base font-bold text-slate-900 mb-2"></h3>
+    <p id="modal-text" class="text-[13px] text-slate-500 leading-relaxed mb-6 px-2"></p>
+
+    <div class="grid grid-cols-2 gap-3 w-full border-t border-slate-100 pt-4">
+      <button id="modal-cancel-btn" class="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200/80 rounded-xl py-2.5 text-xs font-semibold transition active:scale-[0.98] cursor-pointer">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        <span id="modal-cancel-text">Batal</span>
+      </button>
+      <button id="modal-confirm-btn" class="w-full inline-flex items-center justify-center gap-2 text-white rounded-xl py-2.5 text-xs font-semibold transition active:scale-[0.98] cursor-pointer shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+        </svg>
+        <span id="modal-confirm-text">Konfirmasi</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("custom-confirm-modal");
+    const modalContent = modal.querySelector(".relative");
+    const overlay = document.getElementById("modal-overlay");
+    const closeX = document.getElementById("modal-close-x");
+    const cancelBtn = document.getElementById("modal-cancel-btn");
+    const confirmBtn = document.getElementById("modal-confirm-btn");
+    
+    const titleEl = document.getElementById("modal-title");
+    const textEl = document.getElementById("modal-text");
+    const cancelTextEl = document.getElementById("modal-cancel-text");
+    const confirmTextEl = document.getElementById("modal-confirm-text");
+    const iconContainer = document.getElementById("modal-icon-container");
+    const iconDanger = document.getElementById("modal-icon-danger");
+    const iconSuccess = document.getElementById("modal-icon-success");
+
+    let activeFormId = null;
+
+    const openModal = (options) => {
+      activeFormId = options.formId;
+      titleEl.textContent = options.title;
+      textEl.textContent = options.text;
+      cancelTextEl.textContent = options.cancelText;
+      confirmTextEl.textContent = options.confirmText;
+
+      iconDanger.classList.add("hidden");
+      iconSuccess.classList.add("hidden");
+      iconContainer.className = "w-14 h-14 rounded-full flex items-center justify-center mb-4 ";
+
+      if (options.type === "danger") {
+        iconContainer.classList.add("bg-rose-50", "text-rose-600", "border", "border-rose-100");
+        iconDanger.classList.remove("hidden");
+        confirmBtn.className = "w-full inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl py-2.5 text-xs font-semibold transition active:scale-[0.98] cursor-pointer shadow-sm shadow-rose-100";
+      } else {
+        iconContainer.classList.add("bg-emerald-50", "text-emerald-600", "border", "border-emerald-100");
+        iconSuccess.classList.remove("hidden");
+        confirmBtn.className = "w-full inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2.5 text-xs font-semibold transition active:scale-[0.98] cursor-pointer shadow-sm shadow-blue-100";
+      }
+
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modalContent.classList.remove("scale-95", "opacity-0");
+        modalContent.classList.add("scale-100", "opacity-100");
+      }, 10);
+    };
+
+    const closeModal = () => {
+      modalContent.classList.remove("scale-100", "opacity-100");
+      modalContent.classList.add("scale-95", "opacity-0");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        activeFormId = null;
+      }, 200);
+    };
+
+    document.querySelectorAll(".btn-confirm").forEach(button => {
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetBtn = e.currentTarget;
+        
+        openModal({
+          formId: targetBtn.getAttribute("data-form-id"),
+          title: targetBtn.getAttribute("data-title") || "Konfirmasi Aksi",
+          text: targetBtn.getAttribute("data-text") || "Apakah Anda yakin?",
+          confirmText: targetBtn.getAttribute("data-confirm-text") || "Konfirmasi",
+          cancelText: targetBtn.getAttribute("data-cancel-text") || "Batal",
+          type: targetBtn.getAttribute("data-type") || "default"
+        });
+      });
+    });
+
+    [overlay, closeX, cancelBtn].forEach(element => {
+      element.addEventListener("click", closeModal);
+    });
+
+    confirmBtn.addEventListener("click", () => {
+      if (activeFormId) {
+        const form = document.getElementById(activeFormId);
+        if (form) form.submit();
+      }
+      closeModal();
+    });
+  });
+</script>
