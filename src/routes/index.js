@@ -34,7 +34,7 @@ router.use("/sales", salesRoutes);
 router.use("/assignment", assignmentRoutes);
 router.use("/announcement", announcementRoutes);
 router.use("/", expenseRoutes);
-router.use("/loan", loanRoutes);
+router.use("/loans", loanRoutes);
 router.use("/api", notificationRoutes);
 
 export default router;

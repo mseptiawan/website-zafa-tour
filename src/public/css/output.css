@@ -831,9 +831,6 @@
   .max-w-\[240px\] {
     max-width: 240px;
   }
-  .max-w-\[250px\] {
-    max-width: 250px;
-  }
   .max-w-lg {
     max-width: var(--container-lg);
   }
@@ -3814,13 +3811,6 @@
       }
     }
   }
-  .hover\:bg-slate-900 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-slate-900);
-      }
-    }
-  }
   .hover\:bg-white {
     &:hover {
       @media (hover: hover) {
@@ -4407,6 +4397,11 @@
   .lg\:grid-cols-3 {
     @media (width >= 64rem) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .lg\:grid-cols-4 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   .lg\:grid-cols-5 {
