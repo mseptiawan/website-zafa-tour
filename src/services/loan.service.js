@@ -186,32 +186,40 @@ class LoanService {
     return await loan.save();
   }
 
-  async cancelLoan(loanId, userId) {
-    const employee = await Employee.findOne({ userId });
-    if (!employee) throw new Error("Data karyawan tidak ditemukan");
+  async getLoanManagementData(user) {
+    const roleName = (user.role || "").toString().trim().toUpperCase();
 
-    const loan = await Loan.findOne({ _id: loanId, employeeId: employee._id });
-    if (!loan) throw new Error("Data pengajuan tidak ditemukan");
+    console.log("Mencari data untuk Role:", roleName);
 
-    if (loan.status === "CANCELED") {
-      throw new Error("Pengajuan ini sudah dibatalkan sebelumnya");
+    const approvals = await LoanApproval.find({ step: roleName }).sort({ createdAt: -1 });
+    const loanIds = approvals.map((app) => app.loanId);
+
+    const loans = await Loan.find({ _id: { $in: loanIds } }).populate({
+      path: "employeeId",
+      select: "fullName",
+    });
+
+    const activeLoans = [];
+    const historyLoans = [];
+    for (const app of approvals) {
+      const loan = loans.find((l) => l._id.toString() === app.loanId.toString());
+      if (!loan) continue;
+
+      const loanData = {
+        ...loan.toObject(),
+        approvalId: app._id,
+        approvalStatus: app.status,
+        note: app.note,
+      };
+
+      if (app.status === "PENDING") {
+        activeLoans.push(loanData);
+      } else {
+        historyLoans.push(loanData);
+      }
     }
 
-    if (loan.status === "REJECTED") {
-      throw new Error("Pengajuan sudah ditolak, tidak perlu dibatalkan");
-    }
-
-    if (loan.paymentProof || loan.disbursementDate) {
-      throw new Error("Pengajuan tidak bisa dibatalkan karena dana sudah dicairkan oleh keuangan");
-    }
-
-    const hasPayments = await LoanPayment.exists({ loanId });
-    if (hasPayments) {
-      throw new Error("Pengajuan tidak bisa dibatalkan karena skema cicilan sudah berjalan");
-    }
-
-    loan.status = "CANCELED";
-    return await loan.save();
+    return { activeLoans, historyLoans };
   }
 }
 

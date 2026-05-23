@@ -271,55 +271,55 @@
         <!-- ===================================== -->
         <!-- RIGHT COLUMN: TRACKING LOG TIMELINE   -->
         <!-- ===================================== -->
-        <div class="bg-white border border-slate-200/60 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] p-6">
-          <div class="mb-5">
-            <h2 class="text-sm font-bold text-slate-900 tracking-tight">Jejak Log Pemeriksaan</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
-          </div>
+      <div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
+  <div class="mb-8">
+    <h2 class="text-sm font-bold text-slate-900 tracking-tight">Jejak Log Pemeriksaan</h2>
+    <p class="text-xs text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
+  </div>
 
-          <div class="relative pl-4 space-y-6 before:absolute before:left-[4px] before:top-1.5 before:bottom-1.5 before:w-[1px] before:bg-slate-200">
-            <% approvals.forEach(app => { %>
-              <div class="relative group flex flex-col gap-1">
-
-                <!-- Indicator Dot -->
-                <div class="absolute -left-[16px] top-1 w-2 h-2 rounded-full border border-white shadow-sm ring-4 ring-white transition-colors
-                  <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
-                </div>
-
-                <!-- Info Box -->
-                <div class="flex flex-col gap-1 pl-1">
-                  <div class="flex flex-wrap items-center gap-1.5 text-xs">
-                    <span class="font-semibold text-slate-800">
-                      <%= (app.approverId && app.approverId.employeeData) ? app.approverId.employeeData.fullName : 'Sistem Otomatis' %>
-                    </span>
-                    <span class="text-[10px] text-slate-400 font-medium bg-slate-100 px-1.5 py-0.5 rounded">
-                      <%= app.step %>
-                    </span>
-                  </div>
-
-                  <div class="flex items-center justify-between mt-0.5">
-                    <span class="text-[10px] font-bold tracking-wide uppercase px-1.5 py-0.5 rounded
-                      <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700' : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700' %>">
-                      <%= app.status %>
-                    </span>
-                    <span class="text-[10px] text-slate-400 font-normal">
-                      <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Dalam Antrean' %>
-                    </span>
-                  </div>
-
-                  <!-- Notes -->
-                  <% if (app.note) { %>
-                    <div class="text-[11px] text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-2.5 rounded-lg mt-1.5 break-words">
-                      <span class="text-[9px] font-bold text-slate-400 block uppercase tracking-wider mb-0.5">Catatan:</span>
-                      <%= app.note %>
-                    </div>
-                  <% } %>
-                </div>
-
-              </div>
-            <% }) %>
-          </div>
+  <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
+    
+    <% approvals.forEach((app, index) => { %>
+      <div class="relative group">
+        
+        <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center transition-colors shadow-sm
+          <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
+          <span class="text-[8px] text-white font-bold"><%= index + 1 %></span>
         </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase"><%= app.step %></span>
+            
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border
+              <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50' 
+                : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200/50' 
+                : 'bg-amber-50 text-amber-700 border-amber-200/50' %>">
+              <%= app.status %>
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2 text-[11px]">
+            <span class="font-medium text-slate-700">
+              <%= (app.approverId && app.approverId.employeeData) ? app.approverId.employeeData.fullName : 'Sistem' %>
+            </span>
+            <span class="text-slate-300">|</span>
+            <span class="text-slate-400">
+              <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Menunggu' %>
+            </span>
+          </div>
+
+          <% if (app.note) { %>
+            <div class="mt-2 text-[11px] text-slate-600 bg-slate-50 border border-slate-100/50 p-3 rounded-lg leading-relaxed italic">
+              "<%= app.note %>"
+            </div>
+          <% } %>
+        </div>
+
+      </div>
+    <% }) %>
+  </div>
+</div>
 
       </div>
 

@@ -3,16 +3,24 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-5xl mx-auto">
     
-    <div class="flex items-start justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-semibold text-slate-800">Input Penilaian KPI</h1>
-        <p class="text-sm text-slate-500 mt-1">Kelola penilaian kinerja karyawan per kuartal</p>
-      </div>
-      <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Karyawan</span>
-        <span class="text-sm font-bold text-slate-800"><%= employees.length %></span>
-      </div>
+    <div class="flex items-end justify-between mb-10">
+  <div>
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Area Kerja</span>
+      <div class="w-px h-3 bg-slate-300"></div>
+      <span class="text-[10px] font-semibold text-slate-800 uppercase tracking-[0.2em]">Performance</span>
     </div>
+    
+    <h1 class="text-3xl font-semibold text-slate-950 tracking-tighter">Input Penilaian KPI</h1>
+    <p class="text-slate-500 mt-2 text-sm font-medium">Kelola penilaian kinerja karyawan per kuartal secara akurat.</p>
+  </div>
+
+  <div class="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl border border-slate-200/60 shadow-sm">
+    <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Total Karyawan</span>
+    <div class="h-4 w-px bg-slate-200"></div>
+    <span class="text-sm font-black text-slate-900 tabular-nums"><%= employees.length %></span>
+  </div>
+</div>
 
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
@@ -42,11 +50,11 @@
                 <td class="px-6 py-4">
                   <div class="font-medium text-slate-800"><%= emp.fullName %></div>
                 </td>
-                <td class="px-6 py-4 text-slate-500">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-600 border border-blue-100">
-                    <%= emp.unitId?.name || '-' %>
-                  </span>
-                </td>
+           <td class="px-6 py-4">
+  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-600 bg-slate-50 border border-slate-100">
+    <%= emp.unitId?.name || '-' %>
+  </span>
+</td>
                 <td class="px-6 py-4 text-slate-500"><%= emp.bidangId?.name || '-' %></td>
                 
                 <td class="px-6 py-4 text-center">

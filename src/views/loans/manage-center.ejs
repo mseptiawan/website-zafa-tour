@@ -1,0 +1,100 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-6xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-xl font-bold text-slate-800">Pusat Administrasi Pinjaman</h1>
+      <p class="text-xs text-slate-500 mt-0.5">Kelola dan tinjau seluruh permohonan pinjaman karyawan.</p>
+    </div>
+
+    <div class="flex items-center gap-2 mb-6 border-b border-slate-200/60 pb-px">
+      <button type="button" onclick="switchTab('active')" id="tab-btn-active"
+        class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none cursor-pointer">
+        Permintaan Aktif (<%= activeLoans.length %>)
+      </button>
+      <button type="button" onclick="switchTab('history')" id="tab-btn-history"
+        class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150 outline-none cursor-pointer">
+        Riwayat Persetujuan (<%= historyLoans.length %>)
+      </button>
+    </div>
+
+    <div id="tab-content-active" class="tab-pane block">
+      <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+              <th class="px-5 py-3">Tgl Pengajuan</th>
+              <th class="px-5 py-3">Nama Karyawan</th>
+              <th class="px-5 py-3 text-right">Jumlah Pinjaman</th>
+              <th class="px-5 py-3 text-center">Tenor</th>
+              <th class="px-5 py-3 text-right">Cicilan / Bulan</th>
+              <th class="px-5 py-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+            <% if (activeLoans.length === 0) { %>
+              <tr><td colspan="6" class="px-5 py-12 text-center text-slate-400">Tidak ada pinjaman yang menunggu approval.</td></tr>
+            <% } else { %>
+              <% activeLoans.forEach(loan => { %>
+                <tr class="hover:bg-slate-50/50 transition">
+                  <td class="px-5 py-4"><%= new Date(loan.createdAt).toLocaleDateString('id-ID') %></td>
+                  <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId.fullName %></td>
+                  <td class="px-5 py-4 text-right font-mono font-bold text-slate-900">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></td>
+                  <td class="px-5 py-4 text-center"><%= loan.tenorMonths %> Bulan</td>
+                  <td class="px-5 py-4 text-right font-mono">Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %></td>
+                  <td class="px-5 py-4 text-center">
+                    <a href="/loans/detail/<%= loan._id %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition">
+                      <i class="fa-solid fa-magnifying-glass text-[10px]"></i> Periksa
+                    </a>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-content-history" class="tab-pane hidden">
+      <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
+              <th class="px-5 py-3">Nama Karyawan</th>
+              <th class="px-5 py-3 text-right">Jumlah</th>
+              <th class="px-5 py-3 text-center">Status Akhir</th>
+              <th class="px-5 py-3 text-center">Catatan</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs">
+            <% historyLoans.forEach(loan => { %>
+              <tr class="hover:bg-slate-50/50">
+                <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId.fullName %></td>
+                <td class="px-5 py-4 text-right">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></td>
+                <td class="px-5 py-4 text-center">
+                  <span class="px-2 py-0.5 rounded font-bold text-[10px] <%= loan.approvalStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' %>">
+                    <%= loan.approvalStatus %>
+                  </span>
+                </td>
+                <td class="px-5 py-4 text-slate-500 italic"><%= loan.note || '-' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.replace('block', 'hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
+      b.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+    });
+    
+    document.getElementById(`tab-content-${tabName}`).classList.replace('hidden', 'block');
+    document.getElementById(`tab-btn-${tabName}`).classList.add('border-blue-600', 'text-blue-600', 'font-bold');
+  }
+</script>

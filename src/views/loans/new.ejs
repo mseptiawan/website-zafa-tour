@@ -3,24 +3,19 @@
   <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
     <div class="max-w-2xl mx-auto">
+<div class="mb-12"> <div class="flex items-center gap-3 mb-4">
+    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Area Kerja</span>
+    <div class="w-px h-3 bg-slate-200"></div> <span class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.2em]">Finance</span>
+  </div>
 
-      <div class="mb-8">
+  <h1 class="text-3xl font-extrabold text-slate-950 tracking-tighter">
+    <%= typeof loan !== 'undefined' && loan ? 'Ubah Pengajuan Pinjaman' : 'Pengajuan Pinjaman' %>
+  </h1>
 
-        <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-          <span>Workspace</span>
-          <span class="text-slate-300">/</span>
-          <span class="text-slate-900">Finance</span>
-        </nav>
-
-        <h1 class="text-2xl font-bold text-slate-900">
-          <%= typeof loan !== 'undefined' && loan ? 'Ubah Pengajuan Pinjaman (Loan)' : 'Pengajuan Pinjaman (Loan)' %>
-        </h1>
-
-        <p class="text-slate-500 mt-1">
-          <%= typeof loan !== 'undefined' && loan ? 'Lakukan perubahan pada data permohonan pinjaman internal Anda' : 'Ajukan permohonan pinjaman internal karyawan atau modal kerja' %>
-        </p>
-
-      </div>
+  <p class="text-slate-400 mt-2 text-sm font-medium">
+    <%= typeof loan !== 'undefined' && loan ? 'Update data permohonan pinjaman internal Anda.' : 'Ajukan pinjaman internal atau modal kerja Anda di sini.' %>
+  </p>
+</div>
 
       <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
