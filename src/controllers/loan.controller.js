@@ -92,6 +92,15 @@ export const update = async (req, res, next) => {
     });
   }
 };
+
+export const cancel = async (req, res, next) => {
+  try {
+    await loanService.cancelLoan(req.params.id, req.user._id);
+    res.redirect("/loans/my");
+  } catch (error) {
+    res.status(400).redirect("/loans/my?error=" + encodeURIComponent(error.message));
+  }
+};
 export const getManageLoanPage = async (req, res) => {
   try {
     const sessionUser = req.session.user;
