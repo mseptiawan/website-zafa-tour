@@ -130,12 +130,10 @@
                       <% } %>
 
                       <!-- MANAJEMEN PINJAMAN (Khusus HR, Pimpinan, Keuangan untuk approval/pencairan) -->
-                      <% if (user.role === 'PIMPINAN' || user.role === 'HR' || user.role === 'KEUANGAN' || user.permissions.loan_all) { %>
-                        <a href="/loan"
+                        <a href="/loans/manage-center"
                           class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
                           Manajemen Pinjaman
                         </a>
-                      <% } %>
 
                     </div>
                   </details>

@@ -2,7 +2,7 @@ import salesService from "../services/sales.service.js";
 
 export const newForm = (req, res) => {
   res.render("sales/create", {
-    title: "Input Sales Visit",
+    title: "Catat Kunjungan",
     error: null,
     old: {},
   });
@@ -19,7 +19,7 @@ export const create = async (req, res) => {
     return res.redirect("/sales/my");
   } catch (err) {
     return res.status(400).render("sales/create", {
-      title: "Input Sales Visit",
+      title: "Catat Kunjungan",
       error: err.message,
       old: req.body,
     });
@@ -31,7 +31,7 @@ export const myVisits = async (req, res, next) => {
     const visits = await salesService.findMine(req.session.user._id);
 
     res.render("sales/my", {
-      title: "Sales Visit Saya",
+      title: "Daftar Kunjungan Ku",
       visits,
       error: null,
     });
@@ -44,7 +44,7 @@ export const report = async (req, res, next) => {
     const visits = await salesService.findAll();
 
     res.render("sales/report", {
-      title: "Laporan Sales",
+      title: "Laporan",
       visits,
       user: req.session.user,
     });
@@ -68,7 +68,7 @@ export const edit = async (req, res, next) => {
     }
 
     res.render("sales/edit", {
-      title: "Edit Sales Visit",
+      title: "Edit Kunjungan",
       visit,
       error: null,
     });
@@ -77,11 +77,6 @@ export const edit = async (req, res, next) => {
   }
 };
 
-/*
-|-----------------------------
-| UPDATE
-|-----------------------------
-*/
 export const update = async (req, res, next) => {
   try {
     await salesService.update({

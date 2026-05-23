@@ -40,9 +40,9 @@ const userSchema = new mongoose.Schema(
   }
 );
 userSchema.virtual("employeeData", {
-  ref: "Employee", // Nama model target
-  localField: "_id", // Field di model User saat ini
-  foreignField: "userId", // Field di model Employee yang nge-ref ke User id
+  ref: "Employee", 
+  localField: "_id", 
+  foreignField: "userId", 
   justOne: true,
 });
 

@@ -7,6 +7,7 @@ import {
   newForm,
   create,
   myLoans,
+  cancel,
   edit,
   update,
   getManageLoanPage,
@@ -26,7 +27,7 @@ router.get("/my", myLoans);
 router.get("/detail/:id", getDetail);
 router.get("/edit/:id", edit);
 router.post("/update/:id", update);
-
+router.post("/cancel/:id", cancel);
 router.get("/manage-center", roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]), getManageLoanPage);
 
 router.post(

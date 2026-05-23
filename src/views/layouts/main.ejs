@@ -2,6 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+
+    <link rel="manifest" href="/images/site.webmanifest" />
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/output.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -69,7 +76,6 @@
                 Mark all as read
               </button>
             </div>
-
             <div
               id="notifContainer"
               class="divide-y divide-slate-100 max-h-[380px] overflow-y-auto"
@@ -83,182 +89,107 @@
       </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/js/sweetalert-handler.js"></script>
+    <div
+      id="custom-confirm-modal"
+      class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 antialiased"
+    >
+      <div
+        id="modal-overlay"
+        class="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] transition-opacity"
+      ></div>
+
+      <div
+        class="relative bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-200 ease-out flex flex-col items-center text-center"
+      >
+        <button
+          id="modal-close-x"
+          class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-lg p-1 hover:bg-slate-50 transition focus:outline-none"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <div
+          id="modal-icon-container"
+          class="w-14 h-14 rounded-full flex items-center justify-center mb-4"
+        >
+          <svg
+            id="modal-icon-danger"
+            class="w-7 h-7 hidden"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+            />
+          </svg>
+          <svg
+            id="modal-icon-success"
+            class="w-7 h-7 hidden"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+
+        <h3 id="modal-title" class="text-base font-bold text-slate-900 mb-2"></h3>
+        <p id="modal-text" class="text-[13px] text-slate-500 leading-relaxed mb-6 px-2"></p>
+
+        <div class="grid grid-cols-2 gap-3 w-full border-t border-slate-100 pt-4">
+          <button
+            id="modal-cancel-btn"
+            class="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200/80 rounded-xl py-2.5 text-xs font-semibold transition active:scale-[0.98] cursor-pointer focus:outline-none"
+          >
+            <svg
+              class="w-4 h-4 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span id="modal-cancel-text">Batal</span>
+          </button>
+          <button
+            id="modal-confirm-btn"
+            class="w-full inline-flex items-center justify-center gap-2 text-white rounded-xl py-2.5 text-xs font-semibold transition active:scale-[0.98] cursor-pointer shadow-sm focus:outline-none"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+            <span id="modal-confirm-text">Konfirmasi</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/customalert-handler.js"></script>
+    <script src="/js/sidebar-handler.js"></script>
+    <script src="/js/notification-handler.js"></script>
   </body>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const currentPath = window.location.pathname;
-      const sidebarNav = document.getElementById("sidebarNav");
-
-      if (!sidebarNav) return;
-
-      const links = sidebarNav.querySelectorAll("a");
-      const detailsMenus = sidebarNav.querySelectorAll("details[data-menu]");
-
-      // Restore scroll position
-      const savedScroll = localStorage.getItem("sidebarScroll");
-      if (savedScroll) {
-        sidebarNav.scrollTop = savedScroll;
-      }
-
-      sidebarNav.addEventListener("scroll", () => {
-        localStorage.setItem("sidebarScroll", sidebarNav.scrollTop);
-      });
-
-      links.forEach((link) => {
-        const href = link.getAttribute("href");
-        if (currentPath === href) {
-          const parentDetails = link.closest("details");
-
-          if (parentDetails) {
-            link.classList.remove("text-slate-500");
-            link.classList.add("text-indigo-500", "font-semibold", "bg-indigo-50", "rounded-lg");
-            parentDetails.open = true;
-            localStorage.setItem("activeMenu", parentDetails.dataset.menu);
-          } else {
-            link.classList.remove("hover:bg-slate-50");
-            link.classList.add("bg-indigo-50", "border-indigo-100");
-            const spanText = link.querySelector("span");
-            const svgIcon = link.querySelector("svg");
-            if (spanText) spanText.classList.add("text-indigo-600", "font-semibold");
-            if (svgIcon) svgIcon.classList.add("text-indigo-500");
-
-            localStorage.removeItem("activeMenu");
-          }
-        }
-      });
-
-      const activeMenu = localStorage.getItem("activeMenu");
-      if (activeMenu) {
-        const activeDetails = sidebarNav.querySelector(`details[data-menu="${activeMenu}"]`);
-        if (activeDetails) {
-          activeDetails.open = true;
-        }
-      }
-
-      detailsMenus.forEach((menu) => {
-        menu.addEventListener("toggle", () => {
-          if (menu.open) {
-            detailsMenus.forEach((otherMenu) => {
-              if (otherMenu !== menu) {
-                otherMenu.open = false;
-              }
-            });
-            localStorage.setItem("activeMenu", menu.dataset.menu);
-          }
-        });
-      });
-    });
-  </script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const notifButton = document.getElementById("notifButton");
-      const notifMenu = document.getElementById("notifMenu");
-      const notifContainer = document.getElementById("notifContainer");
-      const notifBadge = document.getElementById("notifBadge");
-      const notifCountText = document.getElementById("notifCountText");
-      const markAllReadBtn = document.getElementById("markAllReadBtn");
-
-      fetchNotifications();
-
-      notifButton.addEventListener("click", (e) => {
-        e.stopPropagation();
-        notifMenu.classList.toggle("hidden");
-        if (!notifMenu.classList.contains("hidden")) {
-          fetchNotifications();
-        }
-      });
-
-      window.addEventListener("click", (e) => {
-        const dropdown = document.getElementById("notificationDropdown");
-        if (dropdown && !dropdown.contains(e.target)) {
-          notifMenu.classList.add("hidden");
-        }
-      });
-
-      async function fetchNotifications() {
-        try {
-          const response = await fetch("/api/notifications");
-          const resData = await response.json();
-          if (resData.success) {
-            renderNotifications(resData.notifications, resData.unreadCount);
-          }
-        } catch (error) {
-          console.error("Gagal memuat data notifikasi:", error);
-          notifContainer.innerHTML = `
-          <div class="p-4 text-center text-xs text-red-500">Gagal memuat notifikasi.</div>
-        `;
-        }
-      }
-
-      function renderNotifications(notifications, unreadCount) {
-        if (unreadCount > 0) {
-          notifBadge.classList.remove("hidden");
-          notifCountText.classList.remove("hidden");
-          notifCountText.innerText = unreadCount;
-        } else {
-          notifBadge.classList.add("hidden");
-          notifCountText.classList.add("hidden");
-        }
-
-        if (!notifications || notifications.length === 0) {
-          notifContainer.innerHTML = `
-          <div class="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi baru.</div>
-        `;
-          return;
-        }
-
-        let htmlContent = "";
-
-        notifications.forEach((item) => {
-          const rowBackground = item.isUnread
-            ? "bg-slate-50/70 hover:bg-slate-100/80"
-            : "bg-white hover:bg-slate-50";
-
-          const targetUrl = item.module === "assignment" ? `/assignment/${item.referenceId}` : "#";
-          const avatarStyle =
-            item.type === "assignment"
-              ? "bg-indigo-100 text-indigo-700"
-              : "bg-slate-200 text-slate-600";
-
-          htmlContent += `
-          <a href="${targetUrl}" class="p-3.5 flex gap-3 items-start transition-colors block ${rowBackground}" data-id="${item._id}">
-            <div class="shrink-0 mt-0.5">
-              <div class="w-7 h-7 rounded-full ${avatarStyle} flex items-center justify-center text-[10px] font-bold tracking-wider">
-                ${item.type === "assignment" ? "TASK" : "NOTE"}
-              </div>
-            </div>
-            <div class="min-w-0 flex-1 text-[11px]">
-              <p class="text-slate-600 font-medium leading-normal">
-                <span class="font-semibold text-slate-900">${item.title}</span>: ${item.text}
-              </p>
-              <div class="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400 font-medium">
-                <span>Baru saja</span>
-                <span>•</span>
-                <span class="text-indigo-500 font-semibold capitalize">${item.module}</span>
-              </div>
-            </div>
-          </a>
-        `;
-        });
-
-        notifContainer.innerHTML = htmlContent;
-      }
-
-      markAllReadBtn.addEventListener("click", async () => {
-        try {
-          const response = await fetch("/api/notifications/mark-all-read", { method: "POST" });
-          const resData = await response.json();
-          if (resData.success) {
-            fetchNotifications();
-          }
-        } catch (error) {
-          console.error("Gagal memperbarui status baca:", error);
-        }
-      });
-    });
-  </script>
 </html>

@@ -83,7 +83,7 @@ export const index = async (req, res, next) => {
     const alpaCount = monthlyAttendance.filter((a) => a.status === "ALPA").length;
 
     return res.render("dashboard/main", {
-      title: "HRIS Control Center",
+      title: "Dashboard Zafa Tour",
       user,
 
       attendance: attendanceToday,

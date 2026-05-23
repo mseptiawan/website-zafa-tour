@@ -101,65 +101,22 @@ export const cancel = async (req, res, next) => {
     res.status(400).redirect("/loans/my?error=" + encodeURIComponent(error.message));
   }
 };
-export const getManageLoanPage = async (req, res) => {
+
+export const getManageLoanPage = async (req, res, next) => {
   try {
     const sessionUser = req.session.user;
     if (!sessionUser) return res.redirect("/?error=UNAUTHORIZED");
 
-    const normalizedRole = (sessionUser.roleId?.name || "").toString().trim().toUpperCase();
-    const VALID_LOAN_ROLES = ["HR", "PIMPINAN", "KEUANGAN"];
+    const data = await loanService.getLoanManagementData(sessionUser);
 
-    if (!VALID_LOAN_ROLES.includes(normalizedRole)) {
-      return res.redirect("/?error=FORBIDDEN");
-    }
-
-    const myApprovals = await LoanApproval.find({
-      $or: [{ approverId: sessionUser._id }, { step: normalizedRole }],
-    });
-
-    const activeLoanIds = [];
-    const historyLoanIds = [];
-
-    for (const app of myApprovals) {
-      if (app.status === "PENDING") {
-        if (app.step === "PIMPINAN") {
-          const hrCheck = await LoanApproval.findOne({ loanId: app.loanId, step: "HR" });
-          if (hrCheck && hrCheck.status !== "APPROVED") continue;
-        }
-
-        if (app.step === "KEUANGAN") {
-          const pimpinanCheck = await LoanApproval.findOne({
-            loanId: app.loanId,
-            step: "PIMPINAN",
-          });
-          if (pimpinanCheck && pimpinanCheck.status !== "APPROVED") continue;
-        }
-
-        activeLoanIds.push(app.loanId);
-      } else {
-        historyLoanIds.push(app.loanId);
-      }
-    }
-
-    const activeLoans = await Loan.find({ _id: { $in: activeLoanIds }, status: "PENDING" })
-      .populate({ path: "employeeId", select: "fullName" })
-      .sort({ createdAt: -1 });
-
-    const historyLoans = await Loan.find({ _id: { $in: historyLoanIds } })
-      .populate({ path: "employeeId", select: "fullName" })
-      .sort({ createdAt: -1 });
-
-    return res.render("loans/manage-center", {
-      title: "Pusat Kelola Pinjaman Karyawan",
+    res.render("loans/manage-center", {
+      title: "Pusat Kelola Pinjaman",
       user: sessionUser,
-      activeLoans,
-      historyLoans,
+      activeLoans: data.activeLoans,
+      historyLoans: data.historyLoans,
     });
   } catch (error) {
-    return res.status(500).render("error", {
-      title: "Pusat Pinjaman - Error",
-      message: error.message,
-    });
+    next(error);
   }
 };
 

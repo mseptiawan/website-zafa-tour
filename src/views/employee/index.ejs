@@ -3,10 +3,24 @@
 <div class="ml-72 p-8 bg-slate-50 min-h-screen">
   <!-- HEADER UTAMA -->
   <div class="flex items-center justify-between mb-8">
-    <div>
-      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Data Karyawan</h1>
-      <p class="text-sm text-slate-500 mt-1">Kelola informasi, peran, dan lacak status keanggotaan seluruh organisasi.</p>
-    </div>
+   <div class="">
+  <div class="mb-3 flex items-center gap-3">
+    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
+      Area Kerja
+    </span>
+    <div class="h-3 w-px bg-slate-300"></div>
+    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
+      SDM
+    </span>
+  </div>
+
+  <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
+    Data Karyawan
+  </h1>
+  <p class="mt-1.5 text-sm font-medium text-slate-500">
+    Kelola informasi, peran, dan lacak status keanggotaan seluruh organisasi.
+  </p>
+</div>
 
     <a href="/employee/create"
        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all duration-200">
@@ -41,18 +55,10 @@
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
                     <!-- Avatar Lingkaran Inisial Nama -->
-                    <div class="h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm border <%= isNonActive ? 'bg-slate-200 text-slate-500 border-slate-300' : 'bg-indigo-50 text-indigo-700 border-indigo-100' %>">
-                      <%= e.fullName ? e.fullName.charAt(0).toUpperCase() : '?' %>
-                    </div>
                     <div>
                       <div class="font-semibold text-sm <%= isNonActive ? 'text-slate-500 line-through decoration-slate-400' : 'text-slate-800' %>">
                         <%= e.fullName %>
                       </div>
-                      <div class="text-xs text-slate-500 font-medium tracking-tight flex items-center gap-2">
-                        @<%= e.userId?.username || 'user' %>
-                        <% if (isNonActive) { %>
-                          <span class="px-1.5 py-0.5 bg-red-100 text-red-700 font-bold text-[9px] rounded border border-red-200 uppercase tracking-wider animate-pulse">Non-Aktif</span>
-                        <% } %>
                       </div>
                     </div>    
                   </div>
@@ -69,11 +75,11 @@
                 </td>
 
                 <!-- 3. UNIT KERJA -->
-                <td class="px-6 py-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= isNonActive ? 'bg-slate-100 text-slate-500 border border-slate-200' : 'bg-blue-50 text-blue-700 border border-blue-100' %>">
-                    <%= e.unitId?.name || 'Unassigned' %>
-                  </span>
-                </td>
+               <td class="px-6 py-4">
+  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-600 bg-slate-50 border border-slate-100">
+    <%= e.unitId?.name || '-' %>
+  </span>
+</td>
 
                 <!-- 4. MENU OPERASIONAL / TOMBOL AKSI (IKON DIJAMIN KELIATAN JELAS) -->
                 <td class="px-6 py-4 text-right">
