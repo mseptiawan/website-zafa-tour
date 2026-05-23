@@ -3,15 +3,31 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-5xl mx-auto">
 
-    <div class="flex items-start justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-semibold text-slate-800">Riwayat Absensi</h1>
-        <p class="text-sm text-slate-500 mt-1">Pantau seluruh catatan kehadiran karyawan</p>
-      </div>
-      <div class="text-sm text-slate-500 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm">
-        Total: <span class="font-bold text-slate-900"><%= data.length %></span>
-      </div>
+  <div class="flex items-end justify-between mb-10">
+  <div>
+    <div class="mb-3 flex items-center gap-3">
+      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
+        Area Kerja
+      </span>
+      <div class="h-3 w-px bg-slate-300"></div>
+      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
+        Kehadiran
+      </span>
     </div>
+
+    <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
+      Riwayat Absensi
+    </h1>
+    <p class="mt-1.5 text-sm font-medium text-slate-500">
+      Pantau seluruh catatan kehadiran karyawan secara real-time.
+    </p>
+  </div>
+
+  <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+    <span class="text-[12px] font-medium text-slate-500 uppercase tracking-wide">Total Entri:</span>
+    <span class="text-lg font-bold text-slate-900"><%= data.length %></span>
+  </div>
+</div>
 
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">

@@ -1,10 +1,6 @@
 import DailyLog from "../models/DailyLog.js";
 import moment from "moment";
 
-/**
- * 1. RENDER: Menampilkan halaman utama log harian (EJS View)
- * GET /daily-log
- */
 export const renderDailyLogPage = async (req, res) => {
   try {
     const tanggalHariIni = moment().format("YYYY-MM-DD");
@@ -19,7 +15,7 @@ export const renderDailyLogPage = async (req, res) => {
     return res.render("dailylog/daily-log", {
       user: req.session.user,
       initialLogs: logs,
-      title: "Daily Log",
+      title: "Lembar Kerja",
       error: null,
       tanggalHariIni: tanggalHariIni,
     });
@@ -29,10 +25,6 @@ export const renderDailyLogPage = async (req, res) => {
   }
 };
 
-/**
- * 2. API JSON: Mengambil data log via AJAX Fetch (ketika user mengubah tanggal)
- * GET /daily-log/api/data
- */
 export const getDailyLogApi = async (req, res) => {
   try {
     const { tanggal } = req.query;
@@ -57,11 +49,6 @@ export const getDailyLogApi = async (req, res) => {
   }
 };
 
-/**
- * NEW!!
- * 3. POST API: Membuat aktivitas harian baru
- * POST /daily-log/api/data
- */
 export const createActivity = async (req, res) => {
   try {
     const userId = req.session.user?._id;
@@ -82,7 +69,7 @@ export const createActivity = async (req, res) => {
       tanggal,
       judul,
       kategori: kategori || "Core Task",
-      status: "Pending", // Default awal pengerjaan
+      status: "Pending", 
       penjelasanHasil: "",
       fileLampiran: "",
     });
@@ -100,10 +87,6 @@ export const createActivity = async (req, res) => {
   }
 };
 
-/**
- * 4. PUT: Memperbarui data/status aktivitas (Mendukung file upload & form expand)
- * PUT /daily-log/api/:id
- */
 export const updateActivity = async (req, res) => {
   try {
     const { id } = req.params;
@@ -149,10 +132,6 @@ export const updateActivity = async (req, res) => {
   }
 };
 
-/**
- * 5. POST: Menyalin Tugas Pending/In Progress dari Hari Kemarin (Carry Over)
- * POST /daily-log/api/carry-over
- */
 export const carryOverTasks = async (req, res) => {
   try {
     const userId = req.session.user?._id;

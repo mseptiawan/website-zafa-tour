@@ -3,20 +3,30 @@
   <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
     <div class="max-w-5xl mx-auto">
       <!-- Header Utama -->
-     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
   <div>
-    <h1 class="text-xl font-bold text-slate-800">Pusat Administrasi Cuti</h1>
-    <p class="text-xs text-slate-500 mt-0.5">Persetujuan permohonan staf, arsip riwayat, beserta konfigurasi hari libur nasional secara terpusat.</p>
+    <div class="mb-3 flex items-center gap-3">
+      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">Area Kerja</span>
+      <div class="h-3 w-px bg-slate-300"></div>
+      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">Kehadiran</span>
+    </div>
+    
+    <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">Pusat Administrasi Cuti</h1>
+    <p class="mt-1.5 text-sm font-medium text-slate-500 max-w-xl">
+      Persetujuan permohonan staf, arsip riwayat, beserta konfigurasi hari libur nasional secara terpusat.
+    </p>
   </div>
 
   <form action="/leave/manage-requests/generate-balances" method="POST" 
         onsubmit="return confirm('Apakah Anda yakin ingin melakukan generate/reset saldo seluruh karyawan pada tahun <%= selectedYear %>?');"
-        class="flex items-center gap-2 bg-amber-50 border border-amber-200/80 p-2 rounded-lg shadow-sm">
+        class="flex items-center gap-4 bg-amber-50/50 border border-amber-200/60 p-3 rounded-2xl shadow-sm">
     <input type="hidden" name="year" value="<%= selectedYear %>">
-    <div class="text-[10px] text-amber-800 max-w-[200px] leading-tight hidden xl:block font-medium">
-      Reset & sesuaikan jatah (12 hari) semua karyawan dengan Cuti Bersama.
+    
+    <div class="text-[11px] text-amber-900 leading-tight hidden xl:block font-semibold">
+      Reset & sesuaikan jatah (12 hari) <br/> untuk tahun <%= selectedYear %>
     </div>
-    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-1.5 px-3 rounded-md shadow-sm transition duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+    
+    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-[12px] py-3 px-5 rounded-xl shadow-lg shadow-amber-600/20 transition-all active:scale-[0.98] flex items-center gap-2 whitespace-nowrap cursor-pointer">
       <i class="fa-solid fa-rotate text-[10px]"></i> Sync Saldo <%= selectedYear %>
     </button>
   </form>

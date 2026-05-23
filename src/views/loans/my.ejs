@@ -1,214 +1,245 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-8 flex items-end justify-between">
+      <div>
+        <div class="mb-3 flex items-center gap-3">
+          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
+            Area Kerja
+          </span>
+          <div class="h-3 w-px bg-slate-300"></div>
+          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
+            Finance
+          </span>
+        </div>
 
-    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">Riwayat Pinjaman</h1>
+        <p class="mt-1.5 text-sm font-medium text-slate-500">
+          Pantau status pengajuan, limit, serta sisa cicilan pinjaman internal Anda.
+        </p>
+      </div>
 
-      <div class="flex items-start justify-between mb-8">
+      <a
+        href="/loans/new"
+        class="flex items-center gap-2 rounded-2xl bg-blue-500 px-6 py-3.5 text-[12px] font-bold text-white shadow-lg shadow-slate-900/10 transition hover:bg-blue-700 active:scale-[0.98]"
+      >
+        <i class="fa-solid fa-plus text-[10px]"></i>
+        Ajukan Loan Baru
+      </a>
+    </div>
+
+    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        class="flex items-start justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-xs"
+      >
         <div>
-          <h1 class="text-2xl font-semibold text-slate-800">
-            Riwayat Pinjaman (Loan)
-          </h1>
-          <p class="text-sm text-slate-500 mt-1">
-            Pantau status pengajuan, limit, serta sisa cicilan pinjaman internal Anda
-          </p>
+          <span class="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+            Limit Pinjaman
+          </span>
+          <span class="mt-1 block text-xl font-bold text-slate-800 tabular-nums">
+            Rp <%= summary.limit.toLocaleString('id-ID') %>
+          </span>
         </div>
-
-        <a href="/loans/new"
-          class="font-semibold bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-3 rounded-2xl transition shadow-sm shadow-blue-100/50 active:scale-[0.98]">
-          + Ajukan Loan Baru
-        </a>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Limit Pinjaman</span>
-            <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-              Rp <%= summary.limit.toLocaleString('id-ID') %>
-            </span>
-          </div>
-          <div class="text-slate-400 mt-0.5">
-            <i class="fa-solid fa-chart-pie text-xs"></i>
-          </div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Pinjaman Aktif</span>
-            <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-              Rp <%= summary.activeLoan.toLocaleString('id-ID') %>
-            </span>
-          </div>
-          <div class="text-slate-400 mt-0.5">
-            <i class="fa-solid fa-hand-holding-dollar text-xs"></i>
-          </div>
-        </div>
-
-        <div class="bg-amber-50/50 border border-amber-200/70 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-          <div>
-            <span class="text-[10px] font-bold text-amber-600 block uppercase tracking-wider">Cicilan Bulan Ini</span>
-            <span class="text-xl font-bold text-amber-700 mt-1 block tabular-nums">
-              Rp <%= summary.installmentThisMonth.toLocaleString('id-ID') %>
-            </span>
-          </div>
-          <div class="text-amber-500 mt-0.5">
-            <i class="fa-solid fa-calendar-minus text-xs"></i>
-          </div>
-        </div>
-
-        <div class="bg-slate-50 border border-slate-300 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-          <div>
-            <span class="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Sisa Hutang Pokok</span>
-            <span class="text-xl font-bold text-slate-900 mt-1 block tabular-nums">
-              Rp <%= summary.remainingDebt.toLocaleString('id-ID') %>
-            </span>
-          </div>
-          <div class="text-slate-500 mt-0.5">
-            <i class="fa-solid fa-wallet text-xs"></i>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm min-w-[1000px]">
-
-            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-              <tr>
-                <th class="text-left px-6 py-4">Tgl Pengajuan</th>
-                <th class="text-left px-6 py-4">Jumlah Pinjaman</th>
-                <th class="text-left px-6 py-4">Tenor</th>
-                <th class="text-left px-6 py-4">Cicilan / Bulan</th>
-                <th class="text-left px-6 py-4">Status Akhir</th>
-                <th class="text-right px-6 py-4">Aksi</th>
-              </tr>
-            </thead>
-
-            <tbody class="divide-y divide-slate-100">
-
-              <% if (loans.length === 0) { %>
-                <tr>
-                  <td colspan="6" class="text-center py-12 text-slate-400">
-                    Belum ada riwayat pengajuan pinjaman (loan)
-                  </td>
-                </tr>
-              <% } %>
-
-              <% loans.forEach(loan => { %>
-                <tr class="hover:bg-slate-50/50 transition">
-
-                  <td class="px-6 py-4 text-slate-600 font-medium whitespace-nowrap">
-                    <%= new Date(loan.createdAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>
-                  </td>
-
-                  <td class="px-6 py-4 font-semibold text-slate-800 tabular-nums">
-                    Rp <%= loan.amountRequested.toLocaleString('id-ID') %>
-                  </td>
-
-                  <td class="px-6 py-4 text-slate-600 font-medium">
-                    <%= loan.tenorMonths %> Bulan
-                  </td>
-
-                  <td class="px-6 py-4 font-semibold text-slate-700 tabular-nums">
-                    Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %> <span class="text-[10px] font-medium text-slate-400">/bln</span>
-                  </td>
-
-                  <td class="px-6 py-4 whitespace-nowrap align-middle">
-                    <% 
-                      const textStyles = { 
-                        'PENDING': 'text-amber-600', 
-                        'APPROVED': 'text-emerald-600', 
-                        'REJECTED': 'text-rose-600', 
-                        'CANCELLED': 'text-slate-500'
-                      };
-
-                      const dotStyles = { 
-                        'PENDING': 'bg-amber-500', 
-                        'APPROVED': 'bg-emerald-500', 
-                        'REJECTED': 'bg-rose-500', 
-                        'CANCELLED': 'bg-slate-400'
-                      };
-
-                      const bgStyles = { 
-                        'PENDING': 'bg-amber-50/70', 
-                        'APPROVED': 'bg-emerald-50/70', 
-                        'REJECTED': 'bg-rose-50/70', 
-                        'CANCELLED': 'bg-slate-50'
-                      };
-
-                      const borderStyles = { 
-                        'PENDING': 'border-amber-200/50', 
-                        'APPROVED': 'border-emerald-200/50', 
-                        'REJECTED': 'border-rose-200/50', 
-                        'CANCELLED': 'border-slate-200'
-                      };
-
-                      const statusLabels = { 
-                        'PENDING': 'Pending', 
-                        'APPROVED': 'Approved', 
-                        'REJECTED': 'Rejected', 
-                        'CANCELLED': 'Cancelled'
-                      }; 
-                    %>
-
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200
-                      <%= textStyles[loan.status] || 'text-slate-500' %> 
-                      <%= bgStyles[loan.status] || 'bg-slate-50' %> 
-                      <%= borderStyles[loan.status] || 'border-slate-200' %>">
-
-                      <span class="w-1.5 h-1.5 rounded-full <%= dotStyles[loan.status] || 'bg-slate-400' %> <%= loan.status === 'APPROVED' ? 'animate-pulse' : '' %>"></span>
-                      <span><%= statusLabels[loan.status] || loan.status %></span>
-                    </div>
-                  </td>
-
-                  <td class="px-6 py-4">
-                    <div class="flex items-center justify-end gap-2">
-
-                      <a href="/loans/detail/<%= loan._id %>" title="Lihat Detail & Cicilan"
-                        class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition active:scale-[0.95]">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                        </svg>
-                      </a>
-
-                      <% if (loan.status === 'PENDING') { %>
-                        <a href="/loans/edit/<%= loan._id %>" title="Edit Pengajuan"
-                          class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95]">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
-                          </svg>
-                        </a>
-
-                        <form id="form-cancel-loan-<%= loan._id %>" action="/loans/cancel/<%= loan._id %>" method="POST" class="inline">
-                          <button type="button"
-                            class="btn-confirm inline-flex items-center justify-center w-9 h-9 rounded-lg border border-rose-200 bg-rose-50/40 text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer active:scale-[0.95]"
-                            data-form-id="form-cancel-loan-<%= loan._id %>" 
-                            data-title="Tarik Pengajuan Loan?"
-                            data-text="Apakah kamu yakin ingin membatalkan permohonan pinjaman uang ini?"
-                            data-confirm-text="Ya, Tarik Pengajuan" data-cancel-text="Kembali" data-type="danger" title="Batalkan Pengajuan">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                          </button>
-                        </form>
-                      <% } %>
-
-                    </div>
-                  </td>
-
-                </tr>
-              <% }) %>
-
-            </tbody>
-          </table>
+        <div class="mt-0.5 text-slate-400">
+          <i class="fa-solid fa-chart-pie text-xs"></i>
         </div>
       </div>
 
+      <div
+        class="flex items-start justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-xs"
+      >
+        <div>
+          <span class="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+            Pinjaman Aktif
+          </span>
+          <span class="mt-1 block text-xl font-bold text-slate-800 tabular-nums">
+            Rp <%= summary.activeLoan.toLocaleString('id-ID') %>
+          </span>
+        </div>
+        <div class="mt-0.5 text-slate-400">
+          <i class="fa-solid fa-hand-holding-dollar text-xs"></i>
+        </div>
+      </div>
+
+      <div
+        class="flex items-start justify-between rounded-2xl border border-amber-200/70 bg-amber-50/50 p-4 shadow-xs"
+      >
+        <div>
+          <span class="block text-[10px] font-bold tracking-wider text-amber-600 uppercase">
+            Cicilan Bulan Ini
+          </span>
+          <span class="mt-1 block text-xl font-bold text-amber-700 tabular-nums">
+            Rp <%= summary.installmentThisMonth.toLocaleString('id-ID') %>
+          </span>
+        </div>
+        <div class="mt-0.5 text-amber-500">
+          <i class="fa-solid fa-calendar-minus text-xs"></i>
+        </div>
+      </div>
+
+      <div
+        class="flex items-start justify-between rounded-2xl border border-slate-300 bg-slate-50 p-4 shadow-xs"
+      >
+        <div>
+          <span class="block text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+            Sisa Hutang Pokok
+          </span>
+          <span class="mt-1 block text-xl font-bold text-slate-900 tabular-nums">
+            Rp <%= summary.remainingDebt.toLocaleString('id-ID') %>
+          </span>
+        </div>
+        <div class="mt-0.5 text-slate-500">
+          <i class="fa-solid fa-wallet text-xs"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[1000px] text-sm">
+          <thead
+            class="border-b border-slate-100 bg-slate-50 text-xs tracking-wider text-slate-500 uppercase"
+          >
+            <tr>
+              <th class="px-6 py-4 text-left">Tgl Pengajuan</th>
+              <th class="px-6 py-4 text-left">Jumlah Pinjaman</th>
+              <th class="px-6 py-4 text-left">Tenor</th>
+              <th class="px-6 py-4 text-left">Cicilan / Bulan</th>
+              <th class="px-6 py-4 text-left">Status Akhir</th>
+              <th class="px-6 py-4 text-right">Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-100">
+            <% if (loans.length === 0) { %>
+            <tr>
+              <td colspan="6" class="py-12 text-center text-slate-400">
+                Belum ada riwayat pengajuan pinjaman (loan)
+              </td>
+            </tr>
+            <% } %> <% loans.forEach(loan => { %>
+            <tr class="transition hover:bg-slate-50/50">
+              <td class="px-6 py-4 font-medium whitespace-nowrap text-slate-600">
+                <%= new Date(loan.createdAt).toLocaleDateString('id-ID', {day: '2-digit', month:
+                'long', year: 'numeric'}) %>
+              </td>
+
+              <td class="px-6 py-4 font-semibold text-slate-800 tabular-nums">
+                Rp <%= loan.amountRequested.toLocaleString('id-ID') %>
+              </td>
+
+              <td class="px-6 py-4 font-medium text-slate-600"><%= loan.tenorMonths %> Bulan</td>
+
+              <td class="px-6 py-4 font-semibold text-slate-700 tabular-nums">
+                Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %>
+                <span class="text-[10px] font-medium text-slate-400">/bln</span>
+              </td>
+
+              <td class="px-6 py-4 align-middle whitespace-nowrap">
+                <% const textStyles = { 'PENDING': 'text-amber-600', 'APPROVED': 'text-emerald-600',
+                'REJECTED': 'text-rose-600', 'CANCELLED': 'text-slate-500' }; const dotStyles = {
+                'PENDING': 'bg-amber-500', 'APPROVED': 'bg-emerald-500', 'REJECTED': 'bg-rose-500',
+                'CANCELLED': 'bg-slate-400' }; const bgStyles = { 'PENDING': 'bg-amber-50/70',
+                'APPROVED': 'bg-emerald-50/70', 'REJECTED': 'bg-rose-50/70', 'CANCELLED':
+                'bg-slate-50' }; const borderStyles = { 'PENDING': 'border-amber-200/50',
+                'APPROVED': 'border-emerald-200/50', 'REJECTED': 'border-rose-200/50', 'CANCELLED':
+                'border-slate-200' }; const statusLabels = { 'PENDING': 'Pending', 'APPROVED':
+                'Approved', 'REJECTED': 'Rejected', 'CANCELLED': 'Cancelled' }; %>
+
+                <div
+                  class="<%= textStyles[loan.status] || 'text-slate-500' %> <%= bgStyles[loan.status] || 'bg-slate-50' %> <%= borderStyles[loan.status] || 'border-slate-200' %> inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-wide transition-all duration-200"
+                >
+                  <span
+                    class="<%= dotStyles[loan.status] || 'bg-slate-400' %> <%= loan.status === 'APPROVED' ? 'animate-pulse' : '' %> h-1.5 w-1.5 rounded-full"
+                  ></span>
+                  <span><%= statusLabels[loan.status] || loan.status %></span>
+                </div>
+              </td>
+
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-end gap-2">
+                  <a
+                    href="/loans/detail/<%= loan._id %>"
+                    title="Lihat Detail & Cicilan"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 active:scale-[0.95]"
+                  >
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </a>
+
+                  <% if (loan.status === 'PENDING') { %>
+                  <a
+                    href="/loans/edit/<%= loan._id %>"
+                    title="Edit Pengajuan"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-amber-400 text-white transition hover:bg-amber-500 active:scale-[0.95]"
+                  >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z"
+                      />
+                    </svg>
+                  </a>
+
+                  <form
+                    id="form-cancel-loan-<%= loan._id %>"
+                    action="/loans/cancel/<%= loan._id %>"
+                    method="POST"
+                    class="inline"
+                  >
+                    <button
+                      type="button"
+                      class="btn-confirm inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-rose-200 bg-rose-50/40 text-rose-600 transition hover:bg-rose-50 hover:text-rose-700 active:scale-[0.95]"
+                      data-form-id="form-cancel-loan-<%= loan._id %>"
+                      data-title="Tarik Pengajuan Loan?"
+                      data-text="Apakah kamu yakin ingin membatalkan permohonan pinjaman uang ini?"
+                      data-confirm-text="Ya, Tarik Pengajuan"
+                      data-cancel-text="Kembali"
+                      data-type="danger"
+                      title="Batalkan Pengajuan"
+                    >
+                      <svg
+                        class="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                      </svg>
+                    </button>
+                  </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-
- 
+</div>

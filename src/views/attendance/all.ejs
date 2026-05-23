@@ -3,12 +3,26 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-5xl mx-auto">
     
-    <div class="flex items-start justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-semibold text-slate-800">Dashboard Kehadiran</h1>
-        <p class="text-sm text-slate-500 mt-1">Monitoring real-time kehadiran karyawan - <%= new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) %></p>
-      </div>
+ <div class="mb-10">
+  <div>
+    <div class="mb-3 flex items-center gap-3">
+      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
+        Area Kerja
+      </span>
+      <div class="h-3 w-px bg-slate-300"></div>
+      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
+        Kehadiran
+      </span>
     </div>
+
+    <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
+      Dashboard Kehadiran
+    </h1>
+    <p class="mt-1.5 text-sm font-medium text-slate-500">
+      Monitoring real-time kehadiran karyawan - <%= new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) %>
+    </p>
+  </div>
+</div>
 
     <div class="flex items-center gap-3 mb-6">
       <input type="text" id="searchInput" placeholder="Cari berdasarkan nama..." 

@@ -22,10 +22,20 @@ const create = async (req) => {
     attachment: req.file ? req.file.filename : null,
   });
 };
-
 const getAll = async ({ page, limit, skip }) => {
   const [data, total] = await Promise.all([
-    Announcement.find().populate("createdBy").sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Announcement.find()
+      .populate({
+        path: "createdBy",
+        select: "_id", 
+        populate: {
+          path: "employeeData",
+          select: "fullName" 
+        }
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
 
     Announcement.countDocuments(),
   ]);
@@ -36,7 +46,14 @@ const getAll = async ({ page, limit, skip }) => {
 };
 
 const getById = (id) => {
-  return Announcement.findById(id).populate("createdBy");
+  return Announcement.findById(id).populate({
+    path: "createdBy",
+    select: "_id",
+    populate: {
+      path: "employeeData",
+      select: "fullName"
+    }
+  });
 };
 
 const publish = (id) => {
