@@ -119,9 +119,16 @@ class LoanService {
     });
     if (!loan) throw new Error("Data pengajuan pinjaman tidak ditemukan");
 
-    const approvals = await LoanApproval.find({ loanId })
-      .populate("approverId")
-      .sort({ createdAt: 1 });
+   const approvals = await LoanApproval.find({ loanId })
+  .populate({
+    path: "approverId",
+    populate: {
+      path: "employeeData",
+      model: "Employee",
+      select: "fullName",
+    },
+  })
+  .sort({ createdAt: 1 });
     const payments = await LoanPayment.find({ loanId }).sort({ installmentNumber: 1 });
 
     return { loan, approvals, payments };
@@ -221,6 +228,83 @@ class LoanService {
 
     return { activeLoans, historyLoans };
   }
+
+  async processApproval(approvalId, sessionUser, note) {
+  const approval = await LoanApproval.findOne({ _id: approvalId, status: "PENDING" });
+  if (!approval) throw new Error("Antrean tidak ditemukan atau sudah diproses.");
+
+  const userRole = (sessionUser.role || "").toString().trim().toUpperCase();
+  if (approval.step !== userRole) {
+    throw new Error(`Anda tidak memiliki otoritas. Tahap saat ini: ${approval.step}`);
+  }
+
+  approval.status = "APPROVED";
+  approval.note = note || "";
+  approval.approverId = sessionUser._id;
+  approval.actionDate = new Date();
+  await approval.save();
+
+  const { nextStep, nextApproverId } = await this.getNextLoanApprover(approval.step);
+
+  if (nextStep) {
+    await LoanApproval.create({
+      loanId: approval.loanId,
+      step: nextStep,
+      approverId: nextApproverId,
+      status: "PENDING",
+    });
+  }
+  return true;
 }
+  async processDisbursement(approvalId, sessionUser, note, file) {
+  if (!file) throw new Error("Bukti transfer wajib diunggah.");
+
+  // 1. Cari antrean tugas keuangan yang masih PENDING
+  const approval = await LoanApproval.findOne({ _id: approvalId, step: "KEUANGAN", status: "PENDING" });
+  if (!approval) throw new Error("Antrean pencairan tidak ditemukan.");
+
+  // 2. Update status approval keuangan
+  approval.status = "APPROVED";
+  approval.note = note || "Dana telah ditransfer.";
+  approval.approverId = sessionUser._id;
+  approval.actionDate = new Date();
+  await approval.save();
+
+  // 3. Update Status Loan menjadi APPROVED (Berarti dana sudah di tangan karyawan)
+  const loan = await Loan.findById(approval.loanId);
+  if (!loan) throw new Error("Data pinjaman tidak ditemukan.");
+
+  loan.status = "APPROVED";
+  loan.disbursementDate = new Date();
+  loan.paymentProof = `/uploads/loans/${file.filename}`; // Simpan path file
+  await loan.save();
+
+  // 4. GENERATE CICILAN OTOMATIS
+  const paymentRecords = [];
+  const startMonth = new Date();
+  
+  for (let i = 1; i <= loan.tenorMonths; i++) {
+    // Generate periode bulan (format YYYY-MM)
+    const nextDate = new Date(startMonth.getFullYear(), startMonth.getMonth() + i, 1);
+    const periodMonth = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, "0")}`;
+
+    paymentRecords.push({
+      loanId: loan._id,
+      employeeId: loan.employeeId,
+      installmentNumber: i,
+      amount: loan.monthlyDeduction,
+      periodMonth: periodMonth,
+      isPaid: false,
+    });
+  }
+
+  await LoanPayment.insertMany(paymentRecords);
+  return true;
+}
+
+
+}
+
+
 
 export default new LoanService();

@@ -31,9 +31,8 @@ router.post("/cancel/:id", cancel);
 router.get("/manage-center", roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]), getManageLoanPage);
 
 router.post(
-  "/approval/:id/approve",
-  roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]),
-  uploadFile.single("paymentProof"),
+  "/approval/approve/:id",
+  roleMiddleware(["HR", "PIMPINAN"]),
   approveLoan
 );
 

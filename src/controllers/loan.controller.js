@@ -124,45 +124,28 @@ export const approveLoan = async (req, res) => {
   try {
     const { note } = req.body;
     const sessionUser = req.session.user;
-    if (!sessionUser)
-      return res.status(401).render("error", { title: "Error", message: "Sesi habis." });
-
-    const approval = await LoanApproval.findOne({ _id: req.params.id, status: "PENDING" });
-    if (!approval)
-      return res
-        .status(404)
-        .render("error", { title: "Error", message: "Antrean tidak ditemukan." });
-
-    approval.status = "APPROVED";
-    approval.note = note || "";
-    approval.actionDate = new Date();
-    await approval.save();
-
-    const loan = await Loan.findById(approval.loanId);
-
-    const { nextStep, nextApproverId } = await loanService.getNextLoanApprover(approval.step);
-
-    if (nextApproverId) {
-      await LoanApproval.create({
-        loanId: loan._id,
-        step: nextStep,
-        approverId: nextApproverId,
-        status: "PENDING",
+    
+    // Proteksi awal jika session rusak / hilang
+    if (!sessionUser) {
+      return res.status(401).render("error", { 
+        title: "Error", 
+        message: "Sesi Anda telah berakhir. Silakan login kembali." 
       });
-    } else {
-      if (approval.step === "KEUANGAN") {
-        loan.status = "APPROVED";
-        loan.disbursementDate = new Date();
-        if (req.file) {
-          loan.paymentProof = `/uploads/loans/${req.file.filename}`;
-        }
-        await loan.save();
-      }
     }
 
+    const { id } = req.params; // Ini adalah ID dari LoanApproval
+
+    // Eksekusi approval melalui Service
+    await loanService.processApproval(id, sessionUser, note, req.file);
+
+    // Jika sukses, kembalikan ke halaman manajemen center
     return res.redirect("/loans/manage-center");
   } catch (error) {
-    return res.status(500).render("error", { title: "Approve Loan Error", message: error.message });
+    // Tangani error validasi step atau error database
+    return res.status(400).render("error", { 
+      title: "Approve Loan Error", 
+      message: error.message 
+    });
   }
 };
 
