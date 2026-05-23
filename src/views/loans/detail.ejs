@@ -9,7 +9,7 @@
         });
         const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "KEUANGAN", "GENERAL_MANAGER"];
         const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
-        const backLink = isManagement ? '/loans/manage-requests' : '/loans/my';
+        const backLink = isManagement ? '/loans/manage-center' : '/loans/my';
       %>
 
       <a href="<%= backLink %>"
@@ -30,7 +30,7 @@
     <i class="fa-solid fa-user-tie text-base"></i>
         <div>
           <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-1"><%= (loan.employeeId) ? loan.employeeId.fullName : 'Detail Pengajuan Loan' %></h1>
-          <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Unit: <%= (loan.employeeId && loan.employeeId.unitId) ? loan.employeeId.unitId.name : 'Tidak Ada' %></p>
+          <p class="text-[11px] font-medium text-slate-500  tracking-wider">Unit: <%= (loan.employeeId && loan.employeeId.unitId) ? loan.employeeId.unitId.name : 'Tidak Ada' %></p>
         </div>
       </div>
       <span class="px-3 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= loan.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' : loan.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' %>">
@@ -138,8 +138,9 @@
    <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
     
     <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
-            <i class="fa-solid fa-check-double text-emerald-600"></i>
+        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+                       <i class="fa-solid fa-check-double text-blue-700"></i>
+
         </div>
         Evaluasi Pinjaman
     </h3>
@@ -151,21 +152,21 @@
         placeholder="Masukkan catatan evaluasi..."
     ></textarea>
 
-    <div class="flex gap-3">
+  <div class="flex items-center justify-end gap-3 mt-4 w-full">
 
-        <form action="/loans/approval/approve/<%= activeApproval._id %>" method="POST">
-            <button class="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-500 text-white text-sm font-medium shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition">
-                Terima
-            </button>
-        </form>
+    <form action="/loans/approval/reject/<%= activeApproval._id %>" method="POST">
+        <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition active:scale-[0.98] focus:outline-none">
+            Tolak
+        </button>
+    </form>
 
-        <form action="/loans/approval/reject/<%= activeApproval._id %>" method="POST">
-            <button class="px-6 py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
-                Tolak
-            </button>
-        </form>
+    <form action="/loans/approval/approve/<%= activeApproval._id %>" method="POST">
+        <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/10 transition active:scale-[0.98] focus:outline-none">
+            Terima
+        </button>
+    </form>
 
-    </div>
+</div>
 
 </div>
   <% } %>
