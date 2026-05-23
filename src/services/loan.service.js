@@ -1,6 +1,7 @@
 import Loan from "../models/loan/Loan.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import LoanApproval from "../models/loan/LoanApproval.model.js";
+import LoanPayment from "../models/loan/loanPayment.model.js";
 import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
 import User from "../models/basic/User.js";
 import Role from "../models/basic/Role.js";
@@ -78,7 +79,38 @@ class LoanService {
     const employee = await Employee.findOne({ userId });
     if (!employee) throw new Error("Data karyawan tidak ditemukan");
 
-    return await Loan.find({ employeeId: employee._id }).sort({ createdAt: -1 });
+    const employeeId = employee._id;
+
+    const salaryDoc = await EmployeeSalary.findOne({ employeeId });
+    const basicSalary = salaryDoc ? salaryDoc.basicSalary : 0;
+    const limit = basicSalary * 0.3;
+
+    const loans = await Loan.find({ employeeId }).sort({ createdAt: -1 });
+
+    const unpaidPayments = await LoanPayment.find({ employeeId, isPaid: false });
+
+    const activeLoanIds = [...new Set(unpaidPayments.map((p) => p.loanId.toString()))];
+
+    const activeLoansData = await Loan.find({ _id: { $in: activeLoanIds } });
+    const activeLoan = activeLoansData.reduce((sum, loan) => sum + loan.amountRequested, 0);
+
+    const remainingDebt = unpaidPayments.reduce((sum, payment) => sum + payment.amount, 0);
+
+    const now = new Date();
+    const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    const currentMonthPayment = unpaidPayments.find((p) => p.periodMonth === currentPeriod);
+    const installmentThisMonth = currentMonthPayment ? currentMonthPayment.amount : 0;
+
+    return {
+      loans,
+      summary: {
+        limit,
+        activeLoan,
+        installmentThisMonth,
+        remainingDebt,
+      },
+    };
   }
 
   async getLoanForEdit(loanId, userId) {
