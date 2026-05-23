@@ -14,6 +14,7 @@ import {
   getDetail,
   approveLoan,
   rejectLoan,
+  getFinanceCenterPage
 } from "../controllers/loan.controller.js";
 
 const router = express.Router();
@@ -37,5 +38,16 @@ router.post(
 );
 
 router.post("/approval/:id/reject", roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]), rejectLoan);
+
+
+router.get("/finance-center", roleMiddleware(["KEUANGAN"]), getFinanceCenterPage);
+
+// router.post(
+//   "/approval/disburse/:id",
+//   roleMiddleware(["KEUANGAN"]),
+//   uploadFile.single("paymentProof"),
+//   disburseLoan
+// );
+
 
 export default router;

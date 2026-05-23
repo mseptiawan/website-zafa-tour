@@ -1,238 +1,132 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
-    <div class="max-w-6xl mx-auto">
+<div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
+  <div class="max-w-6xl mx-auto">
 
-      <% 
-        const isApproverView = approvals.some(app => {
-          return app.status === 'PENDING' && (app.step || '').toUpperCase() === (user.role || '').toUpperCase();
-        });
-        const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "KEUANGAN", "GENERAL_MANAGER"];
-        const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
-        const backLink = isManagement ? '/loans/manage-center' : '/loans/my';
-      %>
+    <% 
+      const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "KEUANGAN", "GENERAL_MANAGER"];
+      const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
+      const backLink = isManagement ? '/loans/loan-management' : '/loans/my';
+    %>
 
-      <a href="<%= backLink %>"
-        class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
-        <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        Kembali
-      </a>
+    <a href="<%= backLink %>"
+      class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
+      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      Kembali
+    </a>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      
       <div class="lg:col-span-2 space-y-6">
-  
-  <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-    <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
-      <div class="flex items-center gap-4">
-    <i class="fa-solid fa-user-tie text-base"></i>
-        <div>
-          <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-1"><%= (loan.employeeId) ? loan.employeeId.fullName : 'Detail Pengajuan Loan' %></h1>
-          <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Unit: <%= (loan.employeeId && loan.employeeId.unitId) ? loan.employeeId.unitId.name : 'Tidak Ada' %></p>
-        </div>
-      </div>
-      <span class="px-3 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= loan.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' : loan.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' %>">
-        <%= loan.status %>
-      </span>
-    </div>
-
-    <div class="p-8 space-y-8">
-      <div class="grid grid-cols-2 gap-x-12 gap-y-6">
-        <div>
-          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Total Pinjaman</div>
-          <div class="text-[15px] font-semibold text-slate-900 tabular-nums">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></div>
-        </div>
-        <div>
-          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tenor Pinjaman</div>
-          <div class="text-[15px] font-semibold text-slate-900"><%= loan.tenorMonths %> Bulan</div>
-        </div>
-        <div>
-          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Potongan / Bulan</div>
-          <div class="text-[15px] font-semibold text-slate-900 tabular-nums">Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %></div>
-        </div>
-        <div>
-          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal Pencairan</div>
-          <div class="text-[15px] font-semibold text-slate-900"><%= loan.disbursementDate ? new Date(loan.disbursementDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %></div>
-        </div>
-      </div>
-
-      <div class="relative pl-5 border-l-2 border-slate-200">
-        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Alasan Peminjaman</div>
-        <p class="text-[13px] text-slate-600 leading-relaxed italic">"<%= loan.reason || '-' %>"</p>
-      </div>
-
-      <div class="pt-6 border-t border-slate-100">
-        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Bukti Pencairan Dana</div>
-        <% if (loan.paymentProof) { %>
-          <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400"><i class="fa-solid fa-file-image text-[12px]"></i></div>
-              <span class="text-[12px] font-medium text-slate-700">Bukti_Transfer_Pencairan.jpg</span>
+        <!-- DETAIL CARD -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
+            <div class="flex items-center gap-4">
+              <i class="fa-solid fa-user-tie text-base"></i>
+              <div>
+                <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-1"><%= (loan.employeeId) ? loan.employeeId.fullName : 'Detail Pengajuan Loan' %></h1>
+                <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Unit: <%= (loan.employeeId && loan.employeeId.unitId) ? loan.employeeId.unitId.name : 'Tidak Ada' %></p>
+              </div>
             </div>
-            <a href="<%= loan.paymentProof %>" target="_blank" class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">VIEW</a>
-          </div>
-        <% } else { %><div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200">
-
-    <div class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-4">
-        <i class="fa-solid fa-file-circle-xmark text-amber-500 text-xl"></i>
-    </div>
-
-    <h4 class="text-sm font-semibold text-slate-700 mb-1">
-        Bukti pencairan belum tersedia
-    </h4>
-
-    <p class="text-xs text-slate-500 text-center max-w-[220px] leading-relaxed">
-        Dokumen bukti pencairan dana akan muncul setelah proses pencairan selesai.
-    </p>
-
-</div>
-        <% } %>
-      </div>
-    </div>
-  </div>
-
-  <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-    <div class="px-8 py-6 border-b border-slate-100">
-      <h3 class="text-[11px] font-semibold text-slate-900 uppercase tracking-widest">Jadwal Breakdown Cicilan</h3>
-    </div>
-    <table class="w-full text-left">
-      <thead class="bg-slate-50/50 text-[10px] uppercase text-slate-400 font-semibold tracking-widest">
-        <tr>
-          <th class="px-8 py-4">Cicilan Ke</th>
-          <th class="px-8 py-4">Periode</th>
-          <th class="px-8 py-4">Nominal</th>
-          <th class="px-8 py-4 text-right">Status</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-50">
-        <% if (payments.length === 0) { %>
-          <tr><td colspan="4" class="text-center py-8 text-xs text-slate-400">Jadwal belum digenerate</td></tr>
-        <% } %>
-        <% payments.forEach(p => { %>
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-8 py-4 text-[12px] font-semibold text-slate-500">Ke-<%= p.installmentNumber %></td>
-            <td class="px-8 py-4 text-[12px] font-semibold text-slate-700">
-              <%= new Date(p.periodMonth.split('-')[0], p.periodMonth.split('-')[1]-1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) %>
-            </td>
-            <td class="px-8 py-4 text-[12px] font-semibold text-slate-900 tabular-nums">Rp <%= p.amount.toLocaleString('id-ID') %></td>
-            <td class="px-8 py-4 text-right">
-              <span class="text-[10px] font-semibold px-2 py-1 rounded-md <%= p.isPaid ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' %>">
-                <%= p.isPaid ? 'LUNAS' : 'BELUM' %>
-              </span>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
-  <% 
-  // Pastikan variabel ini tersedia
-  const activeApproval = approvals.find(app => {
-    return app.status === 'PENDING' && (app.step || '').toUpperCase() === (user.role || '').toUpperCase();
-  });
-%>
-
- <% if (activeApproval) { %>
-  <!-- Form disembunyikan, tidak merusak desain -->
-  <form id="reject-form" action="/loans/approval/reject/<%= activeApproval._id %>" method="POST">
-    <input type="hidden" name="note" id="hidden-note-reject">
-  </form>
-  
-  <form id="approve-form" action="/loans/approval/approve/<%= activeApproval._id %>" method="POST"></form>
-
-  <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
-    
-    <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-            <i class="fa-solid fa-check-double text-blue-700"></i>
-        </div>
-        Evaluasi Pinjaman
-    </h3>
-
-    <!-- Textarea ini sekarang terhubung ke 'approve-form' via atribut 'form' -->
-    <!-- 'oninput' akan menyalin teks ke input hidden form tolak secara otomatis -->
-    <textarea
-        name="note"
-        form="approve-form"
-        oninput="document.getElementById('hidden-note-reject').value = this.value"
-        rows="4"
-        class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-        placeholder="Masukkan catatan evaluasi..."
-    ></textarea>
-
-    <div class="flex items-center justify-end gap-3 mt-4 w-full">
-        <!-- Tombol menggunakan atribut 'form' untuk men-trigger form yang sesuai -->
-        <button type="submit" form="reject-form" class="cursor-pointer px-5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition active:scale-[0.98] focus:outline-none">
-            Tolak
-        </button>
-
-        <button type="submit" form="approve-form" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/10 transition active:scale-[0.98] focus:outline-none">
-            Terima
-        </button>
-    </div>
-  </div>
-<% } %>
-</div>
-
-       <div class="space-y-6">
-
-
-<div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
-  <!-- Header dengan Kalimat Jejak Log -->
-  <div class="mb-8">
-    <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h2>
-    <p class="text-[10px] text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
-  </div>
-
-  <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
-    <% approvals.forEach((app, index) => { %>
-      <div class="relative">
-        <!-- Bulatan Indikator -->
-        <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center
-          <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
-          <span class="text-[8px] text-white font-bold"><%= index + 1 %></span>
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <!-- Baris Atas: Step & Status -->
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase"><%= app.step %></span>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border
-              <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' 
-                : 'bg-amber-50 text-amber-700 border-amber-200' %>">
-              <%= app.status %>
+            <span class="px-3 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= loan.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' : loan.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' %>">
+              <%= loan.status %>
             </span>
           </div>
 
-          <!-- Info Pemeriksa & Tanggal -->
-          <div class="flex items-center gap-2 text-[10px] text-slate-500">
-            <span class="font-semibold text-slate-700">
-              <%= app.approverId ? (app.approverId.employeeData.fullName || app.approverId.username) : 'Sistem' %>
-            </span>
-            <span class="text-slate-300">|</span>
-            <span>
-              <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Menunggu' %>
-            </span>
-          </div>
-
-          <!-- Catatan -->
-          <% if (app.status !== 'PENDING' && app.note) { %>
-            <div class="mt-2 text-[10px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic">
-              "<%= app.note %>"
+          <div class="p-8 space-y-8">
+            <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Total Pinjaman</div>
+                <div class="text-[15px] font-semibold text-slate-900 tabular-nums">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></div>
+              </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tenor Pinjaman</div>
+                <div class="text-[15px] font-semibold text-slate-900"><%= loan.tenorMonths %> Bulan</div>
+              </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Potongan / Bulan</div>
+                <div class="text-[15px] font-semibold text-slate-900 tabular-nums">Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %></div>
+              </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal Pencairan</div>
+                <div class="text-[15px] font-semibold text-slate-900"><%= loan.disbursementDate ? new Date(loan.disbursementDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %></div>
+              </div>
             </div>
-          <% } %>
+
+            <div class="relative pl-5 border-l-2 border-slate-200">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Alasan Peminjaman</div>
+              <p class="text-[13px] text-slate-600 leading-relaxed italic">"<%= loan.reason || '-' %>"</p>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Bukti Pencairan Dana</div>
+              <% if (loan.paymentProof) { %>
+                <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400"><i class="fa-solid fa-file-image text-[12px]"></i></div>
+                    <span class="text-[12px] font-medium text-slate-700">Bukti_Transfer_Pencairan.jpg</span>
+                  </div>
+                  <a href="<%= loan.paymentProof %>" target="_blank" class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">VIEW</a>
+                </div>
+              <% } else { %>
+                <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200">
+                  <div class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-4"><i class="fa-solid fa-file-circle-xmark text-amber-500 text-xl"></i></div>
+                  <h4 class="text-sm font-semibold text-slate-700 mb-1">Bukti pencairan belum tersedia</h4>
+                  <p class="text-xs text-slate-500 text-center max-w-[220px] leading-relaxed">Dokumen akan muncul setelah proses pencairan selesai.</p>
+                </div>
+              <% } %>
+            </div>
+          </div>
         </div>
+
+        <!-- CICILAN TABLE -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div class="px-8 py-6 border-b border-slate-100">
+            <h3 class="text-[11px] font-semibold text-slate-900 uppercase tracking-widest">Jadwal Breakdown Cicilan</h3>
+          </div>
+          <table class="w-full text-left">
+            <thead class="bg-slate-50/50 text-[10px] uppercase text-slate-400 font-semibold tracking-widest">
+              <tr>
+                <th class="px-8 py-4">Cicilan Ke</th>
+                <th class="px-8 py-4">Periode</th>
+                <th class="px-8 py-4">Nominal</th>
+                <th class="px-8 py-4 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+              <% if (payments.length === 0) { %>
+                <tr><td colspan="4" class="text-center py-8 text-xs text-slate-400">Jadwal belum digenerate</td></tr>
+              <% } %>
+              <% payments.forEach(p => { %>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-8 py-4 text-[12px] font-semibold text-slate-500">Ke-<%= p.installmentNumber %></td>
+                  <td class="px-8 py-4 text-[12px] font-semibold text-slate-700">
+                    <%= new Date(p.periodMonth.split('-')[0], p.periodMonth.split('-')[1]-1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) %>
+                  </td>
+                  <td class="px-8 py-4 text-[12px] font-semibold text-slate-900 tabular-nums">Rp <%= p.amount.toLocaleString('id-ID') %></td>
+                  <td class="px-8 py-4 text-right">
+                    <span class="text-[10px] font-semibold px-2 py-1 rounded-md <%= p.isPaid ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' %>">
+                      <%= p.isPaid ? 'LUNAS' : 'BELUM' %>
+                    </span>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PANEL AKSI -->
+        <% const activeApproval = approvals.find(app => app.status === 'PENDING' && (app.step || '').toUpperCase() === (user.role || '').toUpperCase()); %>
+        <%- include('partials/_action-panel', { activeApproval, user }) %>
       </div>
-    <% }) %>
-  </div>
-</div>
 
-</div>
-
+      <!-- SIDEBAR LOG -->
+      <div class="space-y-6">
+        <%- include('partials/_log-history', { approvals }) %>
       </div>
 
     </div>
   </div>
+</div>

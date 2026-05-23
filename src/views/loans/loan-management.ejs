@@ -1,0 +1,48 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+  <div class="max-w-6xl mx-auto">
+    
+    <div class="mb-10">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">Area Kerja</span>
+        <div class="h-3 w-px bg-slate-300"></div>
+        <span class="text-[10px] font-semibold tracking-[0.2em] uppercase">Finance</span>
+      </div>
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Pusat Administrasi Pinjaman</h1>
+      <p class="mt-1.5 text-sm font-medium text-slate-500 max-w-xl">Kelola, tinjau, dan otorisasi seluruh permohonan pinjaman karyawan.</p>
+    </div>
+
+    <div class="flex items-center gap-2 mb-6 border-b border-slate-200/60">
+      <button type="button" onclick="switchTab('active')" id="tab-btn-active" class="tab-btn px-4 py-2.5 text-xs font-bold border-b-2 border-blue-600 text-blue-600 outline-none cursor-pointer">
+        Permintaan Aktif (<span id="count-active"><%= activeLoans.length %></span>)
+      </button>
+      <button type="button" onclick="switchTab('history')" id="tab-btn-history" class="tab-btn px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 outline-none cursor-pointer">
+        Riwayat Persetujuan (<span id="count-history"><%= historyLoans.length %></span>)
+      </button>
+    </div>
+
+    <div id="tab-content-active" class="tab-pane block">
+      <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
+        <%- include('partials/_loan-table', { loans: activeLoans, type: 'active' }) %>
+      </div>
+    </div>
+
+    <div id="tab-content-history" class="tab-pane hidden">
+      <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
+        <%- include('partials/_loan-table', { loans: historyLoans, type: 'history' }) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabName) {
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.replace("block", "hidden"));
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.className = "tab-btn cursor-pointer border-b-2 border-transparent px-4 py-2.5 text-xs font-medium text-slate-400 outline-none hover:text-slate-800";
+    });
+    document.getElementById(`tab-content-${tabName}`).classList.replace("hidden", "block");
+    document.getElementById(`tab-btn-${tabName}`).className = "tab-btn cursor-pointer border-b-2 border-blue-600 px-4 py-2.5 text-xs font-bold text-blue-600 outline-none";
+  }
+</script>

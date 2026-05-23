@@ -1,0 +1,54 @@
+<% if (activeApproval) { %>
+  <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
+    
+    <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl <%= user.role === 'KEUANGAN' ? 'bg-emerald-50' : 'bg-blue-50' %> flex items-center justify-center">
+            <i class="fa-solid <%= user.role === 'KEUANGAN' ? 'fa-money-bill-transfer text-emerald-700' : 'fa-check-double text-blue-700' %>"></i>
+        </div>
+        <%= user.role === 'KEUANGAN' ? 'Proses Pencairan Dana' : 'Evaluasi Pinjaman' %>
+    </h3>
+
+    <% if (user.role === 'KEUANGAN') { %>
+     <form action="/loans/approval/disburse/<%= activeApproval._id %>" method="POST" enctype="multipart/form-data">
+  
+  <div class="mb-5">
+    <label class="cursor-pointer flex items-center justify-center gap-2 w-full bg-white border border-slate-200 text-slate-600 text-[11px] font-bold py-2.5 rounded-xl hover:bg-slate-50 transition">
+      <i class="fa-solid fa-paperclip"></i> Pilih Bukti Transfer
+      <input type="file" name="paymentProof" required class="hidden" onchange="this.nextElementSibling.textContent = this.files[0].name">
+    </label>
+    <span class="text-[10px] text-slate-400 mt-1 block text-center">Belum ada file dipilih</span>
+  </div>
+
+  <div class="flex justify-end">
+    <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition active:scale-[0.98]">
+      Mark as Paid
+    </button>
+  </div>
+</form>
+    <% } else { %>
+      <form id="reject-form" action="/loans/approval/reject/<%= activeApproval._id %>" method="POST">
+        <input type="hidden" name="note" id="hidden-note-reject">
+      </form>
+      
+      <form id="approve-form" action="/loans/approval/approve/<%= activeApproval._id %>" method="POST"></form>
+
+      <textarea
+          name="note"
+          form="approve-form"
+          oninput="document.getElementById('hidden-note-reject').value = this.value"
+          rows="4"
+          class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+          placeholder="Masukkan catatan evaluasi..."
+      ></textarea>
+
+      <div class="flex items-center justify-end gap-3 w-full">
+          <button type="submit" form="reject-form" class="cursor-pointer px-5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition active:scale-[0.98]">
+              Tolak
+          </button>
+          <button type="submit" form="approve-form" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition active:scale-[0.98]">
+              Terima
+          </button>
+      </div>
+    <% } %>
+  </div>
+<% } %>

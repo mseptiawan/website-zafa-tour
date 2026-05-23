@@ -259,32 +259,27 @@ class LoanService {
   async processDisbursement(approvalId, sessionUser, note, file) {
   if (!file) throw new Error("Bukti transfer wajib diunggah.");
 
-  // 1. Cari antrean tugas keuangan yang masih PENDING
   const approval = await LoanApproval.findOne({ _id: approvalId, step: "KEUANGAN", status: "PENDING" });
   if (!approval) throw new Error("Antrean pencairan tidak ditemukan.");
 
-  // 2. Update status approval keuangan
   approval.status = "APPROVED";
   approval.note = note || "Dana telah ditransfer.";
   approval.approverId = sessionUser._id;
   approval.actionDate = new Date();
   await approval.save();
 
-  // 3. Update Status Loan menjadi APPROVED (Berarti dana sudah di tangan karyawan)
   const loan = await Loan.findById(approval.loanId);
   if (!loan) throw new Error("Data pinjaman tidak ditemukan.");
 
   loan.status = "APPROVED";
   loan.disbursementDate = new Date();
-  loan.paymentProof = `/uploads/loans/${file.filename}`; // Simpan path file
+  loan.paymentProof = `/uploads/files/${file.filename}`; 
   await loan.save();
 
-  // 4. GENERATE CICILAN OTOMATIS
   const paymentRecords = [];
   const startMonth = new Date();
   
   for (let i = 1; i <= loan.tenorMonths; i++) {
-    // Generate periode bulan (format YYYY-MM)
     const nextDate = new Date(startMonth.getFullYear(), startMonth.getMonth() + i, 1);
     const periodMonth = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, "0")}`;
 

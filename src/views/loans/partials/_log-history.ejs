@@ -1,0 +1,30 @@
+<div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
+  <div class="mb-8">
+    <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h2>
+    <p class="text-[10px] text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
+  </div>
+  <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
+    <% approvals.forEach((app, index) => { %>
+      <div class="relative">
+        <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center
+          <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
+          <span class="text-[8px] text-white font-bold"><%= index + 1 %></span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase"><%= app.step %></span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200' %>"><%= app.status %></span>
+          </div>
+          <div class="flex items-center gap-2 text-[10px] text-slate-500">
+            <span class="font-semibold text-slate-700"><%= app.approverId?.employeeData?.fullName || 'Sistem' %></span>
+            <span class="text-slate-300">|</span>
+            <span><%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Menunggu' %></span>
+          </div>
+          <% if (app.status !== 'PENDING' && app.note) { %>
+            <div class="mt-2 text-[10px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic">"<%= app.note %>"</div>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
