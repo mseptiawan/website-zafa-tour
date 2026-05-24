@@ -1,13 +1,20 @@
 import express from "express";
-import { renderManagePage, getAllComponents } from "../controllers/salaryComponent.controller.js";
-import authMiddleware  from "../middlewares/authMiddleware.js"; 
+import {
+  renderManagePage,
+  createComponent,
+  updateComponent,
+  archiveComponent,
+} from "../controllers/salaryComponent.controller.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/manage", renderManagePage);
+router.post("/", createComponent);
 
-router.get("/api/data", getAllComponents);
+router.put("/:id", updateComponent);
+
+router.patch("/:id", archiveComponent);
 
 export default router;
