@@ -1,0 +1,144 @@
+import mongoose from "mongoose";
+import SalaryComponent from "../../models/payroll/SalaryComponent.model.js"; 
+
+const salaryComponents = [
+  {
+    code: "GAPOK",
+    name: "Gaji Pokok",
+    type: "FIXED",
+    category: "EARNING",
+    calculationType: "FIXED_AMOUNT",
+    defaultAmount: 0, 
+    basedOnComponent: null,
+    isLocked: true,
+    isActive: true,
+    description: "Gaji dasar bulanan karyawan sesuai dengan kontrak kerja."
+  },
+  {
+    code: "TJ_KONSUMSI",
+    name: "Tunjangan Konsumsi (Kehadiran)",
+    type: "FLEXIBLE", 
+    category: "EARNING",
+    calculationType: "FIXED_AMOUNT", 
+    defaultAmount: 25000, 
+    basedOnComponent: "TOTAL_HADIR", 
+    isLocked: false,
+    isActive: true,
+    description: "Uang makan harian yang diberikan berdasarkan jumlah kehadiran fisik."
+  },
+  {
+    code: "TJ_LEMBUR",
+    name: "Tunjangan Lembur per Jam",
+    type: "FLEXIBLE", 
+    category: "EARNING",
+    calculationType: "FIXED_AMOUNT",
+    defaultAmount: 20000, 
+    basedOnComponent: "TOTAL_JAM_LEMBUR", 
+    isLocked: false,
+    isActive: true,
+    description: "Upah lembur per jam di luar jam kerja normal sesuai UU Ketenagakerjaan."
+  },
+  {
+    code: "INS_KEROHANIAN",
+    name: "Insentif Kerohanian (THR)",
+    type: "FLEXIBLE",
+    category: "EARNING",
+    calculationType: "FIXED_AMOUNT",
+    defaultAmount: 0, 
+    basedOnComponent: null,
+    isLocked: false,
+    isActive: true,
+    description: "Tunjangan Hari Raya yang dibayarkan satu kali dalam setahun."
+  },
+  {
+    code: "TJ_KELUARGA",
+    name: "Tunjangan Keluarga",
+    type: "FIXED",
+    category: "EARNING",
+    calculationType: "PERCENTAGE",
+    defaultAmount: 5, 
+    basedOnComponent: "GAPOK", 
+    isLocked: false,
+    isActive: true,
+    description: "Tunjangan tambahan untuk karyawan yang memiliki tanggungan keluarga."
+  },
+  {
+    code: "TJ_KOMUNIKASI",
+    name: "Tunjangan Komunikasi",
+    type: "FIXED",
+    category: "EARNING",
+    calculationType: "FIXED_AMOUNT",
+    defaultAmount: 150000, 
+    basedOnComponent: null,
+    isLocked: false,
+    isActive: true,
+    description: "Tunjangan operasional untuk pulsa dan paket data komunikasi."
+  },
+  {
+    code: "BONUS",
+    name: "Bonus Performa / Insentif",
+    type: "FLEXIBLE",
+    category: "EARNING",
+    calculationType: "FIXED_AMOUNT",
+    defaultAmount: 0, 
+    basedOnComponent: null,
+    isLocked: false,
+    isActive: true,
+    description: "Bonus yang diberikan berdasarkan pencapaian target kinerja bulanan."
+  },
+  {
+    code: "POT_BPJS",
+    name: "Potongan BPJS Ketenagakerjaan & Kesehatan",
+    type: "FIXED",
+    category: "DEDUCTION", 
+    calculationType: "PERCENTAGE",
+    defaultAmount: 3, 
+    basedOnComponent: "GAPOK", 
+    isLocked: false,
+    isActive: true,
+    description: "Potongan iuran wajib BPJS karyawan sesuai regulasi pemerintah."
+  },
+  {
+    code: "POT_PPH21",
+    name: "Potongan Pajak PPh 21",
+    type: "FLEXIBLE", 
+    category: "DEDUCTION",
+    calculationType: "PERCENTAGE",
+    defaultAmount: 5, 
+    basedOnComponent: "GAPOK", 
+    isLocked: false,
+    isActive: true,
+    description: "Potongan pajak penghasilan karyawan sesuai tarif progresif PPh 21."
+  },
+  {
+    code: "POT_LOAN",
+    name: "Potongan Cicilan Pinjaman",
+    type: "FLEXIBLE",
+    category: "DEDUCTION",
+    calculationType: "FIXED_AMOUNT",
+    defaultAmount: 0, 
+    basedOnComponent: null,
+    isLocked: true,
+    isActive: true,
+    description: "Potongan otomatis untuk pelunasan cicilan pinjaman karyawan."
+  }
+];
+
+const seedSalaryComponents = async () => {
+  try {
+    await mongoose.connect("mongodb://localhost:27017/hris_zafa_tour"); 
+
+    await SalaryComponent.deleteMany({});
+    console.log("Data komponen lama berhasil dibersihkan.");
+
+    await SalaryComponent.insertMany(salaryComponents);
+    console.log("Seeder Berhasil! 10 Komponen Gaji utama telah ditambahkan.");
+    
+    process.exit();
+  } catch (error) {
+    console.error("Seeder Gagal:", error);
+    process.exit(1);
+  }
+};
+
+seedSalaryComponents();

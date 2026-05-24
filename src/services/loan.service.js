@@ -36,44 +36,45 @@ class LoanService {
     return employee.toObject();
   }
 
-  async createLoan(employeeId, loanData) {
-    if (!employeeId)
-      throw new Error("Data karyawan tidak ditemukan atau Anda tidak terdaftar sebagai karyawan");
+ async createLoan(employeeId, loanData, userRole = "") {
+  if (!employeeId)
+    throw new Error("Data karyawan tidak ditemukan atau Anda tidak terdaftar sebagai karyawan");
 
-    const salary = await EmployeeSalary.findOne({ employeeId: employeeId });
-    const basicSalary = salary ? salary.basicSalary : 0;
+  const salary = await EmployeeSalary.findOne({ employeeId: employeeId });
+  const basicSalary = salary ? salary.basicSalary : 0;
 
-    const { amountRequested, tenorMonths, reason } = loanData;
-    const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
+  const { amountRequested, tenorMonths, reason } = loanData;
+  const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
+  const maxDeduction = basicSalary * 0.3;
 
-    const maxDeduction = basicSalary * 0.3;
-
-    if (monthlyDeduction > maxDeduction) {
-      throw new Error(
-        `Pengajuan ditolak. Cicilan bulanan (Rp ${monthlyDeduction.toLocaleString()}) melebihi batas maksimal 30% dari gaji pokok Anda (Maksimal Rp ${maxDeduction.toLocaleString()}/bulan).`
-      );
-    }
-
-    const newLoan = await Loan.create({
-      employeeId: employeeId,
-      amountRequested,
-      tenorMonths,
-      monthlyDeduction,
-      reason,
-      status: "PENDING",
-    });
-
-    const { nextStep, nextApproverId } = await this.getNextLoanApprover(null);
-
-    await LoanApproval.create({
-      loanId: newLoan._id,
-      step: nextStep,
-      approverId: nextApproverId,
-      status: "PENDING",
-    });
-
-    return newLoan;
+  if (monthlyDeduction > maxDeduction) {
+    throw new Error(
+      `Pengajuan ditolak. Cicilan bulanan (Rp ${monthlyDeduction.toLocaleString()}) melebihi batas maksimal 30% dari gaji pokok Anda (Maksimal Rp ${maxDeduction.toLocaleString()}/bulan).`
+    );
   }
+
+  const newLoan = await Loan.create({
+    employeeId: employeeId,
+    amountRequested,
+    tenorMonths,
+    monthlyDeduction,
+    reason,
+    status: "PENDING",
+  });
+
+  const initialStep = userRole === "HR" ? "HR" : null;
+
+  const { nextStep, nextApproverId } = await this.getNextLoanApprover(initialStep);
+
+  await LoanApproval.create({
+    loanId: newLoan._id,
+    step: nextStep,
+    approverId: nextApproverId,
+    status: "PENDING",
+  });
+
+  return newLoan;
+}
 
   async getEmployeeLoanHistory(userId) {
     const employee = await Employee.findOne({ userId });
@@ -256,6 +257,25 @@ class LoanService {
   }
   return true;
 }
+  async processReject(approvalId, sessionUser, note) {
+    const approval = await LoanApproval.findOne({ _id: approvalId, status: "PENDING" });
+    if (!approval) throw new Error("Antrean tidak ditemukan atau sudah diproses.");
+
+    const userRole = (sessionUser.role || "").toString().trim().toUpperCase();
+    if (approval.step !== userRole) {
+      throw new Error(`Anda tidak memiliki otoritas. Tahap saat ini: ${approval.step}`);
+    }
+
+    approval.status = "REJECTED";
+    approval.note = note || "Ditolak oleh sistem";
+    approval.approverId = sessionUser._id;
+    approval.actionDate = new Date();
+    await approval.save();
+
+    await Loan.findByIdAndUpdate(approval.loanId, { status: "REJECTED" });
+
+    return true;
+  }
   async processDisbursement(approvalId, sessionUser, note, file) {
   if (!file) throw new Error("Bukti transfer wajib diunggah.");
 

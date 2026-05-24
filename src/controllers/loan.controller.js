@@ -19,8 +19,9 @@ export const newForm = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const employeeId = req.session.user?.employeeId;
+    const userRole = (req.session.user?.role || "").toString().trim().toUpperCase(); // Ambil role (HR/KARYAWAN/dll)
 
-    await loanService.createLoan(employeeId, req.body);
+    await loanService.createLoan(employeeId, req.body, userRole);
 
     res.redirect("/loans/my");
   } catch (error) {
@@ -125,7 +126,6 @@ export const approveLoan = async (req, res) => {
     const { note } = req.body;
     const sessionUser = req.session.user;
     
-    // Proteksi awal jika session rusak / hilang
     if (!sessionUser) {
       return res.status(401).render("error", { 
         title: "Error", 
@@ -133,15 +133,12 @@ export const approveLoan = async (req, res) => {
       });
     }
 
-    const { id } = req.params; // Ini adalah ID dari LoanApproval
+    const { id } = req.params; 
 
-    // Eksekusi approval melalui Service
     await loanService.processApproval(id, sessionUser, note, req.file);
 
-    // Jika sukses, kembalikan ke halaman manajemen center
     return res.redirect("/loans/manage-center");
   } catch (error) {
-    // Tangani error validasi step atau error database
     return res.status(400).render("error", { 
       title: "Approve Loan Error", 
       message: error.message 
@@ -149,35 +146,36 @@ export const approveLoan = async (req, res) => {
   }
 };
 
-export const rejectLoan = async (req, res) => {
+export const rejectLoan = async (req, res, next) => {
   try {
     const { note } = req.body;
     const sessionUser = req.session.user;
-    if (!sessionUser)
-      return res.status(401).render("error", { title: "Error", message: "Sesi habis." });
 
-    const approval = await LoanApproval.findOne({ _id: req.params.id, status: "PENDING" });
-    if (!approval)
-      return res.status(404).render("error", { title: "Error", message: "Data tidak ditemukan." });
+    if (!sessionUser) {
+      return res.status(401).render("error", { 
+        title: "Error", 
+        message: "Sesi Anda telah berakhir." 
+      });
+    }
 
-    approval.status = "REJECTED";
-    approval.note = note || "";
-    approval.actionDate = new Date();
-    await approval.save();
+    const { id } = req.params; 
 
-    await Loan.findByIdAndUpdate(approval.loanId, { status: "REJECTED" });
+    await loanService.processReject(id, sessionUser, note);
 
-    return res.redirect("/loans/loan-management");
+    return res.redirect("/loans/manage-center");
   } catch (error) {
-    return res.status(500).render("error", { title: "Reject Loan Error", message: error.message });
+    return res.status(400).render("error", { 
+      title: "Reject Loan Error", 
+      message: error.message 
+    });
   }
-}
+};
 export const getFinanceCenterPage = async (req, res, next) => {
   try {
     const sessionUser = req.session.user;
     const data = await loanService.getLoanManagementData(sessionUser);
 
-    res.render("loans/finance-center", { 
+    res.render("loans/loan-management", { 
       title: "Pusat Pencairan Dana",
       activeLoans: data.activeLoans, 
       historyLoans: data.historyLoans
@@ -196,7 +194,7 @@ export const getFinanceCenterPage = async (req, res, next) => {
 
     await loanService.processDisbursement(id, sessionUser, note, req.file);
 
-    return res.redirect("/loans/loan-management");
+    return res.redirect("/loans/disbursement");
   } catch (error) {
     return res.status(400).render("error", { 
       title: "Disbursement Error", 

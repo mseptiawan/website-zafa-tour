@@ -1,0 +1,379 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
+  <div class="mx-auto max-w-6xl space-y-6">
+    
+    <div class="flex items-end justify-between mb-10">
+      <div>
+        <div class="mb-3 flex items-center gap-3">
+          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
+            Area Kerja
+          </span>
+          <div class="h-3 w-px bg-slate-300"></div>
+          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
+            Finance
+          </span>
+        </div>
+        <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">Master Komponen Gaji</h1>
+        <p class="mt-1.5 text-sm font-medium text-slate-500">
+          Kelola parameter pendapatan dan potongan payroll karyawan secara terpusat.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.01)] border border-slate-200">
+      <div>
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Komponen Aktif</p>
+        <h3 class="text-xl font-bold text-slate-800 mt-1 block tabular-nums" id="total-komponen">0</h3>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openDocModal()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[12px] font-bold px-4 py-3 rounded-xl transition cursor-pointer">
+          <i class="fa-solid fa-file-invoice text-[11px] text-slate-500"></i>
+          <span>Buat Dokumen</span>
+        </button>
+        <button onclick="openModal('add')" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold px-5 py-3 rounded-xl transition shadow-lg shadow-blue-600/10 active:scale-[0.98]">
+          <i class="fa-solid fa-plus text-[10px]"></i>
+          <span>Tambah Komponen</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[1000px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="text-left px-6 py-4">Kode & Nama Komponen</th>
+              <th class="text-left px-6 py-4">Kategori</th>
+              <th class="text-left px-6 py-4">Sifat / Tipe</th>
+              <th class="text-right px-6 py-4">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="component-table-body" class="divide-y divide-slate-100">
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="component-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition-all">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 transform transition-all">
+    <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <h3 id="modal-title" class="text-[14px] font-bold text-slate-900">Tambah Komponen Gaji</h3>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    
+    <form id="component-form" onsubmit="saveComponent(event)">
+      <input type="hidden" id="form-id">
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Kode Komponen</label>
+          <input type="text" id="form-code" required placeholder="Contoh: GAPOK, TJ-TRAN" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-800 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all disabled:opacity-50">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Nama Komponen</label>
+          <input type="text" id="form-name" required placeholder="Contoh: Gaji Pokok" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Kategori</label>
+          <select id="form-category" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+            <option value="Pendapatan">Pendapatan (Penerimaan)</option>
+            <option value="Potongan">Potongan (Pengurangan)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Sifat</label>
+          <select id="form-type" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+            <option value="Tetap">Tetap (Tiap Bulan Sama)</option>
+            <option value="Tidak Tetap">Tidak Tetap (Variabel/Input Manual)</option>
+          </select>
+        </div>
+      <!-- Tipe Kalkulasi -->
+<div>
+  <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Tipe Kalkulasi</label>
+  <select id="form-calc-type" onchange="updatePlaceholder()"
+    class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+    <option value="FIXED">Nominal Tetap (Rp)</option>
+    <option value="PERCENT">Persentase (%)</option>
+  </select>
+</div>
+
+<!-- Nilai Dinamis -->
+<div>
+  <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1" id="label-value">Nilai Nominal</label>
+  <div class="relative">
+    <input type="number" id="form-amount" required placeholder="0" 
+           class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all pr-8">
+    <span id="unit-symbol" class="absolute right-3 top-2.5 text-[12px] text-slate-400 font-bold">Rp</span>
+  </div>
+</div>
+      </div>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
+        <button type="button" onclick="closeModal()" class="px-3.5 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-600 hover:bg-slate-50 text-[12px] font-medium transition-all cursor-pointer">Batal</button>
+        <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[12px] font-semibold transition-all shadow-sm cursor-pointer">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="doc-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition-all">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 transform transition-all">
+    <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <h3 class="text-[14px] font-bold text-slate-900">Buat Dokumen Komponen Gaji</h3>
+      <button onclick="closeDocModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    
+    <form id="doc-form" onsubmit="generateDocument(event)">
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Judul / Nama Dokumen</label>
+          <input type="text" required placeholder="Contoh: SK Komponen Gaji 2026" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Format Dokumen</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="border border-slate-200 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-all">
+              <input type="radio" name="doc-format" value="pdf" checked class="text-blue-600 focus:ring-blue-500/20">
+              <span class="text-[12px] font-medium text-slate-700"><i class="fa-solid fa-file-pdf text-rose-500 mr-1"></i> PDF File</span>
+            </label>
+            <label class="border border-slate-200 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-all">
+              <input type="radio" name="doc-format" value="xlsx" class="text-blue-600 focus:ring-blue-500/20">
+              <span class="text-[12px] font-medium text-slate-700"><i class="fa-solid fa-file-excel text-emerald-600 mr-1"></i> Excel Spreadsheet</span>
+            </label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catatan Tambahan</label>
+          <textarea rows="3" placeholder="Tambahkan keterangan regulasi atau memo internal jika diperlukan..." class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all resize-none"></textarea>
+        </div>
+      </div>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
+        <button type="button" onclick="closeDocModal()" class="px-3.5 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-600 hover:bg-slate-50 text-[12px] font-medium transition-all cursor-pointer">Batal</button>
+        <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[12px] font-semibold transition-all shadow-sm cursor-pointer">Generate</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+  let components = <%- JSON.stringify(components || []) %>;
+
+  const tableBody = document.getElementById("component-table-body");
+  const totalCounter = document.getElementById("total-komponen");
+  const compModal = document.getElementById("component-modal");
+  const docModal = document.getElementById("doc-modal");
+
+  // Helper Functions
+  function normalizeCategory(category) {
+    return category === "EARNING" ? "Pendapatan" : "Potongan";
+  }
+
+  function normalizeType(type) {
+    return type === "FIXED" ? "Tetap" : "Tidak Tetap";
+  }
+
+  // Render Table
+  function renderTable() {
+    tableBody.innerHTML = "";
+
+    if (!components.length) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-center py-12 text-slate-400">
+            Belum ada data komponen gaji
+          </td>
+        </tr>`;
+      totalCounter.textContent = "0";
+      return;
+    }
+
+    components.forEach((comp) => {
+        const rowOpacity = comp.isActive ? "" : "opacity-60 bg-slate-50";
+    const statusLabel = comp.isActive ? "" : '<span class="text-[9px] font-bold text-slate-400 uppercase ml-2">(Diarsipkan)</span>';
+      const category = normalizeCategory(comp.category);
+      const type = normalizeType(comp.type);
+const displayValue = comp.calcType === 'PERCENT' 
+        ? `${comp.value}%` 
+        : `Rp ${Number(comp.value).toLocaleString('id-ID')}`;
+      const isEarning = category === "Pendapatan";
+      const textClass = isEarning ? "text-emerald-600" : "text-rose-600";
+      const bgClass = isEarning ? "bg-emerald-50/70" : "bg-rose-50/70";
+      const borderClass = isEarning ? "border-emerald-200/50" : "border-rose-200/50";
+      const dotClass = isEarning ? "bg-emerald-500" : "bg-rose-500";
+
+      const tr = document.createElement("tr");
+      tr.className = `hover:bg-slate-50/50 transition ${rowOpacity}`;
+   tr.innerHTML = `
+        <td class="px-6 py-4">
+          <span class="font-semibold text-slate-800 block">${comp.name} ${statusLabel}</span>
+          <span class="text-[10px] font-mono bg-slate-50 border border-slate-200/60 text-slate-500 px-1.5 py-0.5 rounded inline-block mt-1">
+            ${comp.code}
+          </span>
+        </td>
+        <td class="px-6 py-4">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide ${textClass} ${bgClass} ${borderClass}">
+            <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
+            <span>${category}</span>
+          </div>
+        </td>
+      <td class="px-6 py-4">
+          <div class="text-slate-700 font-semibold text-xs">${type}</div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="flex items-center justify-end gap-2">
+            ${comp.isActive ? `
+              <!-- Tombol Edit -->
+              <button onclick="openModal('edit', '${comp._id}')" 
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95] cursor-pointer shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
+                </svg>
+              </button>
+              <!-- Tombol Arsip (Delete) -->
+              <button onclick="deleteComponent('${comp._id}')" 
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition active:scale-[0.95] cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+              </button>
+            ` : `
+              <!-- Tombol Aktifkan Kembali (Restore) -->
+              <button onclick="restoreComponent('${comp._id}')" 
+                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 text-[11px] font-bold transition active:scale-[0.95] cursor-pointer">
+                <i class="fa-solid fa-rotate-left mr-1.5 text-[10px]"></i> Aktifkan
+              </button>
+            `}
+          </div>
+        </td>`;
+      tableBody.appendChild(tr);
+    });
+
+    totalCounter.textContent = components.length;
+  }
+
+  // Modal Management
+  function openModal(mode, id = null) {
+    compModal.classList.remove("hidden");
+    compModal.classList.add("flex");
+
+    if (mode === "edit") {
+      document.getElementById("modal-title").textContent = "Edit Komponen Gaji";
+      const comp = components.find((c) => c._id === id);
+      
+      document.getElementById("form-id").value = comp._id;
+      document.getElementById("form-code").value = comp.code;
+      document.getElementById("form-code").disabled = true;
+      document.getElementById("form-name").value = comp.name;
+      document.getElementById("form-category").value = normalizeCategory(comp.category);
+      document.getElementById("form-type").value = normalizeType(comp.type);
+      document.getElementById("form-amount").value = comp.defaultAmount;
+    } else {
+      document.getElementById("modal-title").textContent = "Tambah Komponen Gaji";
+      document.getElementById("component-form").reset();
+      document.getElementById("form-id").value = "";
+      document.getElementById("form-code").disabled = false;
+    }
+  }
+
+  function closeModal() {
+    compModal.classList.add("hidden");
+    compModal.classList.remove("flex");
+  }
+
+  // API Interactions
+  async function saveComponent(e) {
+    e.preventDefault();
+    const id = document.getElementById("form-id").value;
+    const payload = {
+      code: document.getElementById("form-code").value.toUpperCase(),
+      name: document.getElementById("form-name").value,
+      category: document.getElementById("form-category").value === "Pendapatan" ? "EARNING" : "DEDUCTION",
+      type: document.getElementById("form-type").value === "Tetap" ? "FIXED" : "FLEXIBLE",
+      calculationType: document.getElementById("form-calc-type").value,
+      defaultAmount: parseFloat(document.getElementById("form-amount").value) || 0
+    };
+
+    try {
+      const url = id ? `/api/components/${id}` : "/api/components";
+      const method = id ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message);
+      location.reload();
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  async function deleteComponent(id) {
+  if (!confirm("Apakah Anda yakin ingin mengarsipkan komponen ini?")) return;
+
+  try {
+    const response = await fetch(`/api/components/${id}`, { 
+      method: "PATCH" 
+    });
+    
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+    
+    location.reload(); 
+  } catch (error) {
+    alert(error.message);
+  }
+}
+function updatePlaceholder() {
+  const type = document.getElementById("form-calc-type").value;
+  const input = document.getElementById("form-amount");
+  const label = document.getElementById("label-value");
+  const symbol = document.getElementById("unit-symbol");
+
+  if (type === "PERCENT") {
+    label.textContent = "Nilai Persentase";
+    input.placeholder = "Masukkan persentase (contoh: 10)";
+    symbol.textContent = "%";
+  } else {
+    label.textContent = "Nilai Nominal";
+    input.placeholder = "Masukkan nominal dalam Rupiah";
+    symbol.textContent = "Rp";
+  }
+}
+  function openDocModal() {
+    docModal.classList.remove("hidden");
+    docModal.classList.add("flex");
+  }
+
+  function closeDocModal() {
+    docModal.classList.add("hidden");
+    docModal.classList.remove("flex");
+  }
+
+async function restoreComponent(id) {
+  if (!confirm("Apakah Anda yakin ingin mengaktifkan kembali komponen ini?")) return;
+
+  try {
+    const response = await fetch(`/api/components/restore/${id}`, {
+      method: "PATCH",
+    });
+
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+
+    location.reload();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+
+  // Init
+  renderTable();
+</script>

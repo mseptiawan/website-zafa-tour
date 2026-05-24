@@ -1,8 +1,8 @@
-import User from "../../models/User.js";
-import Employee from "../../models/Employee.js";
-import Position from "../../models/Position.js";
-import Unit from "../../models/Unit.js";
-import Bidang from "../../models/Bidang.js";
+import User from "../../models/basic/User.js";
+import Employee from "../../models/employee/Employee.model.js";
+import Position from "../../models/basic/Position.js";
+import Unit from "../../models/basic/Unit.js";
+import Bidang from "../../models/basic/Bidang.js";
 
 const employeeSeeder = async () => {
   await Employee.deleteMany();
@@ -104,7 +104,7 @@ const employeeSeeder = async () => {
   // DIRECT INSERT EMPLOYEE
   // =====================
 
-  await Employee.insertMany([
+    const rawEmployees = [
     {
       userId: rafikafitrianti._id,
       fullName: "Rafika Fitrianti",
@@ -356,9 +356,20 @@ const employeeSeeder = async () => {
       unitId: perlengkapan._id,
       bidangId: umum._id,
     },
-  ]);
+  ]
 
-  console.log("Employee seeded (STATIC VERSION)");
+  const finalEmployees = rawEmployees.map((emp, index) => {
+    const orderNumber = (index + 1).toString().padStart(3, "0");
+    
+    return {
+      ...emp,
+      employeeIdNumber: `EMP-${orderNumber}`, 
+    };
+  });
+
+  await Employee.insertMany(finalEmployees);
+
+  console.log(`Successfully seeded ${finalEmployees.length} employees with dynamic IDs.`)
 };
 
 export default employeeSeeder;
