@@ -186,24 +186,24 @@ export const getFinanceCenterPage = async (req, res, next) => {
     next(error);
   }
 };
-//   export const disburseLoan = async (req, res, next) => {
-//   try {
-//     const sessionUser = req.session.user;
-//     if (!sessionUser) return res.status(401).redirect("/?error=UNAUTHORIZED");
+  export const disburseLoan = async (req, res, next) => {
+  try {
+    const sessionUser = req.session.user;
+    if (!sessionUser) return res.status(401).redirect("/?error=UNAUTHORIZED");
 
-//     const { note } = req.body;
-//     const { id } = req.params; 
+    const { note } = req.body;
+    const { id } = req.params; 
 
-//     await loanService.processDisbursement(id, sessionUser, note, req.file);
+    await loanService.processDisbursement(id, sessionUser, note, req.file);
 
-//     return res.redirect("/loans/verifikasi-finance");
-//   } catch (error) {
-//     return res.status(400).render("error", { 
-//       title: "Disbursement Error", 
-//       message: error.message 
-//     });
-//   }
-// };
+    return res.redirect("/loans/loan-management");
+  } catch (error) {
+    return res.status(400).render("error", { 
+      title: "Disbursement Error", 
+      message: error.message 
+    });
+  }
+};
 
 
 
