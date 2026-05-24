@@ -42,7 +42,8 @@ router.use("/", expenseRoutes);
 router.use("/loans", loanRoutes);
 router.use("/components", componentPageRoutes);
 router.use("/api/components", salaryComponentRoutes);
-(router.use("/payroll", payrollPageRoutes), router.use("/api/payroll", payrollRoutes));
+router.use("/payroll", payrollPageRoutes);
+router.use("/api/payroll", payrollRoutes);
 router.use("/api", notificationRoutes);
 
 export default router;
