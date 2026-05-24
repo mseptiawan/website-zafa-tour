@@ -49,5 +49,17 @@ app.use((req, res, next) => {
 });
 app.use("/", routes);
 
-app.use(globalErrorHandler);
+app.use((req, res, next) => {
+  const error = new Error("Halaman yang Anda cari tidak ditemukan (404)");
+  error.status = 404;
+  next(error);
+});
+
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  res.status(status).render("error", {
+    message: err.message || "Terjadi kesalahan internal pada server.",
+    user: res.locals.user,
+  });
+});
 export default app;
