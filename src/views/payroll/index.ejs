@@ -30,17 +30,18 @@
         </div>
         
         <div class="divide-y divide-slate-100 max-h-[550px] overflow-y-auto">
-          <% employees.forEach((emp, index) => { %>
-            <!-- UBAH DI SINI: Meneruskan basicSalary dari database via salaryDetail -->
-            <div onclick="switchEmployee(this, '<%= emp.fullName %>', '<%= emp.employeeIdNumber %>', '<%= emp.positionId?.name || 'STAFF' %>', '<%= emp.salaryDetail?.basicSalary || 0 %>')" 
-                 class="employee-card p-4 <%= index === 0 ? 'bg-blue-50/40' : 'hover:bg-slate-50' %> flex items-center justify-between cursor-pointer transition-colors">
-              <div>
-                <h4 class="text-[13px] font-<%= index === 0 ? 'semibold text-blue-900' : 'medium text-slate-800' %>"><%= emp.fullName %></h4>
-                <p class="text-[11px] text-slate-500 mt-0.5">NIK: <%= emp.employeeIdNumber %> • <%= emp.positionId?.name || 'Staff' %></p>
-              </div>
-              <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Draft</span>
-            </div>
-          <% }) %>
+         <% employees.forEach((emp, index) => { %>
+  <!-- UBAH DI SINI: Sudah ditambahkan data-id="<%= emp._id %>" agar javascript bisa membaca ID-nya -->
+  <div onclick="switchEmployee(this, '<%= emp.fullName %>', '<%= emp.employeeIdNumber %>', '<%= emp.positionId?.name || 'STAFF' %>', '<%= emp.salaryDetail?.basicSalary || 0 %>')" 
+       data-id="<%= emp._id %>" 
+       class="employee-card p-4 <%= index === 0 ? 'bg-blue-50/40' : 'hover:bg-slate-50' %> flex items-center justify-between cursor-pointer transition-colors">
+    <div>
+      <h4 class="text-[13px] font-<%= index === 0 ? 'semibold text-blue-900' : 'medium text-slate-800' %>"><%= emp.fullName %></h4>
+      <p class="text-[11px] text-slate-500 mt-0.5">NIK: <%= emp.employeeIdNumber %> • <%= emp.positionId?.name || 'Staff' %></p>
+    </div>
+    <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Draft</span>
+  </div>
+<% }) %>
         </div>
       </div>
 
@@ -109,7 +110,9 @@
               </div>
             </div>
             <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors">Simpan Perubahan</button>
+             <button type="button" onclick="submitPayrollData()" class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors hover:bg-blue-700">
+  Simpan Perubahan
+</button>
             </div>
           </div>
         </div>
@@ -188,6 +191,7 @@
     calculatePayroll();
   }
 
+
   // UBAH DI SINI: Menerima nominal basicSalary dinamis dari parameter ke-5
   function switchEmployee(el, name, nik, pos, basicSalary) {
     document.getElementById('empNameTitle').innerText = name;
@@ -205,7 +209,69 @@
     
     calculatePayroll();
   }
+function submitPayrollData() {
+  // 1. Dapatkan data active employee ID dari kartu yang sedang aktif (bisa manfaatkan selektor css kartu aktif)
+  // Atau ambil manifestasi element simpan data di UI
+ const allCards = document.querySelectorAll('.employee-card');
+  let activeCard = null;
+  
+  allCards.forEach(card => {
+    if (card.classList.contains('bg-blue-50/40')) {
+      activeCard = card;
+    }
+  });
+  if (!activeCard) {
+    alert("Silakan pilih karyawan terlebih dahulu.");
+    return;
+  }
+  
+  const employeeId = activeCard.getAttribute('data-id'); 
+  const periodMonth = "Juni 2026"; // Sesuaikan dengan variabel periode bulan aktif di web kamu
+  const basicSalary = document.getElementById('inputBasicSalary').value;
 
+  // 2. Kumpulkan data Tunjangan Dinamis dari DOM
+  const allowances = [];
+  document.querySelectorAll('.allowance-row').forEach(row => {
+    const name = row.querySelector('input[type="text"]').value;
+    const amount = row.querySelector('.amount-input').value;
+    allowances.push({ componentName: name, amount: parseFloat(amount) || 0 });
+  });
+
+  // 3. Kumpulkan data Potongan Dinamis dari DOM
+  const deductions = [];
+  document.querySelectorAll('.deduction-row').forEach(row => {
+    const name = row.querySelector('input[type="text"]').value;
+    const amount = row.querySelector('.amount-input').value;
+    deductions.push({ componentName: name, amount: parseFloat(amount) || 0 });
+  });
+
+  // 4. Kirim data ke Backend via Fetch API
+  fetch('/api/payroll/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      employeeId,
+      periodMonth,
+      basicSalary,
+      allowances,
+      deductions
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("✅ " + data.message);
+    } else {
+      alert("❌ " + data.message);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Terjadi kesalahan sistem saat menghubungi server.");
+  });
+}
   // Jalankan kalkulasi pertama kali saat halaman siap
   document.addEventListener('DOMContentLoaded', () => {
     calculatePayroll();
