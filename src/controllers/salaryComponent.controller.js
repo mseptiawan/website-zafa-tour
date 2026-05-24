@@ -1,4 +1,4 @@
-import * as salaryComponentService from "../services/salaryComponentService.js";
+import * as salaryComponentService from "../services/salaryComponent.service.js";
 
 export const renderManagePage = async (req, res) => {
   try {

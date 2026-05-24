@@ -1,4 +1,4 @@
-import SalaryComponent from "../models/payroll/SalaryComponent.model";
+import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 
 export const fetchAllComponents = async () => {
   try {

@@ -10,7 +10,9 @@ const salaryComponents = [
     calculationType: "FIXED_AMOUNT",
     defaultAmount: 0, 
     basedOnComponent: null,
-    isLocked: true, 
+    isLocked: true,
+    isActive: true,
+    description: "Gaji dasar bulanan karyawan sesuai dengan kontrak kerja."
   },
   {
     code: "TJ_KONSUMSI",
@@ -21,6 +23,8 @@ const salaryComponents = [
     defaultAmount: 25000, 
     basedOnComponent: "TOTAL_HADIR", 
     isLocked: false,
+    isActive: true,
+    description: "Uang makan harian yang diberikan berdasarkan jumlah kehadiran fisik."
   },
   {
     code: "TJ_LEMBUR",
@@ -31,6 +35,8 @@ const salaryComponents = [
     defaultAmount: 20000, 
     basedOnComponent: "TOTAL_JAM_LEMBUR", 
     isLocked: false,
+    isActive: true,
+    description: "Upah lembur per jam di luar jam kerja normal sesuai UU Ketenagakerjaan."
   },
   {
     code: "INS_KEROHANIAN",
@@ -41,6 +47,8 @@ const salaryComponents = [
     defaultAmount: 0, 
     basedOnComponent: null,
     isLocked: false,
+    isActive: true,
+    description: "Tunjangan Hari Raya yang dibayarkan satu kali dalam setahun."
   },
   {
     code: "TJ_KELUARGA",
@@ -51,6 +59,8 @@ const salaryComponents = [
     defaultAmount: 5, 
     basedOnComponent: "GAPOK", 
     isLocked: false,
+    isActive: true,
+    description: "Tunjangan tambahan untuk karyawan yang memiliki tanggungan keluarga."
   },
   {
     code: "TJ_KOMUNIKASI",
@@ -61,6 +71,8 @@ const salaryComponents = [
     defaultAmount: 150000, 
     basedOnComponent: null,
     isLocked: false,
+    isActive: true,
+    description: "Tunjangan operasional untuk pulsa dan paket data komunikasi."
   },
   {
     code: "BONUS",
@@ -71,6 +83,8 @@ const salaryComponents = [
     defaultAmount: 0, 
     basedOnComponent: null,
     isLocked: false,
+    isActive: true,
+    description: "Bonus yang diberikan berdasarkan pencapaian target kinerja bulanan."
   },
   {
     code: "POT_BPJS",
@@ -81,6 +95,8 @@ const salaryComponents = [
     defaultAmount: 3, 
     basedOnComponent: "GAPOK", 
     isLocked: false,
+    isActive: true,
+    description: "Potongan iuran wajib BPJS karyawan sesuai regulasi pemerintah."
   },
   {
     code: "POT_PPH21",
@@ -91,16 +107,20 @@ const salaryComponents = [
     defaultAmount: 5, 
     basedOnComponent: "GAPOK", 
     isLocked: false,
+    isActive: true,
+    description: "Potongan pajak penghasilan karyawan sesuai tarif progresif PPh 21."
   },
   {
     code: "POT_LOAN",
     name: "Potongan Cicilan Pinjaman",
-    type: "FLEXIBLE", 
+    type: "FLEXIBLE",
     category: "DEDUCTION",
     calculationType: "FIXED_AMOUNT",
     defaultAmount: 0, 
     basedOnComponent: null,
-    isLocked: true, 
+    isLocked: true,
+    isActive: true,
+    description: "Potongan otomatis untuk pelunasan cicilan pinjaman karyawan."
   }
 ];
 

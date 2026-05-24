@@ -1,6 +1,6 @@
 import express from "express";
-import { renderManagePage, getAllComponents } from "../controllers/salaryComponentController.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js"; // Sesuaikan path middleware kamu
+import { renderManagePage, getAllComponents } from "../controllers/salaryComponent.controller.js";
+import authMiddleware  from "../middlewares/authMiddleware.js"; 
 
 const router = express.Router();
 

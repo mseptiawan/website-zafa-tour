@@ -44,6 +44,16 @@ const salaryComponentSchema = new mongoose.Schema(
     isLocked: {
       type: Boolean,
       default: false,
+    },
+    isActive: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: null
     }
   },
   { timestamps: true }
