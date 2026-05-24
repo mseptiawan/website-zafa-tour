@@ -109,7 +109,7 @@ export const getManageLoanPage = async (req, res, next) => {
 
     const data = await loanService.getLoanManagementData(sessionUser);
 
-    res.render("loans/manage-center", {
+    res.render("loans/loan-management", {
       title: "Pusat Kelola Pinjaman",
       user: sessionUser,
       activeLoans: data.activeLoans,
@@ -167,8 +167,43 @@ export const rejectLoan = async (req, res) => {
 
     await Loan.findByIdAndUpdate(approval.loanId, { status: "REJECTED" });
 
-    return res.redirect("/loans/manage-center");
+    return res.redirect("/loans/loan-management");
   } catch (error) {
     return res.status(500).render("error", { title: "Reject Loan Error", message: error.message });
   }
+}
+export const getFinanceCenterPage = async (req, res, next) => {
+  try {
+    const sessionUser = req.session.user;
+    const data = await loanService.getLoanManagementData(sessionUser);
+
+    res.render("loans/finance-center", { 
+      title: "Pusat Pencairan Dana",
+      activeLoans: data.activeLoans, 
+      historyLoans: data.historyLoans
+    });
+  } catch (error) {
+    next(error);
+  }
 };
+  export const disburseLoan = async (req, res, next) => {
+  try {
+    const sessionUser = req.session.user;
+    if (!sessionUser) return res.status(401).redirect("/?error=UNAUTHORIZED");
+
+    const { note } = req.body;
+    const { id } = req.params; 
+
+    await loanService.processDisbursement(id, sessionUser, note, req.file);
+
+    return res.redirect("/loans/loan-management");
+  } catch (error) {
+    return res.status(400).render("error", { 
+      title: "Disbursement Error", 
+      message: error.message 
+    });
+  }
+};
+
+
+
