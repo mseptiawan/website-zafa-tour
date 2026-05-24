@@ -30,7 +30,7 @@ router.get("/detail/:id", getDetail);
 router.get("/edit/:id", edit);
 router.post("/update/:id", update);
 router.post("/cancel/:id", cancel);
-router.get("/manage-center", roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]), getManageLoanPage);
+router.get("/manage-center", roleMiddleware(["HR", "PIMPINAN"]), getManageLoanPage);
 
 router.post(
   "/approval/approve/:id",
@@ -38,7 +38,7 @@ router.post(
   approveLoan
 );
 
-router.post("/approval/:id/reject", roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]), rejectLoan);
+router.post("/approval/reject/:id", roleMiddleware(["HR", "PIMPINAN"]), rejectLoan);
 
 
 router.get("/disbursement", roleMiddleware(["KEUANGAN"]), getFinanceCenterPage);

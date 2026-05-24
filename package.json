@@ -23,7 +23,9 @@
     "seed:unit": "node src/database/seeders/unitSeeder.js",
     "seed:user": "node src/database/seeders/userSeeder.js",
     "seed:expense": "node src/database/seeders/expenseSeeder.js",
-    "seed:salary": "node src/database/seeders/employeeSalary.seeder.js"
+    "seed:salary": "node src/database/seeders/employeeSalary.seeder.js",
+    "seed:employee": "node runEmployeeSeeder.js",
+    "seed:components": "node src/seeders/salaryComponentSeeder"
   },
   "keywords": [],
   "author": "",
