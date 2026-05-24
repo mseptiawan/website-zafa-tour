@@ -1,20 +1,13 @@
-<aside class="fixed inset-y-0 left-0 w-72 bg-white border-r border-white text-black flex flex-col z-50">
-  <!-- LOGO SECTION -->
-  <div class="h-20 flex items-center px-8 border-b border-white/10 relative">
-    <!-- glow background layer -->
-    <div class="absolute inset-0 from-indigo-500/10 via-cyan-500/10 to-purple-500/10"></div>
+<%- include('sidebar-config') %>
 
+<aside class="fixed inset-y-0 left-0 w-72 bg-white  text-black flex flex-col z-50">
+  
+  <div class="h-20 flex items-center px-8 border-b border-slate-100 relative shrink-0">
     <div class="flex items-center gap-4 relative z-10">
-      <!-- TEXT SECTION -->
       <div class="leading-tight">
-        <h1 class="text-lg font-bold tracking-wide text-slate-800 flex items-center gap-2">
+        <h1 class="text-lg font-bold tracking-wide text-slate-800">
           Zafa Tour
-
-          <span class="text-transparent bg-clip-text from-cyan-400 to-indigo-400">
-            Tour
-          </span>
         </h1>
-
         <p class="text-[10px] text-slate-500 uppercase tracking-[0.25em] font-medium">
           PT Zafa Mulia Mandiri
         </p>
@@ -22,855 +15,90 @@
     </div>
   </div>
 
-  <!-- NAVIGATION -->
   <nav id="sidebarNav" class="flex-1 overflow-y-auto scrollbar-hide px-4 py-6 space-y-7 pb-10">
-    <!-- DASHBOARD -->
+    
     <a href="/dashboard"
-      class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group border border-transparent hover:border-white/10">
-      <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none" stroke="currentColor"
-        viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-        </path>
+       class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group border border-transparent ">
+      <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
       </svg>
       <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">Dashboard</span>
     </a>
-    <!-- KARYAWAN -->
-      <section>
 
-        <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-          Human Resource
-        </p>
+    <% sidebarSections.forEach(section => { %>
+      <% if (section.show && section.menus.some(m => m.show)) { %>
+        <section>
+          <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
+            <%= section.title %>
+          </p>
 
-        <div class="space-y-1">
-
-
-          <details class="group outline-none" data-menu="karyawan">
-
-            <summary
-              class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-              <div class="flex items-center gap-3">
-
-                <!-- ICON -->
-                <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m10-4a4 4 0 10-8 0 4 4 0 008 0z" />
-                </svg>
-
-                <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                  Karyawan
-                </span>
-
-              </div>
-
-              <!-- ARROW -->
-              <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-
-            </summary>
-
-            <!-- SUB MENU -->
-            <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-
-              <a href="/employee"
-                class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                Data Karyawan
-              </a>
-
-              <a href="/employee/create"
-                class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                Tambah Karyawan
-              </a>
-
-            </div>
-
-          </details>
-          <!-- MENU PEMINJAMAN UANG -->
-                  <details class="group outline-none" data-menu="loan">
-                    <summary
-                      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                      <div class="flex items-center gap-3">
-                        <!-- Icon Simpel (Bank / Money) -->
-                        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-
-                        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                          Peminjaman Uang
-                        </span>
-                      </div>
-
-                      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          <div class="space-y-1">
+            <% section.menus.forEach(menu => { %>
+              <% if (menu.show && menu.submenus.some(s => s.show)) { %>
+                <details class="group outline-none" data-menu="<%= menu.id %>">
+                  <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent ">
+                    <div class="flex items-center gap-3">
+                      <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <%- menu.icon %>
                       </svg>
-                    </summary>
-
-                    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                      
-                      <% if (user.role !== 'PIMPINAN') { %>
-                        <a href="/loans/new"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                          Buat Pengajuan
-                        </a>
-                      <% } %>
-
-                      <% if (user.permissions.loan_my || user.role !== 'PIMPINAN') { %>
-                        <a href="/loans/my"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                          Riwayat Pengajuan
-                        </a>
-                      <% } %>
-                        <a href="/loans/manage-center"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                          Manajemen Pinjaman
-                        </a>
-                        <a href="/loans/disbursement"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                          Penyaluran Dana
-                        </a>
-
-
+                      <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
+                        <%= menu.name %>
+                      </span>
                     </div>
-                  </details>
-                  
- <div class="space-y-1">
-              <details class="group outline-none" data-menu="kpi">
-                <summary
-                  class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                  <div class="flex items-center gap-3">
-                    <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none" stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                      </path>
+                    <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
-                    <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">KPI Karyawan</span>
-                  </div>
-                  <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                    stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </summary>
-                <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                  <a href="/kpi/input" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Catat KPI</a>
-                    <a href="/kpi/list" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Daftar KPI Karyawan</a>
-                </div>
-              </details>
-            </div>
-<details class="group outline-none" data-menu="assignment">
-                    <summary
-                      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                      <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
-                        </svg>
+                  </summary>
 
-                        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                          Penugasan
-                        </span>
-                      </div>
-
-                      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </summary>
-
-                    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                      <% if ( user.role==='PIMPINAN' ) { %>
-                        <a href="/assignment/new"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                          Buat Penugasan
+                  <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+                    <% menu.submenus.forEach(sub => { %>
+                      <% if (sub.show) { %>
+                        <a href="<%= sub.path %>" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-slate-800 transition">
+                          <%= sub.name %>
                         </a>
-                        <% } %>
-                          <% if (user.permissions.assignment_my) { %>
-                            <a href="/assignment/my"
-                              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                              Penugasan Masuk
-                            </a>
-                            <% } %>
-
-                              <% if (user.permissions.assignment_all) { %>
-
-                                <a href="/assignment/"
-                                  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                  Semua Penugasan
-                                </a>
-                                <% } %>
-
-                    </div>
-                  </details>
-        </div>
-      </section>
-            <% if (user.role !=="ssasasad" ) { %>
-
-              <section>
-
-                <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-                  Absensi & Izin
-                </p>
-
-                <div class="space-y-1">
-                  <!-- CUTI -->
-                  <details class="group outline-none" data-menu="leave">
-                    <summary
-                      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                      <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                          </path>
-                        </svg>
-                        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">Cuti</span>
-                      </div>
-                      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </summary>
-                    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                      <% if (user.permissions.leave_request) { %>
-                        <a href="/leave/apply"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Buat Pengajuan</a>
-                        <% } %>
-                          <% if (user.permissions.leave_my) { %>
-
-                            <a href="/leave/my-history"
-                              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Riwayat Pengajuan</a>
-                            <% } %>
-
-
-
-                                      <a href="/leave/my-delegations"
-                                        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                        Permintaan Delegasi
-                                      </a>
-
-                                    <% if (user.role !== 'STAFF' && user.role !== 'KEUANGAN') { %>
-  <a href="/leave/manage-requests" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-    Manajemen Cuti
-  </a>
-<% } %>
-                    </div>
-                  </details>
-<% if (user.role == 'PIMPINAN') { %>
-  <details class="group outline-none" data-menu="approval">
-    <summary
-      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-      <div class="flex items-center gap-3">
-        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-          stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-          </path>
-        </svg>
-        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">Persetujuan</span>
-      </div>
-      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-        stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-      </svg>
-    </summary>
-    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-      <a href="/approvals/pending"
-        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 flex items-center justify-between">
-        <span>Persetujuan PHK</span>
-      </a>
-      
-    </div>
-  </details>
-<% } %>
-
-
-                  <!-- LEMBUR -->
-                  <details class="group outline-none" data-menu="overtime">
-                    <summary
-                      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                      <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">Lembur</span>
-                      </div>
-                      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </summary>
-                    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                      <% if (user.permissions.overtime_request) { %>
-                        <a href="/overtime/apply"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Buat Pengajuan</a>
-                        <% } %>
-                          <% if (user.permissions.overtime_my) { %>
-                            <a href="/overtime/my"
-                              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Riwayat Pengajuan</a>
-                            <% } %>
-                              <% if (user.permissions.overtime_approval) { %>
-                                <a href="/overtime/approval"
-                                  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Verifikasi Pengajuan</a>
-                                <% } %>
-                                  <% if (user.permissions.overtime_approval_history) { %>
-
-                                    <a href="/overtime/approval/history"
-                                      class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">Riwayat
-                                      Verifikasi</a>
-                                    <% } %>
-
-                    </div>
-                  </details>
-                </div>
-
-                <div class="space-y-1">
-                  <details class="group outline-none" data-menu="attendance">
-                    <summary
-                      class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                      <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                          </path>
-                        </svg>
-
-                        <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                          Kehadiran
-                        </span>
-                      </div>
-
-                      <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </summary>
-
-                    <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                      <a href="/attendance" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-Catat Absensi
-                      </a>
-
-                      <a href="/attendance/history"
-                        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                        Daftar Absensi
-                      </a>
-                      <% if (user.role !== 'STAFF' && user.role !== 'KEUANGAN') { %>
-
-                        <a href="/attendance/getall"
-                        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                        Lihat Semua Absensi
-                      </a>
-                      
                       <% } %>
-
-                      
-                      <!-- <%if (user.permissions.attendance_correction_request) { %>
-                          Ajukan Koreksi
-                        </a>
-                        <% } %> -->
-
-                          <!-- <% if (user.permissions.attendance_correction_view_my) { %>
-                            <a href="/attendance/correction/history"
-                              class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                              Pengajuan Koreksi Saya
-                            </a>
-                            <% } %>
-                              <% if (user.permissions.attendance_correction_approval) { %>
-                                <a href="/attendance/approval-correction"
-                                  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                  Koreksi Masuk
-                                </a>
-                                <% } %>
- -->
-
-
-                                  <!-- <% if ( user.role==='HR' ) { %>
-                                    <a href="/attendance/all"
-                                      class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                      Data Absensi
-                                    </a>
-                                    <% } %> -->
-                    </div>
-                  </details>
-                </div>
-                <details class="group outline-none" data-menu="trip">
-                      <summary
-                        class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                        <div class="flex items-center gap-3">
-                          <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 11c0-1.104-.896-2-2-2s-2 .896-2 2 .896 2 2 2 2-.896 2-2zm0 0v10m6-10c0-3.314-2.686-6-6-6S6 7.686 6 11m12 0v10">
-                            </path>
-                          </svg>
-
-                          <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                            Dinas Luar
-                          </span>
-                        </div>
-
-                        <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                          </path>
-                        </svg>
-                      </summary>
-
-                      <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                        <% if (user.permissions.trip_request) { %>
-                          <a href="/trip/new"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                            Buat Pengajuan
-                          </a>
-                          <% } %>
-                            <% if (user.permissions.trip_my) { %>
-
-                              <a href="/trip/my"
-                                class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                Riwayat Pengajuan 
-                              </a>
-                              <% } %>
-
-                                <% if (user.permissions.trip_approval) { %>
-
-                                  <a href="/trip/approval"
-                                    class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                    Approval
-                                  </a>
-                                  <% } %>
-
-                                    <% if (user.permissions.finance_request) { %>
-
-                                      <a href="/finance"
-                                        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                        Permintaan pembayaran
-
-                                      </a>
-                                      <% } %>
-
-                                        <% if (user.permissions.finance_history) { %>
-                                          <a href="/finance/history"
-                                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                                            Riwayat pembayaran
-
-                                          </a>
-                                          <% } %>
-
-
-                      </div>
-                    </details>
-              </section>
+                    <% }); %>
+                  </div>
+                </details>
               <% } %>
-                <!-- GROUP: FIELD OPERATION -->
-                <section>
-                  <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-                    Aktivitas lapangan
-                  </p>
+            <% }); %>
+          </div>
+        </section>
+      <% } %>
+    <% }); %>
 
-                  <div class="space-y-1">
-                    <!-- DINAS LUAR -->
-                   
-
-                    <!-- SALES VISIT -->
-                    <% if (user.role !=="PIMPINAN" ) { %>
-
-                      <details class="group outline-none" data-menu="sales">
-                        <summary
-                          class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                          <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                              stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 7h18M3 12h18M3 17h18"></path>
-                            </svg>
-
-                            <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                              Kunjungan Sales
-                            </span>
-                          </div>
-
-                          <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                          </svg>
-                        </summary>
-
-                        <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                          <a href="/sales/new"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                            Catat Kunjungan
-                          </a>
-                          <a href="/sales/my"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
-                            Daftar Kunjungan
-                          </a>
-                        </div>
-                      </details>
-                      <% } %>
-                        <details class="group outline-none" data-menu="daily-log">
-                        <summary
-                          class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                          <div class="flex items-center gap-3">
-                            <!-- ICON LOG / DOCUMENT CHECKS -->
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                              stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-                              </path>
-                            </svg>
-
-                            <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                              Jurnal Harian
-                            </span>
-                          </div>
-
-                          <!-- ARROW -->
-                          <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                          </svg>
-                        </summary>
-
-                        <!-- SUBMENU -->
-                        <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                          <!-- LEMBAR KERJA SAYA -->
-                          <a href="/daily-log"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                            Lembar Kerja
-                          </a>
-                        </div>
-                      </details>
-                  </div>
-                  
-                  <section class="mt-6">
-                    <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-                      Internal Communication
-                    </p>
-
-                    <div class="space-y-1">
-                      <!-- PENGUMUMAN -->
-                      <details class="group outline-none" data-menu="announcement">
-                        <summary
-                          class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                          <div class="flex items-center gap-3">
-                            <!-- ICON -->
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                              stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5l-7 7h4v7h6v-4h2v4h6v-7h4l-7-7z"></path>
-                            </svg>
-
-                            <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                              Pengumuman
-                            </span>
-                          </div>
-
-                          <!-- ARROW -->
-                          <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                          </svg>
-                        </summary>
-
-                        <!-- SUBMENU -->
-                        <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                          <!-- BUAT -->
-                          <a href="/announcement/new"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                            Buat Pengumuman
-                          </a>
-
-                          <!-- SEMUA -->
-                          <a href="/announcement"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                            Daftar  Pengumuman
-                          </a>
-                        </div>
-                      </details>
-
-                      <!-- DAILY LOG (BARU) -->
-                    
-                    </div>
-                  </section>
-                  <!-- PENUGASAN -->
-                 
-                </section>
-                <section class="mt-6">
-                  <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-                    Pengajuan Klaim
-                  </p>
-
-                  <div class="space-y-1">
-                    <!-- EXPENSE CLAIM -->
-                    <details class="group outline-none" data-menu="expense">
-                      <summary
-                        class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                        <div class="flex items-center gap-3">
-                          <!-- ICON -->
-                          <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6v2m0 16v2m8-10h2M2 12H4">
-                            </path>
-                          </svg>
-
-                          <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                            Pengajuan Klaim
-                          </span>
-                        </div>
-
-                        <!-- ARROW -->
-                        <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                          </path>
-                        </svg>
-                      </summary>
-
-                      <!-- SUBMENU -->
-                      <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                        <!-- AJUKAN -->
-                        <a href="/expense/create"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                          Buat Pengajuan
-                        </a>
-
-                        <!-- KLAIM SAYA -->
-                        <a href="/expense/my"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                          Riwayat Pengajuan
-                        </a>
-
-                        <!-- APPROVAL MANAGER -->
-                        <% if ( user.role==='MANAGER' || user.role==='GENERAL MANAGER' ) { %>
-
-                          <a href="/expense/approval/manager"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                            Verifikasi Manager
-                          </a>
-
-                          <% } %>
-                            <!-- VALIDASI FINANCE -->
-                            <% if (user.role==='KEUANGAN' ) { %>
-
-                              <a href="/expense/finance"
-                                class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                                Verifikasi Finance
-                              </a>
-
-                              <% } %>
-
-                      </div>
-                    </details>
-                  </div>
-                </section>
-
-                <details class="group outline-none" data-menu="payroll">
-  <summary
-    class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-    <div class="flex items-center gap-3">
-      <!-- ICON PAYROLL (Credit Card / Wallet Icon) -->
-      <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-        stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-        </path>
-      </svg>
-
-      <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-        Manajemen Payroll
-      </span>
-    </div>
-
-    <!-- ARROW -->
-    <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-      stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-      </path>
-    </svg>
-  </summary>
-
-  <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-    
-    <a href="/payroll/my-slip"
-      class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-      Slip Gaji Saya
-    </a>
-
-      
-      <a href="/payroll/manage"
-        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-        Proses Hitung Gaji
-      </a>
-
-      <a href="/components/manage"
-        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-        Kelola Komponen Gaji
-      </a>
-
-      <a href="/payroll/history"
-        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-        Rekap Payroll Bulanan
-      </a>
-
-
-      <a href="/payroll/finance-approval"
-        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-        Verifikasi & Pembayaran
-      </a>
-
-      <a href="/payroll/reports"
-        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-        Laporan Pengeluaran Gaji
-      </a>
-
-  </div>
-</details>
-                <section class="mt-6">
-                  <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-                    Laporan
-                  </p>
-
-                  <div class="space-y-1">
-
-
-                    <!-- LAPORAN -->
-                    <details class="group outline-none" data-menu="report">
-                      <summary
-                        class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
-                        <div class="flex items-center gap-3">
-
-                          <!-- ICON -->
-                          <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 17v-6h6v6m-7 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-2-2h-4L7 5H4a2 2 0 00-2 2v12a2 2 0 002 2z">
-                            </path>
-                          </svg>
-
-                          <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                            Laporan
-                          </span>
-                        </div>
-
-                        <!-- ARROW -->
-                        <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none"
-                          stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                          </path>
-                        </svg>
-                      </summary>
-
-                      <!-- SUB MENU -->
-                      <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-
-                        <!-- KPI REPORT -->
-                        <% if (user.permissions.report_kpi) { %>
-                          <a href="/report/kpi"
-                            class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                            Laporan KPI
-                          </a>
-                          <% } %>
-
-                            <!-- CUTI REPORT -->
-                            <% if (user.permissions.report_leave) { %>
-                              <a href="/report/leave"
-                                class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                                Laporan Cuti
-                              </a>
-                              <% } %>
-                                <a href="/trip/report"
-                                  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                                  Laporan Dinas Luar
-                                </a>
-                                <a href="/sales/report"
-                                  class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                                  Laporan Kunjugan Sales
-                                </a>
-
-                                <!-- LEMBUR REPORT -->
-                                <% if (user.permissions.report_overtime) { %>
-                                  <a href="/report/overtime"
-                                    class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                                    Laporan Lembur
-                                  </a>
-                                  <% } %>
-
-                                    <!-- ABSENSI REPORT -->
-                                    <% if (user.permissions.report_attendance) { %>
-                                      <a href="/report/attendance"
-                                        class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 transition">
-                                        Laporan Absensi
-                                      </a>
-                                      <% } %>
-
-                      </div>
-                    </details>
-
-                  </div>
-                </section>
   </nav>
 
-  <!-- USER FOOTER -->
-  <div class="p-4 border-t border-white/10 backdrop- relative">
-    <!-- ambient glow -->
-    <div class="absolute inset-0 from-indigo-500/10 via-cyan-500/5 to-purple-500/10"></div>
-
-    <div
-      class="relative flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 _rgba(99,102,241,0.15)]">
-      <!-- AVATAR HOLOGRAM -->
-  <div class="relative">
-  <div class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 border border-slate-300 overflow-hidden">
-    <% 
-      let avatarUrl = "https://img.freepik.com/vektor-premium/avatar-kartun-pengusaha-muda-pria-mengenakan-setelan-jas-dan-dasi_645574-600.jpg"; // Default Laki-laki
+  <div class="p-4  relative shrink-0">
+    <div class="relative flex items-center gap-3 p-3 rounded-2xl bg-white ">
       
-      if (user.gender === "Perempuan") {
-        avatarUrl = "https://img.freepik.com/premium-vector/smiling-woman-avatar_937492-6135.jpg?semt=ais_hybrid&w=740&q=80";
-      }
-    %>
-    <img 
-      src="<%= avatarUrl %>" 
-      alt="<%= user.username || 'User Avatar' %>" 
-      class="w-full h-full object-cover rounded-full"
-    />
-  </div>
-</div>
+      <div class="relative">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 border border-slate-300 overflow-hidden">
+          <% 
+            let avatarUrl = "https://img.freepik.com/vektor-premium/avatar-kartun-pengusaha-muda-pria-mengenakan-setelan-jas-dan-dasi_645574-600.jpg"; 
+            if (user.gender === "Perempuan") {
+              avatarUrl = "https://img.freepik.com/premium-vector/smiling-woman-avatar_937492-6135.jpg?semt=ais_hybrid&w=740&q=80";
+            }
+          %>
+          <img src="<%= avatarUrl %>" alt="<%= user.username || 'User Avatar' %>" class="w-full h-full object-cover rounded-full" />
+        </div>
+      </div>
 
-      <!-- USER INFO -->
       <div class="flex-1 overflow-hidden leading-tight">
-        <p class="text-xs font-semibold text-slate-800 truncate flex items-center gap-2">
+        <p class="text-xs font-semibold text-slate-800 truncate">
           <%= user.fullName || 'User' %>
-
-            <!-- system active dot -->
         </p>
-
         <p class="text-[7px] uppercase tracking-[0.25em] text-slate-500 truncate">
           <%= user.role || 'Karyawan' %>
         </p>
       </div>
 
-      <!-- LOGOUT CONTROL -->
-      <a href="/logout"
-        class="group p-2 rounded-xl transition hover:bg-red-500/10 border border-transparent hover:border-red-400/30">
-        <svg class="w-5 h-5 text-slate-500 group-hover:text-red-400 transition" fill="none" stroke="currentColor"
-          viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      <a href="/logout" class="group p-2 rounded-xl transition hover:bg-red-50 border border-transparent hover:border-red-200">
+        <svg class="w-5 h-5 text-slate-500 group-hover:text-red-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
       </a>
+
     </div>
   </div>
 </aside>

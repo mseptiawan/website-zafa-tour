@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
-      required: true,
+      required: false,
       lowercase: true,
       trim: true,
     },
@@ -40,9 +40,9 @@ const userSchema = new mongoose.Schema(
   }
 );
 userSchema.virtual("employeeData", {
-  ref: "Employee", 
-  localField: "_id", 
-  foreignField: "userId", 
+  ref: "Employee",
+  localField: "_id",
+  foreignField: "userId",
   justOne: true,
 });
 
