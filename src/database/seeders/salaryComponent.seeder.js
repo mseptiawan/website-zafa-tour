@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import SalaryComponent from "./models/SalaryComponent.js"; 
+import SalaryComponent from "../../models/payroll/SalaryComponent.model.js"; 
 
 const salaryComponents = [
   {
@@ -106,7 +106,7 @@ const salaryComponents = [
 
 const seedSalaryComponents = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/hris_database"); 
+    await mongoose.connect("mongodb://localhost:27017/hris_zafa_tour"); 
 
     await SalaryComponent.deleteMany({});
     console.log("Data komponen lama berhasil dibersihkan.");
