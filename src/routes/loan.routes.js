@@ -41,7 +41,7 @@ router.post(
 router.post("/approval/:id/reject", roleMiddleware(["HR", "PIMPINAN", "KEUANGAN"]), rejectLoan);
 
 
-router.get("/finance-center", roleMiddleware(["KEUANGAN"]), getFinanceCenterPage);
+router.get("/disbursement", roleMiddleware(["KEUANGAN"]), getFinanceCenterPage);
 
 router.post(
   "/approval/disburse/:id",

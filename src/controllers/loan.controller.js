@@ -125,7 +125,6 @@ export const approveLoan = async (req, res) => {
     const { note } = req.body;
     const sessionUser = req.session.user;
     
-    // Proteksi awal jika session rusak / hilang
     if (!sessionUser) {
       return res.status(401).render("error", { 
         title: "Error", 
@@ -133,15 +132,12 @@ export const approveLoan = async (req, res) => {
       });
     }
 
-    const { id } = req.params; // Ini adalah ID dari LoanApproval
+    const { id } = req.params; 
 
-    // Eksekusi approval melalui Service
     await loanService.processApproval(id, sessionUser, note, req.file);
 
-    // Jika sukses, kembalikan ke halaman manajemen center
     return res.redirect("/loans/manage-center");
   } catch (error) {
-    // Tangani error validasi step atau error database
     return res.status(400).render("error", { 
       title: "Approve Loan Error", 
       message: error.message 
@@ -167,7 +163,7 @@ export const rejectLoan = async (req, res) => {
 
     await Loan.findByIdAndUpdate(approval.loanId, { status: "REJECTED" });
 
-    return res.redirect("/loans/loan-management");
+    return res.redirect("/loans/manage-center");
   } catch (error) {
     return res.status(500).render("error", { title: "Reject Loan Error", message: error.message });
   }
@@ -177,7 +173,7 @@ export const getFinanceCenterPage = async (req, res, next) => {
     const sessionUser = req.session.user;
     const data = await loanService.getLoanManagementData(sessionUser);
 
-    res.render("loans/finance-center", { 
+    res.render("loans/loan-management", { 
       title: "Pusat Pencairan Dana",
       activeLoans: data.activeLoans, 
       historyLoans: data.historyLoans
@@ -196,7 +192,7 @@ export const getFinanceCenterPage = async (req, res, next) => {
 
     await loanService.processDisbursement(id, sessionUser, note, req.file);
 
-    return res.redirect("/loans/loan-management");
+    return res.redirect("/loans/disbursement");
   } catch (error) {
     return res.status(400).render("error", { 
       title: "Disbursement Error", 

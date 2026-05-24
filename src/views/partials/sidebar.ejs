@@ -113,7 +113,6 @@
 
                     <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
                       
-                      <!-- BUAT PENGAJUAN (Bisa diakses oleh Karyawan/HR) -->
                       <% if (user.role !== 'PIMPINAN') { %>
                         <a href="/loans/new"
                           class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
@@ -121,19 +120,21 @@
                         </a>
                       <% } %>
 
-                      <!-- RIWAYAT PENGAJUAN (Melihat pinjaman milik diri sendiri) -->
                       <% if (user.permissions.loan_my || user.role !== 'PIMPINAN') { %>
                         <a href="/loans/my"
                           class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
                           Riwayat Pengajuan
                         </a>
                       <% } %>
-
-                      <!-- MANAJEMEN PINJAMAN (Khusus HR, Pimpinan, Keuangan untuk approval/pencairan) -->
                         <a href="/loans/manage-center"
                           class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
                           Manajemen Pinjaman
                         </a>
+                        <a href="/loans/disbursement"
+                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
+                          Penyaluran Dana
+                        </a>
+
 
                     </div>
                   </details>
@@ -184,14 +185,12 @@
                     </summary>
 
                     <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                      <!-- BUAT PENUGASAN (pimpinan) -->
                       <% if ( user.role==='PIMPINAN' ) { %>
                         <a href="/assignment/new"
                           class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
                           Buat Penugasan
                         </a>
                         <% } %>
-                          <!-- PENUGASAN SAYA -->
                           <% if (user.permissions.assignment_my) { %>
                             <a href="/assignment/my"
                               class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
@@ -211,7 +210,6 @@
                   </details>
         </div>
       </section>
-            <!-- GROUP: ABSENSI -->
             <% if (user.role !=="ssasasad" ) { %>
 
               <section>
@@ -269,7 +267,6 @@
     <summary
       class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent hover:border-white/10">
       <div class="flex items-center gap-3">
-        <!-- Ikon Shield Check (Melambangkan Persetujuan/Otoritas) -->
         <svg class="w-5 h-5 text-slate-500 group-hover:text-indigo-400" fill="none"
           stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -284,11 +281,9 @@
       </svg>
     </summary>
     <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-      <!-- Sub-menu Antrean PHK -->
       <a href="/approvals/pending"
         class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400 flex items-center justify-between">
         <span>Persetujuan PHK</span>
-        <!-- Opsional: Tempat naruh badge angka nunggu acc kalau mau dikembangkan nanti -->
       </a>
       
     </div>
@@ -380,8 +375,6 @@ Catat Absensi
 
                       
                       <!-- <%if (user.permissions.attendance_correction_request) { %>
-                        <a href="/attendance/correction"
-                          class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-indigo-400">
                           Ajukan Koreksi
                         </a>
                         <% } %> -->
