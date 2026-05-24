@@ -1,6 +1,7 @@
 import Employee from "../models/employee/Employee.model.js";
 import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 import Payroll from "../models/payroll/Payroll.model.js";
+import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
 
 export const getPayrollData = async () => {
   const employees = await Employee.find().populate("positionId").populate({
@@ -8,8 +9,9 @@ export const getPayrollData = async () => {
     model: "EmployeeSalary",
   });
   const components = await SalaryComponent.find({ isActive: true });
+  const savedAllowances = await EmployeeAllowance.find().populate("componentId");
 
-  return { employees, components };
+  return { employees, components, savedAllowances };
 };
 
 export const savePayrollRecord = async (data) => {

@@ -4,13 +4,14 @@ import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
 import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 export const renderPayrollPage = async (req, res) => {
   try {
-    const { employees, components } = await payrollService.getPayrollData();
+    const { employees, components, savedAllowances } = await payrollService.getPayrollData();
 
     res.render("payroll/index", {
       title: "Manajemen Payroll",
       user: req.user,
       employees,
       components,
+      savedAllowances,
       currentMonth: "Juni 2026",
     });
   } catch (error) {
@@ -25,57 +26,80 @@ export const saveEmployeeAllowances = async (req, res) => {
       return res.status(400).json({ success: false, message: "ID Karyawan wajib diisi." });
     }
 
-    if (!allowances || allowances.length === 0) {
-      await EmployeeAllowance.deleteMany({ employeeId });
-      return res
-        .status(200)
-        .json({ success: true, message: "Semua tunjangan karyawan berhasil dikosongkan." });
-    }
-
-    const masterComponents = await SalaryComponent.find({ category: "EARNING", isActive: true });
+    // 1. Ambil semua master komponen aktif untuk referensi ID dan Kategori
+    const masterComponents = await SalaryComponent.find({ isActive: true });
 
     const componentMap = {};
+    const categoryMap = {}; // Kamus pembantu untuk mencatat kategori komponen (EARNING / DEDUCTION)
+
     masterComponents.forEach((comp) => {
       componentMap[comp.name] = comp._id;
+      categoryMap[comp._id.toString()] = comp.category;
     });
 
     const bulkOperations = [];
     const incomingComponentIds = [];
+    const categoriesToUpdate = new Set(); // Mencatat kategori apa saja yang sedang dikirim oleh frontend
 
-    for (const item of allowances) {
-      const componentId = componentMap[item.componentName];
+    // Jika ada data yang dikirim, susun bulk write dan catat kategorinya
+    if (allowances && allowances.length > 0) {
+      for (const item of allowances) {
+        const componentId = componentMap[item.componentName];
+        if (!componentId) continue;
 
-      if (!componentId) continue;
+        incomingComponentIds.push(componentId);
 
-      incomingComponentIds.push(componentId);
+        // Masukkan kategori komponen ini (EARNING atau DEDUCTION) ke dalam Set
+        const category = categoryMap[componentId.toString()];
+        if (category) {
+          categoriesToUpdate.add(category);
+        }
 
-      bulkOperations.push({
-        updateOne: {
-          filter: { employeeId, componentId },
-          update: { $set: { amount: parseFloat(item.amount) || 0 } },
-          upsert: true,
-        },
-      });
+        bulkOperations.push({
+          updateOne: {
+            filter: { employeeId, componentId },
+            update: { $set: { amount: parseFloat(item.amount) || 0 } },
+            upsert: true,
+          },
+        });
+      }
     }
 
-    await EmployeeAllowance.deleteMany({
-      employeeId,
-      componentId: { $nin: incomingComponentIds },
-    });
+    // 2. PERBAIKAN BUG: Hapus data lama secara selektif berdasarkan kategori yang dikirim saja
+    // Jika frontend mengirim data EARNING, hapus EARNING lama yang tidak dikirim lagi.
+    // Jika frontend mengirim data DEDUCTION, hapus DEDUCTION lama yang tidak dikirim lagi.
+    if (categoriesToUpdate.size > 0) {
+      // Ambil semua ID master komponen yang masuk dalam kategori yang sedang di-update
+      const targetComponentIds = masterComponents
+        .filter((comp) => categoriesToUpdate.has(comp.category))
+        .map((comp) => comp._id);
 
+      await EmployeeAllowance.deleteMany({
+        employeeId,
+        componentId: {
+          $in: targetComponentIds, // Harus termasuk dalam kategori yang di-update
+          $nin: incomingComponentIds, // Tapi tidak ada di dalam list yang baru dikirim
+        },
+      });
+    } else {
+      // Jika frontend mengirim array kosong (HR menghapus semua baris di form), hapus seluruhnya
+      await EmployeeAllowance.deleteMany({ employeeId });
+    }
+
+    // 3. Eksekusi Bulk Write jika ada data baru/perubahan
     if (bulkOperations.length > 0) {
       await EmployeeAllowance.bulkWrite(bulkOperations);
     }
 
     return res.status(200).json({
       success: true,
-      message: "Komponen tunjangan karyawan berhasil dilekatkan dan diperbarui!",
+      message: "Seluruh komponen payroll berhasil diperbarui!",
     });
   } catch (error) {
     console.error("Error Save Employee Allowance:", error);
     return res.status(500).json({
       success: false,
-      message: "Gagal menyimpan komponen tunjangan: " + error.message,
+      message: "Gagal menyimpan komponen: " + error.message,
     });
   }
 };
