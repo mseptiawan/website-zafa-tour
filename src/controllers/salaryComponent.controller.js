@@ -60,6 +60,18 @@ export const updateComponent = async (req, res) => {
     });
   }
 };
+
+export const restoreComponent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await salaryComponentService.updateComponentStatus(id, true);
+
+    res.json({ success: true, message: "Komponen berhasil diaktifkan kembali!" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const archiveComponent = async (req, res) => {
   try {
     const id = req.params.id;
@@ -85,20 +97,3 @@ export const archiveComponent = async (req, res) => {
     });
   }
 };
-
-async function restoreComponent(id) {
-  if (!confirm("Apakah Anda yakin ingin mengaktifkan kembali komponen ini?")) return;
-
-  try {
-    const response = await fetch(`/api/components/restore/${id}`, {
-      method: "PATCH",
-    });
-
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
-
-    location.reload();
-  } catch (error) {
-    alert(error.message);
-  }
-}

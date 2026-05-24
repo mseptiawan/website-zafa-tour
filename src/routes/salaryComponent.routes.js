@@ -4,6 +4,7 @@ import {
   createComponent,
   updateComponent,
   archiveComponent,
+  restoreComponent,
 } from "../controllers/salaryComponent.controller.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -17,4 +18,5 @@ router.put("/:id", updateComponent);
 
 router.patch("/:id", archiveComponent);
 
+router.patch("/restore/:id", restoreComponent);
 export default router;

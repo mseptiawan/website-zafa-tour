@@ -45,3 +45,14 @@ export const archiveComponent = async (id) => {
     throw new Error("Gagal mengarsipkan komponen gaji: " + error.message);
   }
 };
+
+export const updateComponentStatus = async (id, status) => {
+  const component = await SalaryComponent.findByIdAndUpdate(
+    id,
+    { isActive: status },
+    { new: true }
+  );
+
+  if (!component) throw new Error("Komponen tidak ditemukan");
+  return component;
+};

@@ -1,0 +1,213 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
+  <div class="mx-auto max-w-7xl space-y-6">
+    
+    <!-- TOP HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div>
+        <a href="#" class="inline-flex items-center gap-1 text-[13px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
+          <i class="fa-solid fa-chevron-left text-[11px]"></i> Kembali
+        </a>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900 mt-1">Komponen Payroll</h1>
+      </div>
+      <a href="/payroll/components-master" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200/60 text-blue-600 text-[13px] font-medium rounded-xl hover:bg-slate-50 transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <i class="fa-solid fa-layer-group text-blue-500 text-xs"></i>
+        Master Komponen
+      </a>
+    </div>
+
+    <!-- WORKSPACE ARCHITECTURE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- COLUMN 1: DAFTAR KARYAWAN -->
+      <div class="lg:col-span-4 bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+        <div class="p-3 bg-white border-b border-slate-100">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" placeholder="Cari nama karyawan..." class="w-full bg-[#f2f2f7] border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
+          </div>
+        </div>
+        
+        <div class="divide-y divide-slate-100 max-h-[550px] overflow-y-auto">
+          <% employees.forEach((emp, index) => { %>
+            <!-- UBAH DI SINI: Meneruskan basicSalary dari database via salaryDetail -->
+            <div onclick="switchEmployee(this, '<%= emp.fullName %>', '<%= emp.employeeIdNumber %>', '<%= emp.positionId?.name || 'STAFF' %>', '<%= emp.salaryDetail?.basicSalary || 0 %>')" 
+                 class="employee-card p-4 <%= index === 0 ? 'bg-blue-50/40' : 'hover:bg-slate-50' %> flex items-center justify-between cursor-pointer transition-colors">
+              <div>
+                <h4 class="text-[13px] font-<%= index === 0 ? 'semibold text-blue-900' : 'medium text-slate-800' %>"><%= emp.fullName %></h4>
+                <p class="text-[11px] text-slate-500 mt-0.5">NIK: <%= emp.employeeIdNumber %> • <%= emp.positionId?.name || 'Staff' %></p>
+              </div>
+              <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Draft</span>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- WORKSPACE CONFIGURATION CONTAINER -->
+      <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        
+        <!-- COLUMN 2: WORKSPACE DETAILED FORM -->
+        <div class="md:col-span-2 space-y-6">
+          <div class="bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
+              <div>
+                <h2 id="empNameTitle" class="text-[14px] font-bold text-slate-900"><%= employees[0]?.fullName %></h2>
+                <p id="empMetaTitle" class="text-[11px] text-slate-400">NIK: <%= employees[0]?.employeeIdNumber %> • <%= employees[0]?.positionId?.name || 'Staff' %></p>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] font-semibold text-slate-400 block uppercase tracking-wide">Periode</span>
+                <span class="text-[12px] font-bold text-blue-600">Juni 2026</span>
+              </div>
+            </div>
+
+            <div class="p-5 space-y-5">
+              <div>
+                <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5 block">Gaji Pokok</label>
+                <div class="relative max-w-xs">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-slate-400">Rp</span>
+                  <!-- UBAH DI SINI: Value mengambil data default karyawan indeks pertama dari database -->
+                  <input type="number" id="inputBasicSalary" oninput="calculatePayroll()" value="<%= employees[0]?.salaryDetail?.basicSalary || 0 %>" class="w-full bg-[#f2f2f7]/60 border-none rounded-xl px-3 py-2 pl-9 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                </div>
+              </div>
+
+              <!-- ALLOWANCES -->
+              <div class="pt-4 border-t border-slate-100">
+                <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5">Tunjangan Dinamis</h3>
+                <div id="allowanceContainer" class="space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100"></div>
+                <div class="mt-3 flex items-center gap-2">
+                  <select id="masterAllowanceSelect" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-slate-600 focus:outline-none">
+                    <option value="">-- Pilih Tunjangan --</option>
+                    <% components.filter(c => c.category === 'EARNING').forEach(comp => { %>
+                      <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
+                    <% }) %>
+                  </select>
+                  <button type="button" onclick="addAllowanceField()" class="text-[12px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl transition-colors">+ Tambah</button>
+                </div>
+              </div>
+
+              <!-- SECTION: DEDUCTIONS (POTONGAN) -->
+              <div class="pt-6 border-t border-slate-100">
+                <div class="flex items-center justify-between mb-2.5">
+                  <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Potongan / Cicilan</h3>
+                  <span class="text-[10px] font-medium text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">Out / Pengurangan</span>
+                </div>
+                
+                <div id="deductionContainer" class="space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100">
+                  <!-- Area potongan akan muncul di sini -->
+                </div>
+
+                <div class="mt-3 flex items-center gap-2">
+                  <select id="masterDeductionSelect" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-slate-600 focus:outline-none">
+                    <option value="">-- Pilih Potongan --</option>
+                    <% components.filter(c => c.category === 'DEDUCTION').forEach(comp => { %>
+                      <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
+                    <% }) %>
+                  </select>
+                  <button type="button" onclick="addDeductionField()" class="text-[12px] font-semibold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl transition-colors">+ Tambah</button>
+                </div>
+              </div>
+            </div>
+            <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <button class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors">Simpan Perubahan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMN 3: SIDEBAR -->
+        <div class="space-y-6">
+          <div class="bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] p-4 sticky top-6">
+            <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-4">Ringkasan</h3>
+            <div class="space-y-3 text-[12px]">
+              <div class="flex justify-between"><span>Gaji Pokok</span> <span id="previewBasic" class="font-semibold">Rp 0</span></div>
+              <div class="flex justify-between text-emerald-600"><span>Tunjangan</span> <span id="previewEarnings" class="font-semibold">+Rp 0</span></div>
+              <!-- UBAH DI SINI: Menambahkan baris ringkasan potongan di sidebar -->
+              <div class="flex justify-between text-rose-600"><span>Potongan</span> <span id="previewDeductions" class="font-semibold">-Rp 0</span></div>
+              <div class="border-t pt-3 font-bold flex justify-between"><span>Net Pay</span> <span id="previewNetPay">Rp 0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // UBAH DI SINI: Kalkulasi mencakup komponen pendapatan, potongan, dan render summary sidebar secara lengkap
+  function calculatePayroll() {
+    const basic = parseFloat(document.getElementById('inputBasicSalary').value) || 0;
+    
+    let earnings = 0;
+    document.querySelectorAll('.allowance-row .amount-input').forEach(i => earnings += parseFloat(i.value) || 0);
+    
+    let deductions = 0;
+    document.querySelectorAll('.deduction-row .amount-input').forEach(i => deductions += parseFloat(i.value) || 0);
+    
+    const netPay = (basic + earnings) - deductions;
+    
+    document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
+    document.getElementById('previewEarnings').innerText = '+Rp ' + earnings.toLocaleString('id-ID');
+    document.getElementById('previewDeductions').innerText = '-Rp ' + deductions.toLocaleString('id-ID');
+    document.getElementById('previewNetPay').innerText = 'Rp ' + netPay.toLocaleString('id-ID');
+  }
+
+  function addAllowanceField() {
+    const select = document.getElementById('masterAllowanceSelect');
+    if(!select.value) return;
+    const template = `
+      <div class="flex items-center gap-2 allowance-row animate-fadeIn">
+        <input type="text" value="${select.value}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly>
+        <input type="number" value="${select.options[select.selectedIndex].dataset.amount}" oninput="calculatePayroll()" class="amount-input w-24 bg-white border border-slate-200/60 rounded-lg px-2 py-1.5 text-[12px] text-right font-semibold">
+        <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="text-slate-400 hover:text-rose-500 transition-colors px-1"><i class="fa fa-trash"></i></button>
+      </div>
+    `;
+    document.getElementById('allowanceContainer').insertAdjacentHTML('beforeend', template);
+    select.value = "";
+    calculatePayroll();
+  }
+
+  function addDeductionField() {
+    const select = document.getElementById('masterDeductionSelect');
+    if(!select.value) return;
+    
+    const template = `
+      <div class="flex items-center gap-2 deduction-row animate-fadeIn">
+        <input type="text" value="${select.value}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-700 focus:outline-none" readonly>
+        <div class="w-32 relative">
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
+          <input type="number" value="${select.options[select.selectedIndex].getAttribute('data-amount')}" 
+                 oninput="calculatePayroll()" class="amount-input w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:border-blue-500">
+        </div>
+        <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
+          <i class="fa-solid fa-trash-can text-[11px]"></i>
+        </button>
+      </div>
+    `;
+    document.getElementById('deductionContainer').insertAdjacentHTML('beforeend', template);
+    select.value = ""; 
+    calculatePayroll();
+  }
+
+  // UBAH DI SINI: Menerima nominal basicSalary dinamis dari parameter ke-5
+  function switchEmployee(el, name, nik, pos, basicSalary) {
+    document.getElementById('empNameTitle').innerText = name;
+    document.getElementById('empMetaTitle').innerText = 'NIK: ' + nik + ' • ' + pos;
+    
+    // Set nilai input Gaji Pokok sesuai dengan yang dipilih
+    document.getElementById('inputBasicSalary').value = parseFloat(basicSalary) || 0;
+    
+    // Bersihkan container tunjangan & potongan dinamis ketika berpindah karyawan
+    document.getElementById('allowanceContainer').innerHTML = '';
+    document.getElementById('deductionContainer').innerHTML = '';
+    
+    document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
+    el.classList.add('bg-blue-50/40');
+    
+    calculatePayroll();
+  }
+
+  // Jalankan kalkulasi pertama kali saat halaman siap
+  document.addEventListener('DOMContentLoaded', () => {
+    calculatePayroll();
+  });
+</script>

@@ -224,18 +224,28 @@ const displayValue = comp.calcType === 'PERCENT'
         </td>
         <td class="px-6 py-4">
           <div class="flex items-center justify-end gap-2">
-            <button onclick="openModal('edit', '${comp._id}')" 
-              class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95] cursor-pointer shadow-sm">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
-              </svg>
-            </button>
-            <button onclick="deleteComponent('${comp._id}')" 
-              class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition active:scale-[0.95] cursor-pointer">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-            </button>
+            ${comp.isActive ? `
+              <!-- Tombol Edit -->
+              <button onclick="openModal('edit', '${comp._id}')" 
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95] cursor-pointer shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
+                </svg>
+              </button>
+              <!-- Tombol Arsip (Delete) -->
+              <button onclick="deleteComponent('${comp._id}')" 
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition active:scale-[0.95] cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+              </button>
+            ` : `
+              <!-- Tombol Aktifkan Kembali (Restore) -->
+              <button onclick="restoreComponent('${comp._id}')" 
+                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 text-[11px] font-bold transition active:scale-[0.95] cursor-pointer">
+                <i class="fa-solid fa-rotate-left mr-1.5 text-[10px]"></i> Aktifkan
+              </button>
+            `}
           </div>
         </td>`;
       tableBody.appendChild(tr);
@@ -345,6 +355,24 @@ function updatePlaceholder() {
     docModal.classList.add("hidden");
     docModal.classList.remove("flex");
   }
+
+async function restoreComponent(id) {
+  if (!confirm("Apakah Anda yakin ingin mengaktifkan kembali komponen ini?")) return;
+
+  try {
+    const response = await fetch(`/api/components/restore/${id}`, {
+      method: "PATCH",
+    });
+
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+
+    location.reload();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
 
   // Init
   renderTable();
