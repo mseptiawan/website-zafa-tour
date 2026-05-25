@@ -11,7 +11,7 @@ const salaryComponents = [
     basedOnComponent: null,
     isLocked: true,
     isActive: true,
-    description: "Gaji dasar bulanan karyawan sesuai dengan kontrak kerja.",
+    description: "Gaji dasar bulanan pegawai sesuai dengan kontrak kerja.",
   },
   {
     code: "TJ_KONSUMSI",
@@ -59,7 +59,7 @@ const salaryComponents = [
     basedOnComponent: "GAPOK",
     isLocked: false,
     isActive: true,
-    description: "Tunjangan tambahan untuk karyawan yang memiliki tanggungan keluarga.",
+    description: "Tunjangan tambahan untuk pegawai yang memiliki tanggungan keluarga.",
   },
   {
     code: "TJ_KOMUNIKASI",
@@ -95,7 +95,7 @@ const salaryComponents = [
     basedOnComponent: "GAPOK",
     isLocked: false,
     isActive: true,
-    description: "Potongan iuran wajib BPJS karyawan sesuai regulasi pemerintah.",
+    description: "Potongan iuran wajib BPJS Pegawai sesuai regulasi pemerintah.",
   },
   {
     code: "POT_PPH21",
@@ -107,7 +107,7 @@ const salaryComponents = [
     basedOnComponent: "GAPOK",
     isLocked: false,
     isActive: true,
-    description: "Potongan pajak penghasilan karyawan sesuai tarif progresif PPh 21.",
+    description: "Potongan pajak penghasilan pegawai sesuai tarif progresif PPh 21.",
   },
   {
     code: "POT_LOAN",
@@ -119,7 +119,7 @@ const salaryComponents = [
     basedOnComponent: null,
     isLocked: true,
     isActive: true,
-    description: "Potongan otomatis untuk pelunasan cicilan pinjaman karyawan.",
+    description: "Potongan otomatis untuk pelunasan cicilan pinjaman pegawai.",
   },
 ];
 

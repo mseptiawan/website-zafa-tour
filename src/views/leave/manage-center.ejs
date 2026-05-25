@@ -18,7 +18,7 @@
   </div>
 
   <form action="/leave/manage-requests/generate-balances" method="POST" 
-        onsubmit="return confirm('Apakah Anda yakin ingin melakukan generate/reset saldo seluruh karyawan pada tahun <%= selectedYear %>?');"
+        onsubmit="return confirm('Apakah Anda yakin ingin melakukan generate/reset saldo seluruh Pegawai pada tahun <%= selectedYear %>?');"
         class="flex items-center gap-4 bg-amber-50/50 border border-amber-200/60 p-3 rounded-2xl shadow-sm">
     <input type="hidden" name="year" value="<%= selectedYear %>">
     
@@ -69,7 +69,7 @@
               <thead>
                 <tr
                   class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="px-5 py-3">Nama Karyawan</th>
+                  <th class="px-5 py-3">Nama Pegawai</th>
                   <th class="px-5 py-3 text-left">Jenis Pengajuan</th>
                   <th class="px-5 py-3">Tipe Cuti</th>
                   <th class="px-5 py-3">Tanggal Pelaksanaan</th>
@@ -90,7 +90,7 @@
                       <tr class="hover:bg-slate-50/50 transition duration-150">
                         <td class="px-5 py-4 font-bold text-slate-900">
                           <%= leave.userId && leave.userId.employeeData ? leave.userId.employeeData.fullName
-                            : "Karyawan" %>
+                            : "Pegawai" %>
                         </td>
                         <td class="px-5 py-4">
                           <% if (leave.status==='CANCELLATION_PENDING' ) { %>
@@ -151,7 +151,7 @@
               <thead>
                 <tr
                   class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="px-5 py-3">Nama Karyawan</th>
+                  <th class="px-5 py-3">Nama Pegawai</th>
                   <th class="px-5 py-3 text-left">Jenis Pengajuan</th>
 
                   <th class="px-5 py-3">Tipe Cuti</th>
@@ -173,7 +173,7 @@
                       <tr class="hover:bg-slate-50/50 transition duration-150">
                         <td class="px-5 py-4 font-bold text-slate-900">
                           <%= leave.userId && leave.userId.employeeData ? leave.userId.employeeData.fullName
-                            : "Karyawan" %>
+                            : "Pegawai" %>
                         </td>
                           <td class="px-5 py-4">
                           <% if (leave.status==='CANCELLED' ) { %>
@@ -488,7 +488,7 @@
 
         // Update Teks Info (Warna Amber/Orange-Tua)
         if (deductInfo) {
-          deductInfo.innerHTML = '<i class="fa-solid fa-circle-exclamation text-amber-500 mr-1"></i> Kebijakan Perusahaan: Cuti bersama internal otomatis memotong kuota tahunan karyawan.';
+          deductInfo.innerHTML = '<i class="fa-solid fa-circle-exclamation text-amber-500 mr-1"></i> Kebijakan Perusahaan: Cuti bersama internal otomatis memotong kuota tahunan Pegawai.';
           deductInfo.className = "text-[11px] mt-1 font-medium text-amber-600";
         }
       }

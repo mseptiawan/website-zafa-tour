@@ -1,9 +1,20 @@
 export function getPermissions(role) {
   const permissions = {
+    employee_list: false,
+    employee_add: false,
+    employee_manage: false,
+
     loan_new: false,
     loan_my: false,
     loan_manage_center: false,
     loan_disbursement: false,
+
+    kpi_create: false,
+    kpi_list: false,
+
+    assignment_new: false,
+    assignment_my: false,
+    assignment_all: false,
 
     leave_request: false,
     leave_my: false,
@@ -43,17 +54,10 @@ export function getPermissions(role) {
     announcement_create: false,
     announcement_view: true,
 
-    employee_list: false,
-    employee_add: false,
-    employee_manage: false,
-
     report_kpi: false,
     report_leave: false,
     report_overtime: false,
     report_attendance: false,
-
-    assignment_my: false,
-    assignment_all: false,
 
     finance_request: false,
     finance_history: false,
@@ -63,6 +67,8 @@ export function getPermissions(role) {
     case "PEGAWAI":
       permissions.loan_new = true;
       permissions.loan_my = true;
+
+      permissions.assignment_my = true;
 
       permissions.leave_request = true;
       permissions.leave_my = true;
@@ -93,6 +99,8 @@ export function getPermissions(role) {
       permissions.loan_my = true;
       permissions.loan_disbursement = true;
 
+      permissions.assignment_my = true;
+
       permissions.leave_request = true;
       permissions.leave_my = true;
 
@@ -121,10 +129,14 @@ export function getPermissions(role) {
       break;
 
     case "MANAGER_ADMINISTRASI":
+      permissions.employee_list = true;
+
       permissions.loan_new = true;
       permissions.loan_my = true;
 
-      permissions.employee_list = true;
+      permissions.kpi_list = true;
+
+      permissions.assignment_my = true;
 
       permissions.leave_request = true;
       permissions.leave_my = true;
@@ -164,12 +176,17 @@ export function getPermissions(role) {
       break;
 
     case "WAKIL_DIREKTUR":
+      permissions.employee_list = true;
+      permissions.employee_add = true;
+
       permissions.loan_new = true;
       permissions.loan_my = true;
       permissions.loan_manage_center = true;
 
-      permissions.employee_list = true;
-      permissions.employee_add = true;
+      permissions.kpi_create = true;
+      permissions.kpi_list = true;
+
+      permissions.assignment_my = true;
 
       permissions.leave_request = true;
       permissions.leave_my = true;
@@ -210,6 +227,11 @@ export function getPermissions(role) {
 
     case "DIREKTUR_UTAMA":
       permissions.loan_manage_center = true;
+
+      permissions.kpi_list = true;
+
+      permissions.assignment_new = true;
+      permissions.assignment_all = true;
 
       permissions.employee_list = true;
       permissions.leave_approval = true;

@@ -20,6 +20,6 @@ router.get("/kpi/manage", roleMiddleware(["HR"]), kpiManage);
 router.get("/kpi/report", roleMiddleware(["HR"]), kpiReport);
 router.get("/kpi/list", getKpiList);
 
-// Detail KPI karyawan (Lengkap)
+// Detail KPI Pegawai (Lengkap)
 router.get("/kpi/detail/:employeeId/:periode", getKpiDetail);
 export default router;

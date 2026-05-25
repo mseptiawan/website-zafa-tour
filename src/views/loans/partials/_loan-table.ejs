@@ -3,13 +3,13 @@
     <tr class="bg-slate-50/60 text-slate-400 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
       <% if (type === 'active') { %>
         <th class="px-5 py-3.5">Tgl Pengajuan</th>
-        <th class="px-5 py-3.5">Nama Karyawan</th>
+        <th class="px-5 py-3.5">Nama Pegawai</th>
         <th class="px-5 py-3.5 text-right">Jumlah</th>
         <th class="px-5 py-3.5 text-center">Tenor</th>
         <th class="px-5 py-3.5 text-right">Cicilan/Bln</th>
         <th class="px-5 py-3.5 text-right">Aksi</th>
       <% } else { %>
-        <th class="px-5 py-3.5">Nama Karyawan</th>
+        <th class="px-5 py-3.5">Nama Pegawai</th>
         <th class="px-5 py-3.5 text-right">Jumlah Total</th>
         <th class="px-5 py-3.5 text-center">Status</th>
         <th class="px-5 py-3.5">Catatan</th>
@@ -28,7 +28,7 @@
         <tr class="hover:bg-slate-50/40 transition-colors duration-150">
           <% if (type === 'active') { %>
             <td class="px-5 py-4 text-slate-400"><%= new Date(loan.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
-            <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId?.fullName || "Karyawan" %></td>
+            <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId?.fullName || "Pegawai" %></td>
             <td class="px-5 py-4 text-right font-mono font-bold">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></td>
             <td class="px-5 py-4 text-center"><span class="bg-slate-100 px-2 py-0.5 rounded-md text-[11px] font-medium"><%= loan.tenorMonths %> Bln</span></td>
             <td class="px-5 py-4 text-right font-mono text-slate-500">Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %></td>
@@ -36,7 +36,7 @@
               <a href="/loans/detail/<%= loan._id %>" class="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 text-[11.5px] font-bold rounded-xl bg-white hover:bg-slate-50">Periksa</a>
             </td>
           <% } else { %>
-            <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId?.fullName || "Karyawan" %></td>
+            <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId?.fullName || "Pegawai" %></td>
             <td class="px-5 py-4 text-right font-mono font-bold">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></td>
             <td class="px-5 py-4 text-center">
               <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase border <%= loan.approvalStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' %>">

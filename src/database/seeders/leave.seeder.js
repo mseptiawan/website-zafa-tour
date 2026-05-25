@@ -20,7 +20,7 @@ const leaveTypesMaster = [
     requiresAttachment: false,
     isDeductBalance: true,
     isActive: true,
-    description: "Jatah kuota cuti tahunan reguler karyawan.",
+    description: "Jatah kuota cuti tahunan reguler Pegawai.",
   },
   {
     name: "Cuti Sakit",
@@ -315,7 +315,7 @@ export default async function leaveSeeder() {
             status: "APPROVED",
             processedBy: hrUser._id,
             processAt: startDate,
-            note: "Pembatalan disetujui, kuota karyawan tidak dipotong.",
+            note: "Pembatalan disetujui, kuota Pegawai tidak dipotong.",
           });
         }
 

@@ -431,7 +431,7 @@ export const reportTripPage = async (req, res) => {
 
     const filter = {};
 
-    if (role === "KARYAWAN") {
+    if (role === "Pegawai") {
       filter.userId = user._id;
     }
 

@@ -8,7 +8,7 @@
       Input Absensi Manual
     </h1>
     <p class="text-sm text-slate-500">
-      HR dapat menambahkan absensi karyawan secara manual
+      HR dapat menambahkan absensi Pegawai secara manual
     </p>
   </div>
 
@@ -19,14 +19,14 @@
 
       <!-- EMPLOYEE SELECT -->
       <div>
-        <label class="text-xs text-slate-500">Karyawan</label>
+        <label class="text-xs text-slate-500">Pegawai</label>
 
         <select
           name="userId"
           class="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg"
           required
         >
-          <option value="">Pilih Karyawan</option>
+          <option value="">Pilih Pegawai</option>
 
           <% employees.forEach(e => { %>
             <option value="<%= e.userId._id %>">

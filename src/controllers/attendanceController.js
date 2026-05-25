@@ -225,7 +225,7 @@ export const allAttendance = async (req, res) => {
     const data = await Attendance.find().populate("userId").sort({ createdAt: -1 });
 
     res.render("attendance/index", {
-      title: "Data Absensi Karyawan",
+      title: "Data Absensi Pegawai",
       data,
     });
   } catch (err) {

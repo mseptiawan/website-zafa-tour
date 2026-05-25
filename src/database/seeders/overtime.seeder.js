@@ -9,7 +9,7 @@ dotenv.config();
 const descriptions = [
   "Menyelesaikan laporan bulanan",
   "Perbaikan bug sistem HRIS",
-  "Input data karyawan",
+  "Input data Pegawai",
   "Maintenance server internal",
   "Rekap absensi pegawai",
 ];

@@ -18,7 +18,7 @@ export const kpiEmployeeList = async (req, res) => {
       "Willy Cauza",
     ];
 
-    // 2. Ambil data karyawan selain yang ada di daftar atasan
+    // 2. Ambil data Pegawai selain yang ada di daftar atasan
     const employees = await Employee.find({ fullName: { $nin: atasan } })
       .populate("userId")
       .populate("unitId")
@@ -36,16 +36,16 @@ export const kpiEmployeeList = async (req, res) => {
       employees,
       evaluatedIds,
       user: req.session.user,
-      title: "Input KPI Karyawan",
+      title: "Input KPI Pegawai",
     });
   } catch (error) {
     console.error("Error kpiEmployeeList:", error);
-    res.status(500).send("Gagal memuat daftar karyawan.");
+    res.status(500).send("Gagal memuat daftar Pegawai.");
   }
 };
 
 // =============================
-// FORM INPUT KPI PER KARYAWAN
+// FORM INPUT KPI PER Pegawai
 // =============================
 export const kpiForm = async (req, res) => {
   const { employeeId } = req.params;
@@ -154,7 +154,7 @@ export const getKpiList = async (req, res) => {
       .populate("employeeId", "fullName unitId") // Ambil nama & unit
       .sort({ createdAt: -1 });
 
-    res.render("kpi/list", { title: "daftar kpi karyawan", kpiList });
+    res.render("kpi/list", { title: "daftar kpi Pegawai", kpiList });
   } catch (error) {
     res.status(500).send("Error memuat daftar KPI");
   }

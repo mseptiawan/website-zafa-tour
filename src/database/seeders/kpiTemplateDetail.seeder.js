@@ -439,7 +439,7 @@ const kpiTemplateDetailSeeder = async () => {
     },
     {
       kpiTemplateId: taxAccounting._id,
-      areaKinerja: "Input Piutang Karyawan & Piutang Usaha",
+      areaKinerja: "Input Piutang Pegawai & Piutang Usaha",
       indikator: "Tingkat akurasi input piutang sesuai dengan realisasi",
       bobot: 15,
       target: "100%",

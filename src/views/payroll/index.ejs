@@ -20,12 +20,12 @@
     <!-- WORKSPACE ARCHITECTURE -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
-      <!-- COLUMN 1: DAFTAR KARYAWAN -->
+      <!-- COLUMN 1: DAFTAR Pegawai -->
       <div class="lg:col-span-4 bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
         <div class="p-3 bg-white border-b border-slate-100">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" placeholder="Cari nama karyawan..." class="w-full bg-[#f2f2f7] border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
+            <input type="text" placeholder="Cari nama Pegawai..." class="w-full bg-[#f2f2f7] border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
           </div>
         </div>
         
@@ -86,7 +86,7 @@
                 <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5 block">Gaji Pokok</label>
                 <div class="relative max-w-xs">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-slate-400">Rp</span>
-                  <!-- UBAH DI SINI: Value mengambil data default karyawan indeks pertama dari database -->
+                  <!-- UBAH DI SINI: Value mengambil data default Pegawai indeks pertama dari database -->
                   <input type="number" id="inputBasicSalary" oninput="calculatePayroll()" value="<%= employees[0]?.salaryDetail?.basicSalary || 0 %>" class="w-full bg-[#f2f2f7]/60 border-none rounded-xl px-3 py-2 pl-9 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
                 </div>
               </div>
@@ -294,7 +294,7 @@
   });
 
   if (!activeCard) {
-    alert("Silakan pilih karyawan terlebih dahulu.");
+    alert("Silakan pilih Pegawai terlebih dahulu.");
     return;
   }
   

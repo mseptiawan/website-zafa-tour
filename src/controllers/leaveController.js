@@ -165,7 +165,7 @@ export const createHoliday = async (req, res) => {
 
     if (finalIsDeductLeave === true) {
       console.log(
-        `Mendeteksi Cuti Baru [${name}] memotong kuota. Memperbarui saldo seluruh karyawan tahun ${year}...`
+        `Mendeteksi Cuti Baru [${name}] memotong kuota. Memperbarui saldo seluruh Pegawai tahun ${year}...`
       );
 
       await LeaveBalance.updateMany(
@@ -293,7 +293,7 @@ export const toggleHolidayStatus = async (req, res) => {
     if (holiday.isDeductLeave === true) {
       if (holiday.isActive === true && targetStatus === false) {
         console.log(
-          `♻️ Mengarsipkan agenda [${holiday.name}]. Me-refund ${totalDays} hari ke karyawan...`
+          `♻️ Mengarsipkan agenda [${holiday.name}]. Me-refund ${totalDays} hari ke Pegawai...`
         );
         await LeaveBalance.updateMany(
           { year: holiday.year },
@@ -301,7 +301,7 @@ export const toggleHolidayStatus = async (req, res) => {
         );
       } else if (holiday.isActive === false && targetStatus === true) {
         console.log(
-          `⚠️ Mengaktifkan kembali [${holiday.name}]. Memotong kembali ${totalDays} hari dari karyawan...`
+          `⚠️ Mengaktifkan kembali [${holiday.name}]. Memotong kembali ${totalDays} hari dari Pegawai...`
         );
         await LeaveBalance.updateMany(
           { year: holiday.year },
@@ -338,7 +338,7 @@ export const generateOrResetLeaveBalance = async (req, res) => {
     const DEFAULT_LEAVE_QUOTA = 12;
 
     console.log(
-      `♻️ Memulai proses Generate/Reset Saldo Cuti untuk seluruh karyawan di tahun ${selectedYear}...`
+      `♻️ Memulai proses Generate/Reset Saldo Cuti untuk seluruh Pegawai di tahun ${selectedYear}...`
     );
 
     const activeEmployees = await User.find({ isActive: true });
@@ -346,7 +346,7 @@ export const generateOrResetLeaveBalance = async (req, res) => {
     if (activeEmployees.length === 0) {
       return res
         .status(400)
-        .json({ success: false, message: "Tidak ada karyawan aktif ditemukan." });
+        .json({ success: false, message: "Tidak ada Pegawai aktif ditemukan." });
     }
 
     const companyHolidays = await Holiday.find({
@@ -399,7 +399,7 @@ export const generateOrResetLeaveBalance = async (req, res) => {
       })
     );
 
-    console.log(`✅ Sukses generate/reset saldo cuti untuk ${activeEmployees.length} karyawan.`);
+    console.log(`✅ Sukses generate/reset saldo cuti untuk ${activeEmployees.length} Pegawai.`);
 
     return res.redirect(`/leave/manage-requests?tab=balances&status=success&year=${selectedYear}`);
   } catch (error) {
@@ -1050,7 +1050,7 @@ export const showApprovals = async (req, res) => {
       ],
     });
 
-    res.render("leave/approvals", { title: "Persetujuan Cuti Karyawan", approvals });
+    res.render("leave/approvals", { title: "Persetujuan Cuti Pegawai", approvals });
   } catch (error) {
     res.status(500).render("error", { title: "show approval error", message: error.message });
   }

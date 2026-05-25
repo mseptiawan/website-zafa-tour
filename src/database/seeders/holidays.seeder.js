@@ -91,7 +91,7 @@ const holidays = [
     date: new Date("2026-02-16"),
     type: "COMPANY",
     isDeductLeave: true,
-    description: "Cuti bersama Imlek, memotong jatah cuti tahunan karyawan.",
+    description: "Cuti bersama Imlek, memotong jatah cuti tahunan Pegawai.",
     year: 2026,
   },
   {

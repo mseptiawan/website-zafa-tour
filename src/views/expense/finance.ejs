@@ -46,7 +46,7 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="px-5 py-3">Karyawan</th>
+                  <th class="px-5 py-3">Pegawai</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Nota</th>
@@ -67,7 +67,7 @@
                   <% activeExpenses.forEach(e => { %>
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
-                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
+                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Pegawai' %></div>
                       </td>
                       <td class="px-5 py-4 font-semibold text-slate-800"><%= e.title %></td>
                      
@@ -164,7 +164,7 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="px-5 py-3">Karyawan</th>
+                  <th class="px-5 py-3">Pegawai</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Nota</th>
@@ -185,7 +185,7 @@
                   <% historyExpenses.forEach(e => { %>
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
-                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
+                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Pegawai' %></div>
                       </td>
                       <td class="px-5 py-4 font-semibold text-slate-800"><%= e.title %></td>
                       

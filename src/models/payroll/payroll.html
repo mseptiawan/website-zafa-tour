@@ -1,339 +1,563 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo Payroll Component Management - Model Aligned</title>
-  <!-- Google Fonts & Tailwind CSS CDN -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Payroll Component Management - Model Aligned</title>
+    <!-- Google Fonts & Tailwind CSS CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Plus Jakarta Sans", "sans-serif"],
+            },
           },
         },
-      },
-    }
-  </script>
-</head>
-<body class="bg-slate-50/60 antialiased min-h-screen font-sans">
-
-<div class="ml-72 p-8">
-  <div class="max-w-7xl mx-auto">
-    
-    <!-- TOP HEADER & TOMBOL MASTER YANG DISATUKAN -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-      <div>
-        <a href="#" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-2 transition-colors group">
-          <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Kembali ke Dashboard
-        </a>
-        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Pemrosesan Komponen Payroll</h1>
-      </div>
-      
-      <!-- TOMBOL MASTER SINKRON KE PAGE MASTER -->
-      <a href="/payroll/components-master" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200/60 hover:border-slate-300 text-slate-700 text-[12px] font-semibold rounded-xl transition-all shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] group">
-        <i class="fa-solid fa-layer-group text-slate-400 group-hover:text-slate-600 transition-colors"></i>
-        Kelola Master Komponen Gaji
-      </a>
-    </div>
-
-    <!-- MASTER-DETAIL WORKSPACE ARCHITECTURE -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      
-      <!-- COLUMN 1: DAFTAR KARYAWAN (MASTER SIDEBAR) -->
-      <div class="lg:col-span-4 bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-        <div class="p-4 border-b border-slate-100 bg-white">
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" placeholder="Cari nama karyawan..." class="w-full bg-slate-50/60 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-[12px] focus:outline-none focus:border-slate-300 transition-colors">
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-50/60 font-sans antialiased">
+    <div class="ml-72 p-8">
+      <div class="mx-auto max-w-7xl">
+        <!-- TOP HEADER & TOMBOL MASTER YANG DISATUKAN -->
+        <div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <a
+              href="#"
+              class="group mb-2 inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 transition-colors hover:text-slate-800"
+            >
+              <svg
+                class="h-4 w-4 transform transition-transform group-hover:-translate-x-0.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              Kembali ke Dashboard
+            </a>
+            <h1 class="text-xl font-bold tracking-tight text-slate-900">
+              Pemrosesan Komponen Payroll
+            </h1>
           </div>
+
+          <!-- TOMBOL MASTER SINKRON KE PAGE MASTER -->
+          <a
+            href="/payroll/components-master"
+            class="group inline-flex items-center gap-2 rounded-xl border border-slate-200/60 bg-white px-4 py-2.5 text-[12px] font-semibold text-slate-700 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] transition-all hover:border-slate-300"
+          >
+            <i
+              class="fa-solid fa-layer-group text-slate-400 transition-colors group-hover:text-slate-600"
+            ></i>
+            Kelola Master Komponen Gaji
+          </a>
         </div>
-        
-        <!-- List Karyawan Container -->
-        <div class="divide-y divide-slate-50 max-h-[550px] overflow-y-auto">
-          <!-- Karyawan 1 (Active Default) -->
-          <div onclick="switchEmployee(this, 'M. Septiawan', 'EMP-001', 'IT Specialist', 5500000, 350000)" class="employee-card p-4 bg-slate-50 border-l-4 border-slate-900 flex items-center justify-between cursor-pointer transition-colors">
-            <div>
-              <h4 class="text-[13px] font-semibold text-slate-900">M. Septiawan</h4>
-              <p class="text-[11px] text-slate-400">NIK: EMP-001 • IT Specialist</p>
-            </div>
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded border bg-amber-50 text-amber-700 border-amber-100">DRAFT</span>
-          </div>
 
-          <!-- Karyawan 2 -->
-          <div onclick="switchEmployee(this, 'Nurul Fajriyah', 'EMP-002', 'Finance Admin', 4800000, 0)" class="employee-card p-4 hover:bg-slate-50/50 border-l-4 border-transparent flex items-center justify-between cursor-pointer transition-colors">
-            <div>
-              <h4 class="text-[13px] font-semibold text-slate-700">Nurul Fajriyah</h4>
-              <p class="text-[11px] text-slate-400">NIK: EMP-002 • Finance Admin</p>
+        <!-- MASTER-DETAIL WORKSPACE ARCHITECTURE -->
+        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+          <!-- COLUMN 1: DAFTAR Pegawai (MASTER SIDEBAR) -->
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] lg:col-span-4"
+          >
+            <div class="border-b border-slate-100 bg-white p-4">
+              <div class="relative">
+                <i
+                  class="fa-solid fa-magnifying-glass absolute top-1/2 left-3.5 -translate-y-1/2 text-xs text-slate-400"
+                ></i>
+                <input
+                  type="text"
+                  placeholder="Cari nama Pegawai..."
+                  class="w-full rounded-xl border border-slate-200 bg-slate-50/60 py-2 pr-4 pl-9 text-[12px] transition-colors focus:border-slate-300 focus:outline-none"
+                />
+              </div>
             </div>
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-100">PROCESSED</span>
-          </div>
 
-          <!-- Karyawan 3 -->
-          <div onclick="switchEmployee(this, 'Adit Jansa', 'EMP-003', 'UI/UX Designer', 5000000, 150000)" class="employee-card p-4 hover:bg-slate-50/50 border-l-4 border-transparent flex items-center justify-between cursor-pointer transition-colors">
-            <div>
-              <h4 class="text-[13px] font-semibold text-slate-700">Adit Jansa</h4>
-              <p class="text-[11px] text-slate-400">NIK: EMP-003 • UI/UX Designer</p>
-            </div>
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded border bg-amber-50 text-amber-700 border-amber-100">DRAFT</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- WORKSPACE CONFIGURATION CONTAINER (FORM DETAIL & CALCULATOR) -->
-      <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-        
-        <!-- COLUMN 2: WORKSPACE DETAILED FORM -->
-        <div class="md:col-span-2 space-y-6">
-          <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-            
-            <!-- Target Card Header -->
-            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600">
-                  <i class="fa-solid fa-user-gear text-xs"></i>
-                </div>
+            <!-- List Pegawai Container -->
+            <div class="max-h-[550px] divide-y divide-slate-50 overflow-y-auto">
+              <!-- Pegawai 1 (Active Default) -->
+              <div
+                onclick="
+                  switchEmployee(this, 'M. Septiawan', 'EMP-001', 'IT Specialist', 5500000, 350000)
+                "
+                class="employee-card flex cursor-pointer items-center justify-between border-l-4 border-slate-900 bg-slate-50 p-4 transition-colors"
+              >
                 <div>
-                  <h2 id="empNameTitle" class="text-[14px] font-semibold text-slate-900 leading-none mb-1">M. Septiawan</h2>
-                  <p id="empMetaTitle" class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">NIK: EMP-001 • IT Specialist</p>
+                  <h4 class="text-[13px] font-semibold text-slate-900">M. Septiawan</h4>
+                  <p class="text-[11px] text-slate-400">NIK: EMP-001 • IT Specialist</p>
                 </div>
-              </div>
-              <div class="text-right">
-                <span class="text-[10px] font-semibold text-slate-400 block uppercase tracking-widest">Periode Target</span>
-                <span class="text-[12px] font-bold text-slate-700">Juni 2026</span>
-              </div>
-            </div>
-
-            <!-- Form Workspace Body -->
-            <div class="p-6 space-y-6">
-              
-              <!-- SECTION A: BASIC SALARY -->
-              <div>
-                <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 block">Gaji Pokok (basicSalary)</label>
-                <div class="relative max-w-xs">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-bold text-slate-400">Rp</span>
-                  <input type="number" id="inputBasicSalary" oninput="calculatePayroll()" value="5500000" 
-                         class="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl pl-9 pr-3 py-2 text-[13px] font-bold text-slate-800 tabular-nums focus:outline-none focus:border-slate-400 transition-colors">
-                </div>
+                <span
+                  class="rounded border border-amber-100 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
+                >
+                  DRAFT
+                </span>
               </div>
 
-              <!-- SECTION B: ALLOWANCES BLOCK (EARNINGS) -->
-              <div class="pt-4 border-t border-slate-100">
-                <div class="flex items-center justify-between mb-3">
-                  <h3 class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Tunjangan Dinamis (allowances)</h3>
-                  <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Earnings</span>
+              <!-- Pegawai 2 -->
+              <div
+                onclick="
+                  switchEmployee(this, 'Nurul Fajriyah', 'EMP-002', 'Finance Admin', 4800000, 0)
+                "
+                class="employee-card flex cursor-pointer items-center justify-between border-l-4 border-transparent p-4 transition-colors hover:bg-slate-50/50"
+              >
+                <div>
+                  <h4 class="text-[13px] font-semibold text-slate-700">Nurul Fajriyah</h4>
+                  <p class="text-[11px] text-slate-400">NIK: EMP-002 • Finance Admin</p>
                 </div>
-
-                <!-- Allowance Rows Container -->
-                <div id="allowanceContainer" class="space-y-2.5">
-                  <!-- Default Row 1 -->
-                  <div class="flex items-center gap-2 bg-slate-50/30 p-2 rounded-xl border border-slate-100 allowance-row">
-                    <input type="text" value="Tunjangan Operasional" class="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-slate-700 focus:outline-none" readonly>
-                    <div class="w-32 relative">
-                      <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400">Rp</span>
-                      <input type="number" value="900000" oninput="calculatePayroll()" class="amount-input w-full bg-white border border-slate-200 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-semibold text-slate-800 text-right focus:outline-none">
-                    </div>
-                    <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition-colors text-xs"><i class="fa-solid fa-trash-can"></i></button>
-                  </div>
-                </div>
-
-                <!-- Add Trigger from Master Data -->
-                <div class="mt-3 flex items-center gap-2">
-                  <select id="masterAllowanceSelect" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] font-medium text-slate-600 focus:outline-none">
-                    <option value="">-- Pilih Tunjangan Master --</option>
-                    <option value="Insentif Performa" data-amount="500000">Insentif Performa (FLEXIBLE)</option>
-                    <option value="Bonus Uang Lembur" data-amount="800000">Bonus Uang Lembur (FLEXIBLE)</option>
-                    <option value="Tunjangan Jabatan" data-amount="1500000">Tunjangan Jabatan (FIXED)</option>
-                  </select>
-                  <button type="button" onclick="addAllowanceField()" class="text-[11px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-                    + Tambah
-                  </button>
-                </div>
+                <span
+                  class="rounded border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
+                >
+                  PROCESSED
+                </span>
               </div>
 
-              <!-- SECTION C: DEDUCTIONS BLOCK -->
-              <div class="pt-4 border-t border-slate-100">
-                <div class="flex items-center justify-between mb-3">
-                  <h3 class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Potongan (deductions & loan)</h3>
-                  <span class="text-[10px] font-semibold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">Deductions</span>
+              <!-- Pegawai 3 -->
+              <div
+                onclick="
+                  switchEmployee(this, 'Adit Jansa', 'EMP-003', 'UI/UX Designer', 5000000, 150000)
+                "
+                class="employee-card flex cursor-pointer items-center justify-between border-l-4 border-transparent p-4 transition-colors hover:bg-slate-50/50"
+              >
+                <div>
+                  <h4 class="text-[13px] font-semibold text-slate-700">Adit Jansa</h4>
+                  <p class="text-[11px] text-slate-400">NIK: EMP-003 • UI/UX Designer</p>
                 </div>
-
-                <div id="deductionContainer" class="space-y-2.5">
-                  <!-- AUTO LOAN DEDUCTION COMPONENT (Locked by system reference) -->
-                  <div id="loanDeductionBlock" class="flex items-center gap-2 bg-amber-50/40 p-2.5 rounded-xl border border-amber-100/60">
-                    <div class="flex-1 text-[12px] font-medium text-amber-900 flex items-center gap-2">
-                      <i class="fa-solid fa-hand-holding-dollar text-amber-500"></i>
-                      Potongan Cicilan Loan (loanDeduction)
-                    </div>
-                    <div class="w-32 relative">
-                      <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-amber-600">Rp</span>
-                      <input type="number" id="loanAmountField" value="350000" class="w-full bg-white border border-amber-200/80 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-amber-900 text-right focus:outline-none" readonly>
-                    </div>
-                    <div class="w-8 h-8 flex items-center justify-center text-amber-400" title="Sistem Otomatis (Lock)"><i class="fa-solid fa-lock text-[10px]"></i></div>
-                  </div>
-
-                  <!-- Default Row Deduction 1 -->
-                  <div class="flex items-center gap-2 bg-slate-50/30 p-2 rounded-xl border border-slate-100 deduction-row">
-                    <input type="text" value="Potongan Keterlambatan" class="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-slate-700 focus:outline-none" readonly>
-                    <div class="w-32 relative">
-                      <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400">Rp</span>
-                      <input type="number" value="50000" oninput="calculatePayroll()" class="amount-input w-full bg-white border border-slate-200 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-semibold text-slate-800 text-right focus:outline-none">
-                    </div>
-                    <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition-colors text-xs"><i class="fa-solid fa-trash-can"></i></button>
-                  </div>
-                </div>
-
-                <!-- Add Trigger Deduction from Master -->
-                <div class="mt-3 flex items-center gap-2">
-                  <select id="masterDeductionSelect" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] font-medium text-slate-600 focus:outline-none">
-                    <option value="">-- Pilih Potongan Master --</option>
-                    <option value="Potongan Absen" data-amount="150000">Potongan Absen (FLEXIBLE)</option>
-                    <option value="BPJS Kesehatan" data-amount="120000">BPJS Kesehatan (FIXED)</option>
-                  </select>
-                  <button type="button" onclick="addDeductionField()" class="text-[11px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-                    + Tambah
-                  </button>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Card Footer Action Panel -->
-            <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end">
-              <button type="button" onclick="alert('Simulasi: Mengirim skema data payroll ke backend MongoDB')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-[12px] font-semibold rounded-xl transition-colors shadow-sm">
-                Simpan Komponen
-              </button>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- COLUMN 3: SIDEBAR LIVE REALTIME SLIP CALCULATOR -->
-        <div class="space-y-6">
-          <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden sticky top-6">
-            <div class="px-5 py-4 border-b border-slate-100">
-              <h3 class="text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Kalkulasi Ringkas Model</h3>
-            </div>
-            
-            <div class="p-5 space-y-4">
-              <div class="space-y-2.5 text-[12px]">
-                <div class="flex justify-between items-center">
-                  <span class="text-slate-500">Gaji Pokok (basicSalary)</span>
-                  <span id="previewBasic" class="font-semibold text-slate-900 tabular-nums">Rp 5.500.000</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-slate-400 font-medium">Total Tunjangan (totalEarnings)</span>
-                  <span id="previewEarnings" class="font-semibold text-emerald-600 tabular-nums">+Rp 900.000</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-slate-400 font-medium">Total Potongan (totalDeductions)</span>
-                  <span id="previewDeductions" class="font-semibold text-rose-600 tabular-nums">-Rp 400.000</span>
-                </div>
-              </div>
-
-              <!-- GRAND NET TAKE HOME PAY BALANCE -->
-              <div class="pt-4 border-t border-slate-200/80">
-                <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
-                  <div class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Net Take Home Pay (netTakeHomePay)</div>
-                  <div id="previewNetPay" class="text-[16px] font-bold text-slate-900 tracking-tight tabular-nums">
-                    Rp 6.000.000
-                  </div>
-                </div>
+                <span
+                  class="rounded border border-amber-100 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
+                >
+                  DRAFT
+                </span>
               </div>
             </div>
           </div>
-        </div>
 
+          <!-- WORKSPACE CONFIGURATION CONTAINER (FORM DETAIL & CALCULATOR) -->
+          <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-3 lg:col-span-8">
+            <!-- COLUMN 2: WORKSPACE DETAILED FORM -->
+            <div class="space-y-6 md:col-span-2">
+              <div
+                class="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)]"
+              >
+                <!-- Target Card Header -->
+                <div
+                  class="flex items-center justify-between border-b border-slate-100 bg-white px-6 py-5"
+                >
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-600"
+                    >
+                      <i class="fa-solid fa-user-gear text-xs"></i>
+                    </div>
+                    <div>
+                      <h2
+                        id="empNameTitle"
+                        class="mb-1 text-[14px] leading-none font-semibold text-slate-900"
+                      >
+                        M. Septiawan
+                      </h2>
+                      <p
+                        id="empMetaTitle"
+                        class="text-[10px] font-medium tracking-wider text-slate-400 uppercase"
+                      >
+                        NIK: EMP-001 • IT Specialist
+                      </p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <span
+                      class="block text-[10px] font-semibold tracking-widest text-slate-400 uppercase"
+                    >
+                      Periode Target
+                    </span>
+                    <span class="text-[12px] font-bold text-slate-700">Juni 2026</span>
+                  </div>
+                </div>
+
+                <!-- Form Workspace Body -->
+                <div class="space-y-6 p-6">
+                  <!-- SECTION A: BASIC SALARY -->
+                  <div>
+                    <label
+                      class="mb-2 block text-[10px] font-semibold tracking-widest text-slate-400 uppercase"
+                    >
+                      Gaji Pokok (basicSalary)
+                    </label>
+                    <div class="relative max-w-xs">
+                      <span
+                        class="absolute top-1/2 left-3 -translate-y-1/2 text-[12px] font-bold text-slate-400"
+                      >
+                        Rp
+                      </span>
+                      <input
+                        type="number"
+                        id="inputBasicSalary"
+                        oninput="calculatePayroll()"
+                        value="5500000"
+                        class="w-full rounded-xl border border-slate-200/80 bg-slate-50/50 py-2 pr-3 pl-9 text-[13px] font-bold text-slate-800 tabular-nums transition-colors focus:border-slate-400 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- SECTION B: ALLOWANCES BLOCK (EARNINGS) -->
+                  <div class="border-t border-slate-100 pt-4">
+                    <div class="mb-3 flex items-center justify-between">
+                      <h3
+                        class="text-[10px] font-semibold tracking-widest text-slate-400 uppercase"
+                      >
+                        Tunjangan Dinamis (allowances)
+                      </h3>
+                      <span
+                        class="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600"
+                      >
+                        Earnings
+                      </span>
+                    </div>
+
+                    <!-- Allowance Rows Container -->
+                    <div id="allowanceContainer" class="space-y-2.5">
+                      <!-- Default Row 1 -->
+                      <div
+                        class="allowance-row flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50/30 p-2"
+                      >
+                        <input
+                          type="text"
+                          value="Tunjangan Operasional"
+                          class="flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[12px] font-medium text-slate-700 focus:outline-none"
+                          readonly
+                        />
+                        <div class="relative w-32">
+                          <span
+                            class="absolute top-1/2 left-2.5 -translate-y-1/2 text-[11px] font-semibold text-slate-400"
+                          >
+                            Rp
+                          </span>
+                          <input
+                            type="number"
+                            value="900000"
+                            oninput="calculatePayroll()"
+                            class="amount-input w-full rounded-lg border border-slate-200 bg-white py-1.5 pr-2 pl-7 text-right text-[12px] font-semibold text-slate-800 focus:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onclick="
+                            this.parentElement.remove();
+                            calculatePayroll();
+                          "
+                          class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-xs text-rose-600 transition-colors hover:bg-rose-100"
+                        >
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Add Trigger from Master Data -->
+                    <div class="mt-3 flex items-center gap-2">
+                      <select
+                        id="masterAllowanceSelect"
+                        class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 focus:outline-none"
+                      >
+                        <option value="">-- Pilih Tunjangan Master --</option>
+                        <option value="Insentif Performa" data-amount="500000">
+                          Insentif Performa (FLEXIBLE)
+                        </option>
+                        <option value="Bonus Uang Lembur" data-amount="800000">
+                          Bonus Uang Lembur (FLEXIBLE)
+                        </option>
+                        <option value="Tunjangan Jabatan" data-amount="1500000">
+                          Tunjangan Jabatan (FIXED)
+                        </option>
+                      </select>
+                      <button
+                        type="button"
+                        onclick="addAllowanceField()"
+                        class="rounded-lg bg-slate-100 px-3 py-1.5 text-[11px] font-semibold text-slate-600 transition-colors hover:bg-slate-200"
+                      >
+                        + Tambah
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- SECTION C: DEDUCTIONS BLOCK -->
+                  <div class="border-t border-slate-100 pt-4">
+                    <div class="mb-3 flex items-center justify-between">
+                      <h3
+                        class="text-[10px] font-semibold tracking-widest text-slate-400 uppercase"
+                      >
+                        Potongan (deductions & loan)
+                      </h3>
+                      <span
+                        class="rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600"
+                      >
+                        Deductions
+                      </span>
+                    </div>
+
+                    <div id="deductionContainer" class="space-y-2.5">
+                      <!-- AUTO LOAN DEDUCTION COMPONENT (Locked by system reference) -->
+                      <div
+                        id="loanDeductionBlock"
+                        class="flex items-center gap-2 rounded-xl border border-amber-100/60 bg-amber-50/40 p-2.5"
+                      >
+                        <div
+                          class="flex flex-1 items-center gap-2 text-[12px] font-medium text-amber-900"
+                        >
+                          <i class="fa-solid fa-hand-holding-dollar text-amber-500"></i>
+                          Potongan Cicilan Loan (loanDeduction)
+                        </div>
+                        <div class="relative w-32">
+                          <span
+                            class="absolute top-1/2 left-2.5 -translate-y-1/2 text-[11px] font-semibold text-amber-600"
+                          >
+                            Rp
+                          </span>
+                          <input
+                            type="number"
+                            id="loanAmountField"
+                            value="350000"
+                            class="w-full rounded-lg border border-amber-200/80 bg-white py-1.5 pr-2 pl-7 text-right text-[12px] font-bold text-amber-900 focus:outline-none"
+                            readonly
+                          />
+                        </div>
+                        <div
+                          class="flex h-8 w-8 items-center justify-center text-amber-400"
+                          title="Sistem Otomatis (Lock)"
+                        >
+                          <i class="fa-solid fa-lock text-[10px]"></i>
+                        </div>
+                      </div>
+
+                      <!-- Default Row Deduction 1 -->
+                      <div
+                        class="deduction-row flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50/30 p-2"
+                      >
+                        <input
+                          type="text"
+                          value="Potongan Keterlambatan"
+                          class="flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[12px] font-medium text-slate-700 focus:outline-none"
+                          readonly
+                        />
+                        <div class="relative w-32">
+                          <span
+                            class="absolute top-1/2 left-2.5 -translate-y-1/2 text-[11px] font-semibold text-slate-400"
+                          >
+                            Rp
+                          </span>
+                          <input
+                            type="number"
+                            value="50000"
+                            oninput="calculatePayroll()"
+                            class="amount-input w-full rounded-lg border border-slate-200 bg-white py-1.5 pr-2 pl-7 text-right text-[12px] font-semibold text-slate-800 focus:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onclick="
+                            this.parentElement.remove();
+                            calculatePayroll();
+                          "
+                          class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-xs text-rose-600 transition-colors hover:bg-rose-100"
+                        >
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Add Trigger Deduction from Master -->
+                    <div class="mt-3 flex items-center gap-2">
+                      <select
+                        id="masterDeductionSelect"
+                        class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 focus:outline-none"
+                      >
+                        <option value="">-- Pilih Potongan Master --</option>
+                        <option value="Potongan Absen" data-amount="150000">
+                          Potongan Absen (FLEXIBLE)
+                        </option>
+                        <option value="BPJS Kesehatan" data-amount="120000">
+                          BPJS Kesehatan (FIXED)
+                        </option>
+                      </select>
+                      <button
+                        type="button"
+                        onclick="addDeductionField()"
+                        class="rounded-lg bg-slate-100 px-3 py-1.5 text-[11px] font-semibold text-slate-600 transition-colors hover:bg-slate-200"
+                      >
+                        + Tambah
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card Footer Action Panel -->
+                <div
+                  class="flex items-center justify-end border-t border-slate-100 bg-slate-50/50 px-6 py-4"
+                >
+                  <button
+                    type="button"
+                    onclick="alert('Simulasi: Mengirim skema data payroll ke backend MongoDB')"
+                    class="rounded-xl bg-slate-900 px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition-colors hover:bg-slate-800"
+                  >
+                    Simpan Komponen
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMN 3: SIDEBAR LIVE REALTIME SLIP CALCULATOR -->
+            <div class="space-y-6">
+              <div
+                class="sticky top-6 overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)]"
+              >
+                <div class="border-b border-slate-100 px-5 py-4">
+                  <h3 class="text-[10px] font-semibold tracking-widest text-slate-900 uppercase">
+                    Kalkulasi Ringkas Model
+                  </h3>
+                </div>
+
+                <div class="space-y-4 p-5">
+                  <div class="space-y-2.5 text-[12px]">
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-500">Gaji Pokok (basicSalary)</span>
+                      <span id="previewBasic" class="font-semibold text-slate-900 tabular-nums">
+                        Rp 5.500.000
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="font-medium text-slate-400">
+                        Total Tunjangan (totalEarnings)
+                      </span>
+                      <span
+                        id="previewEarnings"
+                        class="font-semibold text-emerald-600 tabular-nums"
+                      >
+                        +Rp 900.000
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="font-medium text-slate-400">
+                        Total Potongan (totalDeductions)
+                      </span>
+                      <span id="previewDeductions" class="font-semibold text-rose-600 tabular-nums">
+                        -Rp 400.000
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- GRAND NET TAKE HOME PAY BALANCE -->
+                  <div class="border-t border-slate-200/80 pt-4">
+                    <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                      <div
+                        class="mb-0.5 text-[9px] font-semibold tracking-widest text-slate-400 uppercase"
+                      >
+                        Net Take Home Pay (netTakeHomePay)
+                      </div>
+                      <div
+                        id="previewNetPay"
+                        class="text-[16px] font-bold tracking-tight text-slate-900 tabular-nums"
+                      >
+                        Rp 6.000.000
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
     </div>
-  </div>
-</div>
 
-<script>
-  // Fungsi penanganan pergantian tab karyawan secara dinamis
-  function switchEmployee(element, name, nik, role, basicSalary, loanAmount) {
-    // Reset styling semua card list karyawan
-    document.querySelectorAll('.employee-card').forEach(card => {
-      card.classList.remove('bg-slate-50', 'border-slate-900');
-      card.classList.add('hover:bg-slate-50/50', 'border-transparent');
-      card.querySelector('h4').classList.replace('text-slate-900', 'text-slate-700');
-    });
+    <script>
+      // Fungsi penanganan pergantian tab Pegawai secara dinamis
+      function switchEmployee(element, name, nik, role, basicSalary, loanAmount) {
+        // Reset styling semua card list Pegawai
+        document.querySelectorAll(".employee-card").forEach((card) => {
+          card.classList.remove("bg-slate-50", "border-slate-900");
+          card.classList.add("hover:bg-slate-50/50", "border-transparent");
+          card.querySelector("h4").classList.replace("text-slate-900", "text-slate-700");
+        });
 
-    // Pasang active style ke item terpilih
-    element.classList.remove('hover:bg-slate-50/50', 'border-transparent');
-    element.classList.add('bg-slate-50', 'border-slate-900');
-    element.querySelector('h4').classList.replace('text-slate-700', 'text-slate-900');
+        // Pasang active style ke item terpilih
+        element.classList.remove("hover:bg-slate-50/50", "border-transparent");
+        element.classList.add("bg-slate-50", "border-slate-900");
+        element.querySelector("h4").classList.replace("text-slate-700", "text-slate-900");
 
-    // Update data teks Header form
-    document.getElementById('empNameTitle').innerText = name;
-    document.getElementById('empMetaTitle').innerText = `NIK: ${nik} • ${role}`;
-    
-    // Set nilai dasar form berdasarkan parameter profile baru
-    document.getElementById('inputBasicSalary').value = basicSalary;
-    document.getElementById('loanAmountField').value = loanAmount;
-    
-    // Sembunyikan atau tunjukkan block loan tergantung kondisi data loan
-    const loanBlock = document.getElementById('loanDeductionBlock');
-    if(loanAmount === 0) {
-      loanBlock.style.display = 'none';
-    } else {
-      loanBlock.style.display = 'flex';
-    }
+        // Update data teks Header form
+        document.getElementById("empNameTitle").innerText = name;
+        document.getElementById("empMetaTitle").innerText = `NIK: ${nik} • ${role}`;
 
-    // Jalankan kalkulator ulang
-    calculatePayroll();
-  }
+        // Set nilai dasar form berdasarkan parameter profile baru
+        document.getElementById("inputBasicSalary").value = basicSalary;
+        document.getElementById("loanAmountField").value = loanAmount;
 
-  // CORE ENGINE SIMULATOR: Hitung nominal realtime mencerminkan logika rumus Mongoose Schema
-  function calculatePayroll() {
-    const basicSalary = parseFloat(document.getElementById('inputBasicSalary').value) || 0;
-    const loanDeduction = parseFloat(document.getElementById('loanAmountField').value) || 0;
+        // Sembunyikan atau tunjukkan block loan tergantung kondisi data loan
+        const loanBlock = document.getElementById("loanDeductionBlock");
+        if (loanAmount === 0) {
+          loanBlock.style.display = "none";
+        } else {
+          loanBlock.style.display = "flex";
+        }
 
-    // Hitung akumulasi tunjangan dinamis
-    let totalAllowances = 0;
-    document.querySelectorAll('.allowance-row .amount-input').forEach(input => {
-      totalAllowances += parseFloat(input.value) || 0;
-    });
+        // Jalankan kalkulator ulang
+        calculatePayroll();
+      }
 
-    // Hitung akumulasi potongan dinamis
-    let totalDeductionsDynamic = 0;
-    document.querySelectorAll('.deduction-row .amount-input').forEach(input => {
-      totalDeductionsDynamic += parseFloat(input.value) || 0;
-    });
+      // CORE ENGINE SIMULATOR: Hitung nominal realtime mencerminkan logika rumus Mongoose Schema
+      function calculatePayroll() {
+        const basicSalary = parseFloat(document.getElementById("inputBasicSalary").value) || 0;
+        const loanDeduction = parseFloat(document.getElementById("loanAmountField").value) || 0;
 
-    // Rumus Akumulasi Model Gaji
-    const totalEarnings = basicSalary + totalAllowances;
-    const totalDeductions = totalDeductionsDynamic + loanDeduction;
-    const netTakeHomePay = totalEarnings - totalDeductions;
+        // Hitung akumulasi tunjangan dinamis
+        let totalAllowances = 0;
+        document.querySelectorAll(".allowance-row .amount-input").forEach((input) => {
+          totalAllowances += parseFloat(input.value) || 0;
+        });
 
-    // Render output visual ke komponen Sidebar kanan dengan format mata uang IDR lokal
-    document.getElementById('previewBasic').innerText = 'Rp ' + basicSalary.toLocaleString('id-ID');
-    document.getElementById('previewEarnings').innerText = '+Rp ' + totalAllowances.toLocaleString('id-ID');
-    document.getElementById('previewDeductions').innerText = '-Rp ' + totalDeductions.toLocaleString('id-ID');
-    document.getElementById('previewNetPay').innerText = 'Rp ' + netTakeHomePay.toLocaleString('id-ID');
-  }
+        // Hitung akumulasi potongan dinamis
+        let totalDeductionsDynamic = 0;
+        document.querySelectorAll(".deduction-row .amount-input").forEach((input) => {
+          totalDeductionsDynamic += parseFloat(input.value) || 0;
+        });
 
-  // Fungsi menambah baris tunjangan baru dari komponen master
-  function addAllowanceField() {
-    const select = document.getElementById('masterAllowanceSelect');
-    const name = select.value;
-    const amount = select.options[select.selectedIndex]?.getAttribute('data-amount') || 0;
+        // Rumus Akumulasi Model Gaji
+        const totalEarnings = basicSalary + totalAllowances;
+        const totalDeductions = totalDeductionsDynamic + loanDeduction;
+        const netTakeHomePay = totalEarnings - totalDeductions;
 
-    if (!name) return alert('Pilih komponen tunjangan master terlebih dahulu');
+        // Render output visual ke komponen Sidebar kanan dengan format mata uang IDR lokal
+        document.getElementById("previewBasic").innerText =
+          "Rp " + basicSalary.toLocaleString("id-ID");
+        document.getElementById("previewEarnings").innerText =
+          "+Rp " + totalAllowances.toLocaleString("id-ID");
+        document.getElementById("previewDeductions").innerText =
+          "-Rp " + totalDeductions.toLocaleString("id-ID");
+        document.getElementById("previewNetPay").innerText =
+          "Rp " + netTakeHomePay.toLocaleString("id-ID");
+      }
 
-    const template = `
+      // Fungsi menambah baris tunjangan baru dari komponen master
+      function addAllowanceField() {
+        const select = document.getElementById("masterAllowanceSelect");
+        const name = select.value;
+        const amount = select.options[select.selectedIndex]?.getAttribute("data-amount") || 0;
+
+        if (!name) return alert("Pilih komponen tunjangan master terlebih dahulu");
+
+        const template = `
       <div class="flex items-center gap-2 bg-slate-50/30 p-2 rounded-xl border border-slate-100 allowance-row">
         <input type="text" value="${name}" class="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-slate-700 focus:outline-none" readonly>
         <div class="w-32 relative">
@@ -343,20 +567,20 @@
         <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition-colors text-xs"><i class="fa-solid fa-trash-can"></i></button>
       </div>
     `;
-    document.getElementById('allowanceContainer').insertAdjacentHTML('beforeend', template);
-    select.value = ""; 
-    calculatePayroll();
-  }
+        document.getElementById("allowanceContainer").insertAdjacentHTML("beforeend", template);
+        select.value = "";
+        calculatePayroll();
+      }
 
-  // Fungsi menambah baris potongan baru dari komponen master
-  function addDeductionField() {
-    const select = document.getElementById('masterDeductionSelect');
-    const name = select.value;
-    const amount = select.options[select.selectedIndex]?.getAttribute('data-amount') || 0;
+      // Fungsi menambah baris potongan baru dari komponen master
+      function addDeductionField() {
+        const select = document.getElementById("masterDeductionSelect");
+        const name = select.value;
+        const amount = select.options[select.selectedIndex]?.getAttribute("data-amount") || 0;
 
-    if (!name) return alert('Pilih komponen potongan master terlebih dahulu');
+        if (!name) return alert("Pilih komponen potongan master terlebih dahulu");
 
-    const template = `
+        const template = `
       <div class="flex items-center gap-2 bg-slate-50/30 p-2 rounded-xl border border-slate-100 deduction-row">
         <input type="text" value="${name}" class="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-slate-700 focus:outline-none" readonly>
         <div class="w-32 relative">
@@ -366,15 +590,15 @@
         <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition-colors text-xs"><i class="fa-solid fa-trash-can"></i></button>
       </div>
     `;
-    document.getElementById('deductionContainer').insertAdjacentHTML('beforeend', template);
-    select.value = "";
-    calculatePayroll();
-  }
+        document.getElementById("deductionContainer").insertAdjacentHTML("beforeend", template);
+        select.value = "";
+        calculatePayroll();
+      }
 
-  // Inisialisasi awal saat halaman dibuka pertama kali
-  window.onload = function() {
-    calculatePayroll();
-  };
-</script>
-</body>
+      // Inisialisasi awal saat halaman dibuka pertama kali
+      window.onload = function () {
+        calculatePayroll();
+      };
+    </script>
+  </body>
 </html>
