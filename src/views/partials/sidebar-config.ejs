@@ -1,7 +1,7 @@
 <%
   this.sidebarSections = [
     {
-      title: "Human Resource",
+      title: "Manajemen Pegawai",
       show: true,
       menus: [
         {
@@ -42,7 +42,7 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />`,
           show: true,
           submenus: [
-            { name: "Buat Penugasan", path: "/assignment/new", show: user.role === 'PIMPINAN' },
+            { name: "Buat Penugasan", path: "/assignment/new", show: user.role === 'DIREKTUR_UTAMA' },
             { name: "Penugasan Masuk", path: "/assignment/my", show: !!user.permissions.assignment_my },
             { name: "Semua Penugasan", path: "/assignment/", show: !!user.permissions.assignment_all }
           ]
@@ -62,14 +62,14 @@
             { name: "Buat Pengajuan", path: "/leave/apply", show: !!user.permissions.leave_request },
             { name: "Riwayat Pengajuan", path: "/leave/my-history", show: !!user.permissions.leave_my },
             { name: "Permintaan Delegasi", path: "/leave/my-delegations", show: true },
-            { name: "Manajemen Cuti", path: "/leave/manage-requests", show: user.role !== 'STAFF' && user.role !== 'KEUANGAN' }
+            { name: "Manajemen Cuti", path: "/leave/manage-requests", show: user.role !== 'PEGAWAI' && user.role !== 'MANAGER_KEUANGAN' }
           ]
         },
         {
           id: "approval",
           name: "Persetujuan",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
-          show: user.role === 'PIMPINAN',
+          show: user.role === 'DIREKTUR_UTAMA',
           submenus: [
             { name: "Persetujuan PHK", path: "/approvals/pending", show: true }
           ]
@@ -94,7 +94,7 @@
           submenus: [
             { name: "Catat Absensi", path: "/attendance", show: true },
             { name: "Daftar Absensi", path: "/attendance/history", show: true },
-            { name: "Lihat Semua Absensi", path: "/attendance/getall", show: user.role !== 'STAFF' && user.role !== 'KEUANGAN' }
+            { name: "Lihat Semua Absensi", path: "/attendance/getall", show: user.role !== 'PEGAWAI' && user.role !== 'MANAGER_KEUANGAN' }
           ]
         },
         {
@@ -120,7 +120,7 @@
           id: "sales",
           name: "Kunjungan Sales",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />`,
-          show: user.role !== "PIMPINAN",
+          show: user.role !== "DIREKTUR_UTAMA",
           submenus: [
             { name: "Catat Kunjungan", path: "/sales/new", show: true },
             { name: "Daftar Kunjungan", path: "/sales/my", show: true }
@@ -165,8 +165,8 @@
           submenus: [
             { name: "Buat Pengajuan", path: "/expense/create", show: true },
             { name: "Riwayat Pengajuan", path: "/expense/my", show: true },
-            { name: "Verifikasi Manager", path: "/expense/approval/manager", show: user.role === 'MANAGER' || user.role === 'GENERAL MANAGER' },
-            { name: "Verifikasi Finance", path: "/expense/finance", show: user.role === 'KEUANGAN' }
+            { name: "Verifikasi Manager", path: "/expense/approval/manager", show: user.role === 'MANAGER_ADMINISTRASI' },
+            { name: "Verifikasi Finance", path: "/expense/finance", show: user.role === 'MANAGER_KEUANGAN' }
           ]
         },
         {

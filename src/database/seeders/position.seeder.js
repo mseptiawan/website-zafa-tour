@@ -25,7 +25,7 @@ const positionSeeder = async () => {
     },
 
     {
-      name: "Staff",
+      name: "Pegawai",
     },
   ]);
 

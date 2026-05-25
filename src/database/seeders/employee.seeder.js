@@ -7,19 +7,13 @@ import Bidang from "../../models/basic/Bidang.js";
 const employeeSeeder = async () => {
   await Employee.deleteMany();
 
-  // =====================
-  // POSITION
-  // =====================
   const komisaris = await Position.findOne({ name: "Komisaris" });
   const direkturUtama = await Position.findOne({ name: "Direktur Utama" });
   const wakilDirektur = await Position.findOne({ name: "Wakil Direktur" });
   const generalManager = await Position.findOne({ name: "General Manager" });
   const manager = await Position.findOne({ name: "Manager" });
-  const staff = await Position.findOne({ name: "Staff" });
+  const pegawai = await Position.findOne({ name: "Pegawai" });
 
-  // =====================
-  // BIDANG
-  // =====================
   const administrasi = await Bidang.findOne({ name: "Administrasi" });
   const keuangan = await Bidang.findOne({ name: "Keuangan" });
   const marketing = await Bidang.findOne({ name: "Marketing dan Kemitraan" });
@@ -67,11 +61,6 @@ const employeeSeeder = async () => {
 
   const perlengkapan = await Unit.findOne({ name: "Perlengkapan" });
 
-  // =====================
-  // USERS
-  // =====================
-  // ================= EMPLOYEE USERS =================
-
   const gustidiansyah = await User.findOne({ username: "gustidiansyah" });
   const willycauza = await User.findOne({ username: "willycauza" });
   const rafikafitrianti = await User.findOne({ username: "rafikafitrianti" });
@@ -100,11 +89,7 @@ const employeeSeeder = async () => {
   const mariani = await User.findOne({ username: "mariani" });
   const adipuja = await User.findOne({ username: "adipuja" });
 
-  // =====================
-  // DIRECT INSERT EMPLOYEE
-  // =====================
-
-    const rawEmployees = [
+  const rawEmployees = [
     {
       userId: rafikafitrianti._id,
       fullName: "Rafika Fitrianti",
@@ -141,14 +126,10 @@ const employeeSeeder = async () => {
       userId: fadhilah._id,
       fullName: "Fadhilah",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: pengeluaranOperasional._id,
       bidangId: keuangan._id,
     },
-
-    // =====================
-    // ADMINISTRASI
-    // =====================
 
     {
       userId: gustidiansyah._id,
@@ -170,7 +151,7 @@ const employeeSeeder = async () => {
       userId: mriskywindinata._id,
       fullName: "Mrisky Windinata",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: ticketingHajiKhusus._id,
       bidangId: administrasi._id,
     },
@@ -178,20 +159,16 @@ const employeeSeeder = async () => {
       userId: lilymustikasari._id,
       fullName: "Lily Mustikasari",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: cs._id,
       bidangId: administrasi._id,
     },
-
-    // =====================
-    // KEUANGAN
-    // =====================
 
     {
       userId: febriansyah._id,
       fullName: "Febriansyah",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: pelaporanUmrahTransportasi._id,
       bidangId: administrasi._id,
     },
@@ -199,7 +176,7 @@ const employeeSeeder = async () => {
       userId: adindarismayani._id,
       fullName: "Adinda Rismayani",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: onlineCustomerCare._id,
       bidangId: administrasi._id,
     },
@@ -207,7 +184,7 @@ const employeeSeeder = async () => {
       userId: fajarjaniko._id,
       fullName: "Fajar Janiko",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: cs._id,
       bidangId: administrasi._id,
     },
@@ -215,20 +192,16 @@ const employeeSeeder = async () => {
       userId: rendijalil._id,
       fullName: "Rendi Jalil",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: visaHotel._id,
       bidangId: hajiUmrah._id,
     },
-
-    // =====================
-    // Haji & Umrah
-    // =====================
 
     {
       userId: abdulaziz._id,
       fullName: "Abdul Aziz",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: pelayananSaudi._id,
       bidangId: hajiUmrah._id,
     },
@@ -236,7 +209,7 @@ const employeeSeeder = async () => {
       userId: basoherman._id,
       fullName: "Baso Herman",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: pendidikanPelatihan._id,
       bidangId: hajiUmrah._id,
     },
@@ -244,33 +217,25 @@ const employeeSeeder = async () => {
       userId: ongkidwi._id,
       fullName: "Ongki Dwi",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: multimedia._id,
       bidangId: it._id,
     },
-
-    // =====================
-    // IT
-    // =====================
 
     {
       userId: sarwanto._id,
       fullName: "Sarwanto",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: multimedia._id,
       bidangId: it._id,
     },
-
-    // =====================
-    // MARKETING
-    // =====================
 
     {
       userId: dirasuhada._id,
       fullName: "Dira Suhada",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: accounting._id,
       bidangId: keuangan._id,
     },
@@ -278,20 +243,16 @@ const employeeSeeder = async () => {
       userId: muliaeka._id,
       fullName: "Mulia Eka",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: pengeluaranCOGS._id,
       bidangId: keuangan._id,
     },
-
-    // =====================
-    // UMUM
-    // =====================
 
     {
       userId: dinaanggraini._id,
       fullName: "Dina Anggraini",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: penerimaanPenagihan._id,
       bidangId: keuangan._id,
     },
@@ -299,20 +260,16 @@ const employeeSeeder = async () => {
       userId: nurul._id,
       fullName: "Nurul",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: penerimaanStoran._id,
       bidangId: keuangan._id,
     },
-
-    // =====================
-    // SUPPORT / GENERAL STAFF
-    // =====================
 
     {
       userId: arifsuprastiyo._id,
       fullName: "Arif Suprastiyo",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: marketingUnit._id,
       bidangId: marketing._id,
     },
@@ -320,7 +277,7 @@ const employeeSeeder = async () => {
       userId: deckycaprianus._id,
       fullName: "Decky Caprianus",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: marketingUnit._id,
       bidangId: marketing._id,
     },
@@ -328,7 +285,7 @@ const employeeSeeder = async () => {
       userId: adikurniadi._id,
       fullName: "Adi Kurniadi",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: marketingUnit._id,
       bidangId: marketing._id,
     },
@@ -336,7 +293,7 @@ const employeeSeeder = async () => {
       userId: nicoyudhira._id,
       fullName: "Nico Yudhira",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: perlengkapan._id,
       bidangId: umum._id,
     },
@@ -344,7 +301,7 @@ const employeeSeeder = async () => {
       userId: mariani._id,
       fullName: "Mariani",
       gender: "Perempuan",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: perlengkapan._id,
       bidangId: umum._id,
     },
@@ -352,24 +309,24 @@ const employeeSeeder = async () => {
       userId: adipuja._id,
       fullName: "Adi Puja",
       gender: "Laki-Laki",
-      positionId: staff._id,
+      positionId: pegawai._id,
       unitId: perlengkapan._id,
       bidangId: umum._id,
     },
-  ]
+  ];
 
   const finalEmployees = rawEmployees.map((emp, index) => {
     const orderNumber = (index + 1).toString().padStart(3, "0");
-    
+
     return {
       ...emp,
-      employeeIdNumber: `EMP-${orderNumber}`, 
+      employeeIdNumber: `EMP-${orderNumber}`,
     };
   });
 
   await Employee.insertMany(finalEmployees);
 
-  console.log(`Successfully seeded ${finalEmployees.length} employees with dynamic IDs.`)
+  console.log(`Successfully seeded ${finalEmployees.length} employees with dynamic IDs.`);
 };
 
 export default employeeSeeder;
