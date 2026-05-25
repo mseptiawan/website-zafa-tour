@@ -4,16 +4,22 @@ import mongoose from "mongoose";
 import roleSeeder from "./role.seeder.js";
 import bidangSeeder from "./bidang.seeder.js";
 import unitSeeder from "./unit.seeder.js";
-import userSeeder from "./user.seeder.js";
 import positionSeeder from "./position.seeder.js";
+import salaryComponentSeeder from "./salaryComponent.seeder.js";
+
+import userSeeder from "./user.seeder.js";
 import employeeSeeder from "./employee.seeder.js";
-import leaveSeeder from "./leave.seeder.js";
+import employeeSalarySeeder from "./employeeSalary.seeder.js";
+
 import holidaySeeder from "./holidays.seeder.js";
+import leaveSeeder from "./leave.seeder.js";
+
 import assignmentSeeder from "./assignment.seeder.js";
 import announcementSeeder from "./announcement.seeder.js";
 import salesVisitSeeder from "./salesVisit.seeder.js";
 import businessTripSeeder from "./businessTrip.seeder.js";
 import overtimeSeeder from "./overtime.seeder.js";
+import expenseSeeder from "./expenseSeeder.js";
 
 import kpiTemplateSeeder from "./kpiTemplate.seeder.js";
 import kpiTemplateDetailSeeder from "./kpiTemplateDetail.seeder.js";
@@ -22,28 +28,26 @@ import unitKpiMappingSeeder from "./unitKpiMapping.seeder.js";
 dotenv.config();
 
 const seeders = [
-  // master data
   roleSeeder,
   bidangSeeder,
   unitSeeder,
   positionSeeder,
+  salaryComponentSeeder,
 
-  // user & employee
   userSeeder,
   employeeSeeder,
+  employeeSalarySeeder,
 
-  // leave
   holidaySeeder,
   leaveSeeder,
 
-  // aktivitas
   assignmentSeeder,
   announcementSeeder,
   salesVisitSeeder,
   businessTripSeeder,
   overtimeSeeder,
+  expenseSeeder,
 
-  // KPI
   kpiTemplateSeeder,
   kpiTemplateDetailSeeder,
   unitKpiMappingSeeder,

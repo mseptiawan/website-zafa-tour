@@ -2,13 +2,13 @@
   <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
     
     <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl <%= user.role === 'KEUANGAN' ? 'bg-emerald-50' : 'bg-blue-50' %> flex items-center justify-center">
-            <i class="fa-solid <%= user.role === 'KEUANGAN' ? 'fa-money-bill-transfer text-emerald-700' : 'fa-check-double text-blue-700' %>"></i>
+        <div class="w-9 h-9 rounded-xl <%= user.role === 'MANAGER_KEUANGAN' ? 'bg-emerald-50' : 'bg-blue-50' %> flex items-center justify-center">
+            <i class="fa-solid <%= user.role === 'MANAGER_KEUANGAN' ? 'fa-money-bill-transfer text-emerald-700' : 'fa-check-double text-blue-700' %>"></i>
         </div>
-        <%= user.role === 'KEUANGAN' ? 'Proses Pencairan Dana' : 'Evaluasi Pinjaman' %>
+        <%= user.role === 'MANAGER_KEUANGAN' ? 'Proses Pencairan Dana' : 'Evaluasi Pinjaman' %>
     </h3>
 
-  <% if (user.role === 'KEUANGAN') { %>
+  <% if (user.role === 'MANAGER_KEUANGAN') { %>
   <form action="/loans/approval/disburse/<%= activeApproval._id %>" method="POST" enctype="multipart/form-data">
     
     <div id="upload-section" class="mb-5">

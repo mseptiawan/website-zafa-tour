@@ -108,7 +108,7 @@ export const EmployeeService = {
   updateEmployeeById: async (id, data, fileName) => {
     const employee = await Employee.findById(id);
     if (!employee) {
-      throw new AppError("Karyawan tidak ditemukan", 404);
+      throw new AppError("Pegawai tidak ditemukan", 404);
     }
     Object.assign(employee, {
       fullName: data.fullName,

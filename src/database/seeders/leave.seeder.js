@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import User from "../../models/User.js";
-import Role from "../../models/Role.js";
+import User from "../../models/basic/User.js";
+import Role from "../../models/basic/Role.js";
 import Leave from "../../models/leave/Leave.model.js";
 import LeaveApproval from "../../models/leave/LeaveApproval.model.js";
 import LeaveBalance from "../../models/leave/LeaveBalance.model.js";
@@ -20,7 +20,7 @@ const leaveTypesMaster = [
     requiresAttachment: false,
     isDeductBalance: true,
     isActive: true,
-    description: "Jatah kuota cuti tahunan reguler karyawan.",
+    description: "Jatah kuota cuti tahunan reguler Pegawai.",
   },
   {
     name: "Cuti Sakit",
@@ -315,7 +315,7 @@ export default async function leaveSeeder() {
             status: "APPROVED",
             processedBy: hrUser._id,
             processAt: startDate,
-            note: "Pembatalan disetujui, kuota karyawan tidak dipotong.",
+            note: "Pembatalan disetujui, kuota Pegawai tidak dipotong.",
           });
         }
 

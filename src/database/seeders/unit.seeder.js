@@ -1,5 +1,5 @@
-import Bidang from "../../models/Bidang.js";
-import Unit from "../../models/Unit.js";
+import Bidang from "../../models/basic/Bidang.js";
+import Unit from "../../models/basic/Unit.js";
 
 const unitSeeder = async () => {
   await Unit.deleteMany();

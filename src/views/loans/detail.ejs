@@ -4,8 +4,8 @@
   <div class="max-w-6xl mx-auto">
 
     <% 
-      const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "KEUANGAN", "GENERAL_MANAGER"];
-      const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
+     const APPROVER_ROLES = ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
+const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
       const backLink = isManagement ? '/loans/loan-management' : '/loans/my';
     %>
 
@@ -26,8 +26,12 @@
             <div class="flex items-center gap-4">
               <i class="fa-solid fa-user-tie text-base"></i>
               <div>
-                <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-1"><%= (loan.employeeId) ? loan.employeeId.fullName : 'Detail Pengajuan Loan' %></h1>
-                <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Unit: <%= (loan.employeeId && loan.employeeId.unitId) ? loan.employeeId.unitId.name : 'Tidak Ada' %></p>
+               <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-1">
+  <%= loan.employeeId?.fullName || 'Detail Pengajuan Pinjaman Pegawai' %>
+</h1>
+<p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+  Unit: <%= loan.employeeId?.unitId?.name || 'Tidak Ada' %>
+</p>
               </div>
             </div>
             <span class="px-3 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= loan.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' : loan.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' %>">

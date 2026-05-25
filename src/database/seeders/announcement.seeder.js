@@ -2,10 +2,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import Announcement from "../../models/Announcement.js";
-import User from "../../models/User.js";
+import User from "../../models/basic/User.js";
 
 dotenv.config();
-
 
 // ======================================================
 // TARGET USERS
@@ -25,7 +24,7 @@ Mulai tanggal 1 Juni 2026, jam operasional kantor pusat mengalami perubahan menj
 
 Perubahan ini dilakukan untuk menyesuaikan kebutuhan operasional perusahaan dan meningkatkan efektivitas koordinasi antar divisi.
 
-Seluruh karyawan diwajibkan hadir tepat waktu dan melakukan absensi sesuai prosedur yang berlaku. Keterlambatan tanpa alasan yang jelas akan dicatat dalam evaluasi kedisiplinan bulanan.
+Seluruh Pegawai diwajibkan hadir tepat waktu dan melakukan absensi sesuai prosedur yang berlaku. Keterlambatan tanpa alasan yang jelas akan dicatat dalam evaluasi kedisiplinan bulanan.
 
 Untuk divisi tertentu yang memiliki kebutuhan operasional khusus, jadwal kerja akan diinformasikan langsung oleh masing-masing pimpinan divisi.
     `,
@@ -39,7 +38,7 @@ Divisi IT akan melakukan maintenance terhadap sistem HRIS dan payroll perusahaan
 
 Selama proses maintenance berlangsung, beberapa fitur seperti pengajuan cuti, absensi online, reimbursement, dan slip gaji tidak dapat diakses sementara waktu.
 
-Kami menghimbau seluruh karyawan untuk menyelesaikan kebutuhan administrasi sebelum jadwal maintenance dimulai guna menghindari kendala operasional.
+Kami menghimbau seluruh Pegawai untuk menyelesaikan kebutuhan administrasi sebelum jadwal maintenance dimulai guna menghindari kendala operasional.
 
 Apabila ditemukan kendala setelah maintenance selesai, segera hubungi tim IT support internal.
     `,
@@ -58,7 +57,7 @@ Materi training meliputi:
 - Identifikasi malware
 - Kebijakan keamanan perangkat kerja
 
-Seluruh karyawan wajib mengikuti kegiatan ini karena akan menjadi bagian dari penilaian kepatuhan keamanan informasi perusahaan.
+Seluruh Pegawai wajib mengikuti kegiatan ini karena akan menjadi bagian dari penilaian kepatuhan keamanan informasi perusahaan.
     `,
     category: "OFFICIAL",
   },
@@ -66,11 +65,11 @@ Seluruh karyawan wajib mengikuti kegiatan ini karena akan menjadi bagian dari pe
   {
     title: "Kegiatan Family Gathering Tahunan",
     content: `
-Perusahaan akan mengadakan kegiatan family gathering tahunan pada akhir bulan ini sebagai bentuk apresiasi terhadap seluruh karyawan dan keluarga.
+Perusahaan akan mengadakan kegiatan family gathering tahunan pada akhir bulan ini sebagai bentuk apresiasi terhadap seluruh Pegawai dan keluarga.
 
-Acara akan dilaksanakan selama dua hari satu malam dengan berbagai agenda seperti outbound, team building, hiburan, dan pembagian penghargaan karyawan terbaik.
+Acara akan dilaksanakan selama dua hari satu malam dengan berbagai agenda seperti outbound, team building, hiburan, dan pembagian penghargaan Pegawai terbaik.
 
-Diharapkan seluruh karyawan dapat berpartisipasi untuk mempererat hubungan antar tim dan meningkatkan semangat kerja bersama.
+Diharapkan seluruh Pegawai dapat berpartisipasi untuk mempererat hubungan antar tim dan meningkatkan semangat kerja bersama.
     `,
     category: "LIGHT",
   },
@@ -96,7 +95,7 @@ Hasil evaluasi akan digunakan sebagai dasar pengambilan keputusan terkait promos
     content: `
 Mulai bulan depan, perusahaan akan menggunakan sistem absensi digital berbasis mobile untuk meningkatkan akurasi pencatatan kehadiran.
 
-Karyawan diwajibkan melakukan:
+Pegawai diwajibkan melakukan:
 - Check in saat masuk kerja
 - Check out saat selesai bekerja
 - Validasi lokasi kerja
@@ -123,7 +122,7 @@ Pengecualian hanya berlaku untuk kondisi tertentu yang telah mendapatkan persetu
     content: `
 Sehubungan dengan penetapan cuti bersama nasional oleh pemerintah, perusahaan akan menyesuaikan jadwal operasional selama periode libur berlangsung.
 
-Seluruh karyawan diminta memastikan:
+Seluruh Pegawai diminta memastikan:
 - Pekerjaan utama telah diselesaikan
 - Dokumen penting telah diamankan
 - Koordinasi antar tim tetap berjalan
@@ -152,7 +151,7 @@ Kehadiran seluruh kepala divisi dan supervisor bersifat wajib.
   {
     title: "Peluncuran Sistem HRIS Generasi Baru",
     content: `
-Perusahaan resmi meluncurkan sistem HRIS terbaru yang memiliki berbagai fitur tambahan untuk meningkatkan efisiensi administrasi karyawan.
+Perusahaan resmi meluncurkan sistem HRIS terbaru yang memiliki berbagai fitur tambahan untuk meningkatkan efisiensi administrasi Pegawai.
 
 Fitur baru meliputi:
 - Pengajuan cuti online
@@ -199,8 +198,6 @@ function randomDate() {
 // MAIN SEED
 // ======================================================
 
-
-
 export default async function announcementSeeder() {
   try {
     const users = await User.find({
@@ -241,7 +238,6 @@ export default async function announcementSeeder() {
     await Announcement.insertMany(data);
 
     console.log("Seeder Announcement berhasil dibuat");
-
   } catch (err) {
     console.error(err);
     throw err;

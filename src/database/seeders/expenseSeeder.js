@@ -1,12 +1,7 @@
-import mongoose from "mongoose";
 import ExpenseClaim from "../../models/ExpenseClaim.js";
 import User from "../../models/basic/User.js";
 import Employee from "../../models/employee/Employee.model.js";
 
-// =========================
-// CONFIG & TARGET USERS
-// =========================
-const MONGO_URI = "mongodb://localhost:27017/hris_zafa_tour";
 const usernames = [
   "basoherman",
   "ongkidwi",
@@ -22,9 +17,6 @@ const usernames = [
 const categories = ["TRANSPORT", "MEAL", "HOTEL", "PARKING", "OPERASIONAL", "LAINNYA"];
 const finalStatuses = ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"];
 
-// =========================
-// HELPERS
-// =========================
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -35,77 +27,47 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-// =========================
-// MAIN SEED FUNCTION
-// =========================
-const seedExpenses = async () => {
-  try {
-    // 1. Konek ke DB
-    await mongoose.connect(MONGO_URI);
-    console.log("Database connected successfully for seeding...");
-
-    // 2. Cari user
-    const users = await User.find({ username: { $in: usernames } });
-    if (!users.length) {
-      console.log("Tidak ada user ditemukan. Seeding dibatalkan.");
-      return;
-    }
-
-    // 3. Hapus data lama
-    await ExpenseClaim.deleteMany({});
-    console.log("Data klaim lama dibersihkan.");
-
-    const data = [];
-
-    // 4. Proses generate 40 data per user
-    for (const user of users) {
-      const employee = await Employee.findOne({ userId: user._id });
-
-      for (let i = 0; i < 40; i++) {
-        const amount = Math.floor(Math.random() * 500000) + 50000;
-        const date = randomDate();
-
-        // Membagi variasi status secara acak agar kedua Tab (Verifikasi & Riwayat) terisi seimbang
-        const status = randomItem(finalStatuses);
-
-        data.push({
-          userId: user._id,
-          employeeId: employee ? employee._id : null,
-          title: `Klaim Operasional ${i + 1} - ${user.username}`,
-          category: randomItem(categories),
-          amount: amount,
-          expenseDate: date,
-          status: status,
-          selfDeclaration: amount < 100000, // Jika di bawah 100rb, anggap klaim mandiri tanpa nota bawaan
-          proofFile: amount >= 100000 ? "nota-kredit.png" : null,
-
-          // ==========================================
-          // ATURAN BARU: KONDISIONAL BUKTI TRANSFER
-          // ==========================================
-          // Jika statusnya PAID, kita simulasikan 50% dibayar transfer (ada file)
-          // dan 50% dibayar tunai/cash (transferProofFile bernilai null)
-          transferProofFile:
-            status === "PAID" && Math.random() > 0.5 ? "file-1779435027076.jpeg" : null,
-          paidAt: status === "PAID" ? date : null,
-          financeApprovedBy: status === "PAID" ? user._id : null, // Dummy approver
-
-          createdAt: date,
-          updatedAt: new Date(),
-        });
-      }
-      console.log(`Prepared 40 data untuk: ${user.username}`);
-    }
-
-    // 5. Insert
-    await ExpenseClaim.insertMany(data);
-    console.log("Expense Seeder COMPLETE!");
-  } catch (err) {
-    console.error("Error Seeding:", err);
-  } finally {
-    // 6. Tutup koneksi agar script selesai
-    await mongoose.disconnect();
-    console.log("Database connection closed.");
+const expenseSeeder = async () => {
+  const users = await User.find({ username: { $in: usernames } });
+  if (!users.length) {
+    console.log("Tidak ada user ditemukan. Seeding expense dibatalkan.");
+    return;
   }
+
+  await ExpenseClaim.deleteMany({});
+
+  const data = [];
+
+  for (const user of users) {
+    const employee = await Employee.findOne({ userId: user._id });
+
+    for (let i = 0; i < 40; i++) {
+      const amount = Math.floor(Math.random() * 500000) + 50000;
+      const date = randomDate();
+      const status = randomItem(finalStatuses);
+
+      data.push({
+        userId: user._id,
+        employeeId: employee ? employee._id : null,
+        title: `Klaim Operasional ${i + 1} - ${user.username}`,
+        category: randomItem(categories),
+        amount: amount,
+        expenseDate: date,
+        status: status,
+        selfDeclaration: amount < 100000,
+        proofFile: amount >= 100000 ? "nota-kredit.png" : null,
+        transferProofFile:
+          status === "PAID" && Math.random() > 0.5 ? "file-1779435027076.jpeg" : null,
+        paidAt: status === "PAID" ? date : null,
+        financeApprovedBy: status === "PAID" ? user._id : null,
+        createdAt: date,
+        updatedAt: new Date(),
+      });
+    }
+  }
+
+  await ExpenseClaim.insertMany(data);
+  console.log("Expense Claim seeded");
 };
 
-seedExpenses();
+export default expenseSeeder;

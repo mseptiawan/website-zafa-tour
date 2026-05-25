@@ -1,4 +1,4 @@
-<%- layout('layouts/main', { title: "Tambah Karyawan" }) %>
+<%- layout('layouts/main', { title: "Tambah Pegawai" }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
@@ -9,14 +9,14 @@
       <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
         <span>Area Kerja</span>
         <span class="text-slate-300">/</span>
-        <span class="text-slate-900">Karyawan</span>
+        <span class="text-slate-900">Pegawai</span>
       </nav>
 
       <h1 class="text-2xl font-bold text-slate-900">
-        Tambah Karyawan
+        Tambah Pegawai
       </h1>
       <p class="text-sm text-slate-500 mt-1">
-        Isi data karyawan baru dengan lengkap
+        Isi data Pegawai baru dengan lengkap
       </p>
     </div>
 
@@ -85,10 +85,10 @@
           </div>
         </div>
 
-        <!-- STATUS KARYAWAN -->
+        <!-- STATUS Pegawai -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">
-            Status Karyawan
+            Status Pegawai
           </label>
           <select name="employmentStatus" required 
             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
@@ -155,7 +155,7 @@
           <!-- BUTTON SIMPAN (Sesuai Warna Biru Standar) -->
           <button type="submit"
             class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
-            Simpan Karyawan
+            Simpan Pegawai
           </button>
 
         </div>

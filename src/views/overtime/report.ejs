@@ -12,7 +12,7 @@
           Laporan Lembur
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-          Semua data pengajuan lembur karyawan
+          Semua data pengajuan lembur pegawai
         </p>
       </div>
 
@@ -41,7 +41,7 @@
       <input
         type="text"
         name="search"
-        placeholder="Cari nama karyawan..."
+        placeholder="Cari nama pegawai..."
         value="<%= query.search || '' %>"
         class="w-full border border-slate-200 px-3 py-2.5 rounded-lg text-sm
                focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
@@ -131,7 +131,7 @@
       <thead class="bg-slate-100 border-b border-slate-200">
             <tr class="text-left text-xs text-slate-600">
 
-              <th class="px-3 py-3 font-normal">Karyawan</th>
+              <th class="px-3 py-3 font-normal">Pegawai</th>
               <th class="px-3 py-3 font-normal">Tanggal</th>
               <th class="px-3 py-3 font-normal">Jam</th>
               <th class="px-3 py-3 font-normal">Total</th>
@@ -241,7 +241,7 @@
         </h2>
 
         <p class="text-sm text-slate-500 mt-1">
-          Informasi lengkap pengajuan lembur karyawan
+          Informasi lengkap pengajuan lembur Pegawai
         </p>
       </div>
 
@@ -259,9 +259,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
 
-        <!-- KARYAWAN -->
+        <!-- Pegawai -->
         <div>
-          <p class="text-xs uppercase text-slate-400">Karyawan</p>
+          <p class="text-xs uppercase text-slate-400">Pegawai</p>
           <p id="modalEmployee" class="mt-1 font-medium text-slate-700"></p>
         </div>
 

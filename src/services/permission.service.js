@@ -1,290 +1,241 @@
 export function getPermissions(role) {
   const permissions = {
-    loan_new: false,
-    loan_my: false,
-    loan_manage_center: false,
-    loan_disbursement: false,
-    // =========================
-    // CUTI
-    // =========================
-    leave_request: false,
-    leave_my: false,
-    leave_approval: false,
-    leave_all: false,
-
-    // =========================
-    // LEMBUR
-    // =========================
-    overtime_request: false,
-    overtime_my: false,
-    overtime_approval: false,
-    overtime_approval_history: false,
-
-    // =========================
-    // DINAS LUAR / TRIP
-    // =========================
-    trip_request: false,
-    trip_my: false,
-    trip_approval: false,
-
-    // =========================
-    // KLAIM BEBAN
-    // =========================
-    claim_request: false,
-    claim_approval: false,
-
-    // =========================
-    // KASBON
-    // =========================
-    kasbon_request: false,
-    kasbon_approval: false,
-    // =========================
-    // ABSENSI
-    // =========================
-    attendance_input: false,
-    attendance_view_my: false,
-    attendance_view_all: false,
-
-    attendance_correction_view_my: false,
-    attendance_correction_approval: false,
-    attendance_correction_request: false,
-
-    // =========================
-    // TASK
-    // =========================
-    task_create: false,
-    task_view_my: false,
-    task_view_all: false,
-
-    // =========================
-    // PAYROLL
-    // =========================
-    payroll_view: false,
-    payroll_process: false,
-
-    // =========================
-    // PENGUMUMAN
-    // =========================
-    announcement_create: false,
-    announcement_view: true,
-
-    // =========================
-    // ADMIN / MASTER DATA
-    // =========================
     employee_list: false,
     employee_add: false,
     employee_manage: false,
 
-    report_kpi: false,
-    report_leave: false,
-    report_overtime: false,
-    report_attendance: false,
+    loan_new: false,
+    loan_my: false,
+    loan_manage_center: false,
+    loan_disbursement: false,
 
+    kpi_create: false,
+    kpi_list: false,
+
+    assignment_new: false,
     assignment_my: false,
     assignment_all: false,
 
-    finance_request: false,
-    finance_history: false,
+    leave_new: false,
+    leave_my: false,
+    leave_delegation: false,
+    leave_manage: false,
+
+    phk: false,
+
+    overtime_new: false,
+    overtime_my: false,
+    overtime_approval: false,
+    overtime_verify: false,
+
+    attendance_new: false,
+    attendance_my: false,
+    attendance_all: false,
+
+    trip_new: false,
+    trip_my: false,
+    trip_approval: false,
+    trip_verify: false,
+    trip_history: false,
+
+    sales_new: false,
+    sales_my: false,
+
+    announcement_new: true,
+    announcement_all: true,
+
+    claim_new: false,
+    claim_my: false,
+    claim_approval: false,
+    claim_verify: false,
+
+    daily_log_create: false,
+
+    payroll_slip_gaji: false,
+    payroll_process: false,
+    payroll_componenet: false,
+    payroll_verify: false,
+    payroll_history: false,
   };
 
   switch (role) {
-    // =========================
-    // STAFF (KARYAWAN)
-    // =========================
-    case "STAFF":
+    case "PEGAWAI":
       permissions.loan_new = true;
       permissions.loan_my = true;
 
-      permissions.leave_request = true;
-      permissions.leave_my = true;
+      permissions.assignment_my = true;
 
-      permissions.overtime_request = true;
+      permissions.leave_new = true;
+      permissions.leave_my = true;
+      permissions.leave_delegation = true;
+
+      permissions.overtime_new = true;
       permissions.overtime_my = true;
 
-      permissions.trip_request = true;
+      permissions.trip_new = true;
       permissions.trip_my = true;
 
-      permissions.claim_request = true;
+      permissions.sales_new = true;
+      permissions.sales_my = true;
+
+      permissions.daily_log_create = true;
+
+      permissions.claim_new = true;
+      permissions.claim_my = true;
 
       permissions.kasbon_request = true;
 
-      permissions.attendance_input = true;
-      permissions.attendance_view_my = true;
-      permissions.attendance_correction_view_my = true;
-      permissions.attendance_correction_request = true;
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
 
-      permissions.task_create = true;
-      permissions.task_view_my = true;
-      permissions.assignment_my = true;
+      permissions.payroll_slip_gaji = true;
 
       break;
 
-    case "GENERAL_MANAGER":
-      permissions.loan_new = true;
-      permissions.loan_my = true;
-
-      permissions.employee_list = true;
-
-      permissions.leave_request = true;
-      permissions.leave_my = true;
-
-      permissions.overtime_request = true;
-      permissions.overtime_my = true;
-
-      permissions.trip_request = true;
-      permissions.trip_my = true;
-
-      permissions.claim_request = true;
-
-      permissions.kasbon_request = true;
-
-      permissions.attendance_input = true;
-      permissions.attendance_view_my = true;
-      permissions.attendance_correction_view_my = true;
-      permissions.attendance_correction_request = true;
-
-      permissions.task_create = true;
-      permissions.task_view_my = true;
-      permissions.assignment_my = true;
-
-      break;
-
-    case "KEUANGAN":
+    case "MANAGER_KEUANGAN":
       permissions.loan_new = true;
       permissions.loan_my = true;
       permissions.loan_disbursement = true;
 
-      permissions.leave_request = true;
-      permissions.leave_my = true;
-
-      permissions.overtime_request = true;
-      permissions.overtime_my = true;
-
-      permissions.trip_request = true;
-      permissions.trip_my = true;
-
-      permissions.claim_request = true;
-
-      permissions.kasbon_request = true;
-
-      permissions.attendance_input = true;
-      permissions.attendance_view_my = true;
-      permissions.attendance_correction_view_my = true;
-      permissions.attendance_correction_request = true;
-
-      permissions.task_create = true;
-      permissions.task_view_my = true;
       permissions.assignment_my = true;
 
-      permissions.finance_request = true;
-      permissions.finance_history = true;
+      permissions.leave_new = true;
+      permissions.leave_my = true;
+      permissions.leave_delegation = true;
+
+      permissions.overtime_new = true;
+      permissions.overtime_my = true;
+
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
+
+      permissions.trip_new = true;
+      permissions.trip_my = true;
+      permissions.trip_verify = true;
+      permissions.trip_history = true;
+
+      permissions.sales_new = true;
+      permissions.sales_my = true;
+
+      permissions.daily_log_create = true;
+
+      permissions.claim_new = true;
+      permissions.claim_my = true;
+      permissions.claim_verify = true;
+
+      permissions.payroll_slip_gaji = true;
+      permissions.payroll_verify = true;
+      permissions.payroll_history = true;
 
       break;
 
-    // =========================
-    // MANAGER
-    // =========================
-    case "MANAGER":
+    case "MANAGER_ADMINISTRASI":
+      permissions.employee_list = true;
+
       permissions.loan_new = true;
       permissions.loan_my = true;
 
-      permissions.employee_list = true;
+      permissions.kpi_list = true;
 
-      permissions.leave_request = true;
+      permissions.assignment_my = true;
+
+      permissions.leave_new = true;
       permissions.leave_my = true;
-      permissions.leave_all = true;
-      permissions.leave_approval = true;
+      permissions.leave_delegation = true;
+      permissions.leave_manage = true;
 
-      permissions.overtime_request = true;
+      permissions.overtime_new = true;
       permissions.overtime_my = true;
       permissions.overtime_approval = true;
-      permissions.overtime_approval_history = true;
+      permissions.overtime_verify = true;
 
-      permissions.trip_request = true;
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
+
+      permissions.trip_new = true;
       permissions.trip_my = true;
       permissions.trip_approval = true;
+      permissions.trip_history = true;
 
+      permissions.sales_new = true;
+      permissions.sales_my = true;
+
+      permissions.daily_log_create = true;
+
+      permissions.claim_new = true;
+      permissions.claim_my = true;
       permissions.claim_approval = true;
 
-      permissions.kasbon_approval = true;
-
-      permissions.attendance_view_all = true;
-      permissions.attendance_correction_view_my = true;
-      permissions.attendance_correction_request = true;
-
-      permissions.task_view_all = true;
-
-      permissions.payroll_view = true;
-
-      permissions.announcement_create = true;
-
-      permissions.report_kpi = true;
-      permissions.report_leave = true;
-      permissions.report_overtime = true;
-      permissions.report_attendance = true;
-      permissions.assignment_my = true;
-      permissions.finance_history = true;
+      permissions.payroll_slip_gaji = true;
 
       break;
 
-    // =========================
-    // HR
-    // =========================
-    case "HR":
+    case "WAKIL_DIREKTUR":
+      permissions.employee_list = true;
+      permissions.employee_add = true;
+
       permissions.loan_new = true;
       permissions.loan_my = true;
       permissions.loan_manage_center = true;
 
-      permissions.employee_list = true;
-      permissions.employee_add = true;
+      permissions.kpi_create = true;
+      permissions.kpi_list = true;
 
-      permissions.leave_request = true;
+      permissions.assignment_my = true;
+
+      permissions.leave_new = true;
       permissions.leave_my = true;
-      permissions.leave_all = true;
+      permissions.leave_delegation = true;
+      permissions.leave_manage = true;
 
-      permissions.leave_approval = true;
-
-      permissions.overtime_request = true;
+      permissions.overtime_new = true;
       permissions.overtime_my = true;
 
-      permissions.trip_request = true;
-      permissions.trip_my = true;
-      permissions.trip_approval = true;
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
+      permissions.attendance_all = true;
 
-      permissions.claim_approval = true;
+      permissions.trip_new = true;
+      permissions.trip_my = true;
+      permissions.trip_history = true;
+
+      permissions.sales_new = true;
+      permissions.sales_my = true;
+
+      permissions.daily_log_create = true;
+
+      permissions.claim_new = true;
+      permissions.claim_my = true;
 
       permissions.kasbon_request = true;
       permissions.kasbon_approval = true;
-
-      permissions.attendance_view_all = true;
-      permissions.attendance_correction_approval = true;
 
       permissions.payroll_process = true;
       permissions.payroll_view = true;
 
       permissions.employee_manage = true;
 
-      permissions.announcement_create = true;
-      permissions.report_kpi = true;
-      permissions.report_leave = true;
-      permissions.report_overtime = true;
-      permissions.report_attendance = true;
-
-      permissions.assignment_my = true;
-      permissions.finance_history = true;
+      permissions.payroll_slip_gaji = true;
+      permissions.payroll_process = true;
+      permissions.payroll_componenet = true;
+      permissions.payroll_history = true;
 
       break;
 
-    // =========================
-    // GENERAL MANAGER / PIMPINAN
-    // =========================
-    case "PIMPINAN":
+    case "DIREKTUR_UTAMA":
+      permissions.employee_list = true;
+
       permissions.loan_manage_center = true;
 
-      permissions.employee_list = true;
-      permissions.leave_approval = true;
+      permissions.kpi_list = true;
+
+      permissions.assignment_new = true;
+      permissions.assignment_all = true;
+
+      permissions.phk = true;
 
       permissions.trip_approval = true;
+      permissions.trip_history = true;
 
       permissions.claim_approval = true;
 
@@ -292,21 +243,10 @@ export function getPermissions(role) {
 
       permissions.payroll_view = true;
 
-      permissions.announcement_create = true;
-
-      permissions.report_kpi = true;
-      permissions.report_leave = true;
-      permissions.report_overtime = true;
-      permissions.report_attendance = true;
-
-      permissions.finance_history = true;
-      permissions.assignment_all = true;
+      permissions.payroll_history = true;
 
       break;
 
-    // =========================
-    // DEFAULT
-    // =========================
     default:
       break;
   }

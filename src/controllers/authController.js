@@ -5,12 +5,8 @@ import User from "../models/basic/User.js";
 import crypto from "crypto";
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/employee/Employee.model.js";
-// import Leave from "../models/Leave.js";
 import BusinessTrip from "../models/BusinessTrip.js";
 import Announcement from "../models/Announcement.js";
-/* ======================
-   SHOW LOGIN PAGE
-====================== */
 export const showLogin = (req, res) => {
   if (req.session.user) {
     return res.redirect("/dashboard");
@@ -20,10 +16,6 @@ export const showLogin = (req, res) => {
     query: req.query || {},
   });
 };
-
-/* ======================
-   LOGIN
-====================== */
 export const login = async (req, res) => {
   try {
     const { identifier, password, remember } = req.body;
@@ -68,13 +60,6 @@ export const login = async (req, res) => {
   }
 };
 
-/* ======================
-   DASHBOARD
-====================== */
-
-/* ======================
-   LOGOUT (FIXED)
-====================== */
 export const logout = (req, res) => {
   req.session.destroy(() => {
     res.clearCookie("connect.sid");
@@ -92,37 +77,29 @@ export const resetPassword = async (req, res) => {
   try {
     const { password, confirmPassword } = req.body;
 
-    // 1. validasi session dari OTP
     const email = req.session.resetEmail;
 
     if (!email) {
       return res.redirect("/forgot-password");
     }
 
-    // 2. validasi password
     if (!password || password.length < 6) {
       return res.redirect("/reset-password?error=WEAK_PASSWORD");
     }
 
-    // 3. confirm password check
     if (password !== confirmPassword) {
       return res.redirect("/reset-password?error=PASSWORD_MISMATCH");
     }
 
-    // 4. cari user
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.redirect("/forgot-password?error=EMAIL_NOT_FOUND");
     }
 
-    // 5. hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 6. update password
     await User.updateOne({ email }, { $set: { password: hashedPassword } });
 
-    // 7. cleanup session
     req.session.resetEmail = null;
 
     return res.redirect("/?success=PASSWORD_CHANGED");
@@ -142,16 +119,12 @@ export const requestPasswordReset = async (req, res) => {
       return res.redirect("/forgot-password?error=EMAIL_NOT_FOUND");
     }
 
-    // generate token random
     const token = crypto.randomBytes(32).toString("hex");
 
-    // simpan token di redis (15 menit)
     await redisClient.setEx(`reset:${token}`, 900, user.email);
 
-    // link reset password
     const resetLink = `http://localhost:3000/reset-password?token=${token}`;
 
-    // kirim email
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -206,7 +179,6 @@ export const handleResetPassword = async (req, res) => {
 
     await User.updateOne({ email }, { $set: { password: hashedPassword } });
 
-    // hapus token
     await redisClient.del(`reset:${token}`);
 
     return res.redirect("/?success=PASSWORD_CHANGED");

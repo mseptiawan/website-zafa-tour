@@ -2,19 +2,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import BusinessTrip from "../../models/BusinessTrip.js";
-import User from "../../models/User.js";
+import User from "../../models/basic/User.js";
 
 dotenv.config();
 
-// ======================================================
-// TARGET USERS
-// ======================================================
-
 const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
-
-// ======================================================
-// MASTER DATA
-// ======================================================
 
 const titles = [
   "Kunjungan Sales Area",
@@ -43,11 +35,7 @@ const descriptions = [
 
 const purposes = ["KUNJUNGAN_SALES", "RAPAT", "PELATIHAN", "SURVEI", "LAINNYA"];
 
-const requesterRoles = ["STAFF", "MANAGER", "HR", "KEUANGAN"];
-
-// ======================================================
-// HELPERS
-// ======================================================
+const requesterRoles = ["PEGAWAI", "MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "MANAGER_KEUANGAN"];
 
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -60,45 +48,31 @@ function randomBudget() {
 function randomDate() {
   const start = new Date(2026, 0, 1);
   const end = new Date(2026, 11, 31);
-
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
 function createDateRange() {
   const start = randomDate();
-
   const end = new Date(start);
-
   end.setDate(start.getDate() + Math.floor(Math.random() * 5) + 1);
-
-  return {
-    start,
-    end,
-  };
+  return { start, end };
 }
-
-// ======================================================
-// APPROVAL GENERATOR
-// ======================================================
 
 function generateApprovals(status) {
   const approvals = [];
 
-  // REJECT FLOW
   if (status === "REJECTED") {
     approvals.push({
-      step: "MANAGER",
-      actor: "MANAGER",
+      step: "MANAGER_ADMINISTRASI",
+      actor: "MANAGER_ADMINISTRASI",
       userId: new mongoose.Types.ObjectId(),
       status: "REJECTED",
       date: randomDate(),
       note: "Rejected by manager",
     });
-
     return approvals;
   }
 
-  // MANAGER APPROVAL
   if (
     [
       "IN_REVIEW",
@@ -110,8 +84,8 @@ function generateApprovals(status) {
     ].includes(status)
   ) {
     approvals.push({
-      step: "MANAGER",
-      actor: "MANAGER",
+      step: "MANAGER_ADMINISTRASI",
+      actor: "MANAGER_ADMINISTRASI",
       userId: new mongoose.Types.ObjectId(),
       status: "APPROVED",
       date: randomDate(),
@@ -119,15 +93,13 @@ function generateApprovals(status) {
     });
   }
 
-  // PIMPINAN APPROVAL
   if (
     ["APPROVED", "PAYMENT_PROCESSING", "READY_TO_TRAVEL", "ON_TRIP", "SUBMITTED"].includes(status)
   ) {
     const delegated = Math.random() > 0.7;
-
     approvals.push({
-      step: "PIMPINAN",
-      actor: delegated ? "HR" : "PIMPINAN",
+      step: "DIREKTUR_UTAMA",
+      actor: delegated ? "WAKIL_DIREKTUR" : "DIREKTUR_UTAMA",
       userId: new mongoose.Types.ObjectId(),
       status: "APPROVED",
       date: randomDate(),
@@ -138,12 +110,7 @@ function generateApprovals(status) {
   return approvals;
 }
 
-// ======================================================
-// PAYMENT GENERATOR
-// ======================================================
-
 function generatePayment(status) {
-  // DEFAULT
   const payment = {
     status: "PENDING",
     amount: randomBudget(),
@@ -153,36 +120,25 @@ function generatePayment(status) {
     note: "",
   };
 
-  // PROCESSING
   if (status === "PAYMENT_PROCESSING") {
     payment.status = "PROCESSING";
-
     return payment;
   }
 
-  // READY / ON TRIP / SUBMITTED
   if (["READY_TO_TRAVEL", "ON_TRIP", "SUBMITTED"].includes(status)) {
     payment.status = "PAID";
-
     payment.proof = {
       filename: "payment-proof.pdf",
       url: "/uploads/files/payment-proof.pdf",
       uploadedAt: randomDate(),
     };
-
     payment.paidAt = randomDate();
-
     payment.paidBy = new mongoose.Types.ObjectId();
-
     return payment;
   }
 
   return payment;
 }
-
-// ======================================================
-// REPORT GENERATOR
-// ======================================================
 
 function generateTripReport(status) {
   if (status !== "SUBMITTED") {
@@ -196,11 +152,8 @@ function generateTripReport(status) {
 
   return {
     isSubmitted: true,
-
     submittedAt: randomDate(),
-
     description: "Perjalanan berhasil dilakukan dan meeting berjalan dengan baik.",
-
     attachments: [
       {
         filename: "laporan-perjalanan.pdf",
@@ -211,10 +164,6 @@ function generateTripReport(status) {
     ],
   };
 }
-
-// ======================================================
-// MAIN SEED
-// ======================================================
 
 export default async function businessTripSeeder() {
   try {
@@ -246,7 +195,6 @@ export default async function businessTripSeeder() {
     for (const user of users) {
       for (let i = 0; i < 100; i++) {
         const status = randomItem(statuses);
-
         const { start, end } = createDateRange();
 
         const delegated =
@@ -257,25 +205,15 @@ export default async function businessTripSeeder() {
 
         data.push({
           userId: user._id,
-
           requesterRole: randomItem(requesterRoles),
-
           title: randomItem(titles),
-
           purpose: randomItem(purposes),
-
           meetWith: randomItem(meetWithList),
-
           startDate: start,
-
           endDate: end,
-
           destination: randomItem(destinations),
-
           description: randomItem(descriptions),
-
           budget: randomBudget(),
-
           timeline: [
             {
               address: randomItem(destinations),
@@ -286,19 +224,19 @@ export default async function businessTripSeeder() {
               order: 2,
             },
           ],
-
           status,
-
           currentStep:
-            status === "PENDING" ? "MANAGER" : status === "IN_REVIEW" ? "PIMPINAN" : null,
-
+            status === "PENDING"
+              ? "MANAGER_ADMINISTRASI"
+              : status === "IN_REVIEW"
+                ? "DIREKTUR_UTAMA"
+                : null,
           approvals: generateApprovals(status),
-
           delegation: delegated
             ? {
                 active: true,
-                from: "PIMPINAN",
-                to: "HR",
+                from: "DIREKTUR_UTAMA",
+                to: "WAKIL_DIREKTUR",
                 delegatedBy: user._id,
                 delegatedAt: randomDate(),
                 note: "Auto delegation seeded",
@@ -306,20 +244,15 @@ export default async function businessTripSeeder() {
             : {
                 active: false,
               },
-
           tripReport: generateTripReport(status),
-
           payment: generatePayment(status),
-
           createdAt: randomDate(),
-
           updatedAt: new Date(),
         });
       }
     }
 
     await BusinessTrip.insertMany(data);
-
     console.log("Seeder BusinessTrip berhasil dibuat");
   } catch (err) {
     console.log(err);

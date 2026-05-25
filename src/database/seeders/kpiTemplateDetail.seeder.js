@@ -1,5 +1,5 @@
-import KpiTemplate from "../../models/KpiTemplate.js";
-import KpiTemplateDetail from "../../models/KpiTemplateDetail.js";
+import KpiTemplate from "../../models/kpi/KpiTemplate.js";
+import KpiTemplateDetail from "../../models/kpi/KpiTemplateDetail.js";
 
 const kpiTemplateDetailSeeder = async () => {
   await KpiTemplateDetail.deleteMany();
@@ -70,32 +70,28 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: managerAdministrasi._id,
       areaKinerja: "Koordinasi Tim Administrasi",
-      indikator:
-        "Tingkat koordinasi dan pencapaian target kerja staf administrasi",
+      indikator: "Tingkat koordinasi dan pencapaian target kerja staf administrasi",
       bobot: 25,
       target: "100%",
     },
     {
       kpiTemplateId: managerAdministrasi._id,
       areaKinerja: "Manajemen Pendaftaran & Jadwal Keberangkatan",
-      indikator:
-        "Jumlah pendaftaran dan penjadwalan keberangkatan yang tepat dan akurat",
+      indikator: "Jumlah pendaftaran dan penjadwalan keberangkatan yang tepat dan akurat",
       bobot: 25,
       target: "100%",
     },
     {
       kpiTemplateId: managerAdministrasi._id,
       areaKinerja: "Pengelolaan Dokumen Penting",
-      indikator:
-        "Ketersediaan dan kelengkapan dokumen legal dan penting perusahaan",
+      indikator: "Ketersediaan dan kelengkapan dokumen legal dan penting perusahaan",
       bobot: 25,
       target: "100%",
     },
     {
       kpiTemplateId: managerAdministrasi._id,
       areaKinerja: "Koordinasi Antar Bidang",
-      indikator:
-        "Jumlah pertemuan koordinasi dan hasil sinkronisasi antar bidang",
+      indikator: "Jumlah pertemuan koordinasi dan hasil sinkronisasi antar bidang",
       bobot: 25,
       target: "100%",
     },
@@ -109,8 +105,7 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: customerService._id,
       areaKinerja: "Pembuatan Surat Rekomendasi Paspor",
-      indikator:
-        "Ketepatan dan jumlah surat rekomendasi paspor yang dibuat sesuai permintaan",
+      indikator: "Ketepatan dan jumlah surat rekomendasi paspor yang dibuat sesuai permintaan",
       bobot: 20,
       target: "100%",
     },
@@ -131,16 +126,14 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: customerService._id,
       areaKinerja: "Pengelolaan Grup & Reminder Jadwal",
-      indikator:
-        "Konsistensi pengiriman reminder dan manajemen WA group keberangkatan",
+      indikator: "Konsistensi pengiriman reminder dan manajemen WA group keberangkatan",
       bobot: 20,
       target: "100%",
     },
     {
       kpiTemplateId: pelaporan._id,
       areaKinerja: "Input Data Jamaah",
-      indikator:
-        "Ketepatan dan kecepatan input data jamaah dalam sistem pendaftaran",
+      indikator: "Ketepatan dan kecepatan input data jamaah dalam sistem pendaftaran",
       bobot: 20,
       target: "100%",
     },
@@ -155,16 +148,14 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: pelaporan._id,
       areaKinerja: "Pengajuan Klaim Asuransi",
-      indikator:
-        "Responsif dalam pengajuan klaim asuransi jamaah saat ada kejadian",
+      indikator: "Responsif dalam pengajuan klaim asuransi jamaah saat ada kejadian",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: pelaporan._id,
       areaKinerja: "Laporan SISKOPATUH",
-      indikator:
-        "Ketepatan dan kelengkapan laporan keberangkatan di SISKOPATUH",
+      indikator: "Ketepatan dan kelengkapan laporan keberangkatan di SISKOPATUH",
       bobot: 25,
       target: "100%",
     },
@@ -187,16 +178,14 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: onlineCs._id,
       areaKinerja: "Kualitas Informasi Call Center",
-      indikator:
-        "Tingkat akurasi dan kelengkapan informasi yang diberikan kepada calon jamaah",
+      indikator: "Tingkat akurasi dan kelengkapan informasi yang diberikan kepada calon jamaah",
       bobot: 25,
       target: "≥ 95%",
     },
     {
       kpiTemplateId: onlineCs._id,
       areaKinerja: "Pengelolaan Pendaftaran Jamaah",
-      indikator:
-        "Jumlah pendaftaran jamaah yang berhasil dicatat dan diteruskan ke sistem",
+      indikator: "Jumlah pendaftaran jamaah yang berhasil dicatat dan diteruskan ke sistem",
       bobot: 25,
       target: "100%",
     },
@@ -211,24 +200,21 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: ticketing._id,
       areaKinerja: "Manifest Group Keberangkatan",
-      indikator:
-        "Tingkat akurasi dan ketepatan waktu penyelesaian manifest group keberangkatan",
+      indikator: "Tingkat akurasi dan ketepatan waktu penyelesaian manifest group keberangkatan",
       bobot: 20,
       target: "100%",
     },
     {
       kpiTemplateId: ticketing._id,
       areaKinerja: "Pengelolaan Surat",
-      indikator:
-        "Jumlah surat masuk/keluar yang tercatat dan terdokumentasi dengan baik",
+      indikator: "Jumlah surat masuk/keluar yang tercatat dan terdokumentasi dengan baik",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: ticketing._id,
       areaKinerja: "Pendaftaran Haji Khusus",
-      indikator:
-        "Jumlah pendaftaran haji khusus yang diproses sesuai prosedur dan waktu",
+      indikator: "Jumlah pendaftaran haji khusus yang diproses sesuai prosedur dan waktu",
       bobot: 20,
       target: "100%",
     },
@@ -242,24 +228,21 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: ticketing._id,
       areaKinerja: "Rekapitulasi Tagihan Tiket",
-      indikator:
-        "Ketepatan waktu pelaporan rekap tagihan tiket ke tim keuangan",
+      indikator: "Ketepatan waktu pelaporan rekap tagihan tiket ke tim keuangan",
       bobot: 20,
       target: "100%",
     },
     {
       kpiTemplateId: visaHotel._id,
       areaKinerja: "Pengelolaan Visa Jamaah",
-      indikator:
-        "Ketepatan pengajuan visa dan validasi tagihan dengan tim keuangan",
+      indikator: "Ketepatan pengajuan visa dan validasi tagihan dengan tim keuangan",
       bobot: 20,
       target: "≥ 98%",
     },
     {
       kpiTemplateId: visaHotel._id,
       areaKinerja: "Pengaturan Akomodasi",
-      indikator:
-        "Ketepatan alokasi kamar dan data akomodasi di Makkah dan Madinah",
+      indikator: "Ketepatan alokasi kamar dan data akomodasi di Makkah dan Madinah",
       bobot: 20,
       target: "100%",
     },
@@ -273,8 +256,7 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: visaHotel._id,
       areaKinerja: "Manajemen Tour Leader & Administrasi Group",
-      indikator:
-        "Ketersediaan tour leader sesuai jadwal dan jumlah keberangkatan",
+      indikator: "Ketersediaan tour leader sesuai jadwal dan jumlah keberangkatan",
       bobot: 15,
       target: "100%",
     },
@@ -288,8 +270,7 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: landArrangement._id,
       areaKinerja: "Pengelolaan Petugas Saudi & Keuangan",
-      indikator:
-        "Ketepatan data pengeluaran dan pencatatan keuangan petugas Saudi",
+      indikator: "Ketepatan data pengeluaran dan pencatatan keuangan petugas Saudi",
       bobot: 20,
       target: "100%",
     },
@@ -310,16 +291,14 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: landArrangement._id,
       areaKinerja: "Manajemen Handling Bandara",
-      indikator:
-        "Ketersediaan tim handling bandara sesuai jadwal & proses check-in",
+      indikator: "Ketersediaan tim handling bandara sesuai jadwal & proses check-in",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: landArrangement._id,
       areaKinerja: "Kegiatan Manasik",
-      indikator:
-        "Persentase manasik terlaksana sesuai standar & mendapat evaluasi positif",
+      indikator: "Persentase manasik terlaksana sesuai standar & mendapat evaluasi positif",
       bobot: 15,
       target: "100%",
     },
@@ -334,16 +313,14 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: edukasi._id,
       areaKinerja: "Bimbingan Manasik Jamaah",
-      indikator:
-        "Jumlah sesi manasik yang terlaksana sesuai standar & tepat waktu",
+      indikator: "Jumlah sesi manasik yang terlaksana sesuai standar & tepat waktu",
       bobot: 20,
       target: "100%",
     },
     {
       kpiTemplateId: edukasi._id,
       areaKinerja: "Pengembangan Kurikulum",
-      indikator:
-        "Ketersediaan dan pembaruan kurikulum manasik & pelayanan jamaah",
+      indikator: "Ketersediaan dan pembaruan kurikulum manasik & pelayanan jamaah",
       bobot: 20,
       target: "Update min. 1x/tahun",
     },
@@ -357,56 +334,49 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: edukasi._id,
       areaKinerja: "Pelatihan Tim Pendukung",
-      indikator:
-        "Jumlah pelatihan internal untuk tour leader, muthowif, atau staf layanan",
+      indikator: "Jumlah pelatihan internal untuk tour leader, muthowif, atau staf layanan",
       bobot: 15,
       target: "Min. 1 pelatihan/3 bulan",
     },
     {
       kpiTemplateId: edukasi._id,
       areaKinerja: "Kepuasan Jamaah",
-      indikator:
-        "Persentase peserta manasik yang merasa puas dengan materi dan pembimbing",
+      indikator: "Persentase peserta manasik yang merasa puas dengan materi dan pembimbing",
       bobot: 15,
       target: "≥ 85% puas",
     },
     {
       kpiTemplateId: edukasi._id,
       areaKinerja: "Dokumentasi & Laporan Program",
-      indikator:
-        "Kelengkapan laporan kegiatan manasik dan pelatihan sesuai waktu",
+      indikator: "Kelengkapan laporan kegiatan manasik dan pelatihan sesuai waktu",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: penerimaanPenagihan._id,
       areaKinerja: "Sinkronisasi ke Mitra/Jamaah",
-      indikator:
-        "Ketepatan waktu sinkronisasi paling lama 1 bulan sebelum keberangkatan",
+      indikator: "Ketepatan waktu sinkronisasi paling lama 1 bulan sebelum keberangkatan",
       bobot: 20,
       target: "100%",
     },
     {
       kpiTemplateId: penerimaanPenagihan._id,
       areaKinerja: "Respon Chat Call Center Keuangan",
-      indikator:
-        "Respon cepat ke mitra/jamaah minimal 20 menit dan maksimal 1,5 jam di jam kantor",
+      indikator: "Respon cepat ke mitra/jamaah minimal 20 menit dan maksimal 1,5 jam di jam kantor",
       bobot: 20,
       target: "100%",
     },
     {
       kpiTemplateId: penerimaanPenagihan._id,
       areaKinerja: "Pengajuan Refund Dana ke Group WA",
-      indikator:
-        "Ketepatan waktu pengajuan refund H+2 dari pengajuan mitra atau jamaah",
+      indikator: "Ketepatan waktu pengajuan refund H+2 dari pengajuan mitra atau jamaah",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: penerimaanPenagihan._id,
       areaKinerja: "Pengecekan Pembayaran Wilayah",
-      indikator:
-        "Persentase dan ketepatan pengecekan jumlah pembayaran wilayah harian",
+      indikator: "Persentase dan ketepatan pengecekan jumlah pembayaran wilayah harian",
       bobot: 15,
       target: "100%",
     },
@@ -435,24 +405,21 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: penerimaaanStoran._id,
       areaKinerja: "Input Pembayaran dari CS Pusat",
-      indikator:
-        "Ketepatan waktu input pembayaran sesuai data yang dikirim CS Pusat setiap hari",
+      indikator: "Ketepatan waktu input pembayaran sesuai data yang dikirim CS Pusat setiap hari",
       bobot: 30,
       target: "100%",
     },
     {
       kpiTemplateId: penerimaaanStoran._id,
       areaKinerja: "Pengiriman Bukti Invoice ke Jamaah/Mitra",
-      indikator:
-        "Ketepatan waktu dan jumlah pengiriman invoice pembayaran setiap hari",
+      indikator: "Ketepatan waktu dan jumlah pengiriman invoice pembayaran setiap hari",
       bobot: 35,
       target: "100%",
     },
     {
       kpiTemplateId: taxAccounting._id,
       areaKinerja: "Input Data Mutasi Bank",
-      indikator:
-        "Ketepatan waktu dan jumlah mutasi bank (20–35 transaksi per hari)",
+      indikator: "Ketepatan waktu dan jumlah mutasi bank (20–35 transaksi per hari)",
       bobot: 20,
       target: "100%",
     },
@@ -466,14 +433,13 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: taxAccounting._id,
       areaKinerja: "Jurnal Biaya Balik Hotel di Saudi",
-      indikator:
-        "Penyelesaian jurnal biaya balik maksimal H+2 setelah keberangkatan",
+      indikator: "Penyelesaian jurnal biaya balik maksimal H+2 setelah keberangkatan",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: taxAccounting._id,
-      areaKinerja: "Input Piutang Karyawan & Piutang Usaha",
+      areaKinerja: "Input Piutang Pegawai & Piutang Usaha",
       indikator: "Tingkat akurasi input piutang sesuai dengan realisasi",
       bobot: 15,
       target: "100%",
@@ -488,32 +454,28 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: taxAccounting._id,
       areaKinerja: "Audit Laporan Keuangan",
-      indikator:
-        "Penyelesaian audit laporan keuangan maksimal bulan Mei setiap tahun",
+      indikator: "Penyelesaian audit laporan keuangan maksimal bulan Mei setiap tahun",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: taxAccounting._id,
       areaKinerja: "Review Buku Besar Laba Rugi & Neraca",
-      indikator:
-        "Pemeriksaan buku besar selesai direview setiap tanggal 5 setiap bulan",
+      indikator: "Pemeriksaan buku besar selesai direview setiap tanggal 5 setiap bulan",
       bobot: 15,
       target: "100%",
     },
     {
       kpiTemplateId: pengeluaranCogs._id,
       areaKinerja: "Pemrosesan Komisi Mitra Pusat & Wilayah",
-      indikator:
-        "Ketepatan waktu pemrosesan komisi sebelum tanggal 5 dan 20 setiap bulan",
+      indikator: "Ketepatan waktu pemrosesan komisi sebelum tanggal 5 dan 20 setiap bulan",
       bobot: 40,
       target: "100%",
     },
     {
       kpiTemplateId: pengeluaranCogs._id,
       areaKinerja: "Pembayaran Visa dan Hotel",
-      indikator:
-        "Ketepatan pembayaran maksimal H-7 dari keberangkatan sesuai invoice masuk",
+      indikator: "Ketepatan pembayaran maksimal H-7 dari keberangkatan sesuai invoice masuk",
       bobot: 35,
       target: "100%",
     },
@@ -527,8 +489,7 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: pengeluaranOperasional._id,
       areaKinerja: "Petty Cash Harian",
-      indikator:
-        "Ketepatan waktu proses petty cash H+1 maksimal setiap ada pengajuan",
+      indikator: "Ketepatan waktu proses petty cash H+1 maksimal setiap ada pengajuan",
       bobot: 20,
       target: "100%",
     },
@@ -556,8 +517,7 @@ const kpiTemplateDetailSeeder = async () => {
     {
       kpiTemplateId: pengeluaranOperasional._id,
       areaKinerja: "Input Petty Cash (Accurate)",
-      indikator:
-        "Input sesuai seluruh pengeluaran petty cash harian di sistem Accurate",
+      indikator: "Input sesuai seluruh pengeluaran petty cash harian di sistem Accurate",
       bobot: 20,
       target: "100%",
     },

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 
 import SalesVisit from "../../models/SalesVisit.js";
-import User from "../../models/User.js";
+import User from "../../models/basic/User.js";
 
 dotenv.config();
 
@@ -142,4 +142,3 @@ export default async function salesVisitSeeder() {
     console.error(err);
   }
 }
-

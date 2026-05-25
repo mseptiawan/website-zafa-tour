@@ -19,30 +19,34 @@ const router = express.Router();
  */
 
 // list finance trips
-router.get("/", roleMiddleware("KEUANGAN"), financeTripPage);
-router.get("/history", roleMiddleware("KEUANGAN", "HR", "MANAGER", "PIMPINAN"), paymentHistoryPage);
+router.get("/", roleMiddleware("MANAGER_KEUANGAN"), financeTripPage);
+router.get(
+  "/history",
+  roleMiddleware("MANAGER_KEUANGAN", "WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"),
+  paymentHistoryPage
+);
 
 router.get(
   "/history/:id",
-  roleMiddleware("KEUANGAN", "HR", "MANAGER", "PIMPINAN"),
+  roleMiddleware("MANAGER_KEUANGAN", "WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"),
   paymentHistoryDetail
 );
 
 // detail finance trip
-router.get("/:id", roleMiddleware("KEUANGAN"), financeTripDetail);
+router.get("/:id", roleMiddleware("MANAGER_KEUANGAN"), financeTripDetail);
 
 // process payment
-router.post("/:id/process", roleMiddleware("KEUANGAN"), processPayment);
+router.post("/:id/process", roleMiddleware("MANAGER_KEUANGAN"), processPayment);
 
 // upload proof
 router.post(
   "/:id/upload-proof",
-  roleMiddleware("KEUANGAN"),
+  roleMiddleware("MANAGER_KEUANGAN"),
   uploadFile.single("proof"),
   uploadPaymentProof
 );
 
 // confirm payment
-router.post("/:id/confirm", roleMiddleware("KEUANGAN"), confirmPayment);
+router.post("/:id/confirm", roleMiddleware("MANAGER_KEUANGAN"), confirmPayment);
 
 export default router;

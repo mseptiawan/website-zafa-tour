@@ -23,7 +23,7 @@ export const saveEmployeeAllowances = async (req, res) => {
     const { employeeId, allowances } = req.body;
 
     if (!employeeId) {
-      return res.status(400).json({ success: false, message: "ID Karyawan wajib diisi." });
+      return res.status(400).json({ success: false, message: "ID Pegawai wajib diisi." });
     }
 
     // 1. Ambil semua master komponen aktif untuk referensi ID dan Kategori
@@ -110,7 +110,7 @@ export const savePayroll = async (req, res) => {
     if (!employeeId || !periodMonth) {
       return res.status(400).json({
         success: false,
-        message: "ID Karyawan dan Periode Bulan wajib diisi.",
+        message: "ID Pegawai dan Periode Bulan wajib diisi.",
       });
     }
 

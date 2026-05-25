@@ -1,7 +1,7 @@
-import Unit from "../../models/Unit.js";
-import Position from "../../models/Position.js";
-import KpiTemplate from "../../models/KpiTemplate.js";
-import UnitKpiMapping from "../../models/UnitKpiMapping.js";
+import Unit from "../../models/basic/Unit.js";
+import Position from "../../models/basic/Position.js";
+import KpiTemplate from "../../models/kpi/KpiTemplate.js";
+import UnitKpiMapping from "../../models/kpi/UnitKpiMapping.js";
 
 const unitKpiMappingSeeder = async () => {
   await UnitKpiMapping.deleteMany();
@@ -10,8 +10,8 @@ const unitKpiMappingSeeder = async () => {
   // POSITION
   // =========================
 
-  const staff = await Position.findOne({
-    name: "Staff",
+  const pegawai = await Position.findOne({
+    name: "Pegawai",
   });
   const manager = await Position.findOne({
     name: "Manager",
@@ -151,25 +151,25 @@ const unitKpiMappingSeeder = async () => {
     },
     {
       unitId: customerService._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiCustomerService._id,
     },
 
     {
       unitId: pelaporan._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiPelaporan._id,
     },
 
     {
       unitId: onlineCustomerCare._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiOnlineCs._id,
     },
 
     {
       unitId: ticketing._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiTicketing._id,
     },
 
@@ -177,19 +177,19 @@ const unitKpiMappingSeeder = async () => {
 
     {
       unitId: visaHotel._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiVisa._id,
     },
 
     {
       unitId: pelayananSaudi._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiLandArrangement._id,
     },
 
     {
       unitId: pendidikan._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiEdukasi._id,
     },
 
@@ -197,31 +197,31 @@ const unitKpiMappingSeeder = async () => {
 
     {
       unitId: penerimaanPenagihan._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiPenagihan._id,
     },
 
     {
       unitId: penerimaanStoran._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiTunai._id,
     },
 
     {
       unitId: accounting._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiAccounting._id,
     },
 
     {
       unitId: pengeluaranCogs._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiCogs._id,
     },
 
     {
       unitId: pengeluaranOperasional._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiOperasional._id,
     },
 
@@ -229,7 +229,7 @@ const unitKpiMappingSeeder = async () => {
 
     {
       unitId: marketing._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiMarketing._id,
     },
 
@@ -237,7 +237,7 @@ const unitKpiMappingSeeder = async () => {
 
     {
       unitId: perlengkapan._id,
-      positionId: staff._id,
+      positionId: pegawai._id,
       kpiTemplateId: kpiPerlengkapan._id,
     },
   ]);

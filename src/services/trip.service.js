@@ -12,9 +12,6 @@ export const createTripService = async ({ user, body }) => {
   let { title, purpose, startDate, endDate, destination, description, budget, meetWith, timeline } =
     body;
 
-  // =========================
-  // NORMALIZATION
-  // =========================
   title = title?.trim();
   destination = destination?.trim();
   description = description?.trim();
@@ -35,9 +32,6 @@ export const createTripService = async ({ user, body }) => {
     })
     .filter((t) => t.address);
 
-  // =========================
-  // VALIDATION
-  // =========================
   if (!title || title.length < 5) {
     const err = new Error("Judul minimal 5 karakter");
     err.status = 400;
@@ -77,37 +71,27 @@ export const createTripService = async ({ user, body }) => {
     throw err;
   }
 
-  // =========================
-  // STATE INITIALIZATION
-  // =========================
-  let currentStep = "MANAGER";
+  let currentStep = "MANAGER_ADMINISTRASI";
   let status = "PENDING";
 
-  // flow logic (simple state machine)
-  if (user.role === "MANAGER") {
-    currentStep = "PIMPINAN";
+  if (user.role === "MANAGER_ADMINISTRASI") {
+    currentStep = "DIREKTUR_UTAMA";
     status = "IN_REVIEW";
   }
 
-  if (user.role === "HR") {
-    currentStep = "MANAGER";
+  if (user.role === "WAKIL_DIREKTUR") {
+    currentStep = "MANAGER_ADMINISTRASI";
     status = "PENDING";
   }
 
-  if (user.role === "KARYAWAN" || user.role === "KEUANGAN") {
-    currentStep = "MANAGER";
+  if (user.role === "PEGAWAI" || user.role === "MANAGER_KEUANGAN") {
+    currentStep = "MANAGER_ADMINISTRASI";
     status = "PENDING";
   }
 
-  // =========================
-  // CREATE TRIP
-  // =========================
   const trip = await BusinessTrip.create({
     userId: user._id,
-
-    // FIX ERROR WAJIB SCHEMA
     requesterRole: user.role,
-
     title,
     purpose,
     startDate: start,
@@ -117,12 +101,9 @@ export const createTripService = async ({ user, body }) => {
     budget,
     meetWith,
     timeline: normalizedTimeline,
-
     status,
     currentStep,
-
     approvals: [],
-
     delegation: {
       active: false,
     },
@@ -131,16 +112,10 @@ export const createTripService = async ({ user, body }) => {
   return trip;
 };
 
-// ======================================================
-// GET MY TRIPS
-// ======================================================
 export const getMyTripsService = async (userId) => {
   return await BusinessTrip.find({ userId }).sort({ createdAt: -1 });
 };
 
-// ======================================================
-// GET TRIP DETAIL
-// ======================================================
 export const getTripDetailService = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new Error("INVALID_ID");
@@ -160,22 +135,19 @@ export const getTripDetailService = async (id) => {
   return trip;
 };
 
-// ======================================================
-// APPROVAL LIST (ROLE BASED WORKFLOW)
-// ======================================================
 export const getApprovalTripsService = async (role) => {
   let filter = {
     status: { $in: ["PENDING", "IN_REVIEW"] },
   };
 
-  if (role === "MANAGER") {
-    filter.currentStep = "MANAGER";
-  } else if (role === "PIMPINAN") {
-    filter.currentStep = "PIMPINAN";
-  } else if (role === "HR") {
-    filter.currentStep = "PIMPINAN";
+  if (role === "MANAGER_ADMINISTRASI") {
+    filter.currentStep = "MANAGER_ADMINISTRASI";
+  } else if (role === "DIREKTUR_UTAMA") {
+    filter.currentStep = "DIREKTUR_UTAMA";
+  } else if (role === "WAKIL_DIREKTUR") {
+    filter.currentStep = "DIREKTUR_UTAMA";
     filter["delegation.active"] = true;
-    filter["delegation.to"] = "HR";
+    filter["delegation.to"] = "WAKIL_DIREKTUR";
   } else {
     throw new Error("FORBIDDEN");
   }
@@ -192,9 +164,6 @@ export const getApprovalTripsService = async (role) => {
     .sort({ createdAt: -1 });
 };
 
-// ======================================================
-// EDITABLE CHECK
-// ======================================================
 const editableStatuses = ["PENDING", "REJECTED"];
 
 export const getEditableTripService = async (id, userId) => {
@@ -213,9 +182,6 @@ export const getEditableTripService = async (id, userId) => {
   return trip;
 };
 
-// ======================================================
-// UPDATE TRIP (ONLY PENDING)
-// ======================================================
 export const updateTripService = async (id, userId, body) => {
   const trip = await getEditableTripService(id, userId);
 
@@ -238,9 +204,6 @@ export const updateTripService = async (id, userId, body) => {
   return trip;
 };
 
-// ======================================================
-// RESUBMIT AFTER REJECT
-// ======================================================
 export const resubmitTripService = async (id, userId, body) => {
   const trip = await getEditableTripService(id, userId);
 
@@ -248,9 +211,6 @@ export const resubmitTripService = async (id, userId, body) => {
     throw new Error("FORBIDDEN");
   }
 
-  // =========================
-  // UPDATE DATA TRIP
-  // =========================
   Object.assign(trip, {
     title: body.title,
     destination: body.destination,
@@ -261,53 +221,34 @@ export const resubmitTripService = async (id, userId, body) => {
     budget: body.budget,
   });
 
-  // =========================
-  // FIND LAST REJECT
-  // =========================
   const lastRejected = [...trip.approvals].reverse().find((a) => a.status === "REJECTED");
 
   if (!lastRejected) {
     throw new Error("REJECT_HISTORY_NOT_FOUND");
   }
 
-  // =========================
-  // DETECT HR FLOW (FIXED LOGIC)
-  // =========================
   const isHRFlow =
-    trip.delegation?.active === true && trip.delegation?.to === "HR" && lastRejected.actor === "HR";
-  // =========================
-  // RESET APPROVAL HISTORY
-  // =========================
-  trip.approvals = [];
+    trip.delegation?.active === true &&
+    trip.delegation?.to === "WAKIL_DIREKTUR" &&
+    lastRejected.actor === "WAKIL_DIREKTUR";
 
-  // =========================
-  // ROUTING RESUBMIT
-  // =========================
+  trip.approvals = [];
   trip.status = "IN_REVIEW";
 
   if (isHRFlow) {
-    // kembali ke HR lagi
-    trip.currentStep = "PIMPINAN";
-
-    // pertahankan delegation HR
+    trip.currentStep = "DIREKTUR_UTAMA";
     trip.delegation.active = true;
-  } else if (lastRejected.step === "PIMPINAN") {
-    trip.currentStep = "PIMPINAN";
-
-    // tidak perlu HR delegation
+  } else if (lastRejected.step === "DIREKTUR_UTAMA") {
+    trip.currentStep = "DIREKTUR_UTAMA";
     trip.delegation.active = false;
-  } else if (lastRejected.step === "MANAGER") {
+  } else if (lastRejected.step === "MANAGER_ADMINISTRASI") {
     trip.status = "PENDING";
-    trip.currentStep = "MANAGER";
-
+    trip.currentStep = "MANAGER_ADMINISTRASI";
     trip.delegation.active = false;
   } else {
     throw new Error("INVALID_WORKFLOW_STATE");
   }
 
-  // =========================
-  // SAFE CLEANUP DELEGATION META
-  // =========================
   if (!trip.delegation?.active) {
     trip.delegation = {
       active: false,
@@ -318,9 +259,6 @@ export const resubmitTripService = async (id, userId, body) => {
     };
   }
 
-  // =========================
-  // SAVE
-  // =========================
   await trip.save();
 
   return trip;
@@ -346,11 +284,10 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
   }
 
   const effectiveActor =
-    trip.delegation?.active && step === "PIMPINAN" && role === "HR" ? "HR" : role;
+    trip.delegation?.active && step === "DIREKTUR_UTAMA" && role === "WAKIL_DIREKTUR"
+      ? "WAKIL_DIREKTUR"
+      : role;
 
-  // ======================================================
-  // APPROVE FLOW
-  // ======================================================
   if (action === "APPROVE") {
     trip.approvals.push({
       step,
@@ -361,18 +298,15 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
       note: note || null,
     });
 
-    // STEP 1 → MANAGER APPROVE
-    if (step === "MANAGER") {
-      trip.currentStep = "PIMPINAN";
+    if (step === "MANAGER_ADMINISTRASI") {
+      trip.currentStep = "DIREKTUR_UTAMA";
       trip.status = "IN_REVIEW";
     }
 
-    // STEP 2 → PIMPINAN APPROVE (FINAL APPROVAL)
-    if (step === "PIMPINAN") {
+    if (step === "DIREKTUR_UTAMA") {
       trip.status = "APPROVED";
       trip.currentStep = null;
 
-      // 🔥 AUTO TRIGGER FINANCE FLOW
       trip.payment.status = "PENDING";
       trip.payment.amount = trip.budget || 0;
     }
@@ -381,9 +315,6 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
     return { message: "Approved" };
   }
 
-  // ======================================================
-  // REJECT FLOW
-  // ======================================================
   if (action === "REJECT") {
     if (!note || note.trim().length < 5) {
       const err = new Error("Alasan reject minimal 5 karakter");
@@ -407,17 +338,14 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
     return { message: "Rejected" };
   }
 
-  // ======================================================
-  // DELEGATION FLOW (PIMPINAN → HR)
-  // ======================================================
   if (action === "DELEGATE_TO_HR") {
-    if (role !== "PIMPINAN" || step !== "PIMPINAN") {
+    if (role !== "DIREKTUR_UTAMA" || step !== "DIREKTUR_UTAMA") {
       const err = new Error("Tidak boleh delegasi");
       err.status = 403;
       throw err;
     }
 
-    if (trip.requesterRole === "HR") {
+    if (trip.requesterRole === "WAKIL_DIREKTUR") {
       const err = new Error("HR request tidak boleh didelegasikan");
       err.status = 400;
       throw err;
@@ -425,8 +353,8 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
 
     trip.delegation = {
       active: true,
-      from: "PIMPINAN",
-      to: "HR",
+      from: "DIREKTUR_UTAMA",
+      to: "WAKIL_DIREKTUR",
       delegatedBy: user._id,
       delegatedAt: new Date(),
     };
@@ -440,6 +368,7 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
   err.status = 400;
   throw err;
 };
+
 export const delegateTripToHRService = async ({ id, user }) => {
   const trip = await BusinessTrip.findById(id);
 
@@ -449,7 +378,7 @@ export const delegateTripToHRService = async ({ id, user }) => {
     throw err;
   }
 
-  if (user.role !== "PIMPINAN") {
+  if (user.role !== "DIREKTUR_UTAMA") {
     const err = new Error("Hanya pimpinan yang dapat delegasi");
     err.status = 403;
     throw err;
@@ -461,13 +390,13 @@ export const delegateTripToHRService = async ({ id, user }) => {
     throw err;
   }
 
-  if (trip.currentStep !== "PIMPINAN") {
+  if (trip.currentStep !== "DIREKTUR_UTAMA") {
     const err = new Error("Delegasi hanya saat tahap pimpinan");
     err.status = 400;
     throw err;
   }
 
-  if (trip.requesterRole === "HR") {
+  if (trip.requesterRole === "WAKIL_DIREKTUR") {
     const err = new Error("Trip HR tidak bisa didelegasikan");
     err.status = 400;
     throw err;
@@ -481,8 +410,8 @@ export const delegateTripToHRService = async ({ id, user }) => {
 
   trip.delegation = {
     active: true,
-    from: "PIMPINAN",
-    to: "HR",
+    from: "DIREKTUR_UTAMA",
+    to: "WAKIL_DIREKTUR",
     delegatedBy: user._id,
     delegatedAt: new Date(),
   };
