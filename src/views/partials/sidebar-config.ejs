@@ -10,8 +10,8 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m10-4a4 4 0 10-8 0 4 4 0 008 0z" />`,
           show: true,
           submenus: [
-            { name: "Data Karyawan", path: "/employee", show: true },
-            { name: "Tambah Karyawan", path: "/employee/create", show: true }
+            { name: "Data Karyawan", path: "/employee", show: !!user.permissions.employee_list },
+            { name: "Tambah Karyawan", path: "/employee/create", show: !!user.permissions.employee_add }
           ]
         },
         {
