@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
-      required: false,
+      required: true,
       lowercase: true,
       trim: true,
     },
@@ -28,9 +28,10 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    isActive: {
-      type: Boolean,
-      default: true,
+    status: {
+      type: String,
+      enum: ["Active", "Inactive", "Suspended"],
+      default: "Active",
     },
   },
   {

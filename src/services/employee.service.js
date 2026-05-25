@@ -86,6 +86,15 @@ export const EmployeeService = {
       .populate("bidangId");
   },
 
+  getReferenceData: async () => {
+    const [positions, units, bidangs] = await Promise.all([
+      Position.find(),
+      Unit.find(),
+      Bidang.find(),
+    ]);
+    return { positions, units, bidangs };
+  },
+
   createTermination: async (data, filePath) => {
     const newTermination = new Termination({
       employeeId: data.employeeId,

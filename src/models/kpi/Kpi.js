@@ -8,7 +8,6 @@ const kpiSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Format: "YYYY-MM" (contoh: "2026-05")
     periode: {
       type: String,
       required: true,
@@ -20,7 +19,6 @@ const kpiSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Menyimpan snapshot penilaian per indikator saat itu
     results: [
       {
         kpiTemplateDetailId: {
@@ -38,7 +36,6 @@ const kpiSchema = new mongoose.Schema(
       },
     ],
 
-    // Skor total akumulasi (skala 0-100)
     totalKpiScore: {
       type: Number,
       required: true,
@@ -52,7 +49,7 @@ const kpiSchema = new mongoose.Schema(
 
     evaluatedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // ID Admin/HR yang melakukan penilaian
+      ref: "User",
     },
   },
   {
@@ -60,7 +57,6 @@ const kpiSchema = new mongoose.Schema(
   }
 );
 
-// Indeks unik: Mencegah duplikasi penilaian untuk karyawan yang sama di periode yang sama
 kpiSchema.index({ employeeId: 1, periode: 1 }, { unique: true });
 
 const Kpi = mongoose.model("Kpi", kpiSchema);

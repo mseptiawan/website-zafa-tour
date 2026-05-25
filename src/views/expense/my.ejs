@@ -109,17 +109,38 @@
                       <td class="px-5 py-4 text-right font-bold text-slate-900 tabular-nums text-[13px]">
                         Rp <%= e.amount.toLocaleString('id-ID') %>
                       </td>
-                      <td class="px-5 py-4">
-                        <% if (e.status === 'PENDING_MANAGER') { %>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60">
-                            <i class="fa-solid fa-user-tie text-[10px]"></i> Review Manager
-                          </span>
-                        <% } else { %>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
-                            <i class="fa-solid fa-hourglass-half text-[10px]"></i> Antrean Finance
-                          </span>
-                        <% } %>
-                      </td>
+                    <td class="px-5 py-4">
+  <% 
+    // Mapping untuk style posisi dokumen
+    const posStyles = {
+      'PENDING_MANAGER': {
+        text: 'text-amber-600',
+        bg: 'bg-amber-50/70',
+        border: 'border-amber-200/50',
+        dot: 'bg-amber-500',
+        label: 'Review Manager'
+      },
+      'FINANCE': { // Sesuaikan key ini dengan status di database Anda
+        text: 'text-blue-600',
+        bg: 'bg-blue-50/70',
+        border: 'border-blue-200/50',
+        dot: 'bg-blue-500',
+        label: 'Antrean Finance'
+      }
+    };
+
+    // Tentukan style berdasarkan status (default ke FINANCE jika tidak cocok)
+    const currentPos = posStyles[e.status] || posStyles['FINANCE'];
+  %>
+
+  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200 
+    <%= currentPos.text %> <%= currentPos.bg %> <%= currentPos.border %>">
+    
+    <span class="w-1.5 h-1.5 rounded-full <%= currentPos.dot %>"></span>
+    
+    <span><%= currentPos.label %></span>
+  </div>
+</td>
                     </tr>
                   <% }) %>
                 <% } %>

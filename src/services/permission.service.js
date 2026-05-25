@@ -1,5 +1,9 @@
 export function getPermissions(role) {
   const permissions = {
+    loan_new: false,
+    loan_my: false,
+    loan_manage_center: false,
+    loan_disbursement: false,
     // =========================
     // CUTI
     // =========================
@@ -67,6 +71,8 @@ export function getPermissions(role) {
     // =========================
     // ADMIN / MASTER DATA
     // =========================
+    employee_list: false,
+    employee_add: false,
     employee_manage: false,
 
     report_kpi: false,
@@ -86,6 +92,9 @@ export function getPermissions(role) {
     // STAFF (KARYAWAN)
     // =========================
     case "STAFF":
+      permissions.loan_new = true;
+      permissions.loan_my = true;
+
       permissions.leave_request = true;
       permissions.leave_my = true;
 
@@ -111,6 +120,11 @@ export function getPermissions(role) {
       break;
 
     case "GENERAL_MANAGER":
+      permissions.loan_new = true;
+      permissions.loan_my = true;
+
+      permissions.employee_list = true;
+
       permissions.leave_request = true;
       permissions.leave_my = true;
 
@@ -136,6 +150,10 @@ export function getPermissions(role) {
       break;
 
     case "KEUANGAN":
+      permissions.loan_new = true;
+      permissions.loan_my = true;
+      permissions.loan_disbursement = true;
+
       permissions.leave_request = true;
       permissions.leave_my = true;
 
@@ -167,6 +185,11 @@ export function getPermissions(role) {
     // MANAGER
     // =========================
     case "MANAGER":
+      permissions.loan_new = true;
+      permissions.loan_my = true;
+
+      permissions.employee_list = true;
+
       permissions.leave_request = true;
       permissions.leave_my = true;
       permissions.leave_all = true;
@@ -208,6 +231,13 @@ export function getPermissions(role) {
     // HR
     // =========================
     case "HR":
+      permissions.loan_new = true;
+      permissions.loan_my = true;
+      permissions.loan_manage_center = true;
+
+      permissions.employee_list = true;
+      permissions.employee_add = true;
+
       permissions.leave_request = true;
       permissions.leave_my = true;
       permissions.leave_all = true;
@@ -248,9 +278,10 @@ export function getPermissions(role) {
     // =========================
     // GENERAL MANAGER / PIMPINAN
     // =========================
-    case "MANAGER":
-    case "HR":
     case "PIMPINAN":
+      permissions.loan_manage_center = true;
+
+      permissions.employee_list = true;
       permissions.leave_approval = true;
 
       permissions.trip_approval = true;

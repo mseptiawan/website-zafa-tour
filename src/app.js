@@ -6,6 +6,7 @@ import { attachPermissions } from "./middlewares/permission.middleware.js";
 import ejsMate from "ejs-mate";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import flash from "connect-flash";
 import methodOverride from "method-override";
 import session from "express-session";
 import MongoStore from "connect-mongo";
@@ -43,6 +44,12 @@ app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
