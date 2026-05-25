@@ -51,7 +51,7 @@
     },
     {
       title: "Absensi & Izin",
-      show: user.role !== "ssasasad",
+      show: true,
       menus: [
         {
           id: "leave",
@@ -59,19 +59,18 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
           show: true,
           submenus: [
-            { name: "Buat Pengajuan", path: "/leave/apply", show: !!user.permissions.leave_request },
+            { name: "Buat Pengajuan", path: "/leave/apply", show: !!user.permissions.leave_new },
             { name: "Riwayat Pengajuan", path: "/leave/my-history", show: !!user.permissions.leave_my },
-            { name: "Permintaan Delegasi", path: "/leave/my-delegations", show: true },
-            { name: "Manajemen Cuti", path: "/leave/manage-requests", show: user.role !== 'PEGAWAI' && user.role !== 'MANAGER_KEUANGAN' }
+            { name: "Permintaan Delegasi", path: "/leave/my-delegations", show: !!user.permissions.leave_delegation },
+            { name: "Manajemen Cuti", path: "/leave/manage-requests", show: !!user.permissions.leave_manage }
           ]
         },
         {
           id: "approval",
           name: "Persetujuan",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
-          show: user.role === 'DIREKTUR_UTAMA',
           submenus: [
-            { name: "Persetujuan PHK", path: "/approvals/pending", show: true }
+            { name: "Persetujuan PHK", path: "/approvals/pending", show: !!user.permissions.phk }
           ]
         },
         {
@@ -80,10 +79,10 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />`,
           show: true,
           submenus: [
-            { name: "Buat Pengajuan", path: "/overtime/apply", show: !!user.permissions.overtime_request },
+            { name: "Buat Pengajuan", path: "/overtime/apply", show: !!user.permissions.overtime_new },
             { name: "Riwayat Pengajuan", path: "/overtime/my", show: !!user.permissions.overtime_my },
             { name: "Verifikasi Pengajuan", path: "/overtime/approval", show: !!user.permissions.overtime_approval },
-            { name: "Riwayat Verifikasi", path: "/overtime/approval/history", show: !!user.permissions.overtime_approval_history }
+            { name: "Riwayat Verifikasi", path: "/overtime/approval/history", show: !!user.permissions.overtime_verify }
           ]
         },
         {
@@ -103,11 +102,11 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.104-.896-2-2-2s-2 .896-2 2 .896 2 2 2 2-.896 2-2zm0 0v10m6-10c0-3.314-2.686-6-6-6S6 7.686 6 11m12 0v10" />`,
           show: true,
           submenus: [
-            { name: "Buat Pengajuan", path: "/trip/new", show: !!user.permissions.trip_request },
+            { name: "Buat Pengajuan", path: "/trip/new", show: !!user.permissions.trip_new },
             { name: "Riwayat Pengajuan", path: "/trip/my", show: !!user.permissions.trip_my },
             { name: "Approval", path: "/trip/approval", show: !!user.permissions.trip_approval },
-            { name: "Permintaan Pembayaran", path: "/finance", show: !!user.permissions.finance_request },
-            { name: "Riwayat Pembayaran", path: "/finance/history", show: !!user.permissions.finance_history }
+            { name: "Verifikasi Finance", path: "/finance", show: !!user.permissions.trip_verify },
+            { name: "Riwayat Verifikasi", path: "/finance/history", show: !!user.permissions.trip_history }
           ]
         }
       ]
@@ -122,8 +121,8 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />`,
           show: user.role !== "DIREKTUR_UTAMA",
           submenus: [
-            { name: "Catat Kunjungan", path: "/sales/new", show: true },
-            { name: "Daftar Kunjungan", path: "/sales/my", show: true }
+            { name: "Catat Kunjungan", path: "/sales/new", show: !!user.permissions.sales_new },
+            { name: "Daftar Kunjungan", path: "/sales/my", show: !!user.permissions.sales_my }
           ]
         },
         {
@@ -132,7 +131,7 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />`,
           show: true,
           submenus: [
-            { name: "Lembar Kerja", path: "/daily-log", show: true }
+            { name: "Lembar Kerja", path: "/daily-log", show: !!user.permissions.daily_log_create }
           ]
         }
       ]
@@ -147,8 +146,8 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5l-7 7h4v7h6v-4h2v4h6v-7h4l-7-7z" />`,
           show: true,
           submenus: [
-            { name: "Buat Pengumuman", path: "/announcement/new", show: true },
-            { name: "Daftar Pengumuman", path: "/announcement", show: true }
+            { name: "Buat Pengumuman", path: "/announcement/new", show: !!user?.permissions?.announcement_new},
+            { name: "Daftar Pengumuman", path: "/announcement", show: !!user?.permissions?.announcement_all }
           ]
         }
       ]
@@ -163,10 +162,10 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6v2m0 16v2m8-10h2M2 12H4" />`,
           show: true,
           submenus: [
-            { name: "Buat Pengajuan", path: "/expense/create", show: true },
-            { name: "Riwayat Pengajuan", path: "/expense/my", show: true },
-            { name: "Verifikasi Manager", path: "/expense/approval/manager", show: user.role === 'MANAGER_ADMINISTRASI' },
-            { name: "Verifikasi Finance", path: "/expense/finance", show: user.role === 'MANAGER_KEUANGAN' }
+            { name: "Buat Pengajuan", path: "/expense/create", show: !!user.permissions.claim_new },
+            { name: "Riwayat Pengajuan", path: "/expense/my", show: !!user.permissions.claim_my},
+            { name: "Verifikasi Manager", path: "/expense/approval/manager", show: !!user.permissions.claim_approval },
+            { name: "Verifikasi Finance", path: "/expense/finance",show: !!user.permissions.claim_verify }
           ]
         },
         {
