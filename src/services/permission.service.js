@@ -4,43 +4,27 @@ export function getPermissions(role) {
     loan_my: false,
     loan_manage_center: false,
     loan_disbursement: false,
-    // =========================
-    // CUTI
-    // =========================
+
     leave_request: false,
     leave_my: false,
     leave_approval: false,
     leave_all: false,
 
-    // =========================
-    // LEMBUR
-    // =========================
     overtime_request: false,
     overtime_my: false,
     overtime_approval: false,
     overtime_approval_history: false,
 
-    // =========================
-    // DINAS LUAR / TRIP
-    // =========================
     trip_request: false,
     trip_my: false,
     trip_approval: false,
 
-    // =========================
-    // KLAIM BEBAN
-    // =========================
     claim_request: false,
     claim_approval: false,
 
-    // =========================
-    // KASBON
-    // =========================
     kasbon_request: false,
     kasbon_approval: false,
-    // =========================
-    // ABSENSI
-    // =========================
+
     attendance_input: false,
     attendance_view_my: false,
     attendance_view_all: false,
@@ -49,28 +33,16 @@ export function getPermissions(role) {
     attendance_correction_approval: false,
     attendance_correction_request: false,
 
-    // =========================
-    // TASK
-    // =========================
     task_create: false,
     task_view_my: false,
     task_view_all: false,
 
-    // =========================
-    // PAYROLL
-    // =========================
     payroll_view: false,
     payroll_process: false,
 
-    // =========================
-    // PENGUMUMAN
-    // =========================
     announcement_create: false,
     announcement_view: true,
 
-    // =========================
-    // ADMIN / MASTER DATA
-    // =========================
     employee_list: false,
     employee_add: false,
     employee_manage: false,
@@ -88,10 +60,7 @@ export function getPermissions(role) {
   };
 
   switch (role) {
-    // =========================
-    // STAFF (KARYAWAN)
-    // =========================
-    case "STAFF":
+    case "PEGAWAI":
       permissions.loan_new = true;
       permissions.loan_my = true;
 
@@ -119,37 +88,7 @@ export function getPermissions(role) {
 
       break;
 
-    case "GENERAL_MANAGER":
-      permissions.loan_new = true;
-      permissions.loan_my = true;
-
-      permissions.employee_list = true;
-
-      permissions.leave_request = true;
-      permissions.leave_my = true;
-
-      permissions.overtime_request = true;
-      permissions.overtime_my = true;
-
-      permissions.trip_request = true;
-      permissions.trip_my = true;
-
-      permissions.claim_request = true;
-
-      permissions.kasbon_request = true;
-
-      permissions.attendance_input = true;
-      permissions.attendance_view_my = true;
-      permissions.attendance_correction_view_my = true;
-      permissions.attendance_correction_request = true;
-
-      permissions.task_create = true;
-      permissions.task_view_my = true;
-      permissions.assignment_my = true;
-
-      break;
-
-    case "KEUANGAN":
+    case "MANAGER_KEUANGAN":
       permissions.loan_new = true;
       permissions.loan_my = true;
       permissions.loan_disbursement = true;
@@ -181,10 +120,7 @@ export function getPermissions(role) {
 
       break;
 
-    // =========================
-    // MANAGER
-    // =========================
-    case "MANAGER":
+    case "MANAGER_ADMINISTRASI":
       permissions.loan_new = true;
       permissions.loan_my = true;
 
@@ -227,10 +163,7 @@ export function getPermissions(role) {
 
       break;
 
-    // =========================
-    // HR
-    // =========================
-    case "HR":
+    case "WAKIL_DIREKTUR":
       permissions.loan_new = true;
       permissions.loan_my = true;
       permissions.loan_manage_center = true;
@@ -275,10 +208,7 @@ export function getPermissions(role) {
 
       break;
 
-    // =========================
-    // GENERAL MANAGER / PIMPINAN
-    // =========================
-    case "PIMPINAN":
+    case "DIREKTUR_UTAMA":
       permissions.loan_manage_center = true;
 
       permissions.employee_list = true;
@@ -304,9 +234,6 @@ export function getPermissions(role) {
 
       break;
 
-    // =========================
-    // DEFAULT
-    // =========================
     default:
       break;
   }

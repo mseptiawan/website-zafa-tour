@@ -6,8 +6,9 @@
       <!-- Header Utama -->
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-          <h1 class="text-xl font-bold text-slate-800">Approval Klaim Manager</h1>
-          <p class="text-xs text-slate-500 mt-0.5">Evaluasi substansi pengajuan klaim operasional (reimbursement) staf sebelum diteruskan ke bagian keuangan.</p>
+     <h1 class="text-xl font-bold text-slate-800">Approval Klaim Manager</h1>
+<h1 class="text-xl font-bold text-slate-800">Approval Klaim Manager Administrasi</h1>
+<p class="text-xs text-slate-500 mt-0.5">Evaluasi substansi pengajuan klaim operasional (reimbursement) pegawai sebelum diteruskan ke bagian keuangan.</p>
         </div>
       </div>
 
@@ -46,7 +47,7 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="px-5 py-3">Karyawan</th>
+                  <th class="px-5 py-3">Pegawai</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Lampiran</th>
@@ -57,16 +58,16 @@
               <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
                 <% if (activeExpenses.length === 0) { %>
                   <tr>
-                    <td colspan="7" class="px-5 py-12 text-center text-slate-400">
-                      <i class="fa-regular fa-square-check text-3xl mb-2 block text-slate-300"></i>
-                      Antrean kosong! Belum ada berkas pengajuan baru yang membutuhkan persetujuan Anda.
-                    </td>
+                   <td colspan="7" class="px-5 py-12 text-center text-slate-400">
+  <i class="fa-regular fa-square-check text-3xl mb-2 block text-slate-300"></i>
+  Antrean kosong! Belum ada berkas pengajuan baru yang membutuhkan persetujuan Pegawai.
+</td>
                   </tr>
                 <% } else { %>
                   <% activeExpenses.forEach(e => { %>
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
-                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
+                      <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Pegawai' %></div>
                       </td>
                       <td class="px-5 py-4">
                         <div class="font-semibold text-slate-800"><%= e.title %></div>
@@ -128,7 +129,6 @@
         </div>
       </div>
 
-      <!-- ================== ZONE TAB 2: RIWAYAT REVIEW ================== -->
       <div id="tab-content-history" class="tab-pane hidden">
         <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
           <div class="p-4 border-b border-slate-100 bg-slate-50/50">
@@ -138,7 +138,7 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="px-5 py-3">Karyawan</th>
+                  <th class="px-5 py-3">Pegawai</th>
                   <th class="px-5 py-3">Detail Pengajuan</th>
                   <th class="px-5 py-3">Tanggal</th>
                   <th class="px-5 py-3 text-center">Bukti Nota</th>
@@ -158,7 +158,7 @@
                   <% historyExpenses.forEach(e => { %>
                     <tr class="hover:bg-slate-50/50 transition duration-150">
                       <td class="px-5 py-4">
-                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Karyawan' %></div>
+                        <div class="font-bold text-slate-900"><%= e.employeeId?.fullName || 'Pegawai' %></div>
                        
                       </td>
                       <td class="px-5 py-4">
