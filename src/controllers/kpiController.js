@@ -150,7 +150,6 @@ export const submitKpi = async (req, res) => {
 
 export const getKpiList = async (req, res) => {
   try {
-    // Mencari semua data KPI dan meng-populate data karyawan
     const kpiList = await Kpi.find({})
       .populate("employeeId", "fullName unitId") // Ambil nama & unit
       .sort({ createdAt: -1 });
