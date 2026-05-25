@@ -5,29 +5,21 @@ const roleSeeder = async () => {
 
   await Role.insertMany([
     {
-      name: "STAFF",
+      name: "PEGAWAI",
     },
 
     {
-      name: "MANAGER",
+      name: "MANAGER_KEUANGAN",
     },
 
     {
-      name: "GENERAL_MANAGER",
+      name: "MANAGER_ADMINISTRASI",
     },
     {
-      name: "HR",
+      name: "WAKIL_DIREKTUR",
     },
     {
-      name: "PIMPINAN",
-    },
-
-    {
-      name: "KOMISARIS",
-    },
-
-    {
-      name: "KEUANGAN",
+      name: "DIREKTUR_UTAMA",
     },
   ]);
 
