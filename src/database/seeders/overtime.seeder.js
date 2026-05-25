@@ -1,11 +1,10 @@
 import dotenv from "dotenv";
 
 import Overtime from "../../models/Overtime.js";
-import Employee from "../../models/Employee.js";
-import User from "../../models/User.js";
+import Employee from "../../models/employee/Employee.model.js";
+import User from "../../models/basic/User.js";
 
 dotenv.config();
-
 
 const descriptions = [
   "Menyelesaikan laporan bulanan",
@@ -90,6 +89,4 @@ export default async function overtimeSeeder() {
   await Overtime.insertMany(data);
 
   console.log("Seeder lembur berhasil");
-
 }
-

@@ -38,20 +38,25 @@ router.get(
 router.post(
   "/expense/:id/approve/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER"]),
+  roleMiddleware(["MANAGER_ADMINISTRASI"]),
   approveManagerExpense
 );
 router.post(
   "/expense/:id/reject/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER"]),
+  roleMiddleware(["MANAGER_ADMINISTRASI"]),
   rejectManagerExpense
 );
-router.get("/expense/finance", authMiddleware, roleMiddleware("KEUANGAN"), financeExpensePage);
+router.get(
+  "/expense/finance",
+  authMiddleware,
+  roleMiddleware("MANAGER_KEUANGAN"),
+  financeExpensePage
+);
 router.post(
   "/expense/:id/pay",
   authMiddleware,
-  roleMiddleware("KEUANGAN"),
+  roleMiddleware("MANAGER_KEUANGAN"),
   uploadFile.single("transferProof"),
   payExpense
 );

@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import Holiday from "../../models/calender/Holiday.model.js"; // Sesuaikan dengan path model lo
+import Holiday from "../../models/calender/Holiday.model.js";
 
 dotenv.config();
 
 const holidays = [
-  // =========================================================================
-  // 1. DAFTAR HARI LIBUR NASIONAL 2026 (isDeductLeave: false)
-  // =========================================================================
   {
     name: "Tahun Baru 2026 Masehi",
     date: new Date("2026-01-01"),
@@ -89,10 +86,6 @@ const holidays = [
     year: 2026,
   },
 
-  // =========================================================================
-  // 2. DAFTAR CUTI BERSAMA RESMI 2026 (isDeductLeave: true)
-  // TOTAL: 8 HARI SESUAI SKB 3 MENTERI
-  // =========================================================================
   {
     name: "Cuti Bersama Tahun Baru Imlek 2577 Kongzili",
     date: new Date("2026-02-16"),
@@ -163,7 +156,6 @@ const holidaysSeeder = async () => {
   try {
     console.log("⏳ Sedang memproses data hari libur dan cuti bersama 2026...");
 
-    // Menggunakan BulkWrite Upsert supaya jika data di-run berkali-kali tidak bikin row double
     const operations = holidays.map((holiday) => ({
       updateOne: {
         filter: { name: holiday.name, date: holiday.date },
@@ -175,14 +167,14 @@ const holidaysSeeder = async () => {
     const result = await Holiday.bulkWrite(operations);
 
     console.log("-----------------------------------------");
-    console.log(`✅ Seeding Kalender SKB 2026 Selesai!`);
+    console.log(`Seeding Kalender SKB 2026 Selesai!`);
     console.log(`   - Total Terbaca  : ${holidays.length} Hari`);
     console.log(`   - Match Berhasil : ${result.matchedCount} data`);
     console.log(`   - Baru Disuntik  : ${result.upsertedCount} data`);
     console.log(`   - Data Terupdate : ${result.modifiedCount} data`);
     console.log("-----------------------------------------");
   } catch (error) {
-    console.error("❌ Proses seeding kalender gagal total:", error);
+    console.error("Proses seeding kalender gagal total:", error);
   }
 };
 

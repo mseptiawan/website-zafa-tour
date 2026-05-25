@@ -10,7 +10,7 @@ const businessTripSchema = new mongoose.Schema(
 
     requesterRole: {
       type: String,
-      enum: ["STAFF", "MANAGER", "HR", "KEUANGAN"],
+      enum: ["PEGAWAI", "MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "MANAGER_KEUANGAN"],
       required: true,
     },
 
@@ -68,14 +68,14 @@ const businessTripSchema = new mongoose.Schema(
 
     currentStep: {
       type: String,
-      enum: ["MANAGER", "PIMPINAN"],
-      default: "MANAGER",
+      enum: ["MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"],
+      default: "MANAGER_ADMINISTRASI",
     },
 
     approvals: [
       {
-        step: { type: String, enum: ["MANAGER", "PIMPINAN"] },
-        actor: { type: String, enum: ["MANAGER", "PIMPINAN", "HR"] },
+        step: { type: String, enum: ["MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"] },
+        actor: { type: String, enum: ["MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA", "WAKIL_DIREKTUR"] },
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         status: { type: String, enum: ["APPROVED", "REJECTED"] },
         date: Date,
@@ -85,8 +85,8 @@ const businessTripSchema = new mongoose.Schema(
 
     delegation: {
       active: { type: Boolean, default: false },
-      from: { type: String, enum: ["PIMPINAN"] },
-      to: { type: String, enum: ["HR"] },
+      from: { type: String, enum: ["DIREKTUR_UTAMA"] },
+      to: { type: String, enum: ["WAKIL_DIREKTUR"] },
       delegatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       delegatedAt: Date,
       note: String,

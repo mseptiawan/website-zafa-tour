@@ -1,4 +1,4 @@
-import Position from "../../models/Position.js";
+import Position from "../../models/basic/Position.js";
 
 const positionSeeder = async () => {
   await Position.deleteMany();

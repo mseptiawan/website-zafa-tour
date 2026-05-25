@@ -9,7 +9,7 @@ const loanApprovalSchema = new mongoose.Schema(
     },
     step: {
       type: String,
-      enum: ["HR", "PIMPINAN", "KEUANGAN"],
+      enum: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"],
       required: true,
     },
     approverId: {

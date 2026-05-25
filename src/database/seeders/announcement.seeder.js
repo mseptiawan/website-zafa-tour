@@ -2,10 +2,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import Announcement from "../../models/Announcement.js";
-import User from "../../models/User.js";
+import User from "../../models/basic/User.js";
 
 dotenv.config();
-
 
 // ======================================================
 // TARGET USERS
@@ -199,8 +198,6 @@ function randomDate() {
 // MAIN SEED
 // ======================================================
 
-
-
 export default async function announcementSeeder() {
   try {
     const users = await User.find({
@@ -241,7 +238,6 @@ export default async function announcementSeeder() {
     await Announcement.insertMany(data);
 
     console.log("Seeder Announcement berhasil dibuat");
-
   } catch (err) {
     console.error(err);
     throw err;

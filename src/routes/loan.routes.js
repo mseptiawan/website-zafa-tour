@@ -15,7 +15,7 @@ import {
   approveLoan,
   rejectLoan,
   getFinanceCenterPage,
-  disburseLoan
+  disburseLoan,
 } from "../controllers/loan.controller.js";
 
 const router = express.Router();
@@ -30,25 +30,31 @@ router.get("/detail/:id", getDetail);
 router.get("/edit/:id", edit);
 router.post("/update/:id", update);
 router.post("/cancel/:id", cancel);
-router.get("/manage-center", roleMiddleware(["HR", "PIMPINAN"]), getManageLoanPage);
+router.get(
+  "/manage-center",
+  roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]),
+  getManageLoanPage
+);
 
 router.post(
   "/approval/approve/:id",
-  roleMiddleware(["HR", "PIMPINAN"]),
+  roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]),
   approveLoan
 );
 
-router.post("/approval/reject/:id", roleMiddleware(["HR", "PIMPINAN"]), rejectLoan);
+router.post(
+  "/approval/reject/:id",
+  roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]),
+  rejectLoan
+);
 
-
-router.get("/disbursement", roleMiddleware(["KEUANGAN"]), getFinanceCenterPage);
+router.get("/disbursement", roleMiddleware(["MANAGER_KEUANGAN"]), getFinanceCenterPage);
 
 router.post(
   "/approval/disburse/:id",
-  roleMiddleware(["KEUANGAN"]),
+  roleMiddleware(["MANAGER_KEUANGAN"]),
   uploadFile.single("paymentProof"),
   disburseLoan
 );
-
 
 export default router;
