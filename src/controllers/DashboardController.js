@@ -63,14 +63,14 @@ export const index = async (req, res, next) => {
         $or: [{ year: currentYear }, { isRecurring: true }],
       }).sort({ date: 1 }),
 
-      user.role === "MANAGER"
+      user.role === "MANAGER_ADMINISTRASI"
         ? Overtime.find({ status: "Pending Manager", userId: { $ne: userId } })
             .populate("userId")
             .sort({ createdAt: -1 })
             .limit(5)
         : [],
 
-      ["MANAGER", "HR", "PIMPINAN"].includes(user.role)
+      ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(user.role)
         ? BusinessTrip.find({ status: "PENDING_APPROVAL" }) // Sesuai logika getApprovalTripsService(user.role)
             .populate("userId")
             .sort({ createdAt: -1 })

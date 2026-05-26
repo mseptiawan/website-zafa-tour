@@ -8,7 +8,7 @@ const employeeSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-  
+
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -21,43 +21,41 @@ const employeeSchema = new mongoose.Schema(
       required: true,
     },
 
-    phoneNumber: String,
-
-    gender: {
+    nomor_ktp: {
       type: String,
-      enum: ["Laki-Laki", "Perempuan"],
+      required: true,
+      unique: true,
+      trim: true,
     },
-
-    address: String,
-
-    joinDate: {
-      type: Date,
-      default: Date.now,
-    },
-
-    employmentStatus: {
+    tempat_lahir: {
       type: String,
-      enum: ["Tetap", "Kontrak", "Magang"],
-      default: "Tetap",
-    },
-
-    positionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Position",
       required: true,
     },
-
-    bidangId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Bidang",
+    tanggal_lahir: {
+      type: Date,
+      required: true,
     },
-
-    unitId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Unit",
+    jenis_kelamin: {
+      type: String,
+      enum: ["Laki-Laki", "Perempuan"],
+      required: true,
     },
-
-    profilePhoto: String,
+    agama: {
+      type: String,
+      required: true,
+    },
+    golongan_darah: {
+      type: String,
+      trim: true,
+    },
+    status_pernikahan: {
+      type: String,
+      enum: ["Lajang", "Menikah", "Cerai Hidup", "Cerai Mati"],
+      required: true,
+    },
+    foto_profile: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -74,6 +72,13 @@ employeeSchema.virtual("salaryDetail", {
   ref: "EmployeeSalary",
   localField: "_id",
   foreignField: "employeeId",
+  justOne: true,
+});
+
+employeeSchema.virtual("careerData", {
+  ref: "EmployeeCareer",
+  localField: "_id",
+  foreignField: "employee_id",
   justOne: true,
 });
 
