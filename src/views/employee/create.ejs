@@ -1,169 +1,665 @@
+<% if (typeof old === 'undefined' || !old) { var old = {}; } %>
 <%- layout('layouts/main', { title: "Tambah Pegawai" }) %>
-
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-
-  <div class="max-w-2xl mx-auto">
-
-    <!-- BREADCRUMB & HEADER -->
-    <div class="mb-8">
-      <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-        <span>Area Kerja</span>
-        <span class="text-slate-300">/</span>
-        <span class="text-slate-900">Pegawai</span>
-      </nav>
-
-      <h1 class="text-2xl font-bold text-slate-900">
-        Tambah Pegawai
-      </h1>
-      <p class="text-sm text-slate-500 mt-1">
-        Isi data Pegawai baru dengan lengkap
-      </p>
+  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  
+  <div class="mb-8 text-center sm:text-left">
+    <div class="flex items-center justify-center sm:justify-start gap-2 mb-2">
+      <span class="h-2 w-2 rounded-full bg-slate-600 animate-pulse"></span>
+      <span class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">HRIS Master Portal</span>
     </div>
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Pendaftaran pegawai Baru</h1>
+    <p class="text-sm text-slate-500 mt-1">Lengkapi data secara berjenjang untuk membuat profil terintegrasi.</p>
+  </div>
 
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+  <div class="bg-white rounded-2xl border border-slate-200 p-4 mb-6 shadow-sm overflow-x-auto">
+    <div class="flex items-center justify-between min-w-[550px] px-2">
+      
+      <div id="step-nav-1" class="flex items-center gap-2 font-bold text-xs text-slate-900">
+        <span class="nav-circle w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold">1</span>
+        <span>Akses</span>
+      </div>
+      <div class="h-px w-6 bg-slate-200 flex-1 mx-2"></div>
 
-      <form action="/api/employee/create"  method="POST" class="p-8 space-y-6">
+      <div id="step-nav-2" class="flex items-center gap-2 font-medium text-xs text-slate-400">
+        <span class="nav-circle w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center font-bold">2</span>
+        <span>KTP</span>
+      </div>
+      <div class="h-px w-6 bg-slate-200 flex-1 mx-2"></div>
 
-        <!-- NAMA LENGKAP -->
+      <div id="step-nav-3" class="flex items-center gap-2 font-medium text-xs text-slate-400">
+        <span class="nav-circle w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center font-bold">3</span>
+        <span>Karir</span>
+      </div>
+      <div class="h-px w-6 bg-slate-200 flex-1 mx-2"></div>
+
+      <div id="step-nav-4" class="flex items-center gap-2 font-medium text-xs text-slate-400">
+        <span class="nav-circle w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center font-bold">4</span>
+        <span>Kontak</span>
+      </div>
+      <div class="h-px w-6 bg-slate-200 flex-1 mx-2"></div>
+
+      <div id="step-nav-5" class="flex items-center gap-2 font-medium text-xs text-slate-400">
+        <span class="nav-circle w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center font-bold">5</span>
+        <span>Edukasi</span>
+      </div>
+      <div class="h-px w-6 bg-slate-200 flex-1 mx-2"></div>
+
+      <div id="step-nav-6" class="flex items-center gap-2 font-medium text-xs text-slate-400">
+        <span class="nav-circle w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center font-bold">6</span>
+        <span>Finansial</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+    
+    <form id="onboardingForm" action="/api/employee/create" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+
+   <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+  <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100 mb-6">
+    <%= error %>
+  </div>
+<% } %>
+      
+      <!-- STEP 1: AKSES -->
+      <div id="step-panel-1" class="step-panel space-y-6">
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
-            Nama Lengkap
-          </label>
-          <input type="text" name="fullName" required placeholder="Contoh: Budi Santoso" 
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all" />
+          <label class="text-[13px] font-bold text-slate-700">Nama Lengkap <span class="text-red-500">*</span></label>
+          <input type="text" name="fullName" required value="<%= old?.fullName || '' %>" placeholder="Contoh: M Septiawan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
         </div>
 
-        <!-- POSITION -->
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
-            Jabatan / Posisi
-          </label>
-          <select name="positionId" required 
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat">
-            <option value="" disabled selected hidden>Pilih Jabatan</option>
-            <% positions.forEach(p => { %>
-              <option value="<%= p._id %>"><%= p.name %></option>
-            <% }) %>
+          <label class="text-[13px] font-bold text-slate-700">Email Pribadi <span class="text-red-500">*</span></label>
+          <input type="email" name="email" required value="<%= old?.email || '' %>" placeholder="Contoh: septiawan@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+     <% 
+  // Kita simpan string SVG panah ke dalam variabel biar HTML di bawah clean
+  const selectBgIcon = "bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat";
+%>
+
+<div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">Hak Akses Sistem (Role) <span class="text-red-500">*</span></label>
+  
+  <select name="roleId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+    <option value="" disabled selected hidden>Pilih Hak Akses</option>
+    <% roles.forEach(r => { %>
+      <option value="<%= r._id %>" <%= old?.roleId === String(r._id) ? 'selected' : '' %>>
+        <%= r.name.replace(/_/g, ' ') %>
+      </option>
+    <% }) %>
+  </select>
+</div>
+     
+      </div>
+
+      <!-- STEP 2: KTP -->
+      <div id="step-panel-2" class="step-panel hidden space-y-6">
+     
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nomor NIK KTP <span class="text-red-500">*</span></label>
+          <input type="text" name="nomor_ktp" required maxlength="16" value="<%= old?.nomor_ktp || '' %>" placeholder="Wajib 16 digit angka resmi KTP" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Tempat Lahir <span class="text-red-500">*</span></label>
+          <input type="text" name="tempat_lahir" required value="<%= old?.tempat_lahir || '' %>" placeholder="Kota tempat lahir" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Tanggal Lahir <span class="text-red-500">*</span></label>
+          <input type="date" name="tanggal_lahir" required value="<%= old?.tanggal_lahir || '' %>" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Jenis Kelamin <span class="text-red-500">*</span></label>
+          <select name="jenis_kelamin" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
+            <option value="" disabled <%= !old?.jenis_kelamin ? 'selected' : '' %>>Pilih Jenis Kelamin</option>
+            <option value="Laki-Laki" <%= old?.jenis_kelamin === 'Laki-Laki' ? 'selected' : '' %>>Laki-Laki</option>
+            <option value="Perempuan" <%= old?.jenis_kelamin === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
           </select>
         </div>
 
-        <!-- UNIT & BIDANG (GRID) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">
-              Unit Kerja
-            </label>
-            <select name="unitId" required 
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-              focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-              outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat">
-              <option value="" disabled selected hidden>Pilih Unit</option>
-              <% units.forEach(u => { %>
-                <option value="<%= u._id %>"><%= u.name %></option>
-              <% }) %>
-            </select>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">
-              Bidang
-            </label>
-            <select name="bidangId" required 
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-              focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-              outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat">
-              <option value="" disabled selected hidden>Pilih Bidang</option>
-              <% bidang.forEach(b => { %>
-                <option value="<%= b._id %>"><%= b.name %></option>
-              <% }) %>
-            </select>
-          </div>
-        </div>
-
-        <!-- STATUS Pegawai -->
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
-            Status Pegawai
-          </label>
-          <select name="employmentStatus" required 
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat">
-            <option value="" disabled selected hidden>Pilih Status Ikatan Kerja</option>
-            <option value="Tetap">Tetap</option>
-            <option value="Kontrak">Kontrak</option>
-            <option value="Magang">Magang</option>
+          <label class="text-[13px] font-bold text-slate-700">Agama <span class="text-red-500">*</span></label>
+          <select name="agama" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
+            <option value="" disabled <%= !old?.agama ? 'selected' : '' %>>Pilih Agama</option>
+            <option value="Islam" <%= old?.agama === 'Islam' ? 'selected' : '' %>>Islam</option>
+            <option value="Kristen" <%= old?.agama === 'Kristen' ? 'selected' : '' %>>Kristen</option>
+            <option value="Katolik" <%= old?.agama === 'Katolik' ? 'selected' : '' %>>Katolik</option>
+            <option value="Hindu" <%= old?.agama === 'Hindu' ? 'selected' : '' %>>Hindu</option>
+            <option value="Buddha" <%= old?.agama === 'Buddha' ? 'selected' : '' %>>Buddha</option>
           </select>
         </div>
 
-        <!-- JENIS KELAMIN -->
-        <div class="space-y-2">
-          <label class="text-[13px] font-bold text-slate-700 block">
-            Jenis Kelamin
-          </label>
-          <div class="flex items-center gap-6 text-xs font-medium text-slate-600 pt-1">
-            <label class="flex items-center gap-2 cursor-pointer group">
-              <input type="radio" name="gender" value="Laki-Laki" required 
-                class="w-4 h-4 text-blue-600 bg-slate-50 border-slate-300 focus:ring-blue-500/20 focus:ring-offset-0 focus:ring-4 transition-all" />
-              <span class="group-hover:text-slate-900 transition-colors">Laki-Laki</span>
-            </label>
+       <div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">Status Pernikahan <span class="text-red-500">*</span></label>
+  <select name="status_pernikahan" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= typeof selectBgIcon !== 'undefined' ? selectBgIcon : '' %>">
+    <option value="" disabled selected hidden <%= !old?.status_pernikahan ? 'selected' : '' %>>Pilih Status</option>
+    <option value="Lajang" <%= old?.status_pernikahan === 'Lajang' ? 'selected' : '' %>>Lajang</option>
+    <option value="Menikah" <%= old?.status_pernikahan === 'Menikah' ? 'selected' : '' %>>Menikah</option>
+    <option value="Cerai" <%= old?.status_pernikahan === 'Cerai' ? 'selected' : '' %>>Cerai</option>
+  </select>
+</div>
 
-            <label class="flex items-center gap-2 cursor-pointer group">
-              <input type="radio" name="gender" value="Perempuan" 
-                class="w-4 h-4 text-blue-600 bg-slate-50 border-slate-300 focus:ring-blue-500/20 focus:ring-offset-0 focus:ring-4 transition-all" />
-              <span class="group-hover:text-slate-900 transition-colors">Perempuan</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- NO HP -->
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
-            No HP / WhatsApp
-          </label>
-          <input type="tel" name="phoneNumber" placeholder="Contoh: 08xxxxxxxxxx" 
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all" />
+          <label class="text-[13px] font-bold text-slate-700">Golongan Darah <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <select name="golongan_darah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
+            <option value="" <%= !old?.golongan_darah ? 'selected' : '' %>>Belum Diketahui</option>
+            <option value="A" <%= old?.golongan_darah === 'A' ? 'selected' : '' %>>A</option>
+            <option value="B" <%= old?.golongan_darah === 'B' ? 'selected' : '' %>>B</option>
+            <option value="AB" <%= old?.golongan_darah === 'AB' ? 'selected' : '' %>>AB</option>
+            <option value="O" <%= old?.golongan_darah === 'O' ? 'selected' : '' %>>O</option>
+          </select>
         </div>
+      </div>
 
-        <!-- ALAMAT -->
+      <!-- STEP 3: KARIR -->
+      <div id="step-panel-3" class="step-panel hidden space-y-6">
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
-            Alamat Tinggal
-          </label>
-          <textarea name="address" rows="3" placeholder="Tuliskan alamat domisili lengkap saat ini..." 
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none resize-none transition-all"></textarea>
+          <label class="text-[13px] font-bold text-slate-700">Status Hubungan Kerja <span class="text-red-500">*</span></label>
+          <select id="status_pegawai" name="status_pegawai" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
+            <option value="" disabled <%= !old?.status_pegawai ? 'selected' : '' %>>Pilih Ikatan Kerja</option>
+            <option value="Tetap" <%= old?.status_pegawai === 'Tetap' ? 'selected' : '' %>>Tetap (Permanent)</option>
+            <option value="Kontrak" <%= old?.status_pegawai === 'Kontrak' ? 'selected' : '' %>>Kontrak (PKWT)</option>
+            <option value="Magang" <%= old?.status_pegawai === 'Magang' ? 'selected' : '' %>>Magang (Internship)</option>
+      
+          </select>
+        </div>
+ 
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Tanggal Bergabung <span class="text-red-500">*</span></label>
+          <input type="date" name="tanggal_mulai_bergabung" required value="<%= old?.tanggal_mulai_bergabung || '' %>" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
         </div>
 
-        <!-- OPERASIONAL BUTTONS -->
-        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
+               
+        <div id="contract_date_box" class="hidden p-4 bg-slate-50/50 border border-slate-200 rounded-xl transition-all space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Tanggal Akhir Kontrak / Magang <span class="text-red-500">*</span></label>
+          <input type="date" id="tanggal_berakhir_kontrak" name="tanggal_berakhir_kontrak" value="<%= old?.tanggal_berakhir_kontrak || '' %>" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+       <div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">Bidang Kerja (Division)</label>
+  
+  <select id="bidang_select" name="bidangId" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+    <option value="" disabled selected hidden>Pilih Bidang Kerja</option>
+    
+    <% bidang.forEach(b => { %>
+      <option value="<%= b._id %>" <%= old?.bidangId === String(b._id) ? 'selected' : '' %>>
+        <%= b.name %>
+      </option>
+    <% }) %>
+    
+  </select>
+</div>
+
+    <div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">Unit Kerja Spesifik</label>
+  
+  <select id="unit_select" name="unitId" disabled 
+          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed <%= selectBgIcon %>">
+    <option value="" selected>Pilih Bidang Terlebih Dahulu</option>
+  </select>
+</div>
+
+<script>
+  const allUnits = <%- JSON.stringify(units) %>;
+</script>
+
+       <div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">
+    Level Jabatan
+    <span class="text-slate-400 font-normal">(Opsional)</span>
+  </label>
+
+  <select
+    name="positionId"
+    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>"
+  >
+
+    <option value=""
+      <%= !old?.positionId ? 'selected' : '' %>>
+      Pilih Level Jabatan
+    </option>
+
+    <% positions.forEach(p => { %>
+
+      <option
+        value="<%= p._id %>"
+        <%= String(old?.positionId) === String(p._id)
+            ? 'selected'
+            : '' %>
+      >
+        <%= p.name %>
+      </option>
+
+    <% }) %>
+
+  </select>
+</div>
+      </div>
+
+      <!-- STEP 4: KONTAK -->
+      <div id="step-panel-4" class="step-panel hidden space-y-6">
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nomor HP Aktif (WhatsApp) <span class="text-red-500">*</span></label>
+          <input type="text" name="nomor_telp" required value="<%= old?.nomor_telp || '' %>" placeholder="Contoh: 0812XXXXXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Alamat Domisili Sekarang <span class="text-red-500">*</span></label>
+          <input type="text" name="alamat" required value="<%= old?.alamat || '' %>" placeholder="Nama jalan, RT/RW, Kecamatan, Kota" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="p-6 border border-slate-200 rounded-2xl bg-slate-50/30 space-y-5">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Protokol Kontak Darurat Keluarga</div>
           
-          <!-- BUTTON BATAL -->
-          <a href="/employee"
-            class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
-            Batal
-          </a>
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Nama Lengkap Penanggung Jawab <span class="text-red-500">*</span></label>
+            <input type="text" name="nama_kontak_darurat" required value="<%= old?.nama_kontak_darurat || '' %>" placeholder="Nama Kerabat Terdekat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+          </div>
 
-          <!-- BUTTON SIMPAN (Sesuai Warna Biru Standar) -->
-          <button type="submit"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
-            Simpan Pegawai
-          </button>
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Hubungan Keluarga <span class="text-red-500">*</span></label>
+            <input type="text" name="hubungan_kontak_darurat" required value="<%= old?.hubungan_kontak_darurat || '' %>" placeholder="Misal: Orang Tua, Istri, Suami" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+          </div>
 
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">No. Telp Darurat Aktif <span class="text-red-500">*</span></label>
+            <input type="text" name="nomor_kontak_darurat" required value="<%= old?.nomor_kontak_darurat || '' %>" placeholder="Nomor HP Penanggung Jawab" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: EDUKASI -->
+      <div id="step-panel-5" class="step-panel hidden space-y-6">
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Pendidikan Terakhir <span class="text-red-500">*</span></label>
+          <select name="pendidikan_terakhir" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
+            <option value="" disabled <%= !old?.pendidikan_terakhir ? 'selected' : '' %>>Pilih Jenjang Terakhir</option>
+            <option value="SMA/SMK" <%= old?.pendidikan_terakhir === 'SMA/SMK' ? 'selected' : '' %>>SMA / SMK / Sederajat</option>
+            <option value="D3" <%= old?.pendidikan_terakhir === 'D3' ? 'selected' : '' %>>Diploma 3 (D3)</option>
+            <option value="D4" <%= old?.pendidikan_terakhir === 'D4' ? 'selected' : '' %>>Diploma 4 (D4)</option>
+            <option value="S1" <%= old?.pendidikan_terakhir === 'S1' ? 'selected' : '' %>>Sarjana 1 (S1)</option>
+            <option value="S2" <%= old?.pendidikan_terakhir === 'S2' ? 'selected' : '' %>>Magister (S2)</option>
+          </select>
         </div>
 
-      </form>
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nama Lembaga Pendidikan / Universitas <span class="text-red-500">*</span></label>
+          <input type="text" name="institusi_pendidikan" required value="<%= old?.institusi_pendidikan || '' %>" placeholder="Nama Sekolah atau Perguruan Tinggi" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
 
-    </div>
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Tahun Kelulusan Resmi <span class="text-red-500">*</span></label>
+          <input type="number" name="tahun_kelulusan" required value="<%= old?.tahun_kelulusan || '' %>" placeholder="Contoh: 2025" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
 
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Spesialisasi Keahlian Utama <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <input type="text" name="keahlian_utama" value="<%= old?.keahlian_utama || '' %>" placeholder="Pisahkan keterampilan dengan tanda koma (,)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Sertifikasi Profesional Pendukung <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <input type="text" name="sertifikat_profesional" value="<%= old?.sertifikat_profesional || '' %>" placeholder="Contoh: Brevet Pajak, TOEFL, AWS Cloud" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+      </div>
+
+      <!-- STEP 6: FINANSIAL -->
+      <div id="step-panel-6" class="step-panel hidden space-y-6">
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nama Bank Penggajian <span class="text-red-500">*</span></label>
+          <input type="text" name="nama_bank" required value="<%= old?.nama_bank || '' %>" placeholder="Contoh: Bank BCA / Mandiri / BRI" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nomor Rekening Bank <span class="text-red-500">*</span></label>
+          <input type="text" name="nomor_rekening" required value="<%= old?.nomor_rekening || '' %>" placeholder="Pastikan digit nomor sudah tepat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nama Lengkap Pemilik Rekening <span class="text-red-500">*</span></label>
+          <input type="text" name="nama_pemilik_rekening" required value="<%= old?.nama_pemilik_rekening || '' %>" placeholder="Harus sesuai dengan nama di buku tabungan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nomor NPWP Wajib Pajak <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <input type="text" name="npwp" value="<%= old?.npwp || '' %>" placeholder="15 atau 16 digit NPWP" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">Nomor KPJ BPJS Ketenagakerjaan <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <input type="text" name="bpjstk" value="<%= old?.bpjstk || '' %>" placeholder="Nomor keanggotaan BPJSTK jika ada" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        </div>
+
+        <div class="border-t border-slate-100 pt-5 space-y-4">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lampiran Arsip Dokumen Digital <span class="text-slate-400 font-normal">(Opsional)</span></div>
+          
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Scan KTP Asli</label>
+            <input type="file" name="file_ktp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs outline-none file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:bg-slate-900 file:text-white file:text-[11px] file:font-semibold hover:file:bg-slate-800 transition-all" />
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Scan Kartu Keluarga</label>
+            <input type="file" name="file_kk" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs outline-none file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:bg-slate-900 file:text-white file:text-[11px] file:font-semibold hover:file:bg-slate-800 transition-all" />
+          </div>
+        </div>
+      </div>
+
+      <!-- NAVIGATION BUTTONS -->
+      <div class="flex items-center justify-between pt-6 border-t border-slate-100 mt-8">
+        <button type="button" id="prevBtn" class="invisible rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+          Kembali
+        </button>
+        <button type="button" id="nextBtn" class="rounded-xl bg-slate-900 px-6 py-3 text-xs font-bold text-white shadow-sm hover:bg-slate-800 transition">
+          Lanjutkan
+        </button>
+      </div>
+
+    </form>
   </div>
 
 </div>
+
+<script>
+  let currentStep = parseInt(localStorage.getItem("employeeStep")) || 1;
+  const totalSteps = 6;
+
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const form = document.getElementById("onboardingForm");
+  
+  let isRestoring = false;
+
+  const subUnits = {
+    finance: [
+      { id: "u_fn_1", name: "Accounting & Taxing Specialist" },
+      { id: "u_fn_2", name: "Pengeluaran COGS & Storan" }
+    ],
+    tech: [
+      { id: "u_tc_1", name: "AI Agent & Workflow Engineer" },
+      { id: "u_tc_2", name: "IT Multimedia Support" }
+    ]
+  };
+
+  const STORAGE_KEY = "onboarding_form_data";
+
+  function saveFormData() {
+  if (isRestoring) return;
+
+  const data = {
+    currentStep
+  };
+
+  Array.from(form.elements).forEach(input => {
+    if (!input.name) return;
+    if (input.type === "file") return;
+
+    if (
+      input.type === "checkbox" ||
+      input.type === "radio"
+    ) {
+      if (input.checked) {
+        data[input.name] = input.value;
+      }
+    } else {
+      data[input.name] = input.value;
+    }
+  });
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(data)
+  );
+}
+
+  function loadFormData() {
+  const savedData =
+    localStorage.getItem(STORAGE_KEY);
+
+  if (!savedData) return;
+
+  try {
+    const data = JSON.parse(savedData);
+
+    currentStep =
+      data.currentStep || 1;
+
+    Object.keys(data).forEach(key => {
+      if (key === "currentStep")
+        return;
+
+      const input =
+        form.elements[key];
+
+      if (!input) return;
+
+      if (
+        input.type === "checkbox" ||
+        input.type === "radio"
+      ) {
+        input.checked =
+          input.value === data[key];
+      } else {
+        input.value = data[key];
+      }
+    });
+
+  } catch(err){
+    console.error(err);
+  }
+}
+
+
+  if (form) {
+    form.addEventListener("input", saveFormData);
+    form.addEventListener("change", saveFormData);
+  }
+
+  function renderFormLayout() {
+
+    document.querySelectorAll(".step-panel").forEach((panel, index) => {
+      if (index + 1 === currentStep) {
+        panel.classList.remove("hidden");
+      } else {
+        panel.classList.add("hidden");
+      }
+    });
+
+    for (let i = 1; i <= totalSteps; i++) {
+      const nav = document.getElementById(`step-nav-${i}`);
+      if (!nav) continue;
+      
+      const circle = nav.querySelector(".nav-circle");
+      if (!circle) continue;
+
+      if (i === currentStep) {
+        nav.className = "flex items-center gap-2 font-bold text-xs text-slate-900 transition-all";
+        circle.className = "nav-circle w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold ring-4 ring-slate-100";
+      } else if (i < currentStep) {
+        nav.className = "flex items-center gap-2 font-medium text-xs text-slate-600 transition-all";
+        circle.className = "nav-circle w-6 h-6 rounded-full bg-slate-600 text-white flex items-center justify-center font-bold";
+      } else {
+        nav.className = "flex items-center gap-2 font-medium text-xs text-slate-400 transition-all";
+        circle.className = "nav-circle w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center font-bold";
+      }
+    }
+
+    if (prevBtn) prevBtn.style.visibility = currentStep === 1 ? "hidden" : "visible";
+    if (nextBtn) nextBtn.textContent = currentStep === totalSteps ? "Simpan Data pegawai" : "Lanjutkan";
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      const activePanel = document.getElementById(`step-panel-${currentStep}`);
+      if (!activePanel) return;
+
+      // 1. Ambil target validasi
+      const allRequired = activePanel.querySelectorAll("input[required], select[required], textarea[required]");
+      
+      // 2. Filter yang kelihatan saja
+      const validationTargets = Array.from(allRequired).filter(input => input.offsetParent !== null);
+      
+      let stepPassed = true;
+      
+      // 3. Cek validasi
+      validationTargets.forEach(input => {
+        if (!input.checkValidity()) {
+          input.reportValidity();
+          console.error("⛔ Validasi Gagal di input:", input.name);
+          stepPassed = false;
+        }
+      });
+
+      // 4. Jika validasi gagal, stop di sini
+      if (!stepPassed) {
+        console.log("❌ Tombol tidak bisa lanjut karena ada data wajib yang kosong di step ini.");
+        return; 
+      }
+
+      // 5. Jika sukses, baru lanjut
+      if (currentStep < totalSteps) {
+        currentStep++;
+        renderFormLayout();
+        const mainContainer = document.querySelector('main');
+        if (mainContainer) mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (form) {
+        localStorage.removeItem("employeeStep");
+        localStorage.removeItem(STORAGE_KEY);
+        form.submit();
+      }
+    });
+  }
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      if (currentStep > 1) {
+        currentStep--;
+        renderFormLayout();
+        const mainContainer = document.querySelector('main');
+        if (mainContainer) mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
+  const statusPegawaiEl = document.getElementById("status_pegawai");
+  if (statusPegawaiEl) {
+    statusPegawaiEl.addEventListener("change", function() {
+      const box = document.getElementById("contract_date_box");
+      const targetInput = document.getElementById("tanggal_berakhir_kontrak");
+      
+      if (box && targetInput) {
+        if (this.value === "Kontrak" || this.value === "Magang") {
+          box.classList.remove("hidden");
+          targetInput.required = true;
+        } else {
+          box.classList.add("hidden");
+          targetInput.required = false;
+          targetInput.value = "";
+        }
+      }
+      saveFormData();
+    });
+  }
+
+  const bidangSelectEl = document.getElementById("bidang_select");
+const unitSelectEl = document.getElementById("unit_select");
+
+if (bidangSelectEl && unitSelectEl) {
+
+  bidangSelectEl.addEventListener("change", function () {
+
+    const selectedBidangId = this.value;
+
+    // reset
+    unitSelectEl.innerHTML =
+      '<option value="">Pilih Unit Kerja</option>';
+
+    if (!selectedBidangId) {
+      unitSelectEl.disabled = true;
+
+      unitSelectEl.className =
+        "w-full bg-slate-100 border border-slate-200 text-slate-400 rounded-xl px-4 py-3 text-xs outline-none cursor-not-allowed";
+
+      saveFormData();
+      return;
+    }
+
+    // ambil unit dari database
+    const filteredUnits =
+      allUnits.filter(
+        unit => String(unit.bidangId) === String(selectedBidangId)
+      );
+
+    if (filteredUnits.length > 0) {
+
+      unitSelectEl.disabled = false;
+
+      unitSelectEl.className =
+        "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900";
+
+      // ambil unit tersimpan
+      const savedData =
+        JSON.parse(
+          localStorage.getItem(STORAGE_KEY)
+        ) || {};
+
+      const selectedUnitId =
+        savedData.unitId || "<%= old?.unitId || '' %>";
+
+      filteredUnits.forEach(unit => {
+
+        const option =
+          document.createElement("option");
+
+        option.value = unit._id;
+        option.textContent = unit.name;
+
+        if (
+          String(selectedUnitId) ===
+          String(unit._id)
+        ) {
+          option.selected = true;
+        }
+
+        unitSelectEl.appendChild(option);
+      });
+
+    } else {
+
+      unitSelectEl.disabled = true;
+
+      unitSelectEl.innerHTML =
+        '<option value="">Tidak ada unit</option>';
+    }
+
+    // simpan ulang setelah render selesai
+    saveFormData();
+
+  });
+
+}
+  
+  isRestoring = true;
+
+  loadFormData();
+
+  if (statusPegawaiEl) {
+    statusPegawaiEl.dispatchEvent(new Event('change'));
+  }
+  if (bidangSelectEl) {
+    bidangSelectEl.dispatchEvent(new Event('change'));
+  }
+
+  renderFormLayout();
+
+  setTimeout(() => {
+    isRestoring = false;
+    console.log("✅ Sistem Stabil. Sekarang kamu berada di Step:", currentStep);
+  }, 100);
+
+  
+</script>

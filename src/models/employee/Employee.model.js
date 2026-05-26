@@ -50,7 +50,7 @@ const employeeSchema = new mongoose.Schema(
     },
     status_pernikahan: {
       type: String,
-      enum: ["Lajang", "Menikah", "Cerai Hidup", "Cerai Mati"],
+      enum: ["Lajang", "Menikah", "Cerai"],
       required: true,
     },
     foto_profile: {
@@ -77,6 +77,34 @@ employeeSchema.virtual("salaryDetail", {
 
 employeeSchema.virtual("careerData", {
   ref: "EmployeeCareer",
+  localField: "_id",
+  foreignField: "employee_id",
+  justOne: true,
+});
+
+employeeSchema.virtual("contactData", {
+  ref: "EmployeeContact",
+  localField: "_id",
+  foreignField: "employee_id",
+  justOne: true,
+});
+
+employeeSchema.virtual("educationData", {
+  ref: "EmployeeEducation",
+  localField: "_id",
+  foreignField: "employee_id",
+  justOne: true,
+});
+
+employeeSchema.virtual("financialData", {
+  ref: "EmployeeFinancial",
+  localField: "_id",
+  foreignField: "employee_id",
+  justOne: true,
+});
+
+employeeSchema.virtual("documentData", {
+  ref: "EmployeeDocument",
   localField: "_id",
   foreignField: "employee_id",
   justOne: true,

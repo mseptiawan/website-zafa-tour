@@ -52,8 +52,10 @@ export const kpiForm = async (req, res) => {
 
   const employee = await Employee.findById(employeeId)
     .populate("userId")
-    .populate("unitId")
-    .populate("positionId");
+    .populate({
+      path: "careerData",
+      populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
+    });
 
   if (!employee) {
     return res.status(404).send("Employee tidak ditemukan");

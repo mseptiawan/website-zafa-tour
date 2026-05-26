@@ -7,9 +7,9 @@ const employeeCareerSchema = new mongoose.Schema(
       ref: "Employee",
       required: true,
     },
-    status_karyawan: {
+    status_pegawai: {
       type: String,
-      enum: ["Tetap", "Kontrak", "Magang", "Harian"],
+      enum: ["Tetap", "Kontrak", "Magang"],
       required: true,
     },
     tanggal_mulai_bergabung: {
@@ -19,20 +19,17 @@ const employeeCareerSchema = new mongoose.Schema(
     tanggal_berakhir_kontrak: {
       type: Date,
     },
-    bidang: {
+    bidangId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Bidang",
-      required: true,
     },
-    unit: {
+    unitId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Unit",
-      required: true,
     },
-    posisi: {
+    positionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Position",
-      required: true,
     },
   },
   {
