@@ -10,7 +10,7 @@ dotenv.config();
 // TARGET USERS
 // ======================================================
 
-const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
+const usernames = ["ongkidwi", "duwihartati"];
 
 // ======================================================
 // SAMPLE DATA
@@ -213,7 +213,7 @@ export default async function announcementSeeder() {
     const data = [];
 
     for (const user of users) {
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 4; i++) {
         const item = randomItem(announcements);
 
         const createdAt = randomDate();

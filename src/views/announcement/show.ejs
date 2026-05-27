@@ -71,9 +71,9 @@
       </div>
 
       <div class="px-10 pt-7 pb-10">
-        <article class="text-[15px] text-slate-600 leading-7 whitespace-pre-line tracking-normal">
-          <%= announcement.content ? announcement.content.trim() : '' %>
-        </article>
+   <article class="text-[15px] text-slate-600 leading-7 whitespace-pre-line tracking-normal break-words">
+    <%= announcement.content ? announcement.content.trim() : '' %>
+  </article>
 
         <% if(announcement.attachment) { %>
           <div class="mt-12 pt-8 border-t border-slate-100">

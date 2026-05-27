@@ -1,7 +1,5 @@
 import { getPagination } from "../utils/pagination.js";
-
 import announcementService from "../services/announcement.service.js";
-
 export const newForm = (req, res) => {
   res.render("announcement/create", {
     title: "Buat Pengumuman",
@@ -10,16 +8,16 @@ export const newForm = (req, res) => {
     old: {},
   });
 };
-
 export const create = async (req, res, next) => {
   try {
     await announcementService.create(req);
     return res.redirect("/announcement");
   } catch (err) {
-    return res.status(400).render("announcement/create", {
+    return res.status(err.statusCode || 400).render("announcement/create", {
       title: "Buat Pengumuman",
       user: req.session.user,
-      error: err.message,
+      error: err.fields ? null : err.message,
+      errors: err.fields || null,
       old: req.body,
     });
   }

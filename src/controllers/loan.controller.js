@@ -1,6 +1,7 @@
 import Loan from "../models/loan/Loan.model.js";
 import LoanApproval from "../models/loan/LoanApproval.model.js";
 import loanService from "../services/loan.service.js";
+import AppError from "../utils/AppError.js";
 
 export const newForm = async (req, res, next) => {
   try {
@@ -20,22 +21,28 @@ export const create = async (req, res, next) => {
   try {
     const employeeId = req.session.user?.employeeId;
     const userRole = (req.session.user?.role || "").toString().trim().toUpperCase();
-
     await loanService.createLoan(employeeId, req.body, userRole);
-
     res.redirect("/loans/my");
   } catch (error) {
-    res.status(400).render("loans/new", {
-      title: "Form Pengajuan Pinjaman",
-      error: error.message,
-      old: req.body,
-    });
+    try {
+      const userId = req.session.user?._id;
+
+      const employeeData = await loanService.getEmployeeForForm(userId);
+
+      return res.render("loans/new", {
+        title: "Pengajuan Pinjaman",
+        employee: employeeData,
+        formData: req.body,
+        errorMessage: error.message,
+      });
+    } catch (innerError) {
+      next(new AppError(error.message, 400));
+    }
   }
 };
 export const myLoans = async (req, res, next) => {
   try {
     const { loans, summary } = await loanService.getEmployeeLoanHistory(req.user._id);
-
     res.render("loans/my", {
       title: "Riwayat Pinjaman Saya",
       loans,
@@ -50,7 +57,6 @@ export const getDetail = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { loan, approvals, payments } = await loanService.getLoanDetailData(id);
-
     res.render("loans/detail", {
       title: "Detail Pengajuan Pinjaman",
       loan,
@@ -72,7 +78,7 @@ export const edit = async (req, res, next) => {
       errorMessage: null,
     });
   } catch (error) {
-    res.status(400).redirect("/loans/my");
+    next(new AppError("Data tidak ditemukan", 404));
   }
 };
 
@@ -81,16 +87,7 @@ export const update = async (req, res, next) => {
     await loanService.updateLoan(req.params.id, req.user._id, req.body);
     res.redirect("/loans/my");
   } catch (error) {
-    res.status(400).render("loans/new", {
-      title: "Edit Pengajuan Pinjaman",
-      errorMessage: error.message,
-      loan: {
-        _id: req.params.id,
-        amountRequested: req.body.amountRequested,
-        tenorMonths: req.body.tenorMonths,
-        reason: req.body.reason,
-      },
-    });
+    next(new AppError(error.message, 400));
   }
 };
 
@@ -99,17 +96,15 @@ export const cancel = async (req, res, next) => {
     await loanService.cancelLoan(req.params.id, req.user._id);
     res.redirect("/loans/my");
   } catch (error) {
-    res.status(400).redirect("/loans/my?error=" + encodeURIComponent(error.message));
+    next(new AppError(error.message, 400));
   }
 };
 
 export const getManageLoanPage = async (req, res, next) => {
   try {
     const sessionUser = req.session.user;
-    if (!sessionUser) return res.redirect("/?error=UNAUTHORIZED");
-
+    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
     const data = await loanService.getLoanManagementData(sessionUser);
-
     res.render("loans/loan-management", {
       title: "Pusat Kelola Pinjaman",
       user: sessionUser,
@@ -121,28 +116,16 @@ export const getManageLoanPage = async (req, res, next) => {
   }
 };
 
-export const approveLoan = async (req, res) => {
+export const approveLoan = async (req, res, next) => {
   try {
     const { note } = req.body;
     const sessionUser = req.session.user;
-
-    if (!sessionUser) {
-      return res.status(401).render("error", {
-        title: "Error",
-        message: "Sesi Anda telah berakhir. Silakan login kembali.",
-      });
-    }
-
+    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
     const { id } = req.params;
-
     await loanService.processApproval(id, sessionUser, note, req.file);
-
     return res.redirect("/loans/manage-center");
   } catch (error) {
-    return res.status(400).render("error", {
-      title: "Approve Loan Error",
-      message: error.message,
-    });
+    next(new AppError(error.message, 400));
   }
 };
 
@@ -150,31 +133,19 @@ export const rejectLoan = async (req, res, next) => {
   try {
     const { note } = req.body;
     const sessionUser = req.session.user;
-
-    if (!sessionUser) {
-      return res.status(401).render("error", {
-        title: "Error",
-        message: "Sesi Anda telah berakhir.",
-      });
-    }
-
+    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
     const { id } = req.params;
-
     await loanService.processReject(id, sessionUser, note);
-
     return res.redirect("/loans/manage-center");
   } catch (error) {
-    return res.status(400).render("error", {
-      title: "Reject Loan Error",
-      message: error.message,
-    });
+    next(new AppError(error.message, 400));
   }
 };
+
 export const getFinanceCenterPage = async (req, res, next) => {
   try {
     const sessionUser = req.session.user;
     const data = await loanService.getLoanManagementData(sessionUser);
-
     res.render("loans/loan-management", {
       title: "Pusat Pencairan Dana",
       activeLoans: data.activeLoans,
@@ -184,21 +155,16 @@ export const getFinanceCenterPage = async (req, res, next) => {
     next(error);
   }
 };
+
 export const disburseLoan = async (req, res, next) => {
   try {
     const sessionUser = req.session.user;
-    if (!sessionUser) return res.status(401).redirect("/?error=UNAUTHORIZED");
-
+    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
     const { note } = req.body;
     const { id } = req.params;
-
     await loanService.processDisbursement(id, sessionUser, note, req.file);
-
     return res.redirect("/loans/disbursement");
   } catch (error) {
-    return res.status(400).render("error", {
-      title: "Disbursement Error",
-      message: error.message,
-    });
+    next(new AppError(error.message, 400));
   }
 };

@@ -18,7 +18,8 @@
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
       <form method="POST" action="/announcement/" enctype="multipart/form-data" class="p-8 space-y-6">
 
-        <% if (error) { %>
+        <!-- Error Umum / Flash Message Lama (Opsional) -->
+        <% if (typeof error !== 'undefined' && error) { %>
         <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
           <%= error %>
         </div>
@@ -28,17 +29,30 @@
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">Judul Pengumuman</label>
           <input type="text" name="title" placeholder="Ketik judul di sini..." required value="<%= old?.title || '' %>"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+            class="w-full bg-slate-50 border <%= (typeof errors !== 'undefined' && errors?.title) ? 'border-rose-400 focus:ring-rose-100 focus:border-rose-500' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 text-[14px] focus:bg-white outline-none transition-all focus:ring-4" />
+          
+          <% if (typeof errors !== 'undefined' && errors?.title) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1"><%= errors.title %></p>
+          <% } %>
         </div>
 
         <!-- Kategori -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">Kategori</label>
           <div class="relative w-full" id="category-dropdown">
-            <input type="hidden" name="category" id="category-value" value="LIGHT" required>
+            <% 
+              let currentCatValue = old?.category || 'LIGHT';
+              let currentCatLabel = '🍃 Pengumuman Ringan';
+              if (currentCatValue === 'OFFICIAL') {
+                currentCatLabel = '⚖️ Pengumuman Resmi';
+              }
+            %>
+            <input type="hidden" name="category" id="category-value" value="<%= currentCatValue %>" required>
             <button type="button" onclick="toggleCategoryDropdown()"
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-700 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
-              <span id="category-label" class="flex items-center gap-2"><span>🍃</span> Pengumuman Ringan</span>
+              class="w-full bg-slate-50 border <%= (typeof errors !== 'undefined' && errors?.category) ? 'border-rose-400 focus:ring-rose-100 focus:border-rose-500' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 text-[14px] text-slate-700 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 transition-all">
+              <span id="category-label" class="flex items-center gap-2">
+                <%= currentCatLabel %>
+              </span>
               <svg id="category-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
@@ -48,7 +62,7 @@
                 class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">
                 <span>🍃</span> Pengumuman Ringan
               </button>
-              <% if (user.role==="PIMPINAN" ) { %>
+              <% if (user.role === "DIREKTUR_UTAMA") { %>
               <button type="button" onclick="selectCategory('OFFICIAL', '⚖️ Pengumuman Resmi')"
                 class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">
                 <span>⚖️</span> Pengumuman Resmi
@@ -56,13 +70,20 @@
               <% } %>
             </div>
           </div>
+          <% if (typeof errors !== 'undefined' && errors?.category) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1"><%= errors.category %></p>
+          <% } %>
         </div>
 
         <!-- Isi Pengumuman -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">Isi Pengumuman</label>
           <textarea name="content" rows="6" placeholder="Tulis detail informasi di sini..." required
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none resize-none transition-all"><%= old?.content || '' %></textarea>
+            class="w-full bg-slate-50 border <%= (typeof errors !== 'undefined' && errors?.content) ? 'border-rose-400 focus:ring-rose-100 focus:border-rose-500' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 text-[14px] focus:bg-white outline-none resize-none transition-all focus:ring-4"><%= old?.content || '' %></textarea>
+          
+          <% if (typeof errors !== 'undefined' && errors?.content) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1"><%= errors.content %></p>
+          <% } %>
         </div>
 
         <!-- Lampiran -->
@@ -104,7 +125,6 @@
 </div>
 
 <script>
-  // Script tetap dipertahankan dengan logika yang sudah Anda buat
   function handleFileSelect(input) {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
@@ -127,4 +147,4 @@
     document.getElementById('category-label').innerHTML = label;
     toggleCategoryDropdown();
   }
-</script> 
+</script>

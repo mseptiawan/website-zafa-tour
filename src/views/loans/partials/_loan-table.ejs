@@ -1,52 +1,109 @@
-<table class="w-full text-left border-collapse">
-  <thead>
-    <tr class="bg-slate-50/60 text-slate-400 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-      <% if (type === 'active') { %>
-        <th class="px-5 py-3.5">Tgl Pengajuan</th>
-        <th class="px-5 py-3.5">Nama Pegawai</th>
-        <th class="px-5 py-3.5 text-right">Jumlah</th>
-        <th class="px-5 py-3.5 text-center">Tenor</th>
-        <th class="px-5 py-3.5 text-right">Cicilan/Bln</th>
-        <th class="px-5 py-3.5 text-right">Aksi</th>
-      <% } else { %>
-        <th class="px-5 py-3.5">Nama Pegawai</th>
-        <th class="px-5 py-3.5 text-right">Jumlah Total</th>
-        <th class="px-5 py-3.5 text-center">Status</th>
-        <th class="px-5 py-3.5">Catatan</th>
-      <% } %>
-    </tr>
-  </thead>
-  <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
-    <% if (loans.length === 0) { %>
-      <tr>
-        <td colspan="<%= type === 'active' ? 6 : 4 %>" class="px-5 py-12 text-center text-slate-400 font-medium">
-          Tidak ada data ditemukan.
-        </td>
-      </tr>
-    <% } else { %>
-      <% loans.forEach(loan => { %>
-        <tr class="hover:bg-slate-50/40 transition-colors duration-150">
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[1000px] text-sm text-left border-collapse">
+      <thead class="border-b border-slate-100 bg-slate-50 text-xs tracking-wider text-slate-500 uppercase font-bold">
+        <tr>
           <% if (type === 'active') { %>
-            <td class="px-5 py-4 text-slate-400"><%= new Date(loan.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
-            <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId?.fullName || "Pegawai" %></td>
-            <td class="px-5 py-4 text-right font-mono font-bold">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></td>
-            <td class="px-5 py-4 text-center"><span class="bg-slate-100 px-2 py-0.5 rounded-md text-[11px] font-medium"><%= loan.tenorMonths %> Bln</span></td>
-            <td class="px-5 py-4 text-right font-mono text-slate-500">Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %></td>
-            <td class="px-5 py-4 text-right">
-              <a href="/loans/detail/<%= loan._id %>" class="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 text-[11.5px] font-bold rounded-xl bg-white hover:bg-slate-50">Periksa</a>
-            </td>
+            <th class="px-6 py-4">Tgl Pengajuan</th>
+            <th class="px-6 py-4">Nama Pegawai</th>
+            <th class="px-6 py-4 text-right">Jumlah</th>
+            <th class="px-6 py-4 text-center">Tenor</th>
+            <th class="px-6 py-4 text-right">Cicilan/Bln</th>
+            <th class="px-6 py-4 text-right">Aksi</th>
           <% } else { %>
-            <td class="px-5 py-4 font-bold text-slate-900"><%= loan.employeeId?.fullName || "Pegawai" %></td>
-            <td class="px-5 py-4 text-right font-mono font-bold">Rp <%= loan.amountRequested.toLocaleString('id-ID') %></td>
-            <td class="px-5 py-4 text-center">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase border <%= loan.approvalStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' %>">
-                <%= loan.approvalStatus %>
-              </span>
-            </td>
-            <td class="px-5 py-4 text-slate-500 italic truncate max-w-xs"><%= loan.note || '-' %></td>
+            <th class="px-6 py-4">Nama Pegawai</th>
+            <th class="px-6 py-4 text-right">Jumlah Total</th>
+            <th class="px-6 py-4 text-center">Status</th>
+            <th class="px-6 py-4">Catatan</th>
+            <th class="px-6 py-4 text-right">Aksi</th>
           <% } %>
         </tr>
-      <% }) %>
-    <% } %>
-  </tbody>
-</table>
+      </thead>
+      
+      <tbody class="divide-y divide-slate-100 text-sm">
+        <% if (loans.length === 0) { %>
+          <tr>
+            <td colspan="<%= type === 'active' ? 6 : 5 %>" class="py-12 text-center text-slate-400">
+              Tidak ada data ditemukan.
+            </td>
+          </tr>
+        <% } else { %>
+          <% loans.forEach(loan => { %>
+            <tr class="transition hover:bg-slate-50/50">
+              <% if (type === 'active') { %>
+                <td class="px-6 py-4 font-medium whitespace-nowrap text-slate-600">
+                  <%= new Date(loan.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+                </td>
+                
+                <td class="px-6 py-4 font-bold text-slate-900">
+                  <%= loan.employeeId?.fullName || "Pegawai" %>
+                </td>
+                
+                <td class="px-6 py-4 text-right font-semibold text-slate-800 tabular-nums">
+                  Rp <%= loan.amountRequested.toLocaleString('id-ID') %>
+                </td>
+                
+                <td class="px-6 py-4 text-center font-medium text-slate-600">
+                  <%= loan.tenorMonths %> Bulan
+                </td>
+                
+                <td class="px-6 py-4 text-right font-semibold text-slate-700 tabular-nums">
+                  Rp <%= loan.monthlyDeduction.toLocaleString('id-ID') %>
+                  <span class="text-[10px] font-medium text-slate-400">/bln</span>
+                </td>
+                
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end">
+                    <a href="/loans/detail/<%= loan._id %>" title="Periksa" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 active:scale-[0.95]">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                    </a>
+                  </div>
+                </td>
+              <% } else { %>
+                <td class="px-6 py-4 font-bold text-slate-900">
+                  <%= loan.employeeId?.fullName || "Pegawai" %>
+                </td>
+                
+                <td class="px-6 py-4 text-right font-semibold text-slate-800 tabular-nums">
+                  Rp <%= loan.amountRequested.toLocaleString('id-ID') %>
+                </td>
+                
+                <td class="px-6 py-4 align-middle whitespace-nowrap text-center">
+                  <% 
+                    const textStyles = { 'APPROVED': 'text-emerald-600', 'REJECTED': 'text-rose-600', 'PENDING': 'text-amber-600', 'CANCELLED': 'text-slate-500' }; 
+                    const dotStyles = { 'APPROVED': 'bg-emerald-500', 'REJECTED': 'bg-rose-500', 'PENDING': 'bg-amber-500', 'CANCELLED': 'bg-slate-400' }; 
+                    const bgStyles = { 'APPROVED': 'bg-emerald-50/70', 'REJECTED': 'bg-rose-50/70', 'PENDING': 'bg-amber-50/70', 'CANCELLED': 'bg-slate-50' }; 
+                    const borderStyles = { 'APPROVED': 'border-emerald-200/50', 'REJECTED': 'border-rose-200/50', 'PENDING': 'border-amber-200/50', 'CANCELLED': 'border-slate-200' }; 
+                    const statusLabels = { 'APPROVED': 'Approved', 'REJECTED': 'Rejected', 'PENDING': 'Pending', 'CANCELLED': 'Cancelled' }; 
+                  %>
+                  <div class="<%= textStyles[loan.approvalStatus] || 'text-slate-500' %> <%= bgStyles[loan.approvalStatus] || 'bg-slate-50' %> <%= borderStyles[loan.approvalStatus] || 'border-slate-200' %> inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-wide transition-all duration-200">
+                    <span class="<%= dotStyles[loan.approvalStatus] || 'bg-slate-400' %> <%= loan.approvalStatus === 'APPROVED' ? 'animate-pulse' : '' %> h-1.5 w-1.5 rounded-full"></span>
+                    <span><%= statusLabels[loan.approvalStatus] || loan.approvalStatus %></span>
+                  </div>
+                </td>
+                
+                <td class="px-6 py-4 text-slate-500 italic truncate max-w-xs">
+                  <%= loan.note || '-' %>
+                </td>
+                
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end">
+                    <a href="/loans/detail/<%= loan._id %>" title="Lihat" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 active:scale-[0.95]">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                    </a>
+                  </div>
+                </td>
+              <% } %>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
