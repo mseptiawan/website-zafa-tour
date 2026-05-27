@@ -75,9 +75,6 @@ export const restoreComponent = async (req, res) => {
 export const archiveComponent = async (req, res) => {
   try {
     const id = req.params.id;
-    console.log("DEBUG - Tipe ID:", typeof id);
-    console.log("DEBUG - Value ID:", id);
-    console.log("DEBUG - Panjang ID:", id ? id.length : 0);
 
     const component = await salaryComponentService.archiveComponent(req.params.id);
 

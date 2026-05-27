@@ -178,7 +178,6 @@ const userSeeder = async () => {
     },
   ]);
 
-  console.log("User seeded");
   return users;
 };
 

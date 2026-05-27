@@ -63,15 +63,46 @@
           <div class="space-y-1.5">
             <label class="text-[13px] font-bold text-slate-700">Jenis Kelamin</label>
             <select name="jenis_kelamin" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs focus:bg-white outline-none transition-all">
-              <option value="Laki-laki" <%= employee.jenis_kelamin === 'Laki-laki' ? 'selected' : '' %>>Laki-laki</option>
+              <option value="Laki-Laki" <%= employee.jenis_kelamin === 'Laki-Laki' ? 'selected' : '' %>>Laki-Laki</option>
               <option value="Perempuan" <%= employee.jenis_kelamin === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
             </select>
           </div>
 
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">Agama</label>
-            <input type="text" name="agama" value="<%= employee.agama %>" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs focus:bg-white outline-none transition-all" />
-          </div>
+        <div class="space-y-1.5">
+  <label class="text-[13px] font-bold text-slate-700">
+    Agama <span class="text-red-500">*</span>
+  </label>
+
+  <select 
+    name="agama"
+    required
+    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900"
+  >
+    <option value="" disabled <%= !employee.agama ? 'selected' : '' %>>
+      Pilih Agama
+    </option>
+
+    <option value="Islam" <%= employee.agama === 'Islam' ? 'selected' : '' %>>
+      Islam
+    </option>
+
+    <option value="Kristen" <%= employee.agama === 'Kristen' ? 'selected' : '' %>>
+      Kristen
+    </option>
+
+    <option value="Katolik" <%= employee.agama === 'Katolik' ? 'selected' : '' %>>
+      Katolik
+    </option>
+
+    <option value="Hindu" <%= employee.agama === 'Hindu' ? 'selected' : '' %>>
+      Hindu
+    </option>
+
+    <option value="Buddha" <%= employee.agama === 'Buddha' ? 'selected' : '' %>>
+      Buddha
+    </option>
+  </select>
+</div>
 
           <div class="space-y-1.5">
             <label class="text-[13px] font-bold text-slate-700">Golongan Darah</label>
@@ -81,10 +112,9 @@
           <div class="space-y-1.5">
             <label class="text-[13px] font-bold text-slate-700">Status Pernikahan</label>
             <select name="status_pernikahan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs focus:bg-white outline-none transition-all">
-              <option value="Belum Kawin" <%= employee.status_pernikahan === 'Belum Kawin' ? 'selected' : '' %>>Belum Kawin</option>
-              <option value="Kawin" <%= employee.status_pernikahan === 'Kawin' ? 'selected' : '' %>>Kawin</option>
-              <option value="Cerai Hidup" <%= employee.status_pernikahan === 'Cerai Hidup' ? 'selected' : '' %>>Cerai Hidup</option>
-              <option value="Cerai Mati" <%= employee.status_pernikahan === 'Cerai Mati' ? 'selected' : '' %>>Cerai Mati</option>
+              <option value="Lajang" <%= employee.status_pernikahan === 'Lajang' ? 'selected' : '' %>>Lajang</option>
+              <option value="Menikah" <%= employee.status_pernikahan === 'Menikah' ? 'selected' : '' %>>Menikah</option>
+              <option value="Cerai" <%= employee.status_pernikahan === 'Cerai' ? 'selected' : '' %>>Cerai</option>
             </select>
           </div>
         </div>

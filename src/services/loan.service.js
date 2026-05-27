@@ -6,15 +6,15 @@ import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
 import User from "../models/basic/User.js";
 import Role from "../models/basic/Role.js";
 
-const LOAN_WORKFLOW = ["HR", "PIMPINAN", "KEUANGAN"];
+const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
 
 class LoanService {
   async getNextLoanApprover(currentStep) {
     if (!currentStep) {
-      const roleDoc = await Role.findOne({ name: "HR" });
-      if (!roleDoc) return { nextStep: "HR", nextApproverId: null };
+      const roleDoc = await Role.findOne({ name: "WAKIL_DIREKTUR" });
+      if (!roleDoc) return { nextStep: "WAKIL_DIREKTUR", nextApproverId: null };
       const approver = await User.findOne({ roleId: roleDoc._id });
-      return { nextStep: "HR", nextApproverId: approver ? approver._id : null };
+      return { nextStep: "WAKIL_DIREKTUR", nextApproverId: approver ? approver._id : null };
     }
 
     const currentIndex = LOAN_WORKFLOW.indexOf(currentStep);
@@ -62,7 +62,7 @@ class LoanService {
       status: "PENDING",
     });
 
-    const initialStep = userRole === "HR" ? "HR" : null;
+    const initialStep = userRole === "WAKIL_DIREKTUR" ? "WAKIL_DIREKTUR" : null;
 
     const { nextStep, nextApproverId } = await this.getNextLoanApprover(initialStep);
 
@@ -146,9 +146,9 @@ class LoanService {
       throw new Error("Pengajuan yang sudah diproses tidak dapat diubah");
     }
 
-    const hrApproval = await LoanApproval.findOne({ loanId, step: "HR" });
-    if (hrApproval && hrApproval.status !== "PENDING") {
-      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh HR");
+    const wakilDirekturApproval = await LoanApproval.findOne({ loanId, step: "WAKIL_DIREKTUR" });
+    if (wakilDirekturApproval && wakilDirekturApproval.status !== "PENDING") {
+      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh WAKIL_DIREKTUR");
     }
 
     return loan;
@@ -165,9 +165,9 @@ class LoanService {
       throw new Error("Pengajuan yang sudah diproses tidak dapat diubah");
     }
 
-    const hrApproval = await LoanApproval.findOne({ loanId, step: "HR" });
-    if (hrApproval && hrApproval.status !== "PENDING") {
-      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh HR");
+    const wakilDirekturApproval = await LoanApproval.findOne({ loanId, step: "WAKIL_DIREKTUR" });
+    if (wakilDirekturApproval && wakilDirekturApproval.status !== "PENDING") {
+      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh WAKIL_DIREKTUR");
     }
 
     const salary = await EmployeeSalary.findOne({ employeeId: employee._id });
@@ -281,7 +281,7 @@ class LoanService {
 
     const approval = await LoanApproval.findOne({
       _id: approvalId,
-      step: "KEUANGAN",
+      step: "MANAGER_KEUANGAN",
       status: "PENDING",
     });
     if (!approval) throw new Error("Antrean pencairan tidak ditemukan.");

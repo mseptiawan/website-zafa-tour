@@ -205,7 +205,6 @@ export default async function announcementSeeder() {
     });
 
     if (!users.length) {
-      console.log("User tidak ditemukan");
       return;
     }
 

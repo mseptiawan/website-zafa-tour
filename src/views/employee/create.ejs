@@ -510,14 +510,12 @@
       validationTargets.forEach(input => {
         if (!input.checkValidity()) {
           input.reportValidity();
-          console.error("⛔ Validasi Gagal di input:", input.name);
           stepPassed = false;
         }
       });
 
       // 4. Jika validasi gagal, stop di sini
       if (!stepPassed) {
-        console.log("❌ Tombol tidak bisa lanjut karena ada data wajib yang kosong di step ini.");
         return; 
       }
 
@@ -658,7 +656,6 @@ if (bidangSelectEl && unitSelectEl) {
 
   setTimeout(() => {
     isRestoring = false;
-    console.log("✅ Sistem Stabil. Sekarang kamu berada di Step:", currentStep);
   }, 100);
 
   

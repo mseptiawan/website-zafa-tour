@@ -19,7 +19,7 @@ export const newForm = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const employeeId = req.session.user?.employeeId;
-    const userRole = (req.session.user?.role || "").toString().trim().toUpperCase(); // Ambil role (HR/Pegawai/dll)
+    const userRole = (req.session.user?.role || "").toString().trim().toUpperCase();
 
     await loanService.createLoan(employeeId, req.body, userRole);
 

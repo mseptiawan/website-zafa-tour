@@ -1,8 +1,6 @@
 import notificationService from "../services/notification.service.js";
 export const getNotifications = async (req, res, next) => {
   try {
-    console.log("\n====== 🛰️  [DEBUG START: GET NOTIFICATIONS] ======");
-
     if (!req.session || !req.session.user) {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }

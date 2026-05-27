@@ -16,6 +16,13 @@ router.post(
   createEmployeeApi
 );
 router.post("/phk", uploadFile.single("document"), ajukanPHKApi);
-router.post("/edit/:id", updateEmployeeApi);
+router.post(
+  "/edit/:id",
+  uploadFile.fields([
+    { name: "file_ktp", maxCount: 1 },
+    { name: "file_kk", maxCount: 1 },
+  ]),
+  updateEmployeeApi
+);
 
 export default router;
