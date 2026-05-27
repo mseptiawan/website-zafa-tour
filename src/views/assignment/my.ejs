@@ -161,7 +161,6 @@
     <div
       class="mt-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 text-[13px] antialiased shadow-sm"
     >
-      <!-- LEFT INFO -->
       <div class="font-medium text-slate-500">
         Menampilkan halaman
         <span class="font-bold text-slate-900"><%= pagination.page %></span>
@@ -169,9 +168,7 @@
         <span class="font-bold text-slate-900"><%= pagination.totalPages %></span>
       </div>
 
-      <!-- RIGHT CONTROLS -->
       <div class="flex items-center gap-2">
-        <!-- PREV BUTTON -->
         <a
           href="?page=<%= pagination.page - 1 %>"
           class="<%= pagination.hasPrev ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100"
@@ -188,7 +185,6 @@
           Prev
         </a>
 
-        <!-- NEXT BUTTON -->
         <a
           href="?page=<%= pagination.page + 1 %>"
           class="<%= pagination.hasNext ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100"

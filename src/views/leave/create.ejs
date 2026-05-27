@@ -48,11 +48,11 @@
 
           <form action="<%= formAction %>" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
-            <% if (typeof error !=='undefined' && error) { %>
-              <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
-                <%= error %>
-              </div>
-            <% } %>
+          <% if (typeof error !== 'undefined' && error && String(error).trim() !== '') { %>
+  <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+    <%= String(error) %>
+  </div>
+<% } %>
 
             <!-- KATEGORI CUTI -->
             <div class="space-y-1.5">
