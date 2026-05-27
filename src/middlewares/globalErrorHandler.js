@@ -6,9 +6,6 @@ export const globalErrorHandler = (err, req, res, next) => {
       ? "Maaf, sistem sedang mengalami gangguan. Mohon coba beberapa saat lagi."
       : err.message;
 
-  console.error("--- LOG ERROR TEKNIS ---");
-  console.error(err);
-
   if (!req.xhr && !req.headers.accept?.includes("application/json")) {
     return res.status(statusCode).render("error", {
       title: "Terjadi Kesalahan",

@@ -1,23 +1,20 @@
 import Announcement from "../models/Announcement.js";
 import { getPaginationMeta } from "../utils/pagination.js";
 
-const ANNOUNCEMENT_STATUS = {
-  DRAFT: "DRAFT",
-  PUBLISHED: "PUBLISHED",
+const POPULATE_CREATED_BY = {
+  path: "createdBy",
+  select: "username",
+  populate: {
+    path: "employeeData",
+    select: "fullName foto_profile",
+  },
 };
 
-const ANNOUNCEMENT_CATEGORY = {
-  OFFICIAL: "OFFICIAL",
-};
-
-const create = async ({ body, userId, file }) => {
+// ─── CREATE ──────────────────────────────────────────────────────────────────
+const create = ({ body, userId, file }) => {
   const { title, content, category } = body;
 
-  let status = ANNOUNCEMENT_STATUS.PUBLISHED;
-
-  if (category === ANNOUNCEMENT_CATEGORY.OFFICIAL) {
-    status = ANNOUNCEMENT_STATUS.DRAFT;
-  }
+  const status = category === "OFFICIAL" ? "DRAFT" : "PUBLISHED";
 
   return Announcement.create({
     title,
@@ -29,56 +26,37 @@ const create = async ({ body, userId, file }) => {
   });
 };
 
+// ─── GET ALL ─────────────────────────────────────────────────────────────────
 const getAll = async ({ page, limit, skip }) => {
   const [data, total] = await Promise.all([
     Announcement.find()
-      .populate({
-        path: "createdBy",
-        select: "_id",
-        populate: {
-          path: "employeeData",
-          select: "fullName",
-        },
-      })
+      .populate(POPULATE_CREATED_BY)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit),
+      .limit(limit)
+      .lean(),
 
     Announcement.countDocuments(),
   ]);
 
-  const meta = getPaginationMeta({
-    page,
-    limit,
-    total,
-  });
-
   return {
     data,
-    meta,
+    meta: getPaginationMeta({ page, limit, total }),
   };
 };
 
+// ─── GET BY ID ───────────────────────────────────────────────────────────────
 const getById = (id) => {
-  return Announcement.findById(id).populate({
-    path: "createdBy",
-    select: "_id",
-    populate: {
-      path: "employeeData",
-      select: "fullName",
-    },
-  });
+  return Announcement.findById(id).populate(POPULATE_CREATED_BY).lean();
 };
 
+// ─── PUBLISH ─────────────────────────────────────────────────────────────────
 const publish = (id) => {
-  return Announcement.findByIdAndUpdate(id, {
-    status: "PUBLISHED",
-  });
+  return Announcement.findByIdAndUpdate(
+    id,
+    { status: "PUBLISHED", publishDate: new Date() },
+    { new: true }
+  );
 };
 
-export default {
-  create,
-  getAll,
-  getById,
-  publish,
-};
+export default { create, getAll, getById, publish };

@@ -27,7 +27,6 @@
 
         <table class="w-full min-w-[900px] text-sm">
 
-          <!-- HEADER -->
           <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
             <tr>
               <th class="px-6 py-4 text-left">Pengaju</th>
@@ -58,22 +57,18 @@
                 <% trips.forEach(t=> { %>
                   <tr class="hover:bg-slate-50 transition">
 
-                    <!-- PENGAJU -->
                     <td class="px-6 py-4 font-medium text-slate-700">
                       <%= t.userId?.username || '-' %>
                     </td>
 
-                    <!-- JUDUL -->
                     <td class="px-6 py-4 text-slate-600">
                       <%= t.title %>
                     </td>
 
-                    <!-- TUJUAN -->
                     <td class="px-6 py-4 text-slate-500">
                       <%= t.destination || '-' %>
                     </td>
 
-                    <!-- DELEGASI -->
                     <% if (user.role==="HR" ) { %>
                       <td class="px-6 py-4">
                         <% if (t.delegation?.active) { %>
@@ -87,12 +82,10 @@
                       </td>
                       <% } %>
 
-                        <!-- BUDGET -->
                         <td class="px-6 py-4 font-medium text-slate-700">
                           Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
                         </td>
 
-                        <!-- STATUS -->
                         <td class="px-6 py-4">
                           <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
     <%= t.status === 'APPROVED'
@@ -105,13 +98,11 @@
                           </span>
                         </td>
 
-                        <!-- AKSI -->
                         <td class="px-6 py-4 text-center">
 
                           <a href="/trip/approval/<%= t._id %>" title="Tinjau"
                             class="inline-flex items-center text-blue-600 hover:text-blue-800">
 
-                            <!-- eye icon -->
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
