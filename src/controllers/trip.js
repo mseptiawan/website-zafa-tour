@@ -14,13 +14,13 @@ export const approvalPage = async (req, res) => {
 
     let filter = {};
 
-    if (role === "MANAGER") {
+    if (role === "MANAGER_ADMINISTRASI") {
       filter = {
         status: {
           $in: ["PENDING", "IN_REVIEW"],
         },
 
-        currentStep: "MANAGER",
+        currentStep: "MANAGER_ADMINISTRASI",
       };
     } else if (role === "PIMPINAN") {
       filter = {
@@ -28,19 +28,19 @@ export const approvalPage = async (req, res) => {
           $in: ["PENDING", "IN_REVIEW"],
         },
 
-        currentStep: "PIMPINAN",
+        currentStep: "DIREKTUR_UTAMA",
       };
-    } else if (role === "HR") {
+    } else if (role === "WAKIL_DIREKTUR") {
       filter = {
         status: {
           $in: ["PENDING", "IN_REVIEW"],
         },
 
-        currentStep: "PIMPINAN",
+        currentStep: "DIREKTUR_UTAMA",
 
         "delegation.active": true,
 
-        "delegation.to": "HR",
+        "delegation.to": "WAKIL_DIREKTUR",
       };
     } else {
       return res.status(403).send("Tidak memiliki akses approval");
@@ -158,39 +158,39 @@ export const handleApproval = async (req, res) => {
 
     const currentStep = trip.currentStep;
 
-    const isManager = role === "MANAGER";
+    const isManager = role === "MANAGER_ADMINISTRASI";
 
-    const isPimpinan = role === "PIMPINAN";
+    const isPimpinan = role === "DIREKTUR_UTAMA";
 
     const isHRDelegatedAsPimpinan =
-      role === "HR" && currentStep === "PIMPINAN" && trip.delegation?.active === true;
+      role === "HR" && currentStep === "DIREKTUR_UTAMA" && trip.delegation?.active === true;
 
-    if (currentStep === "MANAGER" && !isManager) {
+    if (currentStep === "MANAGER_ADMINISTRASI" && !isManager) {
       return res.status(403).send("Hanya Manager yang bisa approve tahap ini");
     }
 
-    if (currentStep === "PIMPINAN" && !isPimpinan && !isHRDelegatedAsPimpinan) {
+    if (currentStep === "DIREKTUR_UTAMA" && !isPimpinan && !isHRDelegatedAsPimpinan) {
       return res.status(403).send("Tidak memiliki akses approval pimpinan");
     }
 
-    if (action === "DELEGATE_TO_HR") {
+    if (action === "DELEGATE_TO_WAKIL_DIREKTUR") {
       if (!isPimpinan) {
         return res.status(403).send("Hanya pimpinan yang bisa mendelegasikan");
       }
 
       trip.delegation = {
-        from: "PIMPINAN",
-        to: "HR",
+        from: "DIREKTUR_UTAMA",
+        to: "WAKIL_DIREKTUR",
         active: true,
         createdBy: user._id,
         createdAt: new Date(),
-        note: note || "Delegasi approval ke HR",
+        note: note || "Delegasi approval ke WAKIL DIREKTUR",
       };
 
       await trip.save();
 
       return res.json({
-        message: "Approval berhasil didelegasikan ke HR",
+        message: "Approval berhasil didelegasikan ke WAKIL DIREKTUR",
       });
     }
 
@@ -241,11 +241,11 @@ export const handleApproval = async (req, res) => {
         date: new Date(),
       });
 
-      if (currentStep === "MANAGER") {
-        trip.currentStep = "PIMPINAN";
+      if (currentStep === "MANAGER_ADMINISTRASI") {
+        trip.currentStep = "DIREKTUR_UTAMA";
 
         trip.status = "IN_REVIEW";
-      } else if (currentStep === "PIMPINAN") {
+      } else if (currentStep === "DIREKTUR_UTAMA") {
         trip.currentStep = null;
 
         trip.status = "APPROVED";
@@ -285,7 +285,7 @@ export const resubmitTrip = async (req, res) => {
     }
 
     trip.status = "PENDING";
-    trip.currentStep = "MANAGER";
+    trip.currentStep = "MANAGER_ADMINISTRASI";
 
     await trip.save();
 
@@ -353,7 +353,7 @@ export const resubmitUpdateTrip = async (req, res) => {
     ...req.body,
 
     status: "PENDING",
-    currentStep: "MANAGER",
+    currentStep: "MANAGER_ADMINISTRASI",
 
     updatedAt: new Date(),
   });
@@ -367,7 +367,7 @@ export const delegateTripToHR = async (req, res) => {
 
     const { id } = req.params;
 
-    if (user.role !== "PIMPINAN") {
+    if (user.role !== "DIREKTUR_UTAMA") {
       return res.status(403).send("Hanya pimpinan yang dapat melakukan delegasi");
     }
 
@@ -384,12 +384,12 @@ export const delegateTripToHR = async (req, res) => {
       return res.status(404).send("Pengajuan tidak ditemukan");
     }
 
-    if (trip.currentStep !== "PIMPINAN") {
+    if (trip.currentStep !== "DIREKTUR_UTAMA") {
       return res.status(400).send("Pengajuan tidak berada pada tahap pimpinan");
     }
 
-    if (trip.userId?.roleId?.name === "HR") {
-      return res.status(403).send("Pengajuan HR tidak boleh didelegasikan ke HR");
+    if (trip.userId?.roleId?.name === "WAKIL_DIREKTUR") {
+      return res.status(403).send("Pengajuan HR tidak boleh didelegasikan ke WAKIL DIREKTUR");
     }
 
     if (trip.delegation?.active) {
@@ -397,8 +397,8 @@ export const delegateTripToHR = async (req, res) => {
     }
 
     trip.delegation = {
-      from: "PIMPINAN",
-      to: "HR",
+      from: "DIREKTUR_UTAMA",
+      to: "WAKIL_DIREKTUR",
 
       active: true,
 
@@ -406,10 +406,10 @@ export const delegateTripToHR = async (req, res) => {
 
       createdAt: new Date(),
 
-      note: "Delegasi approval ke HR",
+      note: "Delegasi approval ke WAKIL DIREKTUR",
     };
 
-    trip.currentStep = "PIMPINAN";
+    trip.currentStep = "DIREKTUR_UTAMA";
 
     trip.status = "IN_REVIEW";
 
@@ -431,7 +431,7 @@ export const reportTripPage = async (req, res) => {
 
     const filter = {};
 
-    if (role === "Pegawai") {
+    if (role === "PEGAWAI") {
       filter.userId = user._id;
     }
 

@@ -6,15 +6,7 @@ import User from "../../models/basic/User.js";
 
 dotenv.config();
 
-// ======================================================
-// TARGET USERS
-// ======================================================
-
-const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];
-
-// ======================================================
-// SAMPLE DATA
-// ======================================================
+const usernames = ["ongkidwi", "duwihartati"];
 
 const announcements = [
   {
@@ -166,10 +158,6 @@ Panduan penggunaan akan dibagikan melalui email internal dan sesi pelatihan khus
   },
 ];
 
-// ======================================================
-// ATTACHMENTS
-// ======================================================
-
 const attachments = [
   null,
   null,
@@ -179,24 +167,16 @@ const attachments = [
   "/uploads/announcement/family-gathering.pdf",
 ];
 
-// ======================================================
-// HELPERS
-// ======================================================
-
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function randomDate() {
   const start = new Date(2026, 0, 1);
-  const end = new Date(2026, 5, 30);
+  const end = new Date();
 
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
-
-// ======================================================
-// MAIN SEED
-// ======================================================
 
 export default async function announcementSeeder() {
   try {
@@ -205,19 +185,23 @@ export default async function announcementSeeder() {
     });
 
     if (!users.length) {
-      console.log("User tidak ditemukan");
       return;
     }
 
     await Announcement.deleteMany({});
 
     const data = [];
+    const now = new Date();
 
     for (const user of users) {
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 4; i++) {
         const item = randomItem(announcements);
 
-        const createdAt = randomDate();
+        let createdAt = randomDate();
+
+        if (new Date(createdAt) > now) {
+          createdAt = now;
+        }
 
         const signedByUser = Math.random() > 0.4 ? randomItem(users) : null;
 
@@ -230,7 +214,7 @@ export default async function announcementSeeder() {
           signedBy: signedByUser?._id || null,
           publishDate: createdAt,
           createdAt,
-          updatedAt: new Date(),
+          updatedAt: now,
         });
       }
     }

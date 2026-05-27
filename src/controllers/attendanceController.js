@@ -1,63 +1,44 @@
-import Employee from "../models/employee/Employee.model.js";
-import AttendanceCorrection from "../models/AttendanceCorrection.js";
 import Attendance from "../models/Attendance.js";
+import CompanySetting from "../models/CompanySetting.js";
+import AppError from "../utils/AppError.js";
 import User from "../models/basic/User.js";
-/**
- * RANGE HARI INI
- */
 const getTodayRange = () => {
   const start = new Date();
   start.setHours(0, 0, 0, 0);
-
   const end = new Date();
   end.setHours(23, 59, 59, 999);
-
   return { start, end };
 };
 
-/**
- * GEOCODING
- */
 const getAddress = async (lat, lng) => {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
     );
     const data = await res.json();
-
     return data.display_name || "Lokasi tidak diketahui";
   } catch {
     return "Lokasi tidak diketahui";
   }
 };
 
-/**
- * DISTANCE
- */
 const haversineDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371e3;
   const toRad = (v) => (v * Math.PI) / 180;
-
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
-
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
-/**
- * HALAMAN ABSENSI USER
- */
-export const index = async (req, res) => {
+export const index = async (req, res, next) => {
   try {
     const user = req.session.user;
     if (!user) return res.redirect("/");
 
     const { start, end } = getTodayRange();
-
     const attendance = await Attendance.findOne({
       userId: user._id,
       checkIn: { $gte: start, $lte: end },
@@ -70,321 +51,235 @@ export const index = async (req, res) => {
       hasCheckedOut: !!attendance?.checkOut,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error absensi");
+    next(err);
   }
 };
 
-/**
- * CHECK IN
- */
-export const checkIn = async (req, res) => {
+export const checkIn = async (req, res, next) => {
   try {
     const user = req.session.user;
-    if (!user)
-      return res.status(401).json({
-        success: false,
-        message: "Session invalid",
-      });
+    if (!user) throw new AppError("Sesi Anda telah berakhir, silahkan masuk kembali.", 401);
 
     const { start, end } = getTodayRange();
-
     const already = await Attendance.findOne({
       userId: user._id,
-      createdAt: { $gte: start, $lte: end },
+      checkIn: { $gte: start, $lte: end },
     });
 
-    if (already) {
-      return res.json({
-        success: false,
-        message: "Sudah absen hari ini",
-      });
-    }
-
-    const now = new Date();
-    const status = now.getHours() > 8 ? "TELAT" : "HADIR";
-
-    const type = req.body.type;
+    if (already) throw new AppError("Anda sudah melakukan check-in hari ini.", 400);
 
     const lat = parseFloat(req.body.lat);
     const lng = parseFloat(req.body.lng);
+    if (isNaN(lat) || isNaN(lng)) throw new AppError("Koordinat lokasi tidak valid.", 400);
 
-    if (isNaN(lat) || isNaN(lng)) {
-      return res.json({
-        success: false,
-        message: "Lokasi tidak valid",
-      });
+    let company = await CompanySetting.findOne();
+    if (!company) company = await CompanySetting.create({});
+
+    const distance = haversineDistance(company.lat, company.lng, lat, lng);
+
+    let type = "LUAR KANTOR";
+    if (distance <= company.radiusMeter) {
+      type = "KANTOR";
     }
 
-    const OFFICE_LAT = -2.930156;
-    const OFFICE_LNG = 104.763686;
-    const distance = haversineDistance(OFFICE_LAT, OFFICE_LNG, lat, lng);
-
-    if (type === "KANTOR" && distance > 500) {
-      return res.json({
-        success: false,
-        message: "Diluar radius kantor",
-      });
-    }
-
-    let locationLabel =
-      type === "KANTOR" ? "Absen di Kantor Zafa Tour" : await getAddress(lat, lng);
+    let locationLabel = type === "KANTOR" ? `Absen di ${company.name}` : await getAddress(lat, lng);
 
     const photo = req.file ? `/uploads/photos/${req.file.filename}` : null;
+
+    const now = new Date();
+    const [configHour, configMin] = company.entryTimeLimit.split(":").map(Number);
+    const timeLimit = new Date();
+    timeLimit.setHours(configHour, configMin, 0, 0);
+
+    let status = "HADIR";
+    let lateDuration = 0;
+
+    if (now > timeLimit) {
+      status = "TELAT";
+      const diffMs = now - timeLimit;
+      lateDuration = Math.ceil(diffMs / (1000 * 60));
+    }
 
     await Attendance.create({
       userId: user._id,
       checkIn: now,
       status,
+      lateDuration,
       type,
       note: req.body.note || "",
-      photo,
+      checkInPhoto: photo,
       location: {
         lat,
         lng,
         address: locationLabel,
+        accuracy: req.body.accuracy || 0,
       },
-      deviceInfo: {
-        userAgent: req.headers["user-agent"],
-        platform: "WEB",
-      },
+      deviceInfo: { userAgent: req.headers["user-agent"], platform: "WEB" },
     });
 
-    return res.json({
+    res.status(201).json({
       success: true,
-      message: "Absen berhasil",
+      message: `Check-in berhasil.`,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    next(err);
   }
 };
 
-/**
- * CHECK OUT
- */
-export const checkOut = async (req, res) => {
+export const checkOut = async (req, res, next) => {
+  try {
+    const user = req.session.user;
+    if (!user) throw new AppError("Sesi Anda telah berakhir.", 401);
+
+    const { start, end } = getTodayRange();
+    const attendance = await Attendance.findOne({
+      userId: user._id,
+      checkIn: { $gte: start, $lte: end },
+    });
+
+    if (!attendance) throw new AppError("Anda belum memiliki record check-in hari ini.", 400);
+    if (attendance.checkOut) throw new AppError("Anda telah melakukan check-out hari ini.", 400);
+
+    const lat = parseFloat(req.body.lat);
+    const lng = parseFloat(req.body.lng);
+    const currentPhoto = req.file ? `/uploads/photos/${req.file.filename}` : null;
+
+    const now = new Date();
+    attendance.checkOut = now;
+    attendance.checkOutPhoto = currentPhoto;
+    attendance.workDuration = Math.ceil((now - attendance.checkIn) / (1000 * 60));
+
+    if (!isNaN(lat) && !isNaN(lng)) {
+      attendance.checkOutLocation = {
+        lat,
+        lng,
+        address: await getAddress(lat, lng),
+      };
+    }
+
+    await attendance.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Check-out berhasil dilakukan, selamat beristirahat.",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+// Pastikan kamu mengimport Model User di bagian atas file controller
+// const User = require('../models/User'); // sesuaikan dengan path model kamu
+
+export const attendanceHistory = async (req, res, next) => {
   try {
     const user = req.session.user;
     if (!user) return res.redirect("/");
 
-    const { start, end } = getTodayRange();
+    const { startDate, endDate, view } = req.query;
+    const isAdmin = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI"].includes(
+      user.role
+    );
 
-    const attendance = await Attendance.findOne({
-      userId: user._id,
-      createdAt: { $gte: start, $lte: end },
-    });
+    const start = startDate
+      ? new Date(startDate)
+      : new Date(new Date().setDate(new Date().getDate() - 30));
+    const end = endDate ? new Date(endDate) : new Date();
+    end.setHours(23, 59, 59, 999);
 
-    if (!attendance) return res.redirect("/attendance");
+    const isPersonalView = isAdmin && view === "personal";
+    const matchQuery = {
+      checkIn: { $gte: start, $lte: end },
+      ...(isAdmin && !isPersonalView ? {} : { userId: user._id }),
+    };
 
-    if (attendance.checkOut) return res.redirect("/attendance/history");
+    // 1. Ambil data absensi asli dari database
+    let listAttendance = await Attendance.find(matchQuery)
+      .populate("userId", "username")
+      .sort({ checkIn: -1 });
 
-    const now = new Date();
+    // Convert ke plain JavaScript object agar bisa kita manipulasi/tambah data instan
+    listAttendance = listAttendance.map((doc) => doc.toObject());
 
-    attendance.checkOut = now;
-    attendance.workDuration = (now - attendance.checkIn) / (1000 * 60);
+    // 2. LOGIC BARU: Jika Admin melihat semua karyawan, sisipkan yang BELUM ABSEN HARI INI ke paling atas tabel
+    if (isAdmin && !isPersonalView) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date();
+      todayEnd.setHours(23, 59, 59, 999);
 
-    await attendance.save();
+      // Cari ID user yang sudah absen hari ini
+      const attendedToday = await Attendance.find({
+        checkIn: { $gte: todayStart, $lte: todayEnd },
+      }).distinct("userId");
 
-    res.redirect("/attendance/history");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("error checkout");
-  }
-};
+      // Cari user (karyawan) yang belum absen hari ini
+      const adminRoles = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI"];
+      const missingUsers = await User.find({
+        role: { $nin: adminRoles },
+        _id: { $nin: attendedToday },
+      }).select("username");
 
-/**
- * HISTORY USER
- */
-export const history = async (req, res) => {
-  try {
-    const user = req.session.user;
+      // Format data "karyawan bolos/belum absen" agar strukturnya sama dengan tabel absensi
+      const missingAttendanceData = missingUsers.map((emp) => ({
+        _id: `missing-${emp._id}`, // dummy id
+        userId: { username: emp.username },
+        checkIn: null, // belum ada jam masuk
+        checkOut: null,
+        createdAt: new Date(), // Set tanggal hari ini
+        status: "BELUM ABSEN", // Status khusus
+        lateDuration: 0,
+        checkInPhoto: null,
+        isMissing: true, // penanda di EJS nanti
+      }));
 
-    const data = await Attendance.find({
-      userId: user._id,
-    }).sort({ createdAt: -1 });
+      // Gabungkan data karyawan belum absen ke baris PALING ATAS tabel
+      listAttendance = [...missingAttendanceData, ...listAttendance];
+    }
+
+    const summary = await Attendance.aggregate([
+      { $match: matchQuery },
+      {
+        $group: {
+          _id: null,
+          totalLateMinutes: { $sum: "$lateDuration" },
+          totalLateDays: { $sum: { $cond: [{ $eq: ["$status", "TELAT"] }, 1, 0] } },
+          totalHadir: { $sum: { $cond: [{ $eq: ["$status", "HADIR"] }, 1, 0] } },
+        },
+      },
+    ]);
 
     res.render("attendance/history", {
-      title: "Riwayat Absensi",
-      data,
+      title: "Riwayat Kehadiran",
+      listAttendance, // Sudah otomatis gabung di sini
+      analytics: summary[0] || { totalLateMinutes: 0, totalLateDays: 0, totalHadir: 0 },
+      isAdmin,
+      isPersonalView,
+      filters: {
+        startDate: start.toISOString().split("T")[0],
+        endDate: end.toISOString().split("T")[0],
+      },
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("error history");
+    next(err);
   }
 };
 
-/**
- * ADMIN ALL ATTENDANCE
- */
-export const allAttendance = async (req, res) => {
+export const updateCompanyLocation = async (req, res, next) => {
   try {
-    const data = await Attendance.find().populate("userId").sort({ createdAt: -1 });
+    const { lat, lng, radiusMeter, entryTimeLimit, name } = req.body;
 
-    res.render("attendance/index", {
-      title: "Data Absensi Pegawai",
-      data,
-    });
+    let config = await CompanySetting.findOne();
+    if (!config) config = new CompanySetting();
+
+    if (lat) config.lat = parseFloat(lat);
+    if (lng) config.lng = parseFloat(lng);
+    if (radiusMeter) config.radiusMeter = parseInt(radiusMeter);
+    if (entryTimeLimit) config.entryTimeLimit = entryTimeLimit;
+    if (name) config.name = name;
+
+    await config.save();
+    res.json({ success: true, message: "Konformasi parameter instansi berhasil diperbarui." });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error ambil data");
+    next(err);
   }
 };
-export const getAttendanceDashboard = async (req, res) => {
-  try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    // 1. Ambil User dan POPULATE employeeData agar fullName bisa diakses
-    const users = await User.find().populate("employeeData");
-
-    // 2. Ambil absensi hari ini
-    const attendances = await Attendance.find({
-      createdAt: { $gte: today, $lt: tomorrow },
-    });
-
-    // 3. Gabungkan data
-    const dashboardData = users.map((user) => {
-      const attendance = attendances.find((a) => a.userId.toString() === user._id.toString());
-
-      return {
-        // Ambil fullName dari employeeData, fallback ke username jika null
-        name: user.employeeData ? user.employeeData.fullName : user.username,
-        attendance: attendance || null,
-        status: attendance ? attendance.status : "BELUM ABSEN",
-      };
-    });
-
-    // 4. Sorting: BELUM ABSEN selalu di atas
-    dashboardData.sort((a, b) => {
-      if (a.status === "BELUM ABSEN" && b.status !== "BELUM ABSEN") return -1;
-      if (a.status !== "BELUM ABSEN" && b.status === "BELUM ABSEN") return 1;
-      return 0;
-    });
-
-    res.render("attendance/all", { title: "Dashboard Absensi HR", data: dashboardData });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Terjadi kesalahan server");
-  }
-};
-/**
- * EDIT FORM (HR)
- */
-// export const editForm = async (req, res) => {
-//   const data = await Attendance.findById(req.params.id);
-
-//   res.render("attendance/edit", {
-//     title: "Edit Absensi",
-//     data,
-//   });
-// };
-
-/**
- * UPDATE (HR ONLY)
- */
-// export const updateAttendance = async (req, res) => {
-//   try {
-//     const admin = req.session.user;
-
-//     if (!admin || admin.role !== "HR") {
-//       return res.status(403).send("Access denied");
-//     }
-
-//     const { checkIn, checkOut, status, type, note } = req.body;
-
-//     await Attendance.findByIdAndUpdate(req.params.id, {
-//       checkIn,
-//       checkOut,
-//       status,
-//       type,
-//       note,
-//       editedBy: admin._id,
-//       editedAt: new Date(),
-//     });
-
-//     res.redirect("/attendance/all");
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).send("Error update");
-//   }
-// };
-
-/**
- * MANUAL FORM HR
- */
-// export const manualForm = async (req, res) => {
-//   try {
-//     const employees = await Employee.find().populate("userId").sort({ fullName: 1 });
-
-//     res.render("attendance/manual", {
-//       title: "Input Absensi Manual",
-//       employees,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).send("Error load form manual");
-//   }
-// };
-
-/**
- * CREATE MANUAL HR
- */
-// export const createManual = async (req, res) => {
-//   try {
-//     const { userId, checkIn, checkOut, type, status, note } = req.body;
-
-//     const inTime = new Date(checkIn);
-//     const outTime = checkOut ? new Date(checkOut) : null;
-
-//     let workDuration = 0;
-
-//     if (outTime) {
-//       workDuration = (outTime - inTime) / (1000 * 60);
-//     }
-
-//     await Attendance.create({
-//       userId,
-//       checkIn: inTime,
-//       checkOut: outTime,
-//       type,
-//       status,
-//       note,
-//       workDuration,
-//     });
-
-//     res.redirect("/attendance/all");
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).send("Error manual input");
-//   }
-// };
-
-// export const getCorrectionDetail = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const data = await AttendanceCorrection.findById(id).populate("userId"); // pastikan field ini benar
-
-//     if (!data) {
-//       return res.status(404).send("Data tidak ditemukan");
-//     }
-
-//     return res.render("attendance/correction-detail", {
-//       title: "Detail Koreksi Absensi",
-//       data,
-//     });
-//   } catch (err) {
-//     console.error("ERROR getCorrectionDetail:", err);
-
-//     return res.status(500).send({
-//       message: "Server error",
-//       error: err.message,
-//     });
-//   }
-// };

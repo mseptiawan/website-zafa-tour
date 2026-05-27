@@ -6,15 +6,15 @@ import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
 import User from "../models/basic/User.js";
 import Role from "../models/basic/Role.js";
 
-const LOAN_WORKFLOW = ["HR", "PIMPINAN", "KEUANGAN"];
+const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
 
 class LoanService {
   async getNextLoanApprover(currentStep) {
     if (!currentStep) {
-      const roleDoc = await Role.findOne({ name: "HR" });
-      if (!roleDoc) return { nextStep: "HR", nextApproverId: null };
+      const roleDoc = await Role.findOne({ name: "WAKIL_DIREKTUR" });
+      if (!roleDoc) return { nextStep: "WAKIL_DIREKTUR", nextApproverId: null };
       const approver = await User.findOne({ roleId: roleDoc._id });
-      return { nextStep: "HR", nextApproverId: approver ? approver._id : null };
+      return { nextStep: "WAKIL_DIREKTUR", nextApproverId: approver ? approver._id : null };
     }
 
     const currentIndex = LOAN_WORKFLOW.indexOf(currentStep);
@@ -44,6 +44,11 @@ class LoanService {
     const basicSalary = salary ? salary.basicSalary : 0;
 
     const { amountRequested, tenorMonths, reason } = loanData;
+    if (!reason || reason.trim().length < 15) {
+      throw new Error(
+        "Alasan peminjaman terlalu pendek. Harap berikan penjelasan yang jelas (minimal 15 karakter)."
+      );
+    }
     const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
     const maxDeduction = basicSalary * 0.3;
 
@@ -62,7 +67,7 @@ class LoanService {
       status: "PENDING",
     });
 
-    const initialStep = userRole === "HR" ? "HR" : null;
+    const initialStep = userRole === "WAKIL_DIREKTUR" ? "WAKIL_DIREKTUR" : null;
 
     const { nextStep, nextApproverId } = await this.getNextLoanApprover(initialStep);
 
@@ -95,7 +100,10 @@ class LoanService {
     const activeLoansData = await Loan.find({ _id: { $in: activeLoanIds } });
     const activeLoan = activeLoansData.reduce((sum, loan) => sum + loan.amountRequested, 0);
 
-    const remainingDebt = unpaidPayments.reduce((sum, payment) => sum + payment.amount, 0);
+    const paidPayments = await LoanPayment.find({ employeeId, isPaid: true });
+    const totalPaidAmount = paidPayments.reduce((sum, payment) => sum + payment.amount, 0);
+    const rawRemainingDebt = activeLoan - totalPaidAmount;
+    const remainingDebt = rawRemainingDebt < 0 ? 0 : rawRemainingDebt;
 
     const now = new Date();
     const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -116,8 +124,13 @@ class LoanService {
   async getLoanDetailData(loanId) {
     const loan = await Loan.findById(loanId).populate({
       path: "employeeId",
-      populate: { path: "unitId" },
+      populate: {
+        path: "careerData",
+        model: "EmployeeCareer",
+        populate: { path: "unitId" },
+      },
     });
+
     if (!loan) throw new Error("Data pengajuan pinjaman tidak ditemukan");
 
     const approvals = await LoanApproval.find({ loanId })
@@ -130,6 +143,7 @@ class LoanService {
         },
       })
       .sort({ createdAt: 1 });
+
     const payments = await LoanPayment.find({ loanId }).sort({ installmentNumber: 1 });
 
     return { loan, approvals, payments };
@@ -146,15 +160,25 @@ class LoanService {
       throw new Error("Pengajuan yang sudah diproses tidak dapat diubah");
     }
 
-    const hrApproval = await LoanApproval.findOne({ loanId, step: "HR" });
-    if (hrApproval && hrApproval.status !== "PENDING") {
-      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh HR");
+    const wakilDirekturApproval = await LoanApproval.findOne({ loanId, step: "WAKIL_DIREKTUR" });
+    if (wakilDirekturApproval && wakilDirekturApproval.status !== "PENDING") {
+      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh WAKIL_DIREKTUR");
     }
 
     return loan;
   }
 
   async updateLoan(loanId, userId, updateData) {
+    const amountRequested = Number(updateData.amountRequested);
+    const tenorMonths = Number(updateData.tenorMonths);
+    const reason = updateData.reason;
+
+    if (!reason || reason.trim().length < 15) {
+      throw new Error(
+        "Alasan peminjaman terlalu pendek. Harap berikan penjelasan yang jelas (minimal 15 karakter)."
+      );
+    }
+
     const employee = await Employee.findOne({ userId });
     if (!employee) throw new Error("Data pegawai tidak ditemukan");
 
@@ -165,24 +189,20 @@ class LoanService {
       throw new Error("Pengajuan yang sudah diproses tidak dapat diubah");
     }
 
-    const hrApproval = await LoanApproval.findOne({ loanId, step: "HR" });
-    if (hrApproval && hrApproval.status !== "PENDING") {
-      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh HR");
+    const wakilDirekturApproval = await LoanApproval.findOne({ loanId, step: "WAKIL_DIREKTUR" });
+    if (wakilDirekturApproval && wakilDirekturApproval.status !== "PENDING") {
+      throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh WAKIL_DIREKTUR");
     }
 
     const salary = await EmployeeSalary.findOne({ employeeId: employee._id });
     const basicSalary = salary ? salary.basicSalary : 0;
 
-    const amountRequested = Number(updateData.amountRequested);
-    const tenorMonths = Number(updateData.tenorMonths);
-    const reason = updateData.reason;
-
     const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
-    const maxDeduction = basicSalary * 0.1;
+    const maxDeduction = basicSalary * 0.3;
 
     if (monthlyDeduction > maxDeduction) {
       throw new Error(
-        `Cicilan baru (Rp ${monthlyDeduction.toLocaleString("id-ID")}) melebihi batas 10% gaji pokok.`
+        `Pengajuan ditolak. Cicilan bulanan (Rp ${monthlyDeduction.toLocaleString("id-ID")}) melebihi batas maksimal 30% dari gaji pokok Anda (Maksimal Rp ${maxDeduction.toLocaleString("id-ID")}/bulan).`
       );
     }
 
@@ -193,11 +213,8 @@ class LoanService {
 
     return await loan.save();
   }
-
   async getLoanManagementData(user) {
     const roleName = (user.role || "").toString().trim().toUpperCase();
-
-    console.log("Mencari data untuk Role:", roleName);
 
     const approvals = await LoanApproval.find({ step: roleName }).sort({ createdAt: -1 });
     const loanIds = approvals.map((app) => app.loanId);
@@ -281,7 +298,7 @@ class LoanService {
 
     const approval = await LoanApproval.findOne({
       _id: approvalId,
-      step: "KEUANGAN",
+      step: "MANAGER_KEUANGAN",
       status: "PENDING",
     });
     if (!approval) throw new Error("Antrean pencairan tidak ditemukan.");
@@ -319,6 +336,47 @@ class LoanService {
 
     await LoanPayment.insertMany(paymentRecords);
     return true;
+  }
+  async cancelLoan(loanId, userId) {
+    if (!userId) {
+      throw new Error("Sesi pengguna tidak valid, silakan login ulang");
+    }
+
+    const loan = await Loan.findById(loanId);
+    if (!loan) {
+      throw new Error("Data pengajuan pinjaman tidak ditemukan");
+    }
+
+    const employee = await Employee.findOne({ userId: userId });
+    if (!employee) {
+      throw new Error("Data pegawai tidak ditemukan untuk akun Anda");
+    }
+
+    if (loan.employeeId.toString() !== employee._id.toString()) {
+      throw new Error("Anda tidak memiliki akses untuk membatalkan pengajuan ini");
+    }
+
+    if (loan.status === "APPROVED") {
+      throw new Error("Pengajuan tidak dapat dibatalkan karena sudah disetujui (APPROVED)");
+    }
+
+    if (loan.status === "REJECTED" || loan.status === "CANCELLED") {
+      throw new Error(`Pengajuan sudah berstatus ${loan.status}`);
+    }
+
+    loan.status = "CANCELLED";
+    await loan.save();
+
+    await LoanApproval.updateMany(
+      { loanId: loan._id, status: "PENDING" },
+      {
+        status: "CANCELLED",
+        approverId: null,
+        note: "Dibatalkan oleh pemohon",
+      }
+    );
+
+    return loan;
   }
 }
 

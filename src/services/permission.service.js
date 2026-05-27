@@ -4,6 +4,8 @@ export function getPermissions(role) {
     employee_add: false,
     employee_manage: false,
 
+    structure_manage: false,
+
     loan_new: false,
     loan_my: false,
     loan_manage_center: false,
@@ -173,6 +175,8 @@ export function getPermissions(role) {
     case "WAKIL_DIREKTUR":
       permissions.employee_list = true;
       permissions.employee_add = true;
+
+      permissions.structure_manage = true;
 
       permissions.loan_new = true;
       permissions.loan_my = true;

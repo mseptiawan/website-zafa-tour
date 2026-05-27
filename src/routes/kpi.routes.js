@@ -1,25 +1,20 @@
 import express from "express";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 import {
-  kpiEmployeeList,
-  kpiForm,
-  getKpiDetail,
-  submitKpi,
-  kpiManage,
-  getKpiList,
-  kpiReport,
-} from "../controllers/kpiController.js";
+  getAppraisalList,
+  getAppraisalForm,
+  getHistoryDetail,
+  submitAppraisal,
+  getHistoryList,
+} from "../controllers/kpi.controller.js";
 
 const router = express.Router();
 
-router.get("/kpi/input", roleMiddleware(["HR"]), kpiEmployeeList);
-router.get("/kpi/input/:employeeId", roleMiddleware(["HR"]), kpiForm);
-router.post("/kpi/input/:employeeId", roleMiddleware(["HR"]), submitKpi);
+router.get("/kpi/appraisal-list", roleMiddleware(["WAKIL_DIREKTUR"]), getAppraisalList);
+router.get("/kpi/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"]), getAppraisalForm);
+router.post("/kpi/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"]), submitAppraisal);
 
-router.get("/kpi/manage", roleMiddleware(["HR"]), kpiManage);
-router.get("/kpi/report", roleMiddleware(["HR"]), kpiReport);
-router.get("/kpi/list", getKpiList);
+router.get("/kpi/history-list", getHistoryList);
 
-// Detail KPI Pegawai (Lengkap)
-router.get("/kpi/detail/:employeeId/:periode", getKpiDetail);
+router.get("/kpi/history-detail/:employeeId/:periode", getHistoryDetail);
 export default router;

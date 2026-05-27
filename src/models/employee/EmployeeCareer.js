@@ -1,0 +1,41 @@
+import mongoose from "mongoose";
+
+const employeeCareerSchema = new mongoose.Schema(
+  {
+    employee_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
+    status_pegawai: {
+      type: String,
+      enum: ["Tetap", "Kontrak", "Magang"],
+      required: true,
+    },
+    tanggal_mulai_bergabung: {
+      type: Date,
+      required: true,
+    },
+    tanggal_berakhir_kontrak: {
+      type: Date,
+    },
+    bidangId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Bidang",
+    },
+    unitId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Unit",
+    },
+    positionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Position",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const EmployeeCareer = mongoose.model("EmployeeCareer", employeeCareerSchema);
+export default EmployeeCareer;

@@ -67,17 +67,17 @@
                 <!-- 2. JABATAN / BIDANG -->
                 <td class="px-6 py-4">
                   <div class="text-sm font-medium <%= isNonActive ? 'text-slate-400' : 'text-slate-700' %>">
-                    <%= e.positionId?.name || '-' %>
+                    <%= e.careerData?.positionId?.name || '-' %>
                   </div>
                   <div class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">
-                    Bidang: <%= e.bidangId?.name || '-' %>
+                    Bidang: <%= e.careerData?.bidangId?.name || '-' %>
                   </div>
                 </td>
 
                 <!-- 3. UNIT KERJA -->
                <td class="px-6 py-4">
   <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-600 bg-slate-50 border border-slate-100">
-    <%= e.unitId?.name || '-' %>
+    <%= e.careerData?.unitId?.name || '-' %>
   </span>
 </td>
 

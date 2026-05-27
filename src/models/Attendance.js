@@ -8,17 +8,23 @@ const attendanceSchema = new mongoose.Schema(
       required: true,
     },
 
-    checkIn: Date,
+    checkIn: {
+      type: Date,
+      default: null,
+    },
     checkOut: Date,
 
     workDuration: {
       type: Number,
       default: 0,
     },
-
+    lateDuration: {
+      type: Number,
+      default: 0,
+    },
     status: {
       type: String,
-      enum: ["HADIR", "TELAT", "ALPHA"],
+      enum: ["HADIR", "TELAT", "ALPHA", "CUTI", "SAKIT", "IZIN"],
       default: "ALPHA",
     },
 
@@ -28,8 +34,19 @@ const attendanceSchema = new mongoose.Schema(
       default: "KANTOR",
     },
 
-    photo: String,
+    checkInPhoto: {
+      type: String,
+      default: null,
+    },
 
+    checkOutPhoto: {
+      type: String,
+      default: null,
+    },
+    note: {
+      type: String,
+      default: "",
+    },
     location: {
       lat: Number,
       lng: Number,
@@ -37,10 +54,10 @@ const attendanceSchema = new mongoose.Schema(
       address: String,
     },
 
-    deviceInfo: {
-      userAgent: String,
-      platform: String,
-      deviceId: String,
+    checkOutLocation: {
+      lat: Number,
+      lng: Number,
+      address: String,
     },
   },
   { timestamps: true }

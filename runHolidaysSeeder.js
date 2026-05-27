@@ -11,18 +11,14 @@ const run = async () => {
       throw new Error("MONGODB_URI tidak ditemukan di file .env");
     }
 
-    console.log("🔌 Menghubungkan ke database untuk seeder kalender...");
     await mongoose.connect(mongoUri);
-    console.log("✅ Database berhasil terhubung.");
 
     // Eksekusi seeder asli
     await holidaysSeeder();
 
-    console.log("👋 Memutuskan koneksi database...");
     await mongoose.disconnect();
     process.exit(0);
   } catch (error) {
-    console.error("❌ Gagal menjalankan seeder secara individu:", error.message);
     process.exit(1);
   }
 };

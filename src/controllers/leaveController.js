@@ -399,7 +399,6 @@ export const generateOrResetLeaveBalance = async (req, res) => {
       })
     );
 
-    console.log(`✅ Sukses generate/reset saldo cuti untuk ${activeEmployees.length} Pegawai.`);
 
     return res.redirect(`/leave/manage-requests?tab=balances&status=success&year=${selectedYear}`);
   } catch (error) {

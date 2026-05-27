@@ -9,15 +9,19 @@
     </h3>
 
   <% if (user.role === 'MANAGER_KEUANGAN') { %>
-  <form action="/loans/approval/disburse/<%= activeApproval._id %>" method="POST" enctype="multipart/form-data">
+  <form action="/loans/approval/disburse/<%= activeApproval._id %>" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
     
     <div id="upload-section" class="mb-5">
-      <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Upload Bukti Transfer</label>
+      <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+        Upload Bukti Transfer <span class="text-rose-500">*</span>
+      </label>
       
-      <!-- Input Tersembunyi -->
-      <input type="file" name="paymentProof" id="file-input" required class="hidden" accept="image/*,application/pdf" onchange="handleFilePreview(this)">
+      <div id="error-message" class="text-[10px] text-rose-500 mb-2 hidden font-bold">
+        <i class="fa-solid fa-circle-exclamation mr-1"></i> Harap pilih file bukti transfer terlebih dahulu!
+      </div>
       
-      <!-- Area Preview & View -->
+      <input type="file" name="paymentProof" id="file-input" class="hidden" accept="image/*,application/pdf" onchange="handleFilePreview(this)">
+      
       <div id="file-preview-area" class="hidden flex items-center justify-between border border-slate-200 rounded-xl p-3 bg-white shadow-sm">
         <div class="flex items-center gap-3 overflow-hidden">
           <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
@@ -26,14 +30,11 @@
           <span id="file-name" class="text-[12px] font-bold text-slate-700 truncate">file.pdf</span>
         </div>
         <div class="flex items-center gap-1">
-          <!-- Tombol VIEW -->
           <button type="button" id="btn-view" onclick="viewFile()" class="text-[10px] font-bold text-blue-600 hover:text-blue-700 px-2 uppercase">View</button>
-          <!-- Tombol HAPUS/GANTI -->
           <button type="button" onclick="resetFile()" class="text-[10px] font-bold text-rose-600 hover:text-rose-700 px-2 uppercase">Hapus</button>
         </div>
       </div>
 
-      <!-- Tombol Pilih Awal -->
       <button type="button" id="btn-select-file" onclick="document.getElementById('file-input').click()" 
         class="w-full py-3 border border-dashed border-slate-300 rounded-xl text-xs font-bold text-slate-500 hover:border-blue-400 hover:text-blue-600 transition">
         <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Pilih Bukti (JPG/PDF)
@@ -50,16 +51,26 @@
   <script>
     let currentFileUrl = null;
 
+    function validateForm() {
+      const fileInput = document.getElementById('file-input');
+      const errorMessage = document.getElementById('error-message');
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        errorMessage.classList.remove('hidden');
+        return false;
+      }
+      return true;
+    }
+
     function handleFilePreview(input) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
+        document.getElementById('error-message').classList.add('hidden');
         document.getElementById('file-name').textContent = file.name;
         
-        // Ganti Ikon berdasarkan tipe file
         const icon = document.getElementById('file-icon');
         icon.className = file.type === 'application/pdf' ? 'fa-solid fa-file-pdf' : 'fa-solid fa-file-image';
 
-        // Buat URL untuk Preview
         if (currentFileUrl) URL.revokeObjectURL(currentFileUrl);
         currentFileUrl = URL.createObjectURL(file);
 
@@ -68,6 +79,7 @@
       }
     }
 
+    // function viewFile() tetap ada namun dikosongkan komentar di dalamnya
     function viewFile() {
       if (currentFileUrl) window.open(currentFileUrl, '_blank');
     }
@@ -82,7 +94,7 @@
       }
     }
   </script>
-<% }else { %>
+<% } else { %>
      <textarea
       id="evaluation-note"
       rows="4"
@@ -90,10 +102,7 @@
       placeholder="Masukkan catatan evaluasi..."
   ></textarea>
 
-  <!-- Container Tombol Aksi -->
   <div class="flex items-center justify-end gap-3 w-full">
-      
-      <!-- Form Reject langsung membungkus tombolnya -->
       <form action="/loans/approval/reject/<%= activeApproval._id %>" method="POST" onsubmit="appendNoteBeforeSubmit(this)">
           <input type="hidden" name="note" class="hidden-note-field">
           <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition active:scale-[0.98]">
@@ -101,25 +110,20 @@
           </button>
       </form>
       
-      <!-- Form Approve langsung membungkus tombolnya -->
       <form action="/loans/approval/approve/<%= activeApproval._id %>" method="POST" onsubmit="appendNoteBeforeSubmit(this)">
           <input type="hidden" name="note" class="hidden-note-field">
           <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition active:scale-[0.98]">
               Terima
           </button>
       </form>
-
   </div>
     <% } %>
   </div>
 <% } %>
 <script>
     function appendNoteBeforeSubmit(formElement) {
-      // Ambil teks dari textarea utama
       const noteValue = document.getElementById('evaluation-note').value;
-      // Cari input hidden yang ada DI DALAM form yang sedang di-submit saat ini saja
       const hiddenInput = formElement.querySelector('.hidden-note-field');
-      
       if (hiddenInput) {
         hiddenInput.value = noteValue;
       }

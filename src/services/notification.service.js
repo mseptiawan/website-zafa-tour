@@ -15,19 +15,15 @@ class NotificationService {
 
   async getMyNotifications(userId) {
     try {
-      console.log("🗄️ DEBUG SERVICE: Menerima ID ->", userId);
       if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-        console.log("❌ DEBUG SERVICE: Format ID tidak valid untuk MongoDB!");
         return [];
       }
 
       const queryId = new mongoose.Types.ObjectId(userId);
       const data = await Notification.find({ userId: queryId }).sort({ createdAt: -1 }).limit(10);
 
-      console.log("📄 DEBUG SERVICE: Isi dokumen mentah dari MongoDB ->", data);
       return data;
     } catch (error) {
-      console.error("💥 DEBUG SERVICE CRASH:", error);
       return [];
     }
   }

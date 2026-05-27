@@ -154,8 +154,6 @@ const holidays = [
 
 const holidaysSeeder = async () => {
   try {
-    console.log("⏳ Sedang memproses data hari libur dan cuti bersama 2026...");
-
     const operations = holidays.map((holiday) => ({
       updateOne: {
         filter: { name: holiday.name, date: holiday.date },
@@ -165,14 +163,6 @@ const holidaysSeeder = async () => {
     }));
 
     const result = await Holiday.bulkWrite(operations);
-
-    console.log("-----------------------------------------");
-    console.log(`Seeding Kalender SKB 2026 Selesai!`);
-    console.log(`   - Total Terbaca  : ${holidays.length} Hari`);
-    console.log(`   - Match Berhasil : ${result.matchedCount} data`);
-    console.log(`   - Baru Disuntik  : ${result.upsertedCount} data`);
-    console.log(`   - Data Terupdate : ${result.modifiedCount} data`);
-    console.log("-----------------------------------------");
   } catch (error) {
     console.error("Proses seeding kalender gagal total:", error);
   }

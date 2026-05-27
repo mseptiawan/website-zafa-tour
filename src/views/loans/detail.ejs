@@ -30,7 +30,7 @@ const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
   <%= loan.employeeId?.fullName || 'Detail Pengajuan Pinjaman Pegawai' %>
 </h1>
 <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-  Unit: <%= loan.employeeId?.unitId?.name || 'Tidak Ada' %>
+  Unit: <%= loan.employeeId?.careerData?.unitId?.name || 'Tidak Ada' %>
 </p>
               </div>
             </div>

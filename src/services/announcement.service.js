@@ -1,11 +1,22 @@
 import Announcement from "../models/Announcement.js";
-import { createAnnouncementSchema } from "../validations/announcement/announcement.schema.js";
 import { getPaginationMeta } from "../utils/pagination.js";
+import { createAnnouncementSchema } from "../validations/announcementValidator.js";
 const create = async (req) => {
   const parsed = createAnnouncementSchema.safeParse(req.body);
 
   if (!parsed.success) {
-    throw new AppError(parsed.error.errors[0].message, 400);
+    const fieldErrors = {};
+    parsed.error.errors.forEach((err) => {
+      const path = err.path[0];
+      if (!fieldErrors[path]) {
+        fieldErrors[path] = err.message;
+      }
+    });
+
+    const error = new Error("Validasi gagal");
+    error.statusCode = 400;
+    error.fields = fieldErrors;
+    throw error;
   }
 
   const { title, content, category } = parsed.data;
@@ -27,11 +38,11 @@ const getAll = async ({ page, limit, skip }) => {
     Announcement.find()
       .populate({
         path: "createdBy",
-        select: "_id", 
+        select: "_id",
         populate: {
           path: "employeeData",
-          select: "fullName" 
-        }
+          select: "fullName",
+        },
       })
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -51,8 +62,8 @@ const getById = (id) => {
     select: "_id",
     populate: {
       path: "employeeData",
-      select: "fullName"
-    }
+      select: "fullName",
+    },
   });
 };
 

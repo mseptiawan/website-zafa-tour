@@ -118,10 +118,7 @@ export default async function leaveSeeder() {
     await LeaveApproval.deleteMany({});
     await LeaveCancellation.deleteMany({});
 
-    console.log("✔ Master tabel modul cuti berhasil dibersihkan.");
-
     const createdLeaveTypes = await LeaveType.insertMany(leaveTypesMaster);
-    console.log(`✔ Berhasil memuat ${createdLeaveTypes.length} Master Jenis Cuti.`);
 
     const balanceData = [];
     for (const user of users) {
@@ -134,7 +131,6 @@ export default async function leaveSeeder() {
       });
     }
     await LeaveBalance.insertMany(balanceData);
-    console.log(`✔ Berhasil memuat Master Saldo Cuti awal untuk ${users.length} user.`);
 
     const leavesToInsert = [];
     const approvalsToInsert = [];
@@ -169,8 +165,6 @@ export default async function leaveSeeder() {
 
       const userRoleName = (user.roleId ? user.roleId.name : "STAFF").toUpperCase();
 
-      // 🌟 KONDISIONAL LOOP: Jika terdaftar di target dapat 30 data, jika user lain (jika ada) default 6 data
-      // Pastikan field pencocokan menggunakan nama field yang tepat di model User lo (di sini diasumsikan 'username')
       const currentUsername = user.username ? user.username.toLowerCase().trim() : "";
       const loopsPerUser = targetUsernames.includes(currentUsername) ? 30 : 6;
 
@@ -203,7 +197,6 @@ export default async function leaveSeeder() {
           approvalSteps.push({ step: "HR", approver: hrUser });
         }
 
-        // --- KONDISI A: PENDING (Sedang Berjalan) ---
         if (status === "PENDING") {
           let currentStepApproved = true;
 
@@ -239,10 +232,7 @@ export default async function leaveSeeder() {
               }
             }
           });
-        }
-
-        // --- KONDISI B: APPROVED ---
-        else if (status === "APPROVED") {
+        } else if (status === "APPROVED") {
           approvalSteps.forEach((flow) => {
             approvalsToInsert.push({
               leaveId,
@@ -263,10 +253,7 @@ export default async function leaveSeeder() {
               userBalance.remaining = Math.max(0, userBalance.totalQuota - userBalance.used);
             }
           }
-        }
-
-        // --- KONDISI C: REJECTED ---
-        else if (status === "REJECTED") {
+        } else if (status === "REJECTED") {
           let hasRejected = false;
           approvalSteps.forEach((flow, idx) => {
             if (!hasRejected) {
@@ -293,10 +280,7 @@ export default async function leaveSeeder() {
               }
             }
           });
-        }
-
-        // --- KONDISI D: CANCELLED ---
-        else if (status === "CANCELLED") {
+        } else if (status === "CANCELLED") {
           approvalSteps.forEach((flow) => {
             approvalsToInsert.push({
               leaveId,
@@ -317,10 +301,7 @@ export default async function leaveSeeder() {
             processAt: startDate,
             note: "Pembatalan disetujui, kuota Pegawai tidak dipotong.",
           });
-        }
-
-        // --- KONDISI E: CANCELLATION_PENDING ---
-        else if (status === "CANCELLATION_PENDING") {
+        } else if (status === "CANCELLATION_PENDING") {
           approvalSteps.forEach((flow) => {
             approvalsToInsert.push({
               leaveId,
@@ -391,16 +372,7 @@ export default async function leaveSeeder() {
         { $set: { used: updatedBalance.used, remaining: updatedBalance.remaining } }
       );
     }
-
-    console.log(`✔ Sukses melakukan sinkronisasi seeder data transaksi baru:`);
-    console.log(`   - Total User Terproses: ${users.length} Orang`);
-    console.log(`   - ${leavesToInsert.length} Dokumen Pengajuan Cuti (Leave)`);
-    console.log(`   - ${approvalsToInsert.length} Log Langkah Persetujuan (LeaveApproval)`);
-    console.log(
-      `   - ${cancellationsToInsert.length} Data Transaksi Pembatalan Cuti (LeaveCancellation)`
-    );
-    console.log(`\n=== PROSES UPDATE SEEDER BERHASIL DAN BERSIH ===`);
   } catch (err) {
-    console.error("X Terjadi kegagalan proses pembuatan data seeder:", err);
+    console.error("Terjadi kegagalan proses pembuatan data seeder:", err);
   }
 }

@@ -8,12 +8,12 @@ const DailyLogSchema = new mongoose.Schema(
       required: true,
     },
     tanggal: {
-      type: String, // Format 'YYYY-MM-DD' agar mudah di-query tanpa pusing timezone
+      type: String,
       required: true,
     },
     kategori: {
       type: String,
-      enum: ["Core Task", "Meeting", "Support"],
+      enum: ["Tugas Utama", "Rapat", "Dukungan", "Administrasi", "Riset & Teknis", "Lain-lain"],
       required: true,
     },
     judul: {
@@ -30,14 +30,13 @@ const DailyLogSchema = new mongoose.Schema(
       default: "",
     },
     fileLampiran: {
-      type: String, // Menyimpan nama file atau URL path dari storage
+      type: String,
       default: "",
     },
   },
   { timestamps: true }
 );
 
-// Indexing agar pencarian berdasarkan user dan tanggal berjalan secepat kilat
 DailyLogSchema.index({ userId: 1, tanggal: 1 });
 
 export default mongoose.model("DailyLog", DailyLogSchema);

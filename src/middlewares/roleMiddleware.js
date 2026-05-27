@@ -15,9 +15,6 @@ const roleMiddleware = (...roles) => {
       .filter(Boolean)
       .map((r) => String(r).trim().toUpperCase());
 
-    console.log("USER ROLE:", userRole);
-    console.log("ALLOWED:", allowedRoles);
-
     if (!allowedRoles.includes(userRole)) {
       return res.status(403).send("Access denied");
     }

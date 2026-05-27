@@ -16,9 +16,7 @@ const OFFICE_LNG = 104.763686;
 
 // 3. Tes dengan koordinat yang SAMA (Harus 0)
 const jarakTestSama = haversineDistance(OFFICE_LAT, OFFICE_LNG, OFFICE_LAT, OFFICE_LNG);
-console.log("Jarak ke titik yang SAMA (harusnya 0):", jarakTestSama, "meter");
 
 // 4. Tes dengan koordinat yang SEDIKIT BERGESER (Misal bergeser 100 meter)
 // Geser sedikit latitude-nya
 const jarakTestGeser = haversineDistance(OFFICE_LAT, OFFICE_LNG, -2.931, 104.763686);
-console.log("Jarak jika bergeser sedikit:", jarakTestGeser.toFixed(2), "meter");
