@@ -180,7 +180,7 @@ export const rejectManagerExpense = async (req, res) => {
   try {
     await ExpenseClaim.findByIdAndUpdate(req.params.id, {
       status: "REJECTED",
-      managerApprovedBy: req.session.user._id, // Mencatat siapa manager yang menolak
+      managerApprovedBy: req.session.user._id,
     });
 
     res.redirect("/expense/approval/manager");

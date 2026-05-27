@@ -12,7 +12,7 @@ const terminationSchema = new mongoose.Schema(
       required: true,
     },
     documentPath: {
-      type: String, // Path file yang di-upload HR
+      type: String,
       required: true,
     },
     status: {
@@ -22,7 +22,7 @@ const terminationSchema = new mongoose.Schema(
     },
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // ID Pimpinan yang meng-acc
+      ref: "User",
     },
     effectiveDate: {
       type: Date,

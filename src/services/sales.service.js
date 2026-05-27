@@ -1,8 +1,5 @@
 import SalesVisit from "../models/SalesVisit.js";
-import {
-  createSalesVisitSchema,
-  updateSalesVisitSchema,
-} from "../validations/sales-visit/sales.validation.js";
+import { createSalesVisitSchema, updateSalesVisitSchema } from "../validations/sales.schema.js";
 import { validateData } from "../utils/validateData.js";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];

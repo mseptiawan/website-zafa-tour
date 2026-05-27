@@ -44,7 +44,7 @@ export const approvePHK = async (req, res) => {
     }
 
     termination.status = "Approved";
-    termination.approvedBy = req.user._id; // Menyimpan ID Pimpinan yang sedang login
+    termination.approvedBy = req.user._id; 
     await termination.save();
 
     await User.findByIdAndUpdate(termination.employeeId.userId, {
@@ -65,8 +65,8 @@ export const listHistoryPHK = async (req, res) => {
         path: "employeeId",
         populate: [{ path: "userId" }, { path: "positionId" }, { path: "bidangId" }],
       })
-      .populate("approvedBy", "username email") // Ambil data pimpinan yang meng-ACC
-      .sort({ updatedAt: -1 }); // Urutkan dari yang paling baru di-approve
+      .populate("approvedBy", "username email") 
+      .sort({ updatedAt: -1 }); 
 
     res.render("admin/approval_history", {
       title: "Riwayat PHK",

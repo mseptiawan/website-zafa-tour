@@ -293,7 +293,7 @@ export const toggleHolidayStatus = async (req, res) => {
     if (holiday.isDeductLeave === true) {
       if (holiday.isActive === true && targetStatus === false) {
         console.log(
-          `♻️ Mengarsipkan agenda [${holiday.name}]. Me-refund ${totalDays} hari ke Pegawai...`
+          `Mengarsipkan agenda [${holiday.name}]. Me-refund ${totalDays} hari ke Pegawai...`
         );
         await LeaveBalance.updateMany(
           { year: holiday.year },
@@ -301,7 +301,7 @@ export const toggleHolidayStatus = async (req, res) => {
         );
       } else if (holiday.isActive === false && targetStatus === true) {
         console.log(
-          `⚠️ Mengaktifkan kembali [${holiday.name}]. Memotong kembali ${totalDays} hari dari Pegawai...`
+          ` Mengaktifkan kembali [${holiday.name}]. Memotong kembali ${totalDays} hari dari Pegawai...`
         );
         await LeaveBalance.updateMany(
           { year: holiday.year },
@@ -338,7 +338,7 @@ export const generateOrResetLeaveBalance = async (req, res) => {
     const DEFAULT_LEAVE_QUOTA = 12;
 
     console.log(
-      `♻️ Memulai proses Generate/Reset Saldo Cuti untuk seluruh Pegawai di tahun ${selectedYear}...`
+      ` Memulai proses Generate/Reset Saldo Cuti untuk seluruh Pegawai di tahun ${selectedYear}...`
     );
 
     const activeEmployees = await User.find({ isActive: true });
@@ -368,7 +368,7 @@ export const generateOrResetLeaveBalance = async (req, res) => {
     });
 
     console.log(
-      `📊 Ditemukan total ${totalDeductedDays} hari cuti bersama terdaftar di tahun ${selectedYear}.`
+      `Ditemukan total ${totalDeductedDays} hari cuti bersama terdaftar di tahun ${selectedYear}.`
     );
 
     await Promise.all(
@@ -788,17 +788,14 @@ export const requestCancelApprovedLeave = async (req, res) => {
       status: "PENDING",
     });
 
-    // ======================================================================
-    // LOGIKA WORKFLOW PEMBATALAN BARU (DISESUAIKAN REVISI DOSEN)
-    // ======================================================================
-    let targetStep = "WAKIL_DIREKTUR"; // Pengganti default 'HR'
+    let targetStep = "WAKIL_DIREKTUR"; 
 
     const userRole = (sessionUser.role || "").toString().trim().toUpperCase();
 
     if (userRole === "PEGAWAI" || userRole === "MANAGER_KEUANGAN") {
-      targetStep = "MANAGER_ADMINISTRASI"; // Staff & Keuangan wajib disetujui Manager Administrasi dulu
+      targetStep = "MANAGER_ADMINISTRASI"; 
     } else if (userRole === "WAKIL_DIREKTUR") {
-      targetStep = "DIREKTUR_UTAMA"; // Jika Wakil Direktur yang cuti, dilempar langsung ke Direktur Utama
+      targetStep = "DIREKTUR_UTAMA";
     }
 
     const roleDoc = await Role.findOne({ name: targetStep });
@@ -1100,10 +1097,6 @@ export const approveLeave = async (req, res) => {
     console.log(
       `DEBUG APPROVE LEAVE - Pemohon: ${requester.username} (${requesterRoleName}), Step Saat Ini: ${approval.step}`
     );
-
-    // ======================================================================
-    // KONDISI WORKFLOW PEMBATALAN (CANCELLATION WORKFLOW)
-    // ======================================================================
     if (leave.status === "CANCELLATION_PENDING") {
       if (approval.step === "MANAGER_ADMINISTRASI") {
         const hrRoleDoc = await Role.findOne({ name: "WAKIL_DIREKTUR" });
@@ -1151,9 +1144,6 @@ export const approveLeave = async (req, res) => {
       return res.redirect("/leave/manage-requests");
     }
 
-    // ======================================================================
-    // ALUR WORKFLOW PENGAJUAN CUTI BIASA (REGULAR LEAVE WORKFLOW)
-    // ======================================================================
     const { nextStep, nextApproverId } = await getNextApprover(requesterRoleName, approval.step);
 
     if (nextApproverId) {
@@ -1240,7 +1230,6 @@ export const getManageLeavePage = async (req, res) => {
     const normalizedRole = (sessionUser.role || "").toString().trim().toUpperCase();
     sessionUser.role = normalizedRole;
 
-    // Menentukan daftar role baru yang berhak masuk ke halaman manajemen cuti
     const APPROVER_ROLES = [
       "MANAGER_ADMINISTRASI",
       "WAKIL_DIREKTUR",
@@ -1262,7 +1251,6 @@ export const getManageLeavePage = async (req, res) => {
 
     for (const app of myStructuralApprovals) {
       if (app.status === "PENDING") {
-        // Pengecekan beruntun 1: Jika berada di step MANAGER_ADMINISTRASI, pastikan HANDOVER sudah disetujui
         if (app.step === "MANAGER_ADMINISTRASI") {
           const handoverCheck = await LeaveApproval.findOne({
             leaveId: app.leaveId,
@@ -1274,7 +1262,6 @@ export const getManageLeavePage = async (req, res) => {
           }
         }
 
-        // Pengecekan beruntun 2: Jika berada di step WAKIL_DIREKTUR, pastikan tingkat bawahnya (MANAGER_ADMINISTRASI) sudah lolos
         if (app.step === "WAKIL_DIREKTUR") {
           const managerCheck = await LeaveApproval.findOne({
             leaveId: app.leaveId,
@@ -1285,7 +1272,6 @@ export const getManageLeavePage = async (req, res) => {
           }
         }
 
-        // Pengecekan beruntun 3: Jika berada di step tertinggi, pastikan tingkat WAKIL_DIREKTUR sudah lolos
         if (app.step === "DIREKTUR_UTAMA" || app.step === "GENERAL_MANAGER") {
           const hrCheck = await LeaveApproval.findOne({
             leaveId: app.leaveId,

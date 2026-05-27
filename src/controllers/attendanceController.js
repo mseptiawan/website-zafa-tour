@@ -167,8 +167,6 @@ export const checkOut = async (req, res, next) => {
     next(err);
   }
 };
-// Pastikan kamu mengimport Model User di bagian atas file controller
-// const User = require('../models/User'); // sesuaikan dengan path model kamu
 
 export const attendanceHistory = async (req, res, next) => {
   try {
@@ -192,47 +190,40 @@ export const attendanceHistory = async (req, res, next) => {
       ...(isAdmin && !isPersonalView ? {} : { userId: user._id }),
     };
 
-    // 1. Ambil data absensi asli dari database
     let listAttendance = await Attendance.find(matchQuery)
       .populate("userId", "username")
       .sort({ checkIn: -1 });
 
-    // Convert ke plain JavaScript object agar bisa kita manipulasi/tambah data instan
     listAttendance = listAttendance.map((doc) => doc.toObject());
 
-    // 2. LOGIC BARU: Jika Admin melihat semua karyawan, sisipkan yang BELUM ABSEN HARI INI ke paling atas tabel
     if (isAdmin && !isPersonalView) {
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
       const todayEnd = new Date();
       todayEnd.setHours(23, 59, 59, 999);
 
-      // Cari ID user yang sudah absen hari ini
       const attendedToday = await Attendance.find({
         checkIn: { $gte: todayStart, $lte: todayEnd },
       }).distinct("userId");
 
-      // Cari user (karyawan) yang belum absen hari ini
       const adminRoles = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI"];
       const missingUsers = await User.find({
         role: { $nin: adminRoles },
         _id: { $nin: attendedToday },
       }).select("username");
 
-      // Format data "karyawan bolos/belum absen" agar strukturnya sama dengan tabel absensi
       const missingAttendanceData = missingUsers.map((emp) => ({
-        _id: `missing-${emp._id}`, // dummy id
+        _id: `missing-${emp._id}`, 
         userId: { username: emp.username },
-        checkIn: null, // belum ada jam masuk
+        checkIn: null,
         checkOut: null,
-        createdAt: new Date(), // Set tanggal hari ini
-        status: "BELUM ABSEN", // Status khusus
+        createdAt: new Date(), 
+        status: "BELUM ABSEN",
         lateDuration: 0,
         checkInPhoto: null,
-        isMissing: true, // penanda di EJS nanti
+        isMissing: true, 
       }));
 
-      // Gabungkan data karyawan belum absen ke baris PALING ATAS tabel
       listAttendance = [...missingAttendanceData, ...listAttendance];
     }
 
@@ -250,7 +241,7 @@ export const attendanceHistory = async (req, res, next) => {
 
     res.render("attendance/history", {
       title: "Riwayat Kehadiran",
-      listAttendance, // Sudah otomatis gabung di sini
+      listAttendance,
       analytics: summary[0] || { totalLateMinutes: 0, totalLateDays: 0, totalHadir: 0 },
       isAdmin,
       isPersonalView,

@@ -1,18 +1,16 @@
-import Bidang from "../models/basic/Bidang.js"; // sesuaikan path model Anda
-import Unit from "../models/basic/Unit.js"; // sesuaikan path model Anda
-import Position from "../models/basic/Position.js"; // sesuaikan path model Anda
+import Bidang from "../models/basic/Bidang.js";
+import Unit from "../models/basic/Unit.js";
+import Position from "../models/basic/Position.js";
 
-// 1. Render Halaman Utama Struktur Organisasi
 export const getWorkspace = async (req, res) => {
   try {
     const listBidang = await Bidang.find().sort({ createdAt: -1 });
-    // Populate bidangId untuk mendapatkan nama bidang induk di tabel unit
     const listUnit = await Unit.find().populate("bidangId").sort({ createdAt: -1 });
     const listPosition = await Position.find().sort({ createdAt: -1 });
 
     res.render("organization/index", {
       title: "Konfigurasi Struktur Perusahaan",
-      user: req.session.user, // parsing session user seperti login controller Anda
+      user: req.session.user,
       listBidang,
       listUnit,
       listPosition,
@@ -23,7 +21,6 @@ export const getWorkspace = async (req, res) => {
   }
 };
 
-// ================== CRUD BIDANG ==================
 export const createBidang = async (req, res) => {
   try {
     const { name } = req.body;
@@ -52,7 +49,6 @@ export const updateBidang = async (req, res) => {
 export const deleteBidang = async (req, res) => {
   try {
     const { id } = req.params;
-    // Validasi pencegahan jika bidang masih digunakan di model Unit
     const isUsed = await Unit.findOne({ bidangId: id });
     if (isUsed) {
       return res
@@ -66,12 +62,10 @@ export const deleteBidang = async (req, res) => {
   }
 };
 
-// ================== CRUD UNIT ==================
 export const createUnit = async (req, res) => {
   try {
     const { bidangId, name, description } = req.body;
     const newUnit = await Unit.create({ bidangId, name, description });
-    // Ambil data baru beserta populate bidang untuk dikembalikan ke client-side table
     const populatedUnit = await Unit.findById(newUnit._id).populate("bidangId");
     res.status(201).json({ success: true, data: populatedUnit });
   } catch (err) {
@@ -100,7 +94,6 @@ export const deleteUnit = async (req, res) => {
   }
 };
 
-// ================== CRUD POSITION (JABATAN) ==================
 export const createPosition = async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -118,7 +111,7 @@ export const createPosition = async (req, res) => {
 export const updatePosition = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body; // description di form dikirim sebagai 'keterangan'
+    const { name, description } = req.body;
     await Position.findByIdAndUpdate(id, { name, description });
     res.json({ success: true, message: "Jabatan berhasil diperbarui" });
   } catch (err) {

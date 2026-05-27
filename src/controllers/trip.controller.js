@@ -259,12 +259,10 @@ export const startTrip = async (req, res, next) => {
       return res.status(404).send("Trip not found");
     }
 
-    // hanya pemilik trip
     if (trip.userId.toString() !== req.session.user._id.toString()) {
       return res.status(403).send("Forbidden");
     }
 
-    // hanya bisa mulai jika ready
     if (trip.status !== "READY_TO_TRAVEL") {
       return res.status(400).send("Trip belum siap dimulai");
     }

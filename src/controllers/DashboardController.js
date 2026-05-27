@@ -17,17 +17,11 @@ export const index = async (req, res, next) => {
     const currentYear = new Date().getFullYear();
     const tanggalHariIni = moment().format("YYYY-MM-DD");
 
-    // Range waktu hari ini untuk check absensi
     const startToday = new Date();
     startToday.setHours(0, 0, 0, 0);
     const endToday = new Date();
     endToday.setHours(23, 59, 59, 999);
 
-    /*
-    |--------------------------------------------------------------------------
-    | PARALLEL QUERIES (PROMISE.ALL)
-    |--------------------------------------------------------------------------
-    */
     const [
       attendanceToday,
       monthlyAttendance,
@@ -38,10 +32,8 @@ export const index = async (req, res, next) => {
       pendingOvertimeApprovals,
       pendingTripApprovals,
     ] = await Promise.all([
-      // 1. Absensi hari ini
       Attendance.findOne({ userId, checkIn: { $gte: startToday, $lte: endToday } }),
 
-      // 2. Rekap absensi bulan ini
       Attendance.find({
         userId,
         createdAt: {
@@ -50,10 +42,8 @@ export const index = async (req, res, next) => {
         },
       }),
 
-      // 3. Daily Log hari ini
       DailyLog.find({ userId, tanggal: tanggalHariIni }).sort({ createdAt: 1 }),
 
-      // 4. Perjalanan Dinas Saya (Ambil 3 terakhir)
       BusinessTrip.find({ userId }).sort({ createdAt: -1 }).limit(3),
 
       Kpi.findOne({ employeeId: user.employeeData?._id || userId }).sort({ periode: -1 }),
@@ -71,7 +61,7 @@ export const index = async (req, res, next) => {
         : [],
 
       ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(user.role)
-        ? BusinessTrip.find({ status: "PENDING_APPROVAL" }) // Sesuai logika getApprovalTripsService(user.role)
+        ? BusinessTrip.find({ status: "PENDING_APPROVAL" })
             .populate("userId")
             .sort({ createdAt: -1 })
             .limit(5)
@@ -95,13 +85,11 @@ export const index = async (req, res, next) => {
         alpa: alpaCount,
       },
 
-      // Log & Trip & KPI
       initialLogs: dailyLogsToday,
       myTrips: myActiveTrips,
       kpiTerakhir: myLastKpi,
       nextHoliday,
 
-      // Pengganti Fitur Cuti -> Antrean Verifikasi Kerja Tim (Untuk Atasan/HR)
       pendingOvertimeApprovals,
       pendingTripApprovals,
     });

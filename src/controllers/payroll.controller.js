@@ -26,11 +26,10 @@ export const saveEmployeeAllowances = async (req, res) => {
       return res.status(400).json({ success: false, message: "ID Pegawai wajib diisi." });
     }
 
-    // 1. Ambil semua master komponen aktif untuk referensi ID dan Kategori
     const masterComponents = await SalaryComponent.find({ isActive: true });
 
     const componentMap = {};
-    const categoryMap = {}; // Kamus pembantu untuk mencatat kategori komponen (EARNING / DEDUCTION)
+    const categoryMap = {};
 
     masterComponents.forEach((comp) => {
       componentMap[comp.name] = comp._id;
@@ -39,9 +38,8 @@ export const saveEmployeeAllowances = async (req, res) => {
 
     const bulkOperations = [];
     const incomingComponentIds = [];
-    const categoriesToUpdate = new Set(); // Mencatat kategori apa saja yang sedang dikirim oleh frontend
+    const categoriesToUpdate = new Set();
 
-    // Jika ada data yang dikirim, susun bulk write dan catat kategorinya
     if (allowances && allowances.length > 0) {
       for (const item of allowances) {
         const componentId = componentMap[item.componentName];
@@ -49,7 +47,6 @@ export const saveEmployeeAllowances = async (req, res) => {
 
         incomingComponentIds.push(componentId);
 
-        // Masukkan kategori komponen ini (EARNING atau DEDUCTION) ke dalam Set
         const category = categoryMap[componentId.toString()];
         if (category) {
           categoriesToUpdate.add(category);
@@ -65,11 +62,7 @@ export const saveEmployeeAllowances = async (req, res) => {
       }
     }
 
-    // 2. PERBAIKAN BUG: Hapus data lama secara selektif berdasarkan kategori yang dikirim saja
-    // Jika frontend mengirim data EARNING, hapus EARNING lama yang tidak dikirim lagi.
-    // Jika frontend mengirim data DEDUCTION, hapus DEDUCTION lama yang tidak dikirim lagi.
     if (categoriesToUpdate.size > 0) {
-      // Ambil semua ID master komponen yang masuk dalam kategori yang sedang di-update
       const targetComponentIds = masterComponents
         .filter((comp) => categoriesToUpdate.has(comp.category))
         .map((comp) => comp._id);
@@ -77,16 +70,14 @@ export const saveEmployeeAllowances = async (req, res) => {
       await EmployeeAllowance.deleteMany({
         employeeId,
         componentId: {
-          $in: targetComponentIds, // Harus termasuk dalam kategori yang di-update
-          $nin: incomingComponentIds, // Tapi tidak ada di dalam list yang baru dikirim
+          $in: targetComponentIds,
+          $nin: incomingComponentIds,
         },
       });
     } else {
-      // Jika frontend mengirim array kosong (HR menghapus semua baris di form), hapus seluruhnya
       await EmployeeAllowance.deleteMany({ employeeId });
     }
 
-    // 3. Eksekusi Bulk Write jika ada data baru/perubahan
     if (bulkOperations.length > 0) {
       await EmployeeAllowance.bulkWrite(bulkOperations);
     }

@@ -1,14 +1,28 @@
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import Assignment from "../models/Assignment.js";
 import Employee from "../models/employee/Employee.model.js";
-import notificationService from "./notification.service.js";
-import Notification from "../models/notification.model.js";
-import { createAssignmentSchema } from "../validations/assignment/assignment.schema.js";
+import * as notificationService from "./notification.service.js";
 
-const create = async ({ body, file, userId }) => {
+export const findEmployees = async () => {
+  return await Employee.find({}).sort({
+    fullName: 1,
+  });
+};
+
+export const create = async ({ body, file, userId }) => {
+  let employeeIds = [];
+  if (body.employees) {
+    employeeIds = Array.isArray(body.employees) ? body.employees : [body.employees];
+  }
+
   const assignment = await Assignment.create({
-    ...body,
-    employees: body.employees,
+    title: body.title,
+    description: body.description,
+    type: body.type,
+    location: body.location,
+    startDate: body.startDate,
+    endDate: body.endDate,
+    employees: employeeIds,
     createdBy: userId,
     attachment: file?.filename || null,
   });
@@ -17,18 +31,13 @@ const create = async ({ body, file, userId }) => {
     const creator = await Employee.findById(userId);
     const creatorName = creator ? creator.name : "Pimpinan";
 
-    let employeeIds = [];
-    if (body.employees) {
-      employeeIds = Array.isArray(body.employees) ? body.employees : [body.employees];
-    }
-
     if (employeeIds.length > 0 && employeeIds[0]) {
       const notifPromises = employeeIds.map((empId) => {
         return notificationService.createNotification({
           userId: empId,
           type: "assignment",
           title: "Penugasan Baru",
-          text: `${creatorName} memberikan Anda tugas baru: "${body.title || body.taskName || "Tanpa Judul"}"`,
+          text: `${creatorName} memberikan Anda tugas baru: "${body.title || "Tanpa Judul"}"`,
           module: "assignment",
           referenceId: assignment._id,
         });
@@ -43,13 +52,7 @@ const create = async ({ body, file, userId }) => {
   return assignment;
 };
 
-const findEmployees = () => {
-  return Employee.find().sort({
-    fullName: 1,
-  });
-};
-
-const findMine = async ({ userId, page, limit }) => {
+export const findMine = async ({ userId, page, limit }) => {
   const employee = await Employee.findOne({ userId });
 
   if (!employee) {
@@ -90,7 +93,7 @@ const findMine = async ({ userId, page, limit }) => {
   };
 };
 
-const findAll = async ({ page = 1, limit = 7 }) => {
+export const findAll = async ({ page = 1, limit = 7 }) => {
   const {
     skip,
     limit: perPage,
@@ -118,8 +121,8 @@ const findAll = async ({ page = 1, limit = 7 }) => {
   };
 };
 
-const findById = (id) => {
-  return Assignment.findById(id).populate([
+export const findById = async (id) => {
+  return await Assignment.findById(id).populate([
     {
       path: "employees",
     },

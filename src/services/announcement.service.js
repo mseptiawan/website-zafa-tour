@@ -1,38 +1,34 @@
 import Announcement from "../models/Announcement.js";
 import { getPaginationMeta } from "../utils/pagination.js";
-import { createAnnouncementSchema } from "../validations/announcementValidator.js";
-const create = async (req) => {
-  const parsed = createAnnouncementSchema.safeParse(req.body);
 
-  if (!parsed.success) {
-    const fieldErrors = {};
-    parsed.error.errors.forEach((err) => {
-      const path = err.path[0];
-      if (!fieldErrors[path]) {
-        fieldErrors[path] = err.message;
-      }
-    });
+const ANNOUNCEMENT_STATUS = {
+  DRAFT: "DRAFT",
+  PUBLISHED: "PUBLISHED",
+};
 
-    const error = new Error("Validasi gagal");
-    error.statusCode = 400;
-    error.fields = fieldErrors;
-    throw error;
+const ANNOUNCEMENT_CATEGORY = {
+  OFFICIAL: "OFFICIAL",
+};
+
+const create = async ({ body, userId, file }) => {
+  const { title, content, category } = body;
+
+  let status = ANNOUNCEMENT_STATUS.PUBLISHED;
+
+  if (category === ANNOUNCEMENT_CATEGORY.OFFICIAL) {
+    status = ANNOUNCEMENT_STATUS.DRAFT;
   }
-
-  const { title, content, category } = parsed.data;
-
-  let status = "PUBLISHED";
-  if (category === "OFFICIAL") status = "DRAFT";
 
   return Announcement.create({
     title,
     content,
     category,
     status,
-    createdBy: req.session.user._id,
-    attachment: req.file ? req.file.filename : null,
+    createdBy: userId,
+    attachment: file?.filename || null,
   });
 };
+
 const getAll = async ({ page, limit, skip }) => {
   const [data, total] = await Promise.all([
     Announcement.find()
@@ -51,9 +47,16 @@ const getAll = async ({ page, limit, skip }) => {
     Announcement.countDocuments(),
   ]);
 
-  const meta = getPaginationMeta({ page, limit, total });
+  const meta = getPaginationMeta({
+    page,
+    limit,
+    total,
+  });
 
-  return { data, meta };
+  return {
+    data,
+    meta,
+  };
 };
 
 const getById = (id) => {

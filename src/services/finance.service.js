@@ -9,15 +9,7 @@ export const getFinanceTripDetailService = async ({ id }) => {
     throw err;
   }
 
-  // ======================================================
-  // FINANCE ACCESS RULE (UPDATED FLOW)
-  // ======================================================
-
-  const allowedTripStatus = [
-    "APPROVED",
-    "READY_TO_TRAVEL",
-    "ON_TRIP", // optional kalau mau lihat history finance saat perjalanan
-  ];
+  const allowedTripStatus = ["APPROVED", "READY_TO_TRAVEL", "ON_TRIP"];
 
   const allowedPaymentStatus = ["PENDING", "PROCESSING", "FAILED", "PAID"];
 

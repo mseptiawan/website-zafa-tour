@@ -1,4 +1,3 @@
-// public/js/notification-handler.js
 document.addEventListener("DOMContentLoaded", () => {
   const notifButton = document.getElementById("notifButton");
   const notifMenu = document.getElementById("notifMenu");
@@ -7,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const notifCountText = document.getElementById("notifCountText");
   const markAllReadBtn = document.getElementById("markAllReadBtn");
 
-  if (!notifButton) return; 
+  if (!notifButton) return;
 
   fetchNotifications();
 

@@ -2,9 +2,6 @@ import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import BusinessTrip from "../models/BusinessTrip.js";
 import { getFinanceTripDetailService } from "../services/finance.service.js";
 
-/**
- * PROCESS PAYMENT
- */
 export const processPayment = async (req, res) => {
   const trip = await BusinessTrip.findById(req.params.id);
 
@@ -37,7 +34,6 @@ export const uploadPaymentProof = async (req, res, next) => {
       uploadedAt: new Date(),
     };
 
-    // optional safety: pastikan tetap PROCESSING
     trip.payment.status = "PROCESSING";
 
     await trip.save();
@@ -48,9 +44,6 @@ export const uploadPaymentProof = async (req, res, next) => {
   }
 };
 
-/**
- * CONFIRM PAYMENT
- */
 export const confirmPayment = async (req, res, next) => {
   try {
     const trip = await BusinessTrip.findById(req.params.id);
@@ -59,30 +52,18 @@ export const confirmPayment = async (req, res, next) => {
       return res.status(404).send("Trip not found");
     }
 
-    // ======================================================
-    // 1. SAFETY GUARD: HARUS ADA PROOF
-    // ======================================================
     if (!trip.payment?.proof?.filename) {
       return res.status(400).send("Payment proof required");
     }
 
-    // ======================================================
-    // 2. SAFETY GUARD: CEGAH DOUBLE CONFIRM
-    // ======================================================
     if (trip.payment?.status === "PAID") {
       return res.status(400).send("Payment already confirmed");
     }
 
-    // ======================================================
-    // 3. SET PAYMENT PAID
-    // ======================================================
     trip.payment.status = "PAID";
     trip.payment.paidAt = new Date();
     trip.payment.paidBy = req.user?._id;
 
-    // ======================================================
-    // 4. TRANSITION BUSINESS STATUS
-    // ======================================================
     trip.status = "READY_TO_TRAVEL";
 
     await trip.save();
@@ -93,9 +74,6 @@ export const confirmPayment = async (req, res, next) => {
   }
 };
 
-/**
- * FINANCE DETAIL PAGE
- */
 export const financeTripDetail = async (req, res, next) => {
   try {
     const trip = await getFinanceTripDetailService({
@@ -120,9 +98,6 @@ export const financeTripDetail = async (req, res, next) => {
   }
 };
 
-/**
- * FINANCE LIST PAGE
- */
 export const financeTripPage = async (req, res, next) => {
   try {
     const { page, limit, skip } = getPagination({
@@ -162,9 +137,6 @@ export const financeTripPage = async (req, res, next) => {
     next(err);
   }
 };
-/**
- * PAYMENT HISTORY PAGE
- */
 export const paymentHistoryPage = async (req, res, next) => {
   try {
     const { page, limit, skip } = getPagination({

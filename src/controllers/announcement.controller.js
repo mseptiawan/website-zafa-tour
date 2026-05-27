@@ -1,5 +1,6 @@
 import { getPagination } from "../utils/pagination.js";
 import announcementService from "../services/announcement.service.js";
+import { createAnnouncementSchema } from "../validations/announcement.schema..js";
 export const newForm = (req, res) => {
   res.render("announcement/create", {
     title: "Buat Pengumuman",
@@ -10,16 +11,27 @@ export const newForm = (req, res) => {
 };
 export const create = async (req, res, next) => {
   try {
-    await announcementService.create(req);
+    const validatedBody = createAnnouncementSchema.parse(req.body);
+
+    await announcementService.create({
+      body: validatedBody,
+      userId: req.session.user._id,
+      file: req.file,
+    });
+
     return res.redirect("/announcement");
   } catch (err) {
-    return res.status(err.statusCode || 400).render("announcement/create", {
-      title: "Buat Pengumuman",
-      user: req.session.user,
-      error: err.fields ? null : err.message,
-      errors: err.fields || null,
-      old: req.body,
-    });
+    if (err.errors) {
+      return res.status(400).render("announcement/create", {
+        title: "Buat Pengumuman",
+        user: req.session.user,
+        error: null,
+        errors: err.flatten().fieldErrors,
+        old: req.body,
+      });
+    }
+
+    return next(err);
   }
 };
 

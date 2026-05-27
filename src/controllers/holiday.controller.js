@@ -1,6 +1,5 @@
 import Holiday from "../models/calender/Holiday.model.js";
 
-// Menampilkan halaman list hari libur & cuti bersama
 export const getHolidaysPage = async (req, res) => {
   try {
     const currentYear = new Date().getFullYear();
@@ -22,7 +21,6 @@ export const getHolidaysPage = async (req, res) => {
   }
 };
 
-// Menambahkan Hari Libur / Cuti Bersama baru
 export const createHoliday = async (req, res) => {
   try {
     const { name, date, endDate, type, isDeductLeave, isRecurring, description } = req.body;
@@ -47,7 +45,6 @@ export const createHoliday = async (req, res) => {
   }
 };
 
-// Menghapus data hari libur
 export const deleteHoliday = async (req, res) => {
   try {
     await Holiday.findByIdAndDelete(req.params.id);

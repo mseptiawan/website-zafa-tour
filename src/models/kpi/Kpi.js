@@ -30,9 +30,9 @@ const kpiSchema = new mongoose.Schema(
         indikator: { type: String, required: true },
         bobot: { type: Number, required: true },
         target: { type: String, required: true },
-        realisasi: { type: String }, // Bisa diisi teks atau catatan
-        score: { type: Number, required: true }, // Nilai 0-100 dari input HR
-        finalScore: { type: Number, required: true }, // Skor akhir setelah dikali bobot
+        realisasi: { type: String },
+        score: { type: Number, required: true },
+        finalScore: { type: Number, required: true },
       },
     ],
 

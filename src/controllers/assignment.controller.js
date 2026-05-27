@@ -1,4 +1,5 @@
-import assignmentService from "../services/assignment.service.js";
+import { createAssignmentSchema } from "../validations/assignment.schema.js";
+import * as assignmentService from "../services/assignment.service.js";
 
 export const newForm = async (req, res, next) => {
   try {
@@ -15,22 +16,51 @@ export const newForm = async (req, res, next) => {
   }
 };
 
-export const create = async (req, res) => {
+export const create = async (req, res, next) => {
   try {
+    const result = createAssignmentSchema.safeParse(req.body);
+
+    if (!result.success) {
+      const fieldErrors = result.error.format();
+
+      const employees = await assignmentService.findEmployees();
+      return res.status(400).render("assignment/create", {
+        title: "Buat Penugasan",
+        employees,
+        errors: fieldErrors,
+        old: req.body,
+      });
+    }
+
     await assignmentService.create({
-      body: req.body,
+      body: result.data,
       file: req.file,
       userId: req.session.user._id,
     });
 
     return res.redirect("/assignment");
   } catch (err) {
+    console.error("Database Error Terdeteksi:", err);
+
     const employees = await assignmentService.findEmployees();
+
+    let customFieldsError = { _errors: [] };
+
+    if (err.message && err.message.includes("at least 10 character")) {
+      customFieldsError = {
+        _errors: [],
+        description: {
+          _errors: ["Deskripsi terlalu pendek, minimal harus berisi 10 karakter"],
+        },
+      };
+    } else {
+      customFieldsError = { _errors: [err.message || "Terjadi kesalahan pada sistem."] };
+    }
 
     return res.status(400).render("assignment/create", {
       title: "Buat Penugasan",
       employees,
-      error: err.message,
+      errors: customFieldsError,
       old: req.body,
     });
   }
@@ -56,6 +86,7 @@ export const myAssignments = async (req, res, next) => {
     next(err);
   }
 };
+
 export const index = async (req, res, next) => {
   try {
     const page = Math.max(parseInt(req.query.page) || 1, 1);
