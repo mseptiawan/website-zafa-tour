@@ -15,7 +15,7 @@
     <div class="flex items-center justify-between min-w-[550px] px-2">
       
       <div id="step-nav-1" class="flex items-center gap-2 font-bold text-xs text-slate-900">
-        <span class="nav-circle w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold">1</span>
+        <span class="nav-circle w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">1</span>
         <span>Akses</span>
       </div>
       <div class="h-px w-6 bg-slate-200 flex-1 mx-2"></div>
@@ -63,299 +63,399 @@
 <% } %>
       
       <!-- STEP 1: AKSES -->
-      <div id="step-panel-1" class="step-panel space-y-6">
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nama Lengkap <span class="text-red-500">*</span></label>
-          <input type="text" name="fullName" required value="<%= old?.fullName || '' %>" placeholder="Contoh: M Septiawan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Email Pribadi <span class="text-red-500">*</span></label>
-          <input type="email" name="email" required value="<%= old?.email || '' %>" placeholder="Contoh: septiawan@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
-     <% 
-  // Kita simpan string SVG panah ke dalam variabel biar HTML di bawah clean
+    <% 
+  if (typeof errors === 'undefined') { var errors = {}; } 
+  
   const selectBgIcon = "bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat";
 %>
 
-<div class="space-y-1.5">
-  <label class="text-[13px] font-bold text-slate-700">Hak Akses Sistem (Role) <span class="text-red-500">*</span></label>
+<div id="step-panel-1" class="step-panel space-y-6">
   
-  <select name="roleId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
-    <option value="" disabled selected hidden>Pilih Hak Akses</option>
-    <% roles.forEach(r => { %>
-      <option value="<%= r._id %>" <%= old?.roleId === String(r._id) ? 'selected' : '' %>>
-        <%= r.name.replace(/_/g, ' ') %>
-      </option>
-    <% }) %>
-  </select>
-</div>
-     
-      </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nama Lengkap <span class="text-red-500">*</span></label>
+    <input type="text" name="fullName" required value="<%= old?.fullName || '' %>" placeholder="Contoh: M Septiawan" 
+      class="w-full bg-slate-50 border <%= errors.fullName ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.fullName) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.fullName %></p>
+    <% } %>
+  </div>
 
-      <!-- STEP 2: KTP -->
-      <div id="step-panel-2" class="step-panel hidden space-y-6">
-     
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Email Pribadi <span class="text-red-500">*</span></label>
+    <input type="email" name="email" required value="<%= old?.email || '' %>" placeholder="Contoh: septiawan@gmail.com" 
+      class="w-full bg-slate-50 border <%= errors.email ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.email) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.email %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nomor NIK KTP <span class="text-red-500">*</span></label>
-          <input type="text" name="nomor_ktp" required maxlength="16" value="<%= old?.nomor_ktp || '' %>" placeholder="Wajib 16 digit angka resmi KTP" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Hak Akses Sistem (Role) <span class="text-red-500">*</span></label>
+    <select name="roleId" required 
+      class="w-full bg-slate-50 border <%= errors.roleId ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" disabled selected hidden>Pilih Hak Akses</option>
+      <% roles.forEach(r => { %>
+        <option value="<%= r._id %>" <%= old?.roleId === String(r._id) ? 'selected' : '' %>>
+          <%= r.name.replace(/_/g, ' ') %>
+        </option>
+      <% }) %>
+    </select>
+    <% if (errors.roleId) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.roleId %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Tempat Lahir <span class="text-red-500">*</span></label>
-          <input type="text" name="tempat_lahir" required value="<%= old?.tempat_lahir || '' %>" placeholder="Kota tempat lahir" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Tanggal Lahir <span class="text-red-500">*</span></label>
-          <input type="date" name="tanggal_lahir" required value="<%= old?.tanggal_lahir || '' %>" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Jenis Kelamin <span class="text-red-500">*</span></label>
-          <select name="jenis_kelamin" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
-            <option value="" disabled <%= !old?.jenis_kelamin ? 'selected' : '' %>>Pilih Jenis Kelamin</option>
-            <option value="Laki-Laki" <%= old?.jenis_kelamin === 'Laki-Laki' ? 'selected' : '' %>>Laki-Laki</option>
-            <option value="Perempuan" <%= old?.jenis_kelamin === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
-          </select>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Agama <span class="text-red-500">*</span></label>
-          <select name="agama" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
-            <option value="" disabled <%= !old?.agama ? 'selected' : '' %>>Pilih Agama</option>
-            <option value="Islam" <%= old?.agama === 'Islam' ? 'selected' : '' %>>Islam</option>
-            <option value="Kristen" <%= old?.agama === 'Kristen' ? 'selected' : '' %>>Kristen</option>
-            <option value="Katolik" <%= old?.agama === 'Katolik' ? 'selected' : '' %>>Katolik</option>
-            <option value="Hindu" <%= old?.agama === 'Hindu' ? 'selected' : '' %>>Hindu</option>
-            <option value="Buddha" <%= old?.agama === 'Buddha' ? 'selected' : '' %>>Buddha</option>
-          </select>
-        </div>
-
-       <div class="space-y-1.5">
-  <label class="text-[13px] font-bold text-slate-700">Status Pernikahan <span class="text-red-500">*</span></label>
-  <select name="status_pernikahan" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= typeof selectBgIcon !== 'undefined' ? selectBgIcon : '' %>">
-    <option value="" disabled selected hidden <%= !old?.status_pernikahan ? 'selected' : '' %>>Pilih Status</option>
-    <option value="Lajang" <%= old?.status_pernikahan === 'Lajang' ? 'selected' : '' %>>Lajang</option>
-    <option value="Menikah" <%= old?.status_pernikahan === 'Menikah' ? 'selected' : '' %>>Menikah</option>
-    <option value="Cerai" <%= old?.status_pernikahan === 'Cerai' ? 'selected' : '' %>>Cerai</option>
-  </select>
 </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Golongan Darah <span class="text-slate-400 font-normal">(Opsional)</span></label>
-          <select name="golongan_darah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
-            <option value="" <%= !old?.golongan_darah ? 'selected' : '' %>>Belum Diketahui</option>
-            <option value="A" <%= old?.golongan_darah === 'A' ? 'selected' : '' %>>A</option>
-            <option value="B" <%= old?.golongan_darah === 'B' ? 'selected' : '' %>>B</option>
-            <option value="AB" <%= old?.golongan_darah === 'AB' ? 'selected' : '' %>>AB</option>
-            <option value="O" <%= old?.golongan_darah === 'O' ? 'selected' : '' %>>O</option>
-          </select>
-        </div>
-      </div>
+<div id="step-panel-2" class="step-panel hidden space-y-6">
 
-      <!-- STEP 3: KARIR -->
-      <div id="step-panel-3" class="step-panel hidden space-y-6">
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Status Hubungan Kerja <span class="text-red-500">*</span></label>
-          <select id="status_pegawai" name="status_pegawai" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
-            <option value="" disabled <%= !old?.status_pegawai ? 'selected' : '' %>>Pilih Ikatan Kerja</option>
-            <option value="Tetap" <%= old?.status_pegawai === 'Tetap' ? 'selected' : '' %>>Tetap (Permanent)</option>
-            <option value="Kontrak" <%= old?.status_pegawai === 'Kontrak' ? 'selected' : '' %>>Kontrak (PKWT)</option>
-            <option value="Magang" <%= old?.status_pegawai === 'Magang' ? 'selected' : '' %>>Magang (Internship)</option>
-      
-          </select>
-        </div>
- 
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nomor NIK KTP <span class="text-red-500">*</span></label>
+    <input type="text" name="nomor_ktp" required maxlength="16" value="<%= old?.nomor_ktp || '' %>" placeholder="Wajib 16 digit angka resmi KTP" 
+      class="w-full bg-slate-50 border <%= errors.nomor_ktp ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.nomor_ktp) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.nomor_ktp %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Tanggal Bergabung <span class="text-red-500">*</span></label>
-          <input type="date" name="tanggal_mulai_bergabung" required value="<%= old?.tanggal_mulai_bergabung || '' %>" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Tempat Lahir <span class="text-red-500">*</span></label>
+    <input type="text" name="tempat_lahir" required value="<%= old?.tempat_lahir || '' %>" placeholder="Kota tempat lahir" 
+      class="w-full bg-slate-50 border <%= errors.tempat_lahir ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.tempat_lahir) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.tempat_lahir %></p>
+    <% } %>
+  </div>
 
-               
-        <div id="contract_date_box" class="hidden p-4 bg-slate-50/50 border border-slate-200 rounded-xl transition-all space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Tanggal Akhir Kontrak / Magang <span class="text-red-500">*</span></label>
-          <input type="date" id="tanggal_berakhir_kontrak" name="tanggal_berakhir_kontrak" value="<%= old?.tanggal_berakhir_kontrak || '' %>" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Tanggal Lahir <span class="text-red-500">*</span></label>
+    <input type="date" name="tanggal_lahir" required value="<%= old?.tanggal_lahir || '' %>" 
+      class="w-full bg-slate-50 border <%= errors.tanggal_lahir ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.tanggal_lahir) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.tanggal_lahir %></p>
+    <% } %>
+  </div>
 
-       <div class="space-y-1.5">
-  <label class="text-[13px] font-bold text-slate-700">Bidang Kerja (Division)</label>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Jenis Kelamin <span class="text-red-500">*</span></label>
+    <select name="jenis_kelamin" required 
+      class="w-full bg-slate-50 border <%= errors.jenis_kelamin ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" disabled <%= !old?.jenis_kelamin ? 'selected' : '' %>>Pilih Jenis Kelamin</option>
+      <option value="LAKI_LAKI" <%= old?.jenis_kelamin === 'LAKI_LAKI' ? 'selected' : '' %>>Laki-Laki</option>
+      <option value="PEREMPUAN" <%= old?.jenis_kelamin === 'PEREMPUAN' ? 'selected' : '' %>>Perempuan</option>
+    </select>
+    <% if (errors.jenis_kelamin) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.jenis_kelamin %></p>
+    <% } %>
+  </div>
+
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Agama <span class="text-red-500">*</span></label>
+    <select name="agama" required 
+      class="w-full bg-slate-50 border <%= errors.agama ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" disabled <%= !old?.agama ? 'selected' : '' %>>Pilih Agama</option>
+      <option value="Islam" <%= old?.agama === 'Islam' ? 'selected' : '' %>>Islam</option>
+      <option value="Kristen" <%= old?.agama === 'Kristen' ? 'selected' : '' %>>Kristen</option>
+      <option value="Katolik" <%= old?.agama === 'Katolik' ? 'selected' : '' %>>Katolik</option>
+      <option value="Hindu" <%= old?.agama === 'Hindu' ? 'selected' : '' %>>Hindu</option>
+      <option value="Buddha" <%= old?.agama === 'Buddha' ? 'selected' : '' %>>Buddha</option>
+    </select>
+    <% if (errors.agama) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.agama %></p>
+    <% } %>
+  </div>
+
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Status Pernikahan <span class="text-red-500">*</span></label>
+    <select name="status_pernikahan" required 
+      class="w-full bg-slate-50 border <%= errors.status_pernikahan ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" disabled selected hidden <%= !old?.status_pernikahan ? 'selected' : '' %>>Pilih Status</option>
+      <option value="Lajang" <%= old?.status_pernikahan === 'Lajang' ? 'selected' : '' %>>Lajang</option>
+      <option value="Menikah" <%= old?.status_pernikahan === 'Menikah' ? 'selected' : '' %>>Menikah</option>
+      <option value="Cerai" <%= old?.status_pernikahan === 'Cerai' ? 'selected' : '' %>>Cerai</option>
+    </select>
+    <% if (errors.status_pernikahan) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.status_pernikahan %></p>
+    <% } %>
+  </div>
+
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Golongan Darah <span class="text-slate-400 font-normal">(Opsional)</span></label>
+    <select name="golongan_darah" 
+      class="w-full bg-slate-50 border <%= errors.golongan_darah ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" <%= !old?.golongan_darah ? 'selected' : '' %>>Belum Diketahui</option>
+      <option value="A" <%= old?.golongan_darah === 'A' ? 'selected' : '' %>>A</option>
+      <option value="B" <%= old?.golongan_darah === 'B' ? 'selected' : '' %>>B</option>
+      <option value="AB" <%= old?.golongan_darah === 'AB' ? 'selected' : '' %>>AB</option>
+      <option value="O" <%= old?.golongan_darah === 'O' ? 'selected' : '' %>>O</option>
+    </select>
+    <% if (errors.golongan_darah) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.golongan_darah %></p>
+    <% } %>
+  </div>
+</div>
+
+<div id="step-panel-3" class="step-panel hidden space-y-6">
   
-  <select id="bidang_select" name="bidangId" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
-    <option value="" disabled selected hidden>Pilih Bidang Kerja</option>
-    
-    <% bidang.forEach(b => { %>
-      <option value="<%= b._id %>" <%= old?.bidangId === String(b._id) ? 'selected' : '' %>>
-        <%= b.name %>
-      </option>
-    <% }) %>
-    
-  </select>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Status Hubungan Kerja <span class="text-red-500">*</span></label>
+    <select id="status_pegawai" name="status_pegawai" required 
+      class="w-full bg-slate-50 border <%= errors.status_pegawai ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" disabled <%= !old?.status_pegawai ? 'selected' : '' %>>Pilih Ikatan Kerja</option>
+      <option value="Tetap" <%= old?.status_pegawai === 'Tetap' ? 'selected' : '' %>>Tetap (Permanent)</option>
+      <option value="Kontrak" <%= old?.status_pegawai === 'Kontrak' ? 'selected' : '' %>>Kontrak (PKWT)</option>
+      <option value="Magang" <%= old?.status_pegawai === 'Magang' ? 'selected' : '' %>>Magang (Internship)</option>
+    </select>
+    <% if (errors.status_pegawai) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.status_pegawai %></p>
+    <% } %>
+  </div>
+
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Tanggal Bergabung <span class="text-red-500">*</span></label>
+    <input type="date" name="tanggal_mulai_bergabung" required value="<%= old?.tanggal_mulai_bergabung || '' %>" 
+      class="w-full bg-slate-50 border <%= errors.tanggal_mulai_bergabung ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.tanggal_mulai_bergabung) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.tanggal_mulai_bergabung %></p>
+    <% } %>
+  </div>
+
+  <div id="contract_date_box" class="hidden p-4 bg-slate-50/50 border border-slate-200 rounded-xl transition-all space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Tanggal Akhir Kontrak / Magang <span class="text-red-500">*</span></label>
+    <input type="date" id="tanggal_berakhir_kontrak" name="tanggal_berakhir_kontrak" value="<%= old?.tanggal_berakhir_kontrak || '' %>" 
+      class="w-full bg-white border <%= errors.tanggal_berakhir_kontrak ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.tanggal_berakhir_kontrak) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.tanggal_berakhir_kontrak %></p>
+    <% } %>
+  </div>
+
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Bidang Kerja (Division)</label>
+    <select id="bidang_select" name="bidangId" 
+      class="w-full bg-slate-50 border <%= errors.bidangId ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" disabled selected hidden>Pilih Bidang Kerja</option>
+      <% bidang.forEach(b => { %>
+        <option value="<%= b._id %>" <%= old?.bidangId === String(b._id) ? 'selected' : '' %>>
+          <%= b.name %>
+        </option>
+      <% }) %>
+    </select>
+    <% if (errors.bidangId) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.bidangId %></p>
+    <% } %>
+  </div>
+
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Unit Kerja Spesifik</label>
+    <select id="unit_select" name="unitId" disabled 
+      class="w-full bg-slate-50 border <%= errors.unitId ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed <%= selectBgIcon %>">
+      <option value="" selected>Pilih Bidang Terlebih Dahulu</option>
+    </select>
+    <% if (errors.unitId) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.unitId %></p>
+    <% } %>
+  </div>
+
+  <script>
+    const allUnits = <%- JSON.stringify(units) %>;
+  </script>
+
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Level Jabatan <span class="text-slate-400 font-normal">(Opsional)</span></label>
+    <select name="positionId" 
+      class="w-full bg-slate-50 border <%= errors.positionId ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="" <%= !old?.positionId ? 'selected' : '' %>>Pilih Level Jabatan</option>
+      <% positions.forEach(p => { %>
+        <option value="<%= p._id %>" <%= String(old?.positionId) === String(p._id) ? 'selected' : '' %>>
+          <%= p.name %>
+        </option>
+      <% }) %>
+    </select>
+    <% if (errors.positionId) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.positionId %></p>
+    <% } %>
+  </div>
+
 </div>
-
-    <div class="space-y-1.5">
-  <label class="text-[13px] font-bold text-slate-700">Unit Kerja Spesifik</label>
-  
-  <select id="unit_select" name="unitId" disabled 
-          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed <%= selectBgIcon %>">
-    <option value="" selected>Pilih Bidang Terlebih Dahulu</option>
-  </select>
-</div>
-
-<script>
-  const allUnits = <%- JSON.stringify(units) %>;
-</script>
-
-       <div class="space-y-1.5">
-  <label class="text-[13px] font-bold text-slate-700">
-    Level Jabatan
-    <span class="text-slate-400 font-normal">(Opsional)</span>
-  </label>
-
-  <select
-    name="positionId"
-    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>"
-  >
-
-    <option value=""
-      <%= !old?.positionId ? 'selected' : '' %>>
-      Pilih Level Jabatan
-    </option>
-
-    <% positions.forEach(p => { %>
-
-      <option
-        value="<%= p._id %>"
-        <%= String(old?.positionId) === String(p._id)
-            ? 'selected'
-            : '' %>
-      >
-        <%= p.name %>
-      </option>
-
-    <% }) %>
-
-  </select>
-</div>
-      </div>
 
       <!-- STEP 4: KONTAK -->
-      <div id="step-panel-4" class="step-panel hidden space-y-6">
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nomor HP Aktif (WhatsApp) <span class="text-red-500">*</span></label>
-          <input type="text" name="nomor_telp" required value="<%= old?.nomor_telp || '' %>" placeholder="Contoh: 0812XXXXXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Alamat Domisili Sekarang <span class="text-red-500">*</span></label>
-          <input type="text" name="alamat" required value="<%= old?.alamat || '' %>" placeholder="Nama jalan, RT/RW, Kecamatan, Kota" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+<div id="step-panel-4" class="step-panel hidden space-y-6">
+  
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nomor HP Aktif (WhatsApp) <span class="text-red-500">*</span></label>
+    <input type="text" name="nomor_telp" required value="<%= old?.nomor_telp || '' %>" placeholder="Contoh: 0812XXXXXXXX" 
+      class="w-full bg-slate-50 border <%= errors.nomor_telp ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.nomor_telp) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.nomor_telp %></p>
+    <% } %>
+  </div>
 
-        <div class="p-6 border border-slate-200 rounded-2xl bg-slate-50/30 space-y-5">
-          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Protokol Kontak Darurat Keluarga</div>
-          
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">Nama Lengkap Penanggung Jawab <span class="text-red-500">*</span></label>
-            <input type="text" name="nama_kontak_darurat" required value="<%= old?.nama_kontak_darurat || '' %>" placeholder="Nama Kerabat Terdekat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-          </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Alamat Domisili Sekarang <span class="text-red-500">*</span></label>
+    <input type="text" name="alamat" required value="<%= old?.alamat || '' %>" placeholder="Nama jalan, RT/RW, Kecamatan, Kota" 
+      class="w-full bg-slate-50 border <%= errors.alamat ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.alamat) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.alamat %></p>
+    <% } %>
+  </div>
 
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">Hubungan Keluarga <span class="text-red-500">*</span></label>
-            <input type="text" name="hubungan_kontak_darurat" required value="<%= old?.hubungan_kontak_darurat || '' %>" placeholder="Misal: Orang Tua, Istri, Suami" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-          </div>
+  <div class="p-6 border border-slate-200 rounded-2xl bg-slate-50/30 space-y-5">
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Protokol Kontak Darurat Keluarga</div>
+    
+    <div class="space-y-1.5">
+      <label class="text-[13px] font-bold text-slate-700">Nama Lengkap Penanggung Jawab <span class="text-red-500">*</span></label>
+      <input type="text" name="nama_kontak_darurat" required value="<%= old?.nama_kontak_darurat || '' %>" placeholder="Nama Kerabat Terdekat" 
+        class="w-full bg-slate-50 border <%= errors.nama_kontak_darurat ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+      <% if (errors.nama_kontak_darurat) { %>
+        <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.nama_kontak_darurat %></p>
+      <% } %>
+    </div>
 
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">No. Telp Darurat Aktif <span class="text-red-500">*</span></label>
-            <input type="text" name="nomor_kontak_darurat" required value="<%= old?.nomor_kontak_darurat || '' %>" placeholder="Nomor HP Penanggung Jawab" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-          </div>
-        </div>
-      </div>
+    <div class="space-y-1.5">
+      <label class="text-[13px] font-bold text-slate-700">Hubungan Keluarga <span class="text-red-500">*</span></label>
+      <input type="text" name="hubungan_kontak_darurat" required value="<%= old?.hubungan_kontak_darurat || '' %>" placeholder="Misal: Orang Tua, Istri, Suami" 
+        class="w-full bg-slate-50 border <%= errors.hubungan_kontak_darurat ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+      <% if (errors.hubungan_kontak_darurat) { %>
+        <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.hubungan_kontak_darurat %></p>
+      <% } %>
+    </div>
 
-      <!-- STEP 5: EDUKASI -->
-      <div id="step-panel-5" class="step-panel hidden space-y-6">
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Pendidikan Terakhir <span class="text-red-500">*</span></label>
-          <select name="pendidikan_terakhir" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900">
-            <option value="" disabled <%= !old?.pendidikan_terakhir ? 'selected' : '' %>>Pilih Jenjang Terakhir</option>
-            <option value="SMA/SMK" <%= old?.pendidikan_terakhir === 'SMA/SMK' ? 'selected' : '' %>>SMA / SMK / Sederajat</option>
-            <option value="D3" <%= old?.pendidikan_terakhir === 'D3' ? 'selected' : '' %>>Diploma 3 (D3)</option>
-            <option value="D4" <%= old?.pendidikan_terakhir === 'D4' ? 'selected' : '' %>>Diploma 4 (D4)</option>
-            <option value="S1" <%= old?.pendidikan_terakhir === 'S1' ? 'selected' : '' %>>Sarjana 1 (S1)</option>
-            <option value="S2" <%= old?.pendidikan_terakhir === 'S2' ? 'selected' : '' %>>Magister (S2)</option>
-          </select>
-        </div>
+    <div class="space-y-1.5">
+      <label class="text-[13px] font-bold text-slate-700">No. Telp Darurat Aktif <span class="text-red-500">*</span></label>
+      <input type="text" name="nomor_kontak_darurat" required value="<%= old?.nomor_kontak_darurat || '' %>" placeholder="Nomor HP Penanggung Jawab" 
+        class="w-full bg-slate-50 border <%= errors.nomor_kontak_darurat ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+      <% if (errors.nomor_kontak_darurat) { %>
+        <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.nomor_kontak_darurat %></p>
+      <% } %>
+    </div>
+  </div>
+</div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nama Lembaga Pendidikan / Universitas <span class="text-red-500">*</span></label>
-          <input type="text" name="institusi_pendidikan" required value="<%= old?.institusi_pendidikan || '' %>" placeholder="Nama Sekolah atau Perguruan Tinggi" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+<div id="step-panel-5" class="step-panel hidden space-y-6">
+  
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Pendidikan Terakhir <span class="text-red-500">*</span></label>
+    <select name="pendidikan_terakhir" required 
+  class="w-full bg-slate-50 border <%= errors.pendidikan_terakhir ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all appearance-none text-slate-900 <%= selectBgIcon %>">
+      <option value="SMA/SMK" <%= old?.pendidikan_terakhir === 'SMA/SMK' ? 'selected' : '' %>>SMA / SMK / Sederajat</option>
+      <option value="D3" <%= old?.pendidikan_terakhir === 'D3' ? 'selected' : '' %>>Diploma 3 (D3)</option>
+      <option value="D4" <%= old?.pendidikan_terakhir === 'D4' ? 'selected' : '' %>>Diploma 4 (D4)</option>
+      <option value="S1" <%= old?.pendidikan_terakhir === 'S1' ? 'selected' : '' %>>Sarjana 1 (S1)</option>
+      <option value="S2" <%= old?.pendidikan_terakhir === 'S2' ? 'selected' : '' %>>Magister (S2)</option>
+    </select>
+    <% if (errors.pendidikan_terakhir) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.pendidikan_terakhir %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Tahun Kelulusan Resmi <span class="text-red-500">*</span></label>
-          <input type="number" name="tahun_kelulusan" required value="<%= old?.tahun_kelulusan || '' %>" placeholder="Contoh: 2025" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nama Lembaga Pendidikan / Universitas <span class="text-red-500">*</span></label>
+    <input type="text" name="institusi_pendidikan" required value="<%= old?.institusi_pendidikan || '' %>" placeholder="Nama Sekolah atau Perguruan Tinggi" 
+      class="w-full bg-slate-50 border <%= errors.institusi_pendidikan ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.institusi_pendidikan) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.institusi_pendidikan %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Spesialisasi Keahlian Utama <span class="text-slate-400 font-normal">(Opsional)</span></label>
-          <input type="text" name="keahlian_utama" value="<%= old?.keahlian_utama || '' %>" placeholder="Pisahkan keterampilan dengan tanda koma (,)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Tahun Kelulusan Resmi <span class="text-red-500">*</span></label>
+    <input type="number" name="tahun_kelulusan" required value="<%= old?.tahun_kelulusan || '' %>" placeholder="Contoh: 2025" 
+      class="w-full bg-slate-50 border <%= errors.tahun_kelulusan ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.tahun_kelulusan) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.tahun_kelulusan %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Sertifikasi Profesional Pendukung <span class="text-slate-400 font-normal">(Opsional)</span></label>
-          <input type="text" name="sertifikat_profesional" value="<%= old?.sertifikat_profesional || '' %>" placeholder="Contoh: Brevet Pajak, TOEFL, AWS Cloud" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
-      </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Spesialisasi Keahlian Utama <span class="text-slate-400 font-normal">(Opsional)</span></label>
+    <input type="text" name="keahlian_utama" value="<%= old?.keahlian_utama || '' %>" placeholder="Pisahkan keterampilan dengan tanda koma (,)" 
+      class="w-full bg-slate-50 border <%= errors.keahlian_utama ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.keahlian_utama) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.keahlian_utama %></p>
+    <% } %>
+  </div>
 
-      <!-- STEP 6: FINANSIAL -->
-      <div id="step-panel-6" class="step-panel hidden space-y-6">
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nama Bank Penggajian <span class="text-red-500">*</span></label>
-          <input type="text" name="nama_bank" required value="<%= old?.nama_bank || '' %>" placeholder="Contoh: Bank BCA / Mandiri / BRI" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Sertifikasi Profesional Pendukung <span class="text-slate-400 font-normal">(Opsional)</span></label>
+    <input type="text" name="sertifikat_profesional" value="<%= old?.sertifikat_profesional || '' %>" placeholder="Contoh: Brevet Pajak, TOEFL, AWS Cloud" 
+      class="w-full bg-slate-50 border <%= errors.sertifikat_profesional ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.sertifikat_profesional) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.sertifikat_profesional %></p>
+    <% } %>
+  </div>
+</div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nomor Rekening Bank <span class="text-red-500">*</span></label>
-          <input type="text" name="nomor_rekening" required value="<%= old?.nomor_rekening || '' %>" placeholder="Pastikan digit nomor sudah tepat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+<div id="step-panel-6" class="step-panel hidden space-y-6">
+  
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nama Bank Penggajian <span class="text-red-500">*</span></label>
+    <input type="text" name="nama_bank" required value="<%= old?.nama_bank || '' %>" placeholder="Contoh: Bank BCA / Mandiri / BRI" 
+      class="w-full bg-slate-50 border <%= errors.nama_bank ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.nama_bank) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.nama_bank %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nama Lengkap Pemilik Rekening <span class="text-red-500">*</span></label>
-          <input type="text" name="nama_pemilik_rekening" required value="<%= old?.nama_pemilik_rekening || '' %>" placeholder="Harus sesuai dengan nama di buku tabungan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nomor Rekening Bank <span class="text-red-500">*</span></label>
+    <input type="text" name="nomor_rekening" required value="<%= old?.nomor_rekening || '' %>" placeholder="Pastikan digit nomor sudah tepat" 
+      class="w-full bg-slate-50 border <%= errors.nomor_rekening ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.nomor_rekening) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.nomor_rekening %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nomor NPWP Wajib Pajak <span class="text-slate-400 font-normal">(Opsional)</span></label>
-          <input type="text" name="npwp" value="<%= old?.npwp || '' %>" placeholder="15 atau 16 digit NPWP" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nama Lengkap Pemilik Rekening <span class="text-red-500">*</span></label>
+    <input type="text" name="nama_pemilik_rekening" required value="<%= old?.nama_pemilik_rekening || '' %>" placeholder="Harus sesuai dengan nama di buku tabungan" 
+      class="w-full bg-slate-50 border <%= errors.nama_pemilik_rekening ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.nama_pemilik_rekening) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.nama_pemilik_rekening %></p>
+    <% } %>
+  </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">Nomor KPJ BPJS Ketenagakerjaan <span class="text-slate-400 font-normal">(Opsional)</span></label>
-          <input type="text" name="bpjstk" value="<%= old?.bpjstk || '' %>" placeholder="Nomor keanggotaan BPJSTK jika ada" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
-        </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nomor NPWP Wajib Pajak <span class="text-slate-400 font-normal">(Opsional)</span></label>
+    <input type="text" name="npwp" value="<%= old?.npwp || '' %>" placeholder="15 atau 16 digit NPWP" 
+      class="w-full bg-slate-50 border <%= errors.npwp ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.npwp) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.npwp %></p>
+    <% } %>
+  </div>
 
-        <div class="border-t border-slate-100 pt-5 space-y-4">
-          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lampiran Arsip Dokumen Digital <span class="text-slate-400 font-normal">(Opsional)</span></div>
-          
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">Scan KTP Asli</label>
-            <input type="file" name="file_ktp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs outline-none file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:bg-slate-900 file:text-white file:text-[11px] file:font-semibold hover:file:bg-slate-800 transition-all" />
-          </div>
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Nomor KPJ BPJS Ketenagakerjaan <span class="text-slate-400 font-normal">(Opsional)</span></label>
+    <input type="text" name="bpjstk" value="<%= old?.bpjstk || '' %>" placeholder="Nomor keanggotaan BPJSTK jika ada" 
+      class="w-full bg-slate-50 border <%= errors.bpjstk ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:border-slate-400 outline-none transition-all" />
+    <% if (errors.bpjstk) { %>
+      <p class="text-[11px] font-medium text-red-500 mt-1"><%= errors.bpjstk %></p>
+    <% } %>
+  </div>
 
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">Scan Kartu Keluarga</label>
-            <input type="file" name="file_kk" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs outline-none file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:bg-slate-900 file:text-white file:text-[11px] file:font-semibold hover:file:bg-slate-800 transition-all" />
-          </div>
-        </div>
-      </div>
+  <div class="border-t border-slate-100 pt-5 space-y-4">
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lampiran Arsip Dokumen Digital <span class="text-slate-400 font-normal">(Opsional)</span></div>
+    
+    <div class="space-y-1.5">
+      <label class="text-[13px] font-bold text-slate-700">Scan KTP Asli</label>
+      <input type="file" name="file_ktp" 
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs outline-none file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:bg-slate-900 file:text-white file:text-[11px] file:font-semibold hover:file:bg-slate-800 transition-all" />
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="text-[13px] font-bold text-slate-700">Scan Kartu Keluarga</label>
+      <input type="file" name="file_kk" 
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs outline-none file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:bg-slate-900 file:text-white file:text-[11px] file:font-semibold hover:file:bg-slate-800 transition-all" />
+    </div>
+  </div>
+</div>
 
       <!-- NAVIGATION BUTTONS -->
       <div class="flex items-center justify-between pt-6 border-t border-slate-100 mt-8">
         <button type="button" id="prevBtn" class="invisible rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
           Kembali
         </button>
-        <button type="button" id="nextBtn" class="rounded-xl bg-slate-900 px-6 py-3 text-xs font-bold text-white shadow-sm hover:bg-slate-800 transition">
+        <button type="button" id="nextBtn" class="rounded-xl bg-blue-500 px-6 py-3 text-xs font-bold text-white shadow-sm hover:bg-slate-800 transition">
           Lanjutkan
         </button>
       </div>
@@ -660,3 +760,4 @@ if (bidangSelectEl && unitSelectEl) {
 
   
 </script>
+

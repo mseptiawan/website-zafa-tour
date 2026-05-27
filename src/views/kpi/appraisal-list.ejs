@@ -58,10 +58,10 @@
                 <span
                   class="inline-flex items-center rounded-md border border-slate-100 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-600"
                 >
-                  <%= emp.unitId?.name || '-' %>
+                  <%= emp.careerData?.unitId?.name || '-' %>
                 </span>
               </td>
-              <td class="px-6 py-4 text-slate-500"><%= emp.bidangId?.name || '-' %></td>
+              <td class="px-6 py-4 text-slate-500"><%= emp.careerData?.bidangId?.name || '-' %></td>
 
               <td class="px-6 py-4 text-center">
                 <% if (isEvaluated) { %>
@@ -79,7 +79,7 @@
                 </div>
                 <% } else { %>
                 <a
-                  href="/kpi/input/<%= emp._id %>"
+                  href="/kpi/appraisal-form/<%= emp._id %>"
                   class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-medium text-white shadow-sm shadow-indigo-200 transition-all hover:bg-blue-700"
                 >
                   Nilai Kinerja

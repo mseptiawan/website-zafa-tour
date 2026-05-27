@@ -41,8 +41,8 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />`,
           show: true,
           submenus: [
-            { name: "Catat KPI", path: "/kpi/input", show:  !!user.permissions.kpi_create },
-            { name: "Daftar KPI Pegawai", path: "/kpi/list", show:  !!user.permissions.kpi_list }
+            { name: "Catat KPI", path: "/kpi/appraisal-list", show:  !!user.permissions.kpi_create },
+            { name: "Daftar KPI Pegawai", path: "/kpi/history-list", show:  !!user.permissions.kpi_list }
           ]
         },
         {
@@ -102,7 +102,6 @@
           submenus: [
             { name: "Catat Absensi", path: "/attendance", show: true },
             { name: "Daftar Absensi", path: "/attendance/history", show: true },
-            { name: "Lihat Semua Absensi", path: "/attendance/getall", show: user.role !== 'PEGAWAI' && user.role !== 'MANAGER_KEUANGAN' }
           ]
         },
         {
@@ -203,9 +202,6 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h6v6m-7 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-2-2h-4L7 5H4a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
           show: true,
           submenus: [
-            { name: "Laporan KPI", path: "/report/kpi", show: !!user.permissions.report_kpi },
-            { name: "Laporan Cuti", path: "/report/leave", show: !!user.permissions.report_leave },
-            { name: "Laporan Dinas Luar", path: "/trip/report", show: true },
             { name: "Laporan Kunjungan Sales", path: "/sales/report", show: true },
             { name: "Laporan Lembur", path: "/report/overtime", show: !!user.permissions.report_overtime },
             { name: "Laporan Absensi", path: "/report/attendance", show: !!user.permissions.report_attendance }

@@ -1,94 +1,127 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
-  <div class="max-w-5xl mx-auto">
+<div class="ml-72 min-h-screen bg-slate-50 p-8">
+  <div class="max-w-6xl mx-auto">
 
-  <div class="flex items-end justify-between mb-10">
-  <div>
-    <div class="mb-3 flex items-center gap-3">
-      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-        Area Kerja
-      </span>
-      <div class="h-3 w-px bg-slate-300"></div>
-      <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-        Kehadiran
-      </span>
+    <div class="flex items-end justify-between mb-8">
+      <div>
+        <div class="mb-3 flex items-center gap-3">
+          <span class="text-[10px] tracking-[0.2em] text-slate-400 uppercase">Area Kerja</span>
+          <div class="h-3 w-px bg-slate-300"></div>
+          <span class="text-[10px] tracking-[0.2em] text-slate-700 uppercase">Kehadiran</span>
+        </div>
+
+        <h1 class="text-3xl text-slate-900 tracking-tight">Riwayat Absensi</h1>
+        
+        <% if (isAdmin) { %>
+          <div class="mt-4 flex gap-2">
+            <a href="/attendance/history" class="px-4 py-1.5 rounded-lg text-xs border <%= !isPersonalView ? 'bg-slate-900 text-white' : 'bg-white text-slate-600' %>">Semua Karyawan</a>
+            <a href="/attendance/history?view=personal" class="px-4 py-1.5 rounded-lg text-xs border <%= isPersonalView ? 'bg-slate-900 text-white' : 'bg-white text-slate-600' %>">Absensi Saya</a>
+          </div>
+        <% } %>
+      </div>
+
+      <form action="/attendance/history" method="GET" class="flex gap-2">
+        <% if (isAdmin && isPersonalView) { %><input type="hidden" name="view" value="personal"><% } %>
+        <input type="date" name="startDate" value="<%= filters.startDate %>" class="px-3 py-2 rounded-xl border border-slate-200 text-sm">
+        <input type="date" name="endDate" value="<%= filters.endDate %>" class="px-3 py-2 rounded-xl border border-slate-200 text-sm">
+        <button type="submit" class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm hover:bg-slate-50">Filter</button>
+      </form>
     </div>
 
-    <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-      Riwayat Absensi
-    </h1>
-    <p class="mt-1.5 text-sm font-medium text-slate-500">
-      Pantau seluruh catatan kehadiran Pegawai secara real-time.
-    </p>
-  </div>
+    <div class="grid md:grid-cols-3 gap-5 mb-8">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex justify-between">
+        <div><p class="text-xs text-slate-400 uppercase">Hadir</p><h3 class="text-2xl text-slate-800 mt-2"><%= analytics.totalHadir %> <span class="text-sm text-slate-400">hari</span></h3></div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex justify-between">
+        <div><p class="text-xs text-slate-400 uppercase">Terlambat</p><h3 class="text-2xl text-slate-800 mt-2"><%= analytics.totalLateDays %> <span class="text-sm text-slate-400">kali</span></h3></div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex justify-between">
+        <div><p class="text-xs text-slate-400 uppercase">Total Menit</p><h3 class="text-2xl text-slate-800 mt-2"><%= analytics.totalLateMinutes %> <span class="text-sm text-slate-400">menit</span></h3></div>
+      </div>
+    </div>
 
-  <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
-    <span class="text-[12px] font-medium text-slate-500 uppercase tracking-wide">Total Entri:</span>
-    <span class="text-lg font-bold text-slate-900"><%= data.length %></span>
-  </div>
-</div>
-
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="p-5 border-b border-slate-100 bg-white">
+        <h3 class="font-medium text-slate-700">Daftar Riwayat Kehadiran</h3>
+      </div>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-[700px]">
-          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+        <table class="w-full text-sm min-w-[800px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b border-slate-100">
             <tr>
-              <th class="text-left px-6 py-4">Tanggal</th>
-              <th class="text-left px-6 py-4">Masuk</th>
-              <th class="text-left px-6 py-4">Keluar</th>
-              <th class="text-left px-6 py-4">Status</th>
-              <th class="text-center px-6 py-4">Foto</th>
-              <th class="text-center px-6 py-4">Aksi</th>
+              <% if (isAdmin && !isPersonalView) { %><th class="px-6 py-4 text-left">Pegawai</th><% } %>
+              <th class="px-6 py-4 text-left">Tanggal</th>
+              <th class="px-6 py-4 text-left">Masuk</th>
+              <th class="px-6 py-4 text-left">Keluar</th>
+              <th class="px-6 py-4 text-left">Status</th>
+              <th class="px-6 py-4 text-left">Terlambat</th>
+              <th class="px-6 py-4 text-center">Foto</th>
+              <th class="px-6 py-4 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            <% if (data.length === 0) { %>
+            <% if (listAttendance.length === 0) { %>
               <tr>
-                <td colspan="6" class="text-center py-10 text-slate-400">Belum ada data absensi</td>
+                <td colspan="<%= (isAdmin && !isPersonalView) ? 8 : 7 %>" class="py-12 text-center text-slate-400">Belum ada data riwayat absensi</td>
               </tr>
             <% } %>
-
-            <% data.forEach(d => { 
-                const statusColors = {
-                  'HADIR': 'text-emerald-600 bg-emerald-50/70 border-emerald-200/50',
-                  'TELAT': 'text-amber-600 bg-amber-50/70 border-amber-200/50',
-                  'ALPHA': 'text-rose-600 bg-rose-50/70 border-rose-200/50'
-                };
-            %>
-              <tr class="hover:bg-slate-50 transition">
-                <td class="px-6 py-4 font-medium text-slate-800">
-                  <%= new Date(d.createdAt).toLocaleDateString("id-ID") %>
-                </td>
+            
+            <% listAttendance.forEach(row => { %>
+              <tr class="hover:bg-slate-50 transition bg-white">
+                
+                <% if (isAdmin && !isPersonalView) { %>
+                  <td class="px-6 py-4 font-medium text-slate-800">
+                    <%= row.userId?.username || '-' %>
+                  </td>
+                <% } %>
+                
                 <td class="px-6 py-4 text-slate-600">
-                  <%= d.checkIn ? new Date(d.checkIn).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
+                  <%= new Date(row.checkIn || row.createdAt).toLocaleDateString("id-ID", {day:'numeric', month:'short', year:'numeric'}) %>
                 </td>
-                <td class="px-6 py-4 text-slate-600">
-                  <%= d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
+                
+                <td class="px-6 py-4 text-slate-500">
+                  <%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
                 </td>
+                
+                <td class="px-6 py-4 text-slate-500">
+                  <%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
+                </td>
+                
                 <td class="px-6 py-4">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium uppercase tracking-wide <%= statusColors[d.status] || 'text-slate-500 bg-slate-50 border-slate-200' %>">
-                    <%= d.status %>
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-center">
-                  <% if (d.photo) { %>
-                    <img src="<%= d.photo %>" class="w-10 h-10 mx-auto rounded-lg object-cover border border-slate-200" />
+                  <% if (row.status === 'BELUM ABSEN') { %>
+                    <span class="text-xs font-medium text-red-600">
+                      Belum Absen
+                    </span>
                   <% } else { %>
-                    <span class="text-slate-400">-</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] text-slate-600 bg-slate-100 border border-slate-200">
+                      <%= row.status %>
+                    </span>
                   <% } %>
                 </td>
+                
+                <td class="px-6 py-4 text-slate-500">
+                  <%= row.lateDuration > 0 ? row.lateDuration + ' menit' : '-' %>
+                </td>
+                
+                <td class="px-6 py-4 text-center text-slate-400">
+                  <%= row.checkInPhoto ? '📷' : '-' %>
+                </td>
+                
                 <td class="px-6 py-4 text-center">
-                  <button class="openModal inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition"
-                    data-date="<%= new Date(d.createdAt).toLocaleDateString('id-ID') %>"
-                    data-status="<%= d.status %>"
-                    data-checkin="<%= d.checkIn ? new Date(d.checkIn).toLocaleString('id-ID') : '-' %>"
-                    data-checkout="<%= d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '-' %>"
-                    data-duration="<%= d.workDuration || 0 %>"
-                    data-photo="<%= d.photo || '' %>"
-                    data-type="<%= d.type %>">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg>
-                  </button>
+                  <% if (row.status === 'BELUM ABSEN') { %>
+                    <button class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 cursor-not-allowed" title="Data belum tersedia">👁</button>
+                  <% } else { %>
+                    <button class="openModal w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 text-slate-500"
+                      data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID') %>"
+                      data-status="<%= row.status %>"
+                      data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID') : '-' %>"
+                      data-checkout="<%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID') : '-' %>"
+                      data-duration="<%= row.workDuration || 0 %>"
+                      data-lateduration="<%= row.lateDuration || 0 %>"
+                      data-inphoto="<%= row.checkInPhoto || '' %>"
+                      data-outphoto="<%= row.checkOutPhoto || '' %>"
+                      data-type="<%= row.type %>">👁</button>
+                  <% } %>
                 </td>
               </tr>
             <% }) %>
@@ -96,56 +129,8 @@
         </table>
       </div>
     </div>
+
   </div>
 </div>
 
-<div id="detailModal" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-  <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-      <h2 class="font-semibold text-slate-800 text-sm">Detail Absensi</h2>
-      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition">✕</button>
-    </div>
-
-    <div class="p-5 space-y-4 text-sm">
-      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Tanggal</span><span class="font-medium text-slate-700" id="mDate"></span></div>
-      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Status</span><span class="font-medium text-slate-700" id="mStatus"></span></div>
-      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Tipe</span><span class="font-medium text-slate-700 uppercase" id="mType"></span></div>
-      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Masuk</span><span class="font-medium text-slate-700" id="mIn"></span></div>
-      <div class="flex justify-between border-b border-slate-50 pb-2"><span class="text-slate-400">Keluar</span><span class="font-medium text-slate-700" id="mOut"></span></div>
-      <div class="flex justify-between"><span class="text-slate-400">Durasi</span><span class="font-medium text-slate-700"><span id="mDuration"></span> menit</span></div>
-
-      <div id="photoBox" class="hidden pt-2">
-        <img id="mPhoto" class="w-full h-48 object-cover rounded-xl border border-slate-200 shadow-sm">
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-const modal = document.getElementById("detailModal");
-document.querySelectorAll(".openModal").forEach(btn => {
-  btn.addEventListener("click", (e) => {
-    const dataset = e.currentTarget.dataset;
-    document.getElementById("mDate").textContent = dataset.date || "-";
-    document.getElementById("mStatus").textContent = dataset.status || "-";
-    document.getElementById("mType").textContent = dataset.type || "-";
-    document.getElementById("mIn").textContent = dataset.checkin || "-";
-    document.getElementById("mOut").textContent = dataset.checkout || "-";
-    document.getElementById("mDuration").textContent = dataset.duration || "0";
-    
-    const photoBox = document.getElementById("photoBox");
-    const mPhoto = document.getElementById("mPhoto");
-    if (dataset.photo && dataset.photo !== "") {
-      photoBox.classList.remove("hidden");
-      mPhoto.src = dataset.photo;
-    } else {
-      photoBox.classList.add("hidden");
-    }
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  });
-});
-
-function closeModal() { modal.classList.add("hidden"); modal.classList.remove("flex"); }
-modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-</script>
+<%- include('./partials/attendance-modal.ejs') %>

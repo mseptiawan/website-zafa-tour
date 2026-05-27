@@ -1,0 +1,121 @@
+<div
+  id="detailModal"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 p-4 backdrop-blur-sm"
+>
+  <div
+    class="w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl"
+  >
+    <div class="flex justify-between border-b border-slate-100 px-6 py-4">
+      <div>
+        <h2 class="text-slate-800">Detail Kehadiran</h2>
+        <p class="text-xs text-slate-400">Informasi absensi</p>
+      </div>
+      <button
+        onclick="closeModal()"
+        class="h-9 w-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="space-y-3 p-6 text-sm">
+      <div class="flex justify-between">
+        <span class="text-slate-400">Tanggal</span>
+        <span id="mDate"></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-400">Status</span>
+        <span id="mStatus"></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-400">Tipe</span>
+        <span id="mType"></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-400">Masuk</span>
+        <span id="mIn"></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-400">Keluar</span>
+        <span id="mOut"></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-400">Durasi</span>
+        <span>
+          <span id="mDuration"></span>
+          menit
+        </span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-400">Terlambat</span>
+        <span>
+          <span id="mLate"></span>
+          menit
+        </span>
+      </div>
+
+      <div id="inPhotoBox" class="mt-4 flex items-center justify-between">
+        <span class="text-slate-400">Foto Masuk</span>
+        <img
+          id="mInPhoto"
+          src=""
+          class="h-16 w-16 rounded-xl border border-slate-100 object-cover"
+        />
+      </div>
+      <div id="outPhotoBox" class="mt-2 flex items-center justify-between">
+        <span class="text-slate-400">Foto Pulang</span>
+        <img
+          id="mOutPhoto"
+          src=""
+          class="h-16 w-16 rounded-xl border border-slate-100 object-cover"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById("detailModal");
+  function openModalHandler(e) {
+    const dataset = e.currentTarget.dataset;
+    document.getElementById("mDate").textContent = dataset.date || "-";
+    document.getElementById("mStatus").textContent = dataset.status || "-";
+    document.getElementById("mType").textContent = dataset.type || "-";
+    document.getElementById("mIn").textContent = dataset.checkin || "-";
+    document.getElementById("mOut").textContent = dataset.checkout || "-";
+    document.getElementById("mDuration").textContent = dataset.duration || "0";
+    document.getElementById("mLate").textContent = dataset.lateduration || "0";
+
+    const inPhotoBox = document.getElementById("inPhotoBox");
+    const mInPhoto = document.getElementById("mInPhoto");
+    if (dataset.inphoto) {
+      inPhotoBox.classList.remove("hidden");
+      mInPhoto.src = dataset.inphoto;
+    } else {
+      inPhotoBox.classList.add("hidden");
+    }
+
+    const outPhotoBox = document.getElementById("outPhotoBox");
+    const mOutPhoto = document.getElementById("mOutPhoto");
+    if (dataset.outphoto) {
+      outPhotoBox.classList.remove("hidden");
+      mOutPhoto.src = dataset.outphoto;
+    } else {
+      outPhotoBox.classList.add("hidden");
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".openModal"))
+      openModalHandler({ currentTarget: e.target.closest(".openModal") });
+  });
+  function closeModal() {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+</script>

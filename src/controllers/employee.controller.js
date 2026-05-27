@@ -1,3 +1,4 @@
+import { createEmployeeSchema } from "../validations/employeeValidation.js";
 import { EmployeeService } from "../services/employee.service.js";
 import AppError from "../utils/AppError.js";
 import { successResponse } from "../utils/response.js";
@@ -57,6 +58,10 @@ export const editEmployeeWeb = async (req, res, next) => {
 
 export const createEmployeeApi = async (req, res, next) => {
   try {
+    // 1. Validasi data form menggunakan Zod
+    const validatedBody = createEmployeeSchema.parse(req.body);
+
+    // 2. Mapping data file upload jika validasi berhasil
     const fileData = {
       file_ktp:
         req.files && req.files.file_ktp
@@ -68,7 +73,8 @@ export const createEmployeeApi = async (req, res, next) => {
           : null,
     };
 
-    const newEmployee = await EmployeeService.createNewEmployee(req.body, fileData);
+    // 3. Kirim data ke Service
+    const newEmployee = await EmployeeService.createNewEmployee(validatedBody, fileData);
 
     return res.redirect("/employee");
   } catch (err) {
@@ -83,11 +89,28 @@ export const createEmployeeApi = async (req, res, next) => {
         Bidang.find(),
         Role.find(),
       ]);
-    } catch (dbErr) {}
+    } catch (dbErr) {
+      console.error("Database Error:", dbErr);
+    }
+
+    // Tempat menyimpan pesan error per field
+    let mappedErrors = {};
+
+    // Jika error dari Zod, petakan berdasarkan nama field-nya
+    if (err.name === "ZodError" || err.errors) {
+      err.errors.forEach((e) => {
+        const fieldName = e.path[0]; // mengambil nama field, contoh: 'fullName'
+        mappedErrors[fieldName] = e.message; // set pesan errornya
+      });
+    } else {
+      // Jika error dari database/system global biasa
+      mappedErrors["global"] = err.message;
+    }
 
     return res.render("employee/create", {
       title: "Tambah Pegawai",
-      error: err.message,
+      error: mappedErrors.global || null, // Error global jika ada
+      errors: mappedErrors, // Objek error per field (*PENTING*)
       old: req.body,
       employees: [],
       positions,
