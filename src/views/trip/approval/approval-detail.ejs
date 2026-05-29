@@ -130,14 +130,14 @@
               </div>
 
               <% const isFinal=['APPROVED', 'REJECTED' ].includes(trip.status); const
-                isManagerStep=user.role==='MANAGER' && trip.currentStep==='MANAGER' && !isFinal; const
-                isPimpinanStep=user.role==='PIMPINAN' && trip.currentStep==='PIMPINAN' && !isFinal; const
-                isHrStep=user.role==='HR' && trip.currentStep==='PIMPINAN' && trip.delegation?.active===true &&
-                trip.delegation?.to==='HR' && !isFinal; const canApprove=!isFinal && (isManagerStep || isPimpinanStep ||
-                isHrStep); const requesterIsHR=trip.requesterRole==='HR' ; const canDelegate=user.role==='PIMPINAN' &&
-                trip.currentStep==='PIMPINAN' && !trip.delegation?.active && !isFinal && !requesterIsHR; const
-                isDelegatedToHR=trip.delegation?.active===true && trip.delegation?.to==='HR' ; const
-                isPimpinanBlocked=user.role==='PIMPINAN' && isDelegatedToHR && trip.currentStep==='PIMPINAN' ; %>
+                isManagerStep=user.role==='MANAGER_ADMINISTRASI' && trip.currentStep==='MANAGER_ADMINISTRASI' && !isFinal; const
+                isPimpinanStep=user.role==='DIREKTUR_UTAMA' && trip.currentStep==='DIREKTUR_UTAMA' && !isFinal; const
+                isHrStep=user.role==='WAKIL_DIREKTUR' && trip.currentStep==='DIREKTUR_UTAMA' && trip.delegation?.active===true &&
+                trip.delegation?.to==='WAKIL_DIREKTUR' && !isFinal; const canApprove=!isFinal && (isManagerStep || isPimpinanStep ||
+                isHrStep); const requesterIsHR=trip.requesterRole==='WAKIL_DIREKTUR' ; const canDelegate=user.role==='DIREKTUR_UTAMA' &&
+                trip.currentStep==='DIREKTUR_UTAMA' && !trip.delegation?.active && !isFinal && !requesterIsHR; const
+                isDelegatedToHR=trip.delegation?.active===true && trip.delegation?.to==='WAKIL_DIREKTUR' ; const
+                isPimpinanBlocked=user.role==='DIREKTUR_UTAMA' && isDelegatedToHR && trip.currentStep==='DIREKTUR_UTAMA' ; %>
 
                 <% if (canApprove && !isPimpinanBlocked) { %>
                   <div class="pt-6 border-t border-slate-200/60 flex flex-col gap-4">
@@ -209,7 +209,7 @@
                 ? 'bg-amber-50 text-amber-600 border-amber-200'
                 : 'bg-blue-50 text-blue-600 border-blue-200'
               %>">
-                          <%= trip.delegation?.active ? 'HR (DELEGATED)' : trip.currentStep %>
+                          <%= trip.delegation?.active ? 'Wakil Direktur (DELEGATED)' : trip.currentStep %>
                         </span>
                       </div>
                       <% } %>
@@ -222,14 +222,14 @@
                                 Pendelegasian Berkas Otoritas
                               </h4>
                               <p class="text-[11px] text-slate-400 leading-normal">
-                                Alihkan peninjauan data anggaran ke departemen HR untuk pemeriksaan berkas fisik.
+                                Alihkan peninjauan data anggaran ke departemen Wakil Direktur untuk pemeriksaan berkas fisik.
                               </p>
                             </div>
 
                             <form method="POST" action="/trip/<%= trip._id %>/delegate" class="flex-shrink-0">
                               <button type="submit"
                                 class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-amber-50/50 text-amber-600 hover:text-amber-700 border border-amber-200 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all shadow-sm shadow-amber-50 active:scale-[0.98] cursor-pointer">
-                                Delegasikan ke HR
+                                Delegasikan ke Wakil Direktur
                               </button>
                             </form>
                           </div>

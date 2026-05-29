@@ -63,4 +63,10 @@ const attendanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+attendanceSchema.index({ userId: 1, checkIn: -1 }, { name: "idx_userId_checkIn" });
+
+attendanceSchema.index({ checkIn: -1, userId: 1 }, { name: "idx_checkIn_userId" });
+
+attendanceSchema.index({ status: 1, checkIn: -1 }, { name: "idx_status_checkIn" });
+
 export default mongoose.model("Attendance", attendanceSchema);

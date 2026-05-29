@@ -10,7 +10,7 @@ const employeeCareerSchema = new mongoose.Schema(
     status_pegawai: {
       type: String,
       enum: ["Tetap", "Kontrak", "Magang"],
-      required: true,
+      required: false,
     },
     tanggal_mulai_bergabung: {
       type: Date,

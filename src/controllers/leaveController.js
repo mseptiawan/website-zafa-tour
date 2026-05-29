@@ -399,7 +399,6 @@ export const generateOrResetLeaveBalance = async (req, res) => {
       })
     );
 
-
     return res.redirect(`/leave/manage-requests?tab=balances&status=success&year=${selectedYear}`);
   } catch (error) {
     console.error("Error Generate/Reset Leave Balance:", error);
@@ -600,10 +599,14 @@ export const getLeaveDetail = async (req, res) => {
         populate: [
           {
             path: "employeeData",
-            select: "fullName unitId",
+            select: "fullName",
             populate: {
-              path: "unitId",
-              select: "name",
+              path: "careerData",
+              select: "unitId",
+              populate: {
+                path: "unitId",
+                select: "name",
+              },
             },
           },
           {
@@ -618,6 +621,7 @@ export const getLeaveDetail = async (req, res) => {
           select: "fullName",
         },
       });
+
     const workflows = await LeaveApproval.find({ leaveId: req.params.id })
       .populate({
         path: "approverId",
@@ -639,7 +643,6 @@ export const getLeaveDetail = async (req, res) => {
     res.status(500).render("error", { title: "get leave detail err", message: error.message });
   }
 };
-
 export const editLeave = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -788,12 +791,12 @@ export const requestCancelApprovedLeave = async (req, res) => {
       status: "PENDING",
     });
 
-    let targetStep = "WAKIL_DIREKTUR"; 
+    let targetStep = "WAKIL_DIREKTUR";
 
     const userRole = (sessionUser.role || "").toString().trim().toUpperCase();
 
     if (userRole === "PEGAWAI" || userRole === "MANAGER_KEUANGAN") {
-      targetStep = "MANAGER_ADMINISTRASI"; 
+      targetStep = "MANAGER_ADMINISTRASI";
     } else if (userRole === "WAKIL_DIREKTUR") {
       targetStep = "DIREKTUR_UTAMA";
     }

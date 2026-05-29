@@ -1,130 +1,113 @@
-import Bidang from "../models/basic/Bidang.js";
-import Unit from "../models/basic/Unit.js";
-import Position from "../models/basic/Position.js";
+import * as orgService from "../services/organization.service.js";
+import { validateData } from "../utils/validateData.js";
+import { bidangSchema, unitSchema, positionSchema } from "../validations/organization.schema.js";
 
-export const getWorkspace = async (req, res) => {
+// === WORKSPACE ===
+export const getWorkspace = async (req, res, next) => {
   try {
-    const listBidang = await Bidang.find().sort({ createdAt: -1 });
-    const listUnit = await Unit.find().populate("bidangId").sort({ createdAt: -1 });
-    const listPosition = await Position.find().sort({ createdAt: -1 });
-
+    const data = await orgService.fetchWorkspaceData();
     res.render("organization/index", {
       title: "Konfigurasi Struktur Perusahaan",
       user: req.session.user,
-      listBidang,
-      listUnit,
-      listPosition,
+      ...data,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
-export const createBidang = async (req, res) => {
+// === BIDANG CONTROLLERS ===
+export const createBidang = async (req, res, next) => {
   try {
-    const { name } = req.body;
-    const existing = await Bidang.findOne({ name });
-    if (existing)
-      return res.status(400).json({ success: false, message: "Nama bidang sudah digunakan" });
-
-    const newBidang = await Bidang.create({ name });
+    const validatedBody = validateData(bidangSchema, req.body);
+    const newBidang = await orgService.addBidang(validatedBody);
     res.status(201).json({ success: true, data: newBidang });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const updateBidang = async (req, res) => {
+export const updateBidang = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
-    await Bidang.findByIdAndUpdate(id, { name });
+    const validatedBody = validateData(bidangSchema, req.body);
+    await orgService.editBidang(id, validatedBody);
     res.json({ success: true, message: "Bidang berhasil diperbarui" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const deleteBidang = async (req, res) => {
+export const deleteBidang = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const isUsed = await Unit.findOne({ bidangId: id });
-    if (isUsed) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Gagal! Bidang masih digunakan oleh Sub-Unit." });
-    }
-    await Bidang.findByIdAndDelete(id);
+    await orgService.removeBidang(id);
     res.json({ success: true, message: "Bidang berhasil dihapus" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const createUnit = async (req, res) => {
+// === UNIT CONTROLLERS ===
+export const createUnit = async (req, res, next) => {
   try {
-    const { bidangId, name, description } = req.body;
-    const newUnit = await Unit.create({ bidangId, name, description });
-    const populatedUnit = await Unit.findById(newUnit._id).populate("bidangId");
+    const validatedBody = validateData(unitSchema, req.body);
+    const populatedUnit = await orgService.addUnit(validatedBody);
     res.status(201).json({ success: true, data: populatedUnit });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const updateUnit = async (req, res) => {
+export const updateUnit = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
-    await Unit.findByIdAndUpdate(id, { name, description });
+    const validatedBody = validateData(unitSchema, req.body);
+    await orgService.editUnit(id, validatedBody);
     res.json({ success: true, message: "Sub-Unit berhasil diperbarui" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const deleteUnit = async (req, res) => {
+export const deleteUnit = async (req, res, next) => {
   try {
     const { id } = req.params;
-    await Unit.findByIdAndDelete(id);
+    await orgService.removeUnit(id);
     res.json({ success: true, message: "Sub-Unit berhasil dihapus" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const createPosition = async (req, res) => {
+// === POSITION CONTROLLERS ===
+export const createPosition = async (req, res, next) => {
   try {
-    const { name, description } = req.body;
-    const existing = await Position.findOne({ name });
-    if (existing)
-      return res.status(400).json({ success: false, message: "Nama jabatan sudah digunakan" });
-
-    const newPost = await Position.create({ name, description });
+    const validatedBody = validateData(positionSchema, req.body);
+    const newPost = await orgService.addPosition(validatedBody);
     res.status(201).json({ success: true, data: newPost });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const updatePosition = async (req, res) => {
+export const updatePosition = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
-    await Position.findByIdAndUpdate(id, { name, description });
+    const validatedBody = validateData(positionSchema, req.body);
+    await orgService.editPosition(id, validatedBody);
     res.json({ success: true, message: "Jabatan berhasil diperbarui" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-export const deletePosition = async (req, res) => {
+export const deletePosition = async (req, res, next) => {
   try {
     const { id } = req.params;
-    await Position.findByIdAndDelete(id);
+    await orgService.removePosition(id);
     res.json({ success: true, message: "Jabatan berhasil dihapus" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };

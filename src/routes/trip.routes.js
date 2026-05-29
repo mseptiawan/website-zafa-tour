@@ -38,9 +38,9 @@ router.post("/:id/resubmit", resubmit);
 router.post("/:id/start", authMiddleware, startTrip);
 router.get("/:id/report", authMiddleware, reportTripPage);
 router.post("/:id/report", authMiddleware, uploadFile.single("attachments"), submitTripReport);
-router.get("/approval", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalPage);
+router.get("/approval", roleMiddleware(["WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"]), approvalPage);
 
-router.get("/approval/:id", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), approvalDetailPage);
+router.get("/approval/:id", roleMiddleware(["WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"]), approvalDetailPage);
 
 router.post("/approval/:id", handleApproval);
 

@@ -46,7 +46,7 @@ export const applyOvertime = async (req, res) => {
 
     const user = req.session.user;
 
-    const isManager = user.role === "MANAGER";
+    const isManager = user.role === "MANAGER_ADMINISTRASI";
 
     await Overtime.create({
       userId: user._id,

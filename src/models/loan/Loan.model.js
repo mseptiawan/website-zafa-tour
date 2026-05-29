@@ -42,4 +42,10 @@ const loanSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index
+loanSchema.index({ employeeId: 1 });
+loanSchema.index({ status: 1 });
+loanSchema.index({ employeeId: 1, status: 1 });
+loanSchema.index({ createdAt: -1 });
+
 export default mongoose.model("Loan", loanSchema);

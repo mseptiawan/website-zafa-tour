@@ -250,10 +250,10 @@
               <i class="fa-solid fa-calendar-plus text-blue-600"></i> Tambah Hari Libur
             </h3>
 
-            <% if (user.role !=='HR' ) { %>
+            <% if (user.role !=='WAKIL_DIREKTUR' ) { %>
               <div class="p-3 bg-amber-50/70 rounded-lg text-[11px] text-amber-800 border border-amber-200/50 mb-3">
                 <i class="fa-solid fa-circle-info text-amber-600"></i> Form dinonaktifkan. Hanya divisi/role
-                <strong>HR</strong> yang memiliki hak modifikasi kalender perusahaan.
+                <strong>WAKIL_DIREKTUR</strong> yang memiliki hak modifikasi kalender perusahaan.
               </div>
               <% } %>
 
@@ -266,7 +266,7 @@
                       Libur / Agenda</label>
                     <input type="text" name="name" id="form-name" required placeholder="Contoh: Cuti Bersama Lebaran"
                       class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800"
-                      <%=user.role !=='HR' ? 'disabled' : '' %>>
+                      <%=user.role !=='WAKIL_DIREKTUR' ? 'disabled' : '' %>>
                   </div>
 
                   <div class="grid grid-cols-2 gap-3">
@@ -275,14 +275,14 @@
                         Tanggal</label>
                       <input type="date" name="date" id="form-date" required
                         class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800"
-                        <%=user.role !=='HR' ? 'disabled' : '' %>>
+                        <%=user.role !=='WAKIL_DIREKTUR' ? 'disabled' : '' %>>
                     </div>
                     <div>
                       <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Selesai
                         (Opsional)</label>
                       <input type="date" name="endDate" id="form-enddate"
                         class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800"
-                        <%=user.role !=='HR' ? 'disabled' : '' %>>
+                        <%=user.role !=='WAKIL_DIREKTUR' ? 'disabled' : '' %>>
                     </div>
                   </div>
 
@@ -291,7 +291,7 @@
                       Libur</label>
                     <select name="type" id="form-type" required
                       class="w-full rounded-lg border-slate-200 border p-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800"
-                      <%=user.role !=='HR' ? 'disabled' : '' %>>
+                      <%=user.role !=='WAKIL_DIREKTUR' ? 'disabled' : '' %>>
                       <option value="NATIONAL">Nasional (Tanggal Merah)</option>
                       <option value="COMPANY">Internal Perusahaan</option>
                       <option value="RELIGIOUS">Keagamaan</option>
@@ -301,7 +301,7 @@
                   <div class="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-100 text-xs">
                     <label class="flex items-center gap-2 text-slate-700 cursor-pointer font-medium">
                       <input type="checkbox" name="isDeductLeave" id="form-deduct" value="true"
-                        class="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20" <%=user.role !=='HR'
+                        class="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20" <%=user.role !=='WAKIL_DIREKTUR'
                         ? 'disabled' : '' %>>
                       <span>Potong Kuota Cuti Tahunan?</span>
                     </label>
@@ -316,13 +316,13 @@
                       class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Keterangan</label>
                     <textarea name="description" id="form-description" rows="2" placeholder="Catatan opsional..."
                       class="w-full rounded-lg border-slate-200 border p-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none placeholder-slate-400 text-slate-800"
-                      <%=user.role !=='HR' ? 'disabled' : '' %>></textarea>
+                      <%=user.role !=='WAKIL_DIREKTUR' ? 'disabled' : '' %>></textarea>
                   </div>
 
                   <div class="flex flex-col gap-2">
                     <button type="submit" id="form-submit-btn"
                       class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs shadow-sm transition duration-150 flex items-center justify-center gap-1.5"
-                      <%=user.role !=='HR' ? 'disabled' : 'style=cursor:pointer' %>>
+                      <%=user.role !=='WAKIL_DIREKTUR' ? 'disabled' : 'style=cursor:pointer' %>>
                       <i class="fa-solid fa-floppy-disk"></i> Simpan Agenda
                     </button>
                     <button type="button" id="form-cancel-btn" onclick="resetFormToCreate()"
@@ -401,8 +401,8 @@
               </div>
             </div>
 
-            <% const isHR=user && user.role==='HR' ; %>
-              <% if (isHR) { %>
+            <% const isWakilDirektur=user && user.role==='WAKIL_DIREKTUR' ; %>
+              <% if (isWakilDirektur) { %>
                 <div class="flex items-center gap-1">
                   <!-- Tombol Edit -->
                   <button type="button"

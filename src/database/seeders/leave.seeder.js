@@ -154,13 +154,13 @@ export default async function leaveSeeder() {
       const otherUsers = users.filter((u) => u._id.toString() !== user._id.toString());
 
       const managerUser =
-        users.find((u) => u.roleId && u.roleId.name === "MANAGER") ||
+        users.find((u) => u.roleId && u.roleId.name === "MANAGER_ADMINISTRASI") ||
         (otherUsers.length ? otherUsers[0] : user);
       const hrUser =
-        users.find((u) => u.roleId && u.roleId.name === "HR") ||
+        users.find((u) => u.roleId && u.roleId.name === "WAKIL_DIREKTUR") ||
         (otherUsers.length ? otherUsers[1] : user);
       const pimpinanUser =
-        users.find((u) => u.roleId && u.roleId.name === "PIMPINAN") ||
+        users.find((u) => u.roleId && u.roleId.name === "DIREKTUR_UTAMA") ||
         (otherUsers.length ? otherUsers[2] : user);
 
       const userRoleName = (user.roleId ? user.roleId.name : "STAFF").toUpperCase();
@@ -187,14 +187,14 @@ export default async function leaveSeeder() {
         }
 
         if (userRoleName === "STAFF" || userRoleName === "EMPLOYEE") {
-          approvalSteps.push({ step: "MANAGER", approver: managerUser });
-          approvalSteps.push({ step: "HR", approver: hrUser });
-        } else if (userRoleName === "MANAGER") {
-          approvalSteps.push({ step: "HR", approver: hrUser });
-        } else if (userRoleName === "HR") {
-          approvalSteps.push({ step: "PIMPINAN", approver: pimpinanUser });
+          approvalSteps.push({ step: "MANAGER_ADMINISTRASI", approver: managerUser });
+          approvalSteps.push({ step: "WAKIL_DIREKTUR", approver: hrUser });
+        } else if (userRoleName === "MANAGER_ADMINISTRASI") {
+          approvalSteps.push({ step: "WAKIL_DIREKTUR", approver: hrUser });
+        } else if (userRoleName === "WAKIL_DIREKTUR") {
+          approvalSteps.push({ step: "DIREKTUR_UTAMA", approver: pimpinanUser });
         } else {
-          approvalSteps.push({ step: "HR", approver: hrUser });
+          approvalSteps.push({ step: "WAKIL_DIREKTUR", approver: hrUser });
         }
 
         if (status === "PENDING") {
@@ -315,10 +315,11 @@ export default async function leaveSeeder() {
 
           approvalsToInsert.push({
             leaveId,
-            step: userRoleName === "MANAGER" ? "HR" : "MANAGER",
-            approverId: userRoleName === "MANAGER" ? hrUser._id : managerUser._id,
+            step:
+              userRoleName === "MANAGER_ADMINISTRASI" ? "WAKIL_DIREKTUR" : "MANAGER_ADMINISTRASI",
+            approverId: userRoleName === "MANAGER_ADMINISTRASI" ? hrUser._id : managerUser._id,
             status: "PENDING",
-            note: "Persetujuan pembatalan disetujui oleh Manager, menunggu verifikasi akhir HR.",
+            note: "Persetujuan pembatalan disetujui oleh Manager, menunggu verifikasi akhir wakil direktur",
           });
 
           cancellationsToInsert.push({

@@ -79,8 +79,8 @@
                             <i class="fa-solid fa-briefcase text-slate-400 text-[10px]"></i>
                             Unit:
                             <span class="text-slate-700 font-semibold">
-                              <%= (leave.userId && leave.userId.employeeData && leave.userId.employeeData.unitId) ?
-                                leave.userId.employeeData.unitId.name : 'Tidak Ada' %>
+                              <%= (leave.userId && leave.userId.employeeData && leave.careerData?.unitId.name) ?
+                                leave.careerData.unitId.name : 'Tidak Ada' %>
                             </span>
                           </span>
 

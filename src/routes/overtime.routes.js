@@ -24,32 +24,28 @@ router.get("/overtime/my", authMiddleware, myOvertime);
 router.get(
   "/overtime/approval/history",
   authMiddleware,
-  roleMiddleware("MANAGER"),
+  roleMiddleware("MANAGER_ADMINISTRASI"),
   approvalOvertimeHistory
 );
 router.get(
   "/overtime/approval",
   authMiddleware,
-  roleMiddleware(["HR", "MANAGER"]),
+  roleMiddleware(["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR"]),
   approvalOvertimePage
 );
 
 router.post(
   "/overtime/approval/:id/manager",
   authMiddleware,
-  roleMiddleware("MANAGER"),
+  roleMiddleware("MANAGER_ADMINISTRASI"),
   approveManagerOvertime
 );
 router.post(
   "/overtime/approval/:id/reject",
   authMiddleware,
-  roleMiddleware("MANAGER"),
+  roleMiddleware("MANAGER_ADMINISTRASI"),
   rejectOvertime
 );
-
-// router.get("/report/overtime", authMiddleware, getReportPage);
-// router.get("/report/overtime/export/excel", authMiddleware, exportExcel);
-// router.get("/report/overtime/export/pdf", authMiddleware, exportPDF);
 
 router.get("/overtime/:id", authMiddleware, detailOvertime);
 
