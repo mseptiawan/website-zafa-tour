@@ -2,18 +2,18 @@
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-4xl mx-auto">
-    
-    <!-- BACK BUTTON -->
+
     <div class="mb-6">
       <a href="/kpi/history-list" class="text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-2 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
         Kembali ke Daftar
       </a>
     </div>
 
 
-    
-    <!-- HEADER CARD -->
+
     <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm mb-6 flex justify-between items-start">
       <div>
         <h1 class="text-2xl font-bold text-slate-800"><%= kpi.employeeId.fullName %></h1>
@@ -23,14 +23,13 @@
           <%= kpi.status %>
         </div>
       </div>
-      
+
       <div class="text-center">
         <div class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Skor Akhir</div>
         <div class="text-5xl font-extrabold text-indigo-600"><%= kpi.totalKpiScore %></div>
       </div>
     </div>
 
-    <!-- TABLE CARD -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">

@@ -1,9 +1,9 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
-    <div class="max-w-6xl mx-auto"> <!-- Diperlebar ke max-w-6xl agar layout 2 kolom lebih leluasa -->
+<div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
+  <div class="max-w-6xl mx-auto">
 
-      <% // Cek apakah user saat ini adalah orang yang harus memproses persetujuan (approver / delegasi) const
+    <% 
         isApproverView=approvals.some(app=> {
         if (app.status !== 'PENDING') return false;
         if (app.step === 'HANDOVER') {
@@ -13,93 +13,83 @@
         return (app.step || '').toUpperCase() === (user.role || '').toUpperCase();
         });
 
-        // Tentukan arah link kembali secara dinamis
-        // Jaga-jaga jika diakses dari halaman Pusat Manajemen Cuti (HR/Manager/Pimpinan)
         const APPROVER_ROLES = ["MANAGER", "HR", "PIMPINAN", "GENERAL_MANAGER"];
         const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
         const backLink = isManagement ? '/leave/manage-requests' : (isApproverView ? '/leave/my-delegations' :
         '/leave/my-history');
         %>
 
-        <a href="<%= backLink %>"
-          class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
-          <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
-            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Kembali
-        </a>
-        <!-- RESUBMIT ACTION AREA (IF REJECTED) - Tetap Full Width di Atas -->
-        <% if ((leave.status==='REJECTED' || leave.status==='CANCELED' ) && leave.userId &&
+    <a href="<%= backLink %>" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
+      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      Kembali
+    </a>
+    <% if ((leave.status==='REJECTED' || leave.status==='CANCELED' ) && leave.userId &&
           leave.userId._id.toString()===user._id.toString()) { %>
-          <div
-            class="border border-blue-100 bg-blue-50/30 rounded-xl p-5 flex items-center justify-between mb-6 shadow-[0_1px_3px_rgba(15,23,42,0.03)]">
-            <div>
-              <h2 class="text-sm font-semibold text-blue-900">Pengajuan Dihentikan</h2>
-              <p class="text-[13px] text-blue-700/90 mt-0.5">
-                Anda dapat melakukan penyesuaian data dan mengirim ulang berkas ini kembali.
-              </p>
-            </div>
-            <a href="/leave/resubmit/<%= leave._id %>"
-              class="px-4 py-2 bg-blue-600 text-white text-[13px] font-medium rounded-lg hover:bg-blue-700 transition shadow-sm focus:ring-4 focus:ring-blue-50">
-              Resubmit Pengajuan
-            </a>
-          </div>
-          <% } %>
+    <div class="border border-blue-100 bg-blue-50/30 rounded-xl p-5 flex items-center justify-between mb-6 shadow-[0_1px_3px_rgba(15,23,42,0.03)]">
+      <div>
+        <h2 class="text-sm font-semibold text-blue-900">Pengajuan Dihentikan</h2>
+        <p class="text-[13px] text-blue-700/90 mt-0.5">
+          Anda dapat melakukan penyesuaian data dan mengirim ulang berkas ini kembali.
+        </p>
+      </div>
+      <a href="/leave/resubmit/<%= leave._id %>" class="px-4 py-2 bg-blue-600 text-white text-[13px] font-medium rounded-lg hover:bg-blue-700 transition shadow-sm focus:ring-4 focus:ring-blue-50">
+        Resubmit Pengajuan
+      </a>
+    </div>
+    <% } %>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-              <div class="lg:col-span-2 space-y-6">
+      <div class="lg:col-span-2 space-y-6">
 
-                <div
-                  class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-                  <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
-                    <div class="flex items-center gap-4">
-                      <div
-                        class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-500 shrink-0">
-                        <i class="fa-solid fa-user-gear text-sm"></i>
-                      </div>
-                      <div>
-                        <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-2">
-                          <%= (leave.userId && leave.userId.employeeData) ? leave.userId.employeeData.fullName
+        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-500 shrink-0">
+                <i class="fa-solid fa-user-gear text-sm"></i>
+              </div>
+              <div>
+                <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-2">
+                  <%= (leave.userId && leave.userId.employeeData) ? leave.userId.employeeData.fullName
                             : 'Detail Pengajuan Cuti' %>
-                        </h1>
+                </h1>
 
-                        <p class="text-[11px] text-slate-400 font-medium mb-1.5 leading-none">
-                          Tujuan Dokumen:
-                          <span
-                            class="font-bold <%= leave.status === 'CANCELLATION_PENDING' ? 'text-amber-600' : 'text-slate-900' %>">
-                            <%= leave.status==='CANCELLATION_PENDING' ? 'Permohonan Pembatalan Cuti'
+                <p class="text-[11px] text-slate-400 font-medium mb-1.5 leading-none">
+                  Tujuan Dokumen:
+                  <span class="font-bold <%= leave.status === 'CANCELLATION_PENDING' ? 'text-amber-600' : 'text-slate-900' %>">
+                    <%= leave.status==='CANCELLATION_PENDING' ? 'Permohonan Pembatalan Cuti'
                               : 'Permohonan Cuti Baru' %>
-                          </span>
-                        </p>
+                  </span>
+                </p>
 
-                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium mt-2">
-                          <span class="text-slate-500 flex items-center gap-1">
-                            <i class="fa-solid fa-briefcase text-slate-400 text-[10px]"></i>
-                            Unit:
-                            <span class="text-slate-700 font-semibold">
-                              <%= (leave.userId && leave.userId.employeeData && leave.careerData?.unitId.name) ?
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium mt-2">
+                  <span class="text-slate-500 flex items-center gap-1">
+                    <i class="fa-solid fa-briefcase text-slate-400 text-[10px]"></i>
+                    Unit:
+                    <span class="text-slate-700 font-semibold">
+                      <%= (leave.userId && leave.userId.employeeData && leave.careerData?.unitId.name) ?
                                 leave.careerData.unitId.name : 'Tidak Ada' %>
-                            </span>
-                          </span>
+                    </span>
+                  </span>
 
-                          <span class="text-slate-300 hidden sm:inline">•</span>
+                  <span class="text-slate-300 hidden sm:inline">•</span>
 
-                          <span class="text-slate-500 flex items-center gap-1">
-                            <i class="fa-solid fa-clock-rotate-left text-slate-400 text-[10px]"></i>
-                            Sisa Kuota:
-                            <span class="px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-700 tabular-nums">
-                              <%= (leave.userId && leave.userId.leaveBalanceData) ?
+                  <span class="text-slate-500 flex items-center gap-1">
+                    <i class="fa-solid fa-clock-rotate-left text-slate-400 text-[10px]"></i>
+                    Sisa Kuota:
+                    <span class="px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-700 tabular-nums">
+                      <%= (leave.userId && leave.userId.leaveBalanceData) ?
                                 leave.userId.leaveBalanceData.remaining : '0' %> Hari
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
 
-                    <div>
-                      <span class="text-[10px] px-3 py-1 rounded-full font-semibold uppercase tracking-wider border
+            <div>
+              <span class="text-[10px] px-3 py-1 rounded-full font-semibold uppercase tracking-wider border
             <%= leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200'
               : leave.status === 'CANCELLATION_PENDING' ? 'bg-orange-50 text-orange-700 border-orange-200'
               : leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -107,107 +97,101 @@
               : leave.status === 'CANCELLED' || leave.status === 'CANCELED' ? 'bg-slate-100 text-slate-600 border-slate-300'
               : 'bg-purple-50 text-purple-700 border-purple-200/50'
             %>">
-                        <%= leave.status==='CANCELLATION_PENDING' ? 'MINTA BATAL' : leave.status %>
-                      </span>
-                    </div>
-                  </div>
+                <%= leave.status==='CANCELLATION_PENDING' ? 'MINTA BATAL' : leave.status %>
+              </span>
+            </div>
+          </div>
 
-                  <div class="p-8 space-y-8">
+          <div class="p-8 space-y-8">
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
-                      <div>
-                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tipe /
-                          Jenis Cuti</div>
-                        <div class="text-[15px] font-semibold text-slate-900">
-                          <%= leave.leaveTypeId.name %>
-                        </div>
-                      </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tipe /
+                  Jenis Cuti</div>
+                <div class="text-[15px] font-semibold text-slate-900">
+                  <%= leave.leaveTypeId.name %>
+                </div>
+              </div>
 
-                      <div>
-                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Total
-                          Durasi</div>
-                        <div class="text-[15px] font-bold text-slate-900 tabular-nums">
-                          <%= leave.totalDays %> Hari Kerja
-                        </div>
-                      </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Total
+                  Durasi</div>
+                <div class="text-[15px] font-bold text-slate-900 tabular-nums">
+                  <%= leave.totalDays %> Hari Kerja
+                </div>
+              </div>
 
-                      <div>
-                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal
-                          Mulai Cuti</div>
-                        <div class="text-[15px] font-semibold text-slate-900">
-                          <%= leave.startDate ? new Date(leave.startDate).toLocaleDateString('id-ID', { day: '2-digit' ,
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal
+                  Mulai Cuti</div>
+                <div class="text-[15px] font-semibold text-slate-900">
+                  <%= leave.startDate ? new Date(leave.startDate).toLocaleDateString('id-ID', { day: '2-digit' ,
                             month: 'long' , year: 'numeric' }) : '-' %>
-                        </div>
-                      </div>
+                </div>
+              </div>
 
-                      <div>
-                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal
-                          Selesai Cuti</div>
-                        <div class="text-[15px] font-semibold text-slate-900">
-                          <%= leave.endDate ? new Date(leave.endDate).toLocaleDateString('id-ID', { day: '2-digit' ,
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal
+                  Selesai Cuti</div>
+                <div class="text-[15px] font-semibold text-slate-900">
+                  <%= leave.endDate ? new Date(leave.endDate).toLocaleDateString('id-ID', { day: '2-digit' ,
                             month: 'long' , year: 'numeric' }) : '-' %>
-                        </div>
-                      </div>
+                </div>
+              </div>
 
-                      <div class="sm:col-span-2 pt-2">
-                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Delegasi
-                          Tugas (Handover To)</div>
-                        <div class="text-[14px] font-medium text-slate-800 flex items-center gap-2">
-                          <i class="fa-solid fa-handshake-angle text-slate-400 text-xs"></i>
-                          <span class="truncate font-semibold text-slate-900">
-                            <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ?
+              <div class="sm:col-span-2 pt-2">
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Delegasi
+                  Tugas (Handover To)</div>
+                <div class="text-[14px] font-medium text-slate-800 flex items-center gap-2">
+                  <i class="fa-solid fa-handshake-angle text-slate-400 text-xs"></i>
+                  <span class="truncate font-semibold text-slate-900">
+                    <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ?
                               leave.handoverUserId.employeeData.fullName : 'Tidak ada delegasi tugas' %>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                  </span>
+                </div>
+              </div>
+            </div>
 
-                    <div class="relative pl-5 border-l-2 border-slate-200">
-                      <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Alasan /
-                        Kepentingan Cuti</div>
-                      <p class="text-[13px] text-slate-600 leading-relaxed italic whitespace-pre-line">"<%= leave.reason
+            <div class="relative pl-5 border-l-2 border-slate-200">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Alasan /
+                Kepentingan Cuti</div>
+              <p class="text-[13px] text-slate-600 leading-relaxed italic whitespace-pre-line">"<%= leave.reason
                           || '-' %>"</p>
-                    </div>
+            </div>
 
-                    <div class="pt-6 border-t border-slate-100">
-                      <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Lampiran
-                        Dokumen Pendukung</div>
-                      <% if (leave.documentPath) { %>
-                        <div
-                          class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors">
-                          <div class="flex items-center gap-3 min-w-0">
-                            <div
-                              class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
-                              <i class="fa-solid fa-file-pdf text-[12px]"></i>
-                            </div>
-                            <div class="min-w-0">
-                              <span
-                                class="text-[12px] font-medium text-slate-700 truncate block">Berkas_Lampiran_Cuti.pdf</span>
-                            </div>
-                          </div>
-                          <a href="<%= leave.documentPath %>" target="_blank"
-                            class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg tracking-wider">
-                            VIEW
-                          </a>
-                        </div>
-                        <% } else { %>
-                          <div
-                            class="flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200">
-                            <div
-                              class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3">
-                              <i class="fa-solid fa-file-circle-xmark text-slate-400 text-base"></i>
-                            </div>
-                            <h4 class="text-xs font-semibold text-slate-600 mb-0.5">Tidak ada lampiran berkas</h4>
-                            <p class="text-[11px] text-slate-400 text-center max-w-[220px]">Pengajuan ini dikirim tanpa
-                              dokumen pendukung.</p>
-                          </div>
-                          <% } %>
-                    </div>
-
+            <div class="pt-6 border-t border-slate-100">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Lampiran
+                Dokumen Pendukung</div>
+              <% if (leave.documentPath) { %>
+              <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
+                    <i class="fa-solid fa-file-pdf text-[12px]"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <span class="text-[12px] font-medium text-slate-700 truncate block">Berkas_Lampiran_Cuti.pdf</span>
                   </div>
                 </div>
+                <a href="<%= leave.documentPath %>" target="_blank" class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg tracking-wider">
+                  VIEW
+                </a>
+              </div>
+              <% } else { %>
+              <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200">
+                <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3">
+                  <i class="fa-solid fa-file-circle-xmark text-slate-400 text-base"></i>
+                </div>
+                <h4 class="text-xs font-semibold text-slate-600 mb-0.5">Tidak ada lampiran berkas</h4>
+                <p class="text-[11px] text-slate-400 text-center max-w-[220px]">Pengajuan ini dikirim tanpa
+                  dokumen pendukung.</p>
+              </div>
+              <% } %>
+            </div>
 
-                <% const activeApproval=approvals.find(app=> {
+          </div>
+        </div>
+
+        <% const activeApproval=approvals.find(app=> {
                   if (app.status !== 'PENDING') return false;
                   if (app.step === 'HANDOVER') {
                   return (
@@ -220,121 +204,110 @@
                   });
                   %>
 
-            <% if (activeApproval) { %>
-                    <div
-                      class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
+        <% if (activeApproval) { %>
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
 
-                      <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
-                        <div
-                          class="w-9 h-9 rounded-xl <%= leave.status === 'CANCELLATION_PENDING' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600' %> flex items-center justify-center">
-                          <i class="fa-solid fa-check-double"></i>
-                        </div>
-                        <div>
-                          <div class="text-sm font-semibold text-slate-900 leading-none mb-1">
-                            <%= leave.status==='CANCELLATION_PENDING' ? 'Tinjauan Pembatalan Cuti'
+          <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl <%= leave.status === 'CANCELLATION_PENDING' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600' %> flex items-center justify-center">
+              <i class="fa-solid fa-check-double"></i>
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-slate-900 leading-none mb-1">
+                <%= leave.status==='CANCELLATION_PENDING' ? 'Tinjauan Pembatalan Cuti'
                               : 'Evaluasi & Otorisasi Cuti' %>
-                          </div>
-                          <div class="text-[11px] font-medium text-slate-400">Bertindak selaku: <span
-                              class="font-bold text-slate-600">
-                              <%= activeApproval.step %>
-                            </span></div>
-                        </div>
-                      </h3>
+              </div>
+              <div class="text-[11px] font-medium text-slate-400">Bertindak selaku: <span class="font-bold text-slate-600">
+                  <%= activeApproval.step %>
+                </span></div>
+            </div>
+          </h3>
 
-                      <textarea id="reviewNote" name="note" rows="4"
-                        placeholder="<%= leave.status === 'CANCELLATION_PENDING' ? 'Masukkan catatan mengevaluasi pembatalan cuti...' : 'Masukkan catatan evaluasi persetujuan...' %>"
-                        class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 focus:ring-2 focus:ring-blue-500/20 focus:border-transparent outline-none transition resize-none focus:bg-white"
-                        oninput="document.querySelectorAll('.sync-note').forEach(input => input.value = this.value)"></textarea>
+          <textarea id="reviewNote" name="note" rows="4" placeholder="<%= leave.status === 'CANCELLATION_PENDING' ? 'Masukkan catatan mengevaluasi pembatalan cuti...' : 'Masukkan catatan evaluasi persetujuan...' %>" class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 focus:ring-2 focus:ring-blue-500/20 focus:border-transparent outline-none transition resize-none focus:bg-white" oninput="document.querySelectorAll('.sync-note').forEach(input => input.value = this.value)"></textarea>
 
-                      <div class="flex items-center justify-end gap-3 mt-4 w-full">
-                        <% const approveUrl=activeApproval.step==='HANDOVER' ?
+          <div class="flex items-center justify-end gap-3 mt-4 w-full">
+            <% const approveUrl=activeApproval.step==='HANDOVER' ?
                           `/leave/delegation/approve/${activeApproval._id}` :
                           `/leave/approval/approve/${activeApproval._id}`; const
                           rejectUrl=activeApproval.step==='HANDOVER' ? `/leave/delegation/reject/${activeApproval._id}`
                           : `/leave/approval/reject/${activeApproval._id}`; %>
 
-                          <form action="<%= rejectUrl %>" method="POST" class="inline">
-                            <input type="hidden" name="note" class="sync-note" value="">
-                            <button type="submit"
-                              class="cursor-pointer px-5 py-2.5 border border-slate-200 bg-white text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition active:scale-[0.98] focus:outline-none">
-                              <%= leave.status==='CANCELLATION_PENDING' ? 'Tolak Pembatalan' : 'Tolak' %>
-                            </button>
-                          </form>
+            <form action="<%= rejectUrl %>" method="POST" class="inline">
+              <input type="hidden" name="note" class="sync-note" value="">
+              <button type="submit" class="cursor-pointer px-5 py-2.5 border border-slate-200 bg-white text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition active:scale-[0.98] focus:outline-none">
+                <%= leave.status==='CANCELLATION_PENDING' ? 'Tolak Pembatalan' : 'Tolak' %>
+              </button>
+            </form>
 
-                          <form action="<%= approveUrl %>" method="POST" class="inline">
-                            <input type="hidden" name="note" class="sync-note" value="">
-                            <button type="submit"
-                              class="cursor-pointer px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.98] focus:outline-none">
-                              <%= leave.status==='CANCELLATION_PENDING' ? 'Setujui Pembatalan' : 'Terima' %>
-                            </button>
-                          </form>
-                      </div>
+            <form action="<%= approveUrl %>" method="POST" class="inline">
+              <input type="hidden" name="note" class="sync-note" value="">
+              <button type="submit" class="cursor-pointer px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.98] focus:outline-none">
+                <%= leave.status==='CANCELLATION_PENDING' ? 'Setujui Pembatalan' : 'Terima' %>
+              </button>
+            </form>
+          </div>
 
-                    </div>
-                    <% } %>
+        </div>
+        <% } %>
 
-              </div>
+      </div>
 
-              <div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
-                <div class="mb-8">
-                  <h2 class="text-sm font-bold text-slate-900 tracking-tight">Jejak Log Pemeriksaan</h2>
-                  <p class="text-xs text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
-                </div>
+      <div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
+        <div class="mb-8">
+          <h2 class="text-sm font-bold text-slate-900 tracking-tight">Jejak Log Pemeriksaan</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
+        </div>
 
-                <div
-                  class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
+        <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
 
-                  <% approvals.forEach((app, index)=> { %>
-                    <div class="relative group">
+          <% approvals.forEach((app, index)=> { %>
+          <div class="relative group">
 
-                      <div
-                        class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center transition-colors shadow-sm
+            <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center transition-colors shadow-sm
           <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
-                        <span class="text-[8px] text-white font-bold">
-                          <%= index + 1 %>
-                        </span>
-                      </div>
+              <span class="text-[8px] text-white font-bold">
+                <%= index + 1 %>
+              </span>
+            </div>
 
-                      <div class="flex flex-col gap-1.5">
-                        <div class="flex items-center justify-between">
-                          <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase">
-                            <%= app.step %>
-                          </span>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase">
+                  <%= app.step %>
+                </span>
 
-                          <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border
               <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50' 
                 : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200/50' 
                 : 'bg-amber-50 text-amber-700 border-amber-200/50' %>">
-                            <%= app.status %>
-                          </span>
-                        </div>
-
-                        <div class="flex items-center gap-2 text-[11px]">
-                          <span class="font-medium text-slate-700">
-                            <%= (app.approverId && app.approverId.employeeData) ? app.approverId.employeeData.fullName
-                              : 'Sistem' %>
-                          </span>
-                          <span class="text-slate-300">|</span>
-                          <span class="text-slate-400">
-                            <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit' ,
-                              month: 'short' , hour: '2-digit' , minute:'2-digit'}) : 'Menunggu' %>
-                          </span>
-                        </div>
-
-                        <% if (app.note) { %>
-                          <div
-                            class="mt-2 text-[11px] text-slate-600 bg-slate-50 border border-slate-100/50 p-3 rounded-lg leading-relaxed italic">
-                            "<%= app.note %>"
-                          </div>
-                          <% } %>
-                      </div>
-
-                    </div>
-                    <% }) %>
-                </div>
+                  <%= app.status %>
+                </span>
               </div>
 
+              <div class="flex items-center gap-2 text-[11px]">
+                <span class="font-medium text-slate-700">
+                  <%= (app.approverId && app.approverId.employeeData) ? app.approverId.employeeData.fullName
+                              : 'Sistem' %>
+                </span>
+                <span class="text-slate-300">|</span>
+                <span class="text-slate-400">
+                  <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit' ,
+                              month: 'short' , hour: '2-digit' , minute:'2-digit'}) : 'Menunggu' %>
+                </span>
+              </div>
+
+              <% if (app.note) { %>
+              <div class="mt-2 text-[11px] text-slate-600 bg-slate-50 border border-slate-100/50 p-3 rounded-lg leading-relaxed italic">
+                "<%= app.note %>"
+              </div>
+              <% } %>
             </div>
 
+          </div>
+          <% }) %>
+        </div>
+      </div>
+
     </div>
+
   </div>
+</div>

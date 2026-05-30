@@ -21,184 +21,170 @@
 
         <% if (leaves && leaves.length > 0) { %>
 
-          <% leaves.forEach(l => { %>
+        <% leaves.forEach(l => { %>
 
-            <tr class="hover:bg-slate-50 transition">
+        <tr class="hover:bg-slate-50 transition">
 
-              <!-- USER -->
-              <td class="px-5 py-4">
-                <div class="flex items-center gap-3">
+          <!-- USER -->
+          <td class="px-5 py-4">
+            <div class="flex items-center gap-3">
 
 
-                  <div>
-                    <p class="font-medium text-slate-700">
-                      <%= l.employee?.fullName || 'Unknown' %>
-                    </p>
-
-                    <p class="text-xs text-slate-400">
-                      <%= l.employee?.employeeId || '-' %>
-                    </p>
-                  </div>
-
-                </div>
-              </td>
-
-              <!-- TYPE -->
-              <td class="px-5 py-4">
-                <div class="space-y-1">
-
-                  <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                    <%= l.type?.name || '-' %>
-                  </span>
-
-                  <p class="text-xs text-slate-400 truncate max-w-[220px]">
-                    <%= l.reason %>
-                  </p>
-
-                </div>
-              </td>
-
-              <!-- PERIODE -->
-              <td class="px-5 py-4 text-slate-600">
-
-                <div class="text-xs">
-                  <%= new Date(l.startDate).toLocaleDateString("id-ID") %>
-                  -
-                  <%= new Date(l.endDate).toLocaleDateString("id-ID") %>
-                </div>
-
-              </td>
-
-              <!-- DURASI -->
-              <td class="px-5 py-4 text-center">
-
-                <span class="text-sm font-semibold text-slate-700">
-                  <%= l.totalDays %>
-                </span>
-
-                <p class="text-[10px] text-slate-400">
-                  hari
+              <div>
+                <p class="font-medium text-slate-700">
+                  <%= l.employee?.fullName || 'Unknown' %>
                 </p>
 
-              </td>
+                <p class="text-xs text-slate-400">
+                  <%= l.employee?.employeeId || '-' %>
+                </p>
+              </div>
 
-              <!-- STATUS -->
-         <td class="px-5 py-4">
+            </div>
+          </td>
 
-  <div class="flex items-center gap-2 text-sm">
+          <!-- TYPE -->
+          <td class="px-5 py-4">
+            <div class="space-y-1">
 
-    <% if (l.status === "Approved") { %>
+              <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                <%= l.type?.name || '-' %>
+              </span>
 
-      <i
-        data-lucide="check-circle"
-        class="w-4 h-4 text-slate-500">
-      </i>
+              <p class="text-xs text-slate-400 truncate max-w-[220px]">
+                <%= l.reason %>
+              </p>
 
-      <span class="text-slate-600 font-medium">
-        Approved
-      </span>
+            </div>
+          </td>
 
-    <% } else if (l.status === "Rejected") { %>
+          <!-- PERIODE -->
+          <td class="px-5 py-4 text-slate-600">
 
-      <i
-        data-lucide="x-circle"
-        class="w-4 h-4 text-slate-500">
-      </i>
+            <div class="text-xs">
+              <%= new Date(l.startDate).toLocaleDateString("id-ID") %>
+              -
+              <%= new Date(l.endDate).toLocaleDateString("id-ID") %>
+            </div>
 
-      <span class="text-slate-600 font-medium">
-        Rejected
-      </span>
+          </td>
 
-    <% } else { %>
+          <!-- DURASI -->
+          <td class="px-5 py-4 text-center">
 
-      <i
-        data-lucide="clock"
-        class="w-4 h-4 text-slate-500">
-      </i>
+            <span class="text-sm font-semibold text-slate-700">
+              <%= l.totalDays %>
+            </span>
 
-      <span class="text-slate-600 font-medium">
+            <p class="text-[10px] text-slate-400">
+              hari
+            </p>
 
-        <% if (l.status === "Pending Manager") { %>
-          Menunggu Manager
+          </td>
 
-        <% } else if (l.status === "Pending HR") { %>
-          Menunggu HR
+          <!-- STATUS -->
+          <td class="px-5 py-4">
 
-        <% } else if (l.status === "Pending Pimpinan") { %>
-          Menunggu Pimpinan
+            <div class="flex items-center gap-2 text-sm">
+
+              <% if (l.status === "Approved") { %>
+
+              <i data-lucide="check-circle" class="w-4 h-4 text-slate-500">
+              </i>
+
+              <span class="text-slate-600 font-medium">
+                Approved
+              </span>
+
+              <% } else if (l.status === "Rejected") { %>
+
+              <i data-lucide="x-circle" class="w-4 h-4 text-slate-500">
+              </i>
+
+              <span class="text-slate-600 font-medium">
+                Rejected
+              </span>
+
+              <% } else { %>
+
+              <i data-lucide="clock" class="w-4 h-4 text-slate-500">
+              </i>
+
+              <span class="text-slate-600 font-medium">
+
+                <% if (l.status === "Pending Manager") { %>
+                Menunggu Manager
+
+                <% } else if (l.status === "Pending HR") { %>
+                Menunggu HR
+
+                <% } else if (l.status === "Pending Pimpinan") { %>
+                Menunggu Pimpinan
+
+                <% } else { %>
+                <%= l.status %>
+
+                <% } %>
+
+              </span>
+
+              <% } %>
+
+            </div>
+
+          </td>
+
+          <!-- ACTION -->
+          <td class="px-5 py-4">
+
+            <div class="flex justify-center gap-2">
+
+              <!-- APPROVE -->
+              <form action="/leave/approval/<%= l._id %>/<%= actionUrl %>" method="POST">
+
+                <button class="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+
+                  ✔
+
+                </button>
+
+              </form>
+
+              <!-- REJECT -->
+              <form action="/leave/approval/<%= l._id %>/reject" method="POST">
+
+                <button class="p-2 bg-white border border-rose-200 text-rose-500 rounded-lg hover:bg-rose-50 transition">
+
+                  ✕
+
+                </button>
+
+              </form>
+
+              <!-- DETAIL -->
+              <a href="/leave/<%= l._id %>" class="p-2 bg-white border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-50 transition">
+
+                👁
+
+              </a>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+        <% }) %>
 
         <% } else { %>
-          <%= l.status %>
 
-        <% } %>
+        <tr>
 
-      </span>
+          <td colspan="6" class="py-16 text-center text-slate-400">
+            Belum ada pengajuan cuti
+          </td>
 
-    <% } %>
-
-  </div>
-
-</td>
-
-              <!-- ACTION -->
-              <td class="px-5 py-4">
-
-                <div class="flex justify-center gap-2">
-
-                  <!-- APPROVE -->
-                  <form
-                    action="/leave/approval/<%= l._id %>/<%= actionUrl %>"
-                    method="POST">
-
-                    <button
-                      class="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-
-                      ✔
-
-                    </button>
-
-                  </form>
-
-                  <!-- REJECT -->
-                  <form
-                    action="/leave/approval/<%= l._id %>/reject"
-                    method="POST">
-
-                    <button
-                      class="p-2 bg-white border border-rose-200 text-rose-500 rounded-lg hover:bg-rose-50 transition">
-
-                      ✕
-
-                    </button>
-
-                  </form>
-
-                  <!-- DETAIL -->
-                  <a
-                    href="/leave/<%= l._id %>"
-                    class="p-2 bg-white border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-50 transition">
-
-                    👁
-
-                  </a>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          <% }) %>
-
-        <% } else { %>
-
-          <tr>
-
-            <td colspan="6" class="py-16 text-center text-slate-400">
-              Belum ada pengajuan cuti
-            </td>
-
-          </tr>
+        </tr>
 
         <% } %>
 

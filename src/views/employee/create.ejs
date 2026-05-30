@@ -2,32 +2,12 @@
 
 <div class="max-w-6xl mx-auto min-h-screen bg-white p-8 antialiased ml-72">
 
-  <!-- Header Section -->
-  <div class="flex items-end justify-between mb-10 pb-6 border-b border-slate-100">
-    <div>
-      <div class="mb-3 flex items-center gap-3">
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-          Area Kerja
-        </span>
-        <div class="h-3 w-px bg-slate-300"></div>
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-          Tambah Karyawan
-        </span>
-      </div>
-
-      <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-        Daftarkan Karyawan Baru
-      </h1>
-      <p class="mt-1.5 text-sm font-medium text-slate-500">
-        Langkah awal pembuatan akun kredensial dan penempatan posisi kerja staf baru.
-      </p>
-    </div>
-
-    <a href="/employee"
-       class="text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-md px-4 py-2 hover:bg-slate-50 hover:text-slate-800 transition-colors">
-      ← Kembali ke Daftar
-    </a>
-  </div>
+<%- include('../partials/page-header', {
+  section: 'Area Kerja',
+  module: 'Tambah Karyawan',
+  title: 'Daftarkan Karyawan Baru',
+  description: 'Langkah awal pembuatan akun kredensial dan penempatan posisi kerja staf baru.'
+}) %>
 
 <% if (typeof error !== 'undefined' && error && error !== 'null' && error !== null) { %>
   <div class="border-l-2 border-rose-500 bg-rose-50/50 text-rose-700 px-4 py-3 rounded-r-md text-xs mb-8 font-medium">
@@ -35,10 +15,8 @@
   </div>
 <% } %>
 
-  <!-- Main Form -->
   <form action="/api/employee/create" method="POST" class="space-y-10">
 
-    <!-- Section 1: Identitas Dasar -->
    <% const formErrors = typeof errors !== 'undefined' ? errors : {} %>
 <% const oldData = typeof old !== 'undefined' ? old : {} %>
 

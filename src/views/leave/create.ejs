@@ -1,156 +1,140 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
-    <div class="max-w-2xl mx-auto">
+  <div class="max-w-2xl mx-auto">
 
-      <div class="mb-8">
-        <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-          <span>Area Kerja</span>
-          <span class="text-slate-300">/</span>
-          <a href="/leave/my-history" class="hover:text-slate-600 transition">Permintaan Cuti</a>
-        </nav>
+    <div class="mb-8">
+      <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+        <span>Area Kerja</span>
+        <span class="text-slate-300">/</span>
+        <a href="/leave/my-history" class="hover:text-slate-600 transition">Permintaan Cuti</a>
+      </nav>
 
-        <h1 class="text-2xl font-bold text-slate-900">
-          <%= mode==='CREATE' ? 'Input Pengajuan Cuti' : (mode==='EDIT' ? 'Ubah Pengajuan Cuti' : 'Ajukan Ulang Cuti' ) %>
-        </h1>
+      <h1 class="text-2xl font-bold text-slate-900">
+        <%= mode==='CREATE' ? 'Input Pengajuan Cuti' : (mode==='EDIT' ? 'Ubah Pengajuan Cuti' : 'Ajukan Ulang Cuti' ) %>
+      </h1>
 
-        <p class="text-[14px] text-slate-500 mt-1">
-          Pastikan informasi rentang tanggal dan sisa kuota Anda telah sesuai sebelum mengirimkan form.
-        </p>
-      </div>
+      <p class="text-[14px] text-slate-500 mt-1">
+        Pastikan informasi rentang tanggal dan sisa kuota Anda telah sesuai sebelum mengirimkan form.
+      </p>
+    </div>
 
-      <!-- INFO BANNER: SISA KUOTA CUTI -->
-      <div class="mb-6 p-5 bg-white border border-slate-200 rounded-2xl shadow-sm flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Hak Kuota Cuti Anda</p>
-            <p class="text-[13px] font-medium text-slate-500 mt-0.5">Tahun Periode Berjalan</p>
-          </div>
+    <div class="mb-6 p-5 bg-white border border-slate-200 rounded-2xl shadow-sm flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
         </div>
-        <div class="text-right">
-          <span class="text-3xl font-bold text-emerald-600 tabular-nums">
-            <%= leaveBalance.remaining %>
-          </span>
-          <span class="text-[13px] font-bold text-emerald-700/80 ml-1">Hari Tersisa</span>
+        <div>
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Hak Kuota Cuti Anda</p>
+          <p class="text-[13px] font-medium text-slate-500 mt-0.5">Tahun Periode Berjalan</p>
         </div>
       </div>
+      <div class="text-right">
+        <span class="text-3xl font-bold text-emerald-600 tabular-nums">
+          <%= leaveBalance.remaining %>
+        </span>
+        <span class="text-[13px] font-bold text-emerald-700/80 ml-1">Hari Tersisa</span>
+      </div>
+    </div>
 
-      <!-- CARD FORM -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
-        <% let formAction="/leave/apply" ; if (mode==='EDIT' ) formAction="/leave/update/" + leave._id; if (mode==='RESUBMIT' ) formAction="/leave/apply" ; %>
+      <% let formAction="/leave/apply" ; if (mode==='EDIT' ) formAction="/leave/update/" + leave._id; if (mode==='RESUBMIT' ) formAction="/leave/apply" ; %>
 
-          <form action="<%= formAction %>" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+      <form action="<%= formAction %>" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
-          <% if (typeof error !== 'undefined' && error && String(error).trim() !== '') { %>
-  <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
-    <%= String(error) %>
-  </div>
-<% } %>
+        <% if (typeof error !== 'undefined' && error && String(error).trim() !== '') { %>
+        <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+          <%= String(error) %>
+        </div>
+        <% } %>
 
-            <!-- KATEGORI CUTI -->
-            <div class="space-y-1.5">
-              <label class="text-[13px] font-bold text-slate-700">
-                Kategori / Tipe Cuti <span class="text-red-500">*</span>
-              </label>
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">
+            Kategori / Tipe Cuti <span class="text-red-500">*</span>
+          </label>
 
-              <div class="relative w-full" id="leave-dropdown">
-                <input type="hidden" name="leaveTypeId" id="leaveTypeId" value="<%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId._id : '' %>" required>
+          <div class="relative w-full" id="leave-dropdown">
+            <input type="hidden" name="leaveTypeId" id="leaveTypeId" value="<%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId._id : '' %>" required>
 
-                <button type="button" onclick="toggleLeaveDropdown()"
-                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
-                  
-               <span id="leave-label" 
-  class="<%= (mode === 'EDIT' && leave.leaveTypeId) ? 'text-[14px] text-slate-800 font-semibold' : 'text-xs italic text-slate-400/90 font-normal' %>">
-  <%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId.name : '-- Silahkan pilih jenis cuti --' %>
-</span>
-                  <svg id="leave-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </button>
+            <button type="button" onclick="toggleLeaveDropdown()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
 
-                <div id="leave-menu" class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
-                  <% leaveTypes.forEach(type => { %>
-                    <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>')"
-                      class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-                      <%= type.name %>
-                    </button>
-                  <% }) %>
-                </div>
-              </div>
+              <span id="leave-label" class="<%= (mode === 'EDIT' && leave.leaveTypeId) ? 'text-[14px] text-slate-800 font-semibold' : 'text-xs italic text-slate-400/90 font-normal' %>">
+                <%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId.name : '-- Silahkan pilih jenis cuti --' %>
+              </span>
+              <svg id="leave-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <div id="leave-menu" class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
+              <% leaveTypes.forEach(type => { %>
+              <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
+                <%= type.name %>
+              </button>
+              <% }) %>
             </div>
+          </div>
+        </div>
 
-            <!-- RENTANG TANGGAL -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  <div class="space-y-1.5">
-    <label class="text-[13px] font-bold text-slate-700">
-      Tanggal Mulai <span class="text-red-500">*</span>
-    </label>
-    <input type="date" id="startDate" name="startDate" required
-      class="date-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs italic text-slate-400/90 font-normal focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all"
-      value="<%= leave ? new Date(leave.startDate).toISOString().split('T')[0] : '' %>">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">
+              Tanggal Mulai <span class="text-red-500">*</span>
+            </label>
+            <input type="date" id="startDate" name="startDate" required class="date-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs italic text-slate-400/90 font-normal focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" value="<%= leave ? new Date(leave.startDate).toISOString().split('T')[0] : '' %>">
 
-    <p id="date-warning" class="hidden text-[11px] text-red-500 font-medium pl-1">
-      ⚠️ Pengajuan cuti harus dilakukan minimal 7 hari sebelum tanggal mulai.
-    </p>
-  </div>
+            <p id="date-warning" class="hidden text-[11px] text-red-500 font-medium pl-1">
+              Pengajuan cuti harus dilakukan minimal 7 hari sebelum tanggal mulai.
+            </p>
+          </div>
 
-  <div class="space-y-1.5">
-    <label class="text-[13px] font-bold text-slate-700">
-      Tanggal Selesai <span class="text-red-500">*</span>
-    </label>
-    <input type="date" id="endDate" name="endDate" required
-      class="date-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs italic text-slate-400/90 font-normal focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all"
-      value="<%= leave ? new Date(leave.endDate).toISOString().split('T')[0] : '' %>">
-  </div>
-</div>
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">
+              Tanggal Selesai <span class="text-red-500">*</span>
+            </label>
+            <input type="date" id="endDate" name="endDate" required class="date-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs italic text-slate-400/90 font-normal focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" value="<%= leave ? new Date(leave.endDate).toISOString().split('T')[0] : '' %>">
+          </div>
+        </div>
 
-<div class="space-y-1.5">
-  <label class="text-[13px] font-bold text-slate-700">
-    Durasi Pengajuan Cuti
-  </label>
-  <div class="relative flex items-center">
-    
-    <input type="number" id="totalDays" name="totalDays" readonly required
-      class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-4 pr-24 py-3 text-[14px] font-bold text-slate-700 outline-none select-none"
-      value="<%= leave ? leave.totalDays : 0 %>" />
-    <span class="absolute right-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-      <span id="displayDays"><%= leave ? leave.totalDays : 0 %></span> 
-      <span id="duration-label-text">Hari Kerja</span>
-    </span>
-  </div>
-</div>
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">
+            Durasi Pengajuan Cuti
+          </label>
+          <div class="relative flex items-center">
 
-            <!-- HANDOVER USER -->
-            <div class="space-y-1.5" id="handover-wrapper">
-              <div class="flex justify-between items-center">
-                <label class="text-[13px] font-bold text-slate-700">
-                  Delegasi Pengganti / Handover
-                </label>
-                <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  Opsional
-                </span>
-              </div>
+            <input type="number" id="totalDays" name="totalDays" readonly required class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-4 pr-24 py-3 text-[14px] font-bold text-slate-700 outline-none select-none" value="<%= leave ? leave.totalDays : 0 %>" />
+            <span class="absolute right-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span id="displayDays"><%= leave ? leave.totalDays : 0 %></span>
+              <span id="duration-label-text">Hari Kerja</span>
+            </span>
+          </div>
+        </div>
 
-              <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <input type="text" id="handover-search" placeholder="Cari rekan handover..."
-                  onkeyup="filterHandoverList()"
-                  class="w-full bg-slate-50/60 border border-slate-200/60 rounded-xl pl-10 pr-4 py-3 text-[13px] font-medium text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all shadow-sm shadow-slate-100/50" />
-              </div>
+        <div class="space-y-1.5" id="handover-wrapper">
+          <div class="flex justify-between items-center">
+            <label class="text-[13px] font-bold text-slate-700">
+              Delegasi Pengganti / Handover
+            </label>
+            <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              Opsional
+            </span>
+          </div>
 
-              <div id="handover-list" class="border border-slate-200/60 rounded-xl p-1.5 max-h-56 overflow-y-auto bg-slate-50/50 space-y-0.5 shadow-inner shadow-slate-50">
-                <% 
+          <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input type="text" id="handover-search" placeholder="Cari rekan handover..." onkeyup="filterHandoverList()" class="w-full bg-slate-50/60 border border-slate-200/60 rounded-xl pl-10 pr-4 py-3 text-[13px] font-medium text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all shadow-sm shadow-slate-100/50" />
+          </div>
+
+          <div id="handover-list" class="border border-slate-200/60 rounded-xl p-1.5 max-h-56 overflow-y-auto bg-slate-50/50 space-y-0.5 shadow-inner shadow-slate-50">
+            <% 
                   const excludedOwners = ['rafika fitrianti', 'gusti diansyah'];
                   const filteredEmployees = employees.filter(emp => 
                     emp.employeeData && 
@@ -159,341 +143,325 @@
 
                   filteredEmployees.forEach(emp => { 
                 %>
-                    <label class="handover-item flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-200/40 cursor-pointer transition-all duration-150 group"
-                      data-name="<%= emp.employeeData.fullName.toLowerCase() %>">
+            <label class="handover-item flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-200/40 cursor-pointer transition-all duration-150 group" data-name="<%= emp.employeeData.fullName.toLowerCase() %>">
 
-                      <input type="radio" name="handoverUserId" value="<%= emp._id %>" <%=(leave && leave.handoverUserId && leave.handoverUserId.toString()===emp._id.toString()) ? 'checked' : '' %>
-                      class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-100 cursor-pointer accent-blue-600 transition-colors" />
+              <input type="radio" name="handoverUserId" value="<%= emp._id %>" <%=(leave && leave.handoverUserId && leave.handoverUserId.toString()===emp._id.toString()) ? 'checked' : '' %> class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-100 cursor-pointer accent-blue-600 transition-colors" />
 
-                      <div class="flex flex-col">
-                        <span class="text-[13px] font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
-                          <%= emp.employeeData.fullName %>
-                        </span>
-                        <span class="text-[10px] text-slate-400 font-medium">@<%= emp.username %></span>
-                      </div>
-                    </label>
-                <% }) %>
+              <div class="flex flex-col">
+                <span class="text-[13px] font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+                  <%= emp.employeeData.fullName %>
+                </span>
+                <span class="text-[10px] text-slate-400 font-medium">@<%= emp.username %></span>
               </div>
+            </label>
+            <% }) %>
+          </div>
 
-              <p class="text-[11px] text-slate-400 pl-1 leading-normal">
-                Sistem memerlukan persetujuan dari rekan handover sebelum diteruskan ke alur otorisasi manajerial.
-              </p>
-            </div>
+          <p class="text-[11px] text-slate-400 pl-1 leading-normal">
+            Sistem memerlukan persetujuan dari rekan handover sebelum diteruskan ke alur otorisasi manajerial.
+          </p>
+        </div>
 
-            <!-- ALASAN CUTI -->
-           <div class="space-y-1.5">
-  <label class="text-[13px] font-bold text-slate-700">
-    Alasan atau Keterangan Tambahan <span class="text-red-500">*</span>
-  </label>
-  <textarea name="reason" rows="4" 
-    placeholder="Jelaskan alasan pengajuan cuti Anda secara detail..." required
-    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-800 outline-none resize-none transition-all
+        <!-- ALASAN CUTI -->
+        <div class="space-y-1.5">
+          <label class="text-[13px] font-bold text-slate-700">
+            Alasan atau Keterangan Tambahan <span class="text-red-500">*</span>
+          </label>
+          <textarea name="reason" rows="4" placeholder="Jelaskan alasan pengajuan cuti Anda secara detail..." required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-800 outline-none resize-none transition-all
            placeholder:text-[12.5px] placeholder:text-slate-400/80 placeholder:font-normal
            focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400"><%= leave ? leave.reason : '' %></textarea>
-</div>
-            <!-- ATTACHMENT -->
-            <div class="space-y-1.5">
-              <label class="block text-[13px] font-bold text-slate-700">
-                Surat Keterangan / Lampiran <span id="label-required-star" class="text-red-500 hidden">*</span>
-                <span id="label-optional-text" class="text-slate-400 font-normal ml-0.5">(Opsional)</span>
-              </label>
+        </div>
+        <!-- ATTACHMENT -->
+        <div class="space-y-1.5">
+          <label class="block text-[13px] font-bold text-slate-700">
+            Surat Keterangan / Lampiran <span id="label-required-star" class="text-red-500 hidden">*</span>
+            <span id="label-optional-text" class="text-slate-400 font-normal ml-0.5">(Opsional)</span>
+          </label>
 
-              <div id="dropzone-empty" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'hidden' : 'relative' %> w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
-                <input type="file" name="attachments" id="file-input" accept="image/*,.pdf,.docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
-                <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                </svg>
-                <span class="text-[13px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
-                <span class="text-xs text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (maks 5MB)</span>
-              </div>
+          <div id="dropzone-empty" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'hidden' : 'relative' %> w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
+            <input type="file" name="attachments" id="file-input" accept="image/*,.pdf,.docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
+            <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+            </svg>
+            <span class="text-[13px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
+            <span class="text-xs text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (maks 5MB)</span>
+          </div>
 
-              <div id="dropzone-filled" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'flex' : 'hidden' %> items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
-                <div class="flex items-center gap-3 min-w-0 flex-1">
-                  <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
-                    <% 
+          <div id="dropzone-filled" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'flex' : 'hidden' %> items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
+                <% 
                       let isImage = false;
                       if (mode === 'EDIT' && leave.documentPath) {
                         const ext = leave.documentPath.split('.').pop().toLowerCase();
                         isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
                       }
                     %>
-                    <img id="img-preview" src="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '' %>" class="w-full h-full object-cover <%= isImage ? '' : 'hidden' %>" />
-                    <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400 <%= isImage ? 'hidden' : '' %>" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                    </svg>
-                  </div>
+                <img id="img-preview" src="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '' %>" class="w-full h-full object-cover <%= isImage ? '' : 'hidden' %>" />
+                <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400 <%= isImage ? 'hidden' : '' %>" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                </svg>
+              </div>
 
-                  <div class="min-w-0 flex-1">
-                    <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
-                      <%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath.split('/').pop() : 'file_name.jpg' %>
-                    </div>
-                    <div id="size-preview" class="text-xs text-slate-400 mt-0.5">
-                      <%= (mode === 'EDIT' && leave.documentPath) ? 'Berkas Tersimpan' : '0 KB' %>
-                    </div>
-                  </div>
+              <div class="min-w-0 flex-1">
+                <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
+                  <%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath.split('/').pop() : 'file_name.jpg' %>
                 </div>
-
-                <div class="flex items-center gap-2 ml-4 flex-shrink-0">
-                  <a id="view-file-btn" href="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '#' %>" target="_blank" class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">View</a>
-                  <button type="button" onclick="triggerChangeFile()" class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">Ganti File</button>
+                <div id="size-preview" class="text-xs text-slate-400 mt-0.5">
+                  <%= (mode === 'EDIT' && leave.documentPath) ? 'Berkas Tersimpan' : '0 KB' %>
                 </div>
               </div>
             </div>
 
-            <!-- BUTTON PANELS -->
-            <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-              <a href="/leave/my-history" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
-                Batal
-              </a>
-              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
-                <%= mode==='CREATE' ? 'Kirim Pengajuan' : (mode==='EDIT' ? 'Simpan Perubahan' : 'Kirim Ulang Form' ) %>
-              </button>
+            <div class="flex items-center gap-2 ml-4 flex-shrink-0">
+              <a id="view-file-btn" href="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '#' %>" target="_blank" class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">View</a>
+              <button type="button" onclick="triggerChangeFile()" class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">Ganti File</button>
             </div>
+          </div>
+        </div>
 
-          </form>
-      </div>
+        <!-- BUTTON PANELS -->
+        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
+          <a href="/leave/my-history" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
+            Batal
+          </a>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
+            <%= mode==='CREATE' ? 'Kirim Pengajuan' : (mode==='EDIT' ? 'Simpan Perubahan' : 'Kirim Ulang Form' ) %>
+          </button>
+        </div>
 
+      </form>
     </div>
+
   </div>
+</div>
 
-  <script>
-    const startInput = document.getElementById('startDate');
-    const endInput = document.getElementById('endDate');
-    const totalInput = document.getElementById('totalDays');
-    const displayDays = document.getElementById('displayDays');
-    const fileInput = document.getElementById('file-input');
+<script>
+  const startInput = document.getElementById('startDate');
+  const endInput = document.getElementById('endDate');
+  const totalInput = document.getElementById('totalDays');
+  const displayDays = document.getElementById('displayDays');
+  const fileInput = document.getElementById('file-input');
 
-    let currentFileUrl = null;
+  let currentFileUrl = null;
 
-    // --- 1. LOGIC PERHITUNGAN HARI VIA API BACKEND ---
-    async function calculateDays() {
-      const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
-      
-      // Jika kategori melahirkan, JANGAN hitung via API backend (Bypass lock 90 hari)
-      if (selectedLeaveType.includes('melahirkan')) {
-        return; 
-      }
+  // --- 1. LOGIC PERHITUNGAN HARI VIA API BACKEND ---
+  async function calculateDays() {
+    const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
 
-      const start = startInput.value;
-      const end = endInput.value;
+    if (selectedLeaveType.includes('melahirkan')) {
+      return;
+    }
 
-      if (start && end) {
-        try {
-          const response = await fetch(`/api/leave/calculate-days?startDate=${start}&endDate=${end}`);
-          const data = await response.json();
+    const start = startInput.value;
+    const end = endInput.value;
 
-          if (data.success) {
-            displayDays.innerText = data.totalDays;
-            totalInput.value = data.totalDays; 
-          }
-        } catch (err) {
-          console.error("Error calculating days:", err);
+    if (start && end) {
+      try {
+        const response = await fetch(`/api/leave/calculate-days?startDate=${start}&endDate=${end}`);
+        const data = await response.json();
+
+        if (data.success) {
+          displayDays.innerText = data.totalDays;
+          totalInput.value = data.totalDays;
         }
+      } catch (err) {
+        console.error("Error calculating days:", err);
       }
     }
+  }
 
-    // --- 2. LOGIC OTOMATISASI CUTI MELAHIRKAN (90 HARI LURUS) ---
-    function calculateMaternityDuration() {
-      if (startInput.value) {
-        const start = new Date(startInput.value);
-        const end = new Date(start);
-        // Menghitung lurus 90 hari kalender
-        end.setDate(start.getDate() + 90 - 1);
-        
-        endInput.value = end.toISOString().split('T')[0];
-        displayDays.innerText = 90;
-        totalInput.value = 90;
-      }
+  // --- 2. LOGIC OTOMATISASI CUTI MELAHIRKAN (90 HARI LURUS) ---
+  function calculateMaternityDuration() {
+    if (startInput.value) {
+      const start = new Date(startInput.value);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 90 - 1);
+
+      endInput.value = end.toISOString().split('T')[0];
+      displayDays.innerText = 90;
+      totalInput.value = 90;
     }
+  }
 
-    // --- 3. UI HANDLING BERDASARKAN KATEGORI ---
-    function handleLeaveTypeChange(typeName) {
-      const name = typeName.toLowerCase();
-      const starLabel = document.getElementById('label-required-star');
-      const optionalLabel = document.getElementById('label-optional-text');
-      const durationLabelText = document.getElementById('duration-label-text');
+  function handleLeaveTypeChange(typeName) {
+    const name = typeName.toLowerCase();
+    const starLabel = document.getElementById('label-required-star');
+    const optionalLabel = document.getElementById('label-optional-text');
+    const durationLabelText = document.getElementById('duration-label-text');
 
-      if (name.includes('melahirkan')) {
-        if (durationLabelText) durationLabelText.textContent = "Hari Kalender";
-        
-        // Lock Input Tanggal Selesai
-        endInput.readOnly = true;
-        endInput.classList.add('bg-slate-100', 'select-none');
-        endInput.classList.remove('bg-slate-50');
+    if (name.includes('melahirkan')) {
+      if (durationLabelText) durationLabelText.textContent = "Hari Kalender";
 
-        // Hitung durasi 90 hari langsung
-        calculateMaternityDuration();
+      // Lock Input Tanggal Selesai
+      endInput.readOnly = true;
+      endInput.classList.add('bg-slate-100', 'select-none');
+      endInput.classList.remove('bg-slate-50');
 
-        fileInput.required = false;
-        if (starLabel) starLabel.classList.add('hidden');
-        if (optionalLabel) optionalLabel.classList.remove('hidden');
-      } 
-      else if (name.includes('sakit')) {
-        resetMaternityFormState(durationLabelText);
-        fileInput.required = true;
-        if (starLabel) starLabel.classList.remove('hidden');
-        if (optionalLabel) optionalLabel.classList.add('hidden');
-        calculateDays(); // Hitung ulang via API backend
-      } 
-      else {
-        resetMaternityFormState(durationLabelText);
-        fileInput.required = false;
-        if (starLabel) starLabel.classList.add('hidden');
-        if (optionalLabel) optionalLabel.classList.remove('hidden');
-        calculateDays(); // Hitung ulang via API backend
-      }
-    }
+      calculateMaternityDuration();
 
-    function resetMaternityFormState(durationLabelText) {
-      if (durationLabelText) durationLabelText.textContent = "Hari Kerja";
-      endInput.readOnly = false;
-      endInput.classList.remove('bg-slate-100', 'select-none');
-      endInput.classList.add('bg-slate-50');
-    }
-
-    // --- 4. EVENT LISTENERS PERUBAHAN TANGGAL ---
-    startInput.addEventListener('change', () => {
-      validateDateGap();
-      const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
-      
-      if (selectedLeaveType.includes('melahirkan')) {
-        calculateMaternityDuration();
-      } else {
-        calculateDays();
-      }
-    });
-
-    endInput.addEventListener('change', () => {
+      fileInput.required = false;
+      if (starLabel) starLabel.classList.add('hidden');
+      if (optionalLabel) optionalLabel.classList.remove('hidden');
+    } else if (name.includes('sakit')) {
+      resetMaternityFormState(durationLabelText);
+      fileInput.required = true;
+      if (starLabel) starLabel.classList.remove('hidden');
+      if (optionalLabel) optionalLabel.classList.add('hidden');
       calculateDays();
-    });
-
-    // --- 5. CUSTOM DROPDOWN INTERACTION ---
-    function toggleLeaveDropdown() {
-      const menu = document.getElementById('leave-menu');
-      const arrow = document.getElementById('leave-arrow');
-      menu.classList.toggle('hidden');
-      arrow.classList.toggle('rotate-180');
+    } else {
+      resetMaternityFormState(durationLabelText);
+      fileInput.required = false;
+      if (starLabel) starLabel.classList.add('hidden');
+      if (optionalLabel) optionalLabel.classList.remove('hidden');
+      calculateDays();
     }
+  }
 
-    function selectLeave(id, name) {
-      document.getElementById('leaveTypeId').value = id;
-      const label = document.getElementById('leave-label');
-      label.textContent = name;
-      
-      label.classList.remove('text-slate-600');
-      label.classList.add('text-slate-800', 'font-semibold');
+  function resetMaternityFormState(durationLabelText) {
+    if (durationLabelText) durationLabelText.textContent = "Hari Kerja";
+    endInput.readOnly = false;
+    endInput.classList.remove('bg-slate-100', 'select-none');
+    endInput.classList.add('bg-slate-50');
+  }
 
-      toggleLeaveDropdown();
-      handleLeaveTypeChange(name); 
+  startInput.addEventListener('change', () => {
+    validateDateGap();
+    const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
+
+    if (selectedLeaveType.includes('melahirkan')) {
+      calculateMaternityDuration();
+    } else {
+      calculateDays();
     }
+  });
 
-    window.addEventListener('click', function (e) {
-      const dropdown = document.getElementById('leave-dropdown');
-      if (dropdown && !dropdown.contains(e.target)) {
-        document.getElementById('leave-menu').classList.add('hidden');
-        document.getElementById('leave-arrow').classList.remove('rotate-180');
-      }
-    });
+  endInput.addEventListener('change', () => {
+    calculateDays();
+  });
 
-    // --- 6. FILE UPLOAD LOGIC ---
-    function handleFileSelect(input) {
-      if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-        if (currentFileUrl) URL.revokeObjectURL(currentFileUrl);
+  function toggleLeaveDropdown() {
+    const menu = document.getElementById('leave-menu');
+    const arrow = document.getElementById('leave-arrow');
+    menu.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180');
+  }
 
-        currentFileUrl = URL.createObjectURL(file);
-        document.getElementById("view-file-btn").href = currentFileUrl;
-        document.getElementById("name-preview").textContent = file.name;
-        document.getElementById("size-preview").textContent = (file.size / 1024 / 1024).toFixed(2) + " MB";
+  function selectLeave(id, name) {
+    document.getElementById('leaveTypeId').value = id;
+    const label = document.getElementById('leave-label');
+    label.textContent = name;
 
-        const imgPreview = document.getElementById("img-preview");
-        const fileIconFallback = document.getElementById("file-icon-fallback");
+    label.classList.remove('text-slate-600');
+    label.classList.add('text-slate-800', 'font-semibold');
 
-        if (file.type.startsWith("image/")) {
-          imgPreview.src = currentFileUrl;
-          imgPreview.classList.remove("hidden");
-          fileIconFallback.classList.add("hidden");
-        } else {
-          imgPreview.classList.add("hidden");
-          fileIconFallback.classList.remove("hidden");
-        }
+    toggleLeaveDropdown();
+    handleLeaveTypeChange(name);
+  }
 
-        document.getElementById("dropzone-empty").classList.add("hidden");
-        document.getElementById("dropzone-filled").classList.remove("hidden");
-        document.getElementById("dropzone-filled").classList.add("flex");
-        if (document.getElementById('label-required-star')) document.getElementById('label-required-star').classList.add('hidden');
-      }
+  window.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('leave-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+      document.getElementById('leave-menu').classList.add('hidden');
+      document.getElementById('leave-arrow').classList.remove('rotate-180');
     }
+  });
 
-    function triggerChangeFile() {
-      const fileInput = document.getElementById('file-input');
-      fileInput.value = '';
+  function handleFileSelect(input) {
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      if (currentFileUrl) URL.revokeObjectURL(currentFileUrl);
 
-      const emptyZone = document.getElementById('dropzone-empty');
-      const filledZone = document.getElementById('dropzone-filled');
+      currentFileUrl = URL.createObjectURL(file);
+      document.getElementById("view-file-btn").href = currentFileUrl;
+      document.getElementById("name-preview").textContent = file.name;
+      document.getElementById("size-preview").textContent = (file.size / 1024 / 1024).toFixed(2) + " MB";
 
-      emptyZone.classList.remove('hidden');
-      emptyZone.classList.add('relative'); 
-      
-      filledZone.classList.remove('flex');
-      filledZone.classList.add('hidden');
+      const imgPreview = document.getElementById("img-preview");
+      const fileIconFallback = document.getElementById("file-icon-fallback");
 
-      document.getElementById('img-preview').classList.add('hidden');
-      document.getElementById('file-icon-fallback').classList.remove('hidden');
-    }
-
-    // --- 7. UTILITIES (FILTER & VALIDASI) ---
-    function filterHandoverList() {
-      const searchInput = document.getElementById('handover-search').value.toLowerCase();
-      const items = document.getElementsByClassName('handover-item');
-
-      for (let item of items) {
-        const name = item.getAttribute('data-name');
-        if (name.includes(searchInput)) {
-          item.style.display = "flex";
-        } else {
-          item.style.display = "none";
-        }
-      }
-    }
-
-    function validateDateGap() {
-      const startDate = new Date(startInput.value);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const diffTime = startDate - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      const warningDiv = document.getElementById('date-warning');
-
-      if (diffDays < 7 && startInput.value !== "") {
-        if (warningDiv) warningDiv.classList.remove('hidden');
+      if (file.type.startsWith("image/")) {
+        imgPreview.src = currentFileUrl;
+        imgPreview.classList.remove("hidden");
+        fileIconFallback.classList.add("hidden");
       } else {
-        if (warningDiv) warningDiv.classList.add('hidden');
+        imgPreview.classList.add("hidden");
+        fileIconFallback.classList.remove("hidden");
+      }
+
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
+      document.getElementById("dropzone-filled").classList.add("flex");
+      if (document.getElementById('label-required-star')) document.getElementById('label-required-star').classList.add('hidden');
+    }
+  }
+
+  function triggerChangeFile() {
+    const fileInput = document.getElementById('file-input');
+    fileInput.value = '';
+
+    const emptyZone = document.getElementById('dropzone-empty');
+    const filledZone = document.getElementById('dropzone-filled');
+
+    emptyZone.classList.remove('hidden');
+    emptyZone.classList.add('relative');
+
+    filledZone.classList.remove('flex');
+    filledZone.classList.add('hidden');
+
+    document.getElementById('img-preview').classList.add('hidden');
+    document.getElementById('file-icon-fallback').classList.remove('hidden');
+  }
+
+  function filterHandoverList() {
+    const searchInput = document.getElementById('handover-search').value.toLowerCase();
+    const items = document.getElementsByClassName('handover-item');
+
+    for (let item of items) {
+      const name = item.getAttribute('data-name');
+      if (name.includes(searchInput)) {
+        item.style.display = "flex";
+      } else {
+        item.style.display = "none";
       }
     }
+  }
 
-    // DOM Init Loader
-    document.addEventListener("DOMContentLoaded", () => {
-      const initialLabel = document.getElementById('leave-label').textContent;
-      if (initialLabel && !initialLabel.includes('--')) {
-        handleLeaveTypeChange(initialLabel);
-      }
+  function validateDateGap() {
+    const startDate = new Date(startInput.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      // Check existing attachment state for Edit Mode
-      const hasAttachment = "<%= (leave && leave.documentPath) ? '1' : '0' %>";
-      if (hasAttachment === "1") {
-        document.getElementById("dropzone-empty").classList.add("hidden");
-        document.getElementById("dropzone-filled").classList.remove("hidden");
-        document.getElementById("dropzone-filled").classList.add("flex");
+    const diffTime = startDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        const fileUrl = "<%= leave ? leave.documentPath : '' %>";
-        const fileName = fileUrl.split('/').pop();
+    const warningDiv = document.getElementById('date-warning');
 
-        document.getElementById("view-file-btn").href = fileUrl;
-        document.getElementById("name-preview").textContent = fileName;
-        document.getElementById("size-preview").textContent = "Berkas Tersimpan";
-      }
-    });
-  </script>
+    if (diffDays < 7 && startInput.value !== "") {
+      if (warningDiv) warningDiv.classList.remove('hidden');
+    } else {
+      if (warningDiv) warningDiv.classList.add('hidden');
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const initialLabel = document.getElementById('leave-label').textContent;
+    if (initialLabel && !initialLabel.includes('--')) {
+      handleLeaveTypeChange(initialLabel);
+    }
+
+    const hasAttachment = "<%= (leave && leave.documentPath) ? '1' : '0' %>";
+    if (hasAttachment === "1") {
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
+      document.getElementById("dropzone-filled").classList.add("flex");
+
+      const fileUrl = "<%= leave ? leave.documentPath : '' %>";
+      const fileName = fileUrl.split('/').pop();
+
+      document.getElementById("view-file-btn").href = fileUrl;
+      document.getElementById("name-preview").textContent = fileName;
+      document.getElementById("size-preview").textContent = "Berkas Tersimpan";
+    }
+  });
+</script>

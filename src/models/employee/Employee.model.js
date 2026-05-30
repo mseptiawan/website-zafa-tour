@@ -110,6 +110,13 @@ employeeSchema.virtual("documentData", {
   justOne: true,
 });
 
+employeeSchema.virtual("familyData", {
+  ref: "EmployeeFamily",
+  localField: "_id",
+  foreignField: "employee_id",
+  justOne: true,
+});
+
 employeeSchema.set("toObject", { virtuals: true });
 employeeSchema.set("toJSON", { virtuals: true });
 

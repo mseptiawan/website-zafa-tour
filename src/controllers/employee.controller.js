@@ -1,4 +1,5 @@
 import { createEmployeeSchema } from "../validations/employee.schema.js";
+import { updateEmployeeSchema } from "../validations/employeeUpdate.schema.js";
 import { EmployeeService } from "../services/employee.service.js";
 import AppError from "../utils/AppError.js";
 import { successResponse } from "../utils/response.js";
@@ -47,13 +48,14 @@ export const editEmployeeWeb = async (req, res, next) => {
       EmployeeService.getReferenceData(),
     ]);
 
-    if (!employee) return next(new AppError("Pegawai tidak ditemukan", 404));
+    if (!employee)
+      return res.status(404).render("errors/404", { message: "Pegawai tidak ditemukan" });
 
     res.render("employee/edit", {
       title: "Edit Data Pegawai",
       error: null,
+      errors: {},
       old: null,
-      employees: [],
       employee,
       positions: references.positions,
       units: references.units,
@@ -65,6 +67,105 @@ export const editEmployeeWeb = async (req, res, next) => {
   }
 };
 
+export const updateEmployeeApi = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const validatedData = updateEmployeeSchema.parse(req.body);
+
+    const files = req.files || {};
+    const uploadedDocs = {};
+
+    if (files.foto_profile)
+      uploadedDocs.foto_profile = `/uploads/${files.foto_profile[0].filename}`;
+    if (files.file_ktp) uploadedDocs.file_ktp = `/uploads/${files.file_ktp[0].filename}`;
+    if (files.file_kk) uploadedDocs.file_kk = `/uploads/${files.file_kk[0].filename}`;
+    if (files.file_ijazah) uploadedDocs.file_ijazah = `/uploads/${files.file_ijazah[0].filename}`;
+    if (files.file_skck) uploadedDocs.file_skck = `/uploads/${files.file_skck[0].filename}`;
+
+    const structuredData = {
+      fullName: validatedData.fullName,
+      tempat_lahir: validatedData.tempat_lahir,
+      tanggal_lahir: validatedData.tanggal_lahir,
+      jenis_kelamin: validatedData.jenis_kelamin,
+      agama: validatedData.agama,
+      golongan_darah: validatedData.golongan_darah,
+      status_pernikahan: validatedData.status_pernikahan,
+
+      careerData: {
+        positionId: validatedData.positionId,
+        unitId: validatedData.unitId,
+        bidangId: validatedData.bidangId,
+        status_pegawai: validatedData.status_pegawai,
+        tanggal_mulai_bergabung: validatedData.tanggal_mulai_bergabung,
+        tanggal_berakhir_kontrak: validatedData.tanggal_berakhir_kontrak,
+      },
+
+      contactData: {
+        nomor_telp: validatedData.nomor_telp,
+        alamat: validatedData.alamat,
+        nama_kontak_darurat: validatedData.nama_kontak_darurat,
+        hubungan_kontak_darurat: validatedData.hubungan_kontak_darurat,
+        nomor_kontak_darurat: validatedData.nomor_kontak_darurat,
+      },
+
+      educationData: {
+        pendidikan_terakhir: validatedData.pendidikan_terakhir,
+        institusi_pendidikan: validatedData.institusi_pendidikan,
+        tahun_kelulusan: validatedData.tahun_kelulusan,
+        keahlian_utama: validatedData.keahlian_utama
+          ? validatedData.keahlian_utama.split(",").map((s) => s.trim())
+          : [],
+        sertifikat_profesional: validatedData.sertifikat_profesional
+          ? validatedData.sertifikat_profesional.split(",").map((s) => s.trim())
+          : [],
+      },
+
+      financialData: {
+        nama_bank: validatedData.nama_bank,
+        nomor_rekening: validatedData.nomor_rekening,
+        nama_pemilik_rekening: validatedData.nama_pemilik_rekening,
+        npwp: validatedData.npwp,
+        bpjstk: validatedData.bpjstk,
+      },
+
+      documentData: {
+        ...uploadedDocs,
+        ...(validatedData.tanggal_kadaluarsa_skck && {
+          tanggal_kadaluarsa_skck: validatedData.tanggal_kadaluarsa_skck,
+        }),
+      },
+
+      roleId: validatedData.roleId,
+      anggota_keluarga: validatedData.anggota_keluarga || [],
+      sertifikat_kompetensi: validatedData.sertifikat_kompetensi || [],
+    };
+
+    await EmployeeService.updateEmployeeById(id, structuredData);
+
+    req.flash("success", "Profil karyawan berhasil diperbarui.");
+    return res.redirect("/employee");
+  } catch (err) {
+    if (err.name === "ZodError") {
+      const formattedErrors = {};
+      err.errors.forEach((e) => {
+        const path = e.path[0];
+        if (!formattedErrors[path]) {
+          formattedErrors[path] = e.message;
+        }
+      });
+
+      req.flash("errors", formattedErrors);
+      req.flash("old", req.body);
+      req.flash("error", "Gagal memperbarui data. Periksa kembali isian form Anda.");
+      return res.redirect(`/employee/edit/${id}`);
+    }
+
+    console.error("Error updateEmployeeApi:", err);
+    req.flash("error", err.message || "Terjadi kesalahan internal pada server.");
+    return res.redirect(`/employee/edit/${id}`);
+  }
+};
 export const createEmployeeApi = async (req, res, next) => {
   try {
     const validatedBody = createEmployeeSchema.parse(req.body);
@@ -121,18 +222,7 @@ export const createEmployeeApi = async (req, res, next) => {
     });
   }
 };
-export const updateEmployeeApi = async (req, res, next) => {
-  try {
-    const updated = await EmployeeService.updateEmployeeById(req.params.id, req.body, req.files);
 
-    if (!updated) return next(new AppError("Gagal update, Pegawai tidak ditemukan", 404));
-
-    req.flash("success", "Data Pegawai berhasil diperbarui!");
-    return res.redirect("/employee");
-  } catch (err) {
-    next(err);
-  }
-};
 export const ajukanPHKApi = async (req, res, next) => {
   try {
     if (!req.file) return next(new AppError("Dokumen PHK wajib diunggah", 400));

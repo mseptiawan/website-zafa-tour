@@ -3,22 +3,20 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-5xl mx-auto">
 
-    <!-- HEADER -->
     <div class="flex items-end justify-between mb-10">
-  <div>
-    <div class="flex items-center gap-3 mb-3">
-      <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Area Kerja</span>
-      <div class="w-px h-3 bg-slate-300"></div>
-      <span class="text-[10px] font-semibold text-slate-800 uppercase tracking-[0.2em]">Performance</span>
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Area Kerja</span>
+          <div class="w-px h-3 bg-slate-300"></div>
+          <span class="text-[10px] font-semibold text-slate-800 uppercase tracking-[0.2em]">Performance</span>
+        </div>
+
+        <h1 class="text-2xl font-semibold text-slate-800">Daftar Penilaian KPI</h1>
+        <p class="text-sm text-slate-500 mt-1">Kelola seluruh penilaian kinerja Pegawai</p>
+      </div>
+
     </div>
-    
-    <h1 class="text-2xl font-semibold text-slate-800">Daftar Penilaian KPI</h1>
-    <p class="text-sm text-slate-500 mt-1">Kelola seluruh penilaian kinerja Pegawai</p>
-  </div>
 
-</div>
-
-    <!-- CARD -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm min-w-[700px]">
@@ -33,37 +31,33 @@
           </thead>
           <tbody class="divide-y divide-slate-100">
             <% if (kpiList.length === 0) { %>
-              <tr>
-                <td colspan="5" class="text-center py-10 text-slate-400">Belum ada data penilaian</td>
-              </tr>
+            <tr>
+              <td colspan="5" class="text-center py-10 text-slate-400">Belum ada data penilaian</td>
+            </tr>
             <% } %>
 
             <% kpiList.forEach(kpi => { %>
-              <tr class="hover:bg-slate-50 transition">
-                <td class="px-6 py-4 font-medium text-slate-800"><%= kpi.employeeId?.fullName %></td>
-                <td class="px-6 py-4 text-slate-500"><%= kpi.periode %></td>
-                <td class="px-6 py-4 text-center font-bold text-indigo-600"><%= kpi.totalKpiScore %></td>
-                
-                <!-- STATUS DENGAN DOT -->
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide bg-emerald-50/70 border-emerald-200/50 text-emerald-600">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20"></span>
-                    <span><%= kpi.status %></span>
-                  </div>
-                </td>
+            <tr class="hover:bg-slate-50 transition">
+              <td class="px-6 py-4 font-medium text-slate-800"><%= kpi.employeeId?.fullName %></td>
+              <td class="px-6 py-4 text-slate-500"><%= kpi.periode %></td>
+              <td class="px-6 py-4 text-center font-bold text-indigo-600"><%= kpi.totalKpiScore %></td>
 
-                <!-- AKSI -->
-                <td class="px-6 py-4">
-                  <a href="/kpi/history-detail/<%= kpi.employeeId?._id %>/<%= kpi.periode %>" 
-                     class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition"
-                     title="Lihat Detail">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9a3 3 0 100 6 3 3 0 000-6z"/>
-                    </svg>
-                  </a>
-                </td>
-              </tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide bg-emerald-50/70 border-emerald-200/50 text-emerald-600">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20"></span>
+                  <span><%= kpi.status %></span>
+                </div>
+              </td>
+
+              <td class="px-6 py-4">
+                <a href="/kpi/history-detail/<%= kpi.employeeId?._id %>/<%= kpi.periode %>" class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition" title="Lihat Detail">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
+                  </svg>
+                </a>
+              </td>
+            </tr>
             <% }) %>
           </tbody>
         </table>

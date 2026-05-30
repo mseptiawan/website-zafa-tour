@@ -1,0 +1,25 @@
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-12">
+  <div>
+    <div class="mb-3 flex items-center gap-3">
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+        <%= typeof section !== 'undefined' ? section : "Area Kerja" %>
+      </span>
+      
+      <div class="h-3 w-px bg-slate-300"></div>
+      
+      <span class="text-[10px] font-bold text-slate-800 uppercase tracking-[0.2em]">
+        <%= typeof module !== 'undefined' ? module : "" %>
+      </span>
+    </div>
+
+    <h1 class="text-3xl font-extrabold text-slate-950 tracking-tighter">
+      <%= typeof title !== 'undefined' ? title : "" %>
+    </h1>
+    
+    <% if (typeof description !== 'undefined' && description) { %>
+      <p class="text-slate-400 mt-2 text-sm font-medium">
+        <%= description %>
+      </p>
+    <% } %>
+  </div>
+</div>

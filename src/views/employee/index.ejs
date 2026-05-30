@@ -1,37 +1,14 @@
 <%- layout('layouts/main', { title: "Data Pegawai" }) %>
 
 <div class="ml-72 p-8 bg-slate-50 min-h-screen">
-  <!-- HEADER UTAMA -->
-  <div class="flex items-center justify-between mb-8">
-   <div class="">
-  <div class="mb-3 flex items-center gap-3">
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-      Area Kerja
-    </span>
-    <div class="h-3 w-px bg-slate-300"></div>
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-      SDM
-    </span>
-  </div>
+<%- include('../partials/page-header', {
+    section: 'Area Kerja',
+    module: 'SDM',
+    title: 'Data Pegawai',
+    description: 'Kelola informasi, peran, dan lacak status keanggotaan seluruh organisasi.'
+  }) %>
+  
 
-  <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-    Data Pegawai
-  </h1>
-  <p class="mt-1.5 text-sm font-medium text-slate-500">
-    Kelola informasi, peran, dan lacak status keanggotaan seluruh organisasi.
-  </p>
-</div>
-
-    <a href="/employee/create"
-       class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all duration-200">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      Tambah Pegawai
-    </a>
-  </div>
-
-  <!-- CONTAINER DATA TABLE -->
   <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
@@ -47,14 +24,11 @@
         <tbody class="divide-y divide-slate-100">
           <% if (employees && employees.length > 0) { %>
             <% employees.forEach(e => { %>
-              <!-- LOGIK CHECK STATUS: Jika status false, tandai sebagai non-aktif -->
            <% let isNonActive = e.userId && e.userId.isActive === false; %>
               <tr class="transition-all duration-200 <%= isNonActive ? 'bg-red-50/30 opacity-80 hover:bg-red-50/50' : 'hover:bg-slate-50/80 group' %>">
                 
-                <!-- 1. INFORMASI UTAMA Pegawai -->
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <!-- Avatar Lingkaran Inisial Nama -->
                     <div>
                       <div class="font-semibold text-sm <%= isNonActive ? 'text-slate-500 line-through decoration-slate-400' : 'text-slate-800' %>">
                         <%= e.fullName %>
@@ -64,7 +38,6 @@
                   </div>
                 </td>
 
-                <!-- 2. JABATAN / BIDANG -->
                 <td class="px-6 py-4">
                   <div class="text-sm font-medium <%= isNonActive ? 'text-slate-400' : 'text-slate-700' %>">
                     <%= e.careerData?.positionId?.name || '-' %>
@@ -74,17 +47,14 @@
                   </div>
                 </td>
 
-                <!-- 3. UNIT KERJA -->
                <td class="px-6 py-4">
   <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-600 bg-slate-50 border border-slate-100">
     <%= e.careerData?.unitId?.name || '-' %>
   </span>
 </td>
 
-                <!-- 4. MENU OPERASIONAL / TOMBOL AKSI (IKON DIJAMIN KELIATAN JELAS) -->
                 <td class="px-6 py-4 text-right">
                   <% if (isNonActive) { %>
-                    <!-- Jika Pegawai sudah di-PHK, tampilkan tombol cepat log riwayat arsip -->
                     <button type="button" 
                             onclick="showHistoryModal('<%= e.fullName %>', '<%= e.terminationInfo?.reason || 'Alasan tidak ditemukan' %>', '<%= e.terminationInfo?.approvedBy || 'Pimpinan' %>', '<%= e.terminationInfo?.date || '-' %>')"
                             class="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 bg-white hover:bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 shadow-sm transition-all cursor-pointer">
@@ -94,9 +64,7 @@
                       Arsip PHK
                     </button>
                   <% } else { %>
-                    <!-- Jika aktif, menu operasional tampil stabil berbentuk box tombol tanpa sembunyi -->
                     <div class="flex items-center justify-end gap-2">
-                       <!-- Tombol Edit Data -->
                     <a href="/employee/edit/<%= e._id %>" 
    class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95] cursor-pointer shadow-sm"
    title="Edit Data">
@@ -105,7 +73,6 @@
    </svg>
 </a>
                        
-                       <!-- Tombol Ajukan PHK / Keluar -->
 <button type="button" 
         onclick="openPhkModal('<%= e._id %>', '<%= e.fullName %>')"
         class="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50/50 shadow-sm transition-all cursor-pointer"
@@ -120,7 +87,6 @@
               </tr>
             <% }) %>
           <% } else { %>
-            <!-- State Jika Array Data Kosong -->
             <tr>
               <td colspan="4" class="px-6 py-12 text-center text-sm font-medium text-slate-400 bg-slate-50/30">
                 Tidak ada data Pegawai yang ditemukan.
@@ -131,14 +97,12 @@
       </table>
     </div>
     
-    <!-- FOOTER INFORMASI TOTAL DATA -->
     <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30">
       <p class="text-xs text-slate-500">Menampilkan <%= employees ? employees.length : 0 %> Pegawai</p>
     </div>
   </div>
 </div>
 
-<!-- MODAL 1: FORM PENGAJUAN PHK -->
 <div id="phkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
   <form id="phkForm" action="/api/employee/phk" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl w-96 shadow-xl border border-slate-100">
     <h3 class="font-bold text-base text-slate-800 mb-2">Ajukan Pemutusan Hubungan Kerja</h3>
@@ -163,7 +127,6 @@
   </form>
 </div>
 
-<!-- MODAL 2: PREVIEW ARSIP RIWAYAT PHK -->
 <div id="historyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
   <div class="bg-white p-6 rounded-2xl w-96 shadow-xl border border-slate-100">
     <div class="flex items-center gap-2 text-slate-800 mb-3">

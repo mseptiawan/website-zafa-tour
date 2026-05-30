@@ -1,28 +1,14 @@
 <%- layout('layouts/main', { title }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-6xl mx-auto space-y-6">
+<%- include('../partials/page-header', {
+  section: 'Area Kerja',
+  module: 'Struktur Organisasi',
+  title: 'Struktur Organisasi',
+  description: 'Kelola master data Bidang, Sub-Unit Kerja, dan Tingkatan Jabatan secara efisien dalam satu layar kerja.'
+}) %>
 
- <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <div class="mb-3 flex items-center gap-3">
-          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-            Area Kerja
-          </span>
-          <div class="h-3 w-px bg-slate-300"></div>
-          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-            Struktur Organisasi
-          </span>
-        </div>
-
-        <h1 class="text-3xl font-semibold tracking-tighter text-slate-950"><%= title %></h1>
-        <p class="mt-1.5 text-sm font-medium text-slate-500">
-          Kelola master data Bidang, Sub-Unit Kerja, dan Tingkatan Jabatan secara efisien dalam satu layar kerja.
-        </p>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-2 border-b border-slate-200/60 pb-px">
+    <div class="flex items-center gap-2 border-b border-slate-200/60 pb-px ">
       <button type="button" onclick="switchMasterTab('bidang')" id="nav-bidang"
         class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
         Bidang Induk
@@ -42,7 +28,7 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mt-4">
       
       <div class="lg:col-span-5">
         <div class="bg-white border border-slate-200/60 p-5 rounded-xl shadow-sm">
