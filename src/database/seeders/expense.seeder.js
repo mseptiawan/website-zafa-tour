@@ -1,5 +1,5 @@
 import ExpenseClaim from "../../models/ExpenseClaim.model.js";
-import User from "../../models/basic/User.js";
+import User from "../../models/basic/User.model.js";
 import Employee from "../../models/employee/Employee.model.js";
 
 const usernames = [

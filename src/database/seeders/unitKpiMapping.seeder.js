@@ -1,5 +1,5 @@
-import Unit from "../../models/basic/Unit.js";
-import Position from "../../models/basic/Position.js";
+import Unit from "../../models/basic/Unit.model.js";
+import Position from "../../models/basic/Position.model.js";
 import KpiTemplate from "../../models/kpi/KpiTemplate.model.js";
 import UnitKpiMapping from "../../models/kpi/UnitKpiMapping.model.js";
 

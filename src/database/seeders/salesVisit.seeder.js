@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 
 import SalesVisit from "../../models/SalesVisit.model.js";
-import User from "../../models/basic/User.js";
+import User from "../../models/basic/User.model.js";
 
 dotenv.config();
 

@@ -3,8 +3,8 @@ import Employee from "../models/employee/Employee.model.js";
 import LoanApproval from "../models/loan/LoanApproval.model.js";
 import LoanPayment from "../models/loan/loanPayment.model.js";
 import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
-import User from "../models/basic/User.js";
-import Role from "../models/basic/Role.js";
+import User from "../models/basic/User.model.js";
+import Role from "../models/basic/Role.model.js";
 
 const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
 

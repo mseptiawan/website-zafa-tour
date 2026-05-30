@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import User from "../../models/basic/User.js";
-import Role from "../../models/basic/Role.js";
+import User from "../../models/basic/User.model.js";
+import Role from "../../models/basic/Role.model.js";
 import Leave from "../../models/leave/Leave.model.js";
 import LeaveApproval from "../../models/leave/LeaveApproval.model.js";
 import LeaveBalance from "../../models/leave/LeaveBalance.model.js";

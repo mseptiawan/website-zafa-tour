@@ -1,6 +1,6 @@
-import Bidang from "../models/basic/Bidang.js";
-import Unit from "../models/basic/Unit.js";
-import Position from "../models/basic/Position.js";
+import Bidang from "../models/basic/Bidang.model.js";
+import Unit from "../models/basic/Unit.model.js";
+import Position from "../models/basic/Position.model.js";
 import AppError from "../utils/AppError.js";
 
 // === WORKSPACE ===

@@ -1,4 +1,4 @@
-import Role from "../../models/basic/Role.js";
+import Role from "../../models/basic/Role.model.js";
 
 const roleSeeder = async () => {
   await Role.deleteMany();
@@ -7,18 +7,20 @@ const roleSeeder = async () => {
     {
       name: "PEGAWAI",
     },
-
     {
       name: "MANAGER_ADMINISTRASI",
+    },
+    {
+      name: "MANAGER_KEUANGAN",
+    },
+    {
+      name: "MANAGER_HAJI_UMRAH",
     },
     {
       name: "WAKIL_DIREKTUR",
     },
     {
       name: "DIREKTUR_UTAMA",
-    },
-    {
-      name: "MANAGER_KEUANGAN",
     },
   ]);
 

@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import Employee from "../models/employee/Employee.model.js";
-import User from "../models/basic/User.js";
+import User from "../models/basic/User.model.js";
 import Termination from "../models/Termination.model.js";
-import Role from "../models/basic/Role.js";
-import Position from "../models/basic/Position.js";
-import Unit from "../models/basic/Unit.js";
-import Bidang from "../models/basic/Bidang.js";
+import Role from "../models/basic/Role.model.js";
+import Position from "../models/basic/Position.model.js";
+import Unit from "../models/basic/Unit.model.js";
+import Bidang from "../models/basic/Bidang.model.js";
 import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
 import EmployeeDocument from "../models/employee/EmployeeDocument.js";
@@ -48,13 +48,20 @@ export const EmployeeService = {
     });
   },
 
-  getFormData: async () => {
+  getFormData: async (currentUserRole) => {
+    let roleQuery = {};
+
+    if (currentUserRole !== "DIREKTUR_UTAMA") {
+      roleQuery = { name: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] } };
+    }
+
     const [positions, units, bidang, roles] = await Promise.all([
       Position.find(),
       Unit.find(),
       Bidang.find(),
-      Role.find(),
+      Role.find(roleQuery),
     ]);
+
     return { positions, units, bidang, roles };
   },
   createNewEmployee: async (data, fileData = {}) => {

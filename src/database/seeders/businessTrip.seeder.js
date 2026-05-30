@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import BusinessTrip from "../../models/BusinessTrip.model.js";
-import User from "../../models/basic/User.js";
+import User from "../../models/basic/User.model.js";
 
 dotenv.config();
 

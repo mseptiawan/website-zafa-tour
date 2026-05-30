@@ -1,4 +1,4 @@
-import ExpenseCategory from "../models/ExpenseCategory.model.js";
+import ExpenseCategory from "../../models/ExpenseCategory.model.js";
 
 const expenseCategorySeeder = async () => {
   await ExpenseCategory.deleteMany();

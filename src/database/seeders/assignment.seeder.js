@@ -1,5 +1,5 @@
 import Assignment from "../../models/Assignment.model.js";
-import User from "../../models/basic/User.js";
+import User from "../../models/basic/User.model.js";
 import Employee from "../../models/employee/Employee.model.js";
 
 const usernames = ["basoherman", "ongkidwi", "sarwanto", "duwihartati", "ronaldrizky", "fadhilah"];

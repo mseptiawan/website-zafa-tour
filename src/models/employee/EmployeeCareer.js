@@ -9,7 +9,7 @@ const employeeCareerSchema = new mongoose.Schema(
     },
     status_pegawai: {
       type: String,
-      enum: ["Tetap", "Kontrak", "Magang"],
+      enum: ["Pegawai Tetap", "Pegawai Kontrak", "Magang / Intern", "Pensiun"],
       required: false,
     },
     tanggal_mulai_bergabung: {

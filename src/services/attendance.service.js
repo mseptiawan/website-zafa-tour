@@ -1,6 +1,6 @@
 import Attendance from "../models/Attendance.model.js";
 import CompanySetting from "../models/CompanySetting.model.js";
-import User from "../models/basic/User.js";
+import User from "../models/basic/User.model.js";
 import AppError from "../utils/AppError.js";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

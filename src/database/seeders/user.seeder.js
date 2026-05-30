@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
-import User from "../../models/basic/User.js";
-import Role from "../../models/basic/Role.js";
+import User from "../../models/basic/User.model.js";
+import Role from "../../models/basic/Role.model.js";
 
 const userSeeder = async () => {
   await User.deleteMany();
@@ -12,7 +12,9 @@ const userSeeder = async () => {
   const direkturUtamaRole = await Role.findOne({ name: "DIREKTUR_UTAMA" });
   const pegawaiRole = await Role.findOne({ name: "PEGAWAI" });
   const managerKeuanganRole = await Role.findOne({ name: "MANAGER_KEUANGAN" });
-
+  const managerHajiUmrahRole = await Role.findOne({
+    name: "MANAGER_HAJI_UMRAH",
+  });
   const users = await User.insertMany([
     {
       username: "rafikafitrianti",
@@ -102,7 +104,7 @@ const userSeeder = async () => {
       username: "basoherman",
       email: "basoherman@gmail.com",
       password,
-      roleId: pegawaiRole._id,
+      roleId: managerHajiUmrahRole._id,
     },
     {
       username: "ongkidwi",

@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 import Overtime from "../../models/Overtime.model.js";
 import Employee from "../../models/employee/Employee.model.js";
-import User from "../../models/basic/User.js";
+import User from "../../models/basic/User.model.js";
 
 dotenv.config();
 

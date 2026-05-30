@@ -2,10 +2,10 @@ import { createEmployeeSchema } from "../validations/employee.schema.js";
 import { EmployeeService } from "../services/employee.service.js";
 import AppError from "../utils/AppError.js";
 import { successResponse } from "../utils/response.js";
-import Role from "../models/basic/Role.js";
-import Position from "../models/basic/Position.js";
-import Unit from "../models/basic/Unit.js";
-import Bidang from "../models/basic/Bidang.js";
+import Role from "../models/basic/Role.model.js";
+import Position from "../models/basic/Position.model.js";
+import Unit from "../models/basic/Unit.model.js";
+import Bidang from "../models/basic/Bidang.model.js";
 import path from "path";
 
 export const getAllEmployeesWeb = async (req, res, next) => {
@@ -24,7 +24,9 @@ export const getAllEmployeesWeb = async (req, res, next) => {
 
 export const formEmployeeWeb = async (req, res, next) => {
   try {
-    const { positions, units, bidang, roles } = await EmployeeService.getFormData();
+    const currentUserRole = req.session.user.role;
+    const { positions, units, bidang, roles } = await EmployeeService.getFormData(currentUserRole);
+
     res.render("employee/create", { title: "Tambah Pegawai", positions, units, bidang, roles });
   } catch (err) {
     next(err);

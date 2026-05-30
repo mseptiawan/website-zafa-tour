@@ -1,8 +1,8 @@
-import User from "../../models/basic/User.js";
+import User from "../../models/basic/User.model.js";
 import Employee from "../../models/employee/Employee.model.js";
-import Position from "../../models/basic/Position.js";
-import Unit from "../../models/basic/Unit.js";
-import Bidang from "../../models/basic/Bidang.js";
+import Position from "../../models/basic/Position.model.js";
+import Unit from "../../models/basic/Unit.model.js";
+import Bidang from "../../models/basic/Bidang.model.js";
 import EmployeeCareer from "../../models/employee/EmployeeCareer.js";
 
 const employeeSeeder = async () => {
