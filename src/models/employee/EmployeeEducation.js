@@ -10,18 +10,19 @@ const employeeEducationSchema = new mongoose.Schema(
     pendidikan_terakhir: {
       type: String,
       enum: ["SMA/SMK", "D3", "D4", "S1", "S2", "S3"],
-      required: true,
+      required: false,
     },
     institusi_pendidikan: {
       type: String,
-      required: true,
+      required: false,
     },
     tahun_kelulusan: {
       type: Number,
-      required: true,
+      required: false,
     },
     file_ijazah: {
       type: String,
+      required: false,
     },
     sertifikat_profesional: {
       type: mongoose.Schema.Types.Mixed,

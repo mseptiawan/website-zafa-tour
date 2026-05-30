@@ -27,7 +27,14 @@ export const formEmployeeWeb = async (req, res, next) => {
     const currentUserRole = req.session.user.role;
     const { positions, units, bidang, roles } = await EmployeeService.getFormData(currentUserRole);
 
-    res.render("employee/create", { title: "Tambah Pegawai", positions, units, bidang, roles });
+    res.render("employee/create", {
+      title: "Tambah Pegawai",
+      error: null,
+      positions,
+      units,
+      bidang,
+      roles,
+    });
   } catch (err) {
     next(err);
   }
@@ -62,18 +69,7 @@ export const createEmployeeApi = async (req, res, next) => {
   try {
     const validatedBody = createEmployeeSchema.parse(req.body);
 
-    const fileData = {
-      file_ktp:
-        req.files && req.files.file_ktp
-          ? `/uploads/files/${path.basename(req.files.file_ktp[0].path)}`
-          : null,
-      file_kk:
-        req.files && req.files.file_kk
-          ? `/uploads/files/${path.basename(req.files.file_kk[0].path)}`
-          : null,
-    };
-
-    const newEmployee = await EmployeeService.createNewEmployee(validatedBody, fileData);
+    await EmployeeService.createNewEmployee(validatedBody);
 
     return res.redirect("/employee");
   } catch (err) {
@@ -82,31 +78,42 @@ export const createEmployeeApi = async (req, res, next) => {
       bidang = [],
       roles = [];
     try {
+      const currentUserRole = req.session?.user?.role;
+      let roleQuery = {};
+      if (currentUserRole !== "DIREKTUR_UTAMA") {
+        roleQuery = { name: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] } };
+      }
+
       [positions, units, bidang, roles] = await Promise.all([
         Position.find(),
         Unit.find(),
         Bidang.find(),
-        Role.find(),
+        Role.find(roleQuery),
       ]);
-    } catch (dbErr) {}
+    } catch (dbErr) {
+      console.error("Gagal memuat ulang database resource:", dbErr);
+    }
 
     let mappedErrors = {};
+    let globalError = null;
 
-    if (err.name === "ZodError" || err.errors) {
+    if (err.name === "ZodError") {
       err.errors.forEach((e) => {
         const fieldName = e.path[0];
         mappedErrors[fieldName] = e.message;
       });
+    } else if (err.code === 11000) {
+      const field = Object.keys(err.keyValue)[0];
+      globalError = `${field === "email" ? "Email" : "NIK"} tersebut sudah terdaftar di sistem.`;
     } else {
-      mappedErrors["global"] = err.message;
+      globalError = err.message || "Terjadi kesalahan internal pada server.";
     }
 
     return res.render("employee/create", {
       title: "Tambah Pegawai",
-      error: mappedErrors.global || null,
+      error: globalError,
       errors: mappedErrors,
       old: req.body,
-      employees: [],
       positions,
       units,
       bidang,

@@ -3,22 +3,25 @@ import mongoose from "mongoose";
 const familyMemberSchema = new mongoose.Schema({
   nama: {
     type: String,
-    required: true,
+    required: false,
   },
   hubungan: {
     type: String,
     enum: ["Suami", "Istri", "Anak", "Orang Tua", "Saudara Kandung"],
-    required: true,
+    required: false,
   },
   nik: {
     type: String,
+    required: false,
   },
   tanggal_lahir: {
     type: Date,
+    required: false,
   },
   jenis_kelamin: {
     type: String,
     enum: ["Laki-laki", "Perempuan"],
+    required: false,
   },
   pekerjaan: {
     type: String,

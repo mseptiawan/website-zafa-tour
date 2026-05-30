@@ -29,11 +29,11 @@ const employeeSchema = new mongoose.Schema(
     },
     tempat_lahir: {
       type: String,
-      required: true,
+      required: false,
     },
     tanggal_lahir: {
       type: Date,
-      required: true,
+      required: false,
     },
     jenis_kelamin: {
       type: String,
@@ -51,7 +51,7 @@ const employeeSchema = new mongoose.Schema(
     status_pernikahan: {
       type: String,
       enum: ["Lajang", "Menikah", "Cerai"],
-      required: true,
+      required: false,
     },
     foto_profile: {
       type: String,

@@ -10,23 +10,25 @@ const employeeFinancialSchema = new mongoose.Schema(
     },
     nomor_rekening: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     nama_bank: {
       type: String,
-      required: true,
+      required: false,
     },
     nama_pemilik_rekening: {
       type: String,
-      required: true,
+      required: false,
     },
     npwp: {
       type: String,
+      required: false,
       trim: true,
     },
     bpjstk: {
       type: String,
+      required: false,
       trim: true,
     },
   },

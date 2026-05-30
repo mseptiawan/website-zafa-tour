@@ -24,7 +24,7 @@ const employeeDocumentSchema = new mongoose.Schema(
       {
         nama_sertifikat: {
           type: String,
-          required: true,
+          required: false,
         },
         penerbit: {
           type: String,

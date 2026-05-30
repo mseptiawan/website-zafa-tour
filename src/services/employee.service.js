@@ -64,7 +64,7 @@ export const EmployeeService = {
 
     return { positions, units, bidang, roles };
   },
-  createNewEmployee: async (data, fileData = {}) => {
+  createNewEmployee: async (data) => {
     const username = data.fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
     const password = await bcrypt.hash("zafasecret", 10);
 
@@ -83,76 +83,40 @@ export const EmployeeService = {
         userId: createdUser._id,
         employeeIdNumber: data.nomor_ktp,
         fullName: data.fullName,
-        email: data.email,
         nomor_ktp: data.nomor_ktp,
-        tempat_lahir: data.tempat_lahir,
-        tanggal_lahir: data.tanggal_lahir,
         jenis_kelamin: data.jenis_kelamin,
         agama: data.agama,
-        golongan_darah: data.golongan_darah,
-        status_pernikahan: data.status_pernikahan,
       });
 
       await EmployeeCareer.create({
         employee_id: createdEmployee._id,
-        positionId: data.positionId || null,
-        unitId: data.unitId || null,
-        bidangId: data.bidangId || null,
-        status_pegawai: data.status_pegawai || null,
-        tanggal_mulai_bergabung: data.tanggal_mulai_bergabung || null,
-        tanggal_berakhir_kontrak: data.tanggal_berakhir_kontrak || null,
+        positionId: data.positionId,
+        unitId: data.unitId,
+        bidangId: data.bidangId,
+        status_pegawai: data.status_pegawai,
+        tanggal_mulai_bergabung: new Date(data.tanggal_mulai_bergabung),
       });
 
-      await EmployeeContact.create({
-        employee_id: createdEmployee._id,
-        nomor_telp: data.nomor_telp,
-        alamat: data.alamat,
-        nama_kontak_darurat: data.nama_kontak_darurat,
-        hubungan_kontak_darurat: data.hubungan_kontak_darurat,
-        nomor_kontak_darurat: data.nomor_kontak_darurat,
-      });
-
-      await EmployeeEducation.create({
-        employee_id: createdEmployee._id,
-        pendidikan_terakhir: data.pendidikan_terakhir,
-        institusi_pendidikan: data.institusi_pendidikan,
-        tahun_kelulusan: Number(data.tahun_kelulusan) || 0,
-        keahlian_utama: data.keahlian_utama
-          ? data.keahlian_utama.split(",").map((s) => s.trim())
-          : [],
-        sertifikat_profesional: data.sertifikat_profesional
-          ? data.sertifikat_profesional.split(",").map((s) => s.trim())
-          : [],
-      });
-
-      await EmployeeFinancial.create({
-        employee_id: createdEmployee._id,
-        nama_bank: data.nama_bank,
-        nomor_rekening: data.nomor_rekening,
-        nama_pemilik_rekening: data.nama_pemilik_rekening,
-        npwp: data.npwp || null,
-        bpjstk: data.bpjstk || null,
-      });
-
-      await EmployeeDocument.create({
-        employee_id: createdEmployee._id,
-        file_ktp: fileData.file_ktp || null,
-        file_kk: fileData.file_kk || null,
-        file_skck: null,
-        tanggal_kadaluarsa_skck: null,
-      });
+      await Promise.all([
+        EmployeeContact.create({ employee_id: createdEmployee._id }),
+        EmployeeEducation.create({ employee_id: createdEmployee._id, tahun_kelulusan: 0 }),
+        EmployeeFinancial.create({ employee_id: createdEmployee._id }),
+        EmployeeDocument.create({ employee_id: createdEmployee._id }),
+      ]);
 
       return createdEmployee;
     } catch (error) {
-      console.log("[ROLLBACK] Terjadi error di tengah jalan, menghapus data sampah...");
+      console.log("[ROLLBACK] Gagal menyimpan data, memulai pembersihan database...");
 
       if (createdEmployee) {
-        await Employee.findByIdAndDelete(createdEmployee._id);
-        await EmployeeCareer.deleteOne({ employee_id: createdEmployee._id });
-        await EmployeeContact.deleteOne({ employee_id: createdEmployee._id });
-        await EmployeeEducation.deleteOne({ employee_id: createdEmployee._id });
-        await EmployeeFinancial.deleteOne({ employee_id: createdEmployee._id });
-        await EmployeeDocument.deleteOne({ employee_id: createdEmployee._id });
+        await Promise.all([
+          Employee.findByIdAndDelete(createdEmployee._id),
+          EmployeeCareer.deleteOne({ employee_id: createdEmployee._id }),
+          EmployeeContact.deleteOne({ employee_id: createdEmployee._id }),
+          EmployeeEducation.deleteOne({ employee_id: createdEmployee._id }),
+          EmployeeFinancial.deleteOne({ employee_id: createdEmployee._id }),
+          EmployeeDocument.deleteOne({ employee_id: createdEmployee._id }),
+        ]);
       }
 
       if (createdUser) {
@@ -162,23 +126,6 @@ export const EmployeeService = {
       throw error;
     }
   },
-  findEmployeeById: async (id) => {
-    const employee = await Employee.findById(id)
-      .populate("userId")
-      .populate({
-        path: "careerData",
-        populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
-      })
-      .populate("contactData")
-      .populate("educationData")
-      .populate("financialData")
-      .populate("documentData");
-
-    if (!employee) return null;
-
-    return employee;
-  },
-
   getReferenceData: async () => {
     const [positions, units, bidangs, roles] = await Promise.all([
       Position.find(),

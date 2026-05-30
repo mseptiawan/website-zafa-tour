@@ -10,24 +10,24 @@ const employeeContactSchema = new mongoose.Schema(
     },
     nomor_telp: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     alamat: {
       type: String,
-      required: true,
+      required: false,
     },
     nama_kontak_darurat: {
       type: String,
-      required: true,
+      required: false,
     },
     hubungan_kontak_darurat: {
       type: String,
-      required: true,
+      required: false,
     },
     nomor_kontak_darurat: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
   },
