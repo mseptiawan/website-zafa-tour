@@ -1,4 +1,4 @@
-import BusinessTrip from "../models/BusinessTrip.js";
+import BusinessTrip from "../models/BusinessTrip.model.js";
 
 export const getFinanceTripDetailService = async ({ id }) => {
   const trip = await BusinessTrip.findById(id).populate("userId", "username email");

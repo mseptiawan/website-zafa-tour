@@ -1,9 +1,9 @@
 import moment from "moment";
-import Attendance from "../models/Attendance.js";
-import DailyLog from "../models/DailyLog.js";
-import BusinessTrip from "../models/BusinessTrip.js";
-import Overtime from "../models/Overtime.js";
-import Kpi from "../models/kpi/Kpi.js";
+import Attendance from "../models/Attendance.model.js";
+import DailyLog from "../models/DailyLog.model.js";
+import BusinessTrip from "../models/BusinessTrip.model.js";
+import Overtime from "../models/Overtime.model.js";
+import Kpi from "../models/kpi/Kpi.model.js";
 import Holiday from "../models/calender/Holiday.model.js";
 
 export const index = async (req, res, next) => {

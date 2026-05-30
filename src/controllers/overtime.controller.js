@@ -1,4 +1,4 @@
-import Overtime from "../models/Overtime.js";
+import Overtime from "../models/Overtime.model.js";
 export const showApplyOvertime = (req, res) => {
   res.render("overtime/apply", {
     title: "Ajukan Lembur",

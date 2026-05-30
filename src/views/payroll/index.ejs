@@ -11,10 +11,6 @@
         </a>
         <h1 class="text-xl font-bold tracking-tight text-slate-900 mt-1">Komponen Payroll</h1>
       </div>
-      <a href="/payroll/components-master" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200/60 text-blue-600 text-[13px] font-medium rounded-xl hover:bg-slate-50 transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <i class="fa-solid fa-layer-group text-blue-500 text-xs"></i>
-        Master Komponen
-      </a>
     </div>
 
     <!-- WORKSPACE ARCHITECTURE -->
@@ -336,14 +332,14 @@
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      alert("✅ " + data.message);
+      alert(" " + data.message);
     } else {
-      alert("❌ " + data.message);
+      alert("" + data.message);
     }
   })
   .catch(err => {
     console.error(err);
-    alert("❌ Terjadi kesalahan sistem saat menghubungi server.");
+    alert("Terjadi kesalahan sistem saat menghubungi server.");
   });
 }
 

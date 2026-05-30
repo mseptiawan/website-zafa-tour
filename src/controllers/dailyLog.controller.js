@@ -1,4 +1,4 @@
-import DailyLog from "../models/DailyLog.js";
+import DailyLog from "../models/DailyLog.model.js";
 import moment from "moment";
 
 export const renderDailyLogPage = async (req, res) => {
@@ -69,7 +69,7 @@ export const createActivity = async (req, res) => {
       tanggal,
       judul,
       kategori: kategori || "Core Task",
-      status: "Pending", 
+      status: "Pending",
       penjelasanHasil: "",
       fileLampiran: "",
     });

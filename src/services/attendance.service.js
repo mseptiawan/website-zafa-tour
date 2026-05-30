@@ -1,5 +1,5 @@
-import Attendance from "../models/Attendance.js";
-import CompanySetting from "../models/CompanySetting.js";
+import Attendance from "../models/Attendance.model.js";
+import CompanySetting from "../models/CompanySetting.model.js";
 import User from "../models/basic/User.js";
 import AppError from "../utils/AppError.js";
 
@@ -180,7 +180,6 @@ export const getAttendanceHistory = async (sessionUser, query) => {
 
   listAttendance = listAttendance.map((doc) => doc.toObject());
 
-  // Jika admin dan bukan personal view → tambahkan data yang belum absen
   if (isAdmin && !isPersonalView) {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);

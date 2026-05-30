@@ -16,43 +16,33 @@ const expenseClaimSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     category: {
       type: String,
-      enum: ["TRANSPORT", "MEAL", "HOTEL", "PARKING", "OPERASIONAL", "LAINNYA"],
-      default: "LAINNYA",
+      required: true,
     },
-
     amount: {
       type: Number,
       required: true,
     },
-
     expenseDate: {
       type: Date,
       required: true,
     },
-
     proofFile: String,
-
     noReceiptReason: String,
-
     selfDeclaration: {
       type: Boolean,
       default: false,
     },
-
     status: {
       type: String,
       enum: ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"],
       default: "PENDING_FINANCE",
     },
-
     managerApprovedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-
     financeApprovedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

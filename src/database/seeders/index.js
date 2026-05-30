@@ -19,7 +19,8 @@ import announcementSeeder from "./announcement.seeder.js";
 import salesVisitSeeder from "./salesVisit.seeder.js";
 import businessTripSeeder from "./businessTrip.seeder.js";
 import overtimeSeeder from "./overtime.seeder.js";
-import expenseSeeder from "./expenseSeeder.js";
+import expenseCategorySeeder from "./expenseCategory.seeder.js";
+import expenseSeeder from "./expense.seeder.js";
 
 import kpiTemplateSeeder from "./kpiTemplate.seeder.js";
 import kpiTemplateDetailSeeder from "./kpiTemplateDetail.seeder.js";
@@ -46,6 +47,7 @@ const seeders = [
   salesVisitSeeder,
   businessTripSeeder,
   overtimeSeeder,
+  expenseCategorySeeder,
   expenseSeeder,
 
   kpiTemplateSeeder,

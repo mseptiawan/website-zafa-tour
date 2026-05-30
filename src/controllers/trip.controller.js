@@ -13,7 +13,7 @@ import {
   getApprovalTripsService,
   getMyTripsService,
 } from "../services/trip.service.js";
-import BusinessTrip from "../models/BusinessTrip.js";
+import BusinessTrip from "../models/BusinessTrip.model.js";
 export const newForm = (req, res) => {
   res.render("trip/user/create", { title: "Pengajuan Dinas Luar", error: null });
 };

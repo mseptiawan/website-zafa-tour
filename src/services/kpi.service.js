@@ -1,8 +1,8 @@
 import Employee from "../models/employee/Employee.model.js";
-import KpiTemplateDetail from "../models/kpi/KpiTemplateDetail.js";
-import KpiTemplate from "../models/kpi/KpiTemplate.js";
-import Kpi from "../models/kpi/Kpi.js";
-import unitKpiMapping from "../models/kpi/UnitKpiMapping.js";
+import KpiTemplateDetail from "../models/kpi/KpiTemplateDetail.model.js";
+import KpiTemplate from "../models/kpi/KpiTemplate.model.js";
+import Kpi from "../models/kpi/Kpi.model.js";
+import unitKpiMapping from "../models/kpi/UnitKpiMapping.model.js";
 import AppError from "../utils/AppError.js";
 
 export const getEmployeesToAppraise = async () => {

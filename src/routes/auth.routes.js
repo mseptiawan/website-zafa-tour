@@ -7,7 +7,7 @@ import {
   requestPasswordReset,
   showResetPasswordPage,
   handleResetPassword,
-} from "../controllers/authController.js";
+} from "../controllers/auth.controller.js";
 
 import authMiddleware from "../middlewares/authMiddleware.js";
 

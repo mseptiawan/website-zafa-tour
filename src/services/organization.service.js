@@ -1,4 +1,3 @@
-// src/services/organization.service.js
 import Bidang from "../models/basic/Bidang.js";
 import Unit from "../models/basic/Unit.js";
 import Position from "../models/basic/Position.js";

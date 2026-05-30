@@ -1,4 +1,4 @@
-import SalesVisit from "../models/SalesVisit.js";
+import SalesVisit from "../models/SalesVisit.model.js";
 import { createSalesVisitSchema, updateSalesVisitSchema } from "../validations/sales.schema.js";
 import { validateData } from "../utils/validateData.js";
 

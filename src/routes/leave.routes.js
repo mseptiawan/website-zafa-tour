@@ -25,7 +25,7 @@ import {
   toggleHolidayStatus,
   createHoliday,
   deleteHoliday,
-} from "../controllers/leaveController.js";
+} from "../controllers/leave.controller.js";
 
 const router = express.Router();
 
@@ -47,20 +47,15 @@ router.get("/leave/manage-requests", authMiddleware, getManageLeavePage);
 
 router.get("/api/leave/calculate-days", authMiddleware, calculateLeaveDays);
 
-// Route untuk menampilkan halaman kalender
 router.get("/leave/manage-calendar", getHolidaysPage);
 
-// SOLUSI ERROR: Route POST untuk handle submit form tambah hari libur
 router.post("/leave/manage-calendar/create", createHoliday);
 
-// Ganti router.delete lama menjadi patch/post untuk archive
 router.patch("/leave/manage-calendar/toggle/:id", toggleHolidayStatus);
 
-// Tambahkan route POST untuk update data hasil edit
 router.post("/leave/manage-calendar/update/:id", updateHoliday);
 router.post("/leave/manage-requests/generate-balances", generateOrResetLeaveBalance);
 
-// router.get("/leave/approvals", authMiddleware, showApprovals);
 router.post("/leave/approval/approve/:id", authMiddleware, approveLeave);
 
 router.post("/leave/approval/reject/:id", authMiddleware, rejectLeave);

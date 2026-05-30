@@ -1,7 +1,7 @@
 import Unit from "../../models/basic/Unit.js";
 import Position from "../../models/basic/Position.js";
-import KpiTemplate from "../../models/kpi/KpiTemplate.js";
-import UnitKpiMapping from "../../models/kpi/UnitKpiMapping.js";
+import KpiTemplate from "../../models/kpi/KpiTemplate.model.js";
+import UnitKpiMapping from "../../models/kpi/UnitKpiMapping.model.js";
 
 const unitKpiMappingSeeder = async () => {
   await UnitKpiMapping.deleteMany();

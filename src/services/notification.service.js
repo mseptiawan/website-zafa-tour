@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Notification from "../models/notification.model.js";
+import Notification from "../models/Notification.model.js";
 
 class NotificationService {
   async createNotification({ userId, type, title, text, module, referenceId }) {

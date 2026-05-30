@@ -3,10 +3,10 @@ import transporter from "../config/mailer.js";
 import bcrypt from "bcrypt";
 import User from "../models/basic/User.js";
 import crypto from "crypto";
-import Attendance from "../models/Attendance.js";
+import Attendance from "../models/Attendance.model.js";
 import Employee from "../models/employee/Employee.model.js";
-import BusinessTrip from "../models/BusinessTrip.js";
-import Announcement from "../models/Announcement.js";
+import BusinessTrip from "../models/BusinessTrip.model.js";
+import Announcement from "../models/Announcement.mode.js";
 export const showLogin = (req, res) => {
   if (req.session.user) {
     return res.redirect("/dashboard");

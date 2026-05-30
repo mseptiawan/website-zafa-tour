@@ -17,7 +17,6 @@ const roleSeeder = async () => {
     {
       name: "DIREKTUR_UTAMA",
     },
-
     {
       name: "MANAGER_KEUANGAN",
     },

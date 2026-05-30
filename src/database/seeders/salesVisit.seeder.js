@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-import SalesVisit from "../../models/SalesVisit.js";
+import SalesVisit from "../../models/SalesVisit.model.js";
 import User from "../../models/basic/User.js";
 
 dotenv.config();
@@ -105,7 +105,6 @@ export default async function salesVisitSeeder() {
       return;
     }
 
-    // hapus data lama
     await SalesVisit.deleteMany({});
 
     const data = [];

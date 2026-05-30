@@ -13,7 +13,7 @@ import {
   approveManagerExpense,
   financeExpensePage,
   payExpense,
-} from "../controllers/expenseController.js";
+} from "../controllers/expense.controller.js";
 
 const router = express.Router();
 
@@ -24,14 +24,14 @@ router.get("/expense/my", authMiddleware, myExpenses);
 router.get(
   "/expense/all",
   authMiddleware,
-  roleMiddleware(["HR", "MANAGER", "PIMPINAN"]),
+  roleMiddleware(["WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"]),
   allExpenses
 );
 
 router.get(
   "/expense/approval/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER"]),
+  roleMiddleware(["MANAGER_ADMINISTRASI"]),
   approvalManagerExpense
 );
 

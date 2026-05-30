@@ -12,7 +12,7 @@ import {
   detailOvertime,
   rejectOvertime,
   approvalOvertimeHistory,
-} from "../controllers/overtimeController.js";
+} from "../controllers/overtime.controller.js";
 
 const router = express.Router();
 

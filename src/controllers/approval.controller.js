@@ -1,4 +1,4 @@
-import Termination from "../models/Termination.js";
+import Termination from "../models/Termination.model.js";
 import User from "../models/basic/User.js";
 import Employee from "../models/employee/Employee.model.js";
 

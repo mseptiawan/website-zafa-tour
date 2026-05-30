@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import BusinessTrip from "../models/BusinessTrip.js";
+import BusinessTrip from "../models/BusinessTrip.model.js";
 import { X } from "lucide-react";
 
 export const createTripService = async ({ user, body }) => {

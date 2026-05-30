@@ -1,5 +1,5 @@
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
-import BusinessTrip from "../models/BusinessTrip.js";
+import BusinessTrip from "../models/BusinessTrip.model.js";
 import { getFinanceTripDetailService } from "../services/finance.service.js";
 
 export const processPayment = async (req, res) => {

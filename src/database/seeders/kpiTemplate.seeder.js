@@ -1,4 +1,4 @@
-import KpiTemplate from "../../models/kpi/KpiTemplate.js";
+import KpiTemplate from "../../models/kpi/KpiTemplate.model.js";
 
 const kpiTemplateSeeder = async () => {
   await KpiTemplate.deleteMany();

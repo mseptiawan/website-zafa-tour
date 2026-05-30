@@ -111,7 +111,6 @@ export default async function leaveSeeder() {
       return;
     }
 
-    // Bersihkan semua data lama
     await LeaveType.deleteMany({});
     await LeaveBalance.deleteMany({});
     await Leave.deleteMany({});
@@ -138,7 +137,6 @@ export default async function leaveSeeder() {
 
     const statuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED", "CANCELLATION_PENDING"];
 
-    // 🌟 DAFTAR USERNAME PRIORITAS YANG MAU DIBUATKAN MASING-MASING 30 DATA
     const targetUsernames = [
       "basoherman",
       "ongkidwi",

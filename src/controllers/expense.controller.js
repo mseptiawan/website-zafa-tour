@@ -1,10 +1,18 @@
-import ExpenseClaim from "../models/ExpenseClaim.js";
+import ExpenseClaim from "../models/ExpenseClaim.model.js";
 import Employee from "../models/employee/Employee.model.js";
+import ExpenseCategory from "../models/ExpenseCategory.model.js";
+export const formExpense = async (req, res) => {
+  try {
+    const categories = await ExpenseCategory.find({ isActive: true }).sort({ name: 1 });
 
-export const formExpense = (req, res) => {
-  res.render("expense/create", {
-    title: "Ajukan Klaim Beban",
-  });
+    res.render("expense/create", {
+      title: "Ajukan Klaim Beban",
+      categories,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error loading expense form");
+  }
 };
 
 export const createExpense = async (req, res) => {

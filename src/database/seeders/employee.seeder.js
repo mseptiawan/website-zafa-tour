@@ -3,10 +3,9 @@ import Employee from "../../models/employee/Employee.model.js";
 import Position from "../../models/basic/Position.js";
 import Unit from "../../models/basic/Unit.js";
 import Bidang from "../../models/basic/Bidang.js";
-import EmployeeCareer from "../../models/employee/EmployeeCareer.js"; // Import model karir baru
+import EmployeeCareer from "../../models/employee/EmployeeCareer.js";
 
 const employeeSeeder = async () => {
-  // Bersihkan data lama di kedua koleksi agar fresh
   await Employee.deleteMany();
   await EmployeeCareer.deleteMany();
 
@@ -323,10 +322,8 @@ const employeeSeeder = async () => {
     const orderNumber = (i + 1).toString().padStart(3, "0");
     const generatedId = `EMP-${orderNumber}`;
 
-    // Generate dummy NIK unik sepanjang 16 digit berbasis urutan index seeder
     const generatedKtp = `320101${(i + 1).toString().padStart(10, "0")}`;
 
-    // 1. Simpan ke koleksi Employee (Memenuhi validasi required schema)
     const newEmployee = await Employee.create({
       userId: emp.userId,
       employeeIdNumber: generatedId,
@@ -339,8 +336,6 @@ const employeeSeeder = async () => {
       status_pernikahan: "Lajang",
     });
 
-    // 2. Simpan ke koleksi EmployeeCareer jika data struktural ada
-    // Menggunakan validasi internal jika posisiId, bidangId, atau unitId tidak null
     if (emp.positionId || emp.bidangId || emp.unitId) {
       await EmployeeCareer.create({
         employee_id: newEmployee._id,

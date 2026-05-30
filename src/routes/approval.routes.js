@@ -8,7 +8,6 @@ import {
 
 const router = express.Router();
 
-// Semua route di file ini wajib melewati autentikasi
 router.use(authMiddleware);
 
 // Pimpinan melihat daftar antrean pengajuan PHK status 'Waiting'

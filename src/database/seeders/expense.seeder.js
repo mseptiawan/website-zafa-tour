@@ -1,4 +1,4 @@
-import ExpenseClaim from "../../models/ExpenseClaim.js";
+import ExpenseClaim from "../../models/ExpenseClaim.model.js";
 import User from "../../models/basic/User.js";
 import Employee from "../../models/employee/Employee.model.js";
 
