@@ -1,33 +1,27 @@
 <%- layout('layouts/main', { title }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-
   <div class="max-w-2xl mx-auto">
 
-    <!-- HEADER -->
     <%- include('../partials/page-header', { 
-          section: 'Area Kerja', 
-          module: 'Perizinan', 
-          title: 'Pengajuan Izin & Cuti', 
-          description: 'Form permohonan izin absensi atau cuti karyawan' 
-      }) %>
+        section: 'Area Kerja', 
+        module: 'Perizinan', 
+        title: 'Pengajuan Izin & Cuti', 
+        description: 'Form permohonan izin absensi atau cuti karyawan' 
+    }) %>
 
-    <!-- CARD -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
       <form action="/permit" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
-        <!-- LEAVE TYPE (DROPDOWN) -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-semibold text-slate-700">
             Jenis Izin / Cuti
           </label>
 
           <div class="relative w-full" id="custom-dropdown">
-            <!-- HIDDEN INPUT -->
             <input type="hidden" name="type" id="leave-type-value" required>
 
-            <!-- SELECT TRIGGER BUTTON -->
             <button type="button" onclick="toggleDropdown()" class="w-full bg-slate-50/60 border border-slate-200/60 rounded-xl px-4 py-3 text-[13px] font-medium text-slate-700 text-left flex items-center justify-between outline-none hover:bg-slate-50 hover:border-slate-300 focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all duration-200 cursor-pointer shadow-sm shadow-slate-100/50">
               <span id="dropdown-label" class="text-slate-400 text-xs">Pilih jenis permohonan izin</span>
               <svg id="dropdown-arrow" class="w-4 h-4 text-slate-400 stroke-[2] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,28 +29,23 @@
               </svg>
             </button>
 
-            <!-- OPTIONS MENU PANELS -->
             <div id="dropdown-menu" class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200/50 rounded-xl shadow-xl shadow-slate-100/80 p-1.5 space-y-0.5 origin-top transform opacity-0 scale-95 transition-all duration-150 backdrop-blur-sm">
 
-              <!-- 1. IZIN SAKIT -->
               <button type="button" onclick="selectOption('SAKIT', 'Izin Sakit (Dengan Surat Dokter)')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Sakit (Dengan Surat Dokter)</span>
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               </button>
 
-              <!-- 2. IZIN MENDAMPINGI ISTRI MELAHIRKAN -->
               <button type="button" onclick="selectOption('PENDAMPINGAN_MELAHIRKAN', 'Izin Mendampingi Istri Melahirkan')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Mendampingi Istri Melahirkan</span>
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               </button>
 
-              <!-- 3. IZIN KENA MUSIBAH -->
               <button type="button" onclick="selectOption('MUSIBAH', 'Izin Terkena Musibah / Kemalangan')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Terkena Musibah / Kemalangan</span>
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               </button>
 
-              <!-- 4. IZIN HAL PENTING -->
               <button type="button" onclick="selectOption('PENTING', 'Izin Keperluan Mendesak / Hal Penting')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Keperluan Mendesak / Hal Penting</span>
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
@@ -66,24 +55,22 @@
           </div>
         </div>
 
-        <!-- DATE RANGE -->
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1.5">
             <label class="text-[13px] font-semibold text-slate-700">
               Tanggal Mulai
             </label>
-            <input type="date" name="startDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+            <input type="date" id="startDate" name="startDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
           </div>
 
           <div class="space-y-1.5">
             <label class="text-[13px] font-semibold text-slate-700">
               Tanggal Selesai
             </label>
-            <input type="date" name="endDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+            <input type="date" id="endDate" name="endDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
           </div>
         </div>
 
-        <!-- REASON / ALASAN -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-semibold text-slate-700">
             Alasan Pengajuan
@@ -91,17 +78,17 @@
           <textarea name="reason" rows="4" minlength="5" maxlength="500" required placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"></textarea>
         </div>
 
-        <!-- UPLOAD DOCUMENT -->
         <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Dokumen Pendukung <span class="text-slate-400 font-normal">(Opsional / Surat Dokter)</span>
+          <label class="text-[13px] font-semibold text-slate-700 flex items-center gap-1">
+            <span>Dokumen Pendukung</span>
+            <span id="required-mark" class="text-rose-500 hidden">*</span>
+            <span id="optional-mark" class="text-slate-400 font-normal">(Opsional)</span>
           </label>
 
           <div class="group relative border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-white rounded-2xl p-6 transition-all duration-200 text-center cursor-pointer">
             <input type="file" name="document" id="file-upload" accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateFileName(this)" />
 
             <div class="space-y-2 pointer-events-none">
-              <!-- Icon Upload -->
               <div class="mx-auto w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-50 text-slate-400 group-hover:text-blue-500 flex items-center justify-center transition-colors">
                 <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
@@ -109,14 +96,13 @@
               </div>
 
               <div class="text-xs font-medium text-slate-600">
-                <span class="text-blue-600 font-semibold">Klik untuk upload</span> atau drag dan drop berkas
+                Klik untuk upload atau drag dan drop berkas
               </div>
               <p id="file-info" class="text-[11px] text-slate-400">PDF, JPG, JPEG, atau PNG (Maks. 2MB)</p>
             </div>
           </div>
         </div>
 
-        <!-- SUBMIT BUTTONS -->
         <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
           <a href="/permit" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
             Batal
@@ -164,13 +150,29 @@
     }, 150);
   }
 
-  // SELECT DROPDOWN OPTION
+  // SELECT DROPDOWN OPTION WITH DYNAMIC FILE VALIDATION
   function selectOption(value, label) {
     document.getElementById('leave-type-value').value = value;
     const labelEl = document.getElementById('dropdown-label');
     labelEl.textContent = label;
     labelEl.classList.remove('text-slate-400');
     labelEl.classList.add('text-slate-700');
+    
+    // Logika Validasi Surat Sakit
+    const fileUpload = document.getElementById('file-upload');
+    const requiredMark = document.getElementById('required-mark');
+    const optionalMark = document.getElementById('optional-mark');
+
+    if (value === 'SAKIT') {
+      fileUpload.required = true;
+      requiredMark.classList.remove('hidden');
+      optionalMark.classList.add('hidden');
+    } else {
+      fileUpload.required = false;
+      requiredMark.classList.add('hidden');
+      optionalMark.classList.remove('hidden');
+    }
+
     closeDropdown();
   }
 
@@ -196,4 +198,29 @@
       fileInfo.classList.add('text-slate-400');
     }
   }
+
+  // DATE CONSTRAINT LOGIC (LOCKING PAST DATES)
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+  const dd = String(today.getDate()).padStart(2, '0');
+  
+  const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+  const startInput = document.getElementById('startDate');
+  const endInput = document.getElementById('endDate');
+  
+  startInput.min = formattedToday;
+  endInput.min = formattedToday;
+
+  startInput.addEventListener('change', function() {
+    if (this.value) {
+      endInput.min = this.value;
+      if (endInput.value && endInput.value < this.value) {
+        endInput.value = this.value; 
+      }
+    } else {
+      endInput.min = formattedToday;
+    }
+  });
 </script>

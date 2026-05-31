@@ -1,44 +1,37 @@
 <%- layout('layouts/main', { title }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
-  <div class="max-w-6xl mx-auto">
+  <div class="max-w-6xl mx-auto space-y-8">
 
-    <%- include('../partials/page-header', {
-      section: 'Area Kerja',
-      module: 'Finance',
-      title: 'Pusat Administrasi Pinjaman',
-      description: 'Kelola, tinjau, dan otorisasi seluruh permohonan pinjaman pegawai.'
+      <%- include('../partials/page-header', {
+        section: 'Enterprise Wallet',
+        module: 'Finance & Otorisasi',
+        title: 'Pusat Administrasi Pinjaman',
+        description: 'Sistem otomasi tata kelola, mitigasi risiko, dan pengawasan likuiditas peminjaman pegawai.'
+      }) %>
+
+    <%- include('../partials/_stats-grid', {
+      items: [
+        { label: 'Otorisasi Tertunda', value: activeLoans.length, unit: 'Berkas', icon: 'fa-solid fa-clock-rotate-left', bgClass: 'bg-white border-slate-200/60', iconBoxClass: 'bg-amber-50 text-amber-600 border-amber-100' },
+        { label: 'Selesai Diproses', value: historyLoans.length, unit: 'Berkas', icon: 'fa-solid fa-circle-check', bgClass: 'bg-white border-slate-200/60', iconBoxClass: 'bg-blue-50 text-blue-600 border-blue-100' },
+        { label: 'Total Rasio Pencairan', value: (activeLoans.length + historyLoans.length), unit: 'Total Transaksi', icon: 'fa-solid fa-chart-pie', bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800', valueClass: 'text-white', iconBoxClass: 'bg-white/10 text-white border-transparent' }
+      ]
     }) %>
-    <div class="flex items-center gap-2 mb-6 border-b border-slate-200/60">
-      <button type="button" onclick="switchTab('active')" id="tab-btn-active" class="tab-btn px-4 py-2.5 text-xs font-bold border-b-2 border-blue-600 text-blue-600 outline-none cursor-pointer">
-        Permintaan Aktif (<span id="count-active"><%= activeLoans.length %></span>)
-      </button>
-      <button type="button" onclick="switchTab('history')" id="tab-btn-history" class="tab-btn px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 outline-none cursor-pointer">
-        Riwayat Persetujuan (<span id="count-history"><%= historyLoans.length %></span>)
-      </button>
+
+    <%- include('../partials/_tab-nav', {
+      tabs: [
+        { id: 'active', label: `Permintaan Aktif (${activeLoans.length})` },
+        { id: 'history', label: `Riwayat Persetujuan (${historyLoans.length})` }
+      ]
+    }) %>
+
+    <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
+      <%- include('partials/_loan-table', { loans: activeLoans, type: 'active' }) %>
     </div>
 
-    <div id="tab-content-active" class="tab-pane block">
-      <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
-        <%- include('partials/_loan-table', { loans: activeLoans, type: 'active' }) %>
-      </div>
+    <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
+      <%- include('partials/_loan-table', { loans: historyLoans, type: 'history' }) %>
     </div>
 
-    <div id="tab-content-history" class="tab-pane hidden">
-      <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
-        <%- include('partials/_loan-table', { loans: historyLoans, type: 'history' }) %>
-      </div>
-    </div>
   </div>
 </div>
-
-<script>
-  function switchTab(tabName) {
-    document.querySelectorAll(".tab-pane").forEach(p => p.classList.replace("block", "hidden"));
-    document.querySelectorAll(".tab-btn").forEach(b => {
-      b.className = "tab-btn cursor-pointer border-b-2 border-transparent px-4 py-2.5 text-xs font-medium text-slate-400 outline-none hover:text-slate-800";
-    });
-    document.getElementById(`tab-content-${tabName}`).classList.replace("hidden", "block");
-    document.getElementById(`tab-btn-${tabName}`).className = "tab-btn cursor-pointer border-b-2 border-blue-600 px-4 py-2.5 text-xs font-bold text-blue-600 outline-none";
-  }
-</script>

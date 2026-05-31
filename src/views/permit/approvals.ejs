@@ -1,0 +1,38 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+  <div class="max-w-6xl mx-auto space-y-8">
+
+      <%- include('../partials/page-header', {
+        section: 'Area Kerja',
+        module: 'Kehadiran',
+        title: 'Riwayat & Status Izin',
+        description: 'Pantau status, otorisasi, dan riwayat dokumentasi perizinan operasional kerja pegawai.'
+      }) %>
+
+    <%- include('../partials/_stats-grid', {
+      items: [
+        { label: 'Total Pengajuan', value: summary.totalPermits, unit: 'Berkas', icon: 'fa-solid fa-folder-open', bgClass: 'bg-white border-slate-200/60', iconBoxClass: 'bg-slate-50 text-slate-600 border-slate-100' },
+        { label: 'Disetujui Wadir', value: summary.approved, unit: 'Berkas', icon: 'fa-solid fa-circle-check', bgClass: 'bg-white border-slate-200/60', iconBoxClass: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+        { label: 'Pending Approval', value: summary.pending, unit: 'Berkas', icon: 'fa-solid fa-hourglass-half', bgClass: 'bg-white border-slate-200/60', iconBoxClass: 'bg-amber-50 text-amber-600 border-amber-100' },
+        { label: 'Ditolak', value: summary.rejected, unit: 'Berkas', icon: 'fa-solid fa-circle-xmark', bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800', valueClass: 'text-white', iconBoxClass: 'bg-white/10 text-white border-transparent' }
+      ]
+    }) %>
+
+    <%- include('../partials/_tab-nav', {
+      tabs: [
+        { id: 'active', label: `Permintaan Masuk (${permits.filter(p => p.status === 'PENDING').length})` },
+        { id: 'history', label: `Arsip Keputusan (${permits.filter(p => p.status !== 'PENDING').length})` }
+      ]
+    }) %>
+
+    <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
+      <%- include('partials/_table', { permits: permits.filter(p => p.status === 'PENDING'), type: 'active' }) %>
+    </div>
+
+    <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
+      <%- include('partials/_table', { permits: permits.filter(p => p.status !== 'PENDING'), type: 'history' }) %>
+    </div>
+
+  </div>
+</div>

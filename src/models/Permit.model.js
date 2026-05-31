@@ -36,6 +36,15 @@ const permitSchema = new mongoose.Schema(
       enum: ["PENDING", "APPROVED", "REJECTED"],
       default: "PENDING",
     },
+    approvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    approvalDate: {
+      type: Date,
+      default: null,
+    },
     notesByApprover: {
       type: String,
       default: null,

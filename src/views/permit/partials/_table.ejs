@@ -1,0 +1,110 @@
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[1000px] text-sm text-left border-collapse">
+      <thead class="border-b border-slate-100 bg-slate-50 text-[11px] tracking-wider text-slate-400 uppercase font-bold">
+        <tr>
+          <th class="px-6 py-4.5">Jenis Izin</th>
+          <th class="px-6 py-4.5">Alasan Pengajuan</th>
+          <th class="px-6 py-4.5">Periode Pelaksanaan</th>
+          <th class="px-6 py-4.5">Dokumen Pendukung</th>
+          <% if (type === 'history') { %>
+          <th class="px-6 py-4.5 text-center">Status Mitigasi</th>
+          <% } %>
+          <th class="px-6 py-4.5 text-right pr-8">Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-slate-100 text-[13px]">
+        <% if (permits.length === 0) { %>
+        <tr>
+          <td colspan="<%= type === 'active' ? 5 : 6 %>" class="py-16 text-center text-slate-400 font-medium">
+            <div class="flex flex-col items-center justify-center space-y-2">
+              <i class="fa-solid fa-inbox text-xl text-slate-300"></i>
+              <span>Tidak ada data perizinan dalam kategori ini</span>
+            </div>
+          </td>
+        </tr>
+        <% } else { %>
+        <% permits.forEach(permit => { %>
+        <tr class="transition-colors hover:bg-slate-50/60 group">
+          
+          <td class="px-6 py-4.5">
+            <% 
+              const typeLabels = {
+                'SAKIT': 'Izin Sakit',
+                'PENDAMPINGAN_MELAHIRKAN': 'Mendampingi Istri Melahirkan',
+                'MUSIBAH': 'Terkena Musibah',
+                'PENTING': 'Keperluan Mendesak'
+              };
+            %>
+            <span class="font-semibold text-slate-800 block">
+              <%= typeLabels[permit.type] || permit.type %>
+            </span>
+            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded inline-block mt-1">
+              <%= permit.type %>
+            </span>
+          </td>
+
+          <td class="px-6 py-4.5 text-slate-600 max-w-xs truncate font-medium">
+            <%= permit.reason %>
+          </td>
+
+          <td class="px-6 py-4.5 font-medium text-slate-500 tabular-nums">
+            <%= new Date(permit.startDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) %> -
+            <%= new Date(permit.endDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+          </td>
+
+          <td class="px-6 py-4.5 whitespace-nowrap">
+            <% if (permit.document) { %>
+            <a href="<%= permit.document %>" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 font-semibold hover:underline">
+              <i class="fa-solid fa-file-pdf text-xs"></i>
+              Lihat Berkas
+            </a>
+            <% } else { %>
+            <span class="text-xs text-slate-400 italic font-medium">Tidak ada berkas</span>
+            <% } %>
+          </td>
+
+          <% if (type === 'history') { %>
+          <td class="px-6 py-4.5 align-middle whitespace-nowrap text-center">
+            <% 
+              const textStyles = { 'APPROVED': 'text-emerald-700 border-emerald-200/60 bg-emerald-50/50', 'REJECTED': 'text-rose-700 border-rose-200/60 bg-rose-50/50', 'PENDING': 'text-amber-700 border-amber-200/60 bg-amber-50/50' }; 
+              const dotStyles = { 'APPROVED': 'bg-emerald-500', 'REJECTED': 'bg-rose-500', 'PENDING': 'bg-amber-500' }; 
+              const statusLabels = { 'APPROVED': 'Approved', 'REJECTED': 'Rejected', 'PENDING': 'Pending Wadir' }; 
+            %>
+            <div class="<%= textStyles[permit.status] || 'text-slate-500' %> inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-wide shadow-2xs">
+              <span class="<%= dotStyles[permit.status] || 'bg-slate-400' %> <%= permit.status === 'APPROVED' ? 'animate-pulse' : '' %> h-1.5 w-1.5 rounded-full"></span>
+              <span><%= statusLabels[permit.status] || permit.status %></span>
+            </div>
+          </td>
+          <% } %>
+
+          <td class="px-6 py-4.5 pr-8">
+            <div class="flex items-center justify-end gap-2">
+              <% if (type === 'active') { %>
+              <form action="/permit/approval/<%= permit._id %>" method="POST" class="inline">
+                <input type="hidden" name="status" value="APPROVED">
+                <button type="submit" onclick="return confirm('Apakah Anda yakin ingin langsung menyetujui pengajuan izin ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-2xs hover:bg-emerald-600 transition active:scale-[0.95] cursor-pointer" title="Setujui">
+                  <i class="fa-solid fa-check text-xs"></i>
+                </button>
+              </form>
+
+              <form action="/permit/approval/<%= permit._id %>" method="POST" class="inline">
+                <input type="hidden" name="status" value="REJECTED">
+                <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menolak pengajuan izin ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500 text-white shadow-2xs hover:bg-rose-600 transition active:scale-[0.95] cursor-pointer" title="Tolak">
+                  <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+              </form>
+              <% } else { %>
+              <span class="text-xs font-semibold text-slate-400 italic">No Action</span>
+              <% } %>
+            </div>
+          </td>
+
+        </tr>
+        <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
