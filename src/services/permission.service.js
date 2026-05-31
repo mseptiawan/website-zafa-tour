@@ -50,6 +50,7 @@ export function getPermissions(role) {
     claim_my: false,
     claim_approval: false,
     claim_verify: false,
+    claim_category_manage: false,
 
     daily_log_create: false,
 
@@ -210,6 +211,7 @@ export function getPermissions(role) {
 
       permissions.claim_new = true;
       permissions.claim_my = true;
+      permissions.claim_category_manage = true;
 
       permissions.kasbon_request = true;
       permissions.kasbon_approval = true;
