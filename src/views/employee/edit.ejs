@@ -163,9 +163,44 @@
         <div class="bg-slate-50/50 p-5 rounded-xl border border-slate-100 space-y-4">
           <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide mb-2">Dokumen Utama Karyawan</h4>
           <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
-            <div class="space-y-1.5"><label class="label-custom">Berkas KTP (PDF/IMG)</label><input name="file_ktp" type="file" class="input-custom bg-white" /></div>
-            <div class="space-y-1.5"><label class="label-custom">Berkas Kartu Keluarga (PDF/IMG)</label><input name="file_kk" type="file" class="input-custom bg-white" /></div>
-            <div class="space-y-1.5"><label class="label-custom">Berkas SKCK Aktif</label><input name="file_skck" type="file" class="input-custom bg-white" /></div>
+           <div class="space-y-1.5">
+  <label class="label-custom">Berkas KTP (PDF/IMG)</label>
+  <input name="file_ktp" type="file" class="input-custom bg-white" />
+
+  <% if (employee.documentData?.file_ktp) { %>
+    <p class="text-[10px] text-blue-600 font-medium mt-1">
+      <a href="<%= employee.documentData.file_ktp %>" target="_blank">
+        👁 Lihat KTP Saat Ini
+      </a>
+    </p>
+  <% } %>
+</div>
+
+<div class="space-y-1.5">
+  <label class="label-custom">Berkas Kartu Keluarga (PDF/IMG)</label>
+  <input name="file_kk" type="file" class="input-custom bg-white" />
+
+  <% if (employee.documentData?.file_kk) { %>
+    <p class="text-[10px] text-blue-600 font-medium mt-1">
+      <a href="<%= employee.documentData.file_kk %>" target="_blank">
+        👁 Lihat KK Saat Ini
+      </a>
+    </p>
+  <% } %>
+</div>
+
+<div class="space-y-1.5">
+  <label class="label-custom">Berkas SKCK Aktif</label>
+  <input name="file_skck" type="file" class="input-custom bg-white" />
+
+  <% if (employee.documentData?.file_skck) { %>
+    <p class="text-[10px] text-blue-600 font-medium mt-1">
+      <a href="<%= employee.documentData.file_skck %>" target="_blank">
+        👁 Lihat SKCK Saat Ini
+      </a>
+    </p>
+  <% } %>
+</div>
             <div class="space-y-1.5">
               <label class="label-custom">Tanggal Kadaluarsa SKCK</label>
               <input name="tanggal_kadaluarsa_skck" type="date" value="<%= employee.documentData?.tanggal_kadaluarsa_skck ? employee.documentData.tanggal_kadaluarsa_skck.toISOString().split('T')[0] : '' %>" class="input-custom bg-white" />
@@ -229,7 +264,23 @@
             <label class="label-custom">Tahun Kelulusan</label>
             <input name="tahun_kelulusan" type="number" value="<%= employee.educationData?.tahun_kelulusan || '' %>" class="input-custom" />
           </div>
-          <div class="space-y-1.5"><label class="label-custom">Lampiran Berkas Ijazah</label><input name="file_ijazah" type="file" class="input-custom" /></div>
+          <div class="space-y-1.5">
+            <label class="label-custom">Lampiran Berkas Ijazah</label>
+
+            <input name="file_ijazah" type="file" class="input-custom" />
+
+            <% if (employee.educationData?.file_ijazah) { %>
+            <div class="mt-2 rounded border border-slate-200 bg-slate-50 px-3 py-2">
+              <p class="text-[11px] text-slate-500 mb-1">
+                Berkas ijazah saat ini:
+              </p>
+
+              <a href="<%= employee.educationData.file_ijazah %>" target="_blank" class="text-xs font-medium text-blue-600 hover:underline">
+                Buka Dokumen Ijazah
+              </a>
+            </div>
+            <% } %>
+          </div>
         </div>
         <div class="flex justify-end pt-4"><button type="submit" class="btn-primary">Perbarui Akademis</button></div>
       </form>
@@ -268,7 +319,30 @@
     <div id="content-finansial" class="tab-content space-y-6 hidden">
       <form id="form-finansial" class="space-y-6">
         <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
-          <div class="space-y-1.5"><label class="label-custom">Nama Bank</label><input name="nama_bank" type="text" value="<%= employee.financialData?.nama_bank || '' %>" placeholder="Misal: BCA / Bank Mandiri" class="input-custom" /></div>
+         <div class="space-y-1.5">
+  <label class="label-custom">Nama Bank</label>
+  <select name="nama_bank" class="input-custom">
+    <option value="">-- Pilih Bank --</option>
+    <% 
+      const daftarBank = [
+        "BCA", 
+        "Mandiri", 
+        "BRI", 
+        "BNI", 
+        "BSI (Bank Syariah Indonesia)", 
+        "CIMB Niaga", 
+        "Permata", 
+        "Danamon", 
+        "Tabungan Pensiunan Nasional (BTPN/Jenius)"
+      ]; 
+    %>
+    <% daftarBank.forEach(bank => { %>
+      <option value="<%= bank %>" <%= employee.financialData?.nama_bank === bank ? 'selected' : '' %>>
+        <%= bank %>
+      </option>
+    <% }) %>
+  </select>
+</div>
           <div class="space-y-1.5"><label class="label-custom">Nomor Rekening</label><input name="nomor_rekening" type="text" value="<%= employee.financialData?.nomor_rekening || '' %>" class="input-custom" /></div>
           <div class="space-y-1.5"><label class="label-custom">Nama Pemilik Rekening</label><input name="nama_pemilik_rekening" type="text" value="<%= employee.financialData?.nama_pemilik_rekening || '' %>" class="input-custom" /></div>
           <div class="space-y-1.5"><label class="label-custom">Nomor NPWP</label><input name="npwp" type="text" value="<%= employee.financialData?.npwp || '' %>" class="input-custom" /></div>
@@ -441,6 +515,7 @@
     const interceptForm = (formId, endpoint) => {
       const form = document.getElementById(formId);
       if (!form) return;
+
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         globalError.classList.add("hidden");
@@ -457,14 +532,27 @@
           formData.forEach((value, key) => {
             if (key.includes('[')) {
               const parts = key.split(/\[|\]/).filter(p => p !== '');
-              const [arrName, idx, prop] = parts;
-              if (!obj[arrName]) obj[arrName] = [];
-              if (!obj[arrName][idx]) obj[arrName][idx] = {};
-              obj[arrName][idx][prop] = value;
+
+              if (parts.length === 3) {
+                const [arrName, idx, prop] = parts;
+                if (!obj[arrName]) obj[arrName] = [];
+                if (!obj[arrName][idx]) obj[arrName][idx] = {};
+                obj[arrName][idx][prop] = value;
+              } else if (parts.length === 2) {
+                const [arrName, innerKey] = parts;
+                if (isNaN(innerKey)) {
+                  if (!obj[arrName]) obj[arrName] = {};
+                  obj[arrName][innerKey] = value;
+                } else {
+                  if (!obj[arrName]) obj[arrName] = [];
+                  obj[arrName][innerKey] = value;
+                }
+              }
             } else {
               obj[key] = value;
             }
           });
+
           bodyData = JSON.stringify(obj);
           headers["Content-Type"] = "application/json";
         }
@@ -478,6 +566,7 @@
           const result = await res.json();
           if (result.success) {
             alert(result.message);
+            window.location.reload();
           } else {
             globalError.textContent = result.message || "Gagal memproses pembaruan data.";
             globalError.classList.remove("hidden");
@@ -492,7 +581,6 @@
         }
       });
     };
-
     interceptForm("form-pribadi", "pribadi");
     interceptForm("form-karir", "karir");
     interceptForm("form-kontak", "kontak");

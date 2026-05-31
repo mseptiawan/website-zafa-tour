@@ -213,7 +213,7 @@ export const EmployeeService = {
 
   updateDokumen: async (id, data) => {
     const updateFields = {
-      sertifikat_kompetensi: data.sertifikat_kompetensi,
+      sertifikat_kompetensi: data.sertifikat_kompetensi || [],
     };
 
     if (data.tanggal_kadaluarsa_skck) {
@@ -224,24 +224,45 @@ export const EmployeeService = {
     if (data.file_kk) updateFields.file_kk = data.file_kk;
     if (data.file_skck) updateFields.file_skck = data.file_skck;
 
-    return await EmployeeDocument.findOneAndUpdate({ employee_id: id }, updateFields, {
-      new: true,
-      upsert: true,
-    });
+    return await EmployeeDocument.findOneAndUpdate(
+      { employee_id: id },
+      {
+        $set: updateFields,
+        $setOnInsert: {
+          employee_id: id,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
   },
+  updatePendidikan: async (id, data, file) => {
+    const updateData = {
+      pendidikan_terakhir: data.pendidikan_terakhir,
+      institusi_pendidikan: data.institusi_pendidikan,
+      tahun_kelulusan: data.tahun_kelulusan ? Number(data.tahun_kelulusan) : null,
+    };
 
-  updatePendidikan: async (id, data) => {
+    if (file) {
+      updateData.file_ijazah = `/uploads/files/${file.filename}`;
+    }
+
     return await EmployeeEducation.findOneAndUpdate(
       { employee_id: id },
       {
-        pendidikan_terakhir: data.pendidikan_terakhir,
-        institusi_pendidikan: data.institusi_pendidikan,
-        tahun_kelulusan: data.tahun_kelulusan ? Number(data.tahun_kelulusan) : null,
+        $set: updateData,
+        $setOnInsert: {
+          employee_id: id,
+        },
       },
-      { new: true, upsert: true }
+      {
+        new: true,
+        upsert: true,
+      }
     );
   },
-
   updateKeluarga: async (id, data) => {
     const listKeluarga = data.anggota_keluarga || [];
     const formattedFamily = listKeluarga.map((m) => ({

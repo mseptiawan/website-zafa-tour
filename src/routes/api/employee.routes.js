@@ -9,9 +9,10 @@ import {
   updatePendidikanApi,
   updateKeluargaApi,
   updateFinansialApi,
-  updateEmployeeApi,
 } from "../../controllers/employee.controller.js";
 import { uploadFile } from "../../middlewares/uploadFile.js";
+import { updateFinancialSchema } from "../../validations/employee.schema.js";
+import { validate } from "../../middlewares/validate.js";
 
 const router = express.Router();
 router.post(
@@ -27,9 +28,9 @@ router.post("/phk", uploadFile.single("document"), ajukanPHKApi);
 router.put("/:id/pribadi", updatePribadiApi);
 router.put("/:id/karir", updateKarirApi);
 router.put("/:id/kontak", updateKontakApi);
-router.put("/api/employee/:id/dokumen", uploadFile.any(), updateDokumenApi);
-router.put("/:id/pendidikan", updatePendidikanApi);
+router.put("/:id/dokumen", uploadFile.any(), updateDokumenApi);
+router.put("/:id/pendidikan", uploadFile.single("file_ijazah"), updatePendidikanApi);
 router.put("/:id/keluarga", updateKeluargaApi);
-router.put("/:id/finansial", updateFinansialApi);
+router.put("/:id/finansial", validate(updateFinancialSchema), updateFinansialApi);
 
 export default router;
