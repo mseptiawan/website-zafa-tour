@@ -9,6 +9,8 @@ import tripRoutes from "./trip.routes.js";
 import salesRoutes from "./sales.routes.js";
 import assignmentRoutes from "./assignment.routes.js";
 import announcementRoutes from "./announcement.routes.js";
+import expenseCategoryRoutes from "./expenseCategory.routes.js";
+
 import expenseRoutes from "./expense.routes.js";
 import dailylog from "./dailylog.route.js";
 import finance from "./finance.routes.js";
@@ -42,6 +44,7 @@ router.use("/finance", finance);
 router.use("/sales", salesRoutes);
 router.use("/assignment", assignmentRoutes);
 router.use("/announcement", announcementRoutes);
+router.use("/expense-categories", expenseCategoryRoutes);
 router.use("/", expenseRoutes);
 router.use("/loans", loanRoutes);
 router.use("/components", componentPageRoutes);
