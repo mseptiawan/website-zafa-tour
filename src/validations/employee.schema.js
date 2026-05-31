@@ -142,6 +142,41 @@ export const updateFamilySchema = z.object({
   anggota_keluarga: z.array(familyMemberSchema).optional().default([]),
 });
 
+export const updateContactSchema = z.object({
+  nomor_telp: z
+    .string({ required_error: "Nomor telepon pegawai wajib diisi" })
+    .trim()
+    .min(1, "Nomor telepon pegawai tidak boleh kosong")
+    .regex(/^\d+$/, "Nomor telepon harus berupa angka (tidak boleh ada huruf/simbol)")
+    .min(9, "Nomor telepon minimal 9 digit")
+    .max(15, "Nomor telepon maksimal 15 digit"),
+
+  nama_kontak_darurat: z
+    .string({ required_error: "Nama kontak darurat wajib diisi" })
+    .trim()
+    .min(1, "Nama kontak darurat tidak boleh kosong")
+    .min(3, "Nama kontak darurat minimal 3 karakter"),
+
+  hubungan_kontak_darurat: z
+    .string({ required_error: "Hubungan kontak darurat wajib diisi" })
+    .trim()
+    .min(1, "Hubungan kontak darurat tidak boleh kosong"),
+
+  nomor_kontak_darurat: z
+    .string({ required_error: "Nomor kontak darurat wajib diisi" })
+    .trim()
+    .min(1, "Nomor kontak darurat tidak boleh kosong")
+    .regex(/^\d+$/, "Nomor kontak darurat harus berupa angka (tidak boleh ada huruf/simbol)")
+    .min(9, "Nomor kontak darurat minimal 9 digit")
+    .max(15, "Nomor kontak darurat maksimal 15 digit"),
+
+  alamat: z
+    .string({ required_error: "Alamat domisili lengkap wajib diisi" })
+    .trim()
+    .min(1, "Alamat domisili lengkap tidak boleh kosong")
+    .min(10, "Alamat domisili harus lengkap (minimal 10 karakter)"),
+});
+
 export const updateDocumentSchema = z.object({
   nik_ktp: z
     .string({ required_error: "NIK KTP wajib diisi" })
