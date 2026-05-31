@@ -2,7 +2,7 @@ import Attendance from "../models/Attendance.model.js";
 import CompanySetting from "../models/CompanySetting.model.js";
 import User from "../models/basic/User.model.js";
 import AppError from "../utils/AppError.js";
-
+import { uploadAndCompressToR2 } from "../utils/r2Service.js";
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 const getTodayRange = () => {
@@ -78,7 +78,8 @@ export const processCheckIn = async (userId, body, file) => {
   const type = distance <= company.radiusMeter ? "KANTOR" : "LUAR KANTOR";
   const locationLabel = type === "KANTOR" ? `Absen di ${company.name}` : await getAddress(lat, lng);
 
-  const photo = file ? `/uploads/photos/${file.filename}` : null;
+  const photoUrl = file ? await uploadAndCompressToR2(file, "checkin") : null;
+
   const now = new Date();
 
   const [configHour, configMin] = company.entryTimeLimit.split(":").map(Number);
@@ -99,7 +100,7 @@ export const processCheckIn = async (userId, body, file) => {
     lateDuration,
     type,
     note: body.note || "",
-    checkInPhoto: photo,
+    checkInPhoto: photoUrl,
     location: {
       lat,
       lng,
@@ -134,8 +135,10 @@ export const processCheckOut = async (userId, body, file) => {
   const lng = parseFloat(body.lng);
   const now = new Date();
 
+  const photoUrl = file ? await uploadAndCompressToR2(file, "checkout") : null;
+
   attendance.checkOut = now;
-  attendance.checkOutPhoto = file ? `/uploads/photos/${file.filename}` : null;
+  attendance.checkOutPhoto = photoUrl;
   attendance.workDuration = Math.ceil((now - attendance.checkIn) / (1000 * 60));
 
   if (!isNaN(lat) && !isNaN(lng)) {
@@ -149,7 +152,6 @@ export const processCheckOut = async (userId, body, file) => {
   await attendance.save();
   return attendance;
 };
-
 /**
  * Ambil riwayat absensi.
  * @param {Object} sessionUser – data user dari req.session.user
@@ -163,9 +165,14 @@ export const getAttendanceHistory = async (sessionUser, query) => {
   const isAdmin = ADMIN_ROLES.includes(sessionUser.role);
   const isPersonalView = isAdmin && view === "personal";
 
-  const start = startDate
-    ? new Date(startDate)
-    : new Date(new Date().setDate(new Date().getDate() - 30));
+  let start;
+  if (startDate) {
+    start = new Date(startDate);
+  } else {
+    start = new Date();
+    start.setHours(0, 0, 0, 0);
+  }
+
   const end = endDate ? new Date(endDate) : new Date();
   end.setHours(23, 59, 59, 999);
 
@@ -181,18 +188,13 @@ export const getAttendanceHistory = async (sessionUser, query) => {
   listAttendance = listAttendance.map((doc) => doc.toObject());
 
   if (isAdmin && !isPersonalView) {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const attendedToday = await Attendance.find({
-      checkIn: { $gte: todayStart, $lte: todayEnd },
+    const attendedInPeriod = await Attendance.find({
+      checkIn: { $gte: start, $lte: end },
     }).distinct("userId");
 
     const missingUsers = await User.find({
       role: { $nin: ADMIN_ROLES },
-      _id: { $nin: attendedToday },
+      _id: { $nin: attendedInPeriod },
     }).select("username");
 
     const missingAttendanceData = missingUsers.map((emp) => ({
@@ -200,7 +202,7 @@ export const getAttendanceHistory = async (sessionUser, query) => {
       userId: { username: emp.username },
       checkIn: null,
       checkOut: null,
-      createdAt: new Date(),
+      createdAt: start,
       status: "BELUM ABSEN",
       lateDuration: 0,
       checkInPhoto: null,

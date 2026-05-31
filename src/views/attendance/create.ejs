@@ -43,7 +43,6 @@
     </div>
   </div>
 </div>
-
 <script>
 let stream = null, lat = null, lng = null;
 const video = document.getElementById("video");
@@ -52,81 +51,81 @@ const canvas = document.getElementById("canvas");
 const isAlreadyCheckIn = <%- already %>;
 const isAlreadyCheckOut = <%- hasCheckedOut %>;
 
+function showMessage(type, message) {
+  if (type === "success") {
+    alert("✔ " + message);
+  } else {
+    alert("✖ " + message);
+  }
+}
+
 async function submitAttendance(event, actionType) {
   const btn = event.currentTarget;
   const originalText = btn.innerText;
-  
-  btn.disabled = true; 
+
+  btn.disabled = true;
   btn.innerText = "Tunggu sebentar...";
 
   try {
     const pos = await getLocation();
-    lat = pos.lat; 
+    lat = pos.lat;
     lng = pos.lng;
-    
-    canvas.width = video.videoWidth; 
+
+    canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.8));
-    
+
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve, "image/jpeg", 0.8)
+    );
+
     const formData = new FormData();
     formData.append("photo", blob, `${actionType}_selfie.jpg`);
     formData.append("lat", lat);
     formData.append("lng", lng);
-    
-    if (actionType === 'checkin') {
+
+    if (actionType === "checkin") {
       const noteInput = document.getElementById("note");
       formData.append("note", noteInput ? noteInput.value : "");
     }
 
-    const targetUrl = actionType === 'checkin' ? "/attendance/checkin" : "/attendance/checkout";
-    
+    const targetUrl =
+      actionType === "checkin"
+        ? "/attendance/checkin"
+        : "/attendance/checkout";
+
     const res = await fetch(targetUrl, { method: "POST", body: formData });
+
     const data = await res.json();
-    
-   if (data.success) {
-      openModal({
-        title: "Berhasil",
-        text: data.message,
-        confirmText: "Lihat Riwayat",
-        cancelText: "Tutup",
-        type: "success"
-      });
-      
-      document.getElementById("modal-confirm-btn").onclick = () => {
-        window.location.href = "/attendance/history";
-      };
+
+    if (data.success) {
+      showMessage("success", data.message);
+      window.location.href = "/attendance/history";
     } else {
-      openModal({
-        title: "Gagal",
-        text: data.message,
-        confirmText: "Coba Lagi",
-        cancelText: "Batal",
-        type: "danger"
-      });
-      
-      btn.disabled = false; 
+      showMessage("error", data.message);
+      btn.disabled = false;
       btn.innerText = originalText;
     }
-  } catch (e) { 
-    openModal({
-      title: "Gagal",
-      text: "Gagal memproses absensi. Pastikan GPS aktif & izin kamera diberikan.",
-      confirmText: "Coba Lagi",
-      cancelText: "Batal",
-      type: "danger"
-    });
-    btn.disabled = false; 
-    btn.innerText = originalText; 
+
+  } catch (e) {
+    console.error(e);
+    showMessage("error", "Gagal memproses absensi. Cek GPS & kamera.");
+    btn.disabled = false;
+    btn.innerText = originalText;
   }
 }
 
 function getLocation() {
   return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) return reject(new Error("GPS tidak didukung browser"));
+    if (!navigator.geolocation)
+      return reject(new Error("GPS tidak didukung browser"));
+
     navigator.geolocation.getCurrentPosition(
-      p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }), 
-      err => reject(err), 
+      p => resolve({
+        lat: p.coords.latitude,
+        lng: p.coords.longitude
+      }),
+      err => reject(err),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   });
@@ -134,15 +133,17 @@ function getLocation() {
 
 async function startCamera() {
   if (isAlreadyCheckIn && isAlreadyCheckOut) return;
-  if (!video) return; 
+  if (!video) return;
 
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { width: 640, height: 480, facingMode: "user" } 
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: 640, height: 480, facingMode: "user" }
     });
+
     video.srcObject = stream;
-  } catch (err) { 
-    document.getElementById("camera-instruction").innerText = "Gagal memuat modul kamera. Berikan izin akses kamera.";
+  } catch (err) {
+    document.getElementById("camera-instruction").innerText =
+      "Gagal memuat kamera. Aktifkan izin kamera.";
     document.getElementById("camera-instruction").classList.add("text-rose-500");
   }
 }
@@ -153,5 +154,8 @@ function stopCamera() {
 }
 
 startCamera();
-document.addEventListener("visibilitychange", () => document.hidden ? stopCamera() : startCamera());
+
+document.addEventListener("visibilitychange", () => {
+  document.hidden ? stopCamera() : startCamera();
+});
 </script>

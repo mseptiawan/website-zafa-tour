@@ -13,32 +13,25 @@
       </thead>
       <tbody class="divide-y divide-slate-100">
         <% if (listAttendance.length === 0) { %>
-          <tr><td colspan="7" class="py-12 text-center text-slate-400">Belum ada data</td></tr>
+        <tr>
+          <td colspan="7" class="py-12 text-center text-slate-400">Belum ada data</td>
+        </tr>
         <% } %>
         <% listAttendance.forEach(row => { %>
-          <tr class="hover:bg-slate-50 transition">
-            <% if (isAdmin && !isPersonalView) { %>
-              <td class="px-6 py-4 font-medium text-slate-800"><%= row.userId?.username || '-' %></td>
-            <% } %>
-            <td class="px-6 py-4 text-slate-700">
-              <%= new Date(row.checkIn || row.createdAt).toLocaleDateString("id-ID",{day:'numeric',month:'short',year:'numeric'}) %>
-            </td>
-            <td class="px-6 py-4 text-slate-500"><%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %></td>
-            <td class="px-6 py-4 text-slate-500"><%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %></td>
-            <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-[11px] text-slate-600 bg-slate-100"><%= row.status %></span></td>
-            <td class="px-6 py-4 text-center">
-              <button class="openModal w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-slate-50"
-                data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID') %>"
-                data-status="<%= row.status %>"
-                data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID') : '-' %>"
-                data-checkout="<%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID') : '-' %>"
-                data-duration="<%= row.workDuration || 0 %>"
-                data-lateduration="<%= row.lateDuration || 0 %>"
-                data-inphoto="<%= row.checkInPhoto || '' %>"
-                data-outphoto="<%= row.checkOutPhoto || '' %>"
-                data-type="<%= row.type %>">👁</button>
-            </td>
-          </tr>
+        <tr class="hover:bg-slate-50 transition">
+          <% if (isAdmin && !isPersonalView) { %>
+          <td class="px-6 py-4 font-medium text-slate-800"><%= row.userId?.username || '-' %></td>
+          <% } %>
+          <td class="px-6 py-4 text-slate-700">
+            <%= new Date(row.checkIn || row.createdAt).toLocaleDateString("id-ID",{day:'numeric',month:'short',year:'numeric'}) %>
+          </td>
+          <td class="px-6 py-4 text-slate-500"><%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %></td>
+          <td class="px-6 py-4 text-slate-500"><%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %></td>
+          <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-[11px] text-slate-600 bg-slate-100"><%= row.status %></span></td>
+          <td class="px-6 py-4 text-center">
+            <button class="openModal w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-slate-50" data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID') %>" data-status="<%= row.status %>" data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID') : '-' %>" data-checkout="<%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID') : '-' %>" data-duration="<%= row.workDuration || 0 %>" data-lateduration="<%= row.lateDuration || 0 %>" data-inphoto="<%= encodeURI(row.checkInPhoto || '') %>" data-outphoto="<%= encodeURI(row.checkOutPhoto || '') %>" data-type="<%= row.type %>">👁</button>
+          </td>
+        </tr>
         <% }) %>
       </tbody>
     </table>

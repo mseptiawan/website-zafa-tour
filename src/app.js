@@ -7,6 +7,8 @@ import ejsMate from "ejs-mate";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import flash from "connect-flash";
+import multer from "multer";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import methodOverride from "method-override";
 import session from "express-session";
 import MongoStore from "connect-mongo";
@@ -36,6 +38,19 @@ app.use(cookieParser());
 app.use(methodOverride("_method"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+const s3 = new S3Client({
+  region: "auto",
+  endpoint: process.env.R2_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+});
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 app.use(sessionMiddleware);
 app.use(injectUser);
 app.use(attachPermissions);
@@ -57,6 +72,7 @@ app.use((req, res, next) => {
 app.use("/", routes);
 
 app.use((req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl}`);
   const error = new Error("Halaman yang Anda cari tidak ditemukan (404)");
   error.status = 404;
   next(error);
