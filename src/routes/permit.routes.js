@@ -10,6 +10,6 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.get("/new", newForm);
-router.post("/", createPermit);
+router.post("/", uploadFile.single("document"), createPermit);
 
 export default router;
