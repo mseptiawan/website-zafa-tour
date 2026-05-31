@@ -11,9 +11,10 @@ const DailyLogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    kategori: {
-      type: String,
-      enum: ["Tugas Utama", "Rapat", "Dukungan", "Administrasi", "Riset & Teknis", "Lain-lain"],
+
+    kpiTemplateId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "KpiTemplate",
       required: true,
     },
     judul: {
