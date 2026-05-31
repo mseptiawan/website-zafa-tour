@@ -113,6 +113,8 @@ export const updateKontakApi = async (req, res) => {
 };
 
 export const updateDokumenApi = async (req, res) => {
+  console.log("BODY:", req.body);
+  console.log("FILES:", req.files);
   try {
     const { id } = req.params;
     const bodyData = { ...req.body };
@@ -124,17 +126,23 @@ export const updateDokumenApi = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       req.files.forEach((file) => {
-        if (file.fieldname === "file_ktp") fileKtpPath = file.path;
-        else if (file.fieldname === "file_kk") fileKkPath = file.path;
-        else if (file.fieldname === "file_skck") fileSkckPath = file.path;
-        else if (file.fieldname.startsWith("file_sertifikat_")) {
+        const fileUrl = `/uploads/files/${file.filename}`;
+
+        if (file.fieldname === "file_ktp") {
+          fileKtpPath = fileUrl;
+        } else if (file.fieldname === "file_kk") {
+          fileKkPath = fileUrl;
+        } else if (file.fieldname === "file_skck") {
+          fileSkckPath = fileUrl;
+        } else if (file.fieldname.startsWith("file_sertifikat_")) {
           const index = file.fieldname.split("_")[2];
-          certFilesMap[index] = file.path;
+          certFilesMap[index] = fileUrl;
         }
       });
     }
 
     const rawSertifikat = bodyData.sertifikat_kompetensi || [];
+
     const formattedSertifikat = rawSertifikat.map((cert, idx) => ({
       nama_sertifikat: cert.nama_sertifikat || "",
       penerbit: cert.penerbit || "",
@@ -160,23 +168,31 @@ export const updateDokumenApi = async (req, res) => {
       data: updatedDoc,
     });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ success: false, message: err.message || "Gagal memperbarui tab dokumen." });
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Gagal memperbarui tab dokumen.",
+    });
   }
 };
 
 export const updatePendidikanApi = async (req, res) => {
+  console.log(req.body);
+  console.log(req.file);
+
   try {
-    const data = await EmployeeService.updatePendidikan(req.params.id, req.body);
-    return res
-      .status(200)
-      .json({ success: true, message: "Data Pendidikan Terakhir berhasil disimpan.", data });
+    const data = await EmployeeService.updatePendidikan(req.params.id, req.body, req.file);
+
+    return res.status(200).json({
+      success: true,
+      message: "Data Pendidikan Terakhir berhasil disimpan.",
+      data,
+    });
   } catch (err) {
     return handleControllerError(err, res);
   }
 };
-
 export const updateKeluargaApi = async (req, res) => {
   try {
     const data = await EmployeeService.updateKeluarga(req.params.id, req.body);
@@ -187,10 +203,10 @@ export const updateKeluargaApi = async (req, res) => {
     return handleControllerError(err, res);
   }
 };
-
 export const updateFinansialApi = async (req, res) => {
   try {
     const data = await EmployeeService.updateFinansial(req.params.id, req.body);
+
     return res
       .status(200)
       .json({ success: true, message: "Data Finansial & Akun Payroll berhasil disimpan.", data });
@@ -199,105 +215,6 @@ export const updateFinansialApi = async (req, res) => {
   }
 };
 
-export const updateEmployeeApi = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const validatedData = updateEmployeeSchema.parse(req.body);
-
-    const files = req.files || {};
-    const uploadedDocs = {};
-
-    if (files.foto_profile)
-      uploadedDocs.foto_profile = `/uploads/${files.foto_profile[0].filename}`;
-    if (files.file_ktp) uploadedDocs.file_ktp = `/uploads/${files.file_ktp[0].filename}`;
-    if (files.file_kk) uploadedDocs.file_kk = `/uploads/${files.file_kk[0].filename}`;
-    if (files.file_ijazah) uploadedDocs.file_ijazah = `/uploads/${files.file_ijazah[0].filename}`;
-    if (files.file_skck) uploadedDocs.file_skck = `/uploads/${files.file_skck[0].filename}`;
-
-    const structuredData = {
-      fullName: validatedData.fullName,
-      tempat_lahir: validatedData.tempat_lahir,
-      tanggal_lahir: validatedData.tanggal_lahir,
-      jenis_kelamin: validatedData.jenis_kelamin,
-      agama: validatedData.agama,
-      golongan_darah: validatedData.golongan_darah,
-      status_pernikahan: validatedData.status_pernikahan,
-
-      careerData: {
-        positionId: validatedData.positionId,
-        unitId: validatedData.unitId,
-        bidangId: validatedData.bidangId,
-        status_pegawai: validatedData.status_pegawai,
-        tanggal_mulai_bergabung: validatedData.tanggal_mulai_bergabung,
-        tanggal_berakhir_kontrak: validatedData.tanggal_berakhir_kontrak,
-      },
-
-      contactData: {
-        nomor_telp: validatedData.nomor_telp,
-        alamat: validatedData.alamat,
-        nama_kontak_darurat: validatedData.nama_kontak_darurat,
-        hubungan_kontak_darurat: validatedData.hubungan_kontak_darurat,
-        nomor_kontak_darurat: validatedData.nomor_kontak_darurat,
-      },
-
-      educationData: {
-        pendidikan_terakhir: validatedData.pendidikan_terakhir,
-        institusi_pendidikan: validatedData.institusi_pendidikan,
-        tahun_kelulusan: validatedData.tahun_kelulusan,
-        keahlian_utama: validatedData.keahlian_utama
-          ? validatedData.keahlian_utama.split(",").map((s) => s.trim())
-          : [],
-        sertifikat_profesional: validatedData.sertifikat_profesional
-          ? validatedData.sertifikat_profesional.split(",").map((s) => s.trim())
-          : [],
-      },
-
-      financialData: {
-        nama_bank: validatedData.nama_bank,
-        nomor_rekening: validatedData.nomor_rekening,
-        nama_pemilik_rekening: validatedData.nama_pemilik_rekening,
-        npwp: validatedData.npwp,
-        bpjstk: validatedData.bpjstk,
-      },
-
-      documentData: {
-        ...uploadedDocs,
-        ...(validatedData.tanggal_kadaluarsa_skck && {
-          tanggal_kadaluarsa_skck: validatedData.tanggal_kadaluarsa_skck,
-        }),
-      },
-
-      roleId: validatedData.roleId,
-      anggota_keluarga: validatedData.anggota_keluarga || [],
-      sertifikat_kompetensi: validatedData.sertifikat_kompetensi || [],
-    };
-
-    await EmployeeService.updateEmployeeById(id, structuredData);
-
-    req.flash("success", "Profil karyawan berhasil diperbarui.");
-    return res.redirect("/employee");
-  } catch (err) {
-    if (err.name === "ZodError") {
-      const formattedErrors = {};
-      err.errors.forEach((e) => {
-        const path = e.path[0];
-        if (!formattedErrors[path]) {
-          formattedErrors[path] = e.message;
-        }
-      });
-
-      req.flash("errors", formattedErrors);
-      req.flash("old", req.body);
-      req.flash("error", "Gagal memperbarui data. Periksa kembali isian form Anda.");
-      return res.redirect(`/employee/edit/${id}`);
-    }
-
-    console.error("Error updateEmployeeApi:", err);
-    req.flash("error", err.message || "Terjadi kesalahan internal pada server.");
-    return res.redirect(`/employee/edit/${id}`);
-  }
-};
 export const createEmployeeApi = async (req, res, next) => {
   try {
     const validatedBody = createEmployeeSchema.parse(req.body);

@@ -62,11 +62,33 @@ app.use((req, res, next) => {
   next(error);
 });
 
+// app.use((err, req, res, next) => {
+//   const status = err.status || 500;
+//   res.status(status).render("error", {
+//     message: err.message || "Terjadi kesalahan internal pada server.",
+//     user: res.locals.user,
+//   });
+// });
+
 app.use((err, req, res, next) => {
+  console.error("Error Handler Catch:", err);
+
   const status = err.status || 500;
-  res.status(status).render("error", {
+
+  // Jika error berasal dari middleware validate (Zod) lu
+  if (err.details) {
+    return res.status(status).json({
+      success: false,
+      // Mengambil pesan kustom pertama (misal: "Nomor rekening harus berupa angka")
+      message: err.message || err.details[0].message,
+      errors: err.details,
+    });
+  }
+
+  // Handle error bawaan lainnya
+  return res.status(status).json({
+    success: false,
     message: err.message || "Terjadi kesalahan internal pada server.",
-    user: res.locals.user,
   });
 });
 export default app;
