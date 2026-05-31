@@ -1,6 +1,5 @@
 import Permit from "../models/Permit.model.js";
 
-// 1. Menampilkan Form Pengajuan Izin
 export const newForm = async (req, res) => {
   try {
     res.render("permit/create", {
@@ -12,13 +11,17 @@ export const newForm = async (req, res) => {
   }
 };
 
-// 2. Memproses Data Form (POST)
 export const createPermit = async (req, res) => {
   try {
     const { type, startDate, endDate, reason } = req.body;
 
     if (!type || !startDate || !endDate || !reason) {
       return res.status(400).json({ success: false, message: "Semua field wajib diisi" });
+    }
+
+    const allowedTypes = ["SAKIT", "PENDAMPINGAN_MELAHIRKAN", "MUSIBAH", "PENTING"];
+    if (!allowedTypes.includes(type)) {
+      return res.status(400).json({ success: false, message: "Jenis izin tidak valid" });
     }
 
     let documentPath = null;
@@ -36,10 +39,9 @@ export const createPermit = async (req, res) => {
     });
 
     await newPermit.save();
-
-    res.redirect("/permit/my");
+    res.redirect("/permit/my-history");
   } catch (error) {
-    console.error("Error creating permit:", error);
+    console.error(error);
     res.status(500).json({ success: false, message: "Gagal memproses pengajuan izin" });
   }
 };
