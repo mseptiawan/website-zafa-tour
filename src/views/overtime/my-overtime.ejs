@@ -3,34 +3,12 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
   <div class="max-w-5xl mx-auto">
 
-    <div class="flex items-start justify-between mb-8">
-     <div >
-  <div class="mb-3 flex items-center gap-3">
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-      Area Kerja
-    </span>
-    <div class="h-3 w-px bg-slate-300"></div>
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-      Kehadiran
-    </span>
-  </div>
-
-  <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-    Riwayat Lembur
-  </h1>
-  <p class="mt-1.5 text-sm font-medium text-slate-500">
-    Daftar lengkap pengajuan dan status aktivitas lembur Pegawai.
-  </p>
-</div>
-      <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
-        <span class="text-xs font-bold text-slate-400 uppercase">
-          Total
-        </span>
-        <span class="text-sm font-bold text-slate-800">
-          <%= overtimes.length %>
-        </span>
-      </div>
-    </div>
+   <%- include('../partials/page-header', { 
+    section: 'Area Kerja', 
+    module: 'Kehadiran', 
+    title: 'Riwayat Lembur', 
+    description: 'Daftar lengkap pengajuan dan status aktivitas lembur Pegawai.' 
+}) %>
 
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
@@ -97,19 +75,7 @@
 
               <td class="px-6 py-4 text-center">
 
-                <button
-                  class="openModal text-slate-400 hover:text-indigo-600 transition"
-                  type="button"
-
-                  data-date="<%= new Date(o.date).toLocaleDateString('id-ID') %>"
-                  data-time="<%= o.startTime %> - <%= o.endTime %>"
-                  data-total="<%= o.totalHours %> Jam"
-                  data-status="<%= o.status %>"
-                  data-description="<%= o.workDescription %>"
-                  data-result="<%= o.result || '-' %>"
-                  data-created="<%= new Date(o.createdAt).toLocaleString('id-ID') %>"
-                  data-proof="<%= o.proofFile || '' %>"
-                >
+                <button class="openModal text-slate-400 hover:text-indigo-600 transition" type="button" data-date="<%= new Date(o.date).toLocaleDateString('id-ID') %>" data-time="<%= o.startTime %> - <%= o.endTime %>" data-total="<%= o.totalHours %> Jam" data-status="<%= o.status %>" data-description="<%= o.workDescription %>" data-result="<%= o.result || '-' %>" data-created="<%= new Date(o.createdAt).toLocaleString('id-ID') %>" data-proof="<%= o.proofFile || '' %>">
                   <i data-lucide="eye" class="w-4 h-4"></i>
                 </button>
 
@@ -139,8 +105,7 @@
 
 <!-- MODAL -->
 
-<div id="detailModal"
-class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+<div id="detailModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
 
   <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl">
 
@@ -209,10 +174,7 @@ class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
           Bukti
         </p>
 
-        <img
-          id="modalProof"
-          class="w-full rounded-lg border"
-        >
+        <img id="modalProof" class="w-full rounded-lg border">
 
       </div>
 
@@ -223,10 +185,7 @@ class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
     </div>
 
     <div class="px-6 py-4 border-t flex justify-end">
-      <button
-        id="closeModalFooter"
-        class="px-4 py-2 rounded-lg bg-indigo-600 text-white"
-      >
+      <button id="closeModalFooter" class="px-4 py-2 rounded-lg bg-indigo-600 text-white">
         Tutup
       </button>
     </div>
@@ -237,66 +196,64 @@ class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
+  lucide.createIcons();
 
-lucide.createIcons();
+  const modal = document.getElementById("detailModal");
 
-const modal = document.getElementById("detailModal");
+  document.querySelectorAll(".openModal").forEach(btn => {
 
-document.querySelectorAll(".openModal").forEach(btn=>{
+    btn.addEventListener("click", () => {
 
-    btn.addEventListener("click",()=>{
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
 
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
+      modalDate.textContent = btn.dataset.date;
+      modalTime.textContent = btn.dataset.time;
+      modalTotal.textContent = btn.dataset.total;
+      modalStatus.textContent = btn.dataset.status;
+      modalDescription.textContent = btn.dataset.description;
+      modalResult.textContent = btn.dataset.result;
+      modalCreated.textContent = btn.dataset.created;
 
-        modalDate.textContent = btn.dataset.date;
-        modalTime.textContent = btn.dataset.time;
-        modalTotal.textContent = btn.dataset.total;
-        modalStatus.textContent = btn.dataset.status;
-        modalDescription.textContent = btn.dataset.description;
-        modalResult.textContent = btn.dataset.result;
-        modalCreated.textContent = btn.dataset.created;
+      const proof = btn.dataset.proof;
 
-        const proof = btn.dataset.proof;
+      if (proof) {
 
-        if(proof){
+        modalProof.src = `/uploads/files/${proof}`;
 
-            modalProof.src=`/uploads/files/${proof}`;
+        proofWrapper.classList.remove("hidden");
+        proofEmpty.classList.add("hidden");
 
-            proofWrapper.classList.remove("hidden");
-            proofEmpty.classList.add("hidden");
+      } else {
 
-        }else{
+        proofWrapper.classList.add("hidden");
+        proofEmpty.classList.remove("hidden");
 
-            proofWrapper.classList.add("hidden");
-            proofEmpty.classList.remove("hidden");
-
-        }
+      }
 
     });
 
-});
+  });
 
 
-function hideModal(){
+  function hideModal() {
 
     modal.classList.add("hidden");
     modal.classList.remove("flex");
 
-}
+  }
 
-closeModal.addEventListener("click",hideModal);
+  closeModal.addEventListener("click", hideModal);
 
-closeModalFooter.addEventListener("click",hideModal);
+  closeModalFooter.addEventListener("click", hideModal);
 
-modal.addEventListener("click",(e)=>{
+  modal.addEventListener("click", (e) => {
 
-    if(e.target===modal){
+    if (e.target === modal) {
 
-        hideModal();
+      hideModal();
 
     }
 
-});
-
+  });
 </script>

@@ -11,9 +11,8 @@
     </div>
 
     <form method="GET" class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm flex flex-col md:flex-row gap-3">
-      <input type="text" name="search" value="<%= query?.search || '' %>" placeholder="Cari nama Pegawai..." 
-             class="flex-1 border border-slate-200 px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none">
-      
+      <input type="text" name="search" value="<%= query?.search || '' %>" placeholder="Cari nama Pegawai..." class="flex-1 border border-slate-200 px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none">
+
       <select name="status" class="w-full md:w-40 border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none">
         <option value="">Semua Status</option>
         <option value="Approved" <%= query?.status === 'Approved' ? 'selected' : '' %>>Approved</option>
@@ -46,18 +45,20 @@
           </thead>
           <tbody class="divide-y divide-slate-100">
             <% if (overtimes.length === 0) { %>
-              <tr><td colspan="6" class="text-center py-12 text-slate-400">Belum ada data riwayat lembur</td></tr>
+            <tr>
+              <td colspan="6" class="text-center py-12 text-slate-400">Belum ada data riwayat lembur</td>
+            </tr>
             <% } %>
 
             <% overtimes.forEach(o => { %>
-              <tr class="hover:bg-slate-50/50 transition">
-                <td class="px-6 py-4 font-semibold text-slate-800"><%= o.employeeName %></td>
-                <td class="px-6 py-4 text-slate-500"><%= new Date(o.date).toLocaleDateString("id-ID") %></td>
-                <td class="px-6 py-4 text-slate-500 font-mono text-xs"><%= o.startTime %> - <%= o.endTime %></td>
-                <td class="px-6 py-4 font-medium text-slate-700"><%= o.totalHours %> Jam</td>
-                
-                <td class="px-6 py-4 text-center">
-                  <% 
+            <tr class="hover:bg-slate-50/50 transition">
+              <td class="px-6 py-4 font-semibold text-slate-800"><%= o.employeeName %></td>
+              <td class="px-6 py-4 text-slate-500"><%= new Date(o.date).toLocaleDateString("id-ID") %></td>
+              <td class="px-6 py-4 text-slate-500 font-mono text-xs"><%= o.startTime %> - <%= o.endTime %></td>
+              <td class="px-6 py-4 font-medium text-slate-700"><%= o.totalHours %> Jam</td>
+
+              <td class="px-6 py-4 text-center">
+                <% 
                     const statusConfig = {
                       'Approved': { bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },
                       'Rejected': { bg: 'bg-rose-50', text: 'text-rose-600', dot: 'bg-rose-500' },
@@ -65,16 +66,16 @@
                     };
                     const config = statusConfig[o.status] || { bg: 'bg-slate-50', text: 'text-slate-600', dot: 'bg-slate-400' };
                   %>
-                  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-200/50 text-[10px] font-medium <%= config.bg %> <%= config.text %>">
-                    <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
-                    <%= o.status %>
-                  </div>
-                </td>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-200/50 text-[10px] font-medium <%= config.bg %> <%= config.text %>">
+                  <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
+                  <%= o.status %>
+                </div>
+              </td>
 
-                <td class="px-6 py-4 text-center text-xs text-slate-400">
-                  <%= new Date(o.createdAt).toLocaleString("id-ID", {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) %>
-                </td>
-              </tr>
+              <td class="px-6 py-4 text-center text-xs text-slate-400">
+                <%= new Date(o.createdAt).toLocaleString("id-ID", {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) %>
+              </td>
+            </tr>
             <% }) %>
           </tbody>
         </table>
@@ -85,12 +86,10 @@
       <span>Halaman <%= pagination.page %> dari <%= pagination.totalPages %></span>
       <div class="flex gap-2">
         <% if (pagination.page > 1) { %>
-          <a href="?page=<%= pagination.page - 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" 
-             class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Prev</a>
+        <a href="?page=<%= pagination.page - 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Prev</a>
         <% } %>
         <% if (pagination.page < pagination.totalPages) { %>
-          <a href="?page=<%= pagination.page + 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" 
-             class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Next</a>
+        <a href="?page=<%= pagination.page + 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Next</a>
         <% } %>
       </div>
     </div>

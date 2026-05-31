@@ -1,7 +1,7 @@
 <%- include('sidebar-config') %>
 
 <aside class="fixed inset-y-0 left-0 w-72 bg-white  text-black flex flex-col z-50">
-  
+
   <div class="h-20 flex items-center px-8 border-b border-slate-100 relative shrink-0">
     <div class="flex items-center gap-4 relative z-10">
       <div class="leading-tight">
@@ -16,9 +16,8 @@
   </div>
 
   <nav id="sidebarNav" class="flex-1 overflow-y-auto scrollbar-hide px-4 py-6 space-y-7 pb-10">
-    
-    <a href="/dashboard"
-       class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group border border-transparent ">
+
+    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group border border-transparent ">
       <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
       </svg>
@@ -26,52 +25,52 @@
     </a>
 
     <% sidebarSections.forEach(section => { %>
-      <% if (section.show && section.menus.some(m => m.show)) { %>
-        <section>
-          <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-            <%= section.title %>
-          </p>
+    <% if (section.show && section.menus.some(m => m.show)) { %>
+    <section>
+      <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
+        <%= section.title %>
+      </p>
 
-          <div class="space-y-1">
-            <% section.menus.forEach(menu => { %>
-              <% if (menu.show && menu.submenus.some(s => s.show)) { %>
-                <details class="group outline-none" data-menu="<%= menu.id %>">
-                  <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent ">
-                    <div class="flex items-center gap-3">
-                      <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <%- menu.icon %>
-                      </svg>
-                      <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                        <%= menu.name %>
-                      </span>
-                    </div>
-                    <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </summary>
+      <div class="space-y-1">
+        <% section.menus.forEach(menu => { %>
+        <% if (menu.show && menu.submenus.some(s => s.show)) { %>
+        <details class="group outline-none" data-menu="<%= menu.id %>">
+          <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent ">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <%- menu.icon %>
+              </svg>
+              <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
+                <%= menu.name %>
+              </span>
+            </div>
+            <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
 
-                  <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                    <% menu.submenus.forEach(sub => { %>
-                      <% if (sub.show) { %>
-                        <a href="<%= sub.path %>" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-slate-800 transition">
-                          <%= sub.name %>
-                        </a>
-                      <% } %>
-                    <% }); %>
-                  </div>
-                </details>
-              <% } %>
+          <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+            <% menu.submenus.forEach(sub => { %>
+            <% if (sub.show) { %>
+            <a href="<%= sub.path %>" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-slate-800 transition">
+              <%= sub.name %>
+            </a>
+            <% } %>
             <% }); %>
           </div>
-        </section>
-      <% } %>
+        </details>
+        <% } %>
+        <% }); %>
+      </div>
+    </section>
+    <% } %>
     <% }); %>
 
   </nav>
 
   <div class="p-4  relative shrink-0">
     <div class="relative flex items-center gap-3 p-3 rounded-2xl bg-white ">
-      
+
       <div class="relative">
         <div class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 border border-slate-300 overflow-hidden">
           <% 

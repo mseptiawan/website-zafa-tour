@@ -4,30 +4,13 @@
 
   <div class="max-w-6xl mx-auto">
 
-    <div class="flex items-end justify-between mb-10">
-      <div>
-        <div class="mb-3 flex items-center gap-3">
-          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-            Area Kerja
-          </span>
-          <div class="h-3 w-px bg-slate-300"></div>
-          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-            Kehadiran
-          </span>
-        </div>
+    <%- include('../partials/page-header', { 
+    section: 'Area Kerja', 
+    module: 'Kehadiran', 
+    title: 'Riwayat & Status Cuti', 
+    description: 'Pantau penggunaan hak cuti kerja tahunan Anda secara berkala.' 
+}) %>
 
-        <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-          Riwayat & Status Cuti
-        </h1>
-        <p class="mt-1.5 text-sm font-medium text-slate-500">
-          Pantau penggunaan hak cuti kerja tahunan Anda secara berkala.
-        </p>
-      </div>
-
-      <a href="/leave/apply" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold px-6 py-3.5 rounded-2xl transition shadow-lg shadow-blue-600/20 active:scale-[0.98]">
-        <i class="fa-solid fa-plus text-[10px]"></i> Ajukan Cuti Baru
-      </a>
-    </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
 

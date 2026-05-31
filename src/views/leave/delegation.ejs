@@ -2,24 +2,12 @@
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
   <div class="max-w-5xl mx-auto">
-    <div class="mb-10">
-      <div class="mb-3 flex items-center gap-3">
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-          Area Kerja
-        </span>
-        <div class="h-3 w-px bg-slate-300"></div>
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-          Penugasan
-        </span>
-      </div>
-
-      <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-        Permintaan Delegasi
-      </h1>
-      <p class="mt-1.5 text-sm font-medium text-slate-500">
-        Konfirmasi kesediaan Anda untuk mem-backup tugas rekan kerja yang sedang cuti.
-      </p>
-    </div>
+   <%- include('../partials/page-header', { 
+    section: 'Area Kerja', 
+    module: 'Penugasan', 
+    title: 'Permintaan Delegasi', 
+    description: 'Konfirmasi kesediaan Anda untuk mem-backup tugas rekan kerja yang sedang cuti.' 
+}) %>
 
     <div class="flex items-center gap-2 mb-4 border-b border-slate-200/60 pb-px">
       <button type="button" onclick="switchTab('active')" id="tab-btn-active" class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none">

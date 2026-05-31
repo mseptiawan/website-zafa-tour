@@ -2,7 +2,7 @@
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
   <div class="mx-auto max-w-7xl space-y-6">
-    
+
     <!-- TOP HEADER -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
       <div>
@@ -15,7 +15,7 @@
 
     <!-- WORKSPACE ARCHITECTURE -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      
+
       <!-- COLUMN 1: DAFTAR Pegawai -->
       <div class="lg:col-span-4 bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
         <div class="p-3 bg-white border-b border-slate-100">
@@ -24,10 +24,10 @@
             <input type="text" placeholder="Cari nama Pegawai..." class="w-full bg-[#f2f2f7] border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
           </div>
         </div>
-        
+
         <div class="divide-y divide-slate-100 max-h-[550px] overflow-y-auto">
-      <% employees.forEach((emp, index) => { %>
-  <% 
+          <% employees.forEach((emp, index) => { %>
+          <% 
     // Filter khusus komponen Tunjangan (EARNING)
     const empAllowances = savedAllowances
       .filter(allow => allow.employeeId.toString() === emp._id.toString() && allow.componentId?.category === 'EARNING')
@@ -44,25 +44,21 @@
         amount: allow.amount
       }));
   %>
-  
-  <div onclick="switchEmployee(this, '<%= emp.fullName %>', '<%= emp.employeeIdNumber %>', '<%= emp.positionId?.name || 'STAFF' %>', '<%= emp.salaryDetail?.basicSalary || 0 %>')" 
-       data-id="<%= emp._id %>" 
-       data-allowances='<%= JSON.stringify(empAllowances) %>'
-       data-deductions='<%= JSON.stringify(empDeductions) %>'
-       class="employee-card p-4 <%= index === 0 ? 'bg-blue-50/40' : 'hover:bg-slate-50' %> flex items-center justify-between cursor-pointer transition-colors">
-    <div>
-      <h4 class="text-[13px] font-<%= index === 0 ? 'semibold text-blue-900' : 'medium text-slate-800' %>"><%= emp.fullName %></h4>
-      <p class="text-[11px] text-slate-500 mt-0.5">NIK: <%= emp.employeeIdNumber %> • <%= emp.positionId?.name || 'Staff' %></p>
-    </div>
-    <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Draft</span>
-  </div>
-<% }) %>
+
+          <div onclick="switchEmployee(this, '<%= emp.fullName %>', '<%= emp.employeeIdNumber %>', '<%= emp.positionId?.name || 'STAFF' %>', '<%= emp.salaryDetail?.basicSalary || 0 %>')" data-id="<%= emp._id %>" data-allowances='<%= JSON.stringify(empAllowances) %>' data-deductions='<%= JSON.stringify(empDeductions) %>' class="employee-card p-4 <%= index === 0 ? 'bg-blue-50/40' : 'hover:bg-slate-50' %> flex items-center justify-between cursor-pointer transition-colors">
+            <div>
+              <h4 class="text-[13px] font-<%= index === 0 ? 'semibold text-blue-900' : 'medium text-slate-800' %>"><%= emp.fullName %></h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">NIK: <%= emp.employeeIdNumber %> • <%= emp.positionId?.name || 'Staff' %></p>
+            </div>
+            <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Draft</span>
+          </div>
+          <% }) %>
         </div>
       </div>
 
       <!-- WORKSPACE CONFIGURATION CONTAINER -->
       <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-        
+
         <!-- COLUMN 2: WORKSPACE DETAILED FORM -->
         <div class="md:col-span-2 space-y-6">
           <div class="bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
@@ -95,7 +91,7 @@
                   <select id="masterAllowanceSelect" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-slate-600 focus:outline-none">
                     <option value="">-- Pilih Tunjangan --</option>
                     <% components.filter(c => c.category === 'EARNING').forEach(comp => { %>
-                      <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
+                    <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
                     <% }) %>
                   </select>
                   <button type="button" onclick="addAllowanceField()" class="text-[12px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl transition-colors">+ Tambah</button>
@@ -108,16 +104,15 @@
                   <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Potongan / Cicilan</h3>
                   <span class="text-[10px] font-medium text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">Out / Pengurangan</span>
                 </div>
-                
+
                 <div id="deductionContainer" class="space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100">
-                  <!-- Area potongan akan muncul di sini -->
                 </div>
 
                 <div class="mt-3 flex items-center gap-2">
                   <select id="masterDeductionSelect" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-slate-600 focus:outline-none">
                     <option value="">-- Pilih Potongan --</option>
                     <% components.filter(c => c.category === 'DEDUCTION').forEach(comp => { %>
-                      <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
+                    <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
                     <% }) %>
                   </select>
                   <button type="button" onclick="addDeductionField()" class="text-[12px] font-semibold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl transition-colors">+ Tambah</button>
@@ -125,9 +120,9 @@
               </div>
             </div>
             <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-             <button type="button" onclick="submitPayrollData()" class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors hover:bg-blue-700">
-  Simpan Perubahan
-</button>
+              <button type="button" onclick="submitPayrollData()" class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors hover:bg-blue-700">
+                Simpan Perubahan
+              </button>
             </div>
           </div>
         </div>
@@ -139,7 +134,6 @@
             <div class="space-y-3 text-[12px]">
               <div class="flex justify-between"><span>Gaji Pokok</span> <span id="previewBasic" class="font-semibold">Rp 0</span></div>
               <div class="flex justify-between text-emerald-600"><span>Tunjangan</span> <span id="previewEarnings" class="font-semibold">+Rp 0</span></div>
-              <!-- UBAH DI SINI: Menambahkan baris ringkasan potongan di sidebar -->
               <div class="flex justify-between text-rose-600"><span>Potongan</span> <span id="previewDeductions" class="font-semibold">-Rp 0</span></div>
               <div class="border-t pt-3 font-bold flex justify-between"><span>Net Pay</span> <span id="previewNetPay">Rp 0</span></div>
             </div>
@@ -154,23 +148,23 @@
     try {
       const basicInput = document.getElementById('inputBasicSalary');
       const basic = basicInput ? (parseFloat(basicInput.value) || 0) : 0;
-      
+
       let earnings = 0;
       document.querySelectorAll('.amount-input-allowance').forEach(i => {
         earnings += parseFloat(i.value) || 0;
       });
-      
+
       let deductions = 0;
       document.querySelectorAll('.amount-input-deduction').forEach(i => {
         deductions += parseFloat(i.value) || 0;
       });
-      
+
       const netPay = (basic + earnings) - deductions;
-      
-      if(document.getElementById('previewBasic')) document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
-      if(document.getElementById('previewEarnings')) document.getElementById('previewEarnings').innerText = '+Rp ' + earnings.toLocaleString('id-ID');
-      if(document.getElementById('previewDeductions')) document.getElementById('previewDeductions').innerText = '-Rp ' + deductions.toLocaleString('id-ID');
-      if(document.getElementById('previewNetPay')) document.getElementById('previewNetPay').innerText = 'Rp ' + netPay.toLocaleString('id-ID');
+
+      if (document.getElementById('previewBasic')) document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
+      if (document.getElementById('previewEarnings')) document.getElementById('previewEarnings').innerText = '+Rp ' + earnings.toLocaleString('id-ID');
+      if (document.getElementById('previewDeductions')) document.getElementById('previewDeductions').innerText = '-Rp ' + deductions.toLocaleString('id-ID');
+      if (document.getElementById('previewNetPay')) document.getElementById('previewNetPay').innerText = 'Rp ' + netPay.toLocaleString('id-ID');
     } catch (err) {
       console.error(err);
     }
@@ -178,8 +172,8 @@
 
   function addAllowanceField() {
     const select = document.getElementById('masterAllowanceSelect');
-    if(!select || !select.value) return;
-    
+    if (!select || !select.value) return;
+
     const selectedOption = select.options[select.selectedIndex];
     const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
     const componentName = select.value;
@@ -193,7 +187,7 @@
         </button>
       </div>
     `;
-    
+
     document.getElementById('allowanceContainer').insertAdjacentHTML('beforeend', template);
     select.value = "";
     calculatePayroll();
@@ -201,12 +195,12 @@
 
   function addDeductionField() {
     const select = document.getElementById('masterDeductionSelect');
-    if(!select || !select.value) return;
-    
+    if (!select || !select.value) return;
+
     const selectedOption = select.options[select.selectedIndex];
     const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
     const componentName = select.value;
-    
+
     const template = `
       <div class="flex items-center gap-2 deduction-row animate-fadeIn">
         <input type="text" value="${componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-700 focus:outline-none" readonly>
@@ -220,30 +214,29 @@
       </div>
     `;
     document.getElementById('deductionContainer').insertAdjacentHTML('beforeend', template);
-    select.value = ""; 
+    select.value = "";
     calculatePayroll();
   }
 
   function switchEmployee(el, name, nik, pos, basicSalary) {
-  document.getElementById('empNameTitle').innerText = name;
-  document.getElementById('empMetaTitle').innerText = 'NIK: ' + nik + ' • ' + pos;
-  
-  document.getElementById('inputBasicSalary').value = parseFloat(basicSalary) || 0;
-  
-  const allowanceContainer = document.getElementById('allowanceContainer');
-  const deductionContainer = document.getElementById('deductionContainer'); // Ambil container potongan
-  
-  allowanceContainer.innerHTML = '';
-  deductionContainer.innerHTML = ''; // Kosongkan isi potongan lama
-  
-  document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
-  el.classList.add('bg-blue-50/40');
-  
-  // Render Komponen Tunjangan
-  const allowances = JSON.parse(el.getAttribute('data-allowances') || '[]');
-  if (allowances && allowances.length > 0) {
-    allowances.forEach(item => {
-      const template = `
+    document.getElementById('empNameTitle').innerText = name;
+    document.getElementById('empMetaTitle').innerText = 'NIK: ' + nik + ' • ' + pos;
+
+    document.getElementById('inputBasicSalary').value = parseFloat(basicSalary) || 0;
+
+    const allowanceContainer = document.getElementById('allowanceContainer');
+    const deductionContainer = document.getElementById('deductionContainer');
+
+    allowanceContainer.innerHTML = '';
+    deductionContainer.innerHTML = '';
+
+    document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
+    el.classList.add('bg-blue-50/40');
+
+    const allowances = JSON.parse(el.getAttribute('data-allowances') || '[]');
+    if (allowances && allowances.length > 0) {
+      allowances.forEach(item => {
+        const template = `
         <div class="flex items-center gap-2 allowance-row animate-fadeIn">
           <input type="text" value="${item.componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly>
           <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-allowance w-24 bg-white border border-slate-200/60 rounded-lg px-2 py-1.5 text-[12px] text-right font-semibold">
@@ -252,15 +245,14 @@
           </button>
         </div>
       `;
-      allowanceContainer.insertAdjacentHTML('beforeend', template);
-    });
-  }
-  
-  // PERBAIKAN: Ambil dan Render Komponen Potongan (Deduction)
-  const deductions = JSON.parse(el.getAttribute('data-deductions') || '[]');
-  if (deductions && deductions.length > 0) {
-    deductions.forEach(item => {
-      const template = `
+        allowanceContainer.insertAdjacentHTML('beforeend', template);
+      });
+    }
+
+    const deductions = JSON.parse(el.getAttribute('data-deductions') || '[]');
+    if (deductions && deductions.length > 0) {
+      deductions.forEach(item => {
+        const template = `
         <div class="flex items-center gap-2 deduction-row animate-fadeIn">
           <input type="text" value="${item.componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-700 focus:outline-none" readonly>
           <div class="w-32 relative">
@@ -272,83 +264,83 @@
           </button>
         </div>
       `;
-      deductionContainer.insertAdjacentHTML('beforeend', template);
-    });
-  }
-  
-  calculatePayroll();
-}
-
-  function submitPayrollData() {
-  const allCards = document.querySelectorAll('.employee-card');
-  let activeCard = null;
-  
-  allCards.forEach(card => {
-    if (card.classList.contains('bg-blue-50/40')) {
-      activeCard = card;
-    }
-  });
-
-  if (!activeCard) {
-    alert("Silakan pilih Pegawai terlebih dahulu.");
-    return;
-  }
-  
-  const employeeId = activeCard.getAttribute('data-id'); 
-  const combinedComponents = [];
-
-  document.querySelectorAll('.allowance-row').forEach(row => {
-    const nameInput = row.querySelector('input[type="text"]');
-    const amountInput = row.querySelector('.amount-input-allowance');
-    if (nameInput && amountInput) {
-      combinedComponents.push({ 
-        componentName: nameInput.value, 
-        amount: parseFloat(amountInput.value) || 0 
+        deductionContainer.insertAdjacentHTML('beforeend', template);
       });
     }
-  });
 
-  document.querySelectorAll('.deduction-row').forEach(row => {
-    const nameInput = row.querySelector('input[type="text"]');
-    const amountInput = row.querySelector('input[type="number"]'); 
-    if (nameInput && amountInput) {
-      combinedComponents.push({ 
-        componentName: nameInput.value, 
-        amount: parseFloat(amountInput.value) || 0 
-      });
-    }
-  });
-
-  fetch('/api/payroll/save', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ 
-      employeeId, 
-      allowances: combinedComponents 
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      alert(" " + data.message);
-    } else {
-      alert("" + data.message);
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Terjadi kesalahan sistem saat menghubungi server.");
-  });
-}
-
-  document.addEventListener('DOMContentLoaded', () => {
-  const firstCard = document.querySelector('.employee-card');
-  if (firstCard) {
-    firstCard.click();
-  } else {
     calculatePayroll();
   }
-});
+
+  function submitPayrollData() {
+    const allCards = document.querySelectorAll('.employee-card');
+    let activeCard = null;
+
+    allCards.forEach(card => {
+      if (card.classList.contains('bg-blue-50/40')) {
+        activeCard = card;
+      }
+    });
+
+    if (!activeCard) {
+      alert("Silakan pilih Pegawai terlebih dahulu.");
+      return;
+    }
+
+    const employeeId = activeCard.getAttribute('data-id');
+    const combinedComponents = [];
+
+    document.querySelectorAll('.allowance-row').forEach(row => {
+      const nameInput = row.querySelector('input[type="text"]');
+      const amountInput = row.querySelector('.amount-input-allowance');
+      if (nameInput && amountInput) {
+        combinedComponents.push({
+          componentName: nameInput.value,
+          amount: parseFloat(amountInput.value) || 0
+        });
+      }
+    });
+
+    document.querySelectorAll('.deduction-row').forEach(row => {
+      const nameInput = row.querySelector('input[type="text"]');
+      const amountInput = row.querySelector('input[type="number"]');
+      if (nameInput && amountInput) {
+        combinedComponents.push({
+          componentName: nameInput.value,
+          amount: parseFloat(amountInput.value) || 0
+        });
+      }
+    });
+
+    fetch('/api/payroll/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          employeeId,
+          allowances: combinedComponents
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(" " + data.message);
+        } else {
+          alert("" + data.message);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Terjadi kesalahan sistem saat menghubungi server.");
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const firstCard = document.querySelector('.employee-card');
+    if (firstCard) {
+      firstCard.click();
+    } else {
+      calculatePayroll();
+    }
+  });
 </script>

@@ -67,6 +67,138 @@ export const editEmployeeWeb = async (req, res, next) => {
   }
 };
 
+const handleControllerError = (err, res) => {
+  if (err.code === 11000) {
+    return res.status(400).json({
+      success: false,
+      message: "NIK atau berkas unik tersebut sudah terdaftar di sistem.",
+    });
+  }
+  return res
+    .status(500)
+    .json({ success: false, message: err.message || "Terjadi kesalahan internal server." });
+};
+
+export const updatePribadiApi = async (req, res) => {
+  try {
+    const data = await EmployeeService.updatePribadi(req.params.id, req.body);
+    return res
+      .status(200)
+      .json({ success: true, message: "Data Pribadi Pegawai berhasil disimpan.", data });
+  } catch (err) {
+    return handleControllerError(err, res);
+  }
+};
+
+export const updateKarirApi = async (req, res) => {
+  try {
+    const data = await EmployeeService.updateKarir(req.params.id, req.body);
+    return res
+      .status(200)
+      .json({ success: true, message: "Data Struktur Jabatan & Karir berhasil diperbarui.", data });
+  } catch (err) {
+    return handleControllerError(err, res);
+  }
+};
+
+export const updateKontakApi = async (req, res) => {
+  try {
+    const data = await EmployeeService.updateKontak(req.params.id, req.body);
+    return res
+      .status(200)
+      .json({ success: true, message: "Data Kontak Darurat & Alamat diperbarui.", data });
+  } catch (err) {
+    return handleControllerError(err, res);
+  }
+};
+
+export const updateDokumenApi = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const bodyData = { ...req.body };
+
+    let fileKtpPath = null;
+    let fileKkPath = null;
+    let fileSkckPath = null;
+    const certFilesMap = {};
+
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file) => {
+        if (file.fieldname === "file_ktp") fileKtpPath = file.path;
+        else if (file.fieldname === "file_kk") fileKkPath = file.path;
+        else if (file.fieldname === "file_skck") fileSkckPath = file.path;
+        else if (file.fieldname.startsWith("file_sertifikat_")) {
+          const index = file.fieldname.split("_")[2];
+          certFilesMap[index] = file.path;
+        }
+      });
+    }
+
+    const rawSertifikat = bodyData.sertifikat_kompetensi || [];
+    const formattedSertifikat = rawSertifikat.map((cert, idx) => ({
+      nama_sertifikat: cert.nama_sertifikat || "",
+      penerbit: cert.penerbit || "",
+      nomor_sertifikat: cert.nomor_sertifikat || "",
+      tanggal_terbit: cert.tanggal_terbit ? new Date(cert.tanggal_terbit) : null,
+      tanggal_kadaluarsa: cert.tanggal_kadaluarsa ? new Date(cert.tanggal_kadaluarsa) : null,
+      file_sertifikat: certFilesMap[idx] || cert.file_sertifikat_old || "",
+    }));
+
+    const payload = {
+      tanggal_kadaluarsa_skck: bodyData.tanggal_kadaluarsa_skck,
+      file_ktp: fileKtpPath,
+      file_kk: fileKkPath,
+      file_skck: fileSkckPath,
+      sertifikat_kompetensi: formattedSertifikat,
+    };
+
+    const updatedDoc = await EmployeeService.updateDokumen(id, payload);
+
+    return res.status(200).json({
+      success: true,
+      message: "Seluruh berkas legalitas dan sertifikat kompetensi berhasil diperbarui.",
+      data: updatedDoc,
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, message: err.message || "Gagal memperbarui tab dokumen." });
+  }
+};
+
+export const updatePendidikanApi = async (req, res) => {
+  try {
+    const data = await EmployeeService.updatePendidikan(req.params.id, req.body);
+    return res
+      .status(200)
+      .json({ success: true, message: "Data Pendidikan Terakhir berhasil disimpan.", data });
+  } catch (err) {
+    return handleControllerError(err, res);
+  }
+};
+
+export const updateKeluargaApi = async (req, res) => {
+  try {
+    const data = await EmployeeService.updateKeluarga(req.params.id, req.body);
+    return res
+      .status(200)
+      .json({ success: true, message: "Susunan Anggota Keluarga berhasil diperbarui.", data });
+  } catch (err) {
+    return handleControllerError(err, res);
+  }
+};
+
+export const updateFinansialApi = async (req, res) => {
+  try {
+    const data = await EmployeeService.updateFinansial(req.params.id, req.body);
+    return res
+      .status(200)
+      .json({ success: true, message: "Data Finansial & Akun Payroll berhasil disimpan.", data });
+  } catch (err) {
+    return handleControllerError(err, res);
+  }
+};
+
 export const updateEmployeeApi = async (req, res) => {
   const { id } = req.params;
 
@@ -186,9 +318,9 @@ export const createEmployeeApi = async (req, res, next) => {
       }
 
       [positions, units, bidang, roles] = await Promise.all([
-        Position.find(),
-        Unit.find(),
-        Bidang.find(),
+        Position.find({ name: { $in: ["General Manager", "Pegawai", "Manager"] } }),
+        Unit.find().lean(),
+        Bidang.find().lean(),
         Role.find(roleQuery),
       ]);
     } catch (dbErr) {

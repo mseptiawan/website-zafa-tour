@@ -3,15 +3,12 @@
   <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
     <div class="max-w-2xl mx-auto">
 
-      <div class="mb-8">
-        <nav class="flex items-center gap-2 mb-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-          <span>Area Kerja</span>
-          <span class="text-slate-300">/</span>
-          <span class="text-slate-900">Beban</span>
-        </nav>
-        <h1 class="text-2xl font-bold text-slate-900">Ajukan Klaim Beban</h1>
-        <p class="text-slate-500 mt-1 text-sm">Input pengeluaran operasional dan lampirkan bukti transaksi</p>
-      </div>
+  <%- include('../partials/page-header', { 
+    section: 'Area Kerja', 
+    module: 'Beban', 
+    title: 'Ajukan Klaim Beban', 
+    description: 'Input pengeluaran operasional dan lampirkan bukti transaksi' 
+}) %>
 
       <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
         <form action="/expense/create" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">

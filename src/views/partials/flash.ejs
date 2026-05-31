@@ -4,43 +4,43 @@
 %>
 
 <% if (successMsgs.length > 0 || errorMsgs.length > 0) { %>
-  <div id="flash-container" class="fixed bottom-8 right-8 z-[9999] flex flex-col gap-4 w-80">
-    
-    <% if (successMsgs.length > 0) { %>
-      <div class="bg-white p-4 rounded-xl shadow-lg border border-slate-100 flex items-start gap-4 animate-fade-in-up">
-        <div class="w-1.5 h-10 rounded-full bg-emerald-500 flex-shrink-0"></div>
-        <div class="flex-1">
-          <h4 class="text-sm font-bold text-slate-800">Yay! Everything worked!</h4>
-          <p class="text-xs text-slate-500 mt-0.5"><%= successMsgs %></p>
-        </div>
-        <button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-slate-500 transition-colors">
-          <i class="fa-solid fa-xmark text-xs"></i>
-        </button>
-      </div>
-    <% } %>
+<div id="flash-container" class="fixed bottom-8 right-8 z-[9999] flex flex-col gap-4 w-80">
 
-    <% if (errorMsgs.length > 0) { %>
-      <div class="bg-white p-4 rounded-xl shadow-lg border border-slate-100 flex items-start gap-4 animate-fade-in-up">
-        <div class="w-1.5 h-10 rounded-full bg-amber-500 flex-shrink-0"></div>
-        <div class="flex-1">
-          <h4 class="text-sm font-bold text-slate-800">Uh oh, something went wrong</h4>
-          <p class="text-xs text-slate-500 mt-0.5"><%= errorMsgs %></p>
-        </div>
-        <button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-slate-500 transition-colors">
-          <i class="fa-solid fa-xmark text-xs"></i>
-        </button>
-      </div>
-    <% } %>
+  <% if (successMsgs.length > 0) { %>
+  <div class="bg-white p-4 rounded-xl shadow-lg border border-slate-100 flex items-start gap-4 animate-fade-in-up">
+    <div class="w-1.5 h-10 rounded-full bg-emerald-500 flex-shrink-0"></div>
+    <div class="flex-1">
+      <h4 class="text-sm font-bold text-slate-800">Yay! Everything worked!</h4>
+      <p class="text-xs text-slate-500 mt-0.5"><%= successMsgs %></p>
+    </div>
+    <button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-slate-500 transition-colors">
+      <i class="fa-solid fa-xmark text-xs"></i>
+    </button>
   </div>
+  <% } %>
 
-  <script>
-    setTimeout(() => {
-      const container = document.getElementById('flash-container');
-      if (container) {
-        container.style.opacity = '0';
-        container.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => container.remove(), 500);
-      }
-    }, 5000);
-  </script>
+  <% if (errorMsgs.length > 0) { %>
+  <div class="bg-white p-4 rounded-xl shadow-lg border border-slate-100 flex items-start gap-4 animate-fade-in-up">
+    <div class="w-1.5 h-10 rounded-full bg-amber-500 flex-shrink-0"></div>
+    <div class="flex-1">
+      <h4 class="text-sm font-bold text-slate-800">Uh oh, something went wrong</h4>
+      <p class="text-xs text-slate-500 mt-0.5"><%= errorMsgs %></p>
+    </div>
+    <button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-slate-500 transition-colors">
+      <i class="fa-solid fa-xmark text-xs"></i>
+    </button>
+  </div>
+  <% } %>
+</div>
+
+<script>
+  setTimeout(() => {
+    const container = document.getElementById('flash-container');
+    if (container) {
+      container.style.opacity = '0';
+      container.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => container.remove(), 500);
+    }
+  }, 5000);
+</script>
 <% } %>

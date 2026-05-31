@@ -15,12 +15,13 @@
   </div>
 <% } %>
 
+  <div id="units-data" data-json="<%= JSON.stringify(units) %>" class="hidden"></div>
+
   <form action="/api/employee/create" method="POST" class="space-y-10">
 
    <% const formErrors = typeof errors !== 'undefined' ? errors : {} %>
 <% const oldData = typeof old !== 'undefined' ? old : {} %>
 
-<!-- Section 1: Identitas -->
 <div class="space-y-5">
   <div class="pb-2 border-b border-slate-100">
     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -29,7 +30,6 @@
   </div>
 
   <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
-    <!-- Nama Lengkap -->
     <div class="space-y-1.5">
       <label class="label-custom">Nama Lengkap <span class="text-rose-500">*</span></label>
       <input name="fullName" type="text" placeholder="Nama sesuai KTP" value="<%= oldData.fullName || '' %>" required class="input-custom <%= formErrors.fullName ? 'border-rose-400 focus:border-rose-500' : '' %>"/>
@@ -38,7 +38,6 @@
       <% } %>
     </div>
 
-    <!-- Nomor KTP -->
     <div class="space-y-1.5">
       <label class="label-custom">Nomor KTP (NIK) <span class="text-rose-500">*</span></label>
       <input name="nomor_ktp" type="text" maxlength="16" placeholder="16 digit NIK" value="<%= oldData.nomor_ktp || '' %>" required class="input-custom <%= formErrors.nomor_ktp ? 'border-rose-400 focus:border-rose-500' : '' %>"/>
@@ -47,7 +46,6 @@
       <% } %>
     </div>
 
-    <!-- Email -->
     <div class="space-y-1.5">
       <label class="label-custom">Email Utama Aplikasi <span class="text-rose-500">*</span></label>
       <input name="email" type="email" placeholder="nama@zafamulia.com" value="<%= oldData.email || '' %>" required class="input-custom <%= formErrors.email ? 'border-rose-400 focus:border-rose-500' : '' %>"/>
@@ -56,7 +54,6 @@
       <% } %>
     </div>
 
-    <!-- Role -->
     <div class="space-y-1.5">
       <label class="label-custom">Hak Akses Sistem (Role) <span class="text-rose-500">*</span></label>
       <select name="roleId" required class="input-custom <%= formErrors.roleId ? 'border-rose-400 focus:border-rose-500' : '' %>">
@@ -70,7 +67,6 @@
       <% } %>
     </div>
 
-    <!-- Jenis Kelamin -->
     <div class="space-y-1.5">
       <label class="label-custom">Jenis Kelamin <span class="text-rose-500">*</span></label>
       <select name="jenis_kelamin" required class="input-custom <%= formErrors.jenis_kelamin ? 'border-rose-400 focus:border-rose-500' : '' %>">
@@ -83,7 +79,6 @@
       <% } %>
     </div>
 
-    <!-- Agama -->
     <div class="space-y-1.5">
       <label class="label-custom">Agama <span class="text-rose-500">*</span></label>
       <select name="agama" required class="input-custom <%= formErrors.agama ? 'border-rose-400 focus:border-rose-500' : '' %>">
@@ -101,7 +96,6 @@
   </div>
 </div>
 
-<!-- Section 2: Kedinasan -->
 <div class="space-y-5 pt-4">
   <div class="pb-2 border-b border-slate-100">
     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -110,7 +104,6 @@
   </div>
 
   <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
-    <!-- Jabatan -->
     <div class="space-y-1.5">
       <label class="label-custom">Jabatan Struktural <span class="text-rose-500">*</span></label>
       <select name="positionId" required class="input-custom <%= formErrors.positionId ? 'border-rose-400 focus:border-rose-500' : '' %>">
@@ -124,24 +117,9 @@
       <% } %>
     </div>
 
-    <!-- Unit Kerja -->
-    <div class="space-y-1.5">
-      <label class="label-custom">Unit Kantor Penempatan <span class="text-rose-500">*</span></label>
-      <select name="unitId" required class="input-custom <%= formErrors.unitId ? 'border-rose-400 focus:border-rose-500' : '' %>">
-        <option value="" disabled <%= !oldData.unitId ? 'selected' : '' %>>Pilih Unit Kantor</option>
-        <% units.forEach(u => { %>
-          <option value="<%= u._id %>" <%= String(oldData.unitId) === String(u._id) ? 'selected' : '' %>><%= u.name %></option>
-        <% }) %>
-      </select>
-      <% if (formErrors.unitId) { %>
-        <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.unitId %></p>
-      <% } %>
-    </div>
-
-    <!-- Bidang Kerja -->
     <div class="space-y-1.5">
       <label class="label-custom">Bidang Kerja <span class="text-rose-500">*</span></label>
-      <select name="bidangId" required class="input-custom <%= formErrors.bidangId ? 'border-rose-400 focus:border-rose-500' : '' %>">
+      <select id="select-bidang" name="bidangId" required class="input-custom <%= formErrors.bidangId ? 'border-rose-400 focus:border-rose-500' : '' %>">
         <option value="" disabled <%= !oldData.bidangId ? 'selected' : '' %>>Pilih Bidang Kerja</option>
         <% bidang.forEach(b => { %>
           <option value="<%= b._id %>" <%= String(oldData.bidangId) === String(b._id) ? 'selected' : '' %>><%= b.name %></option>
@@ -152,21 +130,30 @@
       <% } %>
     </div>
 
-    <!-- Status Pegawai -->
+    <div class="space-y-1.5">
+      <label class="label-custom">Unit Kantor Penempatan <span class="text-rose-500">*</span></label>
+      <select id="select-unit" name="unitId" required data-old="<%= oldData.unitId || '' %>" class="input-custom <%= formErrors.unitId ? 'border-rose-400 focus:border-rose-500' : '' %>">
+        <option value="" disabled selected>Pilih Bidang Kerja Terlebih Dahulu</option>
+      </select>
+      <% if (formErrors.unitId) { %>
+        <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.unitId %></p>
+      <% } %>
+    </div>
+
     <div class="space-y-1.5">
       <label class="label-custom">Status Kepegawaian Awal <span class="text-rose-500">*</span></label>
-      <select name="status_pegawai" required class="input-custom <%= formErrors.status_pegawai ? 'border-rose-400 focus:border-rose-500' : '' %>">
+      <select id="select-status" name="status_pegawai" required class="input-custom <%= formErrors.status_pegawai ? 'border-rose-400 focus:border-rose-500' : '' %>">
         <option value="" disabled <%= !oldData.status_pegawai ? 'selected' : '' %>>Pilih Status</option>
         <option value="Pegawai Tetap" <%= oldData.status_pegawai === 'Pegawai Tetap' ? 'selected' : '' %>>Pegawai Tetap</option>
         <option value="Pegawai Kontrak" <%= oldData.status_pegawai === 'Pegawai Kontrak' ? 'selected' : '' %>>Pegawai Kontrak</option>
         <option value="Magang / Intern" <%= oldData.status_pegawai === 'Magang / Intern' ? 'selected' : '' %>>Magang / Intern</option>
+        <option value="Pensiun" <%= oldData.status_pegawai === 'Pensiun' ? 'selected' : '' %>>Pensiun</option>
       </select>
       <% if (formErrors.status_pegawai) { %>
         <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.status_pegawai %></p>
       <% } %>
     </div>
 
-    <!-- Tanggal Bergabung -->
     <div class="space-y-1.5">
       <label class="label-custom">Tanggal Mulai Bergabung <span class="text-rose-500">*</span></label>
       <input type="date" name="tanggal_mulai_bergabung" value="<%= oldData.tanggal_mulai_bergabung || '' %>" required class="input-custom <%= formErrors.tanggal_mulai_bergabung ? 'border-rose-400 focus:border-rose-500' : '' %>"/>
@@ -174,10 +161,17 @@
         <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.tanggal_mulai_bergabung %></p>
       <% } %>
     </div>
+
+    <div id="wrapper-kontrak" class="space-y-1.5 hidden">
+      <label class="label-custom">Tanggal Berakhir Kontrak / Magang <span class="text-rose-500">*</span></label>
+      <input type="date" id="input-tanggal-kontrak" name="tanggal_berakhir_kontrak" value="<%= oldData.tanggal_berakhir_kontrak || '' %>" class="input-custom <%= formErrors.tanggal_berakhir_kontrak ? 'border-rose-400 focus:border-rose-500' : '' %>"/>
+      <% if (formErrors.tanggal_berakhir_kontrak) { %>
+        <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.tanggal_berakhir_kontrak %></p>
+      <% } %>
+    </div>
   </div>
 </div>
 
-    <!-- Action Buttons -->
     <div class="flex justify-end items-center gap-3 pt-6 border-t border-slate-100">
       <a href="/employee" 
          class="text-xs font-medium text-slate-500 px-4 py-2.5 rounded-md border border-slate-200 hover:bg-slate-50 hover:text-slate-700 transition-colors">
@@ -223,3 +217,61 @@
     padding-right: 32px;
   }
 </style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const bidangSelect = document.getElementById("select-bidang");
+    const unitSelect = document.getElementById("select-unit");
+    const statusSelect = document.getElementById("select-status");
+    const kontrakWrapper = document.getElementById("wrapper-kontrak");
+    const kontrakInput = document.getElementById("input-tanggal-kontrak");
+    
+    const unitsData = JSON.parse(document.getElementById("units-data").getBoundingClientRect() ? document.getElementById("units-data").dataset.json : '[]');
+
+    const filterUnits = (bidangId, selectedUnitId = "") => {
+      unitSelect.innerHTML = '<option value="" disabled selected>Pilih Unit Kantor</option>';
+      
+      if (!bidangId) return;
+
+      const filtered = unitsData.filter(unit => String(unit.bidangId) === String(bidangId));
+
+      filtered.forEach(unit => {
+        const option = document.createElement("option");
+        option.value = unit._id;
+        option.textContent = unit.name;
+        if (String(unit._id) === String(selectedUnitId)) {
+          option.selected = true;
+        }
+        unitSelect.appendChild(option);
+      });
+    };
+
+    bidangSelect.addEventListener("change", (e) => {
+      filterUnits(e.target.value);
+    });
+
+    const toggleKontrakField = (status) => {
+      if (status === "Pegawai Kontrak" || status === "Magang / Intern") {
+        kontrakWrapper.classList.remove("hidden");
+        kontrakInput.setAttribute("required", "required");
+      } else {
+        kontrakWrapper.classList.add("hidden");
+        kontrakInput.removeAttribute("required");
+        kontrakInput.value = "";
+      }
+    };
+
+    statusSelect.addEventListener("change", (e) => {
+      toggleKontrakField(e.target.value);
+    });
+
+    if (bidangSelect.value) {
+      const oldUnitId = unitSelect.getAttribute("data-old");
+      filterUnits(bidangSelect.value, oldUnitId);
+    }
+    
+    if (statusSelect.value) {
+      toggleKontrakField(statusSelect.value);
+    }
+  });
+</script>

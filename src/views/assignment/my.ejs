@@ -1,37 +1,21 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div
-  class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600"
->
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
   <div class="mx-auto max-w-5xl">
     <div class="mb-10">
-      <div class="mb-3 flex items-center gap-3">
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-          Area Kerja
-        </span>
-        <div class="h-3 w-px bg-slate-300"></div>
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-          Penugasan
-        </span>
-      </div>
-
-      <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">Penugasan Saya</h1>
-      <p class="mt-1.5 text-sm font-medium text-slate-500">
-        Kelola daftar riwayat dan pantau penugasan aktif yang diberikan kepada Anda.
-      </p>
+      <%- include('../partials/page-header.ejs', { 
+    section: 'Area Kerja', 
+    module: 'Penugasan', 
+    title: 'Penugasan Saya', 
+    description: 'Kelola daftar riwayat dan pantau penugasan aktif yang diberikan kepada Anda.' 
+}) %>
     </div>
 
     <% if(assignments.length===0) { %>
     <div class="rounded-2xl border border-slate-200/60 bg-white p-12 text-center shadow-sm">
-      <div
-        class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-400"
-      >
+      <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-400">
         <svg class="h-5 w-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
       </div>
       <p class="text-[13px] font-medium text-slate-700">Belum ada penugasan</p>
@@ -43,15 +27,10 @@
 
     <div class="space-y-3">
       <% assignments.forEach(a=> { %>
-      <a
-        href="/assignment/<%= a._id %>"
-        class="group block rounded-2xl border border-slate-200/60 bg-white p-5 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50/30 hover:shadow-sm"
-      >
+      <a href="/assignment/<%= a._id %>" class="group block rounded-2xl border border-slate-200/60 bg-white p-5 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50/30 hover:shadow-sm">
         <div class="flex items-start justify-between gap-4">
           <div class="min-w-0 space-y-1">
-            <h2
-              class="text-[14px] font-semibold break-words text-slate-800 transition-colors group-hover:text-blue-600"
-            >
+            <h2 class="text-[14px] font-semibold break-words text-slate-800 transition-colors group-hover:text-blue-600">
               <%= a.title %>
             </h2>
             <p class="line-clamp-1 pr-4 text-[13px] leading-relaxed break-words text-slate-400">
@@ -61,16 +40,12 @@
 
           <div class="flex-shrink-0">
             <% if(a.endDate && new Date(a.endDate)>= new Date()) { %>
-            <span
-              class="inline-flex items-center rounded-lg border border-emerald-100 bg-emerald-50/60 px-2.5 py-1 text-[11px] font-medium tracking-wide text-emerald-600"
-            >
+            <span class="inline-flex items-center rounded-lg border border-emerald-100 bg-emerald-50/60 px-2.5 py-1 text-[11px] font-medium tracking-wide text-emerald-600">
               <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
               Active
             </span>
             <% } else { %>
-            <span
-              class="inline-flex items-center rounded-lg border border-slate-200/60 bg-slate-50 px-2.5 py-1 text-[11px] font-medium tracking-wide text-slate-400"
-            >
+            <span class="inline-flex items-center rounded-lg border border-slate-200/60 bg-slate-50 px-2.5 py-1 text-[11px] font-medium tracking-wide text-slate-400">
               <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-300"></span>
               Completed
             </span>
@@ -78,9 +53,7 @@
           </div>
         </div>
 
-        <div
-          class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-100/70 pt-3.5 text-[12px] font-medium text-slate-400"
-        >
+        <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-100/70 pt-3.5 text-[12px] font-medium text-slate-400">
           <div>
             Tipe:
             <span class="ml-0.5 text-slate-600"><%= a.type %></span>
@@ -104,43 +77,18 @@
         </div>
 
         <% if(a.attachment) { %>
-        <div
-          class="mt-3.5 flex items-center justify-between border-t border-dashed border-slate-100 pt-3"
-        >
-          <div
-            class="inline-flex items-center gap-1.5 rounded-md border border-blue-100/60 bg-blue-50/50 px-2.5 py-0.5 text-[11px] font-medium text-blue-600"
-          >
-            <svg
-              class="h-3.5 w-3.5 stroke-[2]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l4.5-4.5a4.5 4.5 0 011.243-0.88m6.364 6.364l-.001-.001m1.036-1.036a4.5 4.5 0 001.24-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364l4.5 4.5a4.5 4.5 0 001.242.88"
-              />
+        <div class="mt-3.5 flex items-center justify-between border-t border-dashed border-slate-100 pt-3">
+          <div class="inline-flex items-center gap-1.5 rounded-md border border-blue-100/60 bg-blue-50/50 px-2.5 py-0.5 text-[11px] font-medium text-blue-600">
+            <svg class="h-3.5 w-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l4.5-4.5a4.5 4.5 0 011.243-0.88m6.364 6.364l-.001-.001m1.036-1.036a4.5 4.5 0 001.24-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364l4.5 4.5a4.5 4.5 0 001.242.88" />
             </svg>
             Surat Tugas Terlampir
           </div>
 
-          <span
-            class="flex items-center gap-1 text-[11px] text-slate-400 transition-colors group-hover:text-blue-500"
-          >
+          <span class="flex items-center gap-1 text-[11px] text-slate-400 transition-colors group-hover:text-blue-500">
             Lihat Detail
-            <svg
-              class="h-3 w-3 transform transition-transform group-hover:translate-x-0.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              />
+            <svg class="h-3 w-3 transform transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </span>
         </div>
@@ -149,9 +97,7 @@
       <% }) %>
     </div>
     <% } %> <% if (pagination.totalPages> 1) { %>
-    <div
-      class="mt-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 text-[13px] antialiased shadow-sm"
-    >
+    <div class="mt-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 text-[13px] antialiased shadow-sm">
       <div class="font-medium text-slate-500">
         Menampilkan halaman
         <span class="font-bold text-slate-900"><%= pagination.page %></span>
@@ -160,34 +106,16 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <a
-          href="?page=<%= pagination.page - 1 %>"
-          class="<%= pagination.hasPrev ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100"
-        >
-          <svg
-            class="h-3.5 w-3.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            viewBox="0 0 24 24"
-          >
+        <a href="?page=<%= pagination.page - 1 %>" class="<%= pagination.hasPrev ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100">
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
           Prev
         </a>
 
-        <a
-          href="?page=<%= pagination.page + 1 %>"
-          class="<%= pagination.hasNext ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100"
-        >
+        <a href="?page=<%= pagination.page + 1 %>" class="<%= pagination.hasNext ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100">
           Next
-          <svg
-            class="h-3.5 w-3.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            viewBox="0 0 24 24"
-          >
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </a>

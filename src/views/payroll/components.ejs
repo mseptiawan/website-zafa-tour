@@ -2,24 +2,13 @@
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
   <div class="mx-auto max-w-6xl space-y-6">
-    
-    <div class="flex items-end justify-between mb-10">
-      <div>
-        <div class="mb-3 flex items-center gap-3">
-          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-            Area Kerja
-          </span>
-          <div class="h-3 w-px bg-slate-300"></div>
-          <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-            Finance
-          </span>
-        </div>
-        <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">Master Komponen Gaji</h1>
-        <p class="mt-1.5 text-sm font-medium text-slate-500">
-          Kelola parameter pendapatan dan potongan payroll Pegawai secara terpusat.
-        </p>
-      </div>
-    </div>
+
+  <%- include('../partials/page-header', { 
+    section: 'Area Kerja', 
+    module: 'Finance', 
+    title: 'Master Komponen Gaji', 
+    description: 'Kelola parameter pendapatan dan potongan payroll Pegawai secara terpusat.' 
+}) %>
 
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.01)] border border-slate-200">
       <div>
@@ -50,7 +39,7 @@
             </tr>
           </thead>
           <tbody id="component-table-body" class="divide-y divide-slate-100">
-            </tbody>
+          </tbody>
         </table>
       </div>
     </div>
@@ -64,7 +53,7 @@
       <h3 id="modal-title" class="text-[14px] font-bold text-slate-900">Tambah Komponen Gaji</h3>
       <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    
+
     <form id="component-form" onsubmit="saveComponent(event)">
       <input type="hidden" id="form-id">
       <div class="p-5 space-y-4">
@@ -90,25 +79,23 @@
             <option value="Tidak Tetap">Tidak Tetap (Variabel/Input Manual)</option>
           </select>
         </div>
-      <!-- Tipe Kalkulasi -->
-<div>
-  <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Tipe Kalkulasi</label>
-  <select id="form-calc-type" onchange="updatePlaceholder()"
-    class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
-    <option value="FIXED">Nominal Tetap (Rp)</option>
-    <option value="PERCENT">Persentase (%)</option>
-  </select>
-</div>
+        <!-- Tipe Kalkulasi -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Tipe Kalkulasi</label>
+          <select id="form-calc-type" onchange="updatePlaceholder()" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+            <option value="FIXED">Nominal Tetap (Rp)</option>
+            <option value="PERCENT">Persentase (%)</option>
+          </select>
+        </div>
 
-<!-- Nilai Dinamis -->
-<div>
-  <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1" id="label-value">Nilai Nominal</label>
-  <div class="relative">
-    <input type="number" id="form-amount" required placeholder="0" 
-           class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all pr-8">
-    <span id="unit-symbol" class="absolute right-3 top-2.5 text-[12px] text-slate-400 font-bold">Rp</span>
-  </div>
-</div>
+        <!-- Nilai Dinamis -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1" id="label-value">Nilai Nominal</label>
+          <div class="relative">
+            <input type="number" id="form-amount" required placeholder="0" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all pr-8">
+            <span id="unit-symbol" class="absolute right-3 top-2.5 text-[12px] text-slate-400 font-bold">Rp</span>
+          </div>
+        </div>
       </div>
       <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
         <button type="button" onclick="closeModal()" class="px-3.5 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-600 hover:bg-slate-50 text-[12px] font-medium transition-all cursor-pointer">Batal</button>
@@ -124,7 +111,7 @@
       <h3 class="text-[14px] font-bold text-slate-900">Buat Dokumen Komponen Gaji</h3>
       <button onclick="closeDocModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    
+
     <form id="doc-form" onsubmit="generateDocument(event)">
       <div class="p-5 space-y-4">
         <div>
@@ -191,13 +178,13 @@
     }
 
     components.forEach((comp) => {
-        const rowOpacity = comp.isActive ? "" : "opacity-60 bg-slate-50";
-    const statusLabel = comp.isActive ? "" : '<span class="text-[9px] font-bold text-slate-400 uppercase ml-2">(Diarsipkan)</span>';
+      const rowOpacity = comp.isActive ? "" : "opacity-60 bg-slate-50";
+      const statusLabel = comp.isActive ? "" : '<span class="text-[9px] font-bold text-slate-400 uppercase ml-2">(Diarsipkan)</span>';
       const category = normalizeCategory(comp.category);
       const type = normalizeType(comp.type);
-const displayValue = comp.calcType === 'PERCENT' 
-        ? `${comp.value}%` 
-        : `Rp ${Number(comp.value).toLocaleString('id-ID')}`;
+      const displayValue = comp.calcType === 'PERCENT' ?
+        `${comp.value}%` :
+        `Rp ${Number(comp.value).toLocaleString('id-ID')}`;
       const isEarning = category === "Pendapatan";
       const textClass = isEarning ? "text-emerald-600" : "text-rose-600";
       const bgClass = isEarning ? "bg-emerald-50/70" : "bg-rose-50/70";
@@ -206,7 +193,7 @@ const displayValue = comp.calcType === 'PERCENT'
 
       const tr = document.createElement("tr");
       tr.className = `hover:bg-slate-50/50 transition ${rowOpacity}`;
-   tr.innerHTML = `
+      tr.innerHTML = `
         <td class="px-6 py-4">
           <span class="font-semibold text-slate-800 block">${comp.name} ${statusLabel}</span>
           <span class="text-[10px] font-mono bg-slate-50 border border-slate-200/60 text-slate-500 px-1.5 py-0.5 rounded inline-block mt-1">
@@ -262,7 +249,7 @@ const displayValue = comp.calcType === 'PERCENT'
     if (mode === "edit") {
       document.getElementById("modal-title").textContent = "Edit Komponen Gaji";
       const comp = components.find((c) => c._id === id);
-      
+
       document.getElementById("form-id").value = comp._id;
       document.getElementById("form-code").value = comp.code;
       document.getElementById("form-code").disabled = true;
@@ -302,7 +289,9 @@ const displayValue = comp.calcType === 'PERCENT'
 
       const response = await fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(payload),
       });
 
@@ -315,37 +304,39 @@ const displayValue = comp.calcType === 'PERCENT'
   }
 
   async function deleteComponent(id) {
-  if (!confirm("Apakah Anda yakin ingin mengarsipkan komponen ini?")) return;
+    if (!confirm("Apakah Anda yakin ingin mengarsipkan komponen ini?")) return;
 
-  try {
-    const response = await fetch(`/api/components/${id}`, { 
-      method: "PATCH" 
-    });
-    
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
-    
-    location.reload(); 
-  } catch (error) {
-    alert(error.message);
-  }
-}
-function updatePlaceholder() {
-  const type = document.getElementById("form-calc-type").value;
-  const input = document.getElementById("form-amount");
-  const label = document.getElementById("label-value");
-  const symbol = document.getElementById("unit-symbol");
+    try {
+      const response = await fetch(`/api/components/${id}`, {
+        method: "PATCH"
+      });
 
-  if (type === "PERCENT") {
-    label.textContent = "Nilai Persentase";
-    input.placeholder = "Masukkan persentase (contoh: 10)";
-    symbol.textContent = "%";
-  } else {
-    label.textContent = "Nilai Nominal";
-    input.placeholder = "Masukkan nominal dalam Rupiah";
-    symbol.textContent = "Rp";
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message);
+
+      location.reload();
+    } catch (error) {
+      alert(error.message);
+    }
   }
-}
+
+  function updatePlaceholder() {
+    const type = document.getElementById("form-calc-type").value;
+    const input = document.getElementById("form-amount");
+    const label = document.getElementById("label-value");
+    const symbol = document.getElementById("unit-symbol");
+
+    if (type === "PERCENT") {
+      label.textContent = "Nilai Persentase";
+      input.placeholder = "Masukkan persentase (contoh: 10)";
+      symbol.textContent = "%";
+    } else {
+      label.textContent = "Nilai Nominal";
+      input.placeholder = "Masukkan nominal dalam Rupiah";
+      symbol.textContent = "Rp";
+    }
+  }
+
   function openDocModal() {
     docModal.classList.remove("hidden");
     docModal.classList.add("flex");
@@ -356,22 +347,22 @@ function updatePlaceholder() {
     docModal.classList.remove("flex");
   }
 
-async function restoreComponent(id) {
-  if (!confirm("Apakah Anda yakin ingin mengaktifkan kembali komponen ini?")) return;
+  async function restoreComponent(id) {
+    if (!confirm("Apakah Anda yakin ingin mengaktifkan kembali komponen ini?")) return;
 
-  try {
-    const response = await fetch(`/api/components/restore/${id}`, {
-      method: "PATCH",
-    });
+    try {
+      const response = await fetch(`/api/components/restore/${id}`, {
+        method: "PATCH",
+      });
 
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message);
 
-    location.reload();
-  } catch (error) {
-    alert(error.message);
+      location.reload();
+    } catch (error) {
+      alert(error.message);
+    }
   }
-}
 
 
   // Init

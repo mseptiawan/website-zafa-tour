@@ -1,161 +1,145 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-    <div class="max-w-5xl mx-auto">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  <div class="max-w-5xl mx-auto">
 
-  <div class="mb-10">
-  <div class="mb-3 flex items-center gap-3">
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-      Area Kerja
-    </span>
-    <div class="h-3 w-px bg-slate-300"></div>
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-      Finance
-    </span>
-  </div>
+   <%- include('../partials/page-header', { 
+    section: 'Area Kerja', 
+    module: 'Finance', 
+    title: 'Riwayat Pembayaran Dinas', 
+    description: 'Daftar pelacakan riwayat pencairan dana dan transfer perjalanan dinas.' 
+}) %>
 
-  <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-    Riwayat Pembayaran Dinas
-  </h1>
-  <p class="mt-1.5 text-sm font-medium text-slate-500">
-    Daftar pelacakan riwayat pencairan dana dan transfer perjalanan dinas.
-  </p>
-</div>
+    <!-- CARD / TABLE WRAPPER -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
 
-      <!-- CARD / TABLE WRAPPER -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[900px]">
 
-          <table class="w-full text-sm min-w-[900px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-6 py-4">Pengaju</th>
+              <th class="text-left px-6 py-4">Judul</th>
+              <th class="text-left px-6 py-4">Budget</th>
+              <th class="text-left px-6 py-4">Status Pembayaran</th>
+              <th class="text-left px-6 py-4">Tanggal Bayar</th>
+              <th class="p-3 text-left">Action</th>
+            </tr>
+          </thead>
 
-            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-              <tr>
-                <th class="text-left px-6 py-4">Pengaju</th>
-                <th class="text-left px-6 py-4">Judul</th>
-                <th class="text-left px-6 py-4">Budget</th>
-                <th class="text-left px-6 py-4">Status Pembayaran</th>
-                <th class="text-left px-6 py-4">Tanggal Bayar</th>
-                <th class="p-3 text-left">Action</th>
-              </tr>
-            </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% if (trips.length===0) { %>
+            <tr>
+              <td colspan="5" class="text-center py-10 text-slate-400">
+                Belum ada data riwayat pembayaran
+              </td>
+            </tr>
+            <% } %>
 
-            <tbody class="divide-y divide-slate-100">
-              <% if (trips.length===0) { %>
-                <tr>
-                  <td colspan="5" class="text-center py-10 text-slate-400">
-                    Belum ada data riwayat pembayaran
-                  </td>
-                </tr>
-                <% } %>
+            <% trips.forEach(t=> { %>
+            <tr class="hover:bg-slate-50/80 transition-all">
 
-                  <% trips.forEach(t=> { %>
-                    <tr class="hover:bg-slate-50/80 transition-all">
+              <!-- PENGAJU -->
+              <td class="px-6 py-4 text-slate-600">
+                <div class="font-medium  text-slate-800">
+                  <%= t.userId?.username || '-' %>
+                </div>
 
-                      <!-- PENGAJU -->
-                      <td class="px-6 py-4 text-slate-600">
-                        <div class="font-medium  text-slate-800">
-                          <%= t.userId?.username || '-' %>
-                        </div>
+              </td>
 
-                      </td>
+              <!-- JUDUL -->
+              <td class="px-6 py-4 font-medium text-slate-800">
+                <%= t.title || '-' %>
+              </td>
 
-                      <!-- JUDUL -->
-                      <td class="px-6 py-4 font-medium text-slate-800">
-                        <%= t.title || '-' %>
-                      </td>
+              <!-- BUDGET -->
+              <td class="px-6 py-4 font-semibold text-slate-700">
+                Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+              </td>
 
-                      <!-- BUDGET -->
-                      <td class="px-6 py-4 font-semibold text-slate-700">
-                        Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
-                      </td>
-
-                      <!-- STATUS PEMBAYARAN -->
-                      <td class="px-6 py-4">
-                        <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
+              <!-- STATUS PEMBAYARAN -->
+              <td class="px-6 py-4">
+                <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
     <%= t.payment?.status === 'PAID'
       ? 'bg-slate-50 text-slate-700 border-slate-200'
       : t.payment?.status === 'PROCESSING'
         ? 'bg-amber-50 text-amber-700 border-amber-200'
         : 'bg-red-50 text-red-700 border-red-200'
     %>">
-                          <%= t.payment?.status || 'UNPAID' %>
-                        </span>
-                      </td>
+                  <%= t.payment?.status || 'UNPAID' %>
+                </span>
+              </td>
 
-                      <!-- TANGGAL BAYAR -->
-                      <td class="px-6 py-4 text-slate-500 font-medium">
-                        <%= t.payment?.paidAt ? new Date(t.payment.paidAt).toLocaleDateString('id-ID', { day: '2-digit'
+              <!-- TANGGAL BAYAR -->
+              <td class="px-6 py-4 text-slate-500 font-medium">
+                <%= t.payment?.paidAt ? new Date(t.payment.paidAt).toLocaleDateString('id-ID', { day: '2-digit'
                           , month: 'short' , year: 'numeric' }) : '-' %>
-                      </td>
-                      <td class="p-3">
-                        <a href="/finance/history/<%= t._id %>"
-                          class="inline-flex items-center text-blue-600 hover:text-blue-800" title="Detail">
+              </td>
+              <td class="p-3">
+                <a href="/finance/history/<%= t._id %>" class="inline-flex items-center text-blue-600 hover:text-blue-800" title="Detail">
 
-                          <!-- eye icon (view/detail) -->
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
-                          </svg>
+                  <!-- eye icon (view/detail) -->
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
+                  </svg>
 
-                        </a>
-                      </td>
-                    </tr>
+                </a>
+              </td>
+            </tr>
 
-                    <% }) %>
+            <% }) %>
 
-            </tbody>
+          </tbody>
 
-          </table>
+        </table>
 
-        </div>
+      </div>
+    </div>
+
+    <% if (pagination.totalPages> 1) { %>
+    <div class="flex items-center justify-between mt-6 px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[13px] antialiased">
+
+      <!-- LEFT INFO -->
+      <div class="text-slate-500 font-medium">
+        Menampilkan halaman
+        <span class="font-bold text-slate-900">
+          <%= pagination.page %>
+        </span>
+        dari
+        <span class="font-bold text-slate-900">
+          <%= pagination.totalPages %>
+        </span>
       </div>
 
-      <% if (pagination.totalPages> 1) { %>
-        <div
-          class="flex items-center justify-between mt-6 px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[13px] antialiased">
+      <!-- RIGHT CONTROLS -->
+      <div class="flex items-center gap-2">
 
-          <!-- LEFT INFO -->
-          <div class="text-slate-500 font-medium">
-            Menampilkan halaman
-            <span class="font-bold text-slate-900">
-              <%= pagination.page %>
-            </span>
-            dari
-            <span class="font-bold text-slate-900">
-              <%= pagination.totalPages %>
-            </span>
-          </div>
-
-          <!-- RIGHT CONTROLS -->
-          <div class="flex items-center gap-2">
-
-            <!-- PREV BUTTON -->
-            <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+        <!-- PREV BUTTON -->
+        <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
           <%= pagination.hasPrev
             ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
             : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              Prev
-            </a>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Prev
+        </a>
 
-            <!-- NEXT BUTTON -->
-            <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+        <!-- NEXT BUTTON -->
+        <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
           <%= pagination.hasNext
             ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
             : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
-              Next
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
+          Next
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
 
-          </div>
+      </div>
 
-        </div>
-        <% } %>
     </div>
+    <% } %>
   </div>
+</div>

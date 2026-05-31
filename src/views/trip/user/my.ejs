@@ -1,81 +1,61 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8">
 
-    <div class="max-w-5xl mx-auto">
+  <div class="max-w-5xl mx-auto">
 
-      <!-- HEADER -->
-      <div class="flex items-start justify-between mb-8">
+    <!-- HEADER -->
+   <%- include('../partials/page-header', { 
+    section: 'Area Kerja', 
+    module: 'Dinas', 
+    title: 'Daftar Pengajuan Dinas', 
+    description: 'Kelola seluruh pengajuan perjalanan dinas Pegawai secara efisien.' 
+}) %>
 
-       <div >
-  <div class="mb-3 flex items-center gap-3">
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-      Area Kerja
-    </span>
-    <div class="h-3 w-px bg-slate-300"></div>
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-      Dinas
-    </span>
-  </div>
+    <!-- CARD -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
-  <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-    Daftar Pengajuan Dinas
-  </h1>
-  <p class="mt-1.5 text-sm font-medium text-slate-500">
-    Kelola seluruh pengajuan perjalanan dinas Pegawai secara efisien.
-  </p>
-</div>
+      <div class="overflow-x-auto">
 
-        <a href="/trip/new" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-3 rounded-xl transition">
-          + Buat Pengajuan
-        </a>
+        <table class="w-full text-sm min-w-[900px]">
 
-      </div>
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-6 py-4">Judul</th>
+              <th class="text-left px-6 py-4">Tujuan</th>
+              <th class="text-left px-6 py-4">Budget</th>
+              <th class="text-left px-6 py-4">Status</th>
+              <th class="text-left px-6 py-4">Aksi</th>
+            </tr>
+          </thead>
 
-      <!-- CARD -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <tbody class="divide-y divide-slate-100">
 
-        <div class="overflow-x-auto">
+            <% if (trips.length===0) { %>
+            <tr>
+              <td colspan="5" class="text-center py-10 text-slate-400">
+                Belum ada data pengajuan
+              </td>
+            </tr>
+            <% } %>
 
-          <table class="w-full text-sm min-w-[900px]">
+            <% trips.forEach(t=> { %>
+            <tr class="hover:bg-slate-50 transition">
 
-            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-              <tr>
-                <th class="text-left px-6 py-4">Judul</th>
-                <th class="text-left px-6 py-4">Tujuan</th>
-                <th class="text-left px-6 py-4">Budget</th>
-                <th class="text-left px-6 py-4">Status</th>
-                <th class="text-left px-6 py-4">Aksi</th>
-              </tr>
-            </thead>
+              <td class="px-6 py-4 font-medium text-slate-800">
+                <%= t.title %>
+              </td>
 
-            <tbody class="divide-y divide-slate-100">
+              <td class="px-6 py-4 text-slate-500">
+                <%= t.destination || '-' %>
+              </td>
 
-              <% if (trips.length===0) { %>
-                <tr>
-                  <td colspan="5" class="text-center py-10 text-slate-400">
-                    Belum ada data pengajuan
-                  </td>
-                </tr>
-                <% } %>
+              <td class="px-6 py-4 font-semibold text-slate-700">
+                Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+              </td>
 
-                  <% trips.forEach(t=> { %>
-                    <tr class="hover:bg-slate-50 transition">
-
-                      <td class="px-6 py-4 font-medium text-slate-800">
-                        <%= t.title %>
-                      </td>
-
-                      <td class="px-6 py-4 text-slate-500">
-                        <%= t.destination || '-' %>
-                      </td>
-
-                      <td class="px-6 py-4 font-semibold text-slate-700">
-                        Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
-                      </td>
-
-               <td class="px-6 py-4 whitespace-nowrap align-middle">
-  <% 
+              <td class="px-6 py-4 whitespace-nowrap align-middle">
+                <% 
     // 1. MAPPING WARNA TEKS (Tonalitas Adem/Soft Premium)
     const textStyles = {
       'PENDING': 'text-amber-600',
@@ -147,132 +127,127 @@
     };
   %>
 
-  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200
       <%= textStyles[t.status] || 'text-slate-500' %>
       <%= bgStyles[t.status] || 'bg-slate-50' %>
       <%= borderStyles[t.status] || 'border-slate-200' %>">
 
-    <span class="w-1.5 h-1.5 rounded-full ring-4
+                  <span class="w-1.5 h-1.5 rounded-full ring-4
       <%= dotStyles[t.status] || 'bg-slate-400 ring-slate-400/20' %> 
       <%= (t.status === 'APPROVED' || t.status === 'ON_TRIP') ? 'animate-pulse' : '' %>">
-    </span>
+                  </span>
 
-    <span>
-      <%= statusLabels[t.status] || t.status %>
-    </span>
+                  <span>
+                    <%= statusLabels[t.status] || t.status %>
+                  </span>
 
-  </div>
-</td>
+                </div>
+              </td>
 
-                      <td class="px-6 py-4 flex items-center gap-2">
+              <td class="px-6 py-4 flex items-center gap-2">
 
-                        <!-- DETAIL -->
-                        <a href="/trip/<%= t._id %>" title="Detail" class="inline-flex items-center justify-center w-9 h-9 rounded-lg
+                <!-- DETAIL -->
+                <a href="/trip/<%= t._id %>" title="Detail" class="inline-flex items-center justify-center w-9 h-9 rounded-lg
             border border-slate-200
             text-slate-600
             hover:bg-slate-50 hover:text-slate-800
             transition">
 
-                          <!-- eye icon -->
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
-                          </svg>
+                  <!-- eye icon -->
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
+                  </svg>
 
-                        </a>
+                </a>
 
-                        <!-- EDIT -->
-                        <% if (t.status==='PENDING' ) { %>
+                <!-- EDIT -->
+                <% if (t.status==='PENDING' ) { %>
 
-                          <a href="/trip/<%= t._id %>/edit" title="Edit"
-                            class="p-2 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition">
+                <a href="/trip/<%= t._id %>/edit" title="Edit" class="p-2 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition">
 
-                            <!-- pencil icon (correct edit icon) -->
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5
+                  <!-- pencil icon (correct edit icon) -->
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5
                L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
-                            </svg>
+                  </svg>
 
-                          </a>
+                </a>
 
-                          <% } %>
+                <% } %>
 
-                            <!-- RESUBMIT -->
-                            <% if (t.status==='REJECTED' ) { %>
+                <!-- RESUBMIT -->
+                <% if (t.status==='REJECTED' ) { %>
 
-                              <a href="/trip/<%= t._id %>/edit" title="Resubmit"
-                                class="p-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition">
+                <a href="/trip/<%= t._id %>/edit" title="Resubmit" class="p-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition">
 
-                                <!-- refresh icon -->
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581
+                  <!-- refresh icon -->
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581
              M5.08 13a7 7 0 0113.84 0
              M18.92 11A7 7 0 005.08 11" />
-                                </svg>
+                  </svg>
 
-                              </a>
+                </a>
 
-                              <% } %>
+                <% } %>
 
-                      </td>
+              </td>
 
-                    </tr>
-                    <% }) %>
+            </tr>
+            <% }) %>
 
-            </tbody>
+          </tbody>
 
-          </table>
-
-        </div>
+        </table>
 
       </div>
-      <% if (pagination.totalPages> 1) { %>
-        <div
-          class="flex items-center justify-between mt-6 px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[13px] antialiased">
 
-          <!-- LEFT INFO -->
-          <div class="text-slate-500 font-medium">
-            Menampilkan halaman
-            <span class="font-bold text-slate-900">
-              <%= pagination.page %>
-            </span>
-            dari
-            <span class="font-bold text-slate-900">
-              <%= pagination.totalPages %>
-            </span>
-          </div>
+    </div>
+    <% if (pagination.totalPages> 1) { %>
+    <div class="flex items-center justify-between mt-6 px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[13px] antialiased">
 
-          <!-- RIGHT CONTROLS -->
-          <div class="flex items-center gap-2">
+      <!-- LEFT INFO -->
+      <div class="text-slate-500 font-medium">
+        Menampilkan halaman
+        <span class="font-bold text-slate-900">
+          <%= pagination.page %>
+        </span>
+        dari
+        <span class="font-bold text-slate-900">
+          <%= pagination.totalPages %>
+        </span>
+      </div>
 
-            <!-- PREV BUTTON -->
-            <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+      <!-- RIGHT CONTROLS -->
+      <div class="flex items-center gap-2">
+
+        <!-- PREV BUTTON -->
+        <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
           <%= pagination.hasPrev
             ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
             : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              Prev
-            </a>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Prev
+        </a>
 
-            <!-- NEXT BUTTON -->
-            <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+        <!-- NEXT BUTTON -->
+        <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
           <%= pagination.hasNext
             ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900'
             : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
-              Next
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
+          Next
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
 
-          </div>
+      </div>
 
-        </div>
-        <% } %>
     </div>
-
+    <% } %>
   </div>
+
+</div>
