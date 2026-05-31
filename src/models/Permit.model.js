@@ -12,11 +12,7 @@ const permitSchema = new mongoose.Schema(
       enum: ["SAKIT", "PENDAMPINGAN_MELAHIRKAN", "MUSIBAH", "PENTING"],
       required: true,
     },
-    startDate: {
-      type: Date,
-      required: true,
-    },
-    endDate: {
+    date: {
       type: Date,
       required: true,
     },

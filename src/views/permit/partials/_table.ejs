@@ -3,6 +3,7 @@
     <table class="w-full min-w-[1000px] text-sm text-left border-collapse">
       <thead class="border-b border-slate-100 bg-slate-50 text-[11px] tracking-wider text-slate-400 uppercase font-bold">
         <tr>
+          <th class="px-6 py-4.5">Nama & Bidang</th>
           <th class="px-6 py-4.5">Jenis Izin</th>
           <th class="px-6 py-4.5">Alasan Pengajuan</th>
           <th class="px-6 py-4.5">Periode Pelaksanaan</th>
@@ -27,7 +28,14 @@
         <% } else { %>
         <% permits.forEach(permit => { %>
         <tr class="transition-colors hover:bg-slate-50/60 group">
-          
+          <td class="px-6 py-4.5">
+            <span class="font-semibold text-slate-800 block">
+              <%= permit.user && permit.user.employeeData ? permit.user.employeeData.fullName : (permit.user ? permit.user.name : 'Unknown') %>
+            </span>
+            <span class="text-[11px] text-slate-500 block mt-0.5">
+              <%= permit.user && permit.user.employeeData && permit.user.employeeData.careerData && permit.user.employeeData.careerData.bidangId ? permit.user.employeeData.careerData.bidangId.name : '' %>
+            </span>
+          </td>
           <td class="px-6 py-4.5">
             <% 
               const typeLabels = {
@@ -50,8 +58,7 @@
           </td>
 
           <td class="px-6 py-4.5 font-medium text-slate-500 tabular-nums">
-            <%= new Date(permit.startDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) %> -
-            <%= new Date(permit.endDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+            <%= new Date(permit.date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
           </td>
 
           <td class="px-6 py-4.5 whitespace-nowrap">
@@ -79,27 +86,39 @@
           </td>
           <% } %>
 
-          <td class="px-6 py-4.5 pr-8">
-            <div class="flex items-center justify-end gap-2">
-              <% if (type === 'active') { %>
-              <form action="/permit/approval/<%= permit._id %>" method="POST" class="inline">
-                <input type="hidden" name="status" value="APPROVED">
-                <button type="submit" onclick="return confirm('Apakah Anda yakin ingin langsung menyetujui pengajuan izin ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-2xs hover:bg-emerald-600 transition active:scale-[0.95] cursor-pointer" title="Setujui">
-                  <i class="fa-solid fa-check text-xs"></i>
-                </button>
-              </form>
+       <td class="px-6 py-4.5 pr-8">
+  <div class="flex items-center justify-end gap-2">
+    <% if (type === 'active') { %>
+      <!-- Tombol Setujui -->
+      <form action="/permit/approval/<%= permit._id %>" method="POST" class="inline">
+        <input type="hidden" name="status" value="APPROVED">
+        <button type="submit" onclick="return confirm('Setujui pengajuan izin ini?')" 
+                class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-2xs hover:bg-emerald-600 transition active:scale-[0.95] cursor-pointer" title="Setujui">
+          <i class="fa-solid fa-check text-xs"></i>
+        </button>
+      </form>
 
-              <form action="/permit/approval/<%= permit._id %>" method="POST" class="inline">
-                <input type="hidden" name="status" value="REJECTED">
-                <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menolak pengajuan izin ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500 text-white shadow-2xs hover:bg-rose-600 transition active:scale-[0.95] cursor-pointer" title="Tolak">
-                  <i class="fa-solid fa-xmark text-xs"></i>
-                </button>
-              </form>
-              <% } else { %>
-              <span class="text-xs font-semibold text-slate-400 italic">No Action</span>
-              <% } %>
-            </div>
-          </td>
+      <form action="/permit/approval/<%= permit._id %>" method="POST" class="inline">
+        <input type="hidden" name="status" value="REJECTED">
+        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menolak pengajuan izin ini?')" 
+                class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500 text-white shadow-2xs hover:bg-rose-600 transition active:scale-[0.95] cursor-pointer" title="Tolak">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </form>
+    <% } else { %>
+      <div class="flex flex-col items-end">
+        <span class="text-xs font-semibold text-slate-500">
+          <%= permit.status === 'APPROVED' ? 'Disetujui' : (permit.status === 'REJECTED' ? 'Ditolak' : permit.status) %>
+        </span>
+        <% if (permit.status === 'REJECTED' && permit.notesByApprover) { %>
+          <span class="text-[10px] text-rose-500 italic mt-0.5" title="<%= permit.notesByApprover %>">
+            Lihat catatan
+          </span>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</td>
 
         </tr>
         <% }) %>
