@@ -15,11 +15,30 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", roleMiddleware("DIREKTUR_UTAMA"), index);
+router.get(
+  "/",
+  roleMiddleware(
+    "DIREKTUR_UTAMA",
+    "MANAGER_ADMINISTRASI",
+    "MANAGER_HAJI_UMRAH",
+    "MANAGER_KEUANGAN"
+  ),
+  index
+);
 
 router.get("/new", newForm);
 
-router.post("/", roleMiddleware(["DIREKTUR_UTAMA"]), uploadFile.single("attachment"), create);
+router.post(
+  "/",
+  roleMiddleware([
+    "DIREKTUR_UTAMA",
+    "MANAGER_ADMINISTRASI",
+    "MANAGER_HAJI_UMRAH",
+    "MANAGER_KEUANGAN",
+  ]),
+  uploadFile.single("attachment"),
+  create
+);
 
 router.get("/my", myAssignments);
 

@@ -3,8 +3,14 @@ import Assignment from "../models/Assignment.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import * as notificationService from "./notification.service.js";
 
-export const findEmployees = async () => {
-  return await Employee.find({}).sort({
+export const findEmployees = async (excludeEmployeeId = null) => {
+  const query = {};
+
+  if (excludeEmployeeId) {
+    query._id = { $ne: excludeEmployeeId };
+  }
+
+  return await Employee.find(query).sort({
     fullName: 1,
   });
 };

@@ -3,11 +3,14 @@ import * as assignmentService from "../services/assignment.service.js";
 
 export const newForm = async (req, res, next) => {
   try {
-    const employees = await assignmentService.findEmployees();
+    const currentEmployeeId = req.session.user?.employeeId;
 
+    const employees = await assignmentService.findEmployees(currentEmployeeId);
+    const today = new Date().toISOString().split("T")[0];
     res.render("assignment/create", {
       title: "Buat Penugasan",
       employees,
+      today,
       error: null,
       old: {},
     });
@@ -15,7 +18,6 @@ export const newForm = async (req, res, next) => {
     next(err);
   }
 };
-
 export const create = async (req, res, next) => {
   try {
     const result = createAssignmentSchema.safeParse(req.body);
