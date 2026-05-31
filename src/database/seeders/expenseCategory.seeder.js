@@ -1,42 +1,53 @@
 import ExpenseCategory from "../../models/ExpenseCategory.model.js";
 
+const expenseCategories = [
+  {
+    name: "Transportasi & Perjalanan Dinas",
+    description: "Biaya bensin, tol, parkir, tiket pesawat, ojek online, atau akomodasi luar kota.",
+    isActive: true,
+  },
+  {
+    name: "Konsumsi & Entertainment Client",
+    description: "Biaya makan siang meeting, menjamu klien (entertainment), atau konsumsi lembur.",
+    isActive: true,
+  },
+  {
+    name: "Operasional & ATK",
+    description:
+      "Pembelian alat tulis kantor, printer supply, software pendukung, atau kebutuhan fisik kantor.",
+    isActive: true,
+  },
+  {
+    name: "Medis & Kesehatan",
+    description:
+      "Klaim biaya pengobatan rawat jalan, kacamata, atau vitamin sesuai plafon perusahaan.",
+    isActive: true,
+  },
+  {
+    name: "Komunikasi & Internet",
+    description: "Biaya pulsa, kuota data internet, atau langganan tool komunikasi tim.",
+    isActive: true,
+  },
+  {
+    name: "Pelatihan & Sertifikasi",
+    description: "Biaya pendaftaran kursus, seminar, webinar, atau sertifikasi keahlian karyawan.",
+    isActive: true,
+  },
+];
+
 const expenseCategorySeeder = async () => {
-  await ExpenseCategory.deleteMany();
+  try {
+    await ExpenseCategory.deleteMany({});
 
-  await ExpenseCategory.insertMany([
-    {
-      name: "Transport",
-      code: "TRANSPORT",
-      isActive: true,
-    },
-    {
-      name: "Meal",
-      code: "MEAL",
-      isActive: true,
-    },
-    {
-      name: "Parking",
-      code: "PARKING",
-      isActive: true,
-    },
-    {
-      name: "Hotel",
-      code: "HOTEL",
-      isActive: true,
-    },
-    {
-      name: "Operasional",
-      code: "OPERASIONAL",
-      isActive: true,
-    },
-    {
-      name: "Lainnya",
-      code: "LAINNYA",
-      isActive: true,
-    },
-  ]);
+    try {
+      await ExpenseCategory.collection.dropIndex("code_1");
+    } catch (indexError) {}
 
-  console.log("Expense Category seeded");
+    await ExpenseCategory.insertMany(expenseCategories);
+    console.log("Expense Category seeded successfully");
+  } catch (error) {
+    console.error("Error seeding Expense Category:", error);
+  }
 };
 
 export default expenseCategorySeeder;

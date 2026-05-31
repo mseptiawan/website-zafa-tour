@@ -6,6 +6,11 @@ const expenseCategorySchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      default: null,
     },
     isActive: {
       type: Boolean,
@@ -18,4 +23,5 @@ const expenseCategorySchema = new mongoose.Schema(
 );
 
 const ExpenseCategory = mongoose.model("ExpenseCategory", expenseCategorySchema);
+
 export default ExpenseCategory;

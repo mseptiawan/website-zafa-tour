@@ -1,6 +1,7 @@
 import ExpenseClaim from "../../models/ExpenseClaim.model.js";
 import User from "../../models/basic/User.model.js";
 import Employee from "../../models/employee/Employee.model.js";
+import ExpenseCategory from "../../models/ExpenseCategory.model.js";
 
 const usernames = [
   "basoherman",
@@ -14,7 +15,6 @@ const usernames = [
   "rafikafitrianti",
 ];
 
-const categories = ["TRANSPORT", "MEAL", "HOTEL", "PARKING", "OPERASIONAL", "LAINNYA"];
 const finalStatuses = ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"];
 
 function randomItem(arr) {
@@ -28,6 +28,12 @@ function randomDate() {
 }
 
 const expenseSeeder = async () => {
+  const dbCategories = await ExpenseCategory.find({});
+  if (!dbCategories.length) {
+    console.log("Tidak ada Expense Category ditemukan. Seeding expense dibatalkan.");
+    return;
+  }
+
   const users = await User.find({ username: { $in: usernames } });
   if (!users.length) {
     console.log("Tidak ada user ditemukan. Seeding expense dibatalkan.");
@@ -46,11 +52,13 @@ const expenseSeeder = async () => {
       const date = randomDate();
       const status = randomItem(finalStatuses);
 
+      const pickedCategory = randomItem(dbCategories);
+
       data.push({
         userId: user._id,
         employeeId: employee ? employee._id : null,
         title: `Klaim Operasional ${i + 1} - ${user.username}`,
-        category: randomItem(categories),
+        category: pickedCategory._id,
         amount: amount,
         expenseDate: date,
         status: status,
