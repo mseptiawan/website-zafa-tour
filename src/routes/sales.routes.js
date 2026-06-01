@@ -9,6 +9,7 @@ import {
   myVisits,
   report,
   edit,
+  exportPdf,
   update,
 } from "../controllers/sales.controller.js";
 
@@ -22,7 +23,7 @@ router.post("/", uploadFile.single("attachments"), create);
 
 // READ
 router.get("/my", myVisits);
-
+router.get("/my/export-pdf", exportPdf);
 router.get("/report", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), report);
 
 router.get("/:id/edit", authMiddleware, edit);

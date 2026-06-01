@@ -9,6 +9,7 @@ export const newForm = async (req, res, next) => {
     res.render("loans/new", {
       title: "Form Pengajuan Pinjaman",
       employee: employeeData,
+      salary: employeeData.basicSalary,
       error: null,
       old: null,
     });
@@ -21,7 +22,9 @@ export const create = async (req, res, next) => {
   try {
     const employeeId = req.session.user?.employeeId;
     const userRole = (req.session.user?.role || "").toString().trim().toUpperCase();
+
     await loanService.createLoan(employeeId, req.body, userRole);
+
     res.redirect("/loans/my");
   } catch (error) {
     try {
@@ -32,6 +35,7 @@ export const create = async (req, res, next) => {
       return res.render("loans/new", {
         title: "Pengajuan Pinjaman",
         employee: employeeData,
+        salary: employeeData.basicSalary || 0,
         formData: req.body,
         errorMessage: error.message,
       });
@@ -71,14 +75,17 @@ export const getDetail = async (req, res, next) => {
 
 export const edit = async (req, res, next) => {
   try {
-    const loan = await loanService.getLoanForEdit(req.params.id, req.user._id);
+    const { loan, basicSalary } = await loanService.getLoanForEdit(req.params.id, req.user._id);
+
     res.render("loans/new", {
       title: "Edit Pengajuan Pinjaman",
-      loan,
+      loan: loan,
+      formData: loan,
+      salary: basicSalary,
       errorMessage: null,
     });
   } catch (error) {
-    next(new AppError("Data tidak ditemukan", 404));
+    next(new AppError(error.message || "Data tidak ditemukan", 404));
   }
 };
 
@@ -105,7 +112,7 @@ export const getManageLoanPage = async (req, res, next) => {
     const sessionUser = req.session.user;
     if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
     const data = await loanService.getLoanManagementData(sessionUser);
-    res.render("loans/loan-management", {
+    res.render("loans/approval", {
       title: "Pusat Kelola Pinjaman",
       user: sessionUser,
       activeLoans: data.activeLoans,
@@ -146,7 +153,7 @@ export const getFinanceCenterPage = async (req, res, next) => {
   try {
     const sessionUser = req.session.user;
     const data = await loanService.getLoanManagementData(sessionUser);
-    res.render("loans/loan-management", {
+    res.render("loans/approval", {
       title: "Pusat Pencairan Dana",
       activeLoans: data.activeLoans,
       historyLoans: data.historyLoans,

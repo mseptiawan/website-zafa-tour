@@ -35,12 +35,15 @@ export const create = async (req, res) => {
     return res.status(status).send(err.message || "Gagal membuat pengajuan");
   }
 };
-
 export const approvalPage = async (req, res) => {
   try {
     const user = req.session.user;
 
-    const trips = await getApprovalTripsService(user.role);
+    if (!user) {
+      return res.status(401).send("Session expired");
+    }
+
+    const trips = await getApprovalTripsService(user);
 
     return res.render("trip/approval", {
       title: "Approval Dinas Luar",
@@ -49,16 +52,13 @@ export const approvalPage = async (req, res) => {
       error: null,
     });
   } catch (err) {
-    console.log(err);
-
     if (err.message === "FORBIDDEN") {
       return res.status(403).send("Tidak memiliki akses approval");
     }
 
-    return res.status(500).send("Error load approval page");
+    return res.status(500).send(`Error load approval page: ${err.message}`);
   }
 };
-
 export const approvalDetailPage = async (req, res) => {
   try {
     const { id } = req.params;

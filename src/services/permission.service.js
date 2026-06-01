@@ -118,6 +118,7 @@ export function getPermissions(role) {
       permissions.trip_my = true;
       permissions.trip_verify = true;
       permissions.trip_history = true;
+      permissions.trip_approval = true;
 
       permissions.sales_new = true;
       permissions.sales_my = true;
@@ -248,6 +249,7 @@ export function getPermissions(role) {
       permissions.trip_new = true;
       permissions.trip_my = true;
       permissions.trip_history = true;
+      permissions.trip_approval = true;
 
       permissions.sales_new = true;
       permissions.sales_my = true;

@@ -104,14 +104,18 @@ export const updateKarirApi = async (req, res) => {
 export const updateKontakApi = async (req, res) => {
   try {
     const data = await EmployeeService.updateKontak(req.params.id, req.body);
-    return res
-      .status(200)
-      .json({ success: true, message: "Data Kontak Darurat & Alamat diperbarui.", data });
+    return res.status(200).json({
+      success: true,
+      message: "Data Kontak Darurat & Alamat diperbarui.",
+      data,
+    });
   } catch (err) {
-    return handleControllerError(err, res);
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Gagal memperbarui data kontak.",
+    });
   }
 };
-
 export const updateDokumenApi = async (req, res) => {
   console.log("BODY:", req.body);
   console.log("FILES:", req.files);

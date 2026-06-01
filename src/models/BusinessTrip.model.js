@@ -26,7 +26,16 @@ const businessTripSchema = new mongoose.Schema(
     endDate: Date,
     destination: String,
     description: String,
-    budget: { type: Number, default: 0 },
+    budget: {
+      total: { type: Number, default: 0 },
+      items: [
+        {
+          title: { type: String, required: true },
+          allocatedAmount: { type: Number, default: 0 },
+          description: { type: String },
+        },
+      ],
+    },
 
     timeline: [
       {
@@ -68,14 +77,13 @@ const businessTripSchema = new mongoose.Schema(
 
     currentStep: {
       type: String,
-      enum: ["MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"],
-      default: "MANAGER_ADMINISTRASI",
+      default: null,
     },
 
     approvals: [
       {
-        step: { type: String, enum: ["MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"] },
-        actor: { type: String, enum: ["MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA", "WAKIL_DIREKTUR"] },
+        step: { type: String },
+        actor: { type: String },
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         status: { type: String, enum: ["APPROVED", "REJECTED"] },
         date: Date,

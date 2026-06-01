@@ -33,42 +33,73 @@ class LoanService {
     const employee = await Employee.findOne({ userId });
     if (!employee) throw new Error("Data Pegawai tidak ditemukan");
 
-    return employee.toObject();
-  }
+    const employeeObj = employee.toObject();
 
+    const salaryData = await EmployeeSalary.findOne({ employeeId: employeeObj._id });
+
+    employeeObj.basicSalary = salaryData ? salaryData.basicSalary : 0;
+
+    return employeeObj;
+  }
   async createLoan(employeeId, loanData, userRole = "") {
     if (!employeeId)
       throw new Error("Data Pegawai tidak ditemukan atau Anda tidak terdaftar sebagai pegawai");
 
+    // 1. Ambil data Gaji Pokok
     const salary = await EmployeeSalary.findOne({ employeeId: employeeId });
     const basicSalary = salary ? salary.basicSalary : 0;
 
-    const { amountRequested, tenorMonths, reason } = loanData;
+    // Pastikan konversi ke tipe data Number untuk keamanan kalkulasi backend
+    const amountRequested = Number(loanData.amountRequested) || 0;
+    const tenorMonths = Number(loanData.tenorMonths) || 0;
+    const { reason } = loanData;
+
+    // 2. Validasi Alasan
     if (!reason || reason.trim().length < 15) {
       throw new Error(
         "Alasan peminjaman terlalu pendek. Harap berikan penjelasan yang jelas (minimal 15 karakter)."
       );
     }
+
+    // =========================================================================
+    // ATURAN BARU 1: MAKSIMAL TOTAL PINJAMAN (3X GAJI POKOK)
+    // =========================================================================
+    const maxLoan = basicSalary * 3;
+    if (amountRequested > maxLoan) {
+      throw new Error(
+        `Pengajuan ditolak. Jumlah pinjaman (Rp ${amountRequested.toLocaleString("id-ID")}) melebihi batas maksimal 3 kali gaji pokok Anda (Maksimal Rp ${maxLoan.toLocaleString("id-ID")}).`
+      );
+    }
+
+    // =========================================================================
+    // ATURAN 2: MAKSIMAL CICILAN BULANAN (30% GAJI POKOK) & TENOR (1-12 BULAN)
+    // =========================================================================
+    if (tenorMonths < 1 || tenorMonths > 12) {
+      throw new Error("Pengajuan ditolak. Tenor pinjaman harus di antara 1 sampai 12 bulan.");
+    }
+
     const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
     const maxDeduction = basicSalary * 0.3;
 
     if (monthlyDeduction > maxDeduction) {
       throw new Error(
-        `Pengajuan ditolak. Cicilan bulanan (Rp ${monthlyDeduction.toLocaleString()}) melebihi batas maksimal 30% dari gaji pokok Anda (Maksimal Rp ${maxDeduction.toLocaleString()}/bulan).`
+        `Pengajuan ditolak. Cicilan bulanan (Rp ${monthlyDeduction.toLocaleString("id-ID")}) melebihi batas maksimal 30% dari gaji pokok Anda (Maksimal Rp ${maxDeduction.toLocaleString("id-ID")}/bulan).`
       );
     }
+    // =========================================================================
 
+    // 3. Buat Data Loan Baru
     const newLoan = await Loan.create({
       employeeId: employeeId,
       amountRequested,
       tenorMonths,
-      monthlyDeduction,
+      monthlyDeduction, // tersimpan rapi dengan pembulatan ke atas (Math.ceil)
       reason,
       status: "PENDING",
     });
 
+    // 4. Alur Approval Otomatis
     const initialStep = userRole === "WAKIL_DIREKTUR" ? "WAKIL_DIREKTUR" : null;
-
     const { nextStep, nextApproverId } = await this.getNextLoanApprover(initialStep);
 
     await LoanApproval.create({
@@ -80,7 +111,6 @@ class LoanService {
 
     return newLoan;
   }
-
   async getEmployeeLoanHistory(userId) {
     const employee = await Employee.findOne({ userId });
     if (!employee) throw new Error("Data pegawai tidak ditemukan");
@@ -115,6 +145,7 @@ class LoanService {
       loans,
       summary: {
         limit,
+        maxLoan: basicSalary * 3,
         activeLoan,
         installmentThisMonth,
         remainingDebt,
@@ -148,7 +179,6 @@ class LoanService {
 
     return { loan, approvals, payments };
   }
-
   async getLoanForEdit(loanId, userId) {
     const employee = await Employee.findOne({ userId });
     if (!employee) throw new Error("Data pegawai tidak ditemukan");
@@ -165,18 +195,25 @@ class LoanService {
       throw new Error("Pengajuan tidak bisa diubah karena sudah diproses oleh WAKIL_DIREKTUR");
     }
 
-    return loan;
+    const salaryDoc = await EmployeeSalary.findOne({ employeeId: employee._id });
+    const basicSalary = salaryDoc ? salaryDoc.basicSalary : 0;
+
+    return { loan, basicSalary };
   }
 
   async updateLoan(loanId, userId, updateData) {
-    const amountRequested = Number(updateData.amountRequested);
-    const tenorMonths = Number(updateData.tenorMonths);
+    const amountRequested = Number(updateData.amountRequested) || 0;
+    const tenorMonths = Number(updateData.tenorMonths) || 0;
     const reason = updateData.reason;
 
     if (!reason || reason.trim().length < 15) {
       throw new Error(
         "Alasan peminjaman terlalu pendek. Harap berikan penjelasan yang jelas (minimal 15 karakter)."
       );
+    }
+
+    if (tenorMonths < 1 || tenorMonths > 12) {
+      throw new Error("Pengajuan ditolak. Tenor pinjaman harus di antara 1 sampai 12 bulan.");
     }
 
     const employee = await Employee.findOne({ userId });
@@ -196,6 +233,16 @@ class LoanService {
 
     const salary = await EmployeeSalary.findOne({ employeeId: employee._id });
     const basicSalary = salary ? salary.basicSalary : 0;
+
+    // =========================================================================
+    // Validasi Maksimal Total Pinjaman (3x Gaji Pokok)
+    // =========================================================================
+    const maxLoan = basicSalary * 3;
+    if (amountRequested > maxLoan) {
+      throw new Error(
+        `Pengajuan ditolak. Jumlah pinjaman (Rp ${amountRequested.toLocaleString("id-ID")}) melebihi batas maksimal 3 kali gaji pokok Anda (Maksimal Rp ${maxLoan.toLocaleString("id-ID")}).`
+      );
+    }
 
     const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
     const maxDeduction = basicSalary * 0.3;
@@ -219,7 +266,10 @@ class LoanService {
     const approvals = await LoanApproval.find({ step: roleName }).sort({ createdAt: -1 });
     const loanIds = approvals.map((app) => app.loanId);
 
-    const loans = await Loan.find({ _id: { $in: loanIds } }).populate({
+    const loans = await Loan.find({
+      _id: { $in: loanIds },
+      status: { $ne: "CANCELLED" }, // $ne = Not Equal
+    }).populate({
       path: "employeeId",
       select: "fullName",
     });
@@ -256,6 +306,22 @@ class LoanService {
       throw new Error(`Anda tidak memiliki otoritas. Tahap saat ini: ${approval.step}`);
     }
 
+    // -------------------------------------------------------------------------
+    // DOUBLE GUARD VALIDATION
+    // -------------------------------------------------------------------------
+    const loan = await Loan.findById(approval.loanId);
+    if (!loan) throw new Error("Data pinjaman terkait tidak ditemukan.");
+
+    const salary = await EmployeeSalary.findOne({ employeeId: loan.employeeId });
+    const basicSalary = salary ? salary.basicSalary : 0;
+
+    if (loan.amountRequested > basicSalary * 3 || loan.monthlyDeduction > basicSalary * 0.3) {
+      throw new Error(
+        "Persetujuan dibatalkan sistem. Profil finansial pegawai saat ini sudah tidak memenuhi syarat limit loan."
+      );
+    }
+    // -------------------------------------------------------------------------
+
     approval.status = "APPROVED";
     approval.note = note || "";
     approval.approverId = sessionUser._id;
@@ -271,6 +337,8 @@ class LoanService {
         approverId: nextApproverId,
         status: "PENDING",
       });
+    } else {
+      await Loan.findByIdAndUpdate(approval.loanId, { status: "APPROVED_BY_MANAGEMENT" });
     }
     return true;
   }
@@ -335,6 +403,7 @@ class LoanService {
     }
 
     await LoanPayment.insertMany(paymentRecords);
+
     return true;
   }
   async cancelLoan(loanId, userId) {
@@ -356,8 +425,10 @@ class LoanService {
       throw new Error("Anda tidak memiliki akses untuk membatalkan pengajuan ini");
     }
 
-    if (loan.status === "APPROVED") {
-      throw new Error("Pengajuan tidak dapat dibatalkan karena sudah disetujui (APPROVED)");
+    if (loan.status === "APPROVED" || loan.status === "APPROVED_BY_MANAGEMENT") {
+      throw new Error(
+        "Pengajuan tidak dapat dibatalkan karena telah disetujui oleh manajemen atau dalam proses pencairan."
+      );
     }
 
     if (loan.status === "REJECTED" || loan.status === "CANCELLED") {

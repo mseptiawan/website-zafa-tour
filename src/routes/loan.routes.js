@@ -30,11 +30,7 @@ router.get("/detail/:id", getDetail);
 router.get("/edit/:id", edit);
 router.post("/update/:id", update);
 router.post("/cancel/:id", cancel);
-router.get(
-  "/manage-center",
-  roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]),
-  getManageLoanPage
-);
+router.get("/approval", roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]), getManageLoanPage);
 
 router.post(
   "/approval/approve/:id",

@@ -9,7 +9,7 @@ export const getFinanceTripDetailService = async ({ id }) => {
     throw err;
   }
 
-  const allowedTripStatus = ["APPROVED", "READY_TO_TRAVEL", "ON_TRIP"];
+  const allowedTripStatus = ["PAYMENT_PROCESSING", "APPROVED"];
 
   const allowedPaymentStatus = ["PENDING", "PROCESSING", "FAILED", "PAID"];
 

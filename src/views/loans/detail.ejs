@@ -58,10 +58,9 @@ const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
               </div>
             </div>
 
-            <div class="relative pl-5 border-l-2 border-slate-200">
-              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Alasan Peminjaman</div>
-              <p class="text-[13px] text-slate-600 leading-relaxed italic">"<%= loan.reason || '-' %>"</p>
-            </div>
+          <p class="text-[13px] text-slate-600 leading-relaxed italic whitespace-normal break-words max-w-md">
+  "<%= loan.reason || '-' %>"
+</p>
 
             <div class="pt-6 border-t border-slate-100">
               <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Bukti Pencairan Dana</div>

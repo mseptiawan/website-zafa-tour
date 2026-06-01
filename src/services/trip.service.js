@@ -1,6 +1,61 @@
 import mongoose from "mongoose";
+import Employee from "../models/employee/Employee.model.js";
+import EmployeeCareer from "../models/employee/EmployeeCareer.js";
+import Bidang from "../models/basic/Bidang.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
 import { X } from "lucide-react";
+// Helper untuk validasi dan normalisasi objek budget baru
+const parseAndValidateBudget = (budgetData) => {
+  let budgetItems = budgetData?.items;
+  if (!Array.isArray(budgetItems)) {
+    budgetItems = budgetItems ? [budgetItems] : [];
+  }
+
+  const normalizedBudgetItems = budgetItems
+    .map((item) => ({
+      title: item?.title?.trim(),
+      allocatedAmount: Number(item?.allocatedAmount || 0),
+      description: item?.description?.trim() || "",
+    }))
+    .filter((item) => item.title);
+
+  if (normalizedBudgetItems.length === 0) {
+    const err = new Error("Rincian budget wajib diisi minimal 1 item");
+    err.status = 400;
+    throw err;
+  }
+
+  const isBudgetInvalid = normalizedBudgetItems.some(
+    (item) => isNaN(item.allocatedAmount) || item.allocatedAmount < 0
+  );
+  if (isBudgetInvalid) {
+    const err = new Error("Nominal angka budget item tidak valid atau bernilai minus");
+    err.status = 400;
+    throw err;
+  }
+
+  const totalBudget = normalizedBudgetItems.reduce((sum, item) => sum + item.allocatedAmount, 0);
+
+  return {
+    total: totalBudget,
+    items: normalizedBudgetItems,
+  };
+};
+
+const resolveApprovalStep = async (user) => {
+  const role = user.role;
+
+  if (role === "DIREKTUR_UTAMA") return "DIREKTUR_UTAMA";
+
+  const employee = await Employee.findOne({ userId: user._id });
+  if (!employee) return null;
+
+  const career = await EmployeeCareer.findOne({ employee_id: employee._id });
+  if (!career) return null;
+
+  const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
+  return bidang?.managerRoleId?.name || null;
+};
 
 export const createTripService = async ({ user, body }) => {
   if (!user) {
@@ -15,7 +70,33 @@ export const createTripService = async ({ user, body }) => {
   title = title?.trim();
   destination = destination?.trim();
   description = description?.trim();
-  budget = Number(budget);
+
+  const employee = await Employee.findOne({ userId: user._id });
+
+  if (!employee) {
+    const err = new Error("Employee tidak ditemukan");
+    err.status = 400;
+    throw err;
+  }
+  const career = await EmployeeCareer.findOne({
+    employee_id: employee._id,
+  });
+
+  if (!career) {
+    const err = new Error("Career tidak ditemukan");
+    err.status = 400;
+    throw err;
+  }
+
+  const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
+
+  if (!bidang || !bidang.managerRoleId) {
+    const err = new Error("Manager bidang belum diset");
+    err.status = 400;
+    throw err;
+  }
+
+  const managerRole = bidang.managerRoleId.name;
 
   if (!Array.isArray(timeline)) {
     timeline = timeline ? [timeline] : [];
@@ -23,8 +104,7 @@ export const createTripService = async ({ user, body }) => {
 
   const normalizedTimeline = timeline
     .map((t, index) => {
-      const address = typeof t === "string" ? t : t?.address || t?.trim?.();
-
+      const address = typeof t === "string" ? t : t?.address?.trim?.();
       return {
         address,
         order: index + 1,
@@ -32,62 +112,31 @@ export const createTripService = async ({ user, body }) => {
     })
     .filter((t) => t.address);
 
-  if (!title || title.length < 5) {
-    const err = new Error("Judul minimal 5 karakter");
-    err.status = 400;
-    throw err;
-  }
+  const normalizedBudgetItems = Array.isArray(budget?.items)
+    ? budget.items
+    : budget?.items
+      ? [budget.items]
+      : [];
+
+  const cleanBudget = normalizedBudgetItems
+    .map((item) => ({
+      title: item?.title?.trim(),
+      allocatedAmount: Number(item?.allocatedAmount || 0),
+      description: item?.description?.trim() || "",
+    }))
+    .filter((i) => i.title);
+
+  const totalBudget = cleanBudget.reduce((sum, i) => sum + i.allocatedAmount, 0);
 
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  if (isNaN(start) || isNaN(end) || start > end) {
-    const err = new Error("Tanggal tidak valid");
-    err.status = 400;
-    throw err;
-  }
-
-  if (!destination || destination.length < 3) {
-    const err = new Error("Destination tidak valid");
-    err.status = 400;
-    throw err;
-  }
-
-  if (!description || description.length < 10) {
-    const err = new Error("Deskripsi terlalu pendek");
-    err.status = 400;
-    throw err;
-  }
-
-  if (isNaN(budget) || budget < 0) {
-    const err = new Error("Budget tidak valid");
-    err.status = 400;
-    throw err;
-  }
-
-  if (normalizedTimeline.length === 0) {
-    const err = new Error("Timeline wajib diisi");
-    err.status = 400;
-    throw err;
-  }
-
-  let currentStep = "MANAGER_ADMINISTRASI";
-  let status = "PENDING";
-
-  if (user.role === "MANAGER_ADMINISTRASI") {
-    currentStep = "DIREKTUR_UTAMA";
-    status = "IN_REVIEW";
-  }
-
-  if (user.role === "WAKIL_DIREKTUR") {
-    currentStep = "MANAGER_ADMINISTRASI";
-    status = "PENDING";
-  }
-
-  if (user.role === "PEGAWAI" || user.role === "MANAGER_KEUANGAN") {
-    currentStep = "MANAGER_ADMINISTRASI";
-    status = "PENDING";
-  }
+  if (!title || title.length < 5) throw new Error("Judul minimal 5 karakter");
+  if (isNaN(start) || isNaN(end) || start > end) throw new Error("Tanggal tidak valid");
+  if (!destination || destination.length < 3) throw new Error("Destination tidak valid");
+  if (!description || description.length < 10) throw new Error("Deskripsi terlalu pendek");
+  if (cleanBudget.length === 0) throw new Error("Budget wajib diisi");
+  if (normalizedTimeline.length === 0) throw new Error("Timeline wajib diisi");
 
   const trip = await BusinessTrip.create({
     userId: user._id,
@@ -98,20 +147,20 @@ export const createTripService = async ({ user, body }) => {
     endDate: end,
     destination,
     description,
-    budget,
     meetWith,
     timeline: normalizedTimeline,
-    status,
-    currentStep,
-    approvals: [],
-    delegation: {
-      active: false,
+    budget: {
+      total: totalBudget,
+      items: cleanBudget,
     },
+    status: "PENDING",
+    currentStep: managerRole,
+    approvals: [],
+    delegation: { active: false },
   });
 
   return trip;
 };
-
 export const getMyTripsService = async (userId) => {
   return await BusinessTrip.find({ userId }).sort({ createdAt: -1 });
 };
@@ -134,36 +183,99 @@ export const getTripDetailService = async (id) => {
 
   return trip;
 };
+export const getApprovalTripsService = async (user) => {
+  const role = (user.role || "").toUpperCase();
 
-export const getApprovalTripsService = async (role) => {
-  let filter = {
+  console.log("\n==== APPROVAL DEBUG START ====");
+  console.log("USER ROLE:", role);
+
+  const baseFilter = {
     status: { $in: ["PENDING", "IN_REVIEW"] },
   };
 
-  if (role === "MANAGER_ADMINISTRASI") {
-    filter.currentStep = "MANAGER_ADMINISTRASI";
-  } else if (role === "DIREKTUR_UTAMA") {
-    filter.currentStep = "DIREKTUR_UTAMA";
-  } else if (role === "WAKIL_DIREKTUR") {
-    filter.currentStep = "DIREKTUR_UTAMA";
-    filter["delegation.active"] = true;
-    filter["delegation.to"] = "WAKIL_DIREKTUR";
-  } else {
-    throw new Error("FORBIDDEN");
+  /**
+   * =========================
+   * 1. DIREKTUR UTAMA
+   * =========================
+   */
+  if (role === "DIREKTUR_UTAMA") {
+    baseFilter.currentStep = "DIREKTUR_UTAMA";
+
+    console.log("FILTER (DIREKTUR):", baseFilter);
+
+    const trips = await BusinessTrip.find(baseFilter);
+    console.log("RESULT:", trips.length);
+
+    return trips;
   }
 
-  return await BusinessTrip.find(filter)
-    .populate({
-      path: "userId",
-      select: "username roleId",
-      populate: {
-        path: "roleId",
-        select: "name",
+  /**
+   * =========================
+   * 2. WAKIL DIREKTUR
+   * =========================
+   * Bisa:
+   * - approve step dia sendiri
+   * - approve delegasi dari direktur
+   */
+  if (role === "WAKIL_DIREKTUR") {
+    baseFilter.$or = [
+      {
+        currentStep: "WAKIL_DIREKTUR",
       },
-    })
-    .sort({ createdAt: -1 });
-};
+      {
+        currentStep: "DIREKTUR_UTAMA",
+        "delegation.active": true,
+        "delegation.to": "WAKIL_DIREKTUR",
+      },
+    ];
 
+    console.log("FILTER (WAKIL DIREKTUR):", baseFilter);
+
+    const trips = await BusinessTrip.find(baseFilter);
+    console.log("RESULT:", trips.length);
+
+    return trips;
+  }
+
+  /**
+   * =========================
+   * 3. MANAGER BIDANG (DINAMIS)
+   * =========================
+   */
+  const employee = await Employee.findOne({ userId: user._id });
+
+  if (!employee) {
+    console.log("❌ employee NOT FOUND");
+    return [];
+  }
+
+  const career = await EmployeeCareer.findOne({
+    employee_id: employee._id,
+  });
+
+  if (!career) {
+    console.log("❌ career NOT FOUND");
+    return [];
+  }
+
+  const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
+
+  if (!bidang?.managerRoleId) {
+    console.log("❌ managerRole NOT FOUND");
+    return [];
+  }
+
+  baseFilter.currentStep = bidang.managerRoleId.name;
+
+  console.log("FILTER (MANAGER):", baseFilter);
+
+  const trips = await BusinessTrip.find(baseFilter);
+
+  console.log("RESULT:", trips.length);
+  console.log("==== APPROVAL DEBUG END ====\n");
+
+  return trips;
+};
 const editableStatuses = ["PENDING", "REJECTED"];
 
 export const getEditableTripService = async (id, userId) => {
@@ -189,6 +301,9 @@ export const updateTripService = async (id, userId, body) => {
     throw new Error("FORBIDDEN");
   }
 
+  // Ambil data budget yang sudah divalidasi lewat helper
+  const processedBudget = parseAndValidateBudget(body.budget);
+
   Object.assign(trip, {
     title: body.title,
     destination: body.destination,
@@ -196,7 +311,7 @@ export const updateTripService = async (id, userId, body) => {
     meetWith: body.meetWith,
     startDate: body.startDate,
     endDate: body.endDate,
-    budget: body.budget,
+    budget: processedBudget, // Pasang objek { total, items } baru
   });
 
   await trip.save();
@@ -211,6 +326,9 @@ export const resubmitTripService = async (id, userId, body) => {
     throw new Error("FORBIDDEN");
   }
 
+  // Ambil data budget yang sudah divalidasi lewat helper
+  const processedBudget = parseAndValidateBudget(body.budget);
+
   Object.assign(trip, {
     title: body.title,
     destination: body.destination,
@@ -218,7 +336,7 @@ export const resubmitTripService = async (id, userId, body) => {
     meetWith: body.meetWith,
     startDate: body.startDate,
     endDate: body.endDate,
-    budget: body.budget,
+    budget: processedBudget, // Pasang objek { total, items } baru
   });
 
   const lastRejected = [...trip.approvals].reverse().find((a) => a.status === "REJECTED");
@@ -264,7 +382,7 @@ export const resubmitTripService = async (id, userId, body) => {
   return trip;
 };
 export const handleApprovalService = async ({ id, user, action, note }) => {
-  const trip = await BusinessTrip.findById(id);
+  const trip = await BusinessTrip.findById(id).populate("userId");
 
   if (!trip) {
     const err = new Error("Data tidak ditemukan");
@@ -272,10 +390,38 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
     throw err;
   }
 
+  const employee = await Employee.findOne({ userId: trip.userId._id });
+
+  if (!employee) {
+    const err = new Error("Employee tidak ditemukan");
+    err.status = 400;
+    throw err;
+  }
+
+  const career = await EmployeeCareer.findOne({
+    employee_id: employee._id,
+  });
+
+  if (!career) {
+    const err = new Error("Career tidak ditemukan");
+    err.status = 400;
+    throw err;
+  }
+
+  const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
+
+  if (!bidang || !bidang.managerRoleId) {
+    const err = new Error("Manager bidang belum diset");
+    err.status = 400;
+    throw err;
+  }
+
+  const managerRole = bidang.managerRoleId.name;
+
   const role = user.role;
   const step = trip.currentStep;
 
-  const isFinal = ["APPROVED", "REJECTED"].includes(trip.status);
+  const isFinal = ["REJECTED", "PAYMENT_PROCESSING"].includes(trip.status);
 
   if (isFinal) {
     const err = new Error("Approval sudah selesai");
@@ -298,17 +444,17 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
       note: note || null,
     });
 
-    if (step === "MANAGER_ADMINISTRASI") {
+    if (step === managerRole) {
       trip.currentStep = "DIREKTUR_UTAMA";
       trip.status = "IN_REVIEW";
-    }
-
-    if (step === "DIREKTUR_UTAMA") {
-      trip.status = "APPROVED";
+    } else if (step === "DIREKTUR_UTAMA") {
+      trip.status = "PAYMENT_PROCESSING";
       trip.currentStep = null;
 
-      trip.payment.status = "PENDING";
-      trip.payment.amount = trip.budget || 0;
+      trip.payment = {
+        status: "PENDING",
+        amount: trip.budget?.total || 0,
+      };
     }
 
     await trip.save();
@@ -336,32 +482,6 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
 
     await trip.save();
     return { message: "Rejected" };
-  }
-
-  if (action === "DELEGATE_TO_HR") {
-    if (role !== "DIREKTUR_UTAMA" || step !== "DIREKTUR_UTAMA") {
-      const err = new Error("Tidak boleh delegasi");
-      err.status = 403;
-      throw err;
-    }
-
-    if (trip.requesterRole === "WAKIL_DIREKTUR") {
-      const err = new Error("HR request tidak boleh didelegasikan");
-      err.status = 400;
-      throw err;
-    }
-
-    trip.delegation = {
-      active: true,
-      from: "DIREKTUR_UTAMA",
-      to: "WAKIL_DIREKTUR",
-      delegatedBy: user._id,
-      delegatedAt: new Date(),
-    };
-
-    await trip.save();
-
-    return { message: "Delegasi sukses" };
   }
 
   const err = new Error("Action tidak valid");

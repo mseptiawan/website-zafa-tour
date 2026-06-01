@@ -513,74 +513,94 @@
 
     // --- INTERSEPTOR AJAX FETCH API PER-FORM ---
     const interceptForm = (formId, endpoint) => {
-      const form = document.getElementById(formId);
-      if (!form) return;
+  const form = document.getElementById(formId);
+  if (!form) return;
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        globalError.classList.add("hidden");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    // Sembunyikan global error bawaan (jika masih dipakai)
+    if (window.globalError) globalError.classList.add("hidden");
 
-        let bodyData;
-        let headers = {};
+    let bodyData;
+    let headers = {};
 
-        if (form.querySelector('input[type="file"]')) {
-          bodyData = new FormData(form);
-        } else {
-          const formData = new FormData(form);
-          const obj = {};
+    if (form.querySelector('input[type="file"]')) {
+      bodyData = new FormData(form);
+    } else {
+      const formData = new FormData(form);
+      const obj = {};
 
-          formData.forEach((value, key) => {
-            if (key.includes('[')) {
-              const parts = key.split(/\[|\]/).filter(p => p !== '');
+      formData.forEach((value, key) => {
+        if (key.includes('[')) {
+          const parts = key.split(/\[|\]/).filter(p => p !== '');
 
-              if (parts.length === 3) {
-                const [arrName, idx, prop] = parts;
-                if (!obj[arrName]) obj[arrName] = [];
-                if (!obj[arrName][idx]) obj[arrName][idx] = {};
-                obj[arrName][idx][prop] = value;
-              } else if (parts.length === 2) {
-                const [arrName, innerKey] = parts;
-                if (isNaN(innerKey)) {
-                  if (!obj[arrName]) obj[arrName] = {};
-                  obj[arrName][innerKey] = value;
-                } else {
-                  if (!obj[arrName]) obj[arrName] = [];
-                  obj[arrName][innerKey] = value;
-                }
-              }
+          if (parts.length === 3) {
+            const [arrName, idx, prop] = parts;
+            if (!obj[arrName]) obj[arrName] = [];
+            if (!obj[arrName][idx]) obj[arrName][idx] = {};
+            obj[arrName][idx][prop] = value;
+          } else if (parts.length === 2) {
+            const [arrName, innerKey] = parts;
+            if (isNaN(innerKey)) {
+              if (!obj[arrName]) obj[arrName] = {};
+              obj[arrName][innerKey] = value;
             } else {
-              obj[key] = value;
+              if (!obj[arrName]) obj[arrName] = [];
+              obj[arrName][innerKey] = value;
             }
-          });
-
-          bodyData = JSON.stringify(obj);
-          headers["Content-Type"] = "application/json";
-        }
-
-        try {
-          const res = await fetch(`/api/employee/${employeeId}/${endpoint}`, {
-            method: "PUT",
-            headers: headers,
-            body: bodyData
-          });
-          const result = await res.json();
-          if (result.success) {
-            alert(result.message);
-            window.location.reload();
-          } else {
-            globalError.textContent = result.message || "Gagal memproses pembaruan data.";
-            globalError.classList.remove("hidden");
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
           }
-        } catch (err) {
-          globalError.textContent = "Terjadi gangguan jaringan atau internal server error.";
-          globalError.classList.remove("hidden");
+        } else {
+          obj[key] = value;
         }
       });
-    };
+
+      bodyData = JSON.stringify(obj);
+      headers["Content-Type"] = "application/json";
+    }
+
+    try {
+      const res = await fetch(`/api/employee/${employeeId}/${endpoint}`, {
+        method: "PUT",
+        headers: headers,
+        body: bodyData
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        // 1. Ganti alert() dengan Toast Desain Baru
+        triggerGlobalToast({
+          title: "Berhasil",
+          message: result.message || "Data berhasil diperbarui.",
+          type: "success"
+        });
+
+        // Berikan jeda 1.5 detik agar user bisa melihat toast animasi masuk sebelum halaman reload
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+
+      } else {
+        // 2. Tampilkan pesan gagal lewat Toast jika API mengembalikan success: false
+        triggerGlobalToast({
+          title: "Gagal",
+          message: result.message || "Gagal memproses pembaruan data.",
+          type: "error"
+        });
+      }
+    } catch (err) {
+      console.error("Fetch Error:", err);
+      
+      // 3. Tampilkan pesan gangguan jaringan murni lewat Toast
+      triggerGlobalToast({
+        title: "Koneksi Terganggu",
+        message: "Tidak dapat terhubung ke server atau terjadi masalah sistem.",
+        type: "error"
+      });
+    }
+  });
+};
     interceptForm("form-pribadi", "pribadi");
     interceptForm("form-karir", "karir");
     interceptForm("form-kontak", "kontak");

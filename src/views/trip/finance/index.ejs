@@ -62,7 +62,7 @@
 
                       <!-- BUDGET -->
                       <td class="px-6 py-4 font-semibold text-slate-700">
-                        Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+                        Rp <%= (t.budget?.total || 0).toLocaleString('id-ID') %>
                       </td>
 
                       <!-- STATUS -->

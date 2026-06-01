@@ -31,7 +31,7 @@
           submenus: [
             { name: "Buat Pengajuan", path: "/loans/new", show: !!user.permissions.loan_new },
             { name: "Riwayat Pengajuan", path: "/loans/my", show: !!user.permissions.loan_my  },
-            { name: "Manajemen Pinjaman", path: "/loans/manage-center", show: !!user.permissions.loan_manage_center },
+            { name: "Persetujuan Pinjaman", path: "/loans/approval", show: !!user.permissions.loan_manage_center },
             { name: "Penyaluran Dana", path: "/loans/disbursement", show: !!user.permissions.loan_disbursement}
           ]
         },

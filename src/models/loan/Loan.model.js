@@ -13,8 +13,9 @@ const loanSchema = new mongoose.Schema(
     },
     tenorMonths: {
       type: Number,
-      enum: [3, 6],
       required: true,
+      min: 1,
+      max: 12,
     },
     monthlyDeduction: {
       type: Number,

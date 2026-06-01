@@ -1,127 +1,138 @@
 <%- layout('layouts/main', { title }) %>
 
-  <div class="ml-72 min-h-screen bg-slate-50/50 p-8">
+<div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
+  <div class="max-w-6xl mx-auto">
 
-  <div class="mb-8">
-  <div class="mb-3 flex items-center gap-3">
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-      Area Kerja
-    </span>
-    <div class="h-3 w-px bg-slate-300"></div>
-    <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase">
-      Dinas
-    </span>
-  </div>
+    <!-- PAGE HEADER -->
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <div class="mb-2 flex items-center gap-2">
+          <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Area Kerja</span>
+          <div class="h-2 w-px bg-slate-300"></div>
+          <span class="text-[10px] font-bold tracking-widest text-slate-700 uppercase">Dinas Luar</span>
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Persetujuan Dinas Luar</h1>
+        <p class="mt-1 text-[13px] font-medium text-slate-500">Kelola dan tinjau seluruh berkas pengajuan perjalanan dinas tim secara terpusat.</p>
+      </div>
+    </div>
 
-  <h1 class="text-3xl font-semibold tracking-tighter text-slate-950">
-    Persetujuan Dinas Luar
-  </h1>
-  <p class="mt-1.5 text-sm font-medium text-slate-500">
-    Kelola dan tinjau semua pengajuan perjalanan dinas tim Anda secara terpusat.
-  </p>
-</div>
-
-    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-
+    <!-- MAIN CARD TABLE CONTAINER -->
+    <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
       <div class="overflow-x-auto">
 
-        <table class="w-full min-w-[900px] text-sm">
+        <table class="w-full min-w-[900px] text-[13px] table-fixed">
+          
+          <!-- COLGROUP: Mengunci lebar kolom secara ketat sesuai standar layout lu -->
+          <colgroup>
+            <col class="w-[18%]"> <!-- Pengaju -->
+            <col class="w-[27%]"> <!-- Judul Perjalanan -->
+            <col class="w-[20%]"> <!-- Tujuan -->
+            <% if (user?.role === "DIREKTUR_UTAMA" || user?.role === "WAKIL_DIREKTUR") { %>
+              <col class="w-[13%]"> <!-- Delegasi (Hanya muncul jika diakses Direksi) -->
+            <% } %>
+            <col class="w-[12%]"> <!-- Budget -->
+            <col class="w-[10%]"> <!-- Status -->
+            <col class="w-[7%]">  <!-- Aksi -->
+          </colgroup>
 
-          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+          <!-- TABLE HEADER -->
+          <thead class="bg-slate-50/70 text-slate-400 text-[10px] font-semibold uppercase tracking-widest border-b border-slate-100">
             <tr>
-              <th class="px-6 py-4 text-left">Pengaju</th>
-              <th class="px-6 py-4 text-left">Judul</th>
-              <th class="px-6 py-4 text-left">Tujuan</th>
-
-              <% if (user.role==="HR" ) { %>
-                <th class="px-6 py-4 text-left">Delegasi</th>
-                <% } %>
-
-                  <th class="px-6 py-4 text-left">Budget</th>
-                  <th class="px-6 py-4 text-left">Status</th>
-                  <th class="px-6 py-4 text-center">Aksi</th>
+              <th class="px-8 py-4 text-left font-semibold">Pengaju</th>
+              <th class="px-8 py-4 text-left font-semibold">Judul Perjalanan</th>
+              <th class="px-8 py-4 text-left font-semibold">Tujuan</th>
+              <% if (user?.role === "DIREKTUR_UTAMA" || user?.role === "WAKIL_DIREKTUR") { %>
+                <th class="px-8 py-4 text-left font-semibold">Delegasi</th>
+              <% } %>
+              <th class="px-8 py-4 text-left font-semibold">Budget</th>
+              <th class="px-8 py-4 text-left font-semibold">Status</th>
+              <th class="px-8 py-4 text-center font-semibold">Aksi</th>
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-slate-100">
+          <!-- TABLE BODY -->
+          <tbody class="divide-y divide-slate-100/80">
 
-            <% if (trips.length===0) { %>
+            <% if (trips.length === 0) { %>
               <tr>
-                <td colspan="10" class="text-center py-10 text-slate-400">
-                  Tidak ada pengajuan
+                <td colspan="<%= (user?.role === 'DIREKTUR_UTAMA' || user?.role === 'WAKIL_DIREKTUR') ? 7 : 6 %>" class="text-center py-12 text-slate-400 font-medium bg-slate-50/20">
+                  <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/40 flex items-center justify-center text-slate-300 mb-1">
+                      <i class="fa-solid fa-folder-open text-sm"></i>
+                    </div>
+                    <span class="text-[12px] font-medium text-slate-400">Tidak ada pengajuan dinas yang perlu ditinjau</span>
+                  </div>
                 </td>
               </tr>
-              <% } %>
+            <% } %>
 
-                <% trips.forEach(t=> { %>
-                  <tr class="hover:bg-slate-50 transition">
+            <% trips.forEach(t => { %>
+              <tr class="hover:bg-slate-50/50 transition-colors duration-150 text-slate-600">
 
-                    <td class="px-6 py-4 font-medium text-slate-700">
-                      <%= t.userId?.username || '-' %>
-                    </td>
+                <!-- PENGAJU -->
+                <td class="px-8 py-5 font-semibold text-slate-800 break-words">
+                  <%= t.userId?.username || '-' %>
+                </td>
 
-                    <td class="px-6 py-4 text-slate-600">
-                      <%= t.title %>
-                    </td>
+                <!-- JUDUL -->
+                <td class="px-8 py-5 font-medium text-slate-700 break-words">
+                  <%= t.title %>
+                </td>
 
-                    <td class="px-6 py-4 text-slate-500">
-                      <%= t.destination || '-' %>
-                    </td>
+                <!-- TUJUAN -->
+                <td class="px-8 py-5 text-slate-500 break-words">
+                  <%= t.destination || '-' %>
+                </td>
 
-                    <% if (user.role==="HR" ) { %>
-                      <td class="px-6 py-4">
-                        <% if (t.delegation?.active) { %>
-                          <span
-                            class="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                            Pimpinan → HR
-                          </span>
-                          <% } else { %>
-                            <span class="text-slate-400">-</span>
-                            <% } %>
-                      </td>
-                      <% } %>
+                <!-- DELEGASI (KONDISIONAL DIREKSI) -->
+                <% if (user?.role === "DIREKTUR_UTAMA" || user?.role === "WAKIL_DIREKTUR") { %>
+                  <td class="px-8 py-5 whitespace-nowrap">
+                    <% if (t.delegation?.active && t.delegation?.to === 'WAKIL_DIREKTUR') { %>
+                      <span class="text-[10px] px-2.5 py-1 rounded-md font-semibold bg-amber-50 text-amber-700 border border-amber-200 tracking-wide">
+                        Direktur → Wadir
+                      </span>
+                    <% } else { %>
+                      <span class="text-slate-400 font-normal">-</span>
+                    <% } %>
+                  </td>
+                <% } %>
 
-                        <td class="px-6 py-4 font-medium text-slate-700">
-                          Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
-                        </td>
+                <!-- BUDGET -->
+                <td class="px-8 py-5 font-bold text-slate-900 whitespace-nowrap tabular-nums">
+                  Rp <%= (typeof t.budget === 'number' ? t.budget : (t.budget?.total || 0)).toLocaleString('id-ID') %>
+                </td>
 
-                        <td class="px-6 py-4">
-                          <span class="text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border
-    <%= t.status === 'APPROVED'
-      ? 'bg-emerald-50/50 text-emerald-700 border-emerald-200/60'
-      : t.status === 'REJECTED'
-        ? 'bg-red-50/50 text-red-700 border-red-200/60'
-        : 'bg-slate-50 text-slate-600 border-slate-200'
-    %>">
-                            <%= t.status %>
-                          </span>
-                        </td>
+                <!-- STATUS BADGE -->
+                <td class="px-8 py-5 whitespace-nowrap">
+                  <span class="px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border
+                    <%= t.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : t.status === 'IN_REVIEW' ? 'bg-blue-50 text-blue-700 border-blue-200'
+                      : t.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : t.status === 'READY_TO_TRAVEL' ? 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                      : t.status === 'ON_TRIP' ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                      : t.status === 'SUBMITTED' ? 'bg-purple-50 text-purple-700 border-purple-200'
+                      : 'bg-rose-50 text-rose-700 border-rose-200'
+                    %>">
+                    <%= t.status %>
+                  </span>
+                </td>
 
-                        <td class="px-6 py-4 text-center">
+                <!-- OPERATIONAL ACTION -->
+                <td class="px-8 py-5 text-center whitespace-nowrap">
+                  <a href="/trip/approval/<%= t._id %>" title="Tinjau Berkas" 
+                     class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 text-slate-400 hover:text-slate-800 hover:bg-slate-100 shadow-sm transition-all group">
+                    <i class="fa-solid fa-eye text-[11px] transform group-hover:scale-105 transition-transform"></i>
+                  </a>
+                </td>
 
-                          <a href="/trip/approval/<%= t._id %>" title="Tinjau"
-                            class="inline-flex items-center text-blue-600 hover:text-blue-800">
-
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
-                            </svg>
-
-                          </a>
-
-                        </td>
-
-                  </tr>
-                  <% }) %>
+              </tr>
+            <% }) %>
 
           </tbody>
-
         </table>
 
       </div>
-
     </div>
 
   </div>
+</div>

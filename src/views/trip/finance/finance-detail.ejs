@@ -67,12 +67,32 @@
                 <%= trip.destination || '-' %>
               </div>
             </div>
-            <div class="space-y-1">
-              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Anggaran</div>
-              <div class="text-[13px] font-semibold text-slate-800">
-                Rp <%= (trip.budget || 0).toLocaleString('id-ID') %>
-              </div>
-            </div>
+            <div class="space-y-2">
+  <div class="space-y-1">
+    <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Anggaran</div>
+    <div class="text-[13px] font-semibold text-slate-800">
+      Rp <%= (typeof trip.budget === 'number' ? trip.budget : (trip.budget?.total || 0)).toLocaleString('id-ID') %>
+    </div>
+  </div>
+
+  <% if (trip.budget && typeof trip.budget === 'object' && trip.budget.items && trip.budget.items.length > 0) { %>
+    <div class="border-t border-slate-100 pt-1.5 space-y-1.5">
+      <% trip.budget.items.forEach(function(item) { %>
+        <div class="flex justify-between items-start text-[11px] bg-slate-50/70 border border-slate-200/30 rounded-lg p-2">
+          <div class="pr-3 leading-tight">
+            <span class="font-medium text-slate-600 block"><%= item.title %></span>
+            <% if (item.description) { %>
+              <span class="text-[10px] text-slate-400 block mt-0.5"><%= item.description %></span>
+            <% } %>
+          </div>
+          <span class="font-semibold text-slate-700 whitespace-nowrap">
+            Rp <%= (item.allocatedAmount || 0).toLocaleString('id-ID') %>
+          </span>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+</div>
             <div class="space-y-1">
               <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Status Approval</div>
               <div class="text-[13px] font-semibold text-slate-700">

@@ -3,7 +3,7 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
   <div class="max-w-5xl mx-auto">
 
-   <%- include('../partials/page-header', { 
+   <%- include('../../partials/page-header', { 
     section: 'Area Kerja', 
     module: 'Finance', 
     title: 'Riwayat Pembayaran Dinas', 
@@ -54,7 +54,7 @@
 
               <!-- BUDGET -->
               <td class="px-6 py-4 font-semibold text-slate-700">
-                Rp <%= (t.budget || 0).toLocaleString('id-ID') %>
+                Rp <%= (t.budget?.total || 0).toLocaleString('id-ID') %>
               </td>
 
               <!-- STATUS PEMBAYARAN -->

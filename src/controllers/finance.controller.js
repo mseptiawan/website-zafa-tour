@@ -106,7 +106,7 @@ export const financeTripPage = async (req, res, next) => {
     });
 
     const query = {
-      status: "APPROVED",
+      status: "PAYMENT_PROCESSING",
       "payment.status": {
         $in: ["PENDING", "PROCESSING", "FAILED"],
       },

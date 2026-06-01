@@ -732,10 +732,9 @@ export const cancelPendingLeave = async (req, res) => {
     const leave = await Leave.findById(req.params.id);
 
     if (!leave || leave.status !== "PENDING") {
-      return res.status(400).render("error", {
-        title: "cancel pending error",
-        message: "Pembatalan gagal. Pengajuan tidak ditemukan atau sudah diproses.",
-      });
+      req.flash("error", "Pembatalan gagal. Pengajuan tidak ditemukan atau sudah diproses.");
+
+      return res.redirect("/leave/my-history");
     }
 
     leave.status = "CANCELLED";
@@ -750,12 +749,15 @@ export const cancelPendingLeave = async (req, res) => {
       }
     );
 
-    res.redirect("/leave/my-history");
+    req.flash("success", "Pengajuan cuti berhasil dibatalkan.");
+
+    return res.redirect("/leave/my-history");
   } catch (error) {
-    return res.status(500).render("error", {
-      title: "Error Sistem",
-      message: error.message,
-    });
+    console.error(error);
+
+    req.flash("error", "Terjadi kesalahan sistem saat membatalkan pengajuan cuti.");
+
+    return res.redirect("/leave/my-history");
   }
 };
 
