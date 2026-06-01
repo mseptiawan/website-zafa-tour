@@ -99,14 +99,17 @@
 <% } %>
         </div>
 
-        <div id="calcPreview" class="hidden p-4 bg-slate-50 border border-slate-150 rounded-xl space-y-2 text-xs">
-          <div class="flex justify-between text-slate-500">
-            <span>Estimasi Cicilan per Bulan:</span>
-            <span id="previewCicilan" class="font-bold text-slate-800">Rp 0</span>
-          </div>
-          <div id="warningMsg" class="hidden text-[11px] text-rose-600 font-medium pt-1 border-t border-dashed border-slate-200">
-            </div>
-        </div>
+        <div id="calcPreview" class="hidden px-4 py-3 bg-white border border-slate-100 rounded-xl shadow-xs space-y-2 text-[11px] ring-1 ring-slate-900/5">
+  <div class="flex justify-between items-center">
+    <span class="text-slate-500 font-medium">Estimasi per Bulan:</span>
+    <span id="previewCicilan" class="text-sm font-bold text-slate-900 tabular-nums">Rp 0</span>
+  </div>
+  
+  <div id="warningMsg" class="hidden text-[11px] text-rose-600 font-medium pt-2 border-t border-slate-100 flex items-center gap-1.5">
+    <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
+    <span class="leading-tight"></span>
+  </div>
+</div>
 
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">

@@ -5,9 +5,9 @@ import LoanPayment from "../models/loan/loanPayment.model.js";
 import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
 import User from "../models/basic/User.model.js";
 import Role from "../models/basic/Role.model.js";
+import { getTotalMonthlyDeduction } from "../helpers/loan.helper.js";
 
 const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
-
 class LoanService {
   async getNextLoanApprover(currentStep) {
     if (!currentStep) {
@@ -47,6 +47,7 @@ class LoanService {
 
     // 1. Ambil data Gaji Pokok
     const salary = await EmployeeSalary.findOne({ employeeId: employeeId });
+    const existingMonthlyCommitment = await getTotalMonthlyDeduction(employeeId);
     const basicSalary = salary ? salary.basicSalary : 0;
 
     // Pastikan konversi ke tipe data Number untuk keamanan kalkulasi backend
@@ -81,9 +82,11 @@ class LoanService {
     const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
     const maxDeduction = basicSalary * 0.3;
 
-    if (monthlyDeduction > maxDeduction) {
+    const totalMonthlyAfterLoan = existingMonthlyCommitment + monthlyDeduction;
+
+    if (totalMonthlyAfterLoan > maxDeduction) {
       throw new Error(
-        `Pengajuan ditolak. Cicilan bulanan (Rp ${monthlyDeduction.toLocaleString("id-ID")}) melebihi batas maksimal 30% dari gaji pokok Anda (Maksimal Rp ${maxDeduction.toLocaleString("id-ID")}/bulan).`
+        `Pengajuan ditolak. Total cicilan bulanan Anda saat ini (existing Rp ${existingMonthlyCommitment.toLocaleString("id-ID")} + pengajuan baru Rp ${monthlyDeduction.toLocaleString("id-ID")} = Rp ${totalMonthlyAfterLoan.toLocaleString("id-ID")}) melebihi batas 30% gaji (Rp ${maxDeduction.toLocaleString("id-ID")}).`
       );
     }
     // =========================================================================
@@ -158,7 +161,7 @@ class LoanService {
       populate: {
         path: "careerData",
         model: "EmployeeCareer",
-        populate: { path: "unitId" },
+        populate: [{ path: "unitId" }, { path: "bidangId" }],
       },
     });
 
@@ -338,7 +341,7 @@ class LoanService {
         status: "PENDING",
       });
     } else {
-      await Loan.findByIdAndUpdate(approval.loanId, { status: "APPROVED_BY_MANAGEMENT" });
+      await Loan.findByIdAndUpdate(approval.loanId, { status: "APPROVED" });
     }
     return true;
   }
@@ -425,7 +428,7 @@ class LoanService {
       throw new Error("Anda tidak memiliki akses untuk membatalkan pengajuan ini");
     }
 
-    if (loan.status === "APPROVED" || loan.status === "APPROVED_BY_MANAGEMENT") {
+    if (loan.status === "APPROVED") {
       throw new Error(
         "Pengajuan tidak dapat dibatalkan karena telah disetujui oleh manajemen atau dalam proses pencairan."
       );

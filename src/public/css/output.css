@@ -3727,6 +3727,12 @@
       --tw-shadow-color: color-mix(in oklab, var(--color-slate-200) var(--tw-shadow-alpha), transparent);
     }
   }
+  .shadow-slate-200\/50 {
+    --tw-shadow-color: color-mix(in srgb, oklch(92.9% 0.013 255.508) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-slate-200) 50%, transparent) var(--tw-shadow-alpha), transparent);
+    }
+  }
   .shadow-slate-300 {
     --tw-shadow-color: oklch(86.9% 0.022 252.894);
     @supports (color: color-mix(in lab, red, red)) {
@@ -3851,6 +3857,12 @@
     --tw-ring-color: color-mix(in srgb, oklch(70.4% 0.04 256.788) 20%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       --tw-ring-color: color-mix(in oklab, var(--color-slate-400) 20%, transparent);
+    }
+  }
+  .ring-slate-900\/5 {
+    --tw-ring-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 5%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-ring-color: color-mix(in oklab, var(--color-slate-900) 5%, transparent);
     }
   }
   .ring-teal-500 {

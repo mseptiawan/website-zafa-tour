@@ -43,8 +43,9 @@ export const login = async (req, res) => {
       email: user.email,
       fullName: employee?.fullName || user.username,
       employeeId: employee?._id || null,
-      gender: employee?.gender || "Laki-Laki",
+      gender: employee?.jenis_kelamin || "Laki-Laki",
       role: user.roleId?.name?.toUpperCase() || "UNKNOWN",
+      roleId: user.roleId?._id || null,
     };
 
     if (remember) {

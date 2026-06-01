@@ -100,9 +100,9 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />`,
           show: true,
           submenus: [
-            { name: "Buat Pengajuan", path: "/overtime/apply", show: !!user.permissions.overtime_new },
-            { name: "Riwayat Pengajuan", path: "/overtime/my", show: !!user.permissions.overtime_my },
-            { name: "Verifikasi Pengajuan", path: "/overtime/approval", show: !!user.permissions.overtime_approval },
+            { name: "Catat Lembur", path: "/overtime/new", show: !!user.permissions.overtime_new },
+            { name: "Riwayat Lembur", path: "/overtime/my", show: !!user.permissions.overtime_my },
+            { name: "Verifikasi Lembur", path: "/overtime/approval", show: !!user.permissions.overtime_approval },
             { name: "Riwayat Verifikasi", path: "/overtime/approval/history", show: !!user.permissions.overtime_verify }
           ]
         },

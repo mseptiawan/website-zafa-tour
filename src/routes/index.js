@@ -33,7 +33,7 @@ router.use("/", authRoutes);
 router.use("/", dashboardRoutes);
 router.use("/", leaveRoutes);
 router.use("/permit", permitRoutes);
-router.use("/", overtimeRoutes);
+router.use("/overtime", overtimeRoutes);
 router.use("/attendance", attendanceRoutes);
 router.use("/employee", webEmployeeRoutes);
 router.use("/api/employee", apiEmployeeRoutes);

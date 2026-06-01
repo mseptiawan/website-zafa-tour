@@ -28,9 +28,13 @@ const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
                 <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-1">
                   <%= loan.employeeId?.fullName || 'Detail Pengajuan Pinjaman Pegawai' %>
                 </h1>
+                 </p>
+                  <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                  Bidang: <%= loan.employeeId?.careerData?.bidangId?.name || 'Tidak Ada' %>
+                </p>
                 <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
                   Unit: <%= loan.employeeId?.careerData?.unitId?.name || 'Tidak Ada' %>
-                </p>
+               
               </div>
             </div>
             <span class="px-3 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= loan.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' : loan.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' %>">

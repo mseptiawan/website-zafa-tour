@@ -8,24 +8,15 @@ const overtimeSchema = new mongoose.Schema(
       required: true,
     },
 
-    employeeName: {
-      type: String,
-    },
+    employeeName: String,
 
     date: {
       type: Date,
       required: true,
     },
 
-    startTime: {
-      type: String,
-      required: true,
-    },
-
-    endTime: {
-      type: String,
-      required: true,
-    },
+    startTime: String,
+    endTime: String,
 
     totalHours: {
       type: Number,
@@ -37,31 +28,54 @@ const overtimeSchema = new mongoose.Schema(
       required: true,
     },
 
-    result: {
-      type: String,
-    },
+    result: String,
 
-    proofFile: {
-      type: String,
-      default: null,
-    },
+    proofFile: String,
 
-    approvedByManager: {
-      type: Boolean,
-      default: false,
+    location: {
+      type: {
+        type: String,
+        enum: ["OFFICE", "REMOTE", "CLIENT_SITE", "OTHER"],
+        default: "OFFICE",
+      },
+      detail: String,
     },
 
     status: {
       type: String,
-      enum: ["Pending Manager", "Approved", "Rejected"],
-      default: "Pending Manager",
+      enum: ["SUBMITTED", "APPROVED", "REJECTED"],
+      default: "SUBMITTED",
     },
+
+    approvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    approvedAt: {
+      type: Date,
+      default: null,
+    },
+    approvalHistory: [
+      {
+        action: {
+          type: String,
+          enum: ["SUBMITTED", "APPROVED", "REJECTED"],
+        },
+        by: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        role: String,
+        note: String,
+        at: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
   }
 );
-
-const Overtime = mongoose.model("Overtime", overtimeSchema);
-
-export default Overtime;
+export const Overtime = mongoose.model("Overtime", overtimeSchema);

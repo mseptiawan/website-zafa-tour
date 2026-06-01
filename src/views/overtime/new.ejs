@@ -1,4 +1,4 @@
-<%- layout('layouts/main', { title: 'Ajukan Lembur' }) %>
+<%- layout('layouts/main', { title: 'Catat Lembur' }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
 
@@ -8,21 +8,21 @@
    <%- include('../partials/page-header', { 
     section: 'Area Kerja', 
     module: 'Lembur', 
-    title: 'Ajukan Lembur', 
+    title: 'Catat Lembur', 
     description: 'Isi detail lembur yang dilakukan' 
 }) %>
 
     <!-- CARD -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
-      <form action="/overtime/apply" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+      <form action="/overtime/" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
         <!-- TANGGAL LEMBUR -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">
             Tanggal Lembur
           </label>
-          <input type="date" name="date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+          <input type="date" id="dateInput" name="date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
             focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
             outline-none transition-all" />
         </div>
@@ -49,7 +49,29 @@
             focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
             outline-none resize-none transition-all"></textarea>
         </div>
+<!-- LOKASI LEMBUR -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Tipe Lokasi -->
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Lokasi Kerja</label>
+    <select id="locationType" name="location[type]" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+      focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+      outline-none transition-all cursor-pointer">
+      <option value="OFFICE">Kantor (Office)</option>
+      <option value="REMOTE">Remote (WFH)</option>
+      <option value="CLIENT_SITE">Lokasi Klien (Client Site)</option>
+      <option value="OTHER">Lainnya</option>
+    </select>
+  </div>
 
+  <!-- Detail Lokasi -->
+  <div class="space-y-1.5">
+    <label class="text-[13px] font-bold text-slate-700">Detail Lokasi</label>
+    <input type="text" id="locationDetail" name="location[detail]" placeholder="Contoh: Gedung A atau Alamat Klien" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+      focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+      outline-none transition-all" />
+  </div>
+</div>
         <!-- HASIL (OPSIONAL) -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">
@@ -130,7 +152,7 @@
 
           <!-- BUTTON SUBMIT -->
           <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
-            Kirim Pengajuan
+            Kirim
           </button>
 
         </div>
@@ -197,4 +219,48 @@
     dateFormat: "H:i",
     time_24hr: true
   });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const dateInput = document.getElementById("dateInput");
+
+    // Mendapatkan tanggal hari ini (format YYYY-MM-DD)
+    const today = new Date();
+    
+    // Hitung tanggal 7 hari yang lalu
+    const pastLimit = new Date();
+    pastLimit.setDate(today.getDate() - 7);
+
+    // Format tanggal ke YYYY-MM-DD
+    const formatDate = (date) => date.toISOString().split('T')[0];
+
+    // Set atribut min (7 hari lalu) dan max (hari ini)
+    dateInput.min = formatDate(pastLimit);
+    dateInput.max = formatDate(today);
+  });
+</script>
+<script>
+  const locationType = document.getElementById('locationType');
+  const locationDetail = document.getElementById('locationDetail');
+
+  // 1. Fungsi untuk mengatur nilai detail berdasarkan lokasi
+  function updateDetailLocation() {
+    if (locationType.value === 'OFFICE') {
+      locationDetail.value = 'Kantor pusat zafa tour palembang';
+    } else {
+      // Jika pilih yang lain (atau halaman baru dimuat dan bukan OFFICE), 
+      // Anda bisa menentukan apakah ingin dikosongkan atau dibiarkan.
+      // Jika ingin tetap kosong saat bukan OFFICE:
+      if (locationDetail.value === 'Kantor pusat zafa tour palembang') {
+          locationDetail.value = '';
+      }
+    }
+  }
+
+  // 2. Jalankan fungsi saat ada perubahan (event listener)
+  locationType.addEventListener('change', updateDetailLocation);
+
+  // 3. JALANKAN SAAT HALAMAN PERTAMA KALI DIMUAT (Initial load)
+  document.addEventListener('DOMContentLoaded', updateDetailLocation);
 </script>

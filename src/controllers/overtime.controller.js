@@ -1,81 +1,31 @@
-import Overtime from "../models/Overtime.model.js";
+import { Overtime } from "../models/Overtime.model.js";
+import { createOvertimeService } from "../services/overtime.service.js";
+
 export const showApplyOvertime = (req, res) => {
-  res.render("overtime/apply", {
-    title: "Ajukan Lembur",
+  res.render("overtime/new", {
+    title: "Catat Lembur",
   });
 };
 
 export const applyOvertime = async (req, res) => {
   try {
-    const { date, startTime, endTime, workDescription, result } = req.body;
-
-    if (!date || !startTime || !endTime || !workDescription) {
-      return res.send("Semua field wajib diisi");
+    if (req.validationErrors) {
+      return res.render("overtime/new", {
+        title: "Catat Lembur",
+        errors: req.validationErrors,
+        old: req.body,
+      });
     }
 
-    if (workDescription.trim().length < 10) {
-      return res.send("Deskripsi pekerjaan minimal 10 karakter");
-    }
-
-    if (workDescription.trim().length > 500) {
-      return res.send("Deskripsi pekerjaan maksimal 500 karakter");
-    }
-
-    if (result && result.trim().length < 10) {
-      return res.send("Hasil pekerjaan minimal 10 karakter");
-    }
-
-    if (result && result.trim().length > 500) {
-      return res.send("Hasil pekerjaan maksimal 500 karakter");
-    }
-
-    const start = new Date(`${date}T${startTime}`);
-    const end = new Date(`${date}T${endTime}`);
-
-    if (end <= start) {
-      return res.send("Jam selesai harus lebih besar dari jam mulai");
-    }
-
-    const diffMs = end - start;
-
-    const totalHours = diffMs / (1000 * 60 * 60);
-
-    if (totalHours > 12) {
-      return res.send("Lembur maksimal 12 jam");
-    }
-
-    const user = req.session.user;
-
-    const isManager = user.role === "MANAGER_ADMINISTRASI";
-
-    await Overtime.create({
-      userId: user._id,
-
-      employeeName: user.fullName,
-
-      date,
-
-      startTime,
-
-      endTime,
-
-      totalHours,
-
-      workDescription: workDescription.trim(),
-
-      result: result ? result.trim() : "",
-
-      proofFile: req.file ? req.file.filename : null,
-
-      status: isManager ? "Approved" : "Pending Manager",
-
-      approvedByManager: isManager ? true : false,
+    await createOvertimeService({
+      user: req.session.user,
+      body: req.body,
+      file: req.file,
     });
 
     return res.redirect("/overtime/my");
   } catch (err) {
     console.log(err);
-
     return res.send(err.message);
   }
 };
@@ -134,7 +84,7 @@ export const approvalOvertimePage = async (req, res) => {
     if (status) {
       filter.status = status;
     } else {
-      filter.status = "Pending Manager";
+      filter.status = "SUBMITTED";
     }
 
     if (search) {
@@ -175,14 +125,26 @@ export const approveManagerOvertime = async (req, res) => {
   try {
     const overtime = await Overtime.findById(req.params.id);
 
-    overtime.approvedByManager = true;
-    overtime.status = "Approved";
+    if (!overtime) {
+      return res.send("Data tidak ditemukan");
+    }
+
+    overtime.status = "APPROVED";
+
+    overtime.approvedBy = req.session.user._id;
+
+    overtime.approvedAt = new Date();
+
+    overtime.approvalHistory.push({
+      action: "APPROVED",
+      by: req.session.user._id,
+    });
+
     await overtime.save();
 
     res.redirect("/overtime/approval");
   } catch (err) {
     console.log(err);
-
     res.send(err.message);
   }
 };
@@ -191,14 +153,26 @@ export const rejectOvertime = async (req, res) => {
   try {
     const overtime = await Overtime.findById(req.params.id);
 
-    overtime.status = "Rejected";
+    if (!overtime) {
+      return res.send("Data tidak ditemukan");
+    }
+
+    overtime.status = "REJECTED";
+
+    overtime.approvedBy = req.session.user._id;
+
+    overtime.approvedAt = new Date();
+
+    overtime.approvalHistory.push({
+      action: "REJECTED",
+      by: req.session.user._id,
+    });
 
     await overtime.save();
 
     res.redirect("/overtime/approval");
   } catch (err) {
     console.log(err);
-
     res.send(err.message);
   }
 };
@@ -211,7 +185,7 @@ export const approvalOvertimeHistory = async (req, res) => {
     const { search, status, sort } = req.query;
 
     const filter = {
-      status: { $in: ["Approved", "Rejected"] },
+      status: { $in: ["APPROVED", "REJECTED"] },
     };
 
     if (search) {

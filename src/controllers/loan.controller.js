@@ -130,7 +130,7 @@ export const approveLoan = async (req, res, next) => {
     if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
     const { id } = req.params;
     await loanService.processApproval(id, sessionUser, note, req.file);
-    return res.redirect("/loans/manage-center");
+    return res.redirect("/loans/approval");
   } catch (error) {
     next(new AppError(error.message, 400));
   }
@@ -143,7 +143,7 @@ export const rejectLoan = async (req, res, next) => {
     if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
     const { id } = req.params;
     await loanService.processReject(id, sessionUser, note);
-    return res.redirect("/loans/manage-center");
+    return res.redirect("/loans/approval");
   } catch (error) {
     next(new AppError(error.message, 400));
   }
