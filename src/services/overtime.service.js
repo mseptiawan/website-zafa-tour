@@ -1,6 +1,6 @@
+import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import { Overtime } from "../models/Overtime.model.js";
 import { getPayrollPeriod } from "../utils/payrollPeriod.js";
-import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
 
 export const createOvertimeService = async ({ user, body, file }) => {
   const rawDate = new Date(body.date);
@@ -17,20 +17,30 @@ export const createOvertimeService = async ({ user, body, file }) => {
     throw new Error("Payroll period invalid");
   }
 
-  const financial = await EmployeeFinancial.findOne({
-    userId: user._id,
+  const employeeId = user.employeeId;
+
+  if (!employeeId) {
+    throw new Error("Employee ID tidak ditemukan di session");
+  }
+
+  const career = await EmployeeCareer.findOne({
+    employee_id: employeeId,
+  }).populate({
+    path: "bidangId",
+    populate: {
+      path: "managerRoleId",
+    },
   });
 
-  if (!financial) {
-    throw new Error("Employee financial data not found");
+  if (!career?.bidangId?.managerRoleId?.name) {
+    throw new Error("Employee career/bidang/manager tidak ditemukan");
   }
 
-  if (!financial.overtimeRate || financial.overtimeRate <= 0) {
-    throw new Error("Overtime rate not configured");
-  }
+  const requiredManagerRole = career.bidangId.managerRoleId.name;
 
   return await Overtime.create({
     userId: user._id,
+    employeeId: user.employeeId,
     employeeName: user.fullName,
 
     date: workDate,
@@ -43,16 +53,14 @@ export const createOvertimeService = async ({ user, body, file }) => {
     result: body.result?.trim() || "",
 
     location: body.location,
-
     proofFile: file ? file.filename : null,
 
     status: "SUBMITTED",
-
     payrollPeriodId: period.id,
     payrollStatus: "PENDING",
 
-    overtimeRateSnapshot: financial.overtimeRate,
-    multiplierSnapshot: 1.5,
+    bidangId: career.bidangId._id,
+    requiredManagerRole,
 
     approvalHistory: [
       {

@@ -7,7 +7,11 @@ const overtimeSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
+    employeeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
     employeeName: String,
 
     date: {
@@ -95,6 +99,17 @@ const overtimeSchema = new mongoose.Schema(
     multiplierSnapshot: {
       type: Number,
       default: 1.5,
+    },
+
+    bidangId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Bidang",
+      required: true,
+    },
+
+    requiredManagerRole: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

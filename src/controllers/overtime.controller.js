@@ -1,5 +1,9 @@
 import { Overtime } from "../models/Overtime.model.js";
 import { createOvertimeService } from "../services/overtime.service.js";
+import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
+import Bidang from "../models/basic/Bidang.model.js";
+import EmployeeCareer from "../models/employee/EmployeeCareer.js";
+import Employee from "../models/employee/Employee.model.js";
 
 export const showApplyOvertime = (req, res) => {
   return res.render("overtime/new", {
@@ -83,8 +87,12 @@ export const approvalOvertimePage = async (req, res) => {
 
     const { search, status, sort, tab = "active" } = req.query;
 
+    const userRole = user.role;
+
+    // BASE FILTER → HANYA DATA SESUAI ROLE MANAGER LOGIN
     const baseFilter = {
       userId: { $ne: user._id },
+      requiredManagerRole: userRole, // ⬅️ INI KUNCI UTAMA
     };
 
     if (search) {
@@ -153,18 +161,33 @@ export const approveManagerOvertime = async (req, res) => {
   try {
     const overtime = await Overtime.findById(req.params.id);
 
-    if (!overtime) return res.send("Data tidak ditemukan");
+    if (!overtime) {
+      return res.status(404).send("Data tidak ditemukan");
+    }
 
+    // ambil note dari form
+    const { note } = req.body;
+
+    // validasi role manager yang berhak approve
+    const userRole = req.session.user.role;
+
+    if (userRole !== overtime.requiredManagerRole) {
+      return res.status(403).send("Anda tidak berhak approve lembur ini");
+    }
+
+    // update status
     overtime.status = "APPROVED";
     overtime.payrollStatus = "PENDING";
 
     overtime.approvedBy = req.session.user._id;
     overtime.approvedAt = new Date();
 
+    // history approval
     overtime.approvalHistory.push({
       action: "APPROVED",
       by: req.session.user._id,
-      role: req.session.user.role,
+      role: userRole,
+      note: note?.trim() || null,
       at: new Date(),
     });
 
@@ -176,12 +199,21 @@ export const approveManagerOvertime = async (req, res) => {
     return res.status(500).send(err.message);
   }
 };
-
 export const rejectOvertime = async (req, res) => {
   try {
     const overtime = await Overtime.findById(req.params.id);
 
-    if (!overtime) return res.send("Data tidak ditemukan");
+    if (!overtime) {
+      return res.status(404).send("Data tidak ditemukan");
+    }
+
+    const { note } = req.body;
+
+    const userRole = req.session.user.role;
+
+    if (userRole !== overtime.requiredManagerRole) {
+      return res.status(403).send("Anda tidak berhak reject lembur ini");
+    }
 
     overtime.status = "REJECTED";
     overtime.payrollStatus = "LOCKED";
@@ -192,7 +224,8 @@ export const rejectOvertime = async (req, res) => {
     overtime.approvalHistory.push({
       action: "REJECTED",
       by: req.session.user._id,
-      role: req.session.user.role,
+      role: userRole,
+      note: note?.trim() || null,
       at: new Date(),
     });
 
@@ -204,7 +237,6 @@ export const rejectOvertime = async (req, res) => {
     return res.status(500).send(err.message);
   }
 };
-
 export const approvalOvertimeHistory = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -250,19 +282,55 @@ export const approvalOvertimeHistory = async (req, res) => {
     return res.status(500).send(err.message);
   }
 };
-
-export const detailOvertime = async (req, res) => {
+export const getOvertimeDetail = async (req, res) => {
   try {
-    const overtime = await Overtime.findById(req.params.id);
+    const { id } = req.params;
 
-    if (!overtime) return res.send("Data lembur tidak ditemukan");
+    // 1. Ambil data lembur dan populate user penilai di history
+    const overtime = await Overtime.findById(id).populate("approvalHistory.by");
+
+    if (!overtime) {
+      return res.status(404).send("Data pengajuan lembur tidak ditemukan");
+    }
+
+    // 2. Ambil data profil Employee berdasarkan userId yang ada di dokumen lembur
+    // Cara ini mengeksploitasi virtual careerData yang berada di dalam Employee model secara legal
+    const employee = await Employee.findOne({ userId: overtime.userId }).populate({
+      path: "careerData",
+      populate: [{ path: "bidangId" }, { path: "unitId" }],
+    });
+
+    // Ambil data user dari session untuk evaluasi panel manajemen
+    const user = req.session.user;
 
     return res.render("overtime/detail", {
-      title: "Detail Lembur",
+      title: "Detail Aktivitas Lembur",
       overtime,
+      employee, // Kita kirim object employee ke dalam view
+      user,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).send(err.message);
   }
+};
+export const getPayrollOvertimeSummary = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const result = await getOvertimeSummary(userId);
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+const canApproveOvertime = (userRole, requiredRole) => {
+  return userRole === requiredRole;
 };

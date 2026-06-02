@@ -1,76 +1,258 @@
-<%- layout('layouts/main', { title: 'Detail Lembur' }) %>
+<%- layout('layouts/main', { title }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50/60 p-8 antialiased">
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w-6xl mx-auto">
 
-    <a href="javascript:history.back()" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
+    <% 
+      const APPROVER_ROLES = ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
+      const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
+      const backLink = isManagement ? '/overtime/management' : '/overtime/my';
+    %>
+
+    <a href="<%= backLink %>" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
       <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
       </svg>
       Kembali
     </a>
 
-    <div class="bg-white border border-slate-200/60 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.03)] overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-      <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
-        <div>
-          <h1 class="text-xl font-semibold text-slate-900 tracking-tight">Detail Lembur</h1>
-          <p class="text-[13px] text-slate-500 mt-0.5">Informasi lengkap pengajuan lembur Pegawai</p>
+      <div class="lg:col-span-2 space-y-6">
+        
+        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 text-slate-600">
+                <i class="fa-solid fa-user-clock text-base"></i>
+              </div>
+              <div>
+                <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-1.5">
+                  <%= employee?.fullName || overtime.employeeName || 'Detail Aktivitas Lembur' %>
+                </h1>
+                <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                  Bidang: <%= employee?.careerData?.bidangId?.name || 'Tidak Ada' %>
+                </p>
+                <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider mt-0.5">
+                  Unit: <%= employee?.careerData?.unitId?.name || 'Tidak Ada' %>
+                </p>
+              </div>
+            </div>
+            
+            <% 
+              const status = (overtime.status || '').toUpperCase();
+              let badgeStyle = 'bg-amber-50 text-amber-700 border-amber-200';
+              if (status === 'APPROVED') badgeStyle = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+              if (status === 'REJECTED') badgeStyle = 'bg-rose-50 text-rose-700 border-rose-200';
+            %>
+            <span class="px-3 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= badgeStyle %>">
+              <%= overtime.status %>
+            </span>
+          </div>
+
+          <div class="p-8 space-y-8">
+            <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal Lembur</div>
+                <div class="text-[15px] font-semibold text-slate-900">
+                  <%= new Date(overtime.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+                </div>
+              </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Jam Pelaksanaan</div>
+                <div class="text-[15px] font-semibold text-slate-900 tabular-nums">
+                  <%= overtime.startTime %> - <%= overtime.endTime %>
+                </div>
+              </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Total Durasi</div>
+                <div class="text-[15px] font-semibold text-slate-900"><%= overtime.totalHours %> Jam</div>
+              </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Lokasi Kerja</div>
+                <div class="text-[13px] font-semibold text-slate-900">
+                  <span class="px-2 py-0.5 text-[10px] border rounded bg-slate-50 border-slate-200 inline-block font-bold text-slate-600 mr-1 uppercase">
+                    <%= overtime.location?.type || 'OFFICE' %>
+                  </span>
+                  <span class="text-slate-600 font-medium"><%= overtime.location?.detail || '-' %></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 space-y-4">
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Deskripsi Pekerjaan</div>
+                <p class="text-[13px] text-slate-600 leading-relaxed whitespace-normal break-words bg-slate-50 border border-slate-100 p-4 rounded-xl">
+                  <%= overtime.workDescription || '-' %>
+                </p>
+              </div>
+              <div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Hasil / Deliverable Pekerjaan</div>
+                <p class="text-[13px] text-slate-600 leading-relaxed whitespace-normal break-words bg-slate-50 border border-slate-100 p-4 rounded-xl italic">
+                  "<%= overtime.result || '-' %>"
+                </p>
+              </div>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Lampiran Bukti Kerja</div>
+              <% if (overtime.proofFile) { %>
+              <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-file-image text-[12px]"></i>
+                  </div>
+                  <span class="text-[12px] font-medium text-slate-700 truncate max-w-xs"><%= overtime.proofFile %></span>
+                </div>
+                <a href="/uploads/files/<%= overtime.proofFile %>" target="_blank" class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg transition hover:bg-blue-100">VIEW</a>
+              </div>
+              <% } else { %>
+              <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200">
+                <div class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-4">
+                  <i class="fa-solid fa-file-circle-xmark text-amber-500 text-xl"></i>
+                </div>
+                <h4 class="text-sm font-semibold text-slate-700 mb-1">Bukti lampiran tidak tersedia</h4>
+                <p class="text-xs text-slate-500 text-center max-w-[220px] leading-relaxed">Pegawai tidak menyertakan file pendukung visual saat input lembur.</p>
+              </div>
+              <% } %>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div class="px-8 py-6 border-b border-slate-100">
+            <h3 class="text-[11px] font-semibold text-slate-900 uppercase tracking-widest">Informasi Snapshot Sistem Payroll</h3>
+          </div>
+          <table class="w-full text-left">
+            <thead class="bg-slate-50/50 text-[10px] uppercase text-slate-400 font-semibold tracking-widest">
+              <tr>
+                <th class="px-8 py-4">Periode Gaji</th>
+                <th class="px-8 py-4">Rate Snapshot (per jam)</th>
+                <th class="px-8 py-4">Multiplier</th>
+                <th class="px-8 py-4">Status Penguncian</th>
+                <th class="px-8 py-4 text-right">Estimasi Upah</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-8 py-4 text-[12px] font-semibold text-slate-700">
+                  <%= overtime.payrollPeriodId || 'Belum Ditentukan' %>
+                </td>
+                <td class="px-8 py-4 text-[12px] font-medium text-slate-600 tabular-nums">
+                  Rp <%= (overtime.overtimeRateSnapshot || 0).toLocaleString('id-ID') %>
+                </td>
+                <td class="px-8 py-4 text-[12px] font-bold text-slate-800">
+                  x<%= overtime.multiplierSnapshot || 1.5 %>
+                </td>
+                <td class="px-8 py-4">
+                  <% 
+                    const payStatus = (overtime.payrollStatus || 'PENDING').toUpperCase();
+                    let payBadge = 'bg-slate-100 text-slate-600';
+                    if (payStatus === 'LOCKED') payBadge = 'bg-amber-50 text-amber-700 border border-amber-100';
+                    if (payStatus === 'PAID') payBadge = 'bg-emerald-50 text-emerald-700 border border-emerald-100';
+                  %>
+                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase <%= payBadge %>">
+                    <%= payStatus %>
+                  </span>
+                </td>
+                <td class="px-8 py-4 text-[12px] font-bold text-slate-900 tabular-nums text-right">
+                  <% const estimatedPay = (overtime.overtimeRateSnapshot || 0) * (overtime.multiplierSnapshot || 1.5) * (overtime.totalHours || 0); %>
+                  Rp <%= estimatedPay.toLocaleString('id-ID') %>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <% 
-          const statusConfig = {
-            'Approved': 'bg-emerald-50 text-emerald-700 border-emerald-200/50',
-            'Rejected': 'bg-red-50 text-red-700 border-red-200/50',
-            'Pending Manager': 'bg-amber-50 text-amber-700 border-amber-200/50'
-          };
+          const isPendingForMe = overtime.status === 'SUBMITTED' && (overtime.requiredManagerRole || '').toUpperCase() === (user.role || '').toUpperCase(); 
         %>
-        <span class="text-[11px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider border <%= statusConfig[overtime.status] || 'bg-slate-50 text-slate-600 border-slate-200' %>">
-          <%= overtime.status %>
-        </span>
-      </div>
-
-      <div class="p-8 space-y-8">
-
-        <div>
-          <h2 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3.5">Informasi Lembur</h2>
-          <div class="grid grid-cols-2 gap-x-8 gap-y-5 border border-slate-100 bg-slate-50/20 p-5 rounded-xl">
-            <div>
-              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Tanggal</div>
-              <div class="text-[13px] font-medium text-slate-800"><%= new Date(overtime.date).toLocaleDateString("id-ID", {day: '2-digit', month: 'long', year: 'numeric'}) %></div>
+        <% if (isPendingForMe) { %>
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
+          <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+              <i class="fa-solid fa-check-double text-blue-700"></i>
             </div>
-            <div>
-              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Jam Lembur</div>
-              <div class="text-[13px] font-medium text-slate-800"><%= overtime.startTime %> - <%= overtime.endTime %></div>
-            </div>
-            <div>
-              <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Total Durasi</div>
-              <div class="text-[13px] font-semibold text-slate-900"><%= overtime.totalHours %> Jam</div>
-            </div>
-          </div>
-        </div>
+            Evaluasi Verifikasi Lembur Karyawan
+          </h3>
+          
+          <textarea id="evaluation-note" rows="4" class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Masukkan catatan atau alasan verifikasi berkas lembur..."></textarea>
 
-        <div class="space-y-6">
-          <div class="border-t border-slate-100 pt-6">
-            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Pekerjaan</div>
-            <div class="text-[13px] text-slate-600 leading-relaxed"><%= overtime.workDescription %></div>
-          </div>
+          <div class="flex items-center justify-end gap-3 w-full">
+            <form action="/overtime/approval/<%= overtime._id %>/reject" method="POST" onsubmit="appendNoteBeforeSubmit(this)">
+              <input type="hidden" name="note" class="hidden-note-field">
+              <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition active:scale-[0.98]">
+                Tolak Pengajuan
+              </button>
+            </form>
 
-          <div class="border-t border-slate-100 pt-6">
-            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Hasil Pekerjaan</div>
-            <div class="text-[13px] text-slate-600 leading-relaxed"><%= overtime.result || '-' %></div>
+            <form action="/overtime/approval/<%= overtime._id %>/manager" method="POST" onsubmit="appendNoteBeforeSubmit(this)">
+              <input type="hidden" name="note" class="hidden-note-field">
+              <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition active:scale-[0.98]">
+                Terima & Setujui
+              </button>
+            </form>
           </div>
-        </div>
-
-        <% if (overtime.proofFile) { %>
-        <div class="border-t border-slate-100 pt-6">
-          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Bukti Pendukung</div>
-          <img src="/uploads/files/<%= overtime.proofFile %>" alt="Bukti Lembur" class="max-w-sm rounded-xl border border-slate-200 shadow-sm transition hover:opacity-90">
         </div>
         <% } %>
 
       </div>
-    </div>
 
+      <div class="space-y-6">
+        <div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
+          <div class="mb-8">
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h2>
+            <p class="text-[10px] text-slate-400 mt-0.5">Alur verifikasi lembur berjenjang</p>
+          </div>
+          
+          <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
+            <% if (!overtime.approvalHistory || overtime.approvalHistory.length === 0) { %>
+              <p class="text-[11px] text-slate-400 italic">Belum ada jejak log terekam.</p>
+            <% } else { %>
+              <% overtime.approvalHistory.forEach((app, index) => { %>
+              <div class="relative mb-6">
+                <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center
+                  <%= app.action === 'APPROVED' ? 'bg-emerald-500' : app.action === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
+                  <span class="text-[8px] text-white font-bold"><%= index + 1 %></span>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase"><%= app.role || app.action %></span>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border <%= app.action === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : app.action === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200' %>">
+                      <%= app.action %>
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2 text-[10px] text-slate-500">
+                    <span class="font-semibold text-slate-700"><%= app.by?.fullName || 'Sistem / Pemohon' %></span>
+                    <span class="text-slate-300">|</span>
+                    <span><%= app.at ? new Date(app.at).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Menunggu' %></span>
+                  </div>
+                  <% if (app.note) { %>
+                  <div class="mt-2 text-[10px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic">"<%= app.note %>"</div>
+                  <% } %>
+                </div>
+              </div>
+              <% }) %>
+            <% } %>
+
+            <div class="relative mt-4 pl-3 border-l border-slate-200 text-[11px] text-slate-400">
+              <span>Waktu Pengajuan Awal: <b class="text-slate-600 font-semibold"><%= new Date(overtime.createdAt).toLocaleString('id-ID') %></b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
+
+<script>
+  function appendNoteBeforeSubmit(formElement) {
+    const noteValue = document.getElementById('evaluation-note').value;
+    const hiddenInput = formElement.querySelector('.hidden-note-field');
+    if (hiddenInput) {
+      hiddenInput.value = noteValue;
+    }
+  }
+</script>

@@ -3,7 +3,6 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
   <div class="max-w-6xl mx-auto">
 
-    <!-- HEADER: Konsisten dengan partials page-header sebelumnya -->
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Kehadiran', 
@@ -11,7 +10,6 @@
         description: 'Daftar lengkap pengajuan dan status aktivitas lembur Pegawai.' 
     }) %>
 
-    <!-- TABLE AREA -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm min-w-[1000px]">
@@ -59,7 +57,7 @@
                   let textStyle = 'text-amber-600', bgStyle = 'bg-amber-50/70', borderStyle = 'border-amber-200/50', dotStyle = 'bg-amber-500';
 
                   if (status === 'APPROVED') {
-                    textStyle = 'text-emerald-600'; bgStyle = 'bg-emerald-50/70'; borderStyle = 'border-emerald-200/50'; dotStyle = 'bg-emerald-500';
+                    textStyle = 'text-emerald-600'; bgStyle = 'bg-emerald-50/70'; borderStyle = 'border-emerald-200/50'; dotStyle = 'bg-emerald-505';
                   } else if (status === 'REJECTED') {
                     textStyle = 'text-rose-600'; bgStyle = 'bg-rose-50/70'; borderStyle = 'border-rose-200/50'; dotStyle = 'bg-rose-500';
                   }
@@ -73,22 +71,14 @@
 
               <td class="px-6 py-4">
                 <div class="flex items-center justify-end">
-                  <button class="openModal inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition active:scale-[0.95]" 
-                    type="button" 
-                    data-date="<%= new Date(o.date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>" 
-                    data-time="<%= o.startTime %> - <%= o.endTime %>" 
-                    data-total="<%= o.totalHours %> Jam" 
-                    data-status="<%= o.status %>" 
-                    data-description="<%= o.workDescription %>" 
-                    data-result="<%= o.result || '-' %>" 
-                    data-created="<%= new Date(o.createdAt).toLocaleString('id-ID') %>" 
-                    data-proof="<%= o.proofFile || '' %>"
-                    title="Lihat Detail Lembur">
+                  <a href="/overtime/detail/<%= o._id %>" 
+                     class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition active:scale-[0.95]" 
+                     title="Lihat Detail Lembur">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
-                  </button>
+                  </a>
                 </div>
               </td>
 
@@ -102,154 +92,3 @@
 
   </div>
 </div>
-
-
-<!-- MODAL DETAIL (DI-REFACTOR LEBIH CLEAN & MODERN) -->
-<div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-all duration-300">
-  <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl border border-slate-100 overflow-hidden transform scale-95 transition-transform duration-300" id="modalContainer">
-
-    <!-- Modal Header -->
-    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
-      <h3 class="font-semibold text-slate-800 text-base">
-        Detail Aktivitas Lembur
-      </h3>
-      <button id="closeModal" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- Modal Body -->
-    <div class="p-6 space-y-6 text-sm max-h-[70vh] overflow-y-auto">
-      
-      <!-- Grid Info Utama -->
-      <div class="grid grid-cols-2 gap-x-4 gap-y-5">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Tanggal</span>
-          <p id="modalDate" class="font-medium text-slate-700 mt-0.5"></p>
-        </div>
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Jam Lembur</span>
-          <p id="modalTime" class="font-medium text-slate-700 mt-0.5 tabular-nums"></p>
-        </div>
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Total Durasi</span>
-          <p id="modalTotal" class="font-semibold text-slate-800 mt-0.5"></p>
-        </div>
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Status Akhir</span>
-          <p id="modalStatus" class="font-medium mt-0.5 inline-block"></p>
-        </div>
-      </div>
-
-      <hr class="border-slate-100">
-
-      <!-- Text Areas -->
-      <div class="space-y-4">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Deskripsi Pekerjaan</span>
-          <p id="modalDescription" class="text-slate-600 mt-1 leading-relaxed bg-slate-50 border border-slate-100 rounded-xl p-3"></p>
-        </div>
-
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Hasil / Deliverable</span>
-          <p id="modalResult" class="text-slate-600 mt-1 leading-relaxed bg-slate-50 border border-slate-100 rounded-xl p-3"></p>
-        </div>
-
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Waktu Pengajuan</span>
-          <p id="modalCreated" class="text-slate-500 mt-0.5 font-medium"></p>
-        </div>
-      </div>
-
-      <!-- Evidence / Bukti File -->
-      <div id="proofSection" class="pt-2">
-        <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-2">Lampiran Bukti Kerja</span>
-        
-        <div id="proofWrapper" class="hidden">
-          <img id="modalProof" class="w-full rounded-xl border border-slate-200 shadow-xs object-cover max-h-60" src="" alt="Bukti Lembur">
-        </div>
-
-        <div id="proofEmpty" class="hidden p-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 text-center text-slate-400 text-xs">
-          Tidak ada berkas bukti kerja yang dilampirkan
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Modal Footer -->
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-end bg-slate-50/50">
-      <button id="closeModalFooter" class="px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-2xs active:scale-95 transition-all">
-        Tutup Detail
-      </button>
-    </div>
-
-  </div>
-</div>
-
-<!-- SCRIPT LOGIC -->
-<script>
-  const modal = document.getElementById("detailModal");
-  const modalContainer = document.getElementById("modalContainer");
-
-  document.querySelectorAll(".openModal").forEach(btn => {
-    btn.addEventListener("click", () => {
-      // Tampilkan Modal
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-      setTimeout(() => modalContainer.classList.remove("scale-95"), 10);
-
-      // Inject data tekstual
-      document.getElementById("modalDate").textContent = btn.dataset.date;
-      document.getElementById("modalTime").textContent = btn.dataset.time;
-      document.getElementById("modalTotal").textContent = btn.dataset.total;
-      document.getElementById("modalDescription").textContent = btn.dataset.description;
-      document.getElementById("modalResult").textContent = btn.dataset.result;
-      document.getElementById("modalCreated").textContent = btn.dataset.created;
-
-      // Styling status pada modal biar senada dengan baris tabel
-      const statusText = btn.dataset.status;
-      const statusElement = document.getElementById("modalStatus");
-      statusElement.textContent = statusText;
-      statusElement.className = "font-semibold mt-0.5 px-2.5 py-0.5 text-xs rounded-full border ";
-
-      if (statusText.toUpperCase() === 'APPROVED') {
-        statusElement.className += "text-emerald-600 bg-emerald-50 border-emerald-200";
-      } else if (statusText.toUpperCase() === 'REJECTED') {
-        statusElement.className += "text-rose-600 bg-rose-50 border-rose-200";
-      } else {
-        statusElement.className += "text-amber-600 bg-amber-50 border-amber-200";
-      }
-
-      // Handler lampiran foto/file bukti
-      const proof = btn.dataset.proof;
-      const wrapper = document.getElementById("proofWrapper");
-      const emptyState = document.getElementById("proofEmpty");
-
-      if (proof && proof.trim() !== "") {
-        document.getElementById("modalProof").src = `/uploads/files/${proof}`;
-        wrapper.classList.remove("hidden");
-        emptyState.classList.add("hidden");
-      } else {
-        wrapper.classList.add("hidden");
-        emptyState.classList.remove("hidden");
-      }
-    });
-  });
-
-  function hideModal() {
-    modalContainer.classList.add("scale-95");
-    setTimeout(() => {
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-    }, 150);
-  }
-
-  document.getElementById("closeModal").addEventListener("click", hideModal);
-  document.getElementById("closeModalFooter").addEventListener("click", hideModal);
-
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) hideModal();
-  });
-</script>

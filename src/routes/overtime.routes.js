@@ -9,52 +9,48 @@ import {
   showApplyOvertime,
   applyOvertime,
   myOvertime,
+  getPayrollOvertimeSummary,
   approvalOvertimePage,
   approveManagerOvertime,
-  detailOvertime,
+  getOvertimeDetail,
   rejectOvertime,
   approvalOvertimeHistory,
 } from "../controllers/overtime.controller.js";
 
 const router = express.Router();
+
+const APPROVAL_ROLES = [
+  "WAKIL_DIREKTUR",
+  "MANAGER_ADMINISTRASI",
+  "MANAGER_KEUANGAN",
+  "MANAGER_HAJI_UMRAH",
+  "DIREKTUR_UTAMA",
+];
+
 router.use(authMiddleware);
 
 router.get("/new", showApplyOvertime);
-router.post(
-  "/",
-  uploadFile.single("proofFile"),
-  validate(createOvertimeSchema),
-  applyOvertime
-);
+router.post("/", uploadFile.single("proofFile"), validate(createOvertimeSchema), applyOvertime);
 
 router.get("/my", myOvertime);
 
 router.get(
   "/approval/history",
 
-  roleMiddleware("MANAGER_ADMINISTRASI"),
+  roleMiddleware(APPROVAL_ROLES),
   approvalOvertimeHistory
 );
 router.get(
   "/approval",
 
-  roleMiddleware(["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR"]),
+  roleMiddleware(APPROVAL_ROLES),
   approvalOvertimePage
 );
 
-router.post(
-  "/approval/:id/manager",
+router.post("/approval/:id/manager", roleMiddleware(APPROVAL_ROLES), approveManagerOvertime);
 
-  roleMiddleware("MANAGER_ADMINISTRASI"),
-  approveManagerOvertime
-);
-router.post(
-  "/approval/:id/reject",
-
-  roleMiddleware("MANAGER_ADMINISTRASI"),
-  rejectOvertime
-);
-
-router.get("/:id", authMiddleware, detailOvertime);
+router.post("/approval/:id/reject", roleMiddleware(APPROVAL_ROLES), rejectOvertime);
+router.get("/summary/:userId", getPayrollOvertimeSummary);
+router.get("/detail/:id", authMiddleware, getOvertimeDetail);
 
 export default router;
