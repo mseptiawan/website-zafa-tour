@@ -2,13 +2,12 @@ import mongoose from "mongoose";
 
 const salaryComponentSchema = new mongoose.Schema(
   {
-
     code: {
       type: String,
       required: true,
       unique: true,
       trim: true,
-      uppercase: true, 
+      uppercase: true,
     },
     name: {
       type: String,
@@ -20,16 +19,23 @@ const salaryComponentSchema = new mongoose.Schema(
       enum: ["FIXED", "FLEXIBLE"],
       required: true,
     },
+
+    sourceType: {
+      type: String,
+      enum: ["STATIC", "DYNAMIC"],
+      default: "STATIC",
+    },
+
     category: {
       type: String,
       enum: ["EARNING", "DEDUCTION"],
       required: true,
     },
-   calculationType: {
+    calculationType: {
       type: String,
-      enum: ["FIXED_AMOUNT", "PERCENTAGE"], 
+      enum: ["FIXED_AMOUNT", "PERCENTAGE"],
       required: true,
-      default: "FIXED_AMOUNT"
+      default: "FIXED_AMOUNT",
     },
     defaultAmount: {
       type: Number,
@@ -39,7 +45,7 @@ const salaryComponentSchema = new mongoose.Schema(
       type: String,
       trim: true,
       uppercase: true,
-      default: null 
+      default: null,
     },
     isLocked: {
       type: Boolean,
@@ -53,8 +59,8 @@ const salaryComponentSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      default: null
-    }
+      default: null,
+    },
   },
   { timestamps: true }
 );

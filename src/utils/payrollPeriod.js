@@ -1,9 +1,9 @@
 export function getPayrollPeriod(date = new Date()) {
   const d = new Date(date);
 
-  const year = d.getFullYear();
-  const month = d.getMonth();
-  const day = d.getDate();
+  const year = d.getUTCFullYear();
+  const month = d.getUTCMonth();
+  const day = d.getUTCDate();
 
   let start, end;
 

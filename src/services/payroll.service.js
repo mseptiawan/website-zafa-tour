@@ -44,16 +44,17 @@ export const calculatePayroll = async ({ userId, date }) => {
 
   const totalHours = records.reduce((sum, r) => sum + (r.totalHours || 0), 0);
 
-  const totalPay = records.reduce((sum, r) => {
-    return (
-      sum + (r.totalHours || 0) * (r.overtimeRateSnapshot || 0) * (r.multiplierSnapshot || 1.5)
-    );
-  }, 0);
+  // ambil rate dari system (idealnya dari Salary model nanti)
+  const rate = records[0]?.overtimeRate || 0;
+  const multiplier = 1.5;
+
+  const totalPay = totalHours * rate * multiplier;
 
   return {
+    periodId: period.id,
     period,
-    totalHours: Number(totalHours.toFixed(2)),
-    totalPay: Number(totalPay.toFixed(2)),
+    totalHours,
+    totalPay,
   };
 };
 

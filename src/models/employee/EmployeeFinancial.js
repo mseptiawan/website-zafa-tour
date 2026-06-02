@@ -31,6 +31,11 @@ const employeeFinancialSchema = new mongoose.Schema(
       required: false,
       trim: true,
     },
+
+    overtimeRate: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

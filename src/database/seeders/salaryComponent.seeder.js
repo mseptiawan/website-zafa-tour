@@ -30,12 +30,17 @@ const salaryComponents = [
     name: "Tunjangan Lembur per Jam",
     type: "FLEXIBLE",
     category: "EARNING",
+
+    sourceType: "DYNAMIC",
+
     calculationType: "FIXED_AMOUNT",
-    defaultAmount: 20000,
-    basedOnComponent: "TOTAL_JAM_LEMBUR",
-    isLocked: false,
+    defaultAmount: 0,
+
+    isLocked: true,
     isActive: true,
-    description: "Upah lembur per jam di luar jam kerja normal sesuai UU Ketenagakerjaan.",
+
+    description:
+      "Upah lembur dihitung berdasarkan total jam lembur × overtime rate snapshot dari data overtime.",
   },
   {
     code: "INS_KEROHANIAN",

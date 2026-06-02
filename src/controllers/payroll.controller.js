@@ -18,13 +18,20 @@ export const renderPayrollPage = async (req, res) => {
   try {
     const { employees, components, savedAllowances } = await payrollService.getPayrollData();
 
+    const now = new Date();
+
+    const currentMonth = now.toLocaleString("id-ID", {
+      month: "long",
+      year: "numeric",
+    });
+
     res.render("payroll/index", {
       title: "Manajemen Payroll",
       user: req.user,
       employees,
       components,
       savedAllowances,
-      currentMonth: "Juni 2026",
+      currentMonth,
     });
   } catch (error) {
     res.status(500).send(error.message);

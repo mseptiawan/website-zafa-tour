@@ -75,12 +75,10 @@ const overtimeSchema = new mongoose.Schema(
         },
       },
     ],
-
-    payrollPeriod: {
-      id: { type: String, required: true },
-      label: { type: String, required: true },
-      start: { type: Date, required: true },
-      end: { type: Date, required: true },
+    payrollPeriodId: {
+      type: String,
+      required: true,
+      ref: "PayrollPeriod",
     },
 
     payrollStatus: {
@@ -89,8 +87,15 @@ const overtimeSchema = new mongoose.Schema(
       default: "PENDING",
     },
 
-    overtimeRateSnapshot: Number,
-    multiplierSnapshot: Number,
+    overtimeRateSnapshot: {
+      type: Number,
+      default: 0,
+    },
+
+    multiplierSnapshot: {
+      type: Number,
+      default: 1.5,
+    },
   },
   { timestamps: true }
 );
