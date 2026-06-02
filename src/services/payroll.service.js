@@ -89,3 +89,54 @@ export const runPayroll = async (date = new Date()) => {
     result: aggregated,
   };
 };
+
+export const buildPayroll = async ({ employeeId, date, overtime }) => {
+  const employee = await Employee.findById(employeeId).populate("salaryDetail");
+
+  const allowances = await EmployeeAllowance.find({ employeeId }).populate("componentId");
+
+  const basicSalary = employee?.salaryDetail?.basicSalary || 0;
+
+  const earning = allowances
+    .filter((a) => a.componentId.category === "EARNING")
+    .reduce((sum, a) => sum + (a.amount || 0), 0);
+
+  const deduction = allowances
+    .filter((a) => a.componentId.category === "DEDUCTION")
+    .reduce((sum, a) => sum + (a.amount || 0), 0);
+
+  const overtimePay = overtime?.totalPay || 0;
+
+  const totalEarnings = basicSalary + earning + overtimePay;
+  const totalDeductions = deduction;
+
+  return {
+    employeeId,
+    periodMonth: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+
+    basicSalary,
+
+    overtime: {
+      hours: overtime.totalHours,
+      amount: overtimePay,
+    },
+
+    allowances: allowances.map((a) => ({
+      name: a.componentId.name,
+      amount: a.amount,
+    })),
+
+    deductions: allowances
+      .filter((a) => a.componentId.category === "DEDUCTION")
+      .map((a) => ({
+        name: a.componentId.name,
+        amount: a.amount,
+      })),
+
+    totalEarnings,
+    totalDeductions,
+    netTakeHomePay: totalEarnings - totalDeductions,
+
+    paymentStatus: "PENDING",
+  };
+};

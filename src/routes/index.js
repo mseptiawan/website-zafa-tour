@@ -24,7 +24,6 @@ import loanRoutes from "./loan.routes.js";
 import notificationRoutes from "./notification.routes.js";
 import componentPageRoutes from "./componentPage.routes.js";
 import salaryComponentRoutes from "./salaryComponent.routes.js";
-import payrollPageRoutes from "./payrollPage.routes.js";
 import payrollRoutes from "./payroll.routes.js";
 
 const router = express.Router();
@@ -51,8 +50,7 @@ router.use("/", expenseRoutes);
 router.use("/loans", loanRoutes);
 router.use("/components", componentPageRoutes);
 router.use("/api/components", salaryComponentRoutes);
-router.use("/payroll", payrollPageRoutes);
-router.use("/api/payroll", payrollRoutes);
+router.use("/payroll", payrollRoutes);
 router.use("/api", notificationRoutes);
 
 export default router;

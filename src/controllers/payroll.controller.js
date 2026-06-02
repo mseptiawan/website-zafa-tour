@@ -1,18 +1,7 @@
 import * as payrollService from "../services/payroll.service.js";
 import Payroll from "../models/payroll/Payroll.model.js";
-import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
-import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
-
 import { runPayroll } from "../services/payrollRun.service.js";
-
-export const payrollPreview = async (req, res) => {
-  const result = await runPayroll(new Date());
-
-  return res.json({
-    success: true,
-    data: result,
-  });
-};
+import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 
 export const renderPayrollPage = async (req, res) => {
   try {
@@ -25,6 +14,11 @@ export const renderPayrollPage = async (req, res) => {
       year: "numeric",
     });
 
+    const payrollPeriod = {
+      month: now.getMonth() + 1,
+      year: now.getFullYear(),
+    };
+
     res.render("payroll/index", {
       title: "Manajemen Payroll",
       user: req.user,
@@ -32,147 +26,53 @@ export const renderPayrollPage = async (req, res) => {
       components,
       savedAllowances,
       currentMonth,
+      payrollPeriod,
     });
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
-export const saveEmployeeAllowances = async (req, res) => {
-  try {
-    const { employeeId, allowances } = req.body;
-
-    if (!employeeId) {
-      return res.status(400).json({ success: false, message: "ID Pegawai wajib diisi." });
-    }
-
-    const masterComponents = await SalaryComponent.find({ isActive: true });
-
-    const componentMap = {};
-    const categoryMap = {};
-
-    masterComponents.forEach((comp) => {
-      componentMap[comp.name] = comp._id;
-      categoryMap[comp._id.toString()] = comp.category;
-    });
-
-    const bulkOperations = [];
-    const incomingComponentIds = [];
-    const categoriesToUpdate = new Set();
-
-    if (allowances && allowances.length > 0) {
-      for (const item of allowances) {
-        const componentId = componentMap[item.componentName];
-        if (!componentId) continue;
-
-        incomingComponentIds.push(componentId);
-
-        const category = categoryMap[componentId.toString()];
-        if (category) {
-          categoriesToUpdate.add(category);
-        }
-
-        bulkOperations.push({
-          updateOne: {
-            filter: { employeeId, componentId },
-            update: { $set: { amount: parseFloat(item.amount) || 0 } },
-            upsert: true,
-          },
-        });
-      }
-    }
-
-    if (categoriesToUpdate.size > 0) {
-      const targetComponentIds = masterComponents
-        .filter((comp) => categoriesToUpdate.has(comp.category))
-        .map((comp) => comp._id);
-
-      await EmployeeAllowance.deleteMany({
-        employeeId,
-        componentId: {
-          $in: targetComponentIds,
-          $nin: incomingComponentIds,
-        },
-      });
-    } else {
-      await EmployeeAllowance.deleteMany({ employeeId });
-    }
-
-    if (bulkOperations.length > 0) {
-      await EmployeeAllowance.bulkWrite(bulkOperations);
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Seluruh komponen payroll berhasil diperbarui!",
-    });
-  } catch (error) {
-    console.error("Error Save Employee Allowance:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Gagal menyimpan komponen: " + error.message,
-    });
-  }
-};
 export const savePayroll = async (req, res) => {
   try {
-    const { employeeId, periodMonth, basicSalary, allowances, deductions } = req.body;
+    const { employeeId, date } = req.body;
 
-    if (!employeeId || !periodMonth) {
+    if (!employeeId) {
       return res.status(400).json({
         success: false,
-        message: "ID Pegawai dan Periode Bulan wajib diisi.",
+        message: "Employee wajib dipilih",
       });
     }
 
-    const parseBasicSalary = parseFloat(basicSalary) || 0;
+    const period = new Date(date || Date.now());
 
-    const totalAllowances = allowances.reduce(
-      (sum, item) => sum + (parseFloat(item.amount) || 0),
-      0
-    );
-    const totalEarnings = parseBasicSalary + totalAllowances;
+    // ambil overtime dari engine
+    const overtime = await getOvertimeSummary(employeeId, period);
 
-    const totalDeductions = deductions.reduce(
-      (sum, item) => sum + (parseFloat(item.amount) || 0),
-      0
-    );
-
-    const netTakeHomePay = totalEarnings - totalDeductions;
-
-    const payrollData = {
+    // ambil payroll base data (allowance + deduction + salary)
+    const payrollData = await payrollService.buildPayroll({
       employeeId,
-      periodMonth,
-      basicSalary: parseBasicSalary,
-      allowances: allowances.map((item) => ({
-        componentName: item.componentName,
-        amount: parseFloat(item.amount) || 0,
-      })),
-      deductions: deductions.map((item) => ({
-        componentName: item.componentName,
-        amount: parseFloat(item.amount) || 0,
-      })),
-      loanDeduction: { loanPaymentId: null, amount: 0 },
-      totalEarnings,
-      totalDeductions,
-      netTakeHomePay,
-      paymentStatus: "PENDING",
-    };
-    const savedPayroll = await Payroll.findOneAndUpdate({ employeeId, periodMonth }, payrollData, {
-      upsert: true,
-      new: true,
-      runValidators: true,
+      date: period,
+      overtime,
     });
 
-    return res.status(200).json({
+    const saved = await Payroll.findOneAndUpdate(
+      {
+        employeeId,
+        periodMonth: `${period.getFullYear()}-${String(period.getMonth() + 1).padStart(2, "0")}`,
+      },
+      payrollData,
+      { upsert: true, new: true, runValidators: true }
+    );
+
+    return res.json({
       success: true,
-      message: "Komponen payroll berhasil disimpan!",
-      data: savedPayroll,
+      message: "Payroll berhasil dihitung",
+      data: saved,
     });
-  } catch (error) {
-    console.error("Error Save Payroll:", error);
+  } catch (err) {
     return res.status(500).json({
       success: false,
-      message: "Gagal menyimpan data payroll: " + error.message,
+      message: err.message,
     });
   }
 };
