@@ -51,10 +51,12 @@ const overtimeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
     approvedAt: {
       type: Date,
       default: null,
     },
+
     approvalHistory: [
       {
         action: {
@@ -73,9 +75,24 @@ const overtimeSchema = new mongoose.Schema(
         },
       },
     ],
+
+    payrollPeriod: {
+      id: { type: String, required: true },
+      label: { type: String, required: true },
+      start: { type: Date, required: true },
+      end: { type: Date, required: true },
+    },
+
+    payrollStatus: {
+      type: String,
+      enum: ["PENDING", "LOCKED", "PAID"],
+      default: "PENDING",
+    },
+
+    overtimeRateSnapshot: Number,
+    multiplierSnapshot: Number,
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
+
 export const Overtime = mongoose.model("Overtime", overtimeSchema);

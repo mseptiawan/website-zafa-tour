@@ -25,6 +25,9 @@ export const createOvertimeSchema = z
     }),
   })
   .superRefine((data, ctx) => {
+    // =========================
+    // TIME VALIDATION
+    // =========================
     const start = new Date(`${data.date}T${data.startTime}`);
     const end = new Date(`${data.date}T${data.endTime}`);
 
@@ -46,11 +49,14 @@ export const createOvertimeSchema = z
       });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // =========================
+    // DATE VALIDATION (FIXED)
+    // =========================
 
-    const workDate = new Date(data.date);
+    const workDate = data.date; // YYYY-MM-DD (string aman)
+    const today = new Date().toISOString().split("T")[0];
 
+    // tidak boleh future date
     if (workDate > today) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -59,7 +65,8 @@ export const createOvertimeSchema = z
       });
     }
 
-    const diffDays = Math.floor((today - workDate) / (1000 * 60 * 60 * 24));
+    // maksimal 7 hari ke belakang
+    const diffDays = (new Date(today) - new Date(workDate)) / (1000 * 60 * 60 * 24);
 
     if (diffDays > 7) {
       ctx.addIssue({

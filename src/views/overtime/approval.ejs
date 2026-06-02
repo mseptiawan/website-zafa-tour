@@ -1,110 +1,82 @@
-<%- layout('layouts/main', { title: 'Approval Lembur' }) %>
+<%- layout('layouts/main', { title: 'Pusat Approval Lembur' }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-6xl mx-auto">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+  <div class="max-w-6xl mx-auto space-y-8">
 
-    <div class="flex items-start justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-semibold text-slate-800">Approval Lembur</h1>
-        <p class="text-sm text-slate-500 mt-1">Kelola dan tinjau pengajuan lembur Pegawai</p>
-      </div>
+    <%- include('../partials/page-header', {
+      section: 'Kepegawaian',
+      module: 'Manajemen Waktu',
+      title: 'Pusat Approval Lembur',
+      description: 'Sistem pengawasan, persetujuan, dan pencatatan riwayat lembur pegawai.'
+    }) %>
+
+    <%- include('../partials/_stats-grid', {
+      items: [
+        { 
+          label: 'Menunggu Approval', 
+          value: activeOvertimes.length, 
+          unit: 'Berkas', 
+          icon: 'fa-solid fa-clock-rotate-left', 
+          bgClass: 'bg-white border-slate-200/60', 
+          iconBoxClass: 'bg-amber-50 text-amber-600 border-amber-100' 
+        },
+        { 
+          label: 'Selesai Diproses', 
+          value: historyOvertimes.length, 
+          unit: 'Berkas', 
+          icon: 'fa-solid fa-circle-check', 
+          bgClass: 'bg-white border-slate-200/60', 
+          iconBoxClass: 'bg-blue-50 text-blue-600 border-blue-100' 
+        },
+        { 
+          label: 'Total Pengajuan', 
+          value: (activeOvertimes.length + historyOvertimes.length), 
+          unit: 'Keseluruhan', 
+          icon: 'fa-solid fa-chart-pie', 
+          bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800', 
+          labelClass: 'text-slate-300', 
+          valueClass: 'text-white', 
+          unitClass: 'text-slate-400',
+          iconBoxClass: 'bg-white/10 text-white border-transparent' 
+        }
+      ]
+    }) %>
+
+    <%- include('../partials/_tab-nav', {
+      tabs: [
+        { id: 'active', label: `Permintaan Aktif (${activeOvertimes.length})` },
+        { id: 'history', label: `Riwayat Approval (${historyOvertimes.length})` }
+      ]
+    }) %>
+
+    <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
+      <%- include('partials/_overtime-table', { 
+        overtimes: activeOvertimes, 
+        query: activeQuery, 
+        pagination: activePagination, 
+        type: 'active' 
+      }) %>
     </div>
 
-    <form method="GET" class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm flex flex-col md:flex-row gap-3">
-      <input type="text" name="search" value="<%= query?.search || '' %>" placeholder="Cari nama Pegawai..." class="flex-1 border border-slate-200 px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
-
-      <select name="status" class="w-full md:w-48 border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none">
-        <option value="">Semua Status</option>
-        <option value="Pending Manager" <%= query?.status === 'Pending Manager' ? 'selected' : '' %>>Pending</option>
-        <option value="Approved" <%= query?.status === 'Approved' ? 'selected' : '' %>>Approved</option>
-        <option value="Rejected" <%= query?.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
-      </select>
-
-      <select name="sort" class="w-full md:w-40 border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none">
-        <option value="desc" <%= query?.sort === 'desc' ? 'selected' : '' %>>Terbaru</option>
-        <option value="asc" <%= query?.sort === 'asc' ? 'selected' : '' %>>Terlama</option>
-      </select>
-
-      <div class="flex gap-2">
-        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition">Filter</button>
-        <a href="/overtime/approval" class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">Reset</a>
-      </div>
-    </form>
-
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-[900px]">
-          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-            <tr>
-              <th class="text-left px-6 py-4">Pegawai</th>
-              <th class="text-left px-6 py-4">Tanggal</th>
-              <th class="text-left px-6 py-4">Jam</th>
-              <th class="text-left px-6 py-4">Total</th>
-              <th class="text-left px-6 py-4">Status</th>
-              <th class="text-right px-6 py-4">Aksi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <% if (overtimes.length === 0) { %>
-            <tr>
-              <td colspan="6" class="text-center py-12 text-slate-400">Belum ada data pengajuan lembur</td>
-            </tr>
-            <% } %>
-
-            <% overtimes.forEach(o => { %>
-            <tr class="hover:bg-slate-50/50 transition">
-              <td class="px-6 py-4 font-semibold text-slate-800"><%= o.employeeName %></td>
-              <td class="px-6 py-4 text-slate-500"><%= new Date(o.date).toLocaleDateString("id-ID") %></td>
-              <td class="px-6 py-4 text-slate-500 font-mono text-xs"><%= o.startTime %> - <%= o.endTime %></td>
-              <td class="px-6 py-4 font-medium text-slate-700"><%= o.totalHours %> Jam</td>
-
-              <td class="px-6 py-4">
-                <% 
-                    const statusConfig = {
-                      'Pending Manager': { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500' },
-                      'Approved': { bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },
-                      'Rejected': { bg: 'bg-rose-50', text: 'text-rose-600', dot: 'bg-rose-500' }
-                    };
-                    const config = statusConfig[o.status] || { bg: 'bg-slate-50', text: 'text-slate-600', dot: 'bg-slate-400' };
-                  %>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-200/50 text-[10px] font-medium <%= config.bg %> <%= config.text %>">
-                  <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
-                  <%= o.status %>
-                </div>
-              </td>
-
-              <td class="px-6 py-4">
-                <div class="flex justify-end gap-2">
-                  <a href="/overtime/<%= o._id %>" class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11px] font-medium transition">
-                    Detail
-                  </a>
-                  <% if(o.status === 'Pending Manager'){ %>
-                  <form action="/overtime/approval/<%= o._id %>/manager" method="POST">
-                    <button class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-medium transition">
-                      Approve
-                    </button>
-                  </form>
-                  <% } %>
-                </div>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="mt-6 flex items-center justify-between text-xs text-slate-500">
-      <span>Halaman <%= pagination.page %> dari <%= pagination.totalPages %></span>
-      <div class="flex gap-2">
-        <% if (pagination.page > 1) { %>
-        <a href="?page=<%= pagination.page - 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Prev</a>
-        <% } %>
-        <% if (pagination.page < pagination.totalPages) { %>
-        <a href="?page=<%= pagination.page + 1 %>&search=<%= query.search || '' %>&status=<%= query.status || '' %>&sort=<%= query.sort || '' %>" class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">Next</a>
-        <% } %>
-      </div>
+    <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
+      <%- include('partials/_overtime-table', { 
+        overtimes: historyOvertimes, 
+        query: historyQuery, 
+        pagination: historyPagination, 
+        type: 'history' 
+      }) %>
     </div>
 
   </div>
 </div>
+
+<script>
+  // Fungsi untuk menjaga tab tetap aktif jika ada parameter filter/pagination di URL
+  document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab') || 'active';
+    if(activeTab === 'history') {
+      switchTab('history');
+    }
+  });
+</script>

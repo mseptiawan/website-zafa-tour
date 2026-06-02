@@ -2,6 +2,18 @@ import * as payrollService from "../services/payroll.service.js";
 import Payroll from "../models/payroll/Payroll.model.js";
 import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
 import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
+
+import { runPayroll } from "../services/payrollRun.service.js";
+
+export const payrollPreview = async (req, res) => {
+  const result = await runPayroll(new Date());
+
+  return res.json({
+    success: true,
+    data: result,
+  });
+};
+
 export const renderPayrollPage = async (req, res) => {
   try {
     const { employees, components, savedAllowances } = await payrollService.getPayrollData();

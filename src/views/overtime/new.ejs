@@ -14,7 +14,17 @@
 
     <!-- CARD -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
-
+<% if (errors && Object.keys(errors).length > 0) { %>
+  <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+    <ul class="space-y-1">
+      <% Object.values(errors).forEach(function(message) { %>
+        <li class="text-xs text-red-600">
+          <%= message %>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
       <form action="/overtime/" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
         <!-- TANGGAL LEMBUR -->
@@ -22,7 +32,7 @@
           <label class="text-[13px] font-bold text-slate-700">
             Tanggal Lembur
           </label>
-          <input type="date" id="dateInput" name="date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+          <input type="date" id="dateInput" name="date"  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
             focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
             outline-none transition-all" />
         </div>
@@ -31,12 +41,12 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1.5">
             <label class="text-[13px] font-bold text-slate-700">Jam Mulai</label>
-            <input type="text" id="startTime" name="startTime" required placeholder="08:00" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
+            <input type="text" id="startTime" name="startTime"  placeholder="08:00" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
           </div>
 
           <div class="space-y-1.5">
             <label class="text-[13px] font-bold text-slate-700">Jam Selesai</label>
-            <input type="text" id="endTime" name="endTime" required placeholder="17:00" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
+            <input type="text" id="endTime" name="endTime"  placeholder="17:00" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
           </div>
         </div>
 
@@ -45,7 +55,7 @@
           <label class="text-[13px] font-bold text-slate-700">
             Pekerjaan
           </label>
-          <textarea name="workDescription" rows="4" minlength="10" maxlength="500" required placeholder="Jelaskan pekerjaan lembur..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+          <textarea name="workDescription" rows="4" minlength="10" maxlength="500"  placeholder="Jelaskan pekerjaan lembur..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
             focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
             outline-none resize-none transition-all"></textarea>
         </div>
@@ -54,7 +64,7 @@
   <!-- Tipe Lokasi -->
   <div class="space-y-1.5">
     <label class="text-[13px] font-bold text-slate-700">Lokasi Kerja</label>
-    <select id="locationType" name="location[type]" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+    <select id="locationType" name="location[type]"  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
       focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
       outline-none transition-all cursor-pointer">
       <option value="OFFICE">Kantor (Office)</option>

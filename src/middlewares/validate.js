@@ -1,21 +1,19 @@
+import { formatZodError } from "../utils/formatZodError.js";
+
 export const validate =
   (schema, source = "body") =>
   (req, res, next) => {
     const result = schema.safeParse(req[source]);
 
     if (!result.success) {
-      const formattedErrors = {};
-      result.error.errors.forEach((err) => {
-        const path = err.path[0];
-        if (!formattedErrors[path]) {
-          formattedErrors[path] = err.message;
-        }
-      });
+      console.log("ZOD ERROR:", result.error.issues);
+      req.validationErrors = formatZodError(result.error);
 
-      req.validationErrors = formattedErrors;
       return next();
     }
 
     req[source] = result.data;
+    req.validationErrors = null;
+
     next();
   };
