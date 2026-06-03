@@ -51,11 +51,20 @@ const canvas = document.getElementById("canvas");
 const isAlreadyCheckIn = <%- already %>;
 const isAlreadyCheckOut = <%- hasCheckedOut %>;
 
+// 🌟 FIX 1: Implementasi fungsi showMessage menggunakan Toast Kustom Global Anda
 function showMessage(type, message) {
   if (type === "success") {
-    alert("✔ " + message);
+    triggerGlobalToast({
+      title: "Berhasil",
+      message: message,
+      type: "success"
+    });
   } else {
-    alert("✖ " + message);
+    triggerGlobalToast({
+      title: "Gagal",
+      message: message,
+      type: "error"
+    });
   }
 }
 
@@ -89,18 +98,26 @@ async function submitAttendance(event, actionType) {
       formData.append("note", noteInput ? noteInput.value : "");
     }
 
+    // 🌟 FIX 2: Sesuaikan route URL ini jika di backend Anda menggunakan tanda strip (check-in / check-out)
     const targetUrl =
       actionType === "checkin"
         ? "/attendance/checkin"
         : "/attendance/checkout";
 
     const res = await fetch(targetUrl, { method: "POST", body: formData });
-
     const data = await res.json();
 
     if (data.success) {
       showMessage("success", data.message);
-      window.location.href = "/attendance/history";
+      
+      // 🌟 FIX 3: Matikan kamera segera demi privasi pengguna
+      stopCamera();
+
+      // 🌟 FIX 4: Beri delay 1.5 detik agar animasi toast sempat tampil sebelum pindah halaman
+      setTimeout(() => {
+        window.location.href = "/attendance/history";
+      }, 1500);
+      
     } else {
       showMessage("error", data.message);
       btn.disabled = false;

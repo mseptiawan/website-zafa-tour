@@ -3,7 +3,7 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
   <div class="mx-auto max-w-6xl space-y-6">
 
-  <%- include('../partials/page-header', { 
+    <%- include('../partials/page-header', { 
     section: 'Area Kerja', 
     module: 'Finance', 
     title: 'Master Komponen Gaji', 
@@ -16,10 +16,6 @@
         <h3 class="text-xl font-bold text-slate-800 mt-1 block tabular-nums" id="total-komponen">0</h3>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="openDocModal()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[12px] font-bold px-4 py-3 rounded-xl transition cursor-pointer">
-          <i class="fa-solid fa-file-invoice text-[11px] text-slate-500"></i>
-          <span>Buat Dokumen</span>
-        </button>
         <button onclick="openModal('add')" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold px-5 py-3 rounded-xl transition shadow-lg shadow-blue-600/10 active:scale-[0.98]">
           <i class="fa-solid fa-plus text-[10px]"></i>
           <span>Tambah Komponen</span>
@@ -80,13 +76,13 @@
           </select>
         </div>
         <!-- Tipe Kalkulasi -->
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Tipe Kalkulasi</label>
-          <select id="form-calc-type" onchange="updatePlaceholder()" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
-            <option value="FIXED">Nominal Tetap (Rp)</option>
-            <option value="PERCENT">Persentase (%)</option>
-          </select>
-        </div>
+      <div>
+  <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Tipe Kalkulasi</label>
+  <select id="form-calc-type" onchange="updatePlaceholder()" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+    <option value="FIXED_AMOUNT">Nominal Tetap (Rp)</option>
+    <option value="PERCENTAGE">Persentase (%)</option>
+  </select>
+</div>
 
         <!-- Nilai Dinamis -->
         <div>
@@ -182,9 +178,9 @@
       const statusLabel = comp.isActive ? "" : '<span class="text-[9px] font-bold text-slate-400 uppercase ml-2">(Diarsipkan)</span>';
       const category = normalizeCategory(comp.category);
       const type = normalizeType(comp.type);
-      const displayValue = comp.calcType === 'PERCENT' ?
-        `${comp.value}%` :
-        `Rp ${Number(comp.value).toLocaleString('id-ID')}`;
+      const displayValue = comp.calculationType === 'PERCENTAGE' ? // <--- Ubah dari comp.calcType ke comp.calculationType
+  `${comp.defaultAmount}%` :                                 // <--- Sesuaikan dari comp.value ke comp.defaultAmount sesuai schema
+  `Rp ${Number(comp.defaultAmount).toLocaleString('id-ID')}`;
       const isEarning = category === "Pendapatan";
       const textClass = isEarning ? "text-emerald-600" : "text-rose-600";
       const bgClass = isEarning ? "bg-emerald-50/70" : "bg-rose-50/70";
@@ -326,7 +322,7 @@
     const label = document.getElementById("label-value");
     const symbol = document.getElementById("unit-symbol");
 
-    if (type === "PERCENT") {
+   if (type === "PERCENTAGE") {
       label.textContent = "Nilai Persentase";
       input.placeholder = "Masukkan persentase (contoh: 10)";
       symbol.textContent = "%";

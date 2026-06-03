@@ -2,18 +2,6 @@ import SalaryComponent from "../../models/payroll/SalaryComponent.model.js";
 
 const salaryComponents = [
   {
-    code: "GAPOK",
-    name: "Gaji Pokok",
-    type: "FIXED",
-    category: "EARNING",
-    calculationType: "FIXED_AMOUNT",
-    defaultAmount: 0,
-    basedOnComponent: null,
-    isLocked: true,
-    isActive: true,
-    description: "Gaji dasar bulanan pegawai sesuai dengan kontrak kerja.",
-  },
-  {
     code: "TJ_KONSUMSI",
     name: "Tunjangan Konsumsi (Kehadiran)",
     type: "FLEXIBLE",
@@ -30,15 +18,11 @@ const salaryComponents = [
     name: "Tunjangan Lembur per Jam",
     type: "FLEXIBLE",
     category: "EARNING",
-
     sourceType: "DYNAMIC",
-
     calculationType: "FIXED_AMOUNT",
     defaultAmount: 0,
-
     isLocked: true,
     isActive: true,
-
     description:
       "Upah lembur dihitung berdasarkan total jam lembur × overtime rate snapshot dari data overtime.",
   },

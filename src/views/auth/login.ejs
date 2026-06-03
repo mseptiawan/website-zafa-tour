@@ -32,8 +32,8 @@
       
       <!-- Top Brand Mark -->
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm">
-          <i data-lucide="plane-takeoff" class="w-4 h-4 text-white"></i>
+        <div class="w-9 h-9 rounded-xl  flex items-center justify-center ">
+          <i data-lucide="plane-takeoff" class="w-4 h-4 text-blue-500"></i>
         </div>
         <span class="text-slate-900 font-bold tracking-tight text-base">Zafa Tour</span>
       </div>
@@ -121,25 +121,38 @@
     </div>
 
     <!-- RIGHT SIDE: HERO PANEL -->
-    <div class="hidden md:flex flex-1 bg-slate-50 relative items-center justify-center p-12 overflow-hidden border-l border-slate-100">
+    <div class="hidden md:block relative flex-1 bg-slate-900 overflow-hidden border-l border-slate-200/60">
       
-      <!-- Soft Blue Gradient Background Lights -->
-      <div class="absolute top-12 left-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full filter blur-[100px]"></div>
-      <div class="absolute bottom-12 right-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full filter blur-[100px]"></div>
+      <img 
+        src="https://skvindia.com/wp-content/uploads/2024/09/Types-of-modern-office-interior-design-banner.webp" 
+        alt="Zafa Tour Workspace" 
+        class="absolute inset-0 w-full h-full object-cover opacity-45 filter brightness-95 contrast-105"
+      />
 
-      <!-- Main Central Card Card -->
-      <div class="relative z-10 max-w-md w-full text-center flex flex-col items-center">
-        <!-- Floating Logo Area -->
-        <div class="mb-6 p-6 bg-white rounded-3xl shadow-lg shadow-slate-200/60 max-w-[280px] border border-slate-100/80">
-          <img src="/images/zafa.png" alt="Zafa Tour" class="w-full h-auto object-contain filter drop-shadow-sm"/>
-        </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-950/30"></div>
+
+      <div class="absolute top-8 right-8 z-10 p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg max-w-[140px] transition-all">
+        <img src="/images/zafa.png" alt="Zafa Tour" class="w-full h-auto object-contain filter brightness-0 invert opacity-90"/>
+      </div>
+
+      <div class="absolute bottom-16 left-16 right-16 z-10 max-w-lg space-y-4">
+        
 
         <div class="space-y-2">
-          <h3 class="text-xl font-bold text-slate-900 tracking-tight">Sistem Informasi Kepegawaian Terintegrasi</h3>
-          <p class="text-sm text-slate-500 leading-relaxed max-w-sm mx-auto">
-            Akses seluruh data operasional, kehadiran, penugasan, dan pengelolaan administrasi internal dalam satu platform.
+          <h2 class="text-3xl font-black text-white leading-tight tracking-tight">
+            Sistem Informasi <br />Kepegawaian Terintegrasi.
+          </h2>
+          <p class="text-[13px] text-slate-300 font-medium leading-relaxed max-w-sm">
+            Akses seluruh data operasional, kehadiran, birokrasi cuti, dan manajemen administrasi internal PT Zafa Mulia Mandiri dalam satu dasbor kendali terpusat.
           </p>
         </div>
+
+        <div class="pt-4 border-t border-white/10 flex items-center gap-4 text-white/40 text-[11px] font-medium">
+          <span>v2.4.0 Production</span>
+          <span>&bull;</span>
+          <span>SaaS Architecture</span>
+        </div>
+
       </div>
 
     </div>

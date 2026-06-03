@@ -1,0 +1,90 @@
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[1000px] text-sm text-left border-collapse">
+      <thead class="border-b border-slate-100 bg-slate-50 text-[11px] tracking-wider text-slate-400 uppercase font-bold">
+        <tr>
+          <th class="px-6 py-4.5">Rekan Kerja</th>
+          <th class="px-6 py-4.5">Jenis Cuti</th>
+          <th class="px-6 py-4.5 text-center">Durasi Kerja</th>
+          <th class="px-6 py-4.5">Tanggal Pelaksanaan</th>
+          <th class="px-6 py-4.5 text-center">Status Konfirmasi</th>
+          <th class="px-6 py-4.5 text-right pr-8">Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-slate-100 text-[13px]">
+        <% if (delegations.length === 0) { %>
+        <tr>
+          <td colspan="6" class="py-16 text-center text-slate-400 font-medium">
+            <div class="flex flex-col items-center justify-center space-y-2">
+              <i class="fa-solid fa-inbox text-xl text-slate-300"></i>
+              <span><%= type === 'active' ? 'Tidak ada permintaan delegasi aktif saat ini' : 'Belum ada riwayat konfirmasi delegasi tugas' %></span>
+            </div>
+          </td>
+        </tr>
+        <% } else { %>
+        <% delegations.forEach(del => { %>
+        <tr class="transition-colors hover:bg-slate-50/60 group">
+          
+          <!-- Kolom Rekan Kerja -->
+          <td class="px-6 py-4.5 font-semibold text-slate-800">
+            <%= (del.leaveId && del.leaveId.userId && del.leaveId.userId.employeeData) ? del.leaveId.userId.employeeData.fullName : '-' %>
+          </td>
+
+          <!-- Kolom Jenis Cuti -->
+          <td class="px-6 py-4.5 font-medium text-slate-600">
+            <%= (del.leaveId && del.leaveId.leaveTypeId) ? del.leaveId.leaveTypeId.name : '-' %>
+          </td>
+
+          <!-- Kolom Durasi -->
+          <td class="px-6 py-4.5 text-center">
+            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-semibold text-xs tabular-nums">
+              <%= del.leaveId ? del.leaveId.totalDays : 0 %> Hari Kerja
+            </span>
+          </td>
+
+          <!-- Kolom Tanggal Pelaksanaan -->
+          <td class="px-6 py-4.5 text-slate-500 font-medium whitespace-nowrap tabular-nums">
+            <% if (del.leaveId && del.leaveId.startDate && del.leaveId.endDate) { %>
+              <%= new Date(del.leaveId.startDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) %> s.d
+              <%= new Date(del.leaveId.endDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+            <% } else { %> - <% } %>
+          </td>
+
+          <!-- Kolom Status Mitigasi/Konfirmasi -->
+          <td class="px-6 py-4.5 align-middle whitespace-nowrap text-center">
+            <% 
+              const currentStatus = type === 'active' ? 'PENDING' : del.status;
+              const textStyles = { 'APPROVED': 'text-emerald-700 border-emerald-200/60 bg-emerald-50/50', 'REJECTED': 'text-rose-700 border-rose-200/60 bg-rose-50/50', 'PENDING': 'text-amber-700 border-amber-200/60 bg-amber-50/50' }; 
+              const dotStyles = { 'APPROVED': 'bg-emerald-500', 'REJECTED': 'bg-rose-500', 'PENDING': 'bg-amber-500' }; 
+              const statusLabels = { 'APPROVED': 'Bersedia (Approved)', 'REJECTED': 'Ditolak (Rejected)', 'PENDING': 'Menunggu Konfirmasi' }; 
+            %>
+            <div class="<%= textStyles[currentStatus] || 'text-slate-500' %> inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-wide shadow-2xs">
+              <span class="<%= dotStyles[currentStatus] || 'bg-slate-400' %> <%= currentStatus === 'PENDING' ? 'animate-pulse' : '' %> h-1.5 w-1.5 rounded-full"></span>
+              <span><%= statusLabels[currentStatus] || currentStatus %></span>
+            </div>
+          </td>
+
+          <!-- Kolom Aksi (Tinjau/Detail) -->
+          <td class="px-6 py-4.5 pr-8">
+            <div class="flex items-center justify-end">
+              <% if (del.leaveId) { %>
+              <a href="/leave/detail/<%= del.leaveId._id %>" title="<%= type === 'active' ? 'Periksa Berkas' : 'Lihat Riwayat' %>" class="inline-flex h-8 px-3.5 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-600 shadow-2xs transition-all <%= type === 'active' ? 'group-hover:border-blue-500 group-hover:text-blue-600' : 'hover:bg-slate-50' %> active:scale-[0.97]">
+                <span><%= type === 'active' ? 'Tinjau' : 'Detail' %></span>
+                <% if (type === 'active') { %>
+                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                <% } %>
+              </a>
+              <% } else { %>
+              <span class="text-xs text-slate-400">-</span>
+              <% } %>
+            </div>
+          </td>
+
+        </tr>
+        <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>

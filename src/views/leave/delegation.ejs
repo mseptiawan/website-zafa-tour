@@ -1,167 +1,65 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-5xl mx-auto">
-   <%- include('../partials/page-header', { 
-    section: 'Area Kerja', 
-    module: 'Penugasan', 
-    title: 'Permintaan Delegasi', 
-    description: 'Konfirmasi kesediaan Anda untuk mem-backup tugas rekan kerja yang sedang cuti.' 
-}) %>
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+  <div class="max-w-6xl mx-auto space-y-8">
 
-    <div class="flex items-center gap-2 mb-4 border-b border-slate-200/60 pb-px">
-      <button type="button" onclick="switchTab('active')" id="tab-btn-active" class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none">
-        Permintaan Aktif
-        <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-blue-50 text-blue-600 rounded-md tabular-nums">
-          <%= delegations.length %>
-        </span>
-      </button>
-      <button type="button" onclick="switchTab('history')" id="tab-btn-history" class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all duration-150 outline-none">
-        Riwayat Delegasi
-        <span class="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-500 rounded-md tabular-nums">
-          <%= historyDelegations.length %>
-        </span>
-      </button>
+    <!-- Page Header Komponen -->
+    <%- include('../partials/page-header', {
+      section: 'Area Kerja',
+      module: 'Penugasan & Backup',
+      title: 'Permintaan Delegasi Tugas',
+      description: 'Konfirmasi kesediaan Anda untuk mem-backup serta menjaga kontinuitas tugas rekan kerja yang sedang cuti.'
+    }) %>
+
+    <!-- Stats Grid Komponen -->
+    <%- include('../partials/_stats-grid', {
+      items: [
+        { 
+          label: 'Permintaan Aktif', 
+          value: delegations.length, 
+          unit: 'Berkas', 
+          icon: 'fa-solid fa-clock-rotate-left', 
+          bgClass: 'bg-white border-slate-200/60', 
+          iconBoxClass: 'bg-amber-50 text-amber-600 border-amber-100' 
+        },
+        { 
+          label: 'Riwayat Konfirmasi', 
+          value: historyDelegations.length, 
+          unit: 'Berkas', 
+          icon: 'fa-solid fa-circle-check', 
+          bgClass: 'bg-white border-slate-200/60', 
+          iconBoxClass: 'bg-blue-50 text-blue-600 border-blue-100' 
+        },
+        { 
+          label: 'Total Keterlibatan Backup', 
+          value: (delegations.length + historyDelegations.length), 
+          unit: 'Total Tugas', 
+          icon: 'fa-solid fa-briefcase', 
+          bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800', 
+          labelClass: 'text-slate-300', 
+          valueClass: 'text-white', 
+          unitClass: 'text-slate-400',
+          iconBoxClass: 'bg-white/10 text-white border-transparent' 
+        }
+      ]
+    }) %>
+
+    <!-- Tab Navigation Komponen (Mewah Capsule Style) -->
+    <%- include('../partials/_tab-nav', {
+      tabs: [
+        { id: 'active', label: `Permintaan Aktif (${delegations.length})` },
+        { id: 'history', label: `Riwayat Delegasi (${historyDelegations.length})` }
+      ]
+    }) %>
+
+    <!-- Tab Content Panes dengan Smooth Opacity Transition -->
+    <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
+      <%- include('./partials/_delegation-table.ejs', { delegations: delegations, type: 'active' }) %>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm shadow-slate-100/50 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              <th class="py-4 px-6">Rekan Kerja</th>
-              <th class="py-4 px-6">Jenis Cuti</th>
-              <th class="py-4 px-6">Durasi & Tanggal</th>
-              <th class="py-4 px-6">Status Anda</th>
-              <th class="py-4 px-6 text-center">Aksi</th>
-            </tr>
-          </thead>
-
-          <tbody id="tab-content-active" class="divide-y divide-slate-100 text-sm">
-            <% if (delegations.length === 0) { %>
-            <tr>
-              <td colspan="5" class="py-12 text-center text-slate-400 italic text-xs">
-                Tidak ada permintaan delegasi aktif saat ini
-              </td>
-            </tr>
-            <% } %>
-
-            <% delegations.forEach(del => { %>
-            <tr class="hover:bg-slate-50/50 transition-colors">
-              <td class="py-4 px-6 text-slate-900 font-medium">
-                <%= (del.leaveId && del.leaveId.userId && del.leaveId.userId.employeeData) ? del.leaveId.userId.employeeData.fullName : '-' %>
-              </td>
-              <td class="py-4 px-6 font-medium text-slate-600">
-                <%= (del.leaveId && del.leaveId.leaveTypeId) ? del.leaveId.leaveTypeId.name : '-' %>
-              </td>
-              <td class="py-4 px-6 text-xs text-slate-500">
-                <span class="font-semibold text-slate-700 block mb-0.5">
-                  <%= del.leaveId ? del.leaveId.totalDays : 0 %> Hari Kerja
-                </span>
-                <% if (del.leaveId && del.leaveId.startDate && del.leaveId.endDate) { %>
-                <%= new Date(del.leaveId.startDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) %> s.d
-                <%= new Date(del.leaveId.endDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
-                <% } else { %> - <% } %>
-              </td>
-              <td class="py-4 px-6 whitespace-nowrap">
-                <div class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-amber-700">
-                  <span class="w-1.5 h-1.5 rounded-full ring-4 bg-amber-500 ring-amber-500/20"></span>
-                  <span>PENDING</span>
-                </div>
-              </td>
-              <td class="py-4 px-6 text-center whitespace-nowrap">
-                <% if (del.leaveId) { %>
-                <a href="/leave/detail/<%= del.leaveId._id %>" title="Tinjau Permintaan" class="inline-flex items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 transition shadow-sm group">
-                  <svg class="w-4 h-4 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </a>
-                <% } else { %> <span class="text-xs text-slate-400">-</span> <% } %>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-
-          <tbody id="tab-content-history" class="hidden divide-y divide-slate-100 text-sm">
-            <% if (historyDelegations.length === 0) { %>
-            <tr>
-              <td colspan="5" class="py-12 text-center text-slate-400 italic text-xs">
-                Belum ada riwayat konfirmasi delegasi tugas
-              </td>
-            </tr>
-            <% } %>
-
-            <% 
-              const textStyles = { 'APPROVED': 'text-emerald-700', 'REJECTED': 'text-rose-700' };
-              const dotStyles = { 'APPROVED': 'bg-emerald-500 ring-emerald-500/20', 'REJECTED': 'bg-rose-500 ring-rose-500/20' };
-            %>
-
-            <% historyDelegations.forEach(del => { %>
-            <tr class="hover:bg-slate-50/50 transition-colors">
-              <td class="py-4 px-6 text-slate-900 font-medium">
-                <%= (del.leaveId && del.leaveId.userId && del.leaveId.userId.employeeData) ? del.leaveId.userId.employeeData.fullName : '-' %>
-              </td>
-              <td class="py-4 px-6 font-medium text-slate-600">
-                <%= (del.leaveId && del.leaveId.leaveTypeId) ? del.leaveId.leaveTypeId.name : '-' %>
-              </td>
-              <td class="py-4 px-6 text-xs text-slate-500">
-                <span class="font-semibold text-slate-700 block mb-0.5">
-                  <%= del.leaveId ? del.leaveId.totalDays : 0 %> Hari Kerja
-                </span>
-                <% if (del.leaveId && del.leaveId.startDate && del.leaveId.endDate) { %>
-                <%= new Date(del.leaveId.startDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) %> s.d
-                <%= new Date(del.leaveId.endDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
-                <% } else { %> - <% } %>
-              </td>
-              <td class="py-4 px-6 whitespace-nowrap">
-                <div class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider <%= textStyles[del.status] || 'text-slate-600' %>">
-                  <span class="w-1.5 h-1.5 rounded-full ring-4 <%= dotStyles[del.status] || 'bg-slate-400 ring-slate-400/20' %>"></span>
-                  <span><%= del.status %></span>
-                </div>
-              </td>
-              <td class="py-4 px-6 text-center whitespace-nowrap">
-                <% if (del.leaveId) { %>
-                <a href="/leave/detail/<%= del.leaveId._id %>" title="Lihat Detail" class="inline-flex items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 transition shadow-sm group">
-                  <svg class="w-4 h-4 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </a>
-                <% } else { %> <span class="text-xs text-slate-400">-</span> <% } %>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+    <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
+      <%- include('./partials/_delegation-table.ejs', { delegations: historyDelegations, type: 'history' }) %>
     </div>
+
   </div>
 </div>
-
-<script>
-  function switchTab(tabType) {
-    const tabActive = document.getElementById('tab-btn-active');
-    const tabHistory = document.getElementById('tab-btn-history');
-    const contentActive = document.getElementById('tab-content-active');
-    const contentHistory = document.getElementById('tab-content-history');
-
-    if (tabType === 'active') {
-      tabActive.classList.add('border-blue-600', 'text-blue-600', 'font-bold');
-      tabActive.classList.remove('border-transparent', 'text-slate-400', 'font-medium');
-      contentActive.classList.remove('hidden');
-
-      tabHistory.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
-      tabHistory.classList.add('border-transparent', 'text-slate-400', 'font-medium');
-      contentHistory.classList.add('hidden');
-    } else {
-      tabHistory.classList.add('border-blue-600', 'text-blue-600', 'font-bold');
-      tabHistory.classList.remove('border-transparent', 'text-slate-400', 'font-medium');
-      contentHistory.classList.remove('hidden');
-
-      tabActive.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
-      tabActive.classList.add('border-transparent', 'text-slate-400', 'font-medium');
-      contentActive.classList.add('hidden');
-    }
-  }
-</script>

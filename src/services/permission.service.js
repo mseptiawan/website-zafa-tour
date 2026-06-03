@@ -298,7 +298,7 @@ export function getPermissions(role) {
       permissions.employee_manage = true;
 
       permissions.payroll_view = true;
-      permissions.payroll_process = true;
+      permissions.payroll_manage = true;
       permissions.payroll_component_manage = true;
       permissions.payroll_history = true;
       permissions.payroll_finance_approval = true;
