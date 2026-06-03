@@ -5,8 +5,6 @@ import { validateData } from "../utils/validateData.js";
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
 const create = async ({ body, file, userId }) => {
-  const data = validateData(createSalesVisitSchema, body);
-
   let attachments = [];
 
   if (file) {
@@ -27,7 +25,7 @@ const create = async ({ body, file, userId }) => {
 
   return SalesVisit.create({
     userId,
-    ...data,
+    ...body,
     attachments,
     visitTime: new Date(),
   });
@@ -39,7 +37,8 @@ const findAll = () => SalesVisit.find().populate("userId").sort({ createdAt: -1 
 
 const findById = (id) => SalesVisit.findById(id).populate("userId");
 
-const update = async ({ id, userId, body, files }) => {
+const update = async ({ id, userId, body, file }) => {
+  // Diubah dari files ke file agar sesuai dengan single upload
   const visit = await SalesVisit.findById(id);
 
   if (!visit) {
@@ -56,27 +55,25 @@ const update = async ({ id, userId, body, files }) => {
     throw new Error("Data tidak bisa diedit setelah 24 jam");
   }
 
-  const data = validateData(updateSalesVisitSchema, body);
-
   let attachments = visit.attachments || [];
 
-  if (files && files.length > 0) {
-    attachments = files.map((file) => {
-      if (!allowedMimeTypes.includes(file.mimetype)) {
-        throw new Error("Format file tidak valid");
-      }
+  if (file) {
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new Error("Format file tidak valid (JPG, PNG, WEBP, PDF)");
+    }
 
-      return {
+    attachments = [
+      {
         filename: file.filename,
         originalName: file.originalname,
         mimetype: file.mimetype,
         size: file.size,
         path: `/uploads/files/${file.filename}`,
-      };
-    });
+      },
+    ];
   }
 
-  Object.assign(visit, data);
+  Object.assign(visit, body);
   visit.attachments = attachments;
 
   return visit.save();

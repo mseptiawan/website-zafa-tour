@@ -50,22 +50,33 @@
 
           <div class="relative w-full" id="leave-dropdown">
             <input type="hidden" name="leaveTypeId" id="leaveTypeId" value="<%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId._id : '' %>" required>
-
             <button type="button" onclick="toggleLeaveDropdown()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
-
               <span id="leave-label" class="<%= (mode === 'EDIT' && leave.leaveTypeId) ? 'text-[14px] text-slate-800 font-semibold' : 'text-xs italic text-slate-400/90 font-normal' %>">
                 <%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId.name : '-- Silahkan pilih jenis cuti --' %>
               </span>
+
+              <!-- optional warning badge -->
+              <span id="leave-warning" class="hidden text-[10px] text-rose-500 font-semibold mr-2">
+                Tidak tersedia
+              </span>
+
               <svg id="leave-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
-
             <div id="leave-menu" class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
+              <%
+  const isMale = (employee?.jenis_kelamin || '').toLowerCase() === 'laki-laki';
+%>
+
               <% leaveTypes.forEach(type => { %>
-              <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
+
+              <% if (isMale && type.code === 'BL') return; %>
+
+              <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>', '<%= type.code %>')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
                 <%= type.name %>
               </button>
+
               <% }) %>
             </div>
           </div>
@@ -226,20 +237,26 @@
 
   </div>
 </div>
-
 <script>
+  console.log("=== DEBUG LEAVE FORM INIT ===");
+
+  // Deklarasi Elemen Utama
   const startInput = document.getElementById('startDate');
   const endInput = document.getElementById('endDate');
   const totalInput = document.getElementById('totalDays');
   const displayDays = document.getElementById('displayDays');
   const fileInput = document.getElementById('file-input');
-
+  const warningDiv = document.getElementById('date-warning');
+  const submitBtn = document.querySelector('button[type="submit"]');
+  
+  const employeeGender = "<%= employee && employee.jenis_kelamin ? employee.jenis_kelamin.toLowerCase() : '' %>";
   let currentFileUrl = null;
 
-  // --- 1. LOGIC PERHITUNGAN HARI VIA API BACKEND ---
+  // --- 1. FUNGSI UTAMA HITUNG HARI KERJA (API BACKEND) ---
   async function calculateDays() {
     const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
 
+    // Jika cuti melahirkan, abaikan hitungan hari kerja biasa
     if (selectedLeaveType.includes('melahirkan')) {
       return;
     }
@@ -249,20 +266,49 @@
 
     if (start && end) {
       try {
+        if (displayDays) displayDays.innerText = "...";
+        
+        // Sesuaikan endpoint API di bawah ini dengan route backend Anda yang benar (/api/leave/... atau /api/leaves/...)
         const response = await fetch(`/api/leave/calculate-days?startDate=${start}&endDate=${end}`);
         const data = await response.json();
 
         if (data.success) {
-          displayDays.innerText = data.totalDays;
-          totalInput.value = data.totalDays;
+          const totalDays = data.totalDays;
+          
+          // Update ke UI
+          displayDays.innerText = totalDays;
+          totalInput.value = totalDays;
+
+          // PROTEKSI JIKA HARI KERJA = 0 (WEEKEND / HARI LIBUR)
+          if (totalDays === 0) {
+            startInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
+            endInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
+            
+            if (warningDiv) {
+              warningDiv.textContent = "Tanggal yang Anda pilih adalah Hari Libur Resmi atau Akhir Pekan. Silahkan pilih tanggal lain.";
+              warningDiv.classList.remove('hidden');
+            }
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+          } else {
+            // Kondisi Normal (Hari Kerja > 0)
+            startInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
+            endInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
+            
+            // Tetap jalankan validasi aturan H-7
+            validateDateGap();
+          }
         }
       } catch (err) {
         console.error("Error calculating days:", err);
+        if (displayDays) displayDays.innerText = "Error";
       }
     }
   }
 
-  // --- 2. LOGIC OTOMATISASI CUTI MELAHIRKAN (90 HARI LURUS) ---
+  // --- 2. OTOMATISASI CUTI MELAHIRKAN (90 HARI KALENDER) ---
   function calculateMaternityDuration() {
     if (startInput.value) {
       const start = new Date(startInput.value);
@@ -272,9 +318,63 @@
       endInput.value = end.toISOString().split('T')[0];
       displayDays.innerText = 90;
       totalInput.value = 90;
+      
+      // Reset status tombol jika cuti melahirkan
+      if (warningDiv) warningDiv.classList.add('hidden');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
     }
   }
 
+  // --- 3. VALIDASI ATURAN TANGGAL LAMPAU & MINIMAL H-7 ---
+  function validateDateGap() {
+    if (startInput.value === "") return;
+
+    const startDate = new Date(startInput.value);
+    startDate.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Cek Apakah Tanggal Lampau
+    if (startDate < today) {
+      if (warningDiv) {
+        warningDiv.textContent = "Pengajuan cuti tidak boleh menggunakan tanggal masa lalu.";
+        warningDiv.classList.remove('hidden');
+      }
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+      return; 
+    }
+
+    // Cek Aturan Minimal 7 Hari
+    const diffTime = startDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 7) {
+      if (warningDiv) {
+        warningDiv.textContent = "Pengajuan cuti harus dilakukan minimal 7 hari sebelum tanggal mulai.";
+        warningDiv.classList.remove('hidden');
+      }
+      if (submitBtn) {
+        // Jika kebijakan cuti sakit/darurat boleh bypass H-7, logic ini bisa Anda sesuaikan
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    } else {
+      if (warningDiv) warningDiv.classList.add('hidden');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+  }
+
+  // --- 4. HANDLE PERUBAHAN JENIS CUTI ---
   function handleLeaveTypeChange(typeName) {
     const name = typeName.toLowerCase();
     const starLabel = document.getElementById('label-required-star');
@@ -283,8 +383,6 @@
 
     if (name.includes('melahirkan')) {
       if (durationLabelText) durationLabelText.textContent = "Hari Kalender";
-
-      // Lock Input Tanggal Selesai
       endInput.readOnly = true;
       endInput.classList.add('bg-slate-100', 'select-none');
       endInput.classList.remove('bg-slate-50');
@@ -294,32 +392,23 @@
       fileInput.required = false;
       if (starLabel) starLabel.classList.add('hidden');
       if (optionalLabel) optionalLabel.classList.remove('hidden');
-    } else if (name.includes('sakit')) {
-      resetMaternityFormState(durationLabelText);
-      fileInput.required = true;
-      if (starLabel) starLabel.classList.remove('hidden');
-      if (optionalLabel) optionalLabel.classList.add('hidden');
-      calculateDays();
     } else {
-      resetMaternityFormState(durationLabelText);
-      fileInput.required = false;
-      if (starLabel) starLabel.classList.add('hidden');
-      if (optionalLabel) optionalLabel.classList.remove('hidden');
+      if (durationLabelText) durationLabelText.textContent = "Hari Kerja";
+      endInput.readOnly = false;
+      endInput.classList.remove('bg-slate-100', 'select-none');
+      endInput.classList.add('bg-slate-50');
+      
+      fileInput.required = name.includes('sakit');
+      if (starLabel) name.includes('sakit') ? starLabel.classList.remove('hidden') : starLabel.classList.add('hidden');
+      if (optionalLabel) name.includes('sakit') ? optionalLabel.classList.add('hidden') : optionalLabel.classList.remove('hidden');
+      
       calculateDays();
     }
   }
 
-  function resetMaternityFormState(durationLabelText) {
-    if (durationLabelText) durationLabelText.textContent = "Hari Kerja";
-    endInput.readOnly = false;
-    endInput.classList.remove('bg-slate-100', 'select-none');
-    endInput.classList.add('bg-slate-50');
-  }
-
+  // --- 5. EVENT LISTENERS INPUT TANGGAL ---
   startInput.addEventListener('change', () => {
-    validateDateGap();
     const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
-
     if (selectedLeaveType.includes('melahirkan')) {
       calculateMaternityDuration();
     } else {
@@ -331,6 +420,7 @@
     calculateDays();
   });
 
+  // --- 6. UI DROPDOWN JENIS CUTI ---
   function toggleLeaveDropdown() {
     const menu = document.getElementById('leave-menu');
     const arrow = document.getElementById('leave-arrow');
@@ -338,13 +428,19 @@
     arrow.classList.toggle('rotate-180');
   }
 
-  function selectLeave(id, name) {
-    document.getElementById('leaveTypeId').value = id;
-    const label = document.getElementById('leave-label');
-    label.textContent = name;
+  window.selectLeave = function(id, name, code) {
+    if (employeeGender === "laki-laki" && code === "BL") {
+      const warn = document.getElementById("leave-warning");
+      if (warn) {
+        warn.classList.remove("hidden");
+        warn.textContent = "Cuti melahirkan hanya untuk perempuan";
+        setTimeout(() => warn.classList.add("hidden"), 2500);
+      }
+      return;
+    }
 
-    label.classList.remove('text-slate-600');
-    label.classList.add('text-slate-800', 'font-semibold');
+    document.getElementById('leaveTypeId').value = id;
+    document.getElementById('leave-label').textContent = name;
 
     toggleLeaveDropdown();
     handleLeaveTypeChange(name);
@@ -358,7 +454,8 @@
     }
   });
 
-  function handleFileSelect(input) {
+  // --- 7. FILE ATTACHMENT HANDLERS ---
+  window.handleFileSelect = function(input) {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       if (currentFileUrl) URL.revokeObjectURL(currentFileUrl);
@@ -383,76 +480,28 @@
       document.getElementById("dropzone-empty").classList.add("hidden");
       document.getElementById("dropzone-filled").classList.remove("hidden");
       document.getElementById("dropzone-filled").classList.add("flex");
-      if (document.getElementById('label-required-star')) document.getElementById('label-required-star').classList.add('hidden');
     }
   }
 
-  function triggerChangeFile() {
-    const fileInput = document.getElementById('file-input');
+  window.triggerChangeFile = function() {
     fileInput.value = '';
-
     const emptyZone = document.getElementById('dropzone-empty');
     const filledZone = document.getElementById('dropzone-filled');
 
     emptyZone.classList.remove('hidden');
     emptyZone.classList.add('relative');
-
     filledZone.classList.remove('flex');
     filledZone.classList.add('hidden');
-
-    document.getElementById('img-preview').classList.add('hidden');
-    document.getElementById('file-icon-fallback').classList.remove('hidden');
   }
 
-  function filterHandoverList() {
+  // --- 8. FILTER HANDOVER LIST ---
+  window.filterHandoverList = function() {
     const searchInput = document.getElementById('handover-search').value.toLowerCase();
     const items = document.getElementsByClassName('handover-item');
 
     for (let item of items) {
       const name = item.getAttribute('data-name');
-      if (name.includes(searchInput)) {
-        item.style.display = "flex";
-      } else {
-        item.style.display = "none";
-      }
+      item.style.display = name.includes(searchInput) ? "flex" : "none";
     }
   }
-
-  function validateDateGap() {
-    const startDate = new Date(startInput.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const diffTime = startDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    const warningDiv = document.getElementById('date-warning');
-
-    if (diffDays < 7 && startInput.value !== "") {
-      if (warningDiv) warningDiv.classList.remove('hidden');
-    } else {
-      if (warningDiv) warningDiv.classList.add('hidden');
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const initialLabel = document.getElementById('leave-label').textContent;
-    if (initialLabel && !initialLabel.includes('--')) {
-      handleLeaveTypeChange(initialLabel);
-    }
-
-    const hasAttachment = "<%= (leave && leave.documentPath) ? '1' : '0' %>";
-    if (hasAttachment === "1") {
-      document.getElementById("dropzone-empty").classList.add("hidden");
-      document.getElementById("dropzone-filled").classList.remove("hidden");
-      document.getElementById("dropzone-filled").classList.add("flex");
-
-      const fileUrl = "<%= leave ? leave.documentPath : '' %>";
-      const fileName = fileUrl.split('/').pop();
-
-      document.getElementById("view-file-btn").href = fileUrl;
-      document.getElementById("name-preview").textContent = fileName;
-      document.getElementById("size-preview").textContent = "Berkas Tersimpan";
-    }
-  });
 </script>

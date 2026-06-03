@@ -1,115 +1,141 @@
 <%- layout('layouts/main', { title }) %>
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-
   <div class="max-w-6xl mx-auto">
 
-    <%- include('../partials/page-header', { 
-    section: 'Area Kerja', 
-    module: 'Kehadiran', 
-    title: 'Riwayat & Status Cuti', 
-    description: 'Pantau penggunaan hak cuti kerja tahunan Anda secara berkala.' 
-}) %>
-
+      <%- include('../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Kehadiran', 
+        title: 'Riwayat & Status Cuti', 
+        description: 'Pantau penggunaan hak cuti kerja tahunan Anda secara berkala.' 
+      }) %>
+      
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
 
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
+      <div class="bg-white border border-slate-200/60 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+        <div class="space-y-1">
           <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Hak Cuti Awal</span>
-          <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= summary.totalQuota %> <span class="text-xs font-medium text-slate-500">Hari</span>
-          </span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-xl font-black text-slate-800 tabular-nums"><%= summary.totalQuota %></span>
+            <span class="text-xs font-medium text-slate-500">Hari</span>
+          </div>
         </div>
-        <div class="text-slate-400 mt-0.5">
-          <i class="fa-solid fa-calendar-check text-xs"></i>
-        </div>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Bersama</span>
-          <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= summary.companyHolidays %> <span class="text-xs font-medium text-slate-500">Hari</span>
-          </span>
-        </div>
-        <div class="text-slate-400 mt-0.5">
-          <i class="fa-solid fa-building text-xs"></i>
+        <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+          <i class="fa-solid fa-calendar-check text-[11px]"></i>
         </div>
       </div>
 
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Mandiri Terpakai</span>
-          <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= summary.usedPrivate %> <span class="text-xs font-medium text-slate-500">Hari</span>
-          </span>
+   <div onclick="openCompanyHolidayModal()" class="group cursor-pointer bg-white border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-500/5 transition duration-200 min-h-[105px]">
+  <div class="flex items-start justify-between w-full">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider group-hover:text-indigo-600 transition">
+          Cuti Bersama
+        </span>
+      </div>
+      <div class="flex items-baseline gap-1 mt-1">
+        <span class="text-xl font-black text-slate-800 tabular-nums"><%= summary.companyHolidays %></span>
+        <span class="text-xs font-medium text-slate-500">Hari</span>
+      </div>
+    </div>
+    
+    <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition duration-200">
+      <i class="fa-solid fa-calendar-days text-[11px]"></i>
+    </div>
+  </div>
+  
+  <span class="text-[9px] font-medium text-slate-400 group-hover:text-indigo-600 transition-colors duration-200 mt-2 block">
+    <i class="fa-solid fa-pointer text-[8px] mr-1 text-indigo-500"></i> Klik untuk detail tanggal
+  </span>
+</div>
+      <div class="bg-white border border-slate-200/60 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+        <div class="space-y-1">
+          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Cuti Terpakai</span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-xl font-black text-slate-800 tabular-nums"><%= summary.usedPrivate %></span>
+            <span class="text-xs font-medium text-slate-500">Hari</span>
+          </div>
         </div>
-        <div class="text-slate-400 mt-0.5">
-          <i class="fa-solid fa-user-clock text-xs"></i>
+        <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+          <i class="fa-solid fa-user-clock text-[11px]"></i>
         </div>
       </div>
 
-      <div class="bg-amber-50/50 border border-amber-200/70 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
+      <div class="bg-amber-50/40 border border-amber-200/70 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+        <div class="space-y-1">
           <span class="text-[10px] font-bold text-amber-600 block uppercase tracking-wider">Pending Approval</span>
-          <span class="text-xl font-bold text-amber-700 mt-1 block tabular-nums">
-            <%= summary.pending %> <span class="text-xs font-medium text-amber-600">Berkas</span>
-          </span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-xl font-black text-amber-700 tabular-nums"><%= summary.pending %></span>
+            <span class="text-xs font-medium text-amber-600">Berkas</span>
+          </div>
         </div>
-        <div class="text-amber-500 mt-0.5">
-          <i class="fa-solid fa-hourglass-half text-xs"></i>
-        </div>
-      </div>
-
-      <div class="bg-slate-50 border border-slate-300 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
-          <span class="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Sisa Cuti</span>
-          <span class="text-xl font-bold text-slate-900 mt-1 block tabular-nums">
-            <%= summary.remaining %> <span class="text-xs font-medium text-slate-600">Hari</span>
-          </span>
-        </div>
-        <div class="text-slate-500 mt-0.5">
-          <i class="fa-solid fa-wallet text-xs"></i>
+        <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500">
+          <i class="fa-solid fa-hourglass-half text-[11px]"></i>
         </div>
       </div>
 
+     <div class="bg-slate-900 border border-slate-950 rounded-2xl p-4 flex flex-col justify-between shadow-sm min-h-[105px]">
+  <div class="flex items-start justify-between w-full">
+    <div class="space-y-1">
+      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Sisa Saku Cuti</span>
+      <div class="flex items-baseline gap-1">
+        <span class="text-xl font-black <%= summary.remaining === 0 ? 'text-slate-500' : 'text-white' %> tabular-nums">
+          <%= summary.remaining %>
+        </span>
+        <span class="text-xs font-medium text-slate-400">Hari</span>
+      </div>
+    </div>
+    <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center <%= summary.remaining === 0 ? 'text-rose-400/70' : 'text-emerald-400' %>">
+      <i class="fa-solid fa-wallet text-[11px]"></i>
+    </div>
+  </div>
+
+  <% if (summary.remaining === 0) { %>
+    <div class="mt-3 pt-2 border-t border-slate-800/60 flex items-center gap-1.5">
+      <span class="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+      <p class="text-[9.5px] font-semibold text-rose-400/90 italic tracking-wide leading-none">
+        Habis Terpotong Cuti Bersama
+      </p>
+    </div>
+  <% } %>
+</div>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-[1000px]">
+        <table class="w-full text-sm min-w-[1000px] border-collapse text-left">
 
-          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+          <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider font-bold border-b border-slate-100">
             <tr>
-              <th class="text-left px-6 py-4">Kode & Jenis Cuti</th>
-              <th class="text-left px-6 py-4">Periode Pelaksanaan</th>
-              <th class="text-left px-6 py-4">Durasi</th>
-              <th class="text-left px-6 py-4">Handover</th>
-              <th class="text-left px-6 py-4">Status Akhir</th>
-              <th class="text-right px-6 py-4">Aksi</th>
+              <th class="px-6 py-3.5">Kode & Jenis Cuti</th>
+              <th class="px-6 py-3.5">Periode Pelaksanaan</th>
+              <th class="px-6 py-3.5">Durasi</th>
+              <th class="px-6 py-3.5">Handover Tugas</th>
+              <th class="px-6 py-3.5">Status Akhir</th>
+              <th class="px-6 py-3.5 text-right">Aksi</th>
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
 
             <% if (leaves.length === 0) { %>
             <tr>
-              <td colspan="6" class="text-center py-12 text-slate-400">
-                Belum ada riwayat pengajuan cuti
+              <td colspan="6" class="text-center py-16 text-slate-400 italic bg-white">
+                Belum ada riwayat pengajuan cuti yang tercatat.
               </td>
             </tr>
             <% } %>
 
             <% leaves.forEach(leave => { %>
-            <tr class="hover:bg-slate-50/50 transition">
+            <tr class="hover:bg-slate-50/40 transition duration-150">
 
               <td class="px-6 py-4">
-                <span class="font-semibold text-slate-800 block">
+                <span class="font-bold text-slate-900 block text-[13px]">
                   <%= leave.leaveTypeId ? leave.leaveTypeId.name : '-' %>
                 </span>
                 <% if (leave.leaveTypeId && leave.leaveTypeId.code) { %>
-                <span class="text-[10px] font-mono bg-slate-50 border border-slate-200/60 text-slate-500 px-1.5 py-0.5 rounded inline-block mt-1">
+                <span class="text-[10px] font-mono font-bold bg-slate-100 border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded-md inline-block mt-1">
                   <%= leave.leaveTypeId.code %>
                 </span>
                 <% } %>
@@ -120,133 +146,108 @@
                 <%= new Date(leave.endDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
               </td>
 
-              <td class="px-6 py-4 font-semibold text-slate-700 tabular-nums">
+              <td class="px-6 py-4 font-bold text-slate-800 tabular-nums">
                 <%= leave.totalDays %> Hari
               </td>
 
-              <td class="px-6 py-4 text-[13px] text-slate-500">
+              <td class="px-6 py-4 text-slate-600 font-medium">
                 <%= (leave.handoverUserId && leave.handoverUserId.employeeData) ? leave.handoverUserId.employeeData.fullName : '-' %>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap align-middle">
+              <td class="px-6 py-4 whitespace-nowrap">
                 <% 
-                      const textStyles = { 
-                        'PENDING': 'text-amber-600', 
-                        'APPROVED': 'text-emerald-600', 
-                        'REJECTED': 'text-rose-600', 
-                        'CANCELLED': 'text-slate-500', 
-                        'CANCELLATION_PENDING': 'text-purple-600' 
-                      };
+                  const textStyles = { 
+                    'PENDING': 'text-amber-600', 
+                    'APPROVED': 'text-emerald-600', 
+                    'REJECTED': 'text-rose-600', 
+                    'CANCELLED': 'text-slate-500', 
+                    'CANCELLATION_PENDING': 'text-purple-600' 
+                  };
 
-                      const dotStyles = { 
-                        'PENDING': 'bg-amber-500', 
-                        'APPROVED': 'bg-emerald-500', 
-                        'REJECTED': 'bg-rose-500', 
-                        'CANCELLED': 'bg-slate-400', 
-                        'CANCELLATION_PENDING': 'bg-purple-500' 
-                      };
+                  const dotStyles = { 
+                    'PENDING': 'bg-amber-500', 
+                    'APPROVED': 'bg-emerald-500', 
+                    'REJECTED': 'bg-rose-500', 
+                    'CANCELLED': 'bg-slate-400', 
+                    'CANCELLATION_PENDING': 'bg-purple-500' 
+                  };
 
-                      const bgStyles = { 
-                        'PENDING': 'bg-amber-50/70', 
-                        'APPROVED': 'bg-emerald-50/70', 
-                        'REJECTED': 'bg-rose-50/70', 
-                        'CANCELLED': 'bg-slate-50', 
-                        'CANCELLATION_PENDING': 'bg-purple-50/70' 
-                      };
+                  const bgStyles = { 
+                    'PENDING': 'bg-amber-50/70', 
+                    'APPROVED': 'bg-emerald-50/70', 
+                    'REJECTED': 'bg-rose-50/70', 
+                    'CANCELLED': 'bg-slate-50', 
+                    'CANCELLATION_PENDING': 'bg-purple-50/70' 
+                  };
 
-                      const borderStyles = { 
-                        'PENDING': 'border-amber-200/50', 
-                        'APPROVED': 'border-emerald-200/50', 
-                        'REJECTED': 'border-rose-200/50', 
-                        'CANCELLED': 'border-slate-200', 
-                        'CANCELLATION_PENDING': 'border-purple-200/50' 
-                      };
+                  const borderStyles = { 
+                    'PENDING': 'border-amber-200/50', 
+                    'APPROVED': 'border-emerald-200/50', 
+                    'REJECTED': 'border-rose-200/50', 
+                    'CANCELLED': 'border-slate-200', 
+                    'CANCELLATION_PENDING': 'border-purple-200/50' 
+                  };
 
-                      const statusLabels = { 
-                        'PENDING': 'Pending', 
-                        'APPROVED': 'Approved', 
-                        'REJECTED': 'Rejected', 
-                        'CANCELLED': 'Cancelled', 
-                        'CANCELLATION_PENDING': 'Cancel Pending' 
-                      }; 
-                    %>
+                  const statusLabels = { 
+                    'PENDING': 'Pending', 
+                    'APPROVED': 'Approved', 
+                    'REJECTED': 'Rejected', 
+                    'CANCELLED': 'Cancelled', 
+                    'CANCELLATION_PENDING': 'Cancel Pending' 
+                  }; 
+                %>
 
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold tracking-wide
                       <%= textStyles[leave.status] || 'text-slate-500' %> 
                       <%= bgStyles[leave.status] || 'bg-slate-50' %> 
                       <%= borderStyles[leave.status] || 'border-slate-200' %>">
-
                   <span class="w-1.5 h-1.5 rounded-full <%= dotStyles[leave.status] || 'bg-slate-400' %> <%= leave.status === 'APPROVED' ? 'animate-pulse' : '' %>"></span>
                   <span><%= statusLabels[leave.status] || leave.status %></span>
                 </div>
               </td>
 
-              <td class="px-6 py-4">
-                <div class="flex items-center justify-end gap-2">
+              <td class="px-6 py-4 text-right">
+                <div class="flex items-center justify-end gap-1.5">
 
-                  <a href="/leave/detail/<%= leave._id %>" title="Lihat Progress" class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition active:scale-[0.95]">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <a href="/leave/detail/<%= leave._id %>" title="Lihat Progress" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition active:scale-[0.95]">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
                   </a>
 
                   <% if (leave.status === 'PENDING') { %>
-                  <a href="/leave/edit/<%= leave._id %>" title="Edit Pengajuan" class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95]">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
+                  <a href="/leave/edit/<%= leave._id %>" title="Edit Pengajuan" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-amber-200 bg-amber-50/50 text-amber-600 hover:bg-amber-400 hover:text-white transition active:scale-[0.95]">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
                     </svg>
                   </a>
 
-                <form
-  id="form-cancel-pending-<%= leave._id %>"
-  action="/leave/cancel-pending/<%= leave._id %>"
-  method="POST"
-  class="inline"
->
-  <button
-    type="button"
-    onclick="openConfirmModal({
-      title:'Batalkan Pengajuan Cuti',
-      message:'Pengajuan cuti yang masih menunggu persetujuan akan dibatalkan dan tidak dapat diproses lebih lanjut.',
-      confirmText:'Batalkan',
-      confirmClass:'bg-rose-600 hover:bg-rose-700',
-      onConfirm:() => {
-        document.getElementById('form-cancel-pending-<%= leave._id %>').submit();
-      }
-    })"
-    class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-rose-200 bg-rose-50/40 text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer active:scale-[0.95]"
-    title="Batalkan Pengajuan"
-  >
-    <svg
-      class="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-      />
-    </svg>
-  </button>
-</form>
+                  <form id="form-cancel-pending-<%= leave._id %>" action="/leave/cancel-pending/<%= leave._id %>" method="POST" class="inline">
+                    <button type="button" onclick="openConfirmModal({
+                      title: 'Batalkan Pengajuan Cuti',
+                      message: 'Pengajuan cuti yang masih menunggu persetujuan akan dibatalkan dan tidak dapat diproses lebih lanjut.',
+                      confirmText: 'Batalkan',
+                      confirmClass: 'bg-rose-600 hover:bg-rose-700',
+                      onConfirm: () => { document.getElementById('form-cancel-pending-<%= leave._id %>').submit(); }
+                    })" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-rose-100 bg-rose-50/40 text-rose-500 hover:bg-rose-600 hover:text-white transition cursor-pointer active:scale-[0.95]" title="Batalkan Pengajuan">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                      </svg>
+                    </button>
+                  </form>
                   <% } %>
 
                   <% if (leave.status === 'APPROVED') { %>
                   <form id="form-cancel-<%= leave._id %>" action="/leave/request-cancel/<%= leave._id %>" method="POST" class="inline">
                     <button type="button" onclick="openConfirmModal({
-      title:'Ajukan Pembatalan Cuti',
-      message:'Permintaan pembatalan cuti akan dikirim ke atasan untuk ditinjau dan disetujui.',
-      confirmText:'Ajukan',
-      confirmClass:'bg-amber-600 hover:bg-amber-700',
-      onConfirm:() => {
-        document.getElementById('form-cancel-<%= leave._id %>').submit();
-      }
-    })" class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition cursor-pointer active:scale-[0.95]" title="Ajukan Pembatalan Cuti">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      title: 'Ajukan Pembatalan Cuti',
+                      message: 'Permintaan pembatalan cuti akan dikirim ke atasan untuk ditinjau dan disetujui.',
+                      confirmText: 'Ajukan Pembatalan',
+                      confirmClass: 'bg-amber-600 hover:bg-amber-700',
+                      onConfirm: () => { document.getElementById('form-cancel-<%= leave._id %>').submit(); }
+                    })" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition cursor-pointer active:scale-[0.95]" title="Ajukan Pembatalan Cuti">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                       </svg>
                     </button>
@@ -266,3 +267,70 @@
 
   </div>
 </div>
+
+<div id="holiday-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 transition-all">
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden transform border border-slate-100">
+
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 bg-indigo-50 text-indigo-600 rounded-md flex items-center justify-center">
+          <i class="fa-solid fa-building text-[10px]"></i>
+        </div>
+        <h2 class="text-xs font-bold text-slate-800">Kalender Cuti Bersama</h2>
+      </div>
+      <button onclick="closeHolidayModal()" class="w-6 h-6 flex items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition cursor-pointer text-xs">
+        ✕
+      </button>
+    </div>
+
+    <div id="holiday-modal-content" class="p-5 space-y-3 max-h-[350px] overflow-y-auto">
+      </div>
+
+  </div>
+</div>
+
+<script>
+  const holidays = <%- JSON.stringify(holidays) %>;
+
+  function openCompanyHolidayModal() {
+    const company = holidays.filter(h => h.type === "COMPANY");
+    const container = document.getElementById("holiday-modal-content");
+
+    if (!company.length) {
+      container.innerHTML = `
+        <div class="text-center text-slate-400 text-xs py-10 italic">
+          Tidak ada agenda cuti bersama yang terjadwal.
+        </div>
+      `;
+    } else {
+      container.innerHTML = company.map(h => `
+        <div class="border border-slate-100 rounded-xl p-3.5 bg-slate-50/60 space-y-2">
+          <div class="flex justify-between items-start gap-4">
+            <div>
+              <h4 class="font-bold text-slate-800 text-[12.5px] leading-tight">${h.name}</h4>
+              <p class="text-[10.5px] font-medium text-slate-400 mt-1">
+                ${new Date(h.date).toLocaleDateString('id-ID', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'short',
+                  day: '2-digit'
+                })}
+              </p>
+            </div>
+            ${h.isDeductLeave
+              ? `<span class="shrink-0 text-[9px] px-2 py-0.5 rounded-md bg-rose-50 border border-rose-100 text-rose-600 font-bold uppercase tracking-wider">Potong Kuota</span>`
+              : `<span class="shrink-0 text-[9px] px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-600 font-bold uppercase tracking-wider">Bebas Potong</span>`
+            }
+          </div>
+          ${h.description ? `<p class="text-[11px] text-slate-500 bg-white border border-slate-100 rounded-lg p-2 mt-2">${h.description}</p>` : ''}
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("holiday-modal").classList.remove("hidden");
+  }
+
+  function closeHolidayModal() {
+    document.getElementById("holiday-modal").classList.add("hidden");
+  }
+</script>

@@ -5,6 +5,7 @@ import Bidang from "../models/basic/Bidang.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
 import { X } from "lucide-react";
 // Helper untuk validasi dan normalisasi objek budget baru
+
 const parseAndValidateBudget = (budgetData) => {
   let budgetItems = budgetData?.items;
   if (!Array.isArray(budgetItems)) {

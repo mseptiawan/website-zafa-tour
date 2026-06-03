@@ -7,9 +7,17 @@ export const newForm = (req, res) => {
     old: {},
   });
 };
-
 export const create = async (req, res) => {
   try {
+    if (req.validationErrors) {
+      return res.status(400).render("sales/create", {
+        title: "Catat Kunjungan",
+        errors: req.validationErrors,
+        validationErrors: req.validationErrors,
+        old: req.body,
+      });
+    }
+
     await salesService.create({
       body: req.body,
       file: req.file,
@@ -79,11 +87,19 @@ export const edit = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
+    if (req.validationErrors) {
+      return res.status(400).render("sales/edit", {
+        title: "Edit Kunjungan",
+        errors: req.validationErrors,
+        validationErrors: req.validationErrors,
+      });
+    }
+
     await salesService.update({
       id: req.params.id,
       userId: req.session.user._id,
       body: req.body,
-      files: req.files,
+      file: req.file,
     });
 
     return res.redirect("/sales/my");
@@ -96,22 +112,16 @@ export const exportPdf = async (req, res, next) => {
     const visits = await salesService.findMine(req.session.user._id);
     const user = req.session.user;
 
-    // Inisialisasi dokumen PDF (Ukuran A4 dengan Margin 15mm)
     const doc = new PDFDocument({ size: "A4", margin: 42 });
 
-    // Konfigurasi Header Response agar otomatis mengunduh file
     const safeUsername = (user.name || "Sales").replace(/\s+/g, "_");
     const filename = `Riwayat_Kunjungan_${safeUsername}_${Date.now()}.pdf`;
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
 
-    // Stream PDF langsung ke response objek Express
     doc.pipe(res);
 
-    // --- DESAIN PDF ---
-
-    // 1. Header Utama Dokumen
     doc
       .font("Helvetica-Bold")
       .fontSize(18)
@@ -124,7 +134,6 @@ export const exportPdf = async (req, res, next) => {
       .text("Sistem Manajemen Kunjungan - Zafa Tour", { align: "center" });
     doc.moveDown(1.5);
 
-    // 2. Blok Informasi Sales (Metadata)
     doc.font("Helvetica-Bold").fontSize(11).fillColor("#334155").text("Informasi Personel:");
     doc
       .font("Helvetica")
@@ -137,11 +146,9 @@ export const exportPdf = async (req, res, next) => {
       );
 
     doc.moveDown(1);
-    // Garis Pemisah (Divider Line)
     doc.strokeColor("#e2e8f0").lineWidth(1).moveTo(42, doc.y).lineTo(553, doc.y).stroke();
     doc.moveDown(1.5);
 
-    // 3. Iterasi Data Kunjungan
     if (visits.length === 0) {
       doc
         .font("Helvetica-Oblique")
@@ -150,7 +157,6 @@ export const exportPdf = async (req, res, next) => {
         .text("Belum ada data riwayat kunjungan.", { align: "center" });
     } else {
       visits.forEach((v, index) => {
-        // Proteksi Page Overflow: Jika sisa halaman terlalu sempit, buat halaman baru
         if (doc.y > 720) {
           doc.addPage();
         }
@@ -161,28 +167,24 @@ export const exportPdf = async (req, res, next) => {
           year: "numeric",
         });
 
-        // Judul Kunjungan
         doc
           .font("Helvetica-Bold")
           .fontSize(12)
           .fillColor("#1e40af")
           .text(`${index + 1}. ${v.title}`);
 
-        // Metadata Kunjungan
         doc
           .font("Helvetica")
           .fontSize(9)
           .fillColor("#64748b")
           .text(`Waktu Kunjungan: ${visitDate}   |   Bertemu Dengan: ${v.meetWith}`);
 
-        // Alamat Klien
         doc
           .font("Helvetica")
           .fontSize(9)
           .fillColor("#475569")
           .text(`Lokasi / Alamat  : ${v.address}`);
 
-        // Hasil Kunjungan (Jika ada)
         if (v.result) {
           doc.moveDown(0.4);
           doc
@@ -194,13 +196,11 @@ export const exportPdf = async (req, res, next) => {
         }
 
         doc.moveDown(1);
-        // Garis pemisah tipis antar data item
         doc.strokeColor("#f1f5f9").lineWidth(0.5).moveTo(42, doc.y).lineTo(553, doc.y).stroke();
         doc.moveDown(1);
       });
     }
 
-    // Finalisasi Dokumen PDF
     doc.end();
   } catch (err) {
     next(err);

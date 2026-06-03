@@ -45,20 +45,21 @@ export const savePayroll = async (req, res) => {
       });
     }
 
-    const period = new Date(date || Date.now());
+    const periodDate = new Date(date || Date.now());
+    const period = getPayrollPeriod(periodDate);
 
-    const overtime = await getOvertimeSummary(employeeId, period);
+    const overtime = await getOvertimeSummary(employeeId, periodDate);
 
     const payrollData = await payrollService.buildPayroll({
       employeeId,
-      date: period,
+      date: periodDate,
       overtime,
     });
 
     const saved = await Payroll.findOneAndUpdate(
       {
         employeeId,
-        periodMonth: `${period.getFullYear()}-${String(period.getMonth() + 1).padStart(2, "0")}`,
+        periodMonth: period.id,
       },
       payrollData,
       { upsert: true, new: true, runValidators: true }

@@ -5,6 +5,7 @@ import Holiday from "../../models/calender/Holiday.model.js";
 dotenv.config();
 
 const holidays = [
+  // === HARI LIBUR NASIONAL (isDeductLeave: false) ===
   {
     name: "Tahun Baru 2026 Masehi",
     date: new Date("2026-01-01"),
@@ -31,15 +32,15 @@ const holidays = [
   },
   {
     name: "Hari Raya Idul Fitri 1447 Hijriah (Hari ke-1)",
-    date: new Date("2026-03-20"),
+    date: new Date("2026-03-21"),
     type: "RELIGIOUS",
     isDeductLeave: false,
-    description: "Libur keagamaan Hari Raya Idul Fitri.",
+    description: "Libur keagamaan Hari Raya Idul Fitri hari pertama.",
     year: 2026,
   },
   {
     name: "Hari Raya Idul Fitri 1447 Hijriah (Hari ke-2)",
-    date: new Date("2026-03-21"),
+    date: new Date("2026-03-22"),
     type: "RELIGIOUS",
     isDeductLeave: false,
     description: "Libur keagamaan Hari Raya Idul Fitri hari kedua.",
@@ -59,6 +60,22 @@ const holidays = [
     type: "NATIONAL",
     isDeductLeave: false,
     description: "Peringatan Hari Buruh Internasional May Day.",
+    year: 2026,
+  },
+  {
+    name: "Hari Kenaikan Yesus Kristus",
+    date: new Date("2026-05-14"),
+    type: "RELIGIOUS",
+    isDeductLeave: false,
+    description: "Libur keagamaan memperingati Kenaikan Yesus Kristus.",
+    year: 2026,
+  },
+  {
+    name: "Hari Raya Idul Adha 1447 Hijriah",
+    date: new Date("2026-05-27"),
+    type: "RELIGIOUS",
+    isDeductLeave: false,
+    description: "Libur keagamaan Hari Raya Idul Adha.",
     year: 2026,
   },
   {
@@ -86,9 +103,10 @@ const holidays = [
     year: 2026,
   },
 
+  // === CUTI BERSAMA PERUSAHAAN (isDeductLeave: true) ===
   {
     name: "Cuti Bersama Tahun Baru Imlek 2577 Kongzili",
-    date: new Date("2026-02-16"),
+    date: new Date("2026-02-18"),
     type: "COMPANY",
     isDeductLeave: true,
     description: "Cuti bersama Imlek, memotong jatah cuti tahunan Pegawai.",
@@ -96,22 +114,14 @@ const holidays = [
   },
   {
     name: "Cuti Bersama Hari Suci Nyepi",
-    date: new Date("2026-03-18"),
+    date: new Date("2026-03-20"),
     type: "COMPANY",
     isDeductLeave: true,
     description: "Cuti bersama Hari Raya Nyepi, memotong jatah cuti tahunan.",
     year: 2026,
   },
   {
-    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Pascalebaran 1)",
-    date: new Date("2026-03-20"),
-    type: "COMPANY",
-    isDeductLeave: true,
-    description: "Cuti bersama Idul Fitri, memotong jatah cuti tahunan.",
-    year: 2026,
-  },
-  {
-    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Pascalebaran 2)",
+    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Sesi 1)",
     date: new Date("2026-03-23"),
     type: "COMPANY",
     isDeductLeave: true,
@@ -119,8 +129,24 @@ const holidays = [
     year: 2026,
   },
   {
-    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Pascalebaran 3)",
+    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Sesi 2)",
     date: new Date("2026-03-24"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Idul Fitri, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Sesi 3)",
+    date: new Date("2026-03-25"),
+    type: "COMPANY",
+    isDeductLeave: true,
+    description: "Cuti bersama Idul Fitri, memotong jatah cuti tahunan.",
+    year: 2026,
+  },
+  {
+    name: "Cuti Bersama Hari Raya Idul Fitri 1447 H (Sesi 4)",
+    date: new Date("2026-03-26"),
     type: "COMPANY",
     isDeductLeave: true,
     description: "Cuti bersama Idul Fitri, memotong jatah cuti tahunan.",
@@ -151,7 +177,6 @@ const holidays = [
     year: 2026,
   },
 ];
-
 const holidaysSeeder = async () => {
   try {
     const operations = holidays.map((holiday) => ({

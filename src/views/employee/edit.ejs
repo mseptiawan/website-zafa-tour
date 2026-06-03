@@ -347,6 +347,17 @@
           <div class="space-y-1.5"><label class="label-custom">Nama Pemilik Rekening</label><input name="nama_pemilik_rekening" type="text" value="<%= employee.financialData?.nama_pemilik_rekening || '' %>" class="input-custom" /></div>
           <div class="space-y-1.5"><label class="label-custom">Nomor NPWP</label><input name="npwp" type="text" value="<%= employee.financialData?.npwp || '' %>" class="input-custom" /></div>
           <div class="space-y-1.5"><label class="label-custom">Nomor BPJS Ketenagakerjaan</label><input name="bpjstk" type="text" value="<%= employee.financialData?.bpjstk || '' %>" class="input-custom" /></div>
+          <div class="space-y-1.5">
+  <label class="label-custom">Overtime Rate (per jam)</label>
+  <input
+    name="overtimeRate"
+    type="number"
+    min="0"
+    step="1000"
+    value="<%= employee.financialData?.overtimeRate || 0 %>"
+    class="input-custom"
+  />
+</div>
         </div>
         <div class="flex justify-end pt-4"><button type="submit" class="btn-primary">Perbarui Data Payroll</button></div>
       </form>

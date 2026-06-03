@@ -23,6 +23,10 @@ export function getPermissions(role) {
     leave_delegation: false,
     leave_manage: false,
 
+    permit_new: false,
+    permit_my: false,
+    permit_approval: false,
+
     phk: false,
 
     overtime_new: false,
@@ -54,11 +58,12 @@ export function getPermissions(role) {
 
     daily_log_create: false,
 
-    payroll_slip_gaji: false,
+    payroll_view: false,
     payroll_process: false,
-    payroll_componenet: false,
-    payroll_verify: false,
+    payroll_manage: false,
+    payroll_component_manage: false,
     payroll_history: false,
+    payroll_finance_approval: false,
   };
 
   switch (role) {
@@ -72,8 +77,15 @@ export function getPermissions(role) {
       permissions.leave_my = true;
       permissions.leave_delegation = true;
 
+      permissions.permit_new = true;
+      permissions.permit_my = true;
+
       permissions.overtime_new = true;
+
       permissions.overtime_my = true;
+
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
 
       permissions.trip_new = true;
       permissions.trip_my = true;
@@ -86,16 +98,14 @@ export function getPermissions(role) {
       permissions.claim_new = true;
       permissions.claim_my = true;
 
-      permissions.kasbon_request = true;
-
-      permissions.attendance_new = true;
-      permissions.attendance_my = true;
-
-      permissions.payroll_slip_gaji = true;
+      permissions.payroll_view = true;
 
       break;
 
     case "MANAGER_KEUANGAN":
+      permissions.employee_list = true;
+      permissions.kpi_list = true;
+
       permissions.loan_new = true;
       permissions.loan_my = true;
       permissions.loan_disbursement = true;
@@ -103,10 +113,15 @@ export function getPermissions(role) {
       permissions.assignment_new = true;
 
       permissions.assignment_my = true;
+      permissions.assignment_all = true;
 
       permissions.leave_new = true;
       permissions.leave_my = true;
       permissions.leave_delegation = true;
+
+      permissions.permit_new = true;
+      permissions.permit_my = true;
+      permissions.permit_approval = true;
 
       permissions.overtime_new = true;
       permissions.overtime_my = true;
@@ -130,9 +145,8 @@ export function getPermissions(role) {
       permissions.claim_my = true;
       permissions.claim_verify = true;
 
-      permissions.payroll_slip_gaji = true;
-      permissions.payroll_verify = true;
-      permissions.payroll_history = true;
+      permissions.payroll_view = true;
+      permissions.payroll_finance_approval = true;
 
       break;
 
@@ -146,16 +160,23 @@ export function getPermissions(role) {
 
       permissions.assignment_new = true;
       permissions.assignment_my = true;
+      permissions.assignment_all = true;
 
       permissions.leave_new = true;
       permissions.leave_my = true;
       permissions.leave_delegation = true;
       permissions.leave_manage = true;
 
+      permissions.permit_new = true;
+      permissions.permit_my = true;
+      permissions.permit_approval = true;
+
       permissions.overtime_new = true;
       permissions.overtime_my = true;
       permissions.overtime_approval = true;
       permissions.overtime_verify = true;
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
 
       permissions.attendance_new = true;
       permissions.attendance_my = true;
@@ -163,7 +184,6 @@ export function getPermissions(role) {
       permissions.trip_new = true;
       permissions.trip_my = true;
       permissions.trip_approval = true;
-      permissions.trip_history = true;
 
       permissions.sales_new = true;
       permissions.sales_my = true;
@@ -174,7 +194,7 @@ export function getPermissions(role) {
       permissions.claim_my = true;
       permissions.claim_approval = true;
 
-      permissions.payroll_slip_gaji = true;
+      permissions.payroll_view = true;
 
       break;
 
@@ -188,11 +208,16 @@ export function getPermissions(role) {
 
       permissions.assignment_new = true;
       permissions.assignment_my = true;
+      permissions.assignment_all = true;
 
       permissions.leave_new = true;
       permissions.leave_my = true;
       permissions.leave_delegation = true;
       permissions.leave_manage = true;
+
+      permissions.permit_new = true;
+      permissions.permit_my = true;
+      permissions.permit_approval = true;
 
       permissions.overtime_new = true;
       permissions.overtime_my = true;
@@ -201,11 +226,12 @@ export function getPermissions(role) {
 
       permissions.attendance_new = true;
       permissions.attendance_my = true;
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
 
       permissions.trip_new = true;
       permissions.trip_my = true;
       permissions.trip_approval = true;
-      permissions.trip_history = true;
 
       permissions.sales_new = true;
       permissions.sales_my = true;
@@ -216,7 +242,7 @@ export function getPermissions(role) {
       permissions.claim_my = true;
       permissions.claim_approval = true;
 
-      permissions.payroll_slip_gaji = true;
+      permissions.payroll_view = true;
 
       break;
 
@@ -232,16 +258,25 @@ export function getPermissions(role) {
 
       permissions.kpi_create = true;
       permissions.kpi_list = true;
+      permissions.assignment_new = true;
 
       permissions.assignment_my = true;
+      permissions.assignment_all = true;
 
       permissions.leave_new = true;
       permissions.leave_my = true;
       permissions.leave_delegation = true;
       permissions.leave_manage = true;
 
+      permissions.permit_new = true;
+      permissions.permit_my = true;
+      permissions.permit_approval = true;
+
       permissions.overtime_new = true;
       permissions.overtime_my = true;
+
+      permissions.attendance_new = true;
+      permissions.attendance_my = true;
 
       permissions.attendance_new = true;
       permissions.attendance_my = true;
@@ -249,7 +284,6 @@ export function getPermissions(role) {
 
       permissions.trip_new = true;
       permissions.trip_my = true;
-      permissions.trip_history = true;
       permissions.trip_approval = true;
 
       permissions.sales_new = true;
@@ -261,18 +295,13 @@ export function getPermissions(role) {
       permissions.claim_my = true;
       permissions.claim_category_manage = true;
 
-      permissions.kasbon_request = true;
-      permissions.kasbon_approval = true;
-
-      permissions.payroll_process = true;
-      permissions.payroll_view = true;
-
       permissions.employee_manage = true;
 
-      permissions.payroll_slip_gaji = true;
+      permissions.payroll_view = true;
       permissions.payroll_process = true;
-      permissions.payroll_componenet = true;
+      permissions.payroll_component_manage = true;
       permissions.payroll_history = true;
+      permissions.payroll_finance_approval = true;
 
       break;
 
@@ -286,16 +315,12 @@ export function getPermissions(role) {
       permissions.assignment_new = true;
       permissions.assignment_all = true;
 
-      permissions.phk = true;
+      permissions.permit_approval = true;
 
       permissions.trip_approval = true;
       permissions.trip_history = true;
 
       permissions.claim_approval = true;
-
-      permissions.kasbon_approval = true;
-
-      permissions.payroll_view = true;
 
       permissions.payroll_history = true;
 

@@ -32,9 +32,17 @@
           <label class="text-[13px] font-bold text-slate-700">
             Tanggal Lembur
           </label>
-          <input type="date" id="dateInput" name="date"  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all" />
+        <input
+  type="date"
+  id="dateInput"
+  name="date"
+  min="<%= dateLimit.min %>"
+  max="<%= dateLimit.max %>"
+  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3
+         text-[13px] text-slate-700
+         focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+         outline-none transition-all"
+/>
         </div>
 
         <!-- JAM (GRID) -->
@@ -224,31 +232,23 @@
 </script>
 <script>
   flatpickr(".timepicker", {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: "H:i",
-    time_24hr: true
-  });
+  enableTime: true,
+  noCalendar: true,
+  dateFormat: "H:i",
+  time_24hr: true,
+
+  minTime: "16:30",
+  maxTime: "23:59",
+});
 </script>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const dateInput = document.getElementById("dateInput");
+document.addEventListener("DOMContentLoaded", function () {
+  const dateInput = document.getElementById("dateInput");
 
-    // Mendapatkan tanggal hari ini (format YYYY-MM-DD)
-    const today = new Date();
-    
-    // Hitung tanggal 7 hari yang lalu
-    const pastLimit = new Date();
-    pastLimit.setDate(today.getDate() - 7);
-
-    // Format tanggal ke YYYY-MM-DD
-    const formatDate = (date) => date.toISOString().split('T')[0];
-
-    // Set atribut min (7 hari lalu) dan max (hari ini)
-    dateInput.min = formatDate(pastLimit);
-    dateInput.max = formatDate(today);
-  });
+  dateInput.min = dateInput.getAttribute("min");
+  dateInput.max = dateInput.getAttribute("max");
+});
 </script>
 <script>
   const locationType = document.getElementById('locationType');

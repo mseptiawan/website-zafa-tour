@@ -4,12 +4,33 @@ import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 import Bidang from "../models/basic/Bidang.model.js";
 import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import Employee from "../models/employee/Employee.model.js";
+import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
+import { getPayrollPeriod } from "../utils/payrollPeriod.js";
 
 export const showApplyOvertime = (req, res) => {
+  const today = new Date();
+
+  const backLimit = new Date();
+  backLimit.setDate(today.getDate() - 7);
+
+  const period = getPayrollPeriod(today);
+
+  const minAllowed = new Date(Math.max(backLimit.getTime(), period.start.getTime()));
+
+  const formatDate = (d) => d.toISOString().split("T")[0];
+  console.log("DATE LIMIT:", {
+    min: formatDate(minAllowed),
+    max: formatDate(today),
+  });
   return res.render("overtime/new", {
     title: "Catat Lembur",
     errors: {},
     old: {},
+
+    dateLimit: {
+      min: formatDate(minAllowed),
+      max: formatDate(today),
+    },
   });
 };
 
@@ -165,15 +186,26 @@ export const approveManagerOvertime = async (req, res) => {
       return res.status(404).send("Data tidak ditemukan");
     }
 
-    // ambil note dari form
     const { note } = req.body;
-
-    // validasi role manager yang berhak approve
     const userRole = req.session.user.role;
 
+    // validasi role approver
     if (userRole !== overtime.requiredManagerRole) {
       return res.status(403).send("Anda tidak berhak approve lembur ini");
     }
+
+    // ambil financial pegawai
+    const financial = await EmployeeFinancial.findOne({
+      employee_id: overtime.employeeId,
+    });
+
+    if (!financial) {
+      return res.status(400).send("Data financial pegawai tidak ditemukan");
+    }
+
+    // SNAPSHOT DI SINI (inti perubahan)
+    overtime.overtimeRateSnapshot = financial.overtimeRate || 0;
+    overtime.multiplierSnapshot = 1.5;
 
     // update status
     overtime.status = "APPROVED";
@@ -316,18 +348,27 @@ export const getOvertimeDetail = async (req, res) => {
 };
 export const getPayrollOvertimeSummary = async (req, res) => {
   try {
-    const { userId } = req.params;
+    console.log("=== CONTROLLER OVERTIME PAYROLL START ===");
+    // Menangkap employeeId dari parameter URL route
+    const { employeeId } = req.params;
+    console.log("Target Employee ID:", employeeId);
 
-    const result = await getOvertimeSummary(userId);
+    // Memanggil service dengan passing employeeId
+    const result = await getOvertimeSummary(employeeId);
+    console.log("SERVICE RESULT FINAL:", result);
 
     return res.status(200).json({
       success: true,
-      data: result,
+      totalHours: result?.totalHours || 0,
+      totalPay: result?.totalPay || 0,
     });
   } catch (error) {
+    console.error("❌ Error di getPayrollOvertimeSummary Controller:", error);
     return res.status(500).json({
       success: false,
       message: error.message,
+      totalHours: 0,
+      totalPay: 0,
     });
   }
 };

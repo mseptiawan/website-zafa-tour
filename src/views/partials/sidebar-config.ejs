@@ -80,9 +80,9 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
           show: true,
           submenus: [
-            { name: "Buat Pengajuan", path: "/permit/new", show:true },
-            { name: "Riwayat Pengajuan", path: "/permit/history", show:true },
-            { name: "Manajemen Izin", path: "/permit/incoming", show:true },
+            { name: "Buat Pengajuan", path: "/permit/new", show: !!user.permissions.permit_new },
+            { name: "Riwayat Pengajuan", path: "/permit/history", show: !!user.permissions.permit_my },
+            { name: "Persetujuan Izin", path: "/permit/incoming", show: !!user.permissions.permit_approval }
 
           ]
         },
@@ -111,8 +111,8 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
           show: true,
           submenus: [
-            { name: "Catat Absensi", path: "/attendance", show: true },
-            { name: "Daftar Absensi", path: "/attendance/history", show: true },
+            { name: "Input Absensi", path: "/attendance", show: !!user.permissions.attendance_new },
+            { name: "Riwayat Absensi", path: "/attendance/history", show: !!user.permissions.attendance_my },
           ]
         },
         {
@@ -123,7 +123,7 @@
           submenus: [
             { name: "Buat Pengajuan", path: "/trip/new", show: !!user.permissions.trip_new },
             { name: "Riwayat Pengajuan", path: "/trip/my", show: !!user.permissions.trip_my },
-            { name: "Approval", path: "/trip/approval", show: !!user.permissions.trip_approval },
+            { name: "Persetujuan Dinas", path: "/trip/approval", show: !!user.permissions.trip_approval },
             { name: "Verifikasi Finance", path: "/finance", show: !!user.permissions.trip_verify },
             { name: "Riwayat Verifikasi", path: "/finance/history", show: !!user.permissions.trip_history }
           ]
@@ -132,13 +132,13 @@
     },
     {
       title: "Aktivitas Lapangan",
-      show: true,
+      show: user?.role !== "DIREKTUR_UTAMA",
       menus: [
         {
           id: "sales",
           name: "Kunjungan Sales",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />`,
-          show: user.role !== "DIREKTUR_UTAMA",
+          show: true,
           submenus: [
             { name: "Catat Kunjungan", path: "/sales/new", show: !!user.permissions.sales_new },
             { name: "Daftar Kunjungan", path: "/sales/my", show: !!user.permissions.sales_my }
@@ -194,12 +194,11 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />`,
           show: true,
           submenus: [
-            { name: "Slip Gaji Saya", path: "/payroll/my-slip", show: true },
-            { name: "Proses Hitung Gaji", path: "/payroll/manage", show: true },
-            { name: "Kelola Komponen Gaji", path: "/components/manage", show: true },
-            { name: "Rekap Payroll Bulanan", path: "/payroll/history", show: true },
-            { name: "Verifikasi & Pembayaran", path: "/payroll/finance-approval", show: true },
-            { name: "Laporan Pengeluaran Gaji", path: "/payroll/reports", show: true }
+            { name: "Slip Gaji Saya", path: "/payroll/my-slip", show: !!user.permissions.payroll_view },
+            { name: "Proses Hitung Gaji", path: "/payroll/manage", show: !!user.permissions.payroll_manage },
+            { name: "Kelola Komponen Gaji", path: "/components/manage", show: !!user.permissions.payroll_component_manage },
+            { name: "Rekap Payroll Bulanan", path: "/payroll/history", show: !!user.permissions.payroll_history },
+            { name: "Verifikasi & Pembayaran", path: "/payroll/finance-approval", show: !!user.permissions.payroll_finance_approval },
           ]
         }
       ]

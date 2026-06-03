@@ -289,6 +289,7 @@ export const EmployeeService = {
         nama_pemilik_rekening: data.nama_pemilik_rekening,
         npwp: data.npwp,
         bpjstk: data.bpjstk,
+        overtimeRate: data.overtimeRate ?? 0,
       },
       { new: true, upsert: true }
     );

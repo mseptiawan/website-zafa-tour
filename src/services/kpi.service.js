@@ -4,7 +4,7 @@ import KpiTemplate from "../models/kpi/KpiTemplate.model.js";
 import Kpi from "../models/kpi/Kpi.model.js";
 import unitKpiMapping from "../models/kpi/UnitKpiMapping.model.js";
 import AppError from "../utils/AppError.js";
-
+import mongoose from "mongoose";
 export const getEmployeesToAppraise = async () => {
   const atasan = [
     "Rafika Fitrianti",
@@ -119,7 +119,11 @@ export const getAllKpiHistory = async () => {
 };
 
 export const getKpiHistoryDetail = async (employeeId, periode) => {
-  const kpi = await Kpi.findOne({ employeeId, periode })
+  const targetId = mongoose.Types.ObjectId.isValid(employeeId)
+    ? new mongoose.Types.ObjectId(employeeId)
+    : employeeId;
+
+  const kpi = await Kpi.findOne({ employeeId: targetId, periode })
     .populate("employeeId", "fullName")
     .populate("evaluatedBy", "name");
 

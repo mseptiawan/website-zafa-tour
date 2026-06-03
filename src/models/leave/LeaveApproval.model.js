@@ -10,7 +10,14 @@ const leaveApprovalSchema = new mongoose.Schema(
 
     step: {
       type: String,
-      enum: ["HANDOVER", "MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"],
+      enum: [
+        "HANDOVER",
+        "MANAGER_ADMINISTRASI",
+        "MANAGER_KEUANGAN",
+        "MANAGER_HAJI_UMRAH",
+        "WAKIL_DIREKTUR",
+        "DIREKTUR_UTAMA",
+      ],
       required: true,
     },
 

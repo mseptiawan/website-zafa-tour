@@ -22,76 +22,81 @@
 
     </div>
 
-    <!-- CARD -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
 
       <form action="/sales/" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
-        <% if (error) { %>
+        <% if (typeof errors !== 'undefined' && errors.global) { %>
         <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
-          <%= error %>
+          <%= errors.global %>
         </div>
         <% } %>
 
-        <!-- TITLE -->
         <div class="space-y-1.5">
 
           <label class="text-[13px] font-bold text-slate-700">
             Judul Kunjungan
           </label>
 
-          <input type="text" name="title" required value="<%= old?.title || '' %>" placeholder="Contoh: Mempererat kerjasama dengan mitra" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all" />
+          <input type="text" name="title" value="<%= old?.title || '' %>" placeholder="Contoh: Mempererat kerjasama dengan mitra" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.title ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
+            focus:bg-white text-xs focus:ring-4 outline-none transition-all" />
+
+          <% if (typeof errors !== 'undefined' && errors.title) { %>
+            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.title %></p>
+          <% } %>
 
         </div>
 
-        <!-- ADDRESS -->
         <div class="space-y-1.5">
 
           <label class="text-[13px] font-bold text-slate-700">
             Alamat
           </label>
 
-          <input type="text" name="address" required value="<%= old?.address || '' %>" placeholder="Alamat lengkap customer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all" />
+          <input type="text" name="address" value="<%= old?.address || '' %>" placeholder="Alamat lengkap customer" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.address ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
+            focus:bg-white text-xs focus:ring-4 outline-none transition-all" />
+
+          <% if (typeof errors !== 'undefined' && errors.address) { %>
+            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.address %></p>
+          <% } %>
 
         </div>
 
-        <!-- MEET WITH -->
         <div class="space-y-1.5">
 
           <label class="text-[13px] font-bold text-slate-700">
             Bertemu Dengan
           </label>
 
-          <input type="text" name="meetWith" required value="<%= old?.meetWith || '' %>" placeholder="M Septiawan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none transition-all" />
+          <input type="text" name="meetWith" value="<%= old?.meetWith || '' %>" placeholder="M Septiawan" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.meetWith ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
+            focus:bg-white text-xs focus:ring-4 outline-none transition-all" />
+
+          <% if (typeof errors !== 'undefined' && errors.meetWith) { %>
+            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.meetWith %></p>
+          <% } %>
 
         </div>
 
-        <!-- RESULT -->
         <div class="space-y-1.5">
 
           <label class="text-[13px] font-bold text-slate-700">
             Hasil Kunjungan
           </label>
 
-          <textarea name="result" rows="5" maxlength="500" placeholder="Jelaskan hasil kunjungan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-            outline-none resize-none transition-all"><%= old?.result || '' %></textarea>
+          <textarea name="result" rows="5" maxlength="500" placeholder="Jelaskan hasil kunjungan" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.result ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
+            focus:bg-white text-xs focus:ring-4 outline-none resize-none transition-all"><%= old?.result || '' %></textarea>
+
+          <% if (typeof errors !== 'undefined' && errors.result) { %>
+            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.result %></p>
+          <% } %>
 
         </div>
 
-        <!-- FILE -->
         <div class="space-y-1.5">
           <label class="block text-[13px] font-medium text-slate-700 mb-1.5">
             Lampiran <span class="text-slate-400 font-normal">(Opsional)</span>
           </label>
 
-          <!-- EMPTY STATE (Upload Box) -->
           <div id="dropzone-empty" class="relative w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
 
             <input type="file" name="attachments" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
@@ -109,7 +114,6 @@
             </span>
           </div>
 
-          <!-- FILLED STATE (Preview Box) -->
           <div id="dropzone-filled" class="hidden flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
 
             <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -144,7 +148,6 @@
 
         <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
 
-          <!-- BUTTON BATAL -->
           <a href="/sales/my" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
             Batal
           </a>

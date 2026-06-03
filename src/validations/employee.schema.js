@@ -114,6 +114,13 @@ export const updateFinancialSchema = z.object({
   nomor_bpjs_ketenagakerjaan: z
     .preprocess((val) => (val === "" || val === undefined ? null : val), z.string().nullable())
     .optional(),
+
+  overtimeRate: z
+    .preprocess(
+      (val) => (val === "" || val === undefined ? 0 : Number(val)),
+      z.number().min(0, "Overtime rate tidak boleh negatif")
+    )
+    .optional(),
 });
 
 const familyMemberSchema = z.object({

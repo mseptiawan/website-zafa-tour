@@ -2,30 +2,91 @@
 
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
   <%- include('../partials/page-header', {
-  section: 'Area Kerja',
-  module: 'Struktur Organisasi',
-  title: 'Struktur Organisasi',
-  description: 'Kelola master data Bidang, Sub-Unit Kerja, dan Tingkatan Jabatan secara efisien dalam satu layar kerja.'
-}) %>
+    section: 'Area Kerja',
+    module: 'Struktur Organisasi',
+    title: 'Struktur Organisasi',
+    description: 'Kelola master data Bidang, Sub-Unit Kerja, dan Tingkatan Jabatan secara efisien dalam satu layar kerja.'
+  }) %>
 
-  <div class="flex items-center gap-2 border-b border-slate-200/60 pb-px ">
-    <button type="button" onclick="switchMasterTab('bidang')" id="nav-bidang" class="tab-btn px-4 py-2.5 text-[13px] font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
-      Bidang Induk
-      <span id="badge-count-bidang" class="ml-1 px-1.5 py-0.5 text-[10px] bg-blue-50 text-blue-600 rounded-md tabular-nums font-bold">0</span>
-    </button>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+    
+    <div class="bg-white border border-slate-200/60 p-5 rounded-2xl shadow-sm flex items-center justify-between">
+      <div class="space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Bidang Induk</span>
+        <div class="flex items-baseline gap-2">
+          <span id="stat-total-bidang" class="text-2xl font-black text-slate-900 tabular-nums">0</span>
+          <span class="text-[11px] text-slate-500 font-medium">Divisi Utama</span>
+        </div>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+        </svg>
+      </div>
+    </div>
 
-    <button type="button" onclick="switchMasterTab('unit')" id="nav-unit" class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
-      Sub-Unit Kerja
-      <span id="badge-count-unit" class="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">0</span>
-    </button>
+    <div class="bg-white border border-slate-200/60 p-5 rounded-2xl shadow-sm flex items-center justify-between">
+      <div class="space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Sub-Unit Kerja</span>
+        <div class="flex items-baseline gap-2">
+          <span id="stat-total-unit" class="text-2xl font-black text-slate-900 tabular-nums">0</span>
+          <span id="stat-subtext-unit" class="text-[11px] text-slate-500 truncate max-w-[130px] font-medium">Tersebar di bidang</span>
+        </div>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v.25c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-.25zM2.25 16.625c0-.621.504-1.125 1.125-1.125h6c.621 0 1.125.504 1.125 1.125v.25c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-.25zM11.625 11.875c0-.621.504-1.125 1.125-1.125h9c.621 0 1.125.504 1.125 1.125v.25c0 .621-.504 1.125-1.125 1.125h-9a1.125 1.125 0 01-1.125-1.125v-.25z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 6.125a1.125 1.125 0 10-2.25 0 1.125 1.125 0 002.25 0zM18.375 15.625a1.125 1.125 0 10-2.25 0 1.125 1.125 0 002.25 0zM6.875 11.375a1.125 1.125 0 10-2.25 0 1.125 1.125 0 002.25 0z" />
+        </svg>
+      </div>
+    </div>
 
-    <button type="button" onclick="switchMasterTab('jabatan')" id="nav-jabatan" class="tab-btn px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
-      Level Jabatan
-      <span id="badge-count-jabatan" class="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">0</span>
-    </button>
+    <div class="bg-white border border-slate-200/60 p-5 rounded-2xl shadow-sm flex items-center justify-between">
+      <div class="space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Tingkatan Jabatan</span>
+        <div class="flex items-baseline gap-2">
+          <span id="stat-total-jabatan" class="text-2xl font-black text-slate-900 tabular-nums">0</span>
+          <span class="text-[11px] text-slate-500 font-medium">Level Karier</span>
+        </div>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+        </svg>
+      </div>
+    </div>
+
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mt-4">
+  <div class="mb-5 bg-white rounded-2xl border border-slate-200/60 p-1.5 shadow-xs inline-flex items-center gap-1">
+    
+    <button type="button" 
+      onclick="switchMasterTab('bidang')" 
+      id="nav-bidang" 
+      class="tab-btn px-5 py-2.5 text-xs font-bold bg-blue-600 text-white shadow-xs rounded-xl transition-all duration-200 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+      Bidang Induk
+      <span id="badge-count-bidang" class="px-1.5 py-0.5 text-[10px] bg-white/20 text-white rounded-md tabular-nums font-bold">0</span>
+    </button>
+
+    <button type="button" 
+      onclick="switchMasterTab('unit')" 
+      id="nav-unit" 
+      class="tab-btn px-5 py-2.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all duration-200 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+      Sub-Unit Kerja
+      <span id="badge-count-unit" class="px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">0</span>
+    </button>
+
+    <button type="button" 
+      onclick="switchMasterTab('jabatan')" 
+      id="nav-jabatan" 
+      class="tab-btn px-5 py-2.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all duration-200 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+      Level Jabatan
+      <span id="badge-count-jabatan" class="px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold">0</span>
+    </button>
+
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
     <div class="lg:col-span-5">
       <div class="bg-white border border-slate-200/60 p-5 rounded-xl shadow-sm">
@@ -143,7 +204,6 @@
 
   </div>
 </div>
-</div>
 
 <script>
   let listBidang = <%- JSON.stringify(listBidang) %>;
@@ -152,9 +212,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     refreshWorkspace();
-
     const savedTab = localStorage.getItem('activeOrgTab') || 'bidang';
-
     switchMasterTab(savedTab);
   });
 
@@ -164,12 +222,28 @@
     renderJabatanTable();
     populateBidangSelect();
     updateTabBadges();
+    calculateStats(); // Jalankan kalkulasi statistik real-time
   }
 
   function updateTabBadges() {
     document.getElementById('badge-count-bidang').innerText = listBidang.length;
     document.getElementById('badge-count-unit').innerText = listUnit.length;
     document.getElementById('badge-count-jabatan').innerText = listJabatan.length;
+  }
+
+  // ================= STATISTIK ENGINE =================
+  function calculateStats() {
+    document.getElementById('stat-total-bidang').innerText = listBidang.length;
+    document.getElementById('stat-total-unit').innerText = listUnit.length;
+    document.getElementById('stat-total-jabatan').innerText = listJabatan.length;
+
+    // Tambah subtext analitik dinamis untuk Sub-Unit Kerja
+    const subtextUnitEl = document.getElementById('stat-subtext-unit');
+    if (listBidang.length > 0) {
+      subtextUnitEl.innerText = `Tersebar di ${listBidang.length} Bidang`;
+    } else {
+      subtextUnitEl.innerText = "Belum ada bidang induk";
+    }
   }
 
   function switchMasterTab(activeTab) {
@@ -185,17 +259,23 @@
       if (tab === activeTab) {
         formPanel?.classList.remove('hidden');
         tablePanel?.classList.remove('hidden');
-        navBtn?.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
-        navBtn?.classList.add('border-blue-600', 'text-blue-600', 'font-bold');
-        badge?.classList.remove('bg-slate-100', 'text-slate-600');
-        badge?.classList.add('bg-blue-50', 'text-blue-600');
+        
+        if (navBtn) {
+          navBtn.className = "tab-btn px-5 py-2.5 text-xs font-bold bg-blue-600 text-white shadow-xs rounded-xl transition-all duration-200 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap";
+        }
+        if (badge) {
+          badge.className = "ml-1 px-1.5 py-0.5 text-[10px] bg-white/20 text-white rounded-md tabular-nums font-bold";
+        }
       } else {
         formPanel?.classList.add('hidden');
         tablePanel?.classList.add('hidden');
-        navBtn?.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
-        navBtn?.classList.add('border-transparent', 'text-slate-500', 'font-medium');
-        badge?.classList.remove('bg-blue-50', 'text-blue-600');
-        badge?.classList.add('bg-slate-100', 'text-slate-600');
+        
+        if (navBtn) {
+          navBtn.className = "tab-btn px-5 py-2.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all duration-200 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap";
+        }
+        if (badge) {
+          badge.className = "ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold";
+        }
       }
     });
   }
@@ -264,12 +344,8 @@
     try {
       const res = await fetch('/api/bidang', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: input.value
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: input.value })
       });
       const data = await res.json();
       if (data.success) {
@@ -290,12 +366,8 @@
     try {
       const res = await fetch(`/api/bidang/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
       });
       const data = await res.json();
       if (data.success) {
@@ -313,9 +385,7 @@
   async function handleDeleteBidang(id) {
     if (!confirm("Hapus bidang ini?")) return;
     try {
-      const res = await fetch(`/api/bidang/${id}`, {
-        method: 'DELETE'
-      });
+      const res = await fetch(`/api/bidang/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         listBidang = listBidang.filter(b => b._id !== id);
@@ -336,14 +406,8 @@
     try {
       const res = await fetch('/api/unit', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          bidangId: bId,
-          name: n.value,
-          description: d.value
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bidangId: bId, name: n.value, description: d.value })
       });
       const data = await res.json();
       if (data.success) {
@@ -367,13 +431,8 @@
     try {
       const res = await fetch(`/api/unit/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name,
-          description
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description })
       });
       const data = await res.json();
       if (data.success) {
@@ -392,9 +451,7 @@
   async function handleDeleteUnit(id) {
     if (!confirm("Hapus unit ini?")) return;
     try {
-      const res = await fetch(`/api/unit/${id}`, {
-        method: 'DELETE'
-      });
+      const res = await fetch(`/api/unit/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         listUnit = listUnit.filter(u => u._id !== id);
@@ -414,13 +471,8 @@
     try {
       const res = await fetch('/api/position', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: n.value,
-          description: k.value
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: n.value, description: k.value })
       });
       const data = await res.json();
       if (data.success) {
@@ -444,13 +496,8 @@
     try {
       const res = await fetch(`/api/position/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name,
-          description
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description })
       });
       const data = await res.json();
       if (data.success) {
@@ -469,9 +516,7 @@
   async function handleDeleteJabatan(id) {
     if (!confirm("Hapus jabatan ini?")) return;
     try {
-      const res = await fetch(`/api/position/${id}`, {
-        method: 'DELETE'
-      });
+      const res = await fetch(`/api/position/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         listJabatan = listJabatan.filter(j => j._id !== id);

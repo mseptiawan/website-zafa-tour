@@ -50,7 +50,7 @@ router.get(
 router.post("/approval/:id/manager", roleMiddleware(APPROVAL_ROLES), approveManagerOvertime);
 
 router.post("/approval/:id/reject", roleMiddleware(APPROVAL_ROLES), rejectOvertime);
-router.get("/summary/:userId", getPayrollOvertimeSummary);
+router.get("/summary/:employeeId", getPayrollOvertimeSummary);
 router.get("/detail/:id", authMiddleware, getOvertimeDetail);
 
 export default router;
