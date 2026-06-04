@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import announcementSeeder from "./database/seeders/announcement.seeder.js";
+import salary from "./database/seeders/salaryComponent.seeder";
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ const runSeeder = async () => {
     console.log("MongoDB Terhubung.");
 
     console.log("Menjalankan seeder...");
-    await announcementSeeder();
+    await salary();
 
     console.log("Proses seeding selesai dengan sukses!");
     process.exit(0);

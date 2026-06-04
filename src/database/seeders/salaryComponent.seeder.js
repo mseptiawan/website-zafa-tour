@@ -3,7 +3,7 @@ import SalaryComponent from "../../models/payroll/SalaryComponent.model.js";
 const salaryComponents = [
   {
     code: "TJ_KONSUMSI",
-    name: "Tunjangan Konsumsi (Kehadiran)",
+    name: "Tunjangan Konsumsi",
     type: "FLEXIBLE",
     category: "EARNING",
     calculationType: "FIXED_AMOUNT",

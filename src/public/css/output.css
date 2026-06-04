@@ -774,6 +774,9 @@
   .max-h-\[550px\] {
     max-height: 550px;
   }
+  .min-h-\[38px\] {
+    min-height: 38px;
+  }
   .min-h-\[80px\] {
     min-height: 80px;
   }
@@ -4158,6 +4161,16 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-rose-100);
+      }
+    }
+  }
+  .hover\:bg-rose-100\/70 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, oklch(94.1% 0.03 12.58) 70%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-rose-100) 70%, transparent);
+        }
       }
     }
   }

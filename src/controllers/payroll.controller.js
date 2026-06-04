@@ -9,6 +9,12 @@ export const renderPayrollPage = async (req, res) => {
   try {
     const { employees, components, savedAllowances } = await payrollService.getPayrollData();
 
+    // FILTER LOGIC: Saring komponen untuk dropdown manual input
+    // Menghapus TJ_LEMBUR atau komponen otomatis lain dari daftar pilihan
+    const dropdownComponents = components.filter(
+      (comp) => comp.sourceType !== "DYNAMIC" && comp.isLocked !== true
+    );
+
     const now = new Date();
 
     const currentMonth = now.toLocaleString("id-ID", {
@@ -25,7 +31,8 @@ export const renderPayrollPage = async (req, res) => {
       title: "Manajemen Payroll",
       user: req.user,
       employees,
-      components,
+      components, // Tetap dikirim jika dibutuhkan untuk kalkulasi total keseluruhan
+      dropdownComponents, // Gunakan variabel ini khusus untuk me-render <option> di dropdown
       savedAllowances,
       currentMonth,
       payrollPeriod,

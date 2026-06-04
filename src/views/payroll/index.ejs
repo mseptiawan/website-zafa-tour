@@ -77,18 +77,20 @@
 
               <div class="pt-4 border-t border-slate-100">
                 <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5">Tunjangan Dinamis</h3>
-                <div id="allowanceContainer" class="space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100"></div>
+                
+                <div id="allowanceWrapper" class="space-y-2 rounded-xl border border-transparent">
+                  <div id="overtimeContainer" class="space-y-2"></div>
+                  <div id="allowanceContainer" class="space-y-2"></div>
+                </div>
 
-                <div id="overtimeContainer" class="space-y-2 mt-2"></div>
-
-                <div class="mt-3 flex items-center gap-2">
-                  <select id="masterAllowanceSelect" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-slate-600 focus:outline-none">
+                <div class="mt-4 flex items-center gap-2 w-full max-w-md">
+                  <select id="masterAllowanceSelect" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-600 focus:outline-none focus:border-blue-500 min-h-[38px]">
                     <option value="">-- Pilih Tunjangan --</option>
-                    <% components.filter(c => c.category === 'EARNING').forEach(comp => { %>
+                    <% components.filter(c => c.category === 'EARNING' && c.code !== 'TJ_LEMBUR').forEach(comp => { %>
                     <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
                     <% }) %>
                   </select>
-                  <button type="button" onclick="addAllowanceField()" class="text-[12px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl transition-colors">+ Tambah</button>
+                  <button type="button" onclick="addAllowanceField()" class="text-[12px] font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl transition-colors hover:bg-blue-100/70 min-h-[38px] whitespace-nowrap">+ Tambah</button>
                 </div>
               </div>
 
@@ -98,19 +100,20 @@
                   <span class="text-[10px] font-medium text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">Out / Pengurangan</span>
                 </div>
 
-                <div id="deductionContainer" class="space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100"></div>
+                <div id="deductionContainer" class="space-y-2 rounded-xl border border-transparent"></div>
 
-                <div class="mt-3 flex items-center gap-2">
-                  <select id="masterDeductionSelect" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-slate-600 focus:outline-none">
+                <div class="mt-4 flex items-center gap-2 w-full max-w-md">
+                  <select id="masterDeductionSelect" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-600 focus:outline-none focus:border-rose-500 min-h-[38px]">
                     <option value="">-- Pilih Potongan --</option>
                     <% components.filter(c => c.category === 'DEDUCTION').forEach(comp => { %>
                     <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
                     <% }) %>
                   </select>
-                  <button type="button" onclick="addDeductionField()" class="text-[12px] font-semibold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl transition-colors">+ Tambah</button>
+                  <button type="button" onclick="addDeductionField()" class="text-[12px] font-semibold text-rose-600 bg-rose-50 px-4 py-2 rounded-xl transition-colors hover:bg-rose-100/70 min-h-[38px] whitespace-nowrap">+ Tambah</button>
                 </div>
               </div>
             </div>
+
             <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
               <button type="button" onclick="submitPayrollData()" class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors hover:bg-blue-700">
                 Simpan Perubahan
@@ -147,18 +150,41 @@
 </div>
 
 <script>
-  // Global State Overtime
   let overtimeSummary = {
     totalHours: 0,
     totalPay: 0
   };
+
+  // Memperbaiki manajemen deteksi background secara presisi
+  function updateContainerBackgrounds() {
+    const allowanceWrapper = document.getElementById('allowanceWrapper');
+    const allowanceContainer = document.getElementById('allowanceContainer');
+    const overtimeContainer = document.getElementById('overtimeContainer');
+
+    if (allowanceWrapper && allowanceContainer && overtimeContainer) {
+      // Background aktif jika di dalam allowanceContainer atau overtimeContainer ada element ter-render
+      if (allowanceContainer.children.length > 0 || overtimeContainer.children.length > 0) {
+        allowanceWrapper.className = "space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100";
+      } else {
+        allowanceWrapper.className = "space-y-2 rounded-xl border border-transparent";
+      }
+    }
+
+    const deductionContainer = document.getElementById('deductionContainer');
+    if (deductionContainer) {
+      if (deductionContainer.children.length > 0) {
+        deductionContainer.className = "space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100";
+      } else {
+        deductionContainer.className = "space-y-2 rounded-xl border border-transparent";
+      }
+    }
+  }
 
   function calculatePayroll() {
     try {
       const basicInput = document.getElementById('inputBasicSalary');
       const basic = basicInput ? (parseFloat(basicInput.value) || 0) : 0;
 
-      // 1. Hitung Tunjangan Dinamis dari DOM input user
       let allowances = 0;
       let earningsDetailHTML = '';
       document.querySelectorAll('.allowance-row').forEach(row => {
@@ -173,7 +199,6 @@
         }
       });
 
-      // 2. Ambil Uang Lembur dari State Hasil Fetch API
       let overtime = 0;
       const previewOvertimeRow = document.getElementById('previewOvertimeRow');
       const previewOvertime = document.getElementById('previewOvertime');
@@ -188,7 +213,6 @@
         if (previewOvertimeRow) previewOvertimeRow.classList.add('hidden');
       }
 
-      // 3. Hitung Potongan dari DOM input user
       let deductions = 0;
       let deductionsDetailHTML = '';
       document.querySelectorAll('.deduction-row').forEach(row => {
@@ -203,10 +227,8 @@
         }
       });
 
-      // 4. Hitung Akumulasi Akhir secara Presisi
       const netPay = (basic + allowances + overtime) - deductions;
 
-      // Render ke UI Sidebar
       if (document.getElementById('previewBasic')) document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
 
       const earnDetailBox = document.getElementById('detailEarningsContainer');
@@ -236,26 +258,25 @@
     if (!container) return;
 
     container.innerHTML = '';
-    if (!overtimeSummary) return;
+    
+    // Walaupun nilainya 0 jam, lembur otomatis tetap di-render agar sesuai requesemu
     container.innerHTML = `
       <div class="flex items-center gap-2 overtime-row animate-fadeIn">
-        <input type="text" value="Lembur (${overtimeSummary.totalHours} jam)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-blue-700 font-medium" readonly>
+        <input type="text" value="Lembur (${overtimeSummary.totalHours} jam)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly>
         <div class="w-32 relative">
-          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-blue-400">Rp</span>
-          <input type="text" value="${overtimeSummary.totalPay.toLocaleString('id-ID')}" class="w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-blue-700 text-right focus:outline-none" readonly>
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
+          <input type="text" value="${overtimeSummary.totalPay.toLocaleString('id-ID')}" class="w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none" readonly>
         </div>
+        <div class="w-8 h-8 flex items-center justify-center opacity-0 pointer-events-none"></div>
       </div>
     `;
+    updateContainerBackgrounds();
   }
-
-  // BULLETPROOF API EXTRACTION: Mendeteksi struktur flat, .data, camelCase, ataupun snake_case otomatis
 
   async function loadOvertime(idParam) {
     try {
       const res = await fetch(`/overtime/summary/${idParam}`);
       const data = await res.json();
-
-      console.log("DEBUG RESPONSE LEMBUR:", data);
 
       const hours = Number(data.totalHours || 0);
       const pay = Number(data.totalPay || 0);
@@ -292,7 +313,7 @@
           <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
           <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none">
         </div>
-        <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
+        <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
           <i class="fa-solid fa-trash-can text-[11px]"></i>
         </button>
       </div>
@@ -300,6 +321,7 @@
 
     document.getElementById('allowanceContainer').insertAdjacentHTML('beforeend', template);
     select.value = "";
+    updateContainerBackgrounds();
     calculatePayroll();
   }
 
@@ -318,13 +340,14 @@
           <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
           <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:border-blue-500">
         </div>
-        <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
+        <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
           <i class="fa-solid fa-trash-can text-[11px]"></i>
         </button>
       </div>
     `;
     document.getElementById('deductionContainer').insertAdjacentHTML('beforeend', template);
     select.value = "";
+    updateContainerBackgrounds();
     calculatePayroll();
   }
 
@@ -359,7 +382,7 @@
               <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
               <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none">
             </div>
-            <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
+            <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
               <i class="fa-solid fa-trash-can text-[11px]"></i>
             </button>
           </div>
@@ -378,7 +401,7 @@
               <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
               <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:border-blue-500">
             </div>
-            <button type="button" onclick="this.parentElement.remove(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
+            <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
               <i class="fa-solid fa-trash-can text-[11px]"></i>
             </button>
           </div>
@@ -387,8 +410,8 @@
       });
     }
 
-    console.log("SWITCH EMPLOYEE CALLED");
-console.log("DATA-ID:", el.getAttribute('data-id'));
+    // Panggil ulang loadOvertime & update visual background wrapper
+    updateContainerBackgrounds();
     loadOvertime(el.getAttribute('data-id'));
   }
 

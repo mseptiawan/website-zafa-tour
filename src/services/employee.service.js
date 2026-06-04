@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Employee from "../models/employee/Employee.model.js";
+import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
 import User from "../models/basic/User.model.js";
 import Termination from "../models/Termination.model.js";
 import Role from "../models/basic/Role.model.js";
@@ -139,7 +140,8 @@ export const EmployeeService = {
       .populate("educationData")
       .populate("financialData")
       .populate("documentData")
-      .populate("familyData");
+      .populate("familyData")
+      .populate("salaryDetail");
   },
 
   getReferenceData: async () => {
@@ -181,20 +183,40 @@ export const EmployeeService = {
   },
 
   updateKarir: async (id, data) => {
-    return await EmployeeCareer.findOneAndUpdate(
-      { employee_id: id },
-      {
-        positionId: data.positionId,
-        bidangId: data.bidangId,
-        unitId: data.unitId,
-        status_pegawai: data.status_pegawai,
-        tanggal_mulai_bergabung: new Date(data.tanggal_mulai_bergabung),
-        tanggal_berakhir_kontrak: data.tanggal_berakhir_kontrak
-          ? new Date(data.tanggal_berakhir_kontrak)
-          : null,
-      },
-      { new: true, upsert: true }
-    );
+    // 1. Cari data Employee terlebih dahulu untuk mendapatkan userId-nya
+    const employee = await Employee.findById(id).select("userId");
+
+    // Siapkan array untuk menampung promise update paralel
+    const updatePromises = [
+      // Update data karir di EmployeeCareer
+      EmployeeCareer.findOneAndUpdate(
+        { employee_id: id },
+        {
+          positionId: data.positionId,
+          bidangId: data.bidangId,
+          unitId: data.unitId,
+          status_pegawai: data.status_pegawai,
+          tanggal_mulai_bergabung: new Date(data.tanggal_mulai_bergabung),
+          tanggal_berakhir_kontrak: data.tanggal_berakhir_kontrak
+            ? new Date(data.tanggal_berakhir_kontrak)
+            : null,
+        },
+        { new: true, upsert: true }
+      ),
+    ];
+
+    if (employee && employee.userId) {
+      updatePromises.push(
+        User.findByIdAndUpdate(employee.userId, { status: data.status || "Active" }, { new: true })
+      );
+    }
+
+    const [careerUpdate, userUpdate] = await Promise.all(updatePromises);
+
+    return {
+      career: careerUpdate,
+      user: userUpdate,
+    };
   },
 
   updateKontak: async (id, data) => {
@@ -281,17 +303,38 @@ export const EmployeeService = {
   },
 
   updateFinansial: async (id, data) => {
-    return await EmployeeFinancial.findOneAndUpdate(
-      { employee_id: id },
-      {
-        nama_bank: data.nama_bank,
-        nomor_rekening: data.nomor_rekening,
-        nama_pemilik_rekening: data.nama_pemilik_rekening,
-        npwp: data.npwp,
-        bpjstk: data.bpjstk,
-        overtimeRate: data.overtimeRate ?? 0,
-      },
-      { new: true, upsert: true }
-    );
+    // 1. Jalankan update untuk EmployeeFinancial dan EmployeeSalary secara bersamaan (Parallel)
+    const [financialUpdate, salaryUpdate] = await Promise.all([
+      // Update data bank, npwp, bpjs, dan overtime rate
+      EmployeeFinancial.findOneAndUpdate(
+        { employee_id: id },
+        {
+          nama_bank: data.nama_bank,
+          nomor_rekening: data.nomor_rekening,
+          nama_pemilik_rekening: data.nama_pemilik_rekening,
+          npwp: data.npwp,
+          bpjstk: data.bpjstk,
+          overtimeRate: data.overtimeRate ?? 0,
+        },
+        { new: true, upsert: true }
+      ),
+
+      // Update data Gaji Pokok di model EmployeeSalary
+      // Pastikan lo sudah meng-import model EmployeeSalary di bagian atas file service ini!
+      EmployeeSalary.findOneAndUpdate(
+        { employeeId: id }, // Perhatikan field-nya 'employeeId' sesuai skema lo
+        {
+          basicSalary: data.basicSalary ?? 0,
+          effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : Date.now(),
+        },
+        { new: true, upsert: true }
+      ),
+    ]);
+
+    // 2. Kembalikan gabungan datanya dalam satu objek untuk mempermudah response controller/frontend
+    return {
+      financial: financialUpdate,
+      salary: salaryUpdate,
+    };
   },
 };
