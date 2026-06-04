@@ -15,7 +15,7 @@ const DailyLogSchema = new mongoose.Schema(
     kpiTemplateId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "KpiTemplate",
-      required: true,
+      required: false,
     },
     judul: {
       type: String,

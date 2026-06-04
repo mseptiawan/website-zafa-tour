@@ -8,6 +8,8 @@ import {
   createActivity,
   updateActivity,
   carryOverTasks,
+  renderReviewPage,
+  getReviewDataApi,
 } from "../controllers/dailyLog.controller.js";
 
 const router = express.Router();
@@ -26,5 +28,6 @@ router.post("/api/carry-over", carryOverTasks);
 
 // 4. Update data/status aktivitas -> PUT /daily-log/api/:id
 router.put("/api/:id", uploadFile.single("attachment"), updateActivity);
-
+router.get("/review", renderReviewPage);
+router.get("/api/review-data", getReviewDataApi);
 export default router;

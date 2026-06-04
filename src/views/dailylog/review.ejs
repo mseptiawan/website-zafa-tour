@@ -1,0 +1,189 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="bg-slate-50 min-h-screen antialiased font-sans lg:ml-72 p-4 md:p-8 text-slate-800">
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Header Panel -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm shadow-slate-100/50">
+      <div>
+        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Review Aktivitas Harian</h1>
+        <p class="text-[12px] text-slate-500 mt-1">Pantau progres dan hasil kerja anggota tim Anda secara tersentralisasi.</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-4 border-t sm:border-0 pt-4 sm:pt-0 border-slate-100 w-full sm:w-auto">
+        <div class="w-full sm:w-auto">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Bidang</label>
+          <select id="filter-bidang" onchange="loadReviewData()" class="w-full sm:w-48 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition">
+            <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'DIREKTUR_UTAMA') { %>
+              <option value="">Semua Bidang</option>
+            <% } %>
+            <% bidangs.forEach(b => { %>
+              <option value="<%= b._id %>"><%= b.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="w-full sm:w-auto">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</label>
+          <input type="date" id="filter-date" onchange="loadReviewData()" class="w-full sm:w-40 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm shadow-slate-100/50 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/70 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <th class="py-4 px-5">Nama Pegawai</th>
+              <th class="py-4 px-5">Bidang Kerja</th>
+              <th class="py-4 px-5 text-center">Tugas Selesai</th>
+              <th class="py-4 px-5 text-center">Tugas Pending</th>
+              <th class="py-4 px-5 text-center w-32">Akumulasi KPI</th>
+              <th class="py-4 px-5 text-center w-24">Detail</th>
+            </tr>
+          </thead>
+          <tbody id="review-table-body" class="divide-y divide-slate-100">
+            <!-- Data will be injected here via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden p-12 text-center max-w-sm mx-auto my-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 mx-auto border border-slate-200/60 mb-3">
+          <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 2.24l-.4 2.055a2.25 2.25 0 001.542 2.58l.107.031" />
+          </svg>
+        </div>
+        <p class="text-[13px] font-bold text-slate-700">Tidak Ada Data</p>
+        <p class="text-[11.5px] text-slate-400 mt-0.5">Pegawai di bidang terkait belum mengisi lembar kerja pada tanggal ini.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Inisialisasi Tanggal Hari Ini
+    const datePicker = document.getElementById('filter-date');
+    datePicker.value = new Date().toISOString().split('T')[0];
+
+    async function loadReviewData() {
+      const date = datePicker.value;
+      const bidang = document.getElementById('filter-bidang').value;
+      
+      const tbody = document.getElementById('review-table-body');
+      const emptyState = document.getElementById('empty-state');
+      
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-xs text-slate-400">Memuat data...</td></tr>`;
+
+      try {
+        const response = await fetch(`/daily-log/api/review-data?tanggal=${date}&bidangId=${bidang}`);
+        const result = await response.json();
+
+        if (result.success) {
+          renderTable(result.data, tbody, emptyState);
+        }
+      } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-xs text-rose-500">Gagal memuat data</td></tr>`;
+      }
+    }
+
+    function renderTable(data, tbody, emptyState) {
+      tbody.innerHTML = "";
+      
+      // Filter karyawan yang punya setidaknya 1 task ATAU tampilkan semua? (Pilih tampilkan semua karyawan di bidang itu)
+      if (!data || data.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      data.forEach(emp => {
+        // Tentukan warna bar progress KPI
+        let kpiColor = "bg-rose-500";
+        if (emp.kpiPercentage >= 80) kpiColor = "bg-emerald-500";
+        else if (emp.kpiPercentage >= 50) kpiColor = "bg-amber-500";
+        else if (emp.kpiPercentage > 0) kpiColor = "bg-blue-500";
+
+        // Generate Rincian Tugas untuk Row Expandable
+        let logsHTML = "";
+        if (emp.logs.length === 0) {
+          logsHTML = `<div class="text-[11px] text-slate-400 italic py-2">Pegawai ini tidak mengerjakan aktivitas apapun hari ini.</div>`;
+        } else {
+          emp.logs.forEach(log => {
+            let statusColor = log.status === 'Completed' ? 'text-emerald-600 bg-emerald-50' : (log.status === 'Pending' ? 'text-amber-600 bg-amber-50' : 'text-slate-500 bg-slate-50');
+            const kpiName = log.kpiTemplateId?.indikator || "Lainnya (Non-KPI)";
+            
+            logsHTML += `
+              <div class="flex items-start justify-between gap-4 p-3 border border-slate-100 rounded-xl mb-2 bg-white">
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-slate-200/60 ${statusColor}">${log.status}</span>
+                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded truncate max-w-[150px]">${kpiName}</span>
+                  </div>
+                  <p class="text-[12.5px] font-semibold text-slate-800">${log.judul}</p>
+                  ${log.penjelasanHasil ? `<p class="text-[11px] text-slate-500 italic mt-0.5">Hasil: ${log.penjelasanHasil}</p>` : ''}
+                </div>
+                ${log.fileLampiran ? `
+                  <a href="/uploads/files/${log.fileLampiran}" target="_blank" class="text-[10px] font-bold text-slate-600 hover:text-blue-600 hover:bg-blue-50 bg-slate-100 px-3 py-1.5 rounded-lg transition whitespace-nowrap">📎 Buka Bukti</a>
+                ` : ''}
+              </div>
+            `;
+          });
+        }
+
+        const rowHTML = `
+          <tr class="hover:bg-slate-50/40 transition-colors border-b border-slate-100">
+            <td class="py-4 px-5">
+              <p class="text-[13px] font-semibold text-slate-800">${emp.fullName}</p>
+            </td>
+            <td class="py-4 px-5">
+              <span class="text-[11px] font-medium text-slate-600 border border-slate-200 bg-slate-50 px-2.5 py-1 rounded-lg">${emp.bidang}</span>
+            </td>
+            <td class="py-4 px-5 text-center">
+              <span class="text-[13px] font-bold text-emerald-600">${emp.completedTasks}</span> <span class="text-[11px] text-slate-400">Tugas</span>
+            </td>
+            <td class="py-4 px-5 text-center">
+              <span class="text-[13px] font-bold text-amber-500">${emp.pendingTasks}</span> <span class="text-[11px] text-slate-400">Tugas</span>
+            </td>
+            <td class="py-4 px-5">
+              <div class="flex items-center gap-3">
+                <div class="w-full bg-slate-100 rounded-full h-1.5">
+                  <div class="${kpiColor} h-1.5 rounded-full" style="width: ${emp.kpiPercentage}%"></div>
+                </div>
+                <span class="text-[11.5px] font-bold text-slate-700 w-8 text-right">${emp.kpiPercentage}%</span>
+              </div>
+            </td>
+            <td class="py-4 px-5 text-center">
+              <button onclick="toggleExpand('detail-${emp._id}')" class="text-[11.5px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Rincian</button>
+            </td>
+          </tr>
+          <tr id="detail-${emp._id}" class="hidden bg-slate-50/40 shadow-inner">
+            <td colspan="6" class="p-4 border-b border-slate-200">
+              <div class="max-w-4xl mx-auto">
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Rincian Laporan Kerja</h4>
+                ${logsHTML}
+              </div>
+            </td>
+          </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', rowHTML);
+      });
+    }
+
+    function toggleExpand(id) {
+      const row = document.getElementById(id);
+      if (row.classList.contains('hidden')) {
+        row.classList.remove('hidden');
+      } else {
+        row.classList.add('hidden');
+      }
+    }
+
+    // Load data saat halaman pertama kali dibuka
+    window.onload = loadReviewData;
+  </script>
+</div>
