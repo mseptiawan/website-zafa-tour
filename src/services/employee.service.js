@@ -18,7 +18,8 @@ import bcrypt from "bcrypt";
 export const EmployeeService = {
   findAllEmployees: async () => {
     const employeesData = await Employee.find()
-      .populate("userId")
+      .populate("userId") // Untuk narik status ("Active"/"Inactive")
+      .populate("salaryDetail") // TAMBAHKAN INI untuk narik basicSalary
       .populate({
         path: "careerData",
         populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
@@ -135,7 +136,14 @@ export const EmployeeService = {
   findEmployeeById: async (id) => {
     return await Employee.findById(id)
       .populate("userId")
-      .populate("careerData")
+      .populate({
+        path: "careerData",
+        populate: [
+          { path: "positionId" }, // Menarik nama posisi jabatan
+          { path: "unitId" }, // Menarik nama unit kerja penempatan
+          { path: "bidangId" }, // Menarik nama bidang kerja
+        ],
+      })
       .populate("contactData")
       .populate("educationData")
       .populate("financialData")

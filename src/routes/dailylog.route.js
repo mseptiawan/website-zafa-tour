@@ -14,7 +14,6 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-// [VIEW RENDERING]
 router.get("/", renderDailyLogPage);
 
 router.get("/api/data", getDailyLogApi);

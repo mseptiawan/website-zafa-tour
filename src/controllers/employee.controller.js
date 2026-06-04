@@ -7,6 +7,7 @@ import Role from "../models/basic/Role.model.js";
 import Position from "../models/basic/Position.model.js";
 import Unit from "../models/basic/Unit.model.js";
 import Bidang from "../models/basic/Bidang.model.js";
+import Employee from "../models/employee/Employee.model.js";
 import path from "path";
 
 export const getAllEmployeesWeb = async (req, res, next) => {
@@ -53,6 +54,7 @@ export const editEmployeeWeb = async (req, res, next) => {
 
     res.render("employee/edit", {
       title: "Edit Data Pegawai",
+      isMandiri: false,
       error: null,
       errors: {},
       old: null,
@@ -67,6 +69,57 @@ export const editEmployeeWeb = async (req, res, next) => {
   }
 };
 
+export const editProfileMandiriWeb = async (req, res, next) => {
+  try {
+    // Ambil ID pegawai dari sesi login yang sedang aktif
+    const employeeId = req.session.user.employeeId;
+
+    const employee = await EmployeeService.findEmployeeById(employeeId);
+    if (!employee)
+      return res.status(404).render("errors/404", { message: "Pegawai tidak ditemukan" });
+
+    res.render("employee/edit", {
+      title: "Edit Profil Mandiri",
+      employee,
+      isMandiri: true, // FLAG UTAMA UNTUK EJS
+      error: null,
+      errors: {},
+      old: null,
+      // Kirim array kosong karena tab karir akan disembunyikan
+      positions: [],
+      units: [],
+      bidang: [],
+      roles: [],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getEmployeeDetailWeb = async (req, res, next) => {
+  try {
+    // Tarik data pegawai komplit berdasarkan ID dari parameter URL
+    const employee = await EmployeeService.findEmployeeById(req.params.id);
+
+    // Jika objek pegawai tidak ditemukan di database
+    if (!employee) {
+      return res.status(404).render("errors/404", {
+        message: "Data informasi pegawai tidak ditemukan atau sudah dihapus.",
+      });
+    }
+
+    // Render ke file EJS detail terpisah (bukan file edit)
+    res.render("employee/detail", {
+      title: "Profil Detail Pegawai",
+      employee,
+      user: req.user,
+      error: null,
+      user: req.session?.user || req.user, // Sesuaikan dengan session login lo untuk verifikasi role di UI
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 const handleControllerError = (err, res) => {
   if (err.code === 11000) {
     return res.status(400).json({
@@ -209,6 +262,16 @@ export const updateKeluargaApi = async (req, res) => {
 };
 export const updateFinansialApi = async (req, res) => {
   try {
+    const payload = { ...req.body };
+    const userRole = req.session.user.role; // Ambil role dari sesi
+
+    // Jika yang mengedit BUKAN HR / Wakil Direktur, hapus payload gaji!
+    if (userRole !== "HR" && userRole !== "WAKIL_DIREKTUR") {
+      delete payload.basicSalary;
+      delete payload.overtimeRate;
+      delete payload.effectiveDate;
+    }
+
     const data = await EmployeeService.updateFinansial(req.params.id, req.body);
 
     return res
@@ -284,5 +347,46 @@ export const ajukanPHKApi = async (req, res, next) => {
     return res.redirect("/employee");
   } catch (err) {
     next(err);
+  }
+};
+export const uploadAvatarWeb = async (req, res) => {
+  try {
+    const employeeId = req.params.id;
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Tidak ada file diunggah" });
+    }
+
+    // Path yang disimpan
+    const imageUrl = `/uploads/files/${req.file.filename}`;
+
+    // Update ke database
+    const updated = await Employee.findByIdAndUpdate(
+      employeeId,
+      { foto_profile: imageUrl },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Pegawai tidak ditemukan" });
+    }
+
+    // --- UPDATE SESI SECARA MANUAL ---
+    // Memastikan data di sesi (sidebar) sinkron dengan database
+    if (req.session && req.session.user) {
+      req.session.user.foto_profile = imageUrl;
+
+      // Simpan perubahan sesi ke store (khusus jika menggunakan store eksternal/DB)
+      req.session.save((err) => {
+        if (err) {
+          console.error("Gagal menyimpan sesi:", err);
+        }
+      });
+    }
+
+    return res.status(200).json({ success: true, imageUrl });
+  } catch (err) {
+    console.error("ERROR UPLOAD:", err);
+    return res.status(500).json({ success: false, message: err.message });
   }
 };

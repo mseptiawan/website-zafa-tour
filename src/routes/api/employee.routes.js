@@ -8,6 +8,7 @@ import {
   updateDokumenApi,
   updatePendidikanApi,
   updateKeluargaApi,
+  uploadAvatarWeb,
   updateFinansialApi,
 } from "../../controllers/employee.controller.js";
 import { uploadFile } from "../../middlewares/uploadFile.js";
@@ -36,5 +37,5 @@ router.put("/:id/dokumen", uploadFile.any(), updateDokumenApi);
 router.put("/:id/pendidikan", uploadFile.single("file_ijazah"), updatePendidikanApi);
 router.put("/:id/keluarga", validate(updateFamilySchema), updateKeluargaApi);
 router.put("/:id/finansial", validate(updateFinancialSchema), updateFinansialApi);
-
+router.post("/upload-avatar/:id", uploadFile.single("foto_profile"), uploadAvatarWeb);
 export default router;

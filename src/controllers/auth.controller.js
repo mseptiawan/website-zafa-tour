@@ -42,6 +42,7 @@ export const login = async (req, res) => {
       username: user.username,
       email: user.email,
       fullName: employee?.fullName || user.username,
+      foto_profile: employee?.foto_profile || null,
       employeeId: employee?._id || null,
       gender: employee?.jenis_kelamin || "Laki-Laki",
       role: user.roleId?.name?.toUpperCase() || "UNKNOWN",

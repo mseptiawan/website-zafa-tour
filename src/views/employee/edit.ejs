@@ -1,25 +1,35 @@
-<%- layout('layouts/main', { title: "Edit Data Pegawai" }) %>
+<%- layout('layouts/main', { title: isMandiri ? "Edit Profil Mandiri" : "Edit Data Pegawai" }) %>
 
 <div class="max-w-6xl mx-auto min-h-screen bg-white p-8 antialiased ml-72">
 
   <%- include('../partials/page-header', {
     section: 'Area Kerja',
-    module: 'Kehadiran',
-    title: 'Edit Data Pegawai',
-    description: 'Kelola berkas personal, struktur kedinasan, kontak darurat, serta informasi payroll pegawai.'
+    module: isMandiri ? 'Profil Saya' : 'Kepegawaian',
+    title: isMandiri ? 'Edit Profil Mandiri' : 'Edit Data Pegawai',
+    description: isMandiri ? 'Perbarui informasi kontak, alamat, dokumen sertifikasi, dan anggota keluarga Anda.' : 'Kelola berkas personal, struktur kedinasan, kontak darurat, serta informasi payroll pegawai.'
   }) %>
 
-  <div id="units-data" data-json="<%= JSON.stringify(units) %>" class="hidden"></div>
+  <div id="units-data" data-json="<%= JSON.stringify(units || []) %>" class="hidden"></div>
 
   <div id="global-error" class="border-l-2 border-rose-500 bg-rose-50/50 text-rose-700 px-4 py-3 rounded-r-md text-xs mb-8 font-medium hidden"></div>
 
   <div class="border-b border-slate-200 overflow-x-auto mb-8">
     <nav class="flex gap-6 min-w-max pb-px">
-      <button type="button" data-tab="pribadi" class="tab-btn border-b-2 border-blue-600 py-3 px-1 text-xs font-semibold tracking-wider uppercase text-blue-600 transition-all">Data Pribadi</button>
-      <button type="button" data-tab="karir" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Karir & Struktur</button>
-      <button type="button" data-tab="kontak" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Kontak & Alamat</button>
+      
+      <% if (!isMandiri) { %>
+        <button type="button" data-tab="pribadi" class="tab-btn border-b-2 border-blue-600 py-3 px-1 text-xs font-semibold tracking-wider uppercase text-blue-600 transition-all">Data Pribadi</button>
+        <button type="button" data-tab="karir" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Karir & Struktur</button>
+      <% } %>
+
+      <!-- Jika mode mandiri, tab kontak otomatis aktif (biru) di awal -->
+      <button type="button" data-tab="kontak" class="tab-btn border-b-2 <%= isMandiri ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500' %> py-3 px-1 text-xs font-semibold tracking-wider uppercase hover:text-slate-700 hover:border-slate-300 transition-all">Kontak & Alamat</button>
+      
       <button type="button" data-tab="dokumen" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Dokumen</button>
-      <button type="button" data-tab="pendidikan" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Pendidikan</button>
+      
+      <% if (!isMandiri) { %>
+        <button type="button" data-tab="pendidikan" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Pendidikan</button>
+      <% } %>
+
       <button type="button" data-tab="keluarga" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Keluarga</button>
       <button type="button" data-tab="finansial" class="tab-btn border-b-2 border-transparent py-3 px-1 text-xs font-semibold tracking-wider uppercase text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all">Finansial</button>
     </nav>
@@ -27,6 +37,7 @@
 
   <div class="bg-white">
 
+    <% if (!isMandiri) { %>
     <div id="content-pribadi" class="tab-content space-y-6">
       <form id="form-pribadi" class="space-y-6">
         <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
@@ -85,63 +96,73 @@
     </div>
 
     <div id="content-karir" class="tab-content space-y-6 hidden">
-  <form id="form-karir" class="space-y-6">
-    <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
-      <div class="space-y-1.5">
-        <label class="label-custom">Jabatan Struktural <span class="text-rose-500">*</span></label>
-        <select name="positionId" required class="input-custom">
-          <% positions.forEach(p => { %>
-          <option value="<%= p._id %>" <%= String(employee.careerData?.positionId) === String(p._id) ? 'selected' : '' %>><%= p.name %></option>
-          <% }) %>
-        </select>
-      </div>
-      <div class="space-y-1.5">
-        <label class="label-custom">Bidang Kerja <span class="text-rose-500">*</span></label>
-        <select id="select-bidang" name="bidangId" required class="input-custom">
-          <option value="" disabled>Pilih Bidang</option>
-          <% bidang.forEach(b => { %>
-          <option value="<%= b._id %>" <%= String(employee.careerData?.bidangId) === String(b._id) ? 'selected' : '' %>><%= b.name %></option>
-          <% }) %>
-        </select>
-      </div>
-      <div class="space-y-1.5">
-        <label class="label-custom">Unit Kantor Penempatan <span class="text-rose-500">*</span></label>
-        <select id="select-unit" name="unitId" required data-old="<%= employee.careerData?.unitId || '' %>" class="input-custom"></select>
-      </div>
-      <div class="space-y-1.5">
-        <label class="label-custom">Status Kepegawaian Awal <span class="text-rose-500">*</span></label>
-        <select id="select-status" name="status_pegawai" required class="input-custom">
-          <% ['Pegawai Tetap', 'Pegawai Kontrak', 'Magang / Intern', 'Pensiun'].forEach(st => { %>
-          <option value="<%= st %>" <%= employee.careerData?.status_pegawai === st ? 'selected' : '' %>><%= st %></option>
-          <% }) %>
-        </select>
-      </div>
-      <div class="space-y-1.5">
-        <label class="label-custom">Tanggal Mulai Bergabung <span class="text-rose-500">*</span></label>
-        <input type="date" name="tanggal_mulai_bergabung" value="<%= employee.careerData?.tanggal_mulai_bergabung ? employee.careerData.tanggal_mulai_bergabung.toISOString().split('T')[0] : '' %>" required class="input-custom" />
-      </div>
+      <form id="form-karir" class="space-y-6">
+        <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
+          <div class="space-y-1.5">
+            <label class="label-custom">Jabatan Struktural <span class="text-rose-500">*</span></label>
+            <select name="positionId" required class="input-custom">
+              <% (positions || []).forEach(p => { %>
+              <option value="<%= p._id %>" <%= String(employee.careerData?.positionId) === String(p._id) ? 'selected' : '' %>><%= p.name %></option>
+              <% }) %>
+            </select>
+          </div>
+         <div class="space-y-1.5">
+            <label class="label-custom">Bidang Kerja <span class="text-rose-500">*</span></label>
+            <select id="select-bidang" name="bidangId" required class="input-custom">
+              <option value="" disabled <%= !employee.careerData?.bidangId ? 'selected' : '' %>>Pilih Bidang</option>
+              <% (bidang || []).forEach(b => { %>
+                <% 
+                  const currentBidangId = employee.careerData?.bidangId?._id || employee.careerData?.bidangId;
+                  const isSelected = String(currentBidangId) === String(b._id);
+                %>
+                <option value="<%= b._id %>" <%= isSelected ? 'selected' : '' %>><%= b.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="label-custom">Unit Kantor Penempatan <span class="text-rose-500">*</span></label>
+            <% const currentUnitId = employee.careerData?.unitId?._id || employee.careerData?.unitId || ''; %>
+            <select id="select-unit" name="unitId" required data-old="<%= currentUnitId %>" class="input-custom"></select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="label-custom">Status Kepegawaian Awal <span class="text-rose-500">*</span></label>
+            <select id="select-status" name="status_pegawai" required class="input-custom">
+              <% ['Pegawai Tetap', 'Pegawai Kontrak', 'Magang / Intern', 'Pensiun'].forEach(st => { %>
+              <option value="<%= st %>" <%= employee.careerData?.status_pegawai === st ? 'selected' : '' %>><%= st %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="label-custom">Tanggal Mulai Bergabung <span class="text-rose-500">*</span></label>
+            <input type="date" name="tanggal_mulai_bergabung" value="<%= employee.careerData?.tanggal_mulai_bergabung ? employee.careerData.tanggal_mulai_bergabung.toISOString().split('T')[0] : '' %>" required class="input-custom" />
+          </div>
 
-      <div class="space-y-1.5">
-        <label class="label-custom">Status Akun Pegawai <span class="text-rose-500">*</span></label>
-        <select name="status" required class="input-custom">
-          <% 
-            const currentStatus = employee.userId?.status || 'Active';
-          %>
-          <option value="Active" <%= currentStatus === 'Active' ? 'selected' : '' %>>Active / Aktif</option>
-          <option value="Inactive" <%= currentStatus === 'Inactive' ? 'selected' : '' %>>Inactive / Nonaktif</option>
-          <option value="Suspended" <%= currentStatus === 'Suspended' ? 'selected' : '' %>>Suspended / Ditangguhkan</option>
-        </select>
-      </div>
+          <div class="space-y-1.5">
+            <label class="label-custom">Status Akun Pegawai <span class="text-rose-500">*</span></label>
 
-      <div id="wrapper-kontrak" class="space-y-1.5 hidden md:col-span-2">
-        <label class="label-custom">Tanggal Berakhir Kontrak / Magang <span class="text-rose-500">*</span></label>
-        <input type="date" id="input-tanggal-kontrak" name="tanggal_berakhir_kontrak" value="<%= employee.careerData?.tanggal_berakhir_kontrak ? employee.careerData.tanggal_berakhir_kontrak.toISOString().split('T')[0] : '' %>" class="input-custom" />
-      </div>
+            <% const currentStatus = employee.userId?.status || 'Active'; %>
+
+            <select disabled class="input-custom opacity-70 bg-slate-50 cursor-not-allowed">
+              <option value="Active" <%= currentStatus === 'Active' ? 'selected' : '' %>>Active / Aktif</option>
+              <option value="Inactive" <%= currentStatus === 'Inactive' ? 'selected' : '' %>>Inactive / Nonaktif</option>
+              <option value="Suspended" <%= currentStatus === 'Suspended' ? 'selected' : '' %>>Suspended / Ditangguhkan</option>
+            </select>
+
+            <input type="hidden" name="status" value="<%= currentStatus %>">
+          </div>
+
+          <div id="wrapper-kontrak" class="space-y-1.5 hidden md:col-span-2">
+            <label class="label-custom">Tanggal Berakhir Kontrak / Magang <span class="text-rose-500">*</span></label>
+            <input type="date" id="input-tanggal-kontrak" name="tanggal_berakhir_kontrak" value="<%= employee.careerData?.tanggal_berakhir_kontrak ? employee.careerData.tanggal_berakhir_kontrak.toISOString().split('T')[0] : '' %>" class="input-custom" />
+          </div>
+        </div>
+        <div class="flex justify-end pt-4"><button type="submit" class="btn-primary">Perbarui Struktur & Karir</button></div>
+      </form>
     </div>
-    <div class="flex justify-end pt-4"><button type="submit" class="btn-primary">Perbarui Struktur & Karir</button></div>
-  </form>
-</div>
-    <div id="content-kontak" class="tab-content space-y-6 hidden">
+    <% } %>
+
+    <!-- Tampilkan kontak sebagai default jika isMandiri -->
+    <div id="content-kontak" class="tab-content space-y-6 <%= isMandiri ? '' : 'hidden' %>">
       <form id="form-kontak" class="space-y-6">
         <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
           <div class="space-y-1.5">
@@ -172,6 +193,7 @@
     <div id="content-dokumen" class="tab-content space-y-6 hidden">
       <form id="form-dokumen" class="space-y-6" enctype="multipart/form-data">
 
+        <% if (!isMandiri) { %>
         <div class="bg-slate-50/50 p-5 rounded-xl border border-slate-100 space-y-4">
           <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide mb-2">Dokumen Utama Karyawan</h4>
           <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
@@ -219,6 +241,7 @@
             </div>
           </div>
         </div>
+        <% } %>
 
         <div class="space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
@@ -256,6 +279,7 @@
       </form>
     </div>
 
+    <% if (!isMandiri) { %>
     <div id="content-pendidikan" class="tab-content space-y-6 hidden">
       <form id="form-pendidikan" class="space-y-6">
         <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
@@ -297,6 +321,7 @@
         <div class="flex justify-end pt-4"><button type="submit" class="btn-primary">Perbarui Akademis</button></div>
       </form>
     </div>
+    <% } %>
 
     <div id="content-keluarga" class="tab-content space-y-6 hidden">
       <form id="form-keluarga" class="space-y-6">
@@ -329,303 +354,323 @@
     </div>
 
     <div id="content-finansial" class="tab-content space-y-6 hidden">
-  <form id="form-finansial" class="space-y-6">
-    <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
-      <div class="space-y-1.5">
-        <label class="label-custom">Nama Bank</label>
-        <select name="nama_bank" class="input-custom">
-          <option value="">-- Pilih Bank --</option>
-          <% 
+      <form id="form-finansial" class="space-y-6">
+        <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
+          <div class="space-y-1.5">
+            <label class="label-custom">Nama Bank</label>
+            <select name="nama_bank" class="input-custom">
+              <option value="">-- Pilih Bank --</option>
+              <% 
             const daftarBank = [
-              "BCA", 
-              "Mandiri", 
-              "BRI", 
-              "BNI", 
-              "BSI (Bank Syariah Indonesia)", 
-              "CIMB Niaga", 
-              "Permata", 
-              "Danamon", 
-              "Tabungan Pensiunan Nasional (BTPN/Jenius)"
+              "BCA", "Mandiri", "BRI", "BNI", "BSI (Bank Syariah Indonesia)", 
+              "CIMB Niaga", "Permata", "Danamon", "Tabungan Pensiunan Nasional (BTPN/Jenius)"
             ]; 
           %>
-          <% daftarBank.forEach(bank => { %>
-          <option value="<%= bank %>" <%= employee.financialData?.nama_bank === bank ? 'selected' : '' %>>
-            <%= bank %>
-          </option>
-          <% }) %>
-        </select>
-      </div>
-      <div class="space-y-1.5"><label class="label-custom">Nomor Rekening</label><input name="nomor_rekening" type="text" value="<%= employee.financialData?.nomor_rekening || '' %>" class="input-custom" /></div>
-      <div class="space-y-1.5"><label class="label-custom">Nama Pemilik Rekening</label><input name="nama_pemilik_rekening" type="text" value="<%= employee.financialData?.nama_pemilik_rekening || '' %>" class="input-custom" /></div>
-      <div class="space-y-1.5"><label class="label-custom">Nomor NPWP</label><input name="npwp" type="text" value="<%= employee.financialData?.npwp || '' %>" class="input-custom" /></div>
-      <div class="space-y-1.5"><label class="label-custom">Nomor BPJS Ketenagakerjaan</label><input name="bpjstk" type="text" value="<%= employee.financialData?.bpjstk || '' %>" class="input-custom" /></div>
-      
-   <div class="space-y-1.5">
-  <label class="label-custom">Gaji Pokok (Rp) <span class="text-rose-500">*</span></label>
-  <input name="basicSalary" type="number" min="0" required placeholder="Contoh: 5000000" value="<%= employee.salaryDetail?.basicSalary || 0 %>" class="input-custom font-semibold text-slate-800" />
-</div>
-      <div class="space-y-1.5">
-        <label class="label-custom">Overtime Rate (per jam)</label>
-        <input name="overtimeRate" type="number" min="0" step="1000" value="<%= employee.financialData?.overtimeRate || 0 %>" class="input-custom" />
-      </div>
-    </div>
-    <div class="flex justify-end pt-4"><button type="submit" class="btn-primary">Perbarui Data Payroll</button></div>
-  </form>
-</div>
-</div>
-
-<style>
-  .label-custom {
-    display: block;
-    font-size: 11px;
-    font-weight: 500;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .input-custom {
-    width: 100%;
-    padding: 9px 12px;
-    font-size: 12px;
-    font-weight: 400;
-    color: #0f172a;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    background-color: #ffffff;
-    outline: none;
-    transition: all 0.15s ease-in-out;
-  }
-
-  .input-custom:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 1px #2563eb;
-  }
-
-  select.input-custom {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 12px;
-    padding-right: 32px;
-  }
-
-  .btn-primary {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #ffffff;
-    background-color: #2563eb;
-    padding: 10px 20px;
-    border-radius: 6px;
-    transition: all 0.15s;
-  }
-
-  .btn-primary:hover {
-    background-color: #1d4ed8;
-  }
-</style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const employeeId = "<%= employee._id %>";
-    const tabs = document.querySelectorAll(".tab-btn");
-    const contents = document.querySelectorAll(".tab-content");
-    const globalError = document.getElementById("global-error");
-
-    // --- INTERAKSI GANTI TAB ---
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        const target = tab.dataset.tab;
-        tabs.forEach(t => {
-          t.classList.remove("border-blue-600", "text-blue-600");
-          t.classList.add("border-transparent", "text-slate-500");
-        });
-        tab.classList.remove("border-transparent", "text-slate-500");
-        tab.classList.add("border-blue-600", "text-blue-600");
-        contents.forEach(c => c.id === `content-${target}` ? c.classList.remove("hidden") : c.classList.add("hidden"));
-      });
-    });
-
-    // --- DEPENDENSI BIDANG VS UNIT ---
-    const bidangSelect = document.getElementById("select-bidang");
-    const unitSelect = document.getElementById("select-unit");
-    const unitsData = JSON.parse(document.getElementById("units-data").dataset.json || '[]');
-
-    const filterUnits = (bidangId, selectedUnitId = "") => {
-      unitSelect.innerHTML = '<option value="" disabled selected>Pilih Unit Kantor</option>';
-      if (!bidangId) return;
-      unitsData.filter(u => String(u.bidangId) === String(bidangId)).forEach(u => {
-        const opt = document.createElement("option");
-        opt.value = u._id;
-        opt.textContent = u.name;
-        if (String(u._id) === String(selectedUnitId)) opt.selected = true;
-        unitSelect.appendChild(opt);
-      });
-    };
-    bidangSelect.addEventListener("change", (e) => filterUnits(e.target.value));
-    if (bidangSelect.value) filterUnits(bidangSelect.value, unitSelect.getAttribute("data-old"));
-
-    // --- KONDISIONAL KONTRAK & MAGANG ---
-    const statusSelect = document.getElementById("select-status");
-    const kontrakWrapper = document.getElementById("wrapper-kontrak");
-    const kontrakInput = document.getElementById("input-tanggal-kontrak");
-
-    const toggleKontrak = (val) => {
-      if (val === "Pegawai Kontrak" || val === "Magang / Intern") {
-        kontrakWrapper.classList.remove("hidden");
-        kontrakInput.setAttribute("required", "required");
-      } else {
-        kontrakWrapper.classList.add("hidden");
-        kontrakInput.removeAttribute("required");
-        kontrakInput.value = "";
-      }
-    };
-    statusSelect.addEventListener("change", (e) => toggleKontrak(e.target.value));
-    if (statusSelect.value) toggleKontrak(statusSelect.value);
-
-    // --- REPEATER FORM KELUARGA ---
-    const familyContainer = document.getElementById("family-container");
-    document.getElementById("btn-add-family").addEventListener("click", () => {
-      const idx = familyContainer.querySelectorAll(".family-row").length;
-      const html = `
-        <div class="family-row grid md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-lg relative border border-slate-100">
-          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Nama</label><input type="text" name="anggota_keluarga[${idx}][nama]" required class="input-custom bg-white"/></div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-slate-400 font-medium">Hubungan</label>
-            <select name="anggota_keluarga[${idx}][hubungan]" required class="input-custom bg-white">
-              <option value="Suami">Suami</option><option value="Istri">Istri</option><option value="Anak">Anak</option><option value="Orang Tua">Orang Tua</option><option value="Saudara Kandung">Saudara Kandung</option>
+              <% daftarBank.forEach(bank => { %>
+              <option value="<%= bank %>" <%= employee.financialData?.nama_bank === bank ? 'selected' : '' %>>
+                <%= bank %>
+              </option>
+              <% }) %>
             </select>
           </div>
-          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">NIK</label><input type="text" maxlength="16" name="anggota_keluarga[${idx}][nik]" class="input-custom bg-white"/></div>
-          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Pekerjaan</label><input type="text" name="anggota_keluarga[${idx}][pekerjaan]" class="input-custom bg-white"/></div>
-          <button type="button" class="btn-remove-family absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-sm font-bold">×</button>
-        </div>`;
-      familyContainer.insertAdjacentHTML('beforeend', html);
-    });
-    familyContainer.addEventListener("click", (e) => {
-      if (e.target.classList.contains("btn-remove-family")) e.target.closest(".family-row").remove();
-    });
+          <div class="space-y-1.5"><label class="label-custom">Nomor Rekening</label><input name="nomor_rekening" type="text" value="<%= employee.financialData?.nomor_rekening || '' %>" class="input-custom" /></div>
+          <div class="space-y-1.5"><label class="label-custom">Nama Pemilik Rekening</label><input name="nama_pemilik_rekening" type="text" value="<%= employee.financialData?.nama_pemilik_rekening || '' %>" class="input-custom" /></div>
+          <div class="space-y-1.5"><label class="label-custom">Nomor NPWP</label><input name="npwp" type="text" value="<%= employee.financialData?.npwp || '' %>" class="input-custom" /></div>
+          <div class="space-y-1.5"><label class="label-custom">Nomor BPJS Ketenagakerjaan</label><input name="bpjstk" type="text" value="<%= employee.financialData?.bpjstk || '' %>" class="input-custom" /></div>
 
-    // --- REPEATER FORM SERTIFIKAT ---
-    const certContainer = document.getElementById("cert-container");
-    document.getElementById("btn-add-cert").addEventListener("click", () => {
-      const idx = certContainer.querySelectorAll(".cert-row").length;
-      const html = `
-    <div class="cert-row grid md:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-lg relative border border-slate-100">
-      <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Nama Sertifikat</label><input type="text" name="sertifikat_kompetensi[${idx}][nama_sertifikat]" class="input-custom bg-white"/></div>
-      <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Penerbit / Lembaga</label><input type="text" name="sertifikat_kompetensi[${idx}][penerbit]" class="input-custom bg-white"/></div>
-      <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Nomor Sertifikat</label><input type="text" name="sertifikat_kompetensi[${idx}][nomor_sertifikat]" class="input-custom bg-white"/></div>
-      <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Tanggal Terbit</label><input type="date" name="sertifikat_kompetensi[${idx}][tanggal_terbit]" class="input-custom bg-white"/></div>
-      <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Tanggal Kadaluarsa</label><input type="date" name="sertifikat_kompetensi[${idx}][tanggal_kadaluarsa]" class="input-custom bg-white"/></div>
-      <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Upload File Sertifikat</label><input type="file" name="file_sertifikat_${idx}" class="input-custom bg-white text-xs"/></div>
-      <button type="button" class="btn-remove-cert absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-sm font-bold">×</button>
-    </div>`;
-      certContainer.insertAdjacentHTML('beforeend', html);
-    });
-    certContainer.addEventListener("click", (e) => {
-      if (e.target.classList.contains("btn-remove-cert")) e.target.closest(".cert-row").remove();
-    });
+          <% if (!isMandiri) { %>
+          <div class="space-y-1.5">
+            <label class="label-custom">Gaji Pokok (Rp) <span class="text-rose-500">*</span></label>
+            <input name="basicSalary" type="number" min="0" required placeholder="Contoh: 5000000" value="<%= employee.salaryDetail?.basicSalary || 0 %>" class="input-custom font-semibold text-slate-800" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="label-custom">Overtime Rate (per jam)</label>
+            <input name="overtimeRate" type="number" min="0" step="1000" value="<%= employee.financialData?.overtimeRate || 0 %>" class="input-custom" />
+          </div>
+          <% } %>
 
+        </div>
+        <div class="flex justify-end pt-4"><button type="submit" class="btn-primary">Perbarui Data Finansial</button></div>
+      </form>
+    </div>
+  </div>
 
-    // --- INTERSEPTOR AJAX FETCH API PER-FORM ---
-    const interceptForm = (formId, endpoint) => {
-      const form = document.getElementById(formId);
-      if (!form) return;
+  <style>
+    .label-custom {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    .input-custom {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background-color: #ffffff;
+      outline: none;
+      transition: all 0.15s ease-in-out;
+    }
 
-        // Sembunyikan global error bawaan (jika masih dipakai)
-        if (window.globalError) globalError.classList.add("hidden");
+    .input-custom:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px #2563eb;
+    }
 
-        let bodyData;
-        let headers = {};
+    select.input-custom {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 12px;
+      padding-right: 32px;
+    }
 
-        if (form.querySelector('input[type="file"]')) {
-          bodyData = new FormData(form);
-        } else {
-          const formData = new FormData(form);
-          const obj = {};
+    .btn-primary {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      background-color: #2563eb;
+      padding: 10px 20px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
 
-          formData.forEach((value, key) => {
-            if (key.includes('[')) {
-              const parts = key.split(/\[|\]/).filter(p => p !== '');
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+    }
+  </style>
 
-              if (parts.length === 3) {
-                const [arrName, idx, prop] = parts;
-                if (!obj[arrName]) obj[arrName] = [];
-                if (!obj[arrName][idx]) obj[arrName][idx] = {};
-                obj[arrName][idx][prop] = value;
-              } else if (parts.length === 2) {
-                const [arrName, innerKey] = parts;
-                if (isNaN(innerKey)) {
-                  if (!obj[arrName]) obj[arrName] = {};
-                  obj[arrName][innerKey] = value;
-                } else {
-                  if (!obj[arrName]) obj[arrName] = [];
-                  obj[arrName][innerKey] = value;
-                }
-              }
-            } else {
-              obj[key] = value;
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const employeeId = "<%= employee._id %>";
+      const tabs = document.querySelectorAll(".tab-btn");
+      const contents = document.querySelectorAll(".tab-content");
+      const globalError = document.getElementById("global-error");
+
+      // --- INTERAKSI GANTI TAB ---
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          const target = tab.dataset.tab;
+          tabs.forEach(t => {
+            t.classList.remove("border-blue-600", "text-blue-600");
+            t.classList.add("border-transparent", "text-slate-500");
+          });
+          tab.classList.remove("border-transparent", "text-slate-500");
+          tab.classList.add("border-blue-600", "text-blue-600");
+          contents.forEach(c => {
+            if(c) {
+              c.id === `content-${target}` ? c.classList.remove("hidden") : c.classList.add("hidden");
             }
           });
+        });
+      });
 
-          bodyData = JSON.stringify(obj);
-          headers["Content-Type"] = "application/json";
-        }
+      // --- DEPENDENSI BIDANG VS UNIT (Hanya jalan jika form karir ada) ---
+      const bidangSelect = document.getElementById("select-bidang");
+      const unitSelect = document.getElementById("select-unit");
+      const unitsDataEl = document.getElementById("units-data");
+      
+      if (bidangSelect && unitSelect && unitsDataEl) {
+        const unitsData = JSON.parse(unitsDataEl.dataset.json || '[]');
 
-        try {
-          const res = await fetch(`/api/employee/${employeeId}/${endpoint}`, {
-            method: "PUT",
-            headers: headers,
-            body: bodyData
+        const filterUnits = (bidangId, selectedUnitId = "") => {
+          const hasSelected = selectedUnitId ? true : false;
+          unitSelect.innerHTML = `<option value="" disabled ${!hasSelected ? 'selected' : ''}>Pilih Unit Kantor</option>`;
+          
+          if (!bidangId) return;
+
+          const filtered = unitsData.filter(u => String(u.bidangId) === String(bidangId));
+          
+          filtered.forEach(u => {
+            const opt = document.createElement("option");
+            opt.value = u._id;
+            opt.textContent = u.name;
+            
+            if (String(u._id) === String(selectedUnitId)) {
+              opt.selected = true;
+            }
+            unitSelect.appendChild(opt);
           });
+        };
 
-          const result = await res.json();
+        bidangSelect.addEventListener("change", (e) => filterUnits(e.target.value));
 
-          if (result.success) {
-            // 1. Ganti alert() dengan Toast Desain Baru
-            triggerGlobalToast({
-              title: "Berhasil",
-              message: result.message || "Data berhasil diperbarui.",
-              type: "success"
+        const selectedBidangOption = bidangSelect.querySelector('option[selected]');
+        const activeBidangId = selectedBidangOption ? selectedBidangOption.value : bidangSelect.value;
+        const activeUnitId = unitSelect.getAttribute("data-old");
+
+        if (activeBidangId) {
+          filterUnits(activeBidangId, activeUnitId);
+        }
+      }
+
+      // --- KONDISIONAL KONTRAK & MAGANG (Hanya jalan jika form karir ada) ---
+      const statusSelect = document.getElementById("select-status");
+      const kontrakWrapper = document.getElementById("wrapper-kontrak");
+      const kontrakInput = document.getElementById("input-tanggal-kontrak");
+
+      if (statusSelect && kontrakWrapper && kontrakInput) {
+        const toggleKontrak = (val) => {
+          if (val === "Pegawai Kontrak" || val === "Magang / Intern") {
+            kontrakWrapper.classList.remove("hidden");
+            kontrakInput.setAttribute("required", "required");
+          } else {
+            kontrakWrapper.classList.add("hidden");
+            kontrakInput.removeAttribute("required");
+            kontrakInput.value = "";
+          }
+        };
+        statusSelect.addEventListener("change", (e) => toggleKontrak(e.target.value));
+        if (statusSelect.value) toggleKontrak(statusSelect.value);
+      }
+
+      // --- REPEATER FORM KELUARGA ---
+      const familyContainer = document.getElementById("family-container");
+      if (familyContainer) {
+        document.getElementById("btn-add-family").addEventListener("click", () => {
+          const idx = familyContainer.querySelectorAll(".family-row").length;
+          const html = `
+          <div class="family-row grid md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-lg relative border border-slate-100">
+            <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Nama</label><input type="text" name="anggota_keluarga[${idx}][nama]" required class="input-custom bg-white"/></div>
+            <div class="space-y-1">
+              <label class="text-[10px] text-slate-400 font-medium">Hubungan</label>
+              <select name="anggota_keluarga[${idx}][hubungan]" required class="input-custom bg-white">
+                <option value="Suami">Suami</option><option value="Istri">Istri</option><option value="Anak">Anak</option><option value="Orang Tua">Orang Tua</option><option value="Saudara Kandung">Saudara Kandung</option>
+              </select>
+            </div>
+            <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">NIK</label><input type="text" maxlength="16" name="anggota_keluarga[${idx}][nik]" class="input-custom bg-white"/></div>
+            <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Pekerjaan</label><input type="text" name="anggota_keluarga[${idx}][pekerjaan]" class="input-custom bg-white"/></div>
+            <button type="button" class="btn-remove-family absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-sm font-bold">×</button>
+          </div>`;
+          familyContainer.insertAdjacentHTML('beforeend', html);
+        });
+        familyContainer.addEventListener("click", (e) => {
+          if (e.target.classList.contains("btn-remove-family")) e.target.closest(".family-row").remove();
+        });
+      }
+
+      // --- REPEATER FORM SERTIFIKAT ---
+      const certContainer = document.getElementById("cert-container");
+      if (certContainer) {
+        document.getElementById("btn-add-cert").addEventListener("click", () => {
+          const idx = certContainer.querySelectorAll(".cert-row").length;
+          const html = `
+        <div class="cert-row grid md:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-lg relative border border-slate-100">
+          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Nama Sertifikat</label><input type="text" name="sertifikat_kompetensi[${idx}][nama_sertifikat]" class="input-custom bg-white"/></div>
+          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Penerbit / Lembaga</label><input type="text" name="sertifikat_kompetensi[${idx}][penerbit]" class="input-custom bg-white"/></div>
+          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Nomor Sertifikat</label><input type="text" name="sertifikat_kompetensi[${idx}][nomor_sertifikat]" class="input-custom bg-white"/></div>
+          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Tanggal Terbit</label><input type="date" name="sertifikat_kompetensi[${idx}][tanggal_terbit]" class="input-custom bg-white"/></div>
+          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Tanggal Kadaluarsa</label><input type="date" name="sertifikat_kompetensi[${idx}][tanggal_kadaluarsa]" class="input-custom bg-white"/></div>
+          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-medium">Upload File Sertifikat</label><input type="file" name="file_sertifikat_${idx}" class="input-custom bg-white text-xs"/></div>
+          <button type="button" class="btn-remove-cert absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-sm font-bold">×</button>
+        </div>`;
+          certContainer.insertAdjacentHTML('beforeend', html);
+        });
+        certContainer.addEventListener("click", (e) => {
+          if (e.target.classList.contains("btn-remove-cert")) e.target.closest(".cert-row").remove();
+        });
+      }
+
+      // --- INTERSEPTOR AJAX FETCH API PER-FORM ---
+      const interceptForm = (formId, endpoint) => {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          if (window.globalError) globalError.classList.add("hidden");
+
+          let bodyData;
+          let headers = {};
+
+          if (form.querySelector('input[type="file"]')) {
+            bodyData = new FormData(form);
+          } else {
+            const formData = new FormData(form);
+            const obj = {};
+
+            formData.forEach((value, key) => {
+              if (key.includes('[')) {
+                const parts = key.split(/\[|\]/).filter(p => p !== '');
+
+                if (parts.length === 3) {
+                  const [arrName, idx, prop] = parts;
+                  if (!obj[arrName]) obj[arrName] = [];
+                  if (!obj[arrName][idx]) obj[arrName][idx] = {};
+                  obj[arrName][idx][prop] = value;
+                } else if (parts.length === 2) {
+                  const [arrName, innerKey] = parts;
+                  if (isNaN(innerKey)) {
+                    if (!obj[arrName]) obj[arrName] = {};
+                    obj[arrName][innerKey] = value;
+                  } else {
+                    if (!obj[arrName]) obj[arrName] = [];
+                    obj[arrName][innerKey] = value;
+                  }
+                }
+              } else {
+                obj[key] = value;
+              }
             });
 
-            // Berikan jeda 1.5 detik agar user bisa melihat toast animasi masuk sebelum halaman reload
-            setTimeout(() => {
-              window.location.reload();
-            }, 1500);
+            bodyData = JSON.stringify(obj);
+            headers["Content-Type"] = "application/json";
+          }
 
-          } else {
-            // 2. Tampilkan pesan gagal lewat Toast jika API mengembalikan success: false
+          try {
+            const res = await fetch(`/api/employee/${employeeId}/${endpoint}`, {
+              method: "PUT",
+              headers: headers,
+              body: bodyData
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+              triggerGlobalToast({
+                title: "Berhasil",
+                message: result.message || "Data berhasil diperbarui.",
+                type: "success"
+              });
+
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+
+            } else {
+              triggerGlobalToast({
+                title: "Gagal",
+                message: result.message || "Gagal memproses pembaruan data.",
+                type: "error"
+              });
+            }
+          } catch (err) {
+            console.error("Fetch Error:", err);
             triggerGlobalToast({
-              title: "Gagal",
-              message: result.message || "Gagal memproses pembaruan data.",
+              title: "Koneksi Terganggu",
+              message: "Tidak dapat terhubung ke server atau terjadi masalah sistem.",
               type: "error"
             });
           }
-        } catch (err) {
-          console.error("Fetch Error:", err);
-
-          // 3. Tampilkan pesan gangguan jaringan murni lewat Toast
-          triggerGlobalToast({
-            title: "Koneksi Terganggu",
-            message: "Tidak dapat terhubung ke server atau terjadi masalah sistem.",
-            type: "error"
-          });
-        }
-      });
-    };
-    interceptForm("form-pribadi", "pribadi");
-    interceptForm("form-karir", "karir");
-    interceptForm("form-kontak", "kontak");
-    interceptForm("form-dokumen", "dokumen");
-    interceptForm("form-pendidikan", "pendidikan");
-    interceptForm("form-keluarga", "keluarga");
-    interceptForm("form-finansial", "finansial");
-  });
-</script>
+        });
+      };
+      
+      interceptForm("form-pribadi", "pribadi");
+      interceptForm("form-karir", "karir");
+      interceptForm("form-kontak", "kontak");
+      interceptForm("form-dokumen", "dokumen");
+      interceptForm("form-pendidikan", "pendidikan");
+      interceptForm("form-keluarga", "keluarga");
+      interceptForm("form-finansial", "finansial");
+    });
+  </script>

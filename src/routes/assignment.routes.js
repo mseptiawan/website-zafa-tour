@@ -21,7 +21,8 @@ router.get(
     "DIREKTUR_UTAMA",
     "MANAGER_ADMINISTRASI",
     "MANAGER_HAJI_UMRAH",
-    "MANAGER_KEUANGAN"
+    "MANAGER_KEUANGAN",
+    "WAKIL_DIREKTUR"
   ),
   index
 );
@@ -35,6 +36,7 @@ router.post(
     "MANAGER_ADMINISTRASI",
     "MANAGER_HAJI_UMRAH",
     "MANAGER_KEUANGAN",
+    "WAKIL_DIREKTUR",
   ]),
   uploadFile.single("attachment"),
   create

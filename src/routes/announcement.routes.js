@@ -7,7 +7,6 @@ import { newForm, create, index, show, publish } from "../controllers/announceme
 
 const router = express.Router();
 
-// Semua route announcement butuh login
 router.use(authMiddleware);
 
 router.get("/", index);

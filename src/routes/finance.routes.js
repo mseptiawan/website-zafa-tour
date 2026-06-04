@@ -18,7 +18,6 @@ const router = express.Router();
  * FINANCE MODULE
  */
 
-// list finance trips
 router.get("/", roleMiddleware("MANAGER_KEUANGAN"), financeTripPage);
 router.get(
   "/history",
@@ -32,13 +31,10 @@ router.get(
   paymentHistoryDetail
 );
 
-// detail finance trip
 router.get("/:id", roleMiddleware("MANAGER_KEUANGAN"), financeTripDetail);
 
-// process payment
 router.post("/:id/process", roleMiddleware("MANAGER_KEUANGAN"), processPayment);
 
-// upload proof
 router.post(
   "/:id/upload-proof",
   roleMiddleware("MANAGER_KEUANGAN"),
@@ -46,7 +42,6 @@ router.post(
   uploadPaymentProof
 );
 
-// confirm payment
 router.post("/:id/confirm", roleMiddleware("MANAGER_KEUANGAN"), confirmPayment);
 
 export default router;
