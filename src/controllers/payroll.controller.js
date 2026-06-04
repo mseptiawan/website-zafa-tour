@@ -1,3 +1,5 @@
+import Employee from "../models/employee/Employee.model.js";
+import { getAttendanceSummary } from "../services/attendanceSummary.service.js";
 import * as payrollService from "../services/payroll.service.js";
 import Payroll from "../models/payroll/Payroll.model.js";
 import { runPayroll } from "../services/payrollRun.service.js";
@@ -164,5 +166,36 @@ export const saveEmployeeAllowances = async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+};
+
+export const getEmployeeAttendanceSummary = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Pegawai tidak ditemukan" });
+    }
+
+    // Set default target date untuk mengambil siklus absensi
+    const targetDate = new Date();
+    const currentDay = targetDate.getDate();
+
+    // Jika hari ini belum melewati tanggal 26, tarik data siklus bulan sebelumnya
+    if (currentDay <= 26) {
+      targetDate.setMonth(targetDate.getMonth() - 1);
+      targetDate.setDate(26);
+    }
+
+    const summary = await getAttendanceSummary(employee.userId, targetDate);
+
+    return res.status(200).json({
+      success: true,
+      totalDays: summary.totalDaysPresent,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };

@@ -62,7 +62,7 @@
               </div>
               <div class="text-right">
                 <span class="text-[10px] font-semibold text-slate-400 block uppercase tracking-wide">Periode</span>
-                <span class="text-[12px] font-bold text-blue-600">Juni 2026</span>
+                <span class="text-[12px] font-bold text-blue-600"><%= currentMonth %></span>
               </div>
             </div>
 
@@ -71,7 +71,7 @@
                 <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5 block">Gaji Pokok</label>
                 <div class="relative max-w-xs">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-slate-400">Rp</span>
-                  <input type="number" id="inputBasicSalary" oninput="calculatePayroll()" value="<%= employees[0]?.salaryDetail?.basicSalary || 0 %>" class="w-full bg-[#f2f2f7]/60 border-none rounded-xl px-3 py-2 pl-9 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                  <input type="number" id="inputBasicSalary" oninput="calculatePayroll()" value="<%= employees[0]?.salaryDetail?.basicSalary || 0 %>" class="w-full bg-[#f2f2f7]/60 border-none rounded-xl px-3 py-2 pl-9 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" readonly>
                 </div>
               </div>
 
@@ -80,13 +80,14 @@
                 
                 <div id="allowanceWrapper" class="space-y-2 rounded-xl border border-transparent">
                   <div id="overtimeContainer" class="space-y-2"></div>
+                  <div id="attendanceAllowanceContainer" class="space-y-2"></div>
                   <div id="allowanceContainer" class="space-y-2"></div>
                 </div>
 
                 <div class="mt-4 flex items-center gap-2 w-full max-w-md">
                   <select id="masterAllowanceSelect" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-600 focus:outline-none focus:border-blue-500 min-h-[38px]">
                     <option value="">-- Pilih Tunjangan --</option>
-                    <% components.filter(c => c.category === 'EARNING' && c.code !== 'TJ_LEMBUR').forEach(comp => { %>
+                    <% dropdownComponents.filter(c => c.category === 'EARNING' && c.name !== 'Tunjangan Konsumsi' ).forEach(comp => { %>
                     <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
                     <% }) %>
                   </select>
@@ -105,7 +106,7 @@
                 <div class="mt-4 flex items-center gap-2 w-full max-w-md">
                   <select id="masterDeductionSelect" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-600 focus:outline-none focus:border-rose-500 min-h-[38px]">
                     <option value="">-- Pilih Potongan --</option>
-                    <% components.filter(c => c.category === 'DEDUCTION').forEach(comp => { %>
+                    <% dropdownComponents.filter(c => c.category === 'DEDUCTION').forEach(comp => { %>
                     <option value="<%= comp.name %>" data-amount="<%= comp.defaultAmount %>"><%= comp.name %></option>
                     <% }) %>
                   </select>
@@ -150,20 +151,31 @@
 </div>
 
 <script>
+  // ==========================================
+  // 1. DEKLARASI VARIABEL GLOBAL
+  // ==========================================
   let overtimeSummary = {
     totalHours: 0,
     totalPay: 0
   };
 
-  // Memperbaiki manajemen deteksi background secara presisi
+  let attendanceSummary = {
+    totalDays: 0,
+    ratePerDay: 0, // Tarif nominal konsumsi/hari
+    totalPay: 0
+  };
+
+  // ==========================================
+  // 2. FUNGSI UTILITAS & PERHITUNGAN UI
+  // ==========================================
   function updateContainerBackgrounds() {
     const allowanceWrapper = document.getElementById('allowanceWrapper');
     const allowanceContainer = document.getElementById('allowanceContainer');
     const overtimeContainer = document.getElementById('overtimeContainer');
+    const attendanceAllowanceContainer = document.getElementById('attendanceAllowanceContainer');
 
-    if (allowanceWrapper && allowanceContainer && overtimeContainer) {
-      // Background aktif jika di dalam allowanceContainer atau overtimeContainer ada element ter-render
-      if (allowanceContainer.children.length > 0 || overtimeContainer.children.length > 0) {
+    if (allowanceWrapper && allowanceContainer && overtimeContainer && attendanceAllowanceContainer) {
+      if (allowanceContainer.children.length > 0 || overtimeContainer.children.length > 0 || attendanceAllowanceContainer.children.length > 0) {
         allowanceWrapper.className = "space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100";
       } else {
         allowanceWrapper.className = "space-y-2 rounded-xl border border-transparent";
@@ -187,6 +199,8 @@
 
       let allowances = 0;
       let earningsDetailHTML = '';
+      
+      // Hitung semua baris tunjangan (termasuk konsumsi yang di-generate otomatis)
       document.querySelectorAll('.allowance-row').forEach(row => {
         const nameInput = row.querySelector('input[type="text"]');
         const amountInput = row.querySelector('.amount-input-allowance');
@@ -199,6 +213,7 @@
         }
       });
 
+      // Hitung Lembur
       let overtime = 0;
       const previewOvertimeRow = document.getElementById('previewOvertimeRow');
       const previewOvertime = document.getElementById('previewOvertime');
@@ -213,6 +228,7 @@
         if (previewOvertimeRow) previewOvertimeRow.classList.add('hidden');
       }
 
+      // Hitung Potongan
       let deductions = 0;
       let deductionsDetailHTML = '';
       document.querySelectorAll('.deduction-row').forEach(row => {
@@ -227,8 +243,10 @@
         }
       });
 
+      // Kalkulasi Akhir
       const netPay = (basic + allowances + overtime) - deductions;
 
+      // Update Tampilan Preview
       if (document.getElementById('previewBasic')) document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
 
       const earnDetailBox = document.getElementById('detailEarningsContainer');
@@ -253,13 +271,32 @@
     }
   }
 
+  // ==========================================
+  // 3. FUNGSI FETCH & RENDER OVERTIME
+  // ==========================================
+  async function loadOvertime(idParam) {
+    try {
+      const res = await fetch(`/overtime/summary/${idParam}`);
+      const data = await res.json();
+
+      const hours = Number(data.totalHours || 0);
+      const pay = Number(data.totalPay || 0);
+
+      overtimeSummary = { totalHours: hours, totalPay: pay };
+    } catch (err) {
+      console.error("Gagal fetch lembur:", err);
+      overtimeSummary = { totalHours: 0, totalPay: 0 };
+    } finally {
+      renderOvertimeComponent();
+      calculatePayroll();
+    }
+  }
+
   function renderOvertimeComponent() {
     const container = document.getElementById('overtimeContainer');
     if (!container) return;
-
     container.innerHTML = '';
     
-    // Walaupun nilainya 0 jam, lembur otomatis tetap di-render agar sesuai requesemu
     container.innerHTML = `
       <div class="flex items-center gap-2 overtime-row animate-fadeIn">
         <input type="text" value="Lembur (${overtimeSummary.totalHours} jam)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly>
@@ -273,31 +310,71 @@
     updateContainerBackgrounds();
   }
 
-  async function loadOvertime(idParam) {
+  // ==========================================
+  // 4. FUNGSI FETCH & RENDER ATTENDANCE (KONSUMSI)
+  // ==========================================
+  async function loadAttendance(idParam) {
     try {
-      const res = await fetch(`/overtime/summary/${idParam}`);
+      const res = await fetch(`/payroll/attendance-summary/${idParam}`);
       const data = await res.json();
 
-      const hours = Number(data.totalHours || 0);
-      const pay = Number(data.totalPay || 0);
-
-      overtimeSummary = {
-        totalHours: hours,
-        totalPay: pay
-      };
-
+      if (data.success) {
+        attendanceSummary.totalDays = Number(data.totalDays || 0);
+        attendanceSummary.ratePerDay = 0; // Kembalikan ke 0 saat ganti pegawai
+        attendanceSummary.totalPay = 0;
+      }
     } catch (err) {
-      console.error("Gagal fetch lembur:", err);
-      overtimeSummary = {
-        totalHours: 0,
-        totalPay: 0
-      };
+      console.error("Gagal fetch attendance:", err);
+      attendanceSummary.totalDays = 0;
     } finally {
-      renderOvertimeComponent();
+      renderAttendanceComponent();
       calculatePayroll();
     }
   }
 
+  function renderAttendanceComponent() {
+    const container = document.getElementById('attendanceAllowanceContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    container.innerHTML = `
+      <div class="flex items-center gap-2 allowance-row animate-fadeIn">
+        <input type="text" value="Tunjangan Konsumsi (${attendanceSummary.totalDays} Hari)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly>
+        
+        <div class="w-28 relative" title="Ketik tarif per hari di sini">
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-400">/hr</span>
+          <input type="number" id="inputRateKonsumsi" placeholder="Tarif..." oninput="calculateAttendancePay()" class="w-full bg-blue-50/30 border border-blue-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-blue-700 text-right focus:outline-none focus:ring-2 focus:ring-blue-400/30 transition-all">
+        </div>
+
+        <div class="w-32 relative">
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
+          <input type="number" id="totalPayKonsumsi" value="0" class="amount-input-allowance w-full bg-slate-50 border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right outline-none cursor-not-allowed" readonly>
+        </div>
+        
+        <div class="w-8 h-8 flex items-center justify-center opacity-0 pointer-events-none"></div>
+      </div>
+    `;
+    updateContainerBackgrounds();
+  }
+
+  function calculateAttendancePay() {
+    const rateInput = document.getElementById('inputRateKonsumsi');
+    const totalOutput = document.getElementById('totalPayKonsumsi');
+    
+    if (rateInput && totalOutput) {
+      const rate = parseFloat(rateInput.value) || 0;
+      const total = attendanceSummary.totalDays * rate;
+      
+      totalOutput.value = total;
+      attendanceSummary.ratePerDay = rate;
+      attendanceSummary.totalPay = total;
+      calculatePayroll();
+    }
+  }
+
+  // ==========================================
+  // 5. FUNGSI TAMBAH KOMPONEN MANUAL
+  // ==========================================
   function addAllowanceField() {
     const select = document.getElementById('masterAllowanceSelect');
     if (!select || !select.value) return;
@@ -311,7 +388,7 @@
         <input type="text" value="${componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly>
         <div class="w-32 relative">
           <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-          <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none">
+          <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
         </div>
         <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
           <i class="fa-solid fa-trash-can text-[11px]"></i>
@@ -338,7 +415,7 @@
         <input type="text" value="${componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-700 focus:outline-none" readonly>
         <div class="w-32 relative">
           <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-          <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:border-blue-500">
+          <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-rose-500/20">
         </div>
         <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
           <i class="fa-solid fa-trash-can text-[11px]"></i>
@@ -351,11 +428,13 @@
     calculatePayroll();
   }
 
+  // ==========================================
+  // 6. FUNGSI UTAMA: SWITCH EMPLOYEE & SUBMIT
+  // ==========================================
   function switchEmployee(el, name, nik, pos, basicSalary) {
-    overtimeSummary = {
-      totalHours: 0,
-      totalPay: 0
-    };
+    // Reset Data Lintas
+    overtimeSummary = { totalHours: 0, totalPay: 0 };
+    attendanceSummary = { totalDays: 0, ratePerDay: 25000, totalPay: 0 };
 
     document.getElementById('empNameTitle').innerText = name;
     document.getElementById('empMetaTitle').innerText = 'NIK: ' + nik + ' • ' + pos;
@@ -364,14 +443,17 @@
     const allowanceContainer = document.getElementById('allowanceContainer');
     const deductionContainer = document.getElementById('deductionContainer');
     const overtimeContainer = document.getElementById('overtimeContainer');
+    const attendanceAllowanceContainer = document.getElementById('attendanceAllowanceContainer');
 
     allowanceContainer.innerHTML = '';
     deductionContainer.innerHTML = '';
     if (overtimeContainer) overtimeContainer.innerHTML = '';
+    if (attendanceAllowanceContainer) attendanceAllowanceContainer.innerHTML = '';
 
     document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
     el.classList.add('bg-blue-50/40');
 
+    // Load allowances dari attribut
     const allowances = JSON.parse(el.getAttribute('data-allowances') || '[]');
     if (allowances && allowances.length > 0) {
       allowances.forEach(item => {
@@ -380,7 +462,7 @@
             <input type="text" value="${item.componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly>
             <div class="w-32 relative">
               <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-              <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none">
+              <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
             </div>
             <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
               <i class="fa-solid fa-trash-can text-[11px]"></i>
@@ -391,6 +473,7 @@
       });
     }
 
+    // Load deductions dari attribut
     const deductions = JSON.parse(el.getAttribute('data-deductions') || '[]');
     if (deductions && deductions.length > 0) {
       deductions.forEach(item => {
@@ -399,7 +482,7 @@
             <input type="text" value="${item.componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-700 focus:outline-none" readonly>
             <div class="w-32 relative">
               <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-              <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:border-blue-500">
+              <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-rose-500/20">
             </div>
             <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
               <i class="fa-solid fa-trash-can text-[11px]"></i>
@@ -410,9 +493,10 @@
       });
     }
 
-    // Panggil ulang loadOvertime & update visual background wrapper
+    // Fetch Ulang API Dinamis
     updateContainerBackgrounds();
     loadOvertime(el.getAttribute('data-id'));
+    loadAttendance(el.getAttribute('data-id'));
   }
 
   function submitPayrollData() {
@@ -431,6 +515,7 @@
     const employeeId = activeCard.getAttribute('data-id');
     const combinedComponents = [];
 
+    // Kumpulkan Earning
     document.querySelectorAll('.allowance-row').forEach(row => {
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-allowance');
@@ -442,6 +527,7 @@
       }
     });
 
+    // Kumpulkan Deduction
     document.querySelectorAll('.deduction-row').forEach(row => {
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-deduction');
@@ -473,6 +559,12 @@
       });
   }
 
+  // ==========================================
+  // 7. EVENT LISTENERS
+  // ==========================================
+  // ==========================================
+  // 7. EVENT LISTENERS
+  // ==========================================
   document.getElementById('searchEmployeeInput').addEventListener('input', function(e) {
     const query = e.target.value.toLowerCase().trim();
     document.querySelectorAll('.employee-card').forEach(card => {
@@ -483,8 +575,21 @@
   });
 
   document.addEventListener('DOMContentLoaded', () => {
-    const firstCard = document.querySelector('.employee-card');
-    if (firstCard) firstCard.click();
+    // 1. Cek apakah ada pegawai yang sedang diingat di memori browser
+    const savedId = sessionStorage.getItem('selectedEmployeeId');
+    let targetCard = null;
+
+    if (savedId) {
+      targetCard = document.querySelector(`.employee-card[data-id="${savedId}"]`);
+    }
+
+    // 2. Kalau gak ada memori atau baru buka pertama kali, pilih yang paling atas
+    if (!targetCard) {
+      targetCard = document.querySelector('.employee-card');
+    }
+
+    // 3. Eksekusi klik otomatisnya
+    if (targetCard) targetCard.click();
     else calculatePayroll();
   });
 </script>

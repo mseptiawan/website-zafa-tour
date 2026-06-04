@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import component from "./src/database/seeders/salaryComponent.seeder.js"; // Sesuaikan path ke file seeder Anda
+import component from "./src/database/seeders/attendance.seeder.js"; // Sesuaikan path ke file seeder Anda
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ const run = async () => {
     await mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI);
     console.log("✅ Database Terkoneksi.");
 
-    console.log("🚀 Memulai proses seeding komponen gaji...");
+    console.log("🚀 Memulai proses seeding absensi...");
     await component();
     console.log("🎉 Seeding selesai dengan sukses!");
 

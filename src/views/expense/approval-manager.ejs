@@ -53,16 +53,20 @@
                     <td class="px-6 py-4 font-bold text-slate-900"><%= e.employeeId?.fullName || 'Pegawai' %></td>
                     <td class="px-6 py-4 font-semibold text-slate-800"><%= e.title %></td>
                     <td class="px-6 py-4 text-slate-500 whitespace-nowrap"><%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
-                    <td class="px-6 py-4 text-center">
-                      <% if (!e.proofFile) { %>
-                        <span class="text-[11px] text-slate-400 italic">Tanpa Nota (Self Dec)</span>
-                      <% } else { %>
-                        <a href="/uploads/files/<%= e.proofFile %>" target="_blank" download class="group inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 hover:text-blue-600 transition-colors">
-                          <i class="fa-solid fa-arrow-down-to-bracket text-slate-400 group-hover:text-blue-600 transition-colors"></i>
-                          Unduh Nota
-                        </a>
-                      <% } %>
-                    </td>
+                   <td class="px-6 py-4 text-center">
+  <% if (!e.proofFile) { %>
+    <!-- KETIKA DI-HOVER, ALASAN AKAN MUNCUL OTOMATIS -->
+    <span class="inline-flex px-2 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/50 cursor-help" 
+          title="Alasan: <%= e.noReceiptReason || 'Tidak ada alasan yang diinput.' %>">
+      Self Declaration ℹ️
+  </span>
+  <% } else { %>
+    <a href="/uploads/files/<%= e.proofFile %>" target="_blank" download class="group inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 hover:text-blue-600 transition-colors">
+      <i class="fa-solid fa-arrow-down-to-bracket text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+      Unduh Nota
+    </a>
+  <% } %>
+</td>
                     <td class="px-6 py-4 text-right font-bold text-slate-900 tabular-nums">Rp <%= e.amount.toLocaleString('id-ID') %></td>
                     <td class="px-6 py-4 text-center">
                       <div class="flex items-center justify-center gap-2">
