@@ -30,45 +30,51 @@
 
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-      
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Total Hadir</span>
-          <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= analytics.totalHadir %> <span class="text-xs font-medium text-slate-500">Hari</span>
-          </span>
-        </div>
-        <div class="text-emerald-500 mt-0.5">
-          <i class="fa-solid fa-user-check text-xs"></i>
-        </div>
-      </div>
-
-      <div class="bg-rose-50/50 border border-rose-200/70 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
-          <span class="text-[10px] font-bold text-rose-600 block uppercase tracking-wider">Terlambat</span>
-          <span class="text-xl font-bold text-rose-700 mt-1 block tabular-nums">
-            <%= analytics.totalLateDays %> <span class="text-xs font-medium text-rose-600">Kali</span>
-          </span>
-        </div>
-        <div class="text-rose-500 mt-0.5">
-          <i class="fa-solid fa-user-clock text-xs"></i>
-        </div>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Akumulasi Menit</span>
-          <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-            <%= analytics.totalLateMinutes %> <span class="text-xs font-medium text-slate-500">Menit</span>
-          </span>
-        </div>
-        <div class="text-amber-500 mt-0.5">
-          <i class="fa-solid fa-stopwatch text-xs"></i>
-        </div>
-      </div>
-
+   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+  
+  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
+        <%= isAdmin && !isPersonalView ? 'Total Hadir (Perusahaan)' : 'Total Hadir Saya' %>
+      </span>
+      <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
+        <%= analytics.totalHadir %> <span class="text-xs font-medium text-slate-500">Hari</span>
+      </span>
     </div>
+    <div class="text-emerald-500 mt-0.5">
+      <i class="fa-solid fa-user-check text-xs"></i>
+    </div>
+  </div>
+
+  <div class="bg-rose-50/50 border border-rose-200/70 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-rose-600 block uppercase tracking-wider">
+        <%= isAdmin && !isPersonalView ? 'Total Terlambat (Karyawan)' : 'Terlambat Saya' %>
+      </span>
+      <span class="text-xl font-bold text-rose-700 mt-1 block tabular-nums">
+        <%= analytics.totalLateDays %> <span class="text-xs font-medium text-rose-600">Kali</span>
+      </span>
+    </div>
+    <div class="text-rose-500 mt-0.5">
+      <i class="fa-solid fa-user-clock text-xs"></i>
+    </div>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
+        <%= isAdmin && !isPersonalView ? 'Akumulasi Menit (Karyawan)' : 'Akumulasi Menit Saya' %>
+      </span>
+      <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
+        <%= analytics.totalLateMinutes %> <span class="text-xs font-medium text-slate-500">Menit</span>
+      </span>
+    </div>
+    <div class="text-amber-500 mt-0.5">
+      <i class="fa-solid fa-stopwatch text-xs"></i>
+    </div>
+  </div>
+
+</div>
 
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
@@ -100,9 +106,9 @@
               <tr class="hover:bg-slate-50/50 transition">
                 
                 <% if (isAdmin && !isPersonalView) { %>
-                  <td class="px-6 py-4 font-semibold text-slate-800">
-                    <%= row.userId?.username || '-' %>
-                  </td>
+             <td class="px-6 py-4 font-semibold text-slate-800">
+  <%= row.fullName %>
+</td>
                 <% } %>
                 
                 <td class="px-6 py-4 text-slate-500 font-medium">

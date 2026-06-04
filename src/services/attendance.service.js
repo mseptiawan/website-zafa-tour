@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Attendance from "../models/Attendance.model.js";
+import Employee from "../models/employee/Employee.model.js";
 import CompanySetting from "../models/CompanySetting.model.js";
 import User from "../models/basic/User.model.js";
 import AppError from "../utils/AppError.js";
@@ -82,17 +84,20 @@ export const processCheckIn = async (userId, body, file) => {
 
   const now = new Date();
 
-  const [configHour, configMin] = company.entryTimeLimit.split(":").map(Number);
+  const [hour, minute] = company.entryTimeLimit.split(":").map(Number);
+
   const timeLimit = new Date();
-  timeLimit.setHours(configHour, configMin, 0, 0);
+  timeLimit.setHours(hour, minute, 0, 0);
+
+  const graceLimit = new Date(timeLimit.getTime() + (company.gracePeriodMinutes || 0) * 60000);
 
   let status = "HADIR";
   let lateDuration = 0;
-  if (now > timeLimit) {
-    status = "TELAT";
-    lateDuration = Math.ceil((now - timeLimit) / (1000 * 60));
-  }
 
+  if (now > graceLimit) {
+    status = "TELAT";
+    lateDuration = Math.ceil((now - graceLimit) / 60000);
+  }
   return Attendance.create({
     userId,
     checkIn: now,
@@ -158,6 +163,7 @@ export const processCheckOut = async (userId, body, file) => {
  * @param {Object} query       – { startDate, endDate, view }
  * @returns {{ listAttendance, analytics, isAdmin, isPersonalView, filters }}
  */
+
 export const getAttendanceHistory = async (sessionUser, query) => {
   const { startDate, endDate, view } = query;
 
@@ -176,11 +182,12 @@ export const getAttendanceHistory = async (sessionUser, query) => {
   const end = endDate ? new Date(endDate) : new Date();
   end.setHours(23, 59, 59, 999);
 
+  // Query dasar untuk memfilter list tabel utama
   const matchQuery = {
     checkIn: { $gte: start, $lte: end },
-    ...(isAdmin && !isPersonalView ? {} : { userId: sessionUser._id }),
+    ...(isAdmin && !isPersonalView ? {} : { userId: new mongoose.Types.ObjectId(sessionUser._id) }),
   };
-
+  // [PROSES LOGIKA FIND DAN POPULATE LIST ATTENDANCE TETAP SAMA SEPERTI SEBELUMNYA...]
   let listAttendance = await Attendance.find(matchQuery)
     .populate("userId", "username")
     .sort({ checkIn: -1 });
@@ -199,7 +206,7 @@ export const getAttendanceHistory = async (sessionUser, query) => {
 
     const missingAttendanceData = missingUsers.map((emp) => ({
       _id: `missing-${emp._id}`,
-      userId: { username: emp.username },
+      userId: { _id: emp._id, username: emp.username },
       checkIn: null,
       checkOut: null,
       createdAt: start,
@@ -212,14 +219,63 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     listAttendance = [...missingAttendanceData, ...listAttendance];
   }
 
+  const employees = await Employee.find({}).select("userId fullName");
+  const employeeMap = new Map();
+  employees.forEach((emp) => {
+    if (emp.userId) {
+      employeeMap.set(emp.userId.toString(), emp.fullName);
+    }
+  });
+
+  listAttendance = listAttendance.map((item) => {
+    const userIdStr = item.userId?._id?.toString() || item.userId?.toString();
+    const fullName = employeeMap.get(userIdStr) || item.userId?.username || "-";
+    return { ...item, fullName };
+  });
+  console.log("DEBUG MATCH QUERY:", JSON.stringify(matchQuery, null, 2));
+
+  // Jika sedang di tab "Semua Karyawan" (isAdmin && !isPersonalView), card akan menghitung total perusahaan.
+  // Jika sedang di tab "Absensi Saya", card hanya akan menghitung milik sessionUser._id yang sedang login.
   const summary = await Attendance.aggregate([
     { $match: matchQuery },
     {
       $group: {
         _id: null,
-        totalLateMinutes: { $sum: "$lateDuration" },
-        totalLateDays: { $sum: { $cond: [{ $eq: ["$status", "TELAT"] }, 1, 0] } },
-        totalHadir: { $sum: { $cond: [{ $eq: ["$status", "HADIR"] }, 1, 0] } },
+        // Akumulasi total menit terlambat (Konversi ke int jika tersimpan sebagai string)
+        totalLateMinutes: {
+          $sum: { $convert: { input: "$lateDuration", to: "int", onError: 0, onNull: 0 } },
+        },
+        // Hitung berapa kali terlambat (Jika lateDuration > 0, otomatis dianggap 1 kali telat)
+        totalLateDays: {
+          $sum: {
+            $cond: [
+              {
+                $gt: [
+                  { $convert: { input: "$lateDuration", to: "int", onError: 0, onNull: 0 } },
+                  0,
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+        // Hitung total hadir (Semua dokumen yang masuk filter kecuali status BELUM ABSEN atau ALFA)
+        totalHadir: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $ne: ["$status", "BELUM ABSEN"] },
+                  { $ne: ["$status", "ALFA"] },
+                  { $ne: ["$status", ""] },
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
       },
     },
   ]);
@@ -235,7 +291,6 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     },
   };
 };
-
 /**
  * Perbarui lokasi & konfigurasi kantor.
  * @param {Object} body – { lat, lng, radiusMeter, entryTimeLimit, name }
