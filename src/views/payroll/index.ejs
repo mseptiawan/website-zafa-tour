@@ -12,9 +12,9 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-      <div class="lg:col-span-4 bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+      <div class="lg:col-span-3 bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
         <div class="p-3 bg-white border-b border-slate-100">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -51,9 +51,9 @@
         </div>
       </div>
 
-      <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+     <div class="lg:col-span-9 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-        <div class="md:col-span-2 space-y-6">
+        <div class="lg:col-span-7 space-y-6">
           <div class="bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
               <div>
@@ -122,25 +122,48 @@
             </div>
           </div>
         </div>
-
-        <div class="space-y-6">
-          <div class="bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] p-4 sticky top-6">
-            <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-4">Ringkasan</h3>
-            <div class="space-y-3 text-[12px]">
-              <div class="flex justify-between"><span>Gaji Pokok</span> <span id="previewBasic" class="font-semibold">Rp 0</span></div>
-
-              <div id="previewOvertimeRow" class="flex justify-between text-blue-600 hidden">
-                <span id="previewOvertimeLabel">Uang Lembur</span>
-                <span id="previewOvertime" class="font-semibold">+Rp 0</span>
+<div class="lg:col-span-5 space-y-6">
+          <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.03)] p-6 sticky top-6 w-full">
+            
+            <h3 class="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-3">
+              Ringkasan Gaji
+            </h3>
+            
+            <div class="space-y-3.5 text-[12px]">
+              
+              <div class="flex justify-between items-center text-slate-600">
+                <span>Gaji Pokok</span> 
+                <span id="previewBasic" class="font-medium text-slate-800 tracking-tight">Rp 0</span>
               </div>
 
-              <div id="detailEarningsContainer" class="space-y-1 pl-2 border-l border-emerald-100 hidden text-slate-500 text-[11px]"></div>
-              <div class="flex justify-between text-emerald-600"><span>Tunjangan</span> <span id="previewEarnings" class="font-semibold">+Rp 0</span></div>
+              <div id="previewOvertimeRow" class="flex justify-between items-center text-blue-600 hidden">
+                <span id="previewOvertimeLabel">Uang Lembur</span>
+                <span id="previewOvertime" class="font-medium tracking-tight">+Rp 0</span>
+              </div>
 
-              <div id="detailDeductionsContainer" class="space-y-1 pl-2 border-l border-rose-100 hidden text-slate-500 text-[11px]"></div>
-              <div class="flex justify-between text-rose-600"><span>Potongan</span> <span id="previewDeductions" class="font-semibold">-Rp 0</span></div>
+              <div class="flex flex-col gap-1.5">
+                <div class="flex justify-between items-center text-emerald-600">
+                  <span>Total Tunjangan</span> 
+                  <span id="previewEarnings" class="font-medium tracking-tight">+Rp 0</span>
+                </div>
+                <div id="detailEarningsContainer" class="hidden pl-3 border-l-2 border-emerald-100 space-y-1.5 mt-0.5 w-full"></div>
+              </div>
 
-              <div class="border-t pt-3 font-bold flex justify-between"><span>Net Pay</span> <span id="previewNetPay">Rp 0</span></div>
+              <div class="flex flex-col gap-1.5">
+                <div class="flex justify-between items-center text-rose-500">
+                  <span>Total Potongan</span> 
+                  <span id="previewDeductions" class="font-medium tracking-tight">-Rp 0</span>
+                </div>
+                <div id="detailDeductionsContainer" class="hidden pl-3 border-l-2 border-rose-100 space-y-1.5 mt-0.5 w-full"></div>
+              </div>
+
+              <div class="pt-4 mt-2 border-t border-slate-200/80">
+                <div class="flex justify-between items-end">
+                  <span class="font-medium text-slate-600 text-[13px]">Take Home Pay</span> 
+                  <span id="previewNetPay" class="font-bold text-blue-600 text-[15px] tracking-tight">Rp 0</span>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -208,7 +231,13 @@
           const val = parseFloat(amountInput.value) || 0;
           allowances += val;
           if (val > 0) {
-            earningsDetailHTML += `<div class="flex justify-between"><span>• ${nameInput.value}</span> <span>Rp ${val.toLocaleString('id-ID')}</span></div>`;
+            // Template HTML Rapi & Presisi
+            earningsDetailHTML += `
+              <div class="flex justify-between items-center text-[11px] text-slate-500">
+                <span>${nameInput.value}</span>
+                <span class="font-medium text-slate-600">Rp ${val.toLocaleString('id-ID')}</span>
+              </div>
+            `;
           }
         }
       });
@@ -219,13 +248,19 @@
       const previewOvertime = document.getElementById('previewOvertime');
       const previewOvertimeLabel = document.getElementById('previewOvertimeLabel');
 
-      if (overtimeSummary && overtimeSummary.totalPay > 0) {
+      if (typeof overtimeSummary !== 'undefined' && overtimeSummary && overtimeSummary.totalPay > 0) {
         overtime = overtimeSummary.totalPay;
         if (previewOvertimeLabel) previewOvertimeLabel.innerText = `Uang Lembur (${overtimeSummary.totalHours} jam)`;
         if (previewOvertime) previewOvertime.innerText = '+Rp ' + overtime.toLocaleString('id-ID');
-        if (previewOvertimeRow) previewOvertimeRow.classList.remove('hidden');
+        if (previewOvertimeRow) {
+          previewOvertimeRow.classList.remove('hidden');
+          previewOvertimeRow.classList.add('flex');
+        }
       } else {
-        if (previewOvertimeRow) previewOvertimeRow.classList.add('hidden');
+        if (previewOvertimeRow) {
+          previewOvertimeRow.classList.add('hidden');
+          previewOvertimeRow.classList.remove('flex');
+        }
       }
 
       // Hitung Potongan
@@ -238,7 +273,13 @@
           const val = parseFloat(amountInput.value) || 0;
           deductions += val;
           if (val > 0) {
-            deductionsDetailHTML += `<div class="flex justify-between"><span>• ${nameInput.value}</span> <span>Rp ${val.toLocaleString('id-ID')}</span></div>`;
+            // Template HTML Rapi & Presisi
+            deductionsDetailHTML += `
+              <div class="flex justify-between items-center text-[11px] text-slate-500">
+                <span>${nameInput.value}</span>
+                <span class="font-medium text-slate-600">Rp ${val.toLocaleString('id-ID')}</span>
+              </div>
+            `;
           }
         }
       });
@@ -252,16 +293,22 @@
       const earnDetailBox = document.getElementById('detailEarningsContainer');
       if (earnDetailBox) {
         earnDetailBox.innerHTML = earningsDetailHTML;
-        if (earningsDetailHTML) earnDetailBox.classList.remove('hidden');
-        else earnDetailBox.classList.add('hidden');
+        if (earningsDetailHTML !== '') {
+          earnDetailBox.classList.remove('hidden');
+        } else {
+          earnDetailBox.classList.add('hidden');
+        }
       }
       if (document.getElementById('previewEarnings')) document.getElementById('previewEarnings').innerText = '+Rp ' + allowances.toLocaleString('id-ID');
 
       const dedDetailBox = document.getElementById('detailDeductionsContainer');
       if (dedDetailBox) {
         dedDetailBox.innerHTML = deductionsDetailHTML;
-        if (deductionsDetailHTML) dedDetailBox.classList.remove('hidden');
-        else dedDetailBox.classList.add('hidden');
+        if (deductionsDetailHTML !== '') {
+          dedDetailBox.classList.remove('hidden');
+        } else {
+          dedDetailBox.classList.add('hidden');
+        }
       }
       if (document.getElementById('previewDeductions')) document.getElementById('previewDeductions').innerText = '-Rp ' + deductions.toLocaleString('id-ID');
 
@@ -270,7 +317,6 @@
       console.error(err);
     }
   }
-
   // ==========================================
   // 3. FUNGSI FETCH & RENDER OVERTIME
   // ==========================================
@@ -320,57 +366,80 @@
 
       if (data.success) {
         attendanceSummary.totalDays = Number(data.totalDays || 0);
-        attendanceSummary.ratePerDay = 0; // Kembalikan ke 0 saat ganti pegawai
-        attendanceSummary.totalPay = 0;
+        
+        // Cari tahu apakah user ini punya simpanan Tunjangan Konsumsi lama di card-nya
+        const activeCard = document.querySelector(`.employee-card[data-id="${idParam}"]`);
+        const savedAllowances = JSON.parse(activeCard.getAttribute('data-allowances') || '[]');
+        const existingKonsumsi = savedAllowances.find(a => a.componentName === 'Tunjangan Konsumsi');
+
+        if (existingKonsumsi && attendanceSummary.totalDays > 0) {
+          // Balikkan kalkulasi untuk mencari tarif per hari yang pernah disimpan
+          attendanceSummary.totalPay = existingKonsumsi.amount;
+          attendanceSummary.ratePerDay = existingKonsumsi.amount / attendanceSummary.totalDays;
+        } else {
+          attendanceSummary.ratePerDay = 0; 
+          attendanceSummary.totalPay = 0;
+        }
       }
     } catch (err) {
       console.error("Gagal fetch attendance:", err);
       attendanceSummary.totalDays = 0;
     } finally {
       renderAttendanceComponent();
+      
+      // Jika ada data lama, suntik balik angkanya ke kotak input tarif di UI
+      const rateInput = document.getElementById('inputRateKonsumsi');
+      const totalOutput = document.getElementById('totalPayKonsumsi');
+      if (rateInput && totalOutput && attendanceSummary.ratePerDay > 0) {
+        rateInput.value = attendanceSummary.ratePerDay;
+        totalOutput.value = attendanceSummary.totalPay;
+      }
+
       calculatePayroll();
     }
   }
-
-  function renderAttendanceComponent() {
+function renderAttendanceComponent() {
     const container = document.getElementById('attendanceAllowanceContainer');
     if (!container) return;
-    container.innerHTML = '';
     
-    container.innerHTML = `
+    if (attendanceSummary.totalDays === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+   container.innerHTML = `
       <div class="flex items-center gap-2 allowance-row animate-fadeIn">
         <input type="text" value="Tunjangan Konsumsi (${attendanceSummary.totalDays} Hari)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly>
         
-        <div class="w-28 relative" title="Ketik tarif per hari di sini">
-          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-400">/hr</span>
-          <input type="number" id="inputRateKonsumsi" placeholder="Tarif..." oninput="calculateAttendancePay()" class="w-full bg-blue-50/30 border border-blue-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-blue-700 text-right focus:outline-none focus:ring-2 focus:ring-blue-400/30 transition-all">
-        </div>
-
         <div class="w-32 relative">
           <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-          <input type="number" id="totalPayKonsumsi" value="0" class="amount-input-allowance w-full bg-slate-50 border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right outline-none cursor-not-allowed" readonly>
+          <input type="number" id="inputRateKonsumsi" placeholder="0" oninput="calculateAttendancePay()" class="w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
         </div>
+
+        <input type="hidden" id="totalPayKonsumsi" value="0" class="amount-input-allowance">
         
         <div class="w-8 h-8 flex items-center justify-center opacity-0 pointer-events-none"></div>
       </div>
     `;
     updateContainerBackgrounds();
   }
-
-  function calculateAttendancePay() {
-    const rateInput = document.getElementById('inputRateKonsumsi');
-    const totalOutput = document.getElementById('totalPayKonsumsi');
+function calculateAttendancePay() {
+  const rateInput = document.getElementById('inputRateKonsumsi');
+  const totalHiddenInput = document.getElementById('totalPayKonsumsi');
+  
+  if (rateInput && totalHiddenInput) {
+    const rate = parseFloat(rateInput.value) || 0;
     
-    if (rateInput && totalOutput) {
-      const rate = parseFloat(rateInput.value) || 0;
-      const total = attendanceSummary.totalDays * rate;
-      
-      totalOutput.value = total;
-      attendanceSummary.ratePerDay = rate;
-      attendanceSummary.totalPay = total;
-      calculatePayroll();
-    }
+    // Kalikan tarif dengan jumlah kehadiran
+    const total = rate * attendanceSummary.totalDays;
+    
+    // Simpan ke input hidden agar dibaca oleh fungsi Save / Database
+    totalHiddenInput.value = total;
+    
+    // Update total Grand Total Gaji
+    calculatePayroll();
   }
+}
 
   // ==========================================
   // 5. FUNGSI TAMBAH KOMPONEN MANUAL
@@ -454,9 +523,13 @@
     el.classList.add('bg-blue-50/40');
 
     // Load allowances dari attribut
+  // Load allowances dari attribut
     const allowances = JSON.parse(el.getAttribute('data-allowances') || '[]');
     if (allowances && allowances.length > 0) {
       allowances.forEach(item => {
+        // JANGAN RENDER KONSUMSI DI SINI, KARENA SUDAH DI-HANDLE OLEH CONTAINER OTOMATIS DI ATASNYA
+        if (item.componentName === 'Tunjangan Konsumsi') return;
+
         const template = `
           <div class="flex items-center gap-2 allowance-row animate-fadeIn">
             <input type="text" value="${item.componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly>
@@ -515,19 +588,27 @@
     const employeeId = activeCard.getAttribute('data-id');
     const combinedComponents = [];
 
-    // Kumpulkan Earning
+    // Kumpulkan Earning (Tunjangan)
     document.querySelectorAll('.allowance-row').forEach(row => {
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-allowance');
+      
       if (nameInput && amountInput) {
+        let nameValue = nameInput.value;
+        
+        // Jembatan pembersih nama komponen otomatis agar cocok dengan DB Master
+        if (nameValue.includes('Tunjangan Konsumsi')) {
+          nameValue = 'Tunjangan Konsumsi';
+        }
+
         combinedComponents.push({
-          componentName: nameInput.value,
+          componentName: nameValue,
           amount: parseFloat(amountInput.value) || 0
         });
       }
     });
 
-    // Kumpulkan Deduction
+    // Kumpulkan Deduction (Potongan)
     document.querySelectorAll('.deduction-row').forEach(row => {
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-deduction');
@@ -559,11 +640,8 @@
       });
   }
 
-  // ==========================================
-  // 7. EVENT LISTENERS
-  // ==========================================
-  // ==========================================
-  // 7. EVENT LISTENERS
+// ==========================================
+  // 7. EVENT LISTENERS & FIX REFRESH MEMORY
   // ==========================================
   document.getElementById('searchEmployeeInput').addEventListener('input', function(e) {
     const query = e.target.value.toLowerCase().trim();
@@ -573,23 +651,44 @@
       card.style.display = (name.includes(query) || meta.includes(query)) ? 'flex' : 'none';
     });
   });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1. Cek apakah ada pegawai yang sedang diingat di memori browser
-    const savedId = sessionStorage.getItem('selectedEmployeeId');
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Ambil ID pegawai terakhir dari memori browser
+    const savedEmployeeId = sessionStorage.getItem('selectedEmployeeId');
     let targetCard = null;
 
-    if (savedId) {
-      targetCard = document.querySelector(`.employee-card[data-id="${savedId}"]`);
+    console.log("ID Pegawai yang tersimpan di memori:", savedEmployeeId); // Untuk cek di inspect f12
+
+    // 2. Cari card yang sesuai dengan memori
+    if (savedEmployeeId) {
+      // Kita pakai querySelector khusus untuk mencari exact match dari data-id string
+      targetCard = document.querySelector(`.employee-card[data-id="${savedEmployeeId}"]`);
     }
 
-    // 2. Kalau gak ada memori atau baru buka pertama kali, pilih yang paling atas
-    if (!targetCard) {
-      targetCard = document.querySelector('.employee-card');
-    }
+    // 3. Eksekusi penguncian pegawai setelah refresh
+    if (targetCard) {
+      console.log("Ketemu card pegawai lama! Memulai auto-click...");
+      
+      // FIX UTAMA: Beri sedikit delay (100ms) agar semua fungsi switchEmployee siap dieksekusi browser
+      setTimeout(() => {
+        // Hapus background biru di card pertama bawaan EJS agar tidak double highlight
+        document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
+        
+        // Jalankan fungsi klik bawaan DOM element
+        targetCard.dispatchEvent(new Event('click', { bubbles: true }));
+        
+        // Scroll otomatis ke posisi pegawai tersebut jika posisinya di bawah
+        targetCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }, 100);
 
-    // 3. Eksekusi klik otomatisnya
-    if (targetCard) targetCard.click();
-    else calculatePayroll();
+    } else {
+      console.log("Tidak ada memori lama / pegawai tidak ketemu, klik pegawai pertama.");
+      // Jika baru pertama kali buka atau tidak ketemu, klik card pertama yang ada di layar
+      const firstCard = document.querySelector('.employee-card');
+      if (firstCard) {
+        firstCard.click();
+      } else {
+        calculatePayroll();
+      }
+    }
   });
 </script>

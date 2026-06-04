@@ -18,7 +18,7 @@ import assignmentSeeder from "./assignment.seeder.js";
 import announcementSeeder from "./announcement.seeder.js";
 import salesVisitSeeder from "./salesVisit.seeder.js";
 import businessTripSeeder from "./businessTrip.seeder.js";
-// import overtimeSeeder from "./overtime.seeder.js";
+import overtimeSeeder from "./overtime.seeder.js";
 import expenseCategorySeeder from "./expenseCategory.seeder.js";
 import expenseSeeder from "./expense.seeder.js";
 
@@ -46,7 +46,7 @@ const seeders = [
   announcementSeeder,
   salesVisitSeeder,
   businessTripSeeder,
-  // overtimeSeeder,
+  overtimeSeeder,
   expenseCategorySeeder,
   expenseSeeder,
 
