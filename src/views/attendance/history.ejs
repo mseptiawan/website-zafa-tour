@@ -1,7 +1,7 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-6xl mx-auto">
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+  <div class="max-w-6xl mx-auto space-y-8">
 
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
@@ -10,72 +10,73 @@
         description: 'Pantau data kehadiran, jam kerja, dan kedisiplinan Anda secara berkala.' 
     }) %>
 
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <!-- 1. STATS GRID DI ATAS NAVIGASI TAB -->
+    <%- include('../partials/_stats-grid', {
+      items: [
+        { 
+          label: isAdmin && !isPersonalView ? 'Total Hadir (Perusahaan)' : 'Total Hadir Saya', 
+          value: analytics.totalHadir, 
+          unit: 'Hari', 
+          icon: 'fa-solid fa-user-check', 
+          bgClass: 'bg-white border-slate-200/60', 
+          iconBoxClass: 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+        },
+        { 
+          label: isAdmin && !isPersonalView ? 'Total Terlambat (Karyawan)' : 'Terlambat Saya', 
+          value: analytics.totalLateDays, 
+          unit: 'Kali', 
+          icon: 'fa-solid fa-user-clock', 
+          bgClass: 'bg-rose-50/50 border-rose-200/70', 
+          labelClass: 'text-rose-600', 
+          valueClass: 'text-rose-700', 
+          unitClass: 'text-rose-600',
+          iconBoxClass: 'bg-white text-rose-500 border-rose-100' 
+        },
+        { 
+          label: isAdmin && !isPersonalView ? 'Akumulasi Menit (Karyawan)' : 'Akumulasi Menit Saya', 
+          value: analytics.totalLateMinutes, 
+          unit: 'Menit', 
+          icon: 'fa-solid fa-stopwatch', 
+          bgClass: 'bg-white border-slate-200/60', 
+          iconBoxClass: 'bg-amber-50 text-amber-600 border-amber-100' 
+        }
+      ]
+    }) %>
+
+    <!-- 2. NAVIGASI TAB (Gaya Identik _tab-nav) & FILTER TANGGAL -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       
       <% if (isAdmin) { %>
-        <div class="flex bg-slate-200/50 p-1 rounded-xl">
-          <a href="/attendance/history" class="px-4 py-1.5 rounded-lg text-xs font-medium transition-all <%= !isPersonalView ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' %>">Semua Karyawan</a>
-          <a href="/attendance/history?view=personal" class="px-4 py-1.5 rounded-lg text-xs font-medium transition-all <%= isPersonalView ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' %>">Absensi Saya</a>
+        <!-- Tab Navigasi Tiruan untuk SSR Server -->
+        <div class="bg-white rounded-2xl border border-slate-200/60 p-1.5 shadow-xs inline-flex items-center gap-1">
+          <a href="/attendance/history" 
+             class="px-5 py-2.5 text-xs rounded-xl transition-all duration-200 outline-none cursor-pointer <%= !isPersonalView ? 'font-bold bg-blue-600 text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50' %>">
+            Semua Karyawan
+          </a>
+          <a href="/attendance/history?view=personal" 
+             class="px-5 py-2.5 text-xs rounded-xl transition-all duration-200 outline-none cursor-pointer <%= isPersonalView ? 'font-bold bg-blue-600 text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50' %>">
+            Absensi Saya
+          </a>
         </div>
       <% } else { %>
-        <div></div> <% } %>
+        <div></div> 
+      <% } %>
 
       <form action="/attendance/history" method="GET" class="flex items-center gap-2">
-        <% if (isAdmin && isPersonalView) { %><input type="hidden" name="view" value="personal"><% } %>
+        <% if (isAdmin && isPersonalView) { %>
+          <input type="hidden" name="view" value="personal">
+        <% } %>
         <input type="date" name="startDate" value="<%= filters.startDate %>" class="px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:ring-2 focus:ring-slate-100 outline-none transition-all">
         <span class="text-slate-400 text-sm">-</span>
         <input type="date" name="endDate" value="<%= filters.endDate %>" class="px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:ring-2 focus:ring-slate-100 outline-none transition-all">
-        <button type="submit" class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 active:scale-95 transition-all">Filter</button>
+        <button type="submit" class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 active:scale-95 transition-all shadow-sm">
+          Filter
+        </button>
       </form>
 
     </div>
 
-   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-  
-  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-    <div>
-      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
-        <%= isAdmin && !isPersonalView ? 'Total Hadir (Perusahaan)' : 'Total Hadir Saya' %>
-      </span>
-      <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-        <%= analytics.totalHadir %> <span class="text-xs font-medium text-slate-500">Hari</span>
-      </span>
-    </div>
-    <div class="text-emerald-500 mt-0.5">
-      <i class="fa-solid fa-user-check text-xs"></i>
-    </div>
-  </div>
-
-  <div class="bg-rose-50/50 border border-rose-200/70 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-    <div>
-      <span class="text-[10px] font-bold text-rose-600 block uppercase tracking-wider">
-        <%= isAdmin && !isPersonalView ? 'Total Terlambat (Karyawan)' : 'Terlambat Saya' %>
-      </span>
-      <span class="text-xl font-bold text-rose-700 mt-1 block tabular-nums">
-        <%= analytics.totalLateDays %> <span class="text-xs font-medium text-rose-600">Kali</span>
-      </span>
-    </div>
-    <div class="text-rose-500 mt-0.5">
-      <i class="fa-solid fa-user-clock text-xs"></i>
-    </div>
-  </div>
-
-  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start justify-between shadow-xs">
-    <div>
-      <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
-        <%= isAdmin && !isPersonalView ? 'Akumulasi Menit (Karyawan)' : 'Akumulasi Menit Saya' %>
-      </span>
-      <span class="text-xl font-bold text-slate-800 mt-1 block tabular-nums">
-        <%= analytics.totalLateMinutes %> <span class="text-xs font-medium text-slate-500">Menit</span>
-      </span>
-    </div>
-    <div class="text-amber-500 mt-0.5">
-      <i class="fa-solid fa-stopwatch text-xs"></i>
-    </div>
-  </div>
-
-</div>
-
+    <!-- 3. TABEL DATA -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm min-w-[1000px]">
@@ -106,9 +107,9 @@
               <tr class="hover:bg-slate-50/50 transition">
                 
                 <% if (isAdmin && !isPersonalView) { %>
-             <td class="px-6 py-4 font-semibold text-slate-800">
-  <%= row.fullName %>
-</td>
+                  <td class="px-6 py-4 font-semibold text-slate-800">
+                    <%= row.fullName %>
+                  </td>
                 <% } %>
                 
                 <td class="px-6 py-4 text-slate-500 font-medium">
