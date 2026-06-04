@@ -35,12 +35,26 @@ export const showApplyOvertime = (req, res) => {
 };
 
 export const applyOvertime = async (req, res) => {
+  // 1. HITUNG ULANG DATELIMIT DI SINI UNTUK JAGA-JAGA JIKA FORM ERROR
+  const today = new Date();
+  const backLimit = new Date();
+  backLimit.setDate(today.getDate() - 7);
+  const period = getPayrollPeriod(today); // Pastikan getPayrollPeriod tetap di-import
+  const minAllowed = new Date(Math.max(backLimit.getTime(), period.start.getTime()));
+  const formatDate = (d) => d.toISOString().split("T")[0];
+
+  const currentDateLimit = {
+    min: formatDate(minAllowed),
+    max: formatDate(today),
+  };
+
   try {
     if (req.validationErrors) {
       return res.render("overtime/new", {
         title: "Catat Lembur",
         errors: req.validationErrors,
         old: req.body,
+        dateLimit: currentDateLimit, // <--- TAMBAHKAN DI SINI
       });
     }
 
@@ -60,6 +74,7 @@ export const applyOvertime = async (req, res) => {
         general: err.message,
       },
       old: req.body,
+      dateLimit: currentDateLimit, // <--- TAMBAHKAN DI SINI JUGA
     });
   }
 };
