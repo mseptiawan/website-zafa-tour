@@ -6,47 +6,106 @@ import { runPayroll } from "../services/payrollRun.service.js";
 import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
+import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
+import LoanPayment from "../models/loan/loanPayment.model.js";
 
 export const renderPayrollPage = async (req, res) => {
   try {
     const { employees, components, savedAllowances } = await payrollService.getPayrollData();
 
-    // FILTER LOGIC: Saring komponen untuk dropdown manual input
-    // Menghapus TJ_LEMBUR atau komponen otomatis lain dari daftar pilihan
     const dropdownComponents = components.filter(
       (comp) => comp.sourceType !== "DYNAMIC" && comp.isLocked !== true
     );
 
     const now = new Date();
+    const currentMonthRaw = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-    const currentMonth = now.toLocaleString("id-ID", {
-      month: "long",
-      year: "numeric",
-    });
+    const periodsFromDB = await Payroll.distinct("periodMonth");
+    const periodsSet = new Set(periodsFromDB);
+    periodsSet.add(currentMonthRaw);
 
-    const payrollPeriod = {
-      month: now.getMonth() + 1,
-      year: now.getFullYear(),
-    };
+    const availablePeriods = Array.from(periodsSet).sort((a, b) => b.localeCompare(a));
 
     res.render("payroll/index", {
       title: "Manajemen Payroll",
       user: req.user,
       employees,
-      components, // Tetap dikirim jika dibutuhkan untuk kalkulasi total keseluruhan
-      dropdownComponents, // Gunakan variabel ini khusus untuk me-render <option> di dropdown
+      components,
+      dropdownComponents,
       savedAllowances,
-      currentMonth,
-      payrollPeriod,
+      availablePeriods,
+      currentPeriod: currentMonthRaw,
     });
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
+
+export const calculateEmployeePayroll = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+    const period = req.query.period; // Contoh nilai: "2026-05"
+
+    // 1. Dapatkan format string bulan berjalan saat ini (Contoh: "2026-06")
+    const now = new Date();
+    const currentMonthRaw = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    // 2. Cek apakah periode yang di-request adalah masa lalu
+    // Perbandingan string "2026-05" < "2026-06" akan menghasilkan TRUE
+    const isPastPeriod = period < currentMonthRaw;
+
+    // 3. Cek data slip gaji yang sudah tersimpan di database
+    const existingPayroll = await Payroll.findOne({ employeeId, periodMonth: period });
+
+    // KONDISI A: Slip gaji masa lalu (atau bulan ini) sudah pernah di-generate & disimpan
+    if (existingPayroll) {
+      return res.json({
+        isHistory: true, // Kunci UI
+        data: existingPayroll,
+      });
+    }
+
+    // KONDISI B: Tidak ada data slip gaji, TAPI yang dipilih adalah bulan MASA LALU
+    if (isPastPeriod) {
+      return res.json({
+        isHistory: true, // Paksa Kunci UI!
+        data: {
+          basicSalary: 0,
+          allowances: [],
+          deductions: [],
+          loanDeduction: null,
+          overtime: { hours: 0, amount: 0 },
+        },
+      });
+    }
+
+    // KONDISI C: MODE INPUT AKTIF (Bulan Berjalan & Belum Ada Slip Gaji Tersimpan)
+    const salaryDoc = await EmployeeSalary.findOne({ employeeId });
+    const basicSalary = salaryDoc ? salaryDoc.basicSalary : 0;
+
+    const activeLoanPayment = await LoanPayment.findOne({
+      employeeId,
+      periodMonth: period,
+      isPaid: false,
+    });
+
+    return res.json({
+      isHistory: false, // Buka Kunci UI, tampilkan tombol Simpan
+      data: {
+        basicSalary,
+        loanDeduction: activeLoanPayment
+          ? { loanPaymentId: activeLoanPayment._id, amount: activeLoanPayment.amount }
+          : null,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const savePayroll = async (req, res) => {
   try {
     const { employeeId, date } = req.body;
-
     if (!employeeId) {
       return res.status(400).json({
         success: false,
@@ -56,9 +115,7 @@ export const savePayroll = async (req, res) => {
 
     const periodDate = new Date(date || Date.now());
     const period = getPayrollPeriod(periodDate);
-
     const overtime = await getOvertimeSummary(employeeId, periodDate);
-
     const payrollData = await payrollService.buildPayroll({
       employeeId,
       date: periodDate,
@@ -90,7 +147,6 @@ export const savePayroll = async (req, res) => {
 export const saveEmployeeAllowances = async (req, res) => {
   try {
     const { employeeId, allowances } = req.body;
-
     if (!employeeId) {
       return res.status(400).json({
         success: false,
@@ -99,7 +155,6 @@ export const saveEmployeeAllowances = async (req, res) => {
     }
 
     const masterComponents = await SalaryComponent.find({ isActive: true });
-
     const componentMap = {};
     const categoryMap = {};
 
@@ -161,7 +216,6 @@ export const saveEmployeeAllowances = async (req, res) => {
       message: "Seluruh komponen payroll berhasil diperbarui!",
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -172,30 +226,23 @@ export const saveEmployeeAllowances = async (req, res) => {
 export const getEmployeeAttendanceSummary = async (req, res) => {
   try {
     const { employeeId } = req.params;
+    const periodParam = req.query.period;
 
     const employee = await Employee.findById(employeeId);
     if (!employee) {
       return res.status(404).json({ success: false, message: "Pegawai tidak ditemukan" });
     }
 
-    // Set default target date untuk mengambil siklus absensi
-    const targetDate = new Date();
-    const currentDay = targetDate.getDate();
-
-    // Jika hari ini belum melewati tanggal 26, tarik data siklus bulan sebelumnya
-    if (currentDay <= 26) {
-      targetDate.setMonth(targetDate.getMonth() - 1);
-      targetDate.setDate(26);
-    }
+    const targetDate = periodParam ? new Date(`${periodParam}-01`) : new Date();
 
     const summary = await getAttendanceSummary(employee.userId, targetDate);
 
     return res.status(200).json({
       success: true,
       totalDays: summary.totalDaysPresent,
+      periodInfo: summary.period,
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

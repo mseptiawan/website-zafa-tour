@@ -51,10 +51,10 @@ const payrollSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    paymentStatus: {
+    status: {
       type: String,
-      enum: ["PENDING", "PAID"],
-      default: "PENDING",
+      enum: ["DRAFT", "CLOSED", "PAID"],
+      default: "DRAFT",
     },
     paidAt: {
       type: Date,

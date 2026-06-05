@@ -1,27 +1,22 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import seedOvertimeComponet from "./src/database/seeders/overtime.seeder.js";
+import completePayrollHistorySeeder from "./src/database/seeders/completeLoan.seeder.js";
 
 dotenv.config();
+const MONGO_URI = process.env.MONGODB_URI;
 
-const run = async () => {
+async function startSeeding() {
   try {
-    console.log("⏳ Menghubungkan ke MongoDB...");
-    await mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI);
-    console.log("✅ Database Terkoneksi.");
-
-    console.log("🚀 Memulai proses seeding data lembur (overtime)...");
-    // Jalankan fungsi seeder yang di-import
-    await seedOvertimeComponet();
-    console.log("🎉 Seeding lembur selesai dengan sukses!");
-
+    console.log("🔌 Menghubungkan ke MongoDB...");
+    await mongoose.connect(MONGO_URI);
+    await completePayrollHistorySeeder();
     await mongoose.disconnect();
-    console.log("🔌 Koneksi database diputuskan dengan aman.");
     process.exit(0);
-  } catch (error) {
-    console.error("❌ Terjadi kesalahan saat menjalankan seeder:", error);
+  } catch (err) {
+    try {
+      await mongoose.disconnect();
+    } catch (e) {}
     process.exit(1);
   }
-};
-
-run();
+}
+startSeeding();

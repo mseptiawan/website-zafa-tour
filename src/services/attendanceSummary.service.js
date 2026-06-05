@@ -10,7 +10,6 @@ export const getAttendanceSummary = async (userId, date = new Date()) => {
       $gte: period.start,
       $lte: period.end,
     },
-    // Sesuaikan dengan enum di skema: Hitung hari jika pegawai HADIR atau TELAT
     status: { $in: ["HADIR", "TELAT"] },
   });
 

@@ -3,17 +3,25 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
   <div class="mx-auto max-w-7xl space-y-6">
 
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/60 rounded-2xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.02)] mb-6">
       <div>
-        <a href="#" class="inline-flex items-center gap-1 text-[13px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
-          <i class="fa-solid fa-chevron-left text-[11px]"></i> Kembali
-        </a>
-        <h1 class="text-xl font-bold tracking-tight text-slate-900 mt-1">Komponen Payroll</h1>
+        <h1 class="text-lg font-bold tracking-tight text-slate-900">Komponen Payroll</h1>
+        <p class="text-[11px] text-slate-400 mt-0.5">Kelola kalkulasi gaji, tunjangan, dan potongan karyawan aktif</p>
+      </div>
+      <div class="flex items-center gap-3 min-w-[240px]">
+        <div class="w-full relative">
+          <i class="fa-solid fa-calendar-days absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+          <select id="filterPeriod" class="w-full bg-slate-50 border border-slate-200 text-[13px] font-semibold text-slate-700 rounded-xl pl-9 pr-8 py-2.5 appearance-none cursor-pointer focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all">
+            <% availablePeriods.forEach(p => { %>
+              <option value="<%= p %>" <%= p === currentPeriod ? 'selected' : '' %>><%= p %></option>
+            <% }) %>
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i>
+        </div>
       </div>
     </div>
 
    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
       <div class="lg:col-span-3 bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
         <div class="p-3 bg-white border-b border-slate-100">
           <div class="relative">
@@ -39,8 +47,7 @@
                 amount: allow.amount
               }));
           %>
-
-          <div onclick="switchEmployee(this, '<%= emp.fullName %>', '<%= emp.employeeIdNumber %>', '<%= emp.positionId?.name || 'STAFF' %>', '<%= emp.salaryDetail?.basicSalary || 0 %>')" data-id="<%= emp._id %>" data-nik="<%= emp.employeeIdNumber %>" data-allowances='<%= JSON.stringify(empAllowances) %>' data-deductions='<%= JSON.stringify(empDeductions) %>' class="employee-card p-4 <%= index === 0 ? 'bg-blue-50/40' : 'hover:bg-slate-50' %> flex items-center justify-between cursor-pointer transition-colors">
+          <div onclick="switchEmployee(this)" data-id="<%= emp._id %>" data-name="<%= emp.fullName %>" data-nik="<%= emp.employeeIdNumber %>" data-pos="<%= emp.positionId?.name || 'STAFF' %>" data-allowances='<%= JSON.stringify(empAllowances) %>' data-deductions='<%= JSON.stringify(empDeductions) %>' class="employee-card p-4 <%= index === 0 ? 'bg-blue-50/40' : 'hover:bg-slate-50' %> flex items-center justify-between cursor-pointer transition-colors">
             <div>
               <h4 class="text-[13px] font-<%= index === 0 ? 'semibold text-blue-900' : 'medium text-slate-800' %>"><%= emp.fullName %></h4>
               <p class="text-[11px] text-slate-500 mt-0.5">NIK: <%= emp.employeeIdNumber %> • <%= emp.positionId?.name || 'Staff' %></p>
@@ -52,7 +59,6 @@
       </div>
 
      <div class="lg:col-span-9 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
         <div class="lg:col-span-7 space-y-6">
           <div class="bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
@@ -62,7 +68,7 @@
               </div>
               <div class="text-right">
                 <span class="text-[10px] font-semibold text-slate-400 block uppercase tracking-wide">Periode</span>
-                <span class="text-[12px] font-bold text-blue-600"><%= currentMonth %></span>
+                <span id="labelPeriodSummary" class="text-[12px] font-bold text-blue-600"><%= currentPeriod %></span>
               </div>
             </div>
 
@@ -71,7 +77,7 @@
                 <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5 block">Gaji Pokok</label>
                 <div class="relative max-w-xs">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-slate-400">Rp</span>
-                  <input type="number" id="inputBasicSalary" oninput="calculatePayroll()" value="<%= employees[0]?.salaryDetail?.basicSalary || 0 %>" class="w-full bg-[#f2f2f7]/60 border-none rounded-xl px-3 py-2 pl-9 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" readonly>
+                  <input type="text" id="inputBasicSalary" oninput="formatRupiahInput(this)" value="0" class="w-full bg-[#f2f2f7]/60 border-none rounded-xl px-3 py-2 pl-9 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" readonly>
                 </div>
               </div>
 
@@ -116,31 +122,27 @@
             </div>
 
             <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button type="button" onclick="submitPayrollData()" class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors hover:bg-blue-700">
+              <button id="btnSavePayroll" type="button" onclick="submitPayrollData()" class="px-5 py-2 bg-blue-600 text-white text-[13px] font-semibold rounded-xl transition-colors hover:bg-blue-700">
                 Simpan Perubahan
               </button>
             </div>
           </div>
         </div>
-<div class="lg:col-span-5 space-y-6">
+
+        <div class="lg:col-span-5 space-y-6">
           <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.03)] p-6 sticky top-6 w-full">
-            
             <h3 class="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-3">
               Ringkasan Gaji
             </h3>
-            
             <div class="space-y-3.5 text-[12px]">
-              
               <div class="flex justify-between items-center text-slate-600">
                 <span>Gaji Pokok</span> 
                 <span id="previewBasic" class="font-medium text-slate-800 tracking-tight">Rp 0</span>
               </div>
-
               <div id="previewOvertimeRow" class="flex justify-between items-center text-blue-600 hidden">
                 <span id="previewOvertimeLabel">Uang Lembur</span>
                 <span id="previewOvertime" class="font-medium tracking-tight">+Rp 0</span>
               </div>
-
               <div class="flex flex-col gap-1.5">
                 <div class="flex justify-between items-center text-emerald-600">
                   <span>Total Tunjangan</span> 
@@ -148,7 +150,6 @@
                 </div>
                 <div id="detailEarningsContainer" class="hidden pl-3 border-l-2 border-emerald-100 space-y-1.5 mt-0.5 w-full"></div>
               </div>
-
               <div class="flex flex-col gap-1.5">
                 <div class="flex justify-between items-center text-rose-500">
                   <span>Total Potongan</span> 
@@ -156,14 +157,12 @@
                 </div>
                 <div id="detailDeductionsContainer" class="hidden pl-3 border-l-2 border-rose-100 space-y-1.5 mt-0.5 w-full"></div>
               </div>
-
               <div class="pt-4 mt-2 border-t border-slate-200/80">
                 <div class="flex justify-between items-end">
                   <span class="font-medium text-slate-600 text-[13px]">Take Home Pay</span> 
                   <span id="previewNetPay" class="font-bold text-blue-600 text-[15px] tracking-tight">Rp 0</span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -174,29 +173,38 @@
 </div>
 
 <script>
-  // ==========================================
-  // 1. DEKLARASI VARIABEL GLOBAL
-  // ==========================================
-  let overtimeSummary = {
-    totalHours: 0,
-    totalPay: 0
-  };
+  let overtimeSummary = { totalHours: 0, totalPay: 0 };
+  let attendanceSummary = { totalDays: 0, ratePerDay: 0, totalPay: 0 };
+  let isReadOnlyMode = false;
 
-  let attendanceSummary = {
-    totalDays: 0,
-    ratePerDay: 0, // Tarif nominal konsumsi/hari
-    totalPay: 0
-  };
+  function parseIDR(str) {
+    if (!str) return 0;
+    return parseFloat(str.toString().replace(/\./g, '')) || 0;
+  }
 
-  // ==========================================
-  // 2. FUNGSI UTILITAS & PERHITUNGAN UI
-  // ==========================================
+  function formatIDRValue(number) {
+    return new Intl.NumberFormat('id-ID').format(number || 0);
+  }
+
+  function formatRupiahInput(el) {
+    let angka = el.value.replace(/[^,\d]/g, '').toString();
+    let split = angka.split(',');
+    let sisa = split[0].length % 3;
+    let rupiah = split[0].substr(0, sisa);
+    let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if (ribuan) {
+      let separator = sisa ? '.' : '';
+      rupiah += separator + ribuan.join('.');
+    }
+    el.value = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+    calculatePayroll();
+  }
+
   function updateContainerBackgrounds() {
     const allowanceWrapper = document.getElementById('allowanceWrapper');
     const allowanceContainer = document.getElementById('allowanceContainer');
     const overtimeContainer = document.getElementById('overtimeContainer');
     const attendanceAllowanceContainer = document.getElementById('attendanceAllowanceContainer');
-
     if (allowanceWrapper && allowanceContainer && overtimeContainer && attendanceAllowanceContainer) {
       if (allowanceContainer.children.length > 0 || overtimeContainer.children.length > 0 || attendanceAllowanceContainer.children.length > 0) {
         allowanceWrapper.className = "space-y-2 bg-[#f2f2f7]/40 p-2.5 rounded-xl border border-slate-100";
@@ -204,7 +212,6 @@
         allowanceWrapper.className = "space-y-2 rounded-xl border border-transparent";
       }
     }
-
     const deductionContainer = document.getElementById('deductionContainer');
     if (deductionContainer) {
       if (deductionContainer.children.length > 0) {
@@ -218,36 +225,28 @@
   function calculatePayroll() {
     try {
       const basicInput = document.getElementById('inputBasicSalary');
-      const basic = basicInput ? (parseFloat(basicInput.value) || 0) : 0;
-
+      const basic = basicInput ? parseIDR(basicInput.value) : 0;
+      
       let allowances = 0;
       let earningsDetailHTML = '';
       
-      // Hitung semua baris tunjangan (termasuk konsumsi yang di-generate otomatis)
+      // 1. HITUNG TUNJANGAN
       document.querySelectorAll('.allowance-row').forEach(row => {
         const nameInput = row.querySelector('input[type="text"]');
         const amountInput = row.querySelector('.amount-input-allowance');
         if (nameInput && amountInput) {
-          const val = parseFloat(amountInput.value) || 0;
+          const val = parseIDR(amountInput.value);
           allowances += val;
           if (val > 0) {
-            // Template HTML Rapi & Presisi
-            earningsDetailHTML += `
-              <div class="flex justify-between items-center text-[11px] text-slate-500">
-                <span>${nameInput.value}</span>
-                <span class="font-medium text-slate-600">Rp ${val.toLocaleString('id-ID')}</span>
-              </div>
-            `;
+            earningsDetailHTML += `<div class="flex justify-between items-center text-[11px] text-slate-500"><span>${nameInput.value}</span><span class="font-medium text-slate-600">Rp ${val.toLocaleString('id-ID')}</span></div>`;
           }
         }
       });
 
-      // Hitung Lembur
       let overtime = 0;
       const previewOvertimeRow = document.getElementById('previewOvertimeRow');
       const previewOvertime = document.getElementById('previewOvertime');
       const previewOvertimeLabel = document.getElementById('previewOvertimeLabel');
-
       if (typeof overtimeSummary !== 'undefined' && overtimeSummary && overtimeSummary.totalPay > 0) {
         overtime = overtimeSummary.totalPay;
         if (previewOvertimeLabel) previewOvertimeLabel.innerText = `Uang Lembur (${overtimeSummary.totalHours} jam)`;
@@ -263,33 +262,38 @@
         }
       }
 
-      // Hitung Potongan
+      // 2. HITUNG POTONGAN (LOGIKA PERSEN DI INTEGRASIKAN DI SINI)
       let deductions = 0;
       let deductionsDetailHTML = '';
+      
       document.querySelectorAll('.deduction-row').forEach(row => {
         const nameInput = row.querySelector('input[type="text"]');
         const amountInput = row.querySelector('.amount-input-deduction');
+        
         if (nameInput && amountInput) {
-          const val = parseFloat(amountInput.value) || 0;
-          deductions += val;
-          if (val > 0) {
-            // Template HTML Rapi & Presisi
-            deductionsDetailHTML += `
-              <div class="flex justify-between items-center text-[11px] text-slate-500">
-                <span>${nameInput.value}</span>
-                <span class="font-medium text-slate-600">Rp ${val.toLocaleString('id-ID')}</span>
-              </div>
-            `;
+          let inputVal = parseIDR(amountInput.value);
+          let finalAmount = inputVal;
+          let displayLabel = nameInput.value;
+
+          // Cek jika nama komponen mengandung kata BPJS atau Pajak / PPh 21 untuk hitungan persen
+          if (nameInput.value.toUpperCase().includes('BPJS') || nameInput.value.toUpperCase().includes('PPH') || nameInput.value.toUpperCase().includes('PAJAK')) {
+            // Rumus: (Nilai input persen / 100) * Gaji Pokok
+            finalAmount = (inputVal / 100) * basic;
+            displayLabel = `${nameInput.value} (${inputVal}%)`;
+          }
+
+          deductions += finalAmount;
+          if (finalAmount > 0) {
+            deductionsDetailHTML += `<div class="flex justify-between items-center text-[11px] text-slate-500"><span>${displayLabel}</span><span class="font-medium text-slate-600">Rp ${finalAmount.toLocaleString('id-ID')}</span></div>`;
           }
         }
       });
 
-      // Kalkulasi Akhir
+      // 3. HITUNG NET TAKE HOME PAY
       const netPay = (basic + allowances + overtime) - deductions;
-
-      // Update Tampilan Preview
+      
       if (document.getElementById('previewBasic')) document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
-
+      
       const earnDetailBox = document.getElementById('detailEarningsContainer');
       if (earnDetailBox) {
         earnDetailBox.innerHTML = earningsDetailHTML;
@@ -300,7 +304,7 @@
         }
       }
       if (document.getElementById('previewEarnings')) document.getElementById('previewEarnings').innerText = '+Rp ' + allowances.toLocaleString('id-ID');
-
+      
       const dedDetailBox = document.getElementById('detailDeductionsContainer');
       if (dedDetailBox) {
         dedDetailBox.innerHTML = deductionsDetailHTML;
@@ -310,27 +314,19 @@
           dedDetailBox.classList.add('hidden');
         }
       }
+      
       if (document.getElementById('previewDeductions')) document.getElementById('previewDeductions').innerText = '-Rp ' + deductions.toLocaleString('id-ID');
-
       if (document.getElementById('previewNetPay')) document.getElementById('previewNetPay').innerText = 'Rp ' + netPay.toLocaleString('id-ID');
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   }
-  // ==========================================
-  // 3. FUNGSI FETCH & RENDER OVERTIME
-  // ==========================================
+
   async function loadOvertime(idParam) {
+    if (isReadOnlyMode) return;
     try {
       const res = await fetch(`/overtime/summary/${idParam}`);
       const data = await res.json();
-
-      const hours = Number(data.totalHours || 0);
-      const pay = Number(data.totalPay || 0);
-
-      overtimeSummary = { totalHours: hours, totalPay: pay };
+      overtimeSummary = { totalHours: Number(data.totalHours || 0), totalPay: Number(data.totalPay || 0) };
     } catch (err) {
-      console.error("Gagal fetch lembur:", err);
       overtimeSummary = { totalHours: 0, totalPay: 0 };
     } finally {
       renderOvertimeComponent();
@@ -342,172 +338,170 @@
     const container = document.getElementById('overtimeContainer');
     if (!container) return;
     container.innerHTML = '';
-    
-    container.innerHTML = `
-      <div class="flex items-center gap-2 overtime-row animate-fadeIn">
-        <input type="text" value="Lembur (${overtimeSummary.totalHours} jam)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly>
-        <div class="w-32 relative">
-          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-          <input type="text" value="${overtimeSummary.totalPay.toLocaleString('id-ID')}" class="w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none" readonly>
-        </div>
-        <div class="w-8 h-8 flex items-center justify-center opacity-0 pointer-events-none"></div>
-      </div>
-    `;
+    if (overtimeSummary.totalHours === 0) return;
+    container.innerHTML = `<div class="flex items-center gap-2 overtime-row animate-fadeIn"><input type="text" value="Lembur (${overtimeSummary.totalHours} jam)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span><input type="text" value="${formatIDRValue(overtimeSummary.totalPay)}" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none" readonly></div><div class="w-8 h-8 flex items-center justify-center opacity-0 pointer-events-none"></div></div>`;
     updateContainerBackgrounds();
   }
 
-  // ==========================================
-  // 4. FUNGSI FETCH & RENDER ATTENDANCE (KONSUMSI)
-  // ==========================================
   async function loadAttendance(idParam) {
+    if (isReadOnlyMode) return;
     try {
       const res = await fetch(`/payroll/attendance-summary/${idParam}`);
       const data = await res.json();
-
       if (data.success) {
         attendanceSummary.totalDays = Number(data.totalDays || 0);
-        
-        // Cari tahu apakah user ini punya simpanan Tunjangan Konsumsi lama di card-nya
         const activeCard = document.querySelector(`.employee-card[data-id="${idParam}"]`);
         const savedAllowances = JSON.parse(activeCard.getAttribute('data-allowances') || '[]');
         const existingKonsumsi = savedAllowances.find(a => a.componentName === 'Tunjangan Konsumsi');
-
         if (existingKonsumsi && attendanceSummary.totalDays > 0) {
-          // Balikkan kalkulasi untuk mencari tarif per hari yang pernah disimpan
           attendanceSummary.totalPay = existingKonsumsi.amount;
           attendanceSummary.ratePerDay = existingKonsumsi.amount / attendanceSummary.totalDays;
         } else {
-          attendanceSummary.ratePerDay = 0; 
+          attendanceSummary.ratePerDay = 0;
           attendanceSummary.totalPay = 0;
         }
       }
     } catch (err) {
-      console.error("Gagal fetch attendance:", err);
       attendanceSummary.totalDays = 0;
     } finally {
       renderAttendanceComponent();
-      
-      // Jika ada data lama, suntik balik angkanya ke kotak input tarif di UI
       const rateInput = document.getElementById('inputRateKonsumsi');
       const totalOutput = document.getElementById('totalPayKonsumsi');
       if (rateInput && totalOutput && attendanceSummary.ratePerDay > 0) {
-        rateInput.value = attendanceSummary.ratePerDay;
+        rateInput.value = formatIDRValue(attendanceSummary.ratePerDay);
         totalOutput.value = attendanceSummary.totalPay;
       }
-
       calculatePayroll();
     }
   }
-function renderAttendanceComponent() {
+
+  function renderAttendanceComponent() {
     const container = document.getElementById('attendanceAllowanceContainer');
     if (!container) return;
-    
     if (attendanceSummary.totalDays === 0) {
-        container.innerHTML = '';
-        return;
+      container.innerHTML = '';
+      return;
     }
-
-   container.innerHTML = `
-      <div class="flex items-center gap-2 allowance-row animate-fadeIn">
-        <input type="text" value="Tunjangan Konsumsi (${attendanceSummary.totalDays} Hari)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly>
-        
-        <div class="w-32 relative">
-          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-          <input type="number" id="inputRateKonsumsi" placeholder="0" oninput="calculateAttendancePay()" class="w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-        </div>
-
-        <input type="hidden" id="totalPayKonsumsi" value="0" class="amount-input-allowance">
-        
-        <div class="w-8 h-8 flex items-center justify-center opacity-0 pointer-events-none"></div>
-      </div>
-    `;
+    const readOnlyAttr = isReadOnlyMode ? 'readonly' : '';
+    container.innerHTML = `<div class="flex items-center gap-2 allowance-row animate-fadeIn"><input type="text" value="Tunjangan Konsumsi (${attendanceSummary.totalDays} Hari)" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span><input type="text" id="inputRateKonsumsi" placeholder="0" oninput="formatRupiahInput(this); calculateAttendancePay()" class="w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20" ${readOnlyAttr}></div><input type="hidden" id="totalPayKonsumsi" value="0" class="amount-input-allowance"><div class="w-8 h-8 flex items-center justify-center opacity-0 pointer-events-none"></div></div>`;
     updateContainerBackgrounds();
   }
-function calculateAttendancePay() {
-  const rateInput = document.getElementById('inputRateKonsumsi');
-  const totalHiddenInput = document.getElementById('totalPayKonsumsi');
-  
-  if (rateInput && totalHiddenInput) {
-    const rate = parseFloat(rateInput.value) || 0;
-    
-    // Kalikan tarif dengan jumlah kehadiran
-    const total = rate * attendanceSummary.totalDays;
-    
-    // Simpan ke input hidden agar dibaca oleh fungsi Save / Database
-    totalHiddenInput.value = total;
-    
-    // Update total Grand Total Gaji
-    calculatePayroll();
-  }
-}
 
-  // ==========================================
-  // 5. FUNGSI TAMBAH KOMPONEN MANUAL
-  // ==========================================
+  function calculateAttendancePay() {
+    const rateInput = document.getElementById('inputRateKonsumsi');
+    const totalHiddenInput = document.getElementById('totalPayKonsumsi');
+    if (rateInput && totalHiddenInput) {
+      const rate = parseIDR(rateInput.value);
+      const total = rate * attendanceSummary.totalDays;
+      totalHiddenInput.value = total;
+      calculatePayroll();
+    }
+  }
+
+  function generateRowHTML(name, amount, isFixed, type) {
+    const colorClass = type === 'allowance' ? 'blue' : 'rose';
+    const readOnlyInput = isFixed || isReadOnlyMode ? 'readonly' : '';
+    const trashButton = (isFixed || isReadOnlyMode) ? `<div class="w-8 h-8"></div>` : `<button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-${colorClass}-600 flex items-center justify-center transition-all text-xs shadow-sm"><i class="fa-solid fa-trash-can text-[11px]"></i></button>`;
+    
+    // Deteksi jika baris ini merupakan komponen persen
+    const isPercentage = name.toUpperCase().includes('BPJS') || name.toUpperCase().includes('PPH') || name.toUpperCase().includes('PAJAK');
+    
+    // Jika komponen persen, tampilkan angka aslinya saja (misal 3), jika nominal baru pakai format rupiah
+    const formattedAmount = isPercentage ? amount : formatIDRValue(amount);
+    const unitSymbol = isPercentage ? '%' : 'Rp';
+
+    // Jika persen, panggil calculatePayroll langsung tanpa formatRupiahInput agar ketikan tidak rusak
+    const onInputHandler = isPercentage ? 'oninput="calculatePayroll()"' : 'oninput="formatRupiahInput(this)"';
+
+    return `<div class="flex items-center gap-2 ${type}-row animate-fadeIn"><input type="text" value="${name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">${unitSymbol}</span><input type="text" value="${formattedAmount}" ${onInputHandler} class="amount-input-${type} w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-${colorClass}-500/20" ${readOnlyInput}></div>${trashButton}</div>`;
+  }
+
   function addAllowanceField() {
     const select = document.getElementById('masterAllowanceSelect');
     if (!select || !select.value) return;
-
+    
     const selectedOption = select.options[select.selectedIndex];
-    const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
     const componentName = select.value;
+    const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
 
-    const template = `
-      <div class="flex items-center gap-2 allowance-row animate-fadeIn">
-        <input type="text" value="${componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly>
-        <div class="w-32 relative">
-          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-          <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-        </div>
-        <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
-          <i class="fa-solid fa-trash-can text-[11px]"></i>
-        </button>
-      </div>
-    `;
+    // --- VALIDASI CEK DUPLIKAT ---
+    let isDuplicate = false;
+    document.querySelectorAll('.allowance-row input[type="text"]').forEach(input => {
+      // Hilangkan teks tambahan seperti "(X Hari)" atau "(X jam)" untuk perbandingan yang akurat
+      const existingName = input.value.split('(')[0].trim();
+      if (existingName === componentName.trim()) {
+        isDuplicate = true;
+      }
+    });
 
-    document.getElementById('allowanceContainer').insertAdjacentHTML('beforeend', template);
+    if (isDuplicate) {
+      alert(`❌ Komponen "${componentName}" sudah ada di daftar tunjangan!`);
+      select.value = "";
+      return;
+    }
+    // ------------------------------
+
+    document.getElementById('allowanceContainer').insertAdjacentHTML('beforeend', generateRowHTML(componentName, defaultAmount, false, 'allowance'));
     select.value = "";
     updateContainerBackgrounds();
     calculatePayroll();
   }
-
-  function addDeductionField() {
+function addDeductionField() {
     const select = document.getElementById('masterDeductionSelect');
     if (!select || !select.value) return;
-
+    
     const selectedOption = select.options[select.selectedIndex];
-    const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
     const componentName = select.value;
+    const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
 
-    const template = `
-      <div class="flex items-center gap-2 deduction-row animate-fadeIn">
-        <input type="text" value="${componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-700 focus:outline-none" readonly>
-        <div class="w-32 relative">
-          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-          <input type="number" value="${defaultAmount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-rose-500/20">
-        </div>
-        <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
-          <i class="fa-solid fa-trash-can text-[11px]"></i>
-        </button>
-      </div>
-    `;
-    document.getElementById('deductionContainer').insertAdjacentHTML('beforeend', template);
+    // --- VALIDASI CEK DUPLIKAT ---
+    let isDuplicate = false;
+    document.querySelectorAll('.deduction-row input[type="text"]').forEach(input => {
+      // Hilangkan teks tambahan atau persentase untuk perbandingan yang akurat
+      const existingName = input.value.split('(')[0].trim();
+      if (existingName === componentName.trim() || (componentName.trim() === 'Potongan Pajak PPh 21' && existingName.includes('Pajak'))) {
+        isDuplicate = true;
+      }
+    });
+
+    if (isDuplicate) {
+      alert(`❌ Komponen "${componentName}" sudah ada di daftar potongan!`);
+      select.value = "";
+      return;
+    }
+    // ------------------------------
+
+    document.getElementById('deductionContainer').insertAdjacentHTML('beforeend', generateRowHTML(componentName, defaultAmount, false, 'deduction'));
     select.value = "";
     updateContainerBackgrounds();
     calculatePayroll();
   }
 
-  // ==========================================
-  // 6. FUNGSI UTAMA: SWITCH EMPLOYEE & SUBMIT
-  // ==========================================
-  function switchEmployee(el, name, nik, pos, basicSalary) {
-    // Reset Data Lintas
-    overtimeSummary = { totalHours: 0, totalPay: 0 };
-    attendanceSummary = { totalDays: 0, ratePerDay: 25000, totalPay: 0 };
-
+  function switchEmployee(el) {
+    document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
+    el.classList.add('bg-blue-50/40');
+    
+    const employeeId = el.getAttribute('data-id');
+    const name = el.getAttribute('data-name');
+    const nik = el.getAttribute('data-nik');
+    const pos = el.getAttribute('data-pos');
+    
+    sessionStorage.setItem('selectedEmployeeId', employeeId);
+    
     document.getElementById('empNameTitle').innerText = name;
     document.getElementById('empMetaTitle').innerText = 'NIK: ' + nik + ' • ' + pos;
-    document.getElementById('inputBasicSalary').value = parseFloat(basicSalary) || 0;
+    
+    fetchAndRenderPayrollData(employeeId);
+  }
+
+  function fetchAndRenderPayrollData(employeeId) {
+    const period = document.getElementById('filterPeriod').value;
+    document.getElementById('labelPeriodSummary').innerText = period;
+    const activeCard = document.querySelector(`.employee-card[data-id="${employeeId}"]`);
+    if(!activeCard) return;
+
+    overtimeSummary = { totalHours: 0, totalPay: 0 };
+    attendanceSummary = { totalDays: 0, ratePerDay: 0, totalPay: 0 };
 
     const allowanceContainer = document.getElementById('allowanceContainer');
     const deductionContainer = document.getElementById('deductionContainer');
@@ -519,130 +513,131 @@ function calculateAttendancePay() {
     if (overtimeContainer) overtimeContainer.innerHTML = '';
     if (attendanceAllowanceContainer) attendanceAllowanceContainer.innerHTML = '';
 
-    document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
-    el.classList.add('bg-blue-50/40');
+    fetch(`/payroll/calculate/${employeeId}?period=${period}`)
+      .then(res => res.json())
+      .then(resData => {
+        isReadOnlyMode = resData.isHistory;
+        const data = resData.data;
 
-    // Load allowances dari attribut
-  // Load allowances dari attribut
-    const allowances = JSON.parse(el.getAttribute('data-allowances') || '[]');
-    if (allowances && allowances.length > 0) {
-      allowances.forEach(item => {
-        // JANGAN RENDER KONSUMSI DI SINI, KARENA SUDAH DI-HANDLE OLEH CONTAINER OTOMATIS DI ATASNYA
-        if (item.componentName === 'Tunjangan Konsumsi') return;
+        document.getElementById('inputBasicSalary').value = formatIDRValue(data.basicSalary || 0);
 
-        const template = `
-          <div class="flex items-center gap-2 allowance-row animate-fadeIn">
-            <input type="text" value="${item.componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly>
-            <div class="w-32 relative">
-              <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-              <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-            </div>
-            <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
-              <i class="fa-solid fa-trash-can text-[11px]"></i>
-            </button>
-          </div>
-        `;
-        allowanceContainer.insertAdjacentHTML('beforeend', template);
+        const actionInputsA = document.getElementById('masterAllowanceSelect').parentElement;
+        const actionInputsD = document.getElementById('masterDeductionSelect').parentElement;
+        const btnSave = document.getElementById('btnSavePayroll');
+
+        if (isReadOnlyMode) {
+          actionInputsA.classList.add('hidden');
+          actionInputsD.classList.add('hidden');
+          btnSave.classList.add('hidden');
+
+          const arrAllow = data.allowances || [];
+          arrAllow.forEach(item => {
+            const cName = item.componentName || item.name;
+            if(cName.includes('Konsumsi') || cName.includes('Lembur')) return; 
+            allowanceContainer.insertAdjacentHTML('beforeend', generateRowHTML(cName, item.amount, true, 'allowance'));
+          });
+
+          const konsumsiItem = arrAllow.find(a => (a.componentName || a.name).includes('Konsumsi'));
+          if(konsumsiItem) {
+             attendanceSummary.totalDays = 1; 
+             attendanceAllowanceContainer.innerHTML = `<div class="flex items-center gap-2 allowance-row animate-fadeIn"><input type="text" value="${konsumsiItem.componentName || konsumsiItem.name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span><input type="text" value="${formatIDRValue(konsumsiItem.amount)}" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20" readonly></div><div class="w-8 h-8"></div></div>`;
+          }
+
+          if(data.overtime && data.overtime.amount > 0) {
+             overtimeSummary = { totalHours: data.overtime.hours, totalPay: data.overtime.amount };
+             renderOvertimeComponent();
+          }
+
+          const arrDed = data.deductions || [];
+          arrDed.forEach(item => {
+            const cName = item.componentName || item.name;
+            deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML(cName, item.amount, true, 'deduction'));
+          });
+
+          if (data.loanDeduction && data.loanDeduction.amount > 0) {
+            deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML('Cicilan Pinjaman', data.loanDeduction.amount, true, 'deduction'));
+          }
+
+          updateContainerBackgrounds();
+          calculatePayroll();
+
+        } else {
+          actionInputsA.classList.remove('hidden');
+          actionInputsD.classList.remove('hidden');
+          btnSave.classList.remove('hidden');
+
+          const allowances = JSON.parse(activeCard.getAttribute('data-allowances') || '[]');
+          allowances.forEach(item => {
+            if (item.componentName === 'Tunjangan Konsumsi') return;
+            allowanceContainer.insertAdjacentHTML('beforeend', generateRowHTML(item.componentName, item.amount, false, 'allowance'));
+          });
+
+          const deductions = JSON.parse(activeCard.getAttribute('data-deductions') || '[]');
+          deductions.forEach(item => {
+            deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML(item.componentName, item.amount, false, 'deduction'));
+          });
+
+          if (data.loanDeduction && data.loanDeduction.amount > 0) {
+            deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML('Cicilan Pinjaman', data.loanDeduction.amount, true, 'deduction'));
+          }
+
+          updateContainerBackgrounds();
+          loadOvertime(employeeId);
+          loadAttendance(employeeId);
+        }
       });
-    }
-
-    // Load deductions dari attribut
-    const deductions = JSON.parse(el.getAttribute('data-deductions') || '[]');
-    if (deductions && deductions.length > 0) {
-      deductions.forEach(item => {
-        const template = `
-          <div class="flex items-center gap-2 deduction-row animate-fadeIn">
-            <input type="text" value="${item.componentName}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-700 focus:outline-none" readonly>
-            <div class="w-32 relative">
-              <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span>
-              <input type="number" value="${item.amount}" oninput="calculatePayroll()" class="amount-input-deduction w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-rose-500/20">
-            </div>
-            <button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all text-xs shadow-sm">
-              <i class="fa-solid fa-trash-can text-[11px]"></i>
-            </button>
-          </div>
-        `;
-        deductionContainer.insertAdjacentHTML('beforeend', template);
-      });
-    }
-
-    // Fetch Ulang API Dinamis
-    updateContainerBackgrounds();
-    loadOvertime(el.getAttribute('data-id'));
-    loadAttendance(el.getAttribute('data-id'));
   }
 
   function submitPayrollData() {
     const allCards = document.querySelectorAll('.employee-card');
     let activeCard = null;
-
     allCards.forEach(card => {
       if (card.classList.contains('bg-blue-50/40')) activeCard = card;
     });
-
-    if (!activeCard) {
-      alert("Silakan pilih Pegawai terlebih dahulu.");
-      return;
-    }
-
+    if (!activeCard) return;
+    
     const employeeId = activeCard.getAttribute('data-id');
     const combinedComponents = [];
-
-    // Kumpulkan Earning (Tunjangan)
+    
     document.querySelectorAll('.allowance-row').forEach(row => {
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-allowance');
-      
       if (nameInput && amountInput) {
         let nameValue = nameInput.value;
-        
-        // Jembatan pembersih nama komponen otomatis agar cocok dengan DB Master
-        if (nameValue.includes('Tunjangan Konsumsi')) {
-          nameValue = 'Tunjangan Konsumsi';
-        }
-
-        combinedComponents.push({
-          componentName: nameValue,
-          amount: parseFloat(amountInput.value) || 0
-        });
+        if (nameValue.includes('Tunjangan Konsumsi')) nameValue = 'Tunjangan Konsumsi';
+        combinedComponents.push({ componentName: nameValue, amount: parseIDR(amountInput.value) || 0 });
       }
     });
 
-    // Kumpulkan Deduction (Potongan)
     document.querySelectorAll('.deduction-row').forEach(row => {
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-deduction');
       if (nameInput && amountInput) {
-        combinedComponents.push({
-          componentName: nameInput.value,
-          amount: parseFloat(amountInput.value) || 0
-        });
+        combinedComponents.push({ componentName: nameInput.value, amount: parseIDR(amountInput.value) || 0 });
       }
     });
 
     fetch('/payroll/save', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          employeeId,
-          allowances: combinedComponents
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employeeId, allowances: combinedComponents })
       })
       .then(res => res.json())
       .then(data => {
         alert(data.success ? " " + data.message : "" + data.message);
       })
       .catch(err => {
-        console.error(err);
         alert("Terjadi kesalahan sistem.");
       });
   }
 
-// ==========================================
-  // 7. EVENT LISTENERS & FIX REFRESH MEMORY
-  // ==========================================
+  document.getElementById('filterPeriod').addEventListener('change', function() {
+      const activeCard = document.querySelector('.employee-card.bg-blue-50\\/40');
+      if (activeCard) {
+          fetchAndRenderPayrollData(activeCard.getAttribute('data-id'));
+      }
+  });
+
   document.getElementById('searchEmployeeInput').addEventListener('input', function(e) {
     const query = e.target.value.toLowerCase().trim();
     document.querySelectorAll('.employee-card').forEach(card => {
@@ -651,44 +646,21 @@ function calculateAttendancePay() {
       card.style.display = (name.includes(query) || meta.includes(query)) ? 'flex' : 'none';
     });
   });
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Ambil ID pegawai terakhir dari memori browser
+
+  document.addEventListener('DOMContentLoaded', () => {
     const savedEmployeeId = sessionStorage.getItem('selectedEmployeeId');
     let targetCard = null;
-
-    console.log("ID Pegawai yang tersimpan di memori:", savedEmployeeId); // Untuk cek di inspect f12
-
-    // 2. Cari card yang sesuai dengan memori
     if (savedEmployeeId) {
-      // Kita pakai querySelector khusus untuk mencari exact match dari data-id string
       targetCard = document.querySelector(`.employee-card[data-id="${savedEmployeeId}"]`);
     }
-
-    // 3. Eksekusi penguncian pegawai setelah refresh
     if (targetCard) {
-      console.log("Ketemu card pegawai lama! Memulai auto-click...");
-      
-      // FIX UTAMA: Beri sedikit delay (100ms) agar semua fungsi switchEmployee siap dieksekusi browser
       setTimeout(() => {
-        // Hapus background biru di card pertama bawaan EJS agar tidak double highlight
-        document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
-        
-        // Jalankan fungsi klik bawaan DOM element
-        targetCard.dispatchEvent(new Event('click', { bubbles: true }));
-        
-        // Scroll otomatis ke posisi pegawai tersebut jika posisinya di bawah
+        targetCard.click();
         targetCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }, 100);
-
     } else {
-      console.log("Tidak ada memori lama / pegawai tidak ketemu, klik pegawai pertama.");
-      // Jika baru pertama kali buka atau tidak ketemu, klik card pertama yang ada di layar
       const firstCard = document.querySelector('.employee-card');
-      if (firstCard) {
-        firstCard.click();
-      } else {
-        calculatePayroll();
-      }
+      if (firstCard) firstCard.click();
     }
   });
 </script>
