@@ -56,6 +56,10 @@ const payrollSchema = new mongoose.Schema(
       enum: ["DRAFT", "CLOSED", "PAID"],
       default: "DRAFT",
     },
+    mutationFile: {
+      type: String,
+      default: null,
+    },
     paidAt: {
       type: Date,
       default: null,

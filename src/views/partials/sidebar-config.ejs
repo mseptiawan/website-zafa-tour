@@ -199,8 +199,7 @@
             { name: "Slip Gaji Saya", path: "/payroll/my-slip", show: !!user.permissions.payroll_view },
             { name: "Proses Hitung Gaji", path: "/payroll/manage", show: !!user.permissions.payroll_manage },
             { name: "Kelola Komponen Gaji", path: "/components/manage", show: !!user.permissions.payroll_component_manage },
-            { name: "Rekap Payroll Bulanan", path: "/payroll/history", show: !!user.permissions.payroll_history },
-            { name: "Verifikasi & Pembayaran", path: "/payroll/finance-approval", show: !!user.permissions.payroll_finance_approval },
+            { name: "Verifikasi & Pembayaran", path: "/finance/payroll", show: !!user.permissions.payroll_finance_approval },
           ]
         }
       ]

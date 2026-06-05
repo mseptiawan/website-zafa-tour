@@ -1,0 +1,443 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
+  <div class="mx-auto max-w-7xl space-y-6">
+
+    <!-- HEADER PAGE -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/60 rounded-2xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.02)] mb-6">
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-slate-900">Verifikasi Pembayaran</h1>
+        <p class="text-[11px] text-slate-400 mt-0.5">Disburse dana payroll, unggah mutasi bank, dan selesaikan transaksi keuangan bulanan</p>
+      </div>
+      <div class="flex items-center gap-3 min-w-[240px]">
+        <div class="w-full relative">
+          <i class="fa-solid fa-calendar-days absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+          <select id="filterPeriodFinance" onchange="loadFinanceData()" class="w-full bg-slate-50 border border-slate-200 text-[13px] font-semibold text-slate-700 rounded-xl pl-9 pr-8 py-2.5 appearance-none cursor-pointer focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all">
+            <% availablePeriods.forEach(p => { %>
+              <option value="<%= p %>" <%= p === currentPeriod ? 'selected' : '' %>><%= p %></option>
+            <% }) %>
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS CARDS BARU (SESUAI STYLE LU) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+      <!-- Card Total Dana -->
+      <div class="bg-white border border-slate-200/60 rounded-2xl p-5 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+        <div class="space-y-1">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Alokasi Dana</span>
+          <span id="statTotalDisburse" class="text-2xl font-bold text-slate-900 tracking-tight tabular-nums block">
+            Rp 0 <span class="text-xs font-medium text-slate-500">IDR</span>
+          </span>
+        </div>
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center border bg-blue-50 text-blue-600 border-blue-100">
+          <i class="fa-solid fa-wallet text-sm"></i>
+        </div>
+      </div>
+
+      <!-- Card Siap Proses -->
+      <div class="bg-white border border-slate-200/60 rounded-2xl p-5 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+        <div class="space-y-1">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Belum Dibayar (Closed)</span>
+          <span id="statPendingCount" class="text-2xl font-bold text-amber-600 tracking-tight tabular-nums block">
+            0 <span class="text-xs font-medium text-slate-500">Karyawan</span>
+          </span>
+        </div>
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center border bg-amber-50 text-amber-600 border-amber-100">
+          <i class="fa-solid fa-clock text-sm"></i>
+        </div>
+      </div>
+
+      <!-- Card Selesai Dibayar -->
+      <div class="bg-white border border-slate-200/60 rounded-2xl p-5 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+        <div class="space-y-1">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Selesai Dibayar (Paid)</span>
+          <span id="statPaidCount" class="text-2xl font-bold text-emerald-600 tracking-tight tabular-nums block">
+            0 <span class="text-xs font-medium text-slate-500">Karyawan</span>
+          </span>
+        </div>
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center border bg-emerald-50 text-emerald-600 border-emerald-100">
+          <i class="fa-solid fa-circle-check text-sm"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS NAVIGATION (SESUAI STYLE LU) -->
+    <div class="bg-white rounded-2xl border border-slate-200/60 p-1.5 shadow-xs inline-flex items-center gap-1 mb-4">
+      <button type="button" onclick="switchTabFinance('pending')" id="tab-btn-pending" class="tab-btn px-5 py-2.5 text-xs font-bold rounded-xl bg-blue-600 text-white shadow-xs transition-all duration-200 outline-none cursor-pointer">
+        Antrean Pembayaran (Pending)
+      </button>
+      <button type="button" onclick="switchTabFinance('history')" id="tab-btn-history" class="tab-btn px-5 py-2.5 text-xs font-medium rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-200 outline-none cursor-pointer">
+        Riwayat Pembayaran (Paid)
+      </button>
+    </div>
+
+    <!-- MAIN CONTENT UTAMA -->
+    <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] overflow-hidden">
+      
+      <!-- TAB PENDING (ANTREAN) -->
+      <div id="tab-content-pending" class="tab-pane block transition-all duration-200">
+        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="relative max-w-xs w-full">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchPendingInput" oninput="filterTable('pending')" placeholder="Cari nama karyawan..." class="w-full bg-[#f2f2f7]/60 border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
+          </div>
+          
+          <!-- BATCH ACTION UNTUK MULTIPLE MARK AS PAID -->
+          <button id="btnBatchPaid" onclick="processBatchPayment()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[12px] h-9 px-4 rounded-xl shadow-xs transition-all active:scale-[0.98] flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-money-bill-wave text-[11px]"></i> Bayar Sekaligus (<span id="selectedCount">0</span>)
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="p-4 w-12 text-center"><input type="checkbox" id="selectAllPending" onchange="toggleSelectAll(this)" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"></th>
+                <th class="p-4">Karyawan</th>
+                <th class="p-4">Gaji Pokok</th>
+                <th class="p-4">Tunjangan</th>
+                <th class="p-4">Potongan</th>
+                <th class="p-4">Net Take Home Pay</th>
+                <th class="p-4 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="pendingTableBody" class="divide-y divide-slate-100 text-[13px] text-slate-700">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB HISTORY (RIWAYAT PAID) -->
+      <div id="tab-content-history" class="tab-pane hidden opacity-0 translate-y-2 transition-all duration-200">
+        <div class="p-5 border-b border-slate-100">
+          <div class="relative max-w-xs">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchHistoryInput" oninput="filterTable('history')" placeholder="Cari riwayat karyawan..." class="w-full bg-[#f2f2f7]/60 border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="p-4">Karyawan</th>
+                <th class="p-4">Net Gaji</th>
+                <th class="p-4">Waktu Dibayar</th>
+                <th class="p-4">Bukti Mutasi</th>
+                <th class="p-4 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-slate-100 text-[13px] text-slate-700">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL POPUP JALUR CEPAT: UNGGAH BUKTI MUTASI & MARK AS PAID -->
+<div id="paymentModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+  <div class="bg-white border border-slate-200/80 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 transform scale-95 transition-transform duration-300">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 class="text-[14px] font-bold text-slate-900">Verifikasi Bank Disbursement</h3>
+      <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    
+    <form id="paymentForm" onsubmit="submitPaymentVerification(event)" class="space-y-4">
+      <input type="hidden" id="modalEmployeeId">
+      
+      <div>
+        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide block mb-1">Nama Karyawan</label>
+        <input type="text" id="modalEmployeeName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] font-semibold text-slate-700 focus:outline-none" readonly>
+      </div>
+
+      <div>
+        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide block mb-1">Total Transfer (THP)</label>
+        <input type="text" id="modalNetPay" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] font-bold text-blue-600 focus:outline-none" readonly>
+      </div>
+
+      <div>
+        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide block mb-1">Dokumen Mutasi Rekening / Lampiran Bukti (.pdf, .png, .jpg)</label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl hover:border-blue-400 transition-colors bg-slate-50/50 cursor-pointer relative">
+          <div class="space-y-1 text-center">
+            <i class="fa-solid fa-cloud-arrow-up text-slate-400 text-xl mb-1 block"></i>
+            <div class="text-xs text-slate-600">
+              <span class="font-semibold text-blue-600 hover:text-blue-500">Pilih file mutasi</span> atau drag and drop
+            </div>
+            <p class="text-[10px] text-slate-400">PDF, PNG, JPG maksimal 2MB</p>
+            <p id="fileSelectedLabel" class="text-[11px] font-medium text-emerald-600 mt-2 hidden"></p>
+          </div>
+          <input id="fileMutation" type="file" accept=".pdf,.png,.jpg,.jpeg" onchange="handleFileChange(this)" class="absolute inset-0 opacity-0 cursor-pointer">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="closePaymentModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[12px] font-semibold rounded-xl transition-colors">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-semibold rounded-xl transition-colors shadow-xs">Konfirmasi & Tandai Lunas</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let allPayrollData = [];
+
+  function formatIDR(num) {
+    return 'Rp ' + new Intl.NumberFormat('id-ID').format(num || 0);
+  }
+
+  // --- TAB NAVIGATION (STYLE RE-USE DARI KODE LU) ---
+  function switchTabFinance(tabName) {
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.add('hidden', 'opacity-0', 'translate-y-2');
+      pane.classList.remove('block', 'opacity-100', 'translate-y-0');
+    });
+
+    const activeContent = document.getElementById(`tab-content-${tabName}`);
+    if (activeContent) {
+      activeContent.classList.remove('hidden');
+      setTimeout(() => {
+        activeContent.classList.add('block', 'opacity-100', 'translate-y-0');
+        activeContent.classList.remove('opacity-0', 'translate-y-2');
+      }, 10);
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.className = "tab-btn px-5 py-2.5 text-xs font-medium rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-200 outline-none cursor-pointer";
+    });
+
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (activeBtn) {
+      activeBtn.className = "tab-btn px-5 py-2.5 text-xs font-bold rounded-xl bg-blue-600 text-white shadow-xs transition-all duration-200 outline-none cursor-pointer";
+    }
+  }
+
+  // --- AMBIL DATA KESELURUHAN DARI BACKEND REAL-TIME ---
+  async function loadFinanceData() {
+    const period = document.getElementById('filterPeriodFinance').value;
+    
+    try {
+      // Ambil seluruh data payroll di bulan berjalan
+      const res = await fetch(`/finance/all-records?period=${period}`);
+      const result = await res.json();
+      
+      if (result.success) {
+        allPayrollData = result.data || [];
+        renderTablesAndStats();
+      }
+    } catch (err) {
+      console.error("Gagal menarik data finance:", err);
+    }
+  }
+
+  function renderTablesAndStats() {
+    const pendingBody = document.getElementById('pendingTableBody');
+    const historyBody = document.getElementById('historyTableBody');
+    
+    pendingBody.innerHTML = '';
+    historyBody.innerHTML = '';
+
+    let totalDisburse = 0;
+    let pendingCount = 0;
+    let paidCount = 0;
+
+    allPayrollData.forEach(p => {
+      totalDisburse += p.netTakeHomePay;
+
+ if (p.status === 'CLOSED') {
+        pendingCount++;
+        // Gunakan token pemisah atau langsung bungkus parameter string dengan aman
+        const employeeNameEscaped = p.employeeId.fullName.replace(/'/g, "\\'");
+        
+        const tr = `<tr class="hover:bg-slate-50/80 transition-colors payroll-row-pending" data-name="${p.employeeId.fullName.toLowerCase()}">
+          <td class="p-4 text-center"><input type="checkbox" value="${p.employeeId._id}" class="row-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" onchange="updateBatchButtonState()"></td>
+          <td class="p-4 font-semibold text-slate-800">${p.employeeId.fullName}<div class="text-[10px] text-slate-400 font-normal">NIK: ${p.employeeId.employeeIdNumber}</div></td>
+          <td class="p-4 font-medium tabular-nums">${formatIDR(p.basicSalary)}</td>
+          <td class="p-4 font-medium text-emerald-600 tabular-nums">+${formatIDR(p.totalEarnings - p.basicSalary)}</td>
+          <td class="p-4 font-medium text-rose-500 tabular-nums">-${formatIDR(p.totalDeductions)}</td>
+          <td class="p-4 font-bold text-slate-900 tabular-nums">${formatIDR(p.netTakeHomePay)}</td>
+          <td class="p-4 text-center">
+            <button onclick="openPaymentModal('${p.employeeId._id}', '${employeeNameEscaped}', ${p.netTakeHomePay})" class="bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold text-[11px] px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 mx-auto">
+              <i class="fa-solid fa-money-bill-transfer"></i> Disburse
+            </button>
+          </td>
+        </tr>`;
+        pendingBody.insertAdjacentHTML('beforeend', tr);
+      }else if (p.status === 'PAID') {
+        paidCount++;
+        // Render Baris Riwayat Selesai
+        const tr = `<tr class="hover:bg-slate-50/80 transition-colors payroll-row-history" data-name="${p.employeeId.fullName.toLowerCase()}">
+          <td class="p-4 font-semibold text-slate-800">${p.employeeId.fullName}<div class="text-[10px] text-slate-400 font-normal">NIK: ${p.employeeId.employeeIdNumber}</div></td>
+          <td class="p-4 font-bold text-slate-900 tabular-nums">${formatIDR(p.netTakeHomePay)}</td>
+          <td class="p-4 text-slate-500 font-medium">${new Date(p.updatedAt).toLocaleString('id-ID', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'})} WIB</td>
+          <td class="p-4">
+            <a href="${p.mutationFile || '#'}" target="_blank" class="text-blue-600 hover:underline font-medium inline-flex items-center gap-1">
+              <i class="fa-solid fa-file-invoice-dollar"></i> Lihat Mutasi
+            </a>
+          </td>
+          <td class="p-4 text-center">
+            <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Lunas (Paid)
+            </span>
+          </td>
+        </tr>`;
+        historyBody.insertAdjacentHTML('beforeend', tr);
+      }
+    });
+
+    // Pasang hasil akumulasi statistik ke boks atas (Style sesuai modifikasi lu)
+    document.getElementById('statTotalDisburse').innerHTML = `${formatIDR(totalDisburse)} <span class="text-xs font-medium text-slate-500">IDR</span>`;
+    document.getElementById('statPendingCount').innerHTML = `${pendingCount} <span class="text-xs font-medium text-slate-500">Karyawan</span>`;
+    document.getElementById('statPaidCount').innerHTML = `${paidCount} <span class="text-xs font-medium text-slate-500">Karyawan</span>`;
+
+    if(pendingCount === 0) {
+      pendingBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-medium"><i class="fa-solid fa-folder-open text-xl block mb-2 opacity-50"></i> Antrean Pembayaran Bersih! Tidak ada payroll berstatus Closed.</td></tr>`;
+    }
+    if(paidCount === 0) {
+      historyBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium"><i class="fa-solid fa-clock-rotate-left text-xl block mb-2 opacity-50"></i> Belum ada riwayat pembayaran di periode ini.</td></tr>`;
+    }
+  }
+
+  // --- ACTION MODAL VERIFIKASI ---
+  function openPaymentModal(id, name, thp) {
+    // 1. RESET FORM DI AWAL (Agar sisa ketikan/file dari pegawai sebelumnya bersih dulu)
+    const form = document.getElementById('paymentForm');
+    if (form) form.reset();
+
+    // 2. BARU SET NILAI TERBARU DARI PEGAWAI YANG DI-KLIK
+    document.getElementById('modalEmployeeId').value = id;
+    document.getElementById('modalEmployeeName').value = name;
+    document.getElementById('modalNetPay').value = formatIDR(thp);
+    
+    // Reset label text file upload agar kembali bersih
+    const fileLabel = document.getElementById('fileSelectedLabel');
+    if (fileLabel) {
+      fileLabel.innerText = '';
+      fileLabel.classList.add('hidden');
+    }
+
+    // 3. MUNCULKAN MODAL DENGAN ANIMASI TRANSISI
+    const modal = document.getElementById('paymentModal');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      modal.classList.add('opacity-100');
+      const innerModal = modal.querySelector('.transform');
+      if (innerModal) innerModal.classList.remove('scale-95');
+    }, 10);
+  }
+  function closePaymentModal() {
+    const modal = document.getElementById('paymentModal');
+    modal.classList.remove('opacity-100');
+    modal.querySelector('.transform').classList.add('scale-95');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+  }
+
+  function handleFileChange(input) {
+    const label = document.getElementById('fileSelectedLabel');
+    if (input.files && input.files[0]) {
+      label.innerText = `📎 Terpilih: ${input.files[0].name}`;
+      label.classList.remove('hidden');
+    }
+  }
+
+  // --- SUBMIT VERIFIKASI KE BACKEND (MARK AS PAID) ---
+  async function submitPaymentVerification(e) {
+    e.preventDefault();
+    const period = document.getElementById('filterPeriodFinance').value;
+    const employeeId = document.getElementById('modalEmployeeId').value;
+    const fileInput = document.getElementById('fileMutation');
+
+    // Menggunakan FormData untuk mendukung unggah file berkas mutasi bank
+    const formData = new FormData();
+    formData.append('employeeId', employeeId);
+    formData.append('periodMonth', period);
+    if(fileInput.files[0]) {
+      formData.append('mutationFile', fileInput.files[0]);
+    }
+
+    try {
+      const response = await fetch('/finance/verify-payment', {
+        method: 'POST',
+        body: formData // Kirim multipart/form-data
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert(`💵 Berhasil! Payroll untuk ${document.getElementById('modalEmployeeName').value} ditandai Lunas.`);
+        closePaymentModal();
+        loadFinanceData(); // Reload data secara dinamis tanpa refresh halaman penuh
+      } else {
+        alert(`❌ Gagal: ${result.message}`);
+      }
+    } catch (err) {
+      alert("Terjadi masalah sistem saat memproses pembayaran.");
+    }
+  }
+
+  // --- SEARCH LIVE FILTER TABLE ---
+  function filterTable(type) {
+    const query = document.getElementById(type === 'pending' ? 'searchPendingInput' : 'searchHistoryInput').value.toLowerCase().trim();
+    document.querySelectorAll(`.payroll-row-${type}`).forEach(row => {
+      const name = row.getAttribute('data-name');
+      row.style.display = name.includes(query) ? '' : 'none';
+    });
+  }
+
+  // --- MULTIPLE CHECKBOX & BATCH ACTION FUNCTIONS ---
+  function toggleSelectAll(master) {
+    document.querySelectorAll('.row-checkbox').forEach(cb => {
+      if(cb.closest('tr').style.display !== 'none') cb.checked = master.checked;
+    });
+    updateBatchButtonState();
+  }
+
+  function updateBatchButtonState() {
+    const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+    const batchBtn = document.getElementById('btnBatchPaid');
+    const countLabel = document.getElementById('selectedCount');
+    
+    if (checkedBoxes.length > 0) {
+      countLabel.innerText = checkedBoxes.length;
+      batchBtn.classList.remove('hidden');
+    } else {
+      batchBtn.classList.add('hidden');
+    }
+  }
+
+  async function processBatchPayment() {
+    const period = document.getElementById('filterPeriodFinance').value;
+    const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+    const employeeIds = Array.from(checkedBoxes).map(cb => cb.value);
+
+    if(!confirm(`Konfirmasi pembayaran sekaligus untuk ${employeeIds.length} karyawan?\nStatus akan langsung berubah menjadi Paid.`)) return;
+
+    try {
+      const response = await fetch('/finance/verify-payment-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employeeIds, periodMonth: period })
+      });
+
+      const result = await response.json();
+      if(result.success) {
+        alert(`🔒 Sukses! ${result.message}`);
+        document.getElementById('selectAllPending').checked = false;
+        document.getElementById('btnBatchPaid').classAdd = 'hidden';
+        loadFinanceData();
+      }
+    } catch (err) {
+      alert("Gagal memproses pembayaran kolektif.");
+    }
+  }
+
+  // Auto Load Data saat pertama kali halaman terbuka
+  document.addEventListener('DOMContentLoaded', loadFinanceData);
+</script>

@@ -8,6 +8,18 @@
         <h1 class="text-lg font-bold tracking-tight text-slate-900">Komponen Payroll</h1>
         <p class="text-[11px] text-slate-400 mt-0.5">Kelola kalkulasi gaji, tunjangan, dan potongan karyawan aktif</p>
       </div>
+      <div class="flex shrink-0 items-center lg:self-center">
+        <form id="form-tutup-buku" onsubmit="triggerTutupBuku(event)" class="flex items-center gap-4 bg-white border border-slate-200 p-2.5 pl-4 rounded-2xl shadow-2xs max-w-sm w-full lg:w-auto">
+          
+          <div class="text-[11px] text-slate-500 leading-tight hidden sm:block font-medium whitespace-nowrap">
+            Kunci transaksi & update <br /> pinjaman periode <span class="font-bold text-blue-600"><%= currentPeriod %></span>
+          </div>
+
+          <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-[12px] h-9 px-4 rounded-xl shadow-xs hover:shadow-rose-600/10 transition-all active:scale-[0.98] flex items-center gap-2 whitespace-nowrap cursor-pointer">
+            <i class="fa-solid fa-lock text-[10px] text-rose-200"></i> Tutup Buku Parsial
+          </button>
+        </form>
+      </div>
       <div class="flex items-center gap-3 min-w-[240px]">
         <div class="w-full relative">
           <i class="fa-solid fa-calendar-days absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
@@ -52,7 +64,9 @@
               <h4 class="text-[13px] font-<%= index === 0 ? 'semibold text-blue-900' : 'medium text-slate-800' %>"><%= emp.fullName %></h4>
               <p class="text-[11px] text-slate-500 mt-0.5">NIK: <%= emp.employeeIdNumber %> • <%= emp.positionId?.name || 'Staff' %></p>
             </div>
-            <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Draft</span>
+            <span class="status-badge text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 transition-colors">
+              Draft
+            </span>
           </div>
           <% }) %>
         </div>
@@ -230,7 +244,6 @@
       let allowances = 0;
       let earningsDetailHTML = '';
       
-      // 1. HITUNG TUNJANGAN
       document.querySelectorAll('.allowance-row').forEach(row => {
         const nameInput = row.querySelector('input[type="text"]');
         const amountInput = row.querySelector('.amount-input-allowance');
@@ -262,22 +275,24 @@
         }
       }
 
-      // 2. HITUNG POTONGAN (LOGIKA PERSEN DI INTEGRASIKAN DI SINI)
       let deductions = 0;
       let deductionsDetailHTML = '';
       
       document.querySelectorAll('.deduction-row').forEach(row => {
         const nameInput = row.querySelector('input[type="text"]');
         const amountInput = row.querySelector('.amount-input-deduction');
+        const container = row.querySelector('.w-32 relative');
+        const unitSpan = container ? container.querySelector('span') : null;
         
         if (nameInput && amountInput) {
           let inputVal = parseIDR(amountInput.value);
           let finalAmount = inputVal;
           let displayLabel = nameInput.value;
 
-          // Cek jika nama komponen mengandung kata BPJS atau Pajak / PPh 21 untuk hitungan persen
-          if (nameInput.value.toUpperCase().includes('BPJS') || nameInput.value.toUpperCase().includes('PPH') || nameInput.value.toUpperCase().includes('PAJAK')) {
-            // Rumus: (Nilai input persen / 100) * Gaji Pokok
+          // HANYA hitung rumus persen jika unit di UI saat itu terdeteksi '%' (Artinya sedang di mode DRAFT)
+          const isPercentageUnit = unitSpan && unitSpan.innerText === '%';
+
+          if (isPercentageUnit && (nameInput.value.toUpperCase().includes('BPJS') || nameInput.value.toUpperCase().includes('PPH') || nameInput.value.toUpperCase().includes('PAJAK'))) {
             finalAmount = (inputVal / 100) * basic;
             displayLabel = `${nameInput.value} (${inputVal}%)`;
           }
@@ -289,7 +304,6 @@
         }
       });
 
-      // 3. HITUNG NET TAKE HOME PAY
       const netPay = (basic + allowances + overtime) - deductions;
       
       if (document.getElementById('previewBasic')) document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
@@ -297,22 +311,14 @@
       const earnDetailBox = document.getElementById('detailEarningsContainer');
       if (earnDetailBox) {
         earnDetailBox.innerHTML = earningsDetailHTML;
-        if (earningsDetailHTML !== '') {
-          earnDetailBox.classList.remove('hidden');
-        } else {
-          earnDetailBox.classList.add('hidden');
-        }
+        earnDetailBox.classList.toggle('hidden', earningsDetailHTML === '');
       }
       if (document.getElementById('previewEarnings')) document.getElementById('previewEarnings').innerText = '+Rp ' + allowances.toLocaleString('id-ID');
       
       const dedDetailBox = document.getElementById('detailDeductionsContainer');
       if (dedDetailBox) {
         dedDetailBox.innerHTML = deductionsDetailHTML;
-        if (deductionsDetailHTML !== '') {
-          dedDetailBox.classList.remove('hidden');
-        } else {
-          dedDetailBox.classList.add('hidden');
-        }
+        dedDetailBox.classList.toggle('hidden', deductionsDetailHTML === '');
       }
       
       if (document.getElementById('previewDeductions')) document.getElementById('previewDeductions').innerText = '-Rp ' + deductions.toLocaleString('id-ID');
@@ -398,20 +404,35 @@
     }
   }
 
+  // --- REVISI UTAMA FIX 404 & FIX RIBAUAN PERSEN DI HISTORY MODE ---
   function generateRowHTML(name, amount, isFixed, type) {
     const colorClass = type === 'allowance' ? 'blue' : 'rose';
     const readOnlyInput = isFixed || isReadOnlyMode ? 'readonly' : '';
     const trashButton = (isFixed || isReadOnlyMode) ? `<div class="w-8 h-8"></div>` : `<button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-${colorClass}-600 flex items-center justify-center transition-all text-xs shadow-sm"><i class="fa-solid fa-trash-can text-[11px]"></i></button>`;
     
-    // Deteksi jika baris ini merupakan komponen persen
     const isPercentage = name.toUpperCase().includes('BPJS') || name.toUpperCase().includes('PPH') || name.toUpperCase().includes('PAJAK');
     
-    // Jika komponen persen, tampilkan angka aslinya saja (misal 3), jika nominal baru pakai format rupiah
-    const formattedAmount = isPercentage ? amount : formatIDRValue(amount);
-    const unitSymbol = isPercentage ? '%' : 'Rp';
+    let formattedAmount = amount;
+    let unitSymbol = 'Rp';
+    let onInputHandler = 'oninput="formatRupiahInput(this)"';
 
-    // Jika persen, panggil calculatePayroll langsung tanpa formatRupiahInput agar ketikan tidak rusak
-    const onInputHandler = isPercentage ? 'oninput="calculatePayroll()"' : 'oninput="formatRupiahInput(this)"';
+    if (isPercentage) {
+      // Jika statusnya DRAFT (nilai nominal kecil di database seperti angka 2)
+      if (!isReadOnlyMode && parseFloat(amount) < 100) {
+        unitSymbol = '%';
+        formattedAmount = amount;
+        onInputHandler = 'oninput="calculatePayroll()"';
+      } else {
+        // Jika statusnya HISTORY/CLOSED (nilainya sudah matang jadi rupiah 80000 di DB)
+        unitSymbol = 'Rp';
+        formattedAmount = formatIDRValue(amount);
+        onInputHandler = 'oninput="formatRupiahInput(this)"';
+      }
+    } else {
+      formattedAmount = type === 'allowance' && name.includes('Lembur') ? formatIDRValue(amount) : (isNumeric(amount) ? formatIDRValue(amount) : amount);
+    }
+
+    function isNumeric(n) { return !isNaN(parseFloat(n)) && isFinite(n); }
 
     return `<div class="flex items-center gap-2 ${type}-row animate-fadeIn"><input type="text" value="${name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">${unitSymbol}</span><input type="text" value="${formattedAmount}" ${onInputHandler} class="amount-input-${type} w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-${colorClass}-500/20" ${readOnlyInput}></div>${trashButton}</div>`;
   }
@@ -424,14 +445,10 @@
     const componentName = select.value;
     const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
 
-    // --- VALIDASI CEK DUPLIKAT ---
     let isDuplicate = false;
     document.querySelectorAll('.allowance-row input[type="text"]').forEach(input => {
-      // Hilangkan teks tambahan seperti "(X Hari)" atau "(X jam)" untuk perbandingan yang akurat
       const existingName = input.value.split('(')[0].trim();
-      if (existingName === componentName.trim()) {
-        isDuplicate = true;
-      }
+      if (existingName === componentName.trim()) isDuplicate = true;
     });
 
     if (isDuplicate) {
@@ -439,14 +456,14 @@
       select.value = "";
       return;
     }
-    // ------------------------------
 
     document.getElementById('allowanceContainer').insertAdjacentHTML('beforeend', generateRowHTML(componentName, defaultAmount, false, 'allowance'));
     select.value = "";
     updateContainerBackgrounds();
     calculatePayroll();
   }
-function addDeductionField() {
+
+  function addDeductionField() {
     const select = document.getElementById('masterDeductionSelect');
     if (!select || !select.value) return;
     
@@ -454,10 +471,8 @@ function addDeductionField() {
     const componentName = select.value;
     const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
 
-    // --- VALIDASI CEK DUPLIKAT ---
     let isDuplicate = false;
     document.querySelectorAll('.deduction-row input[type="text"]').forEach(input => {
-      // Hilangkan teks tambahan atau persentase untuk perbandingan yang akurat
       const existingName = input.value.split('(')[0].trim();
       if (existingName === componentName.trim() || (componentName.trim() === 'Potongan Pajak PPh 21' && existingName.includes('Pajak'))) {
         isDuplicate = true;
@@ -469,7 +484,6 @@ function addDeductionField() {
       select.value = "";
       return;
     }
-    // ------------------------------
 
     document.getElementById('deductionContainer').insertAdjacentHTML('beforeend', generateRowHTML(componentName, defaultAmount, false, 'deduction'));
     select.value = "";
@@ -519,6 +533,16 @@ function addDeductionField() {
         isReadOnlyMode = resData.isHistory;
         const data = resData.data;
 
+        const badge = activeCard.querySelector('.status-badge');
+        if (badge) {
+          if (isReadOnlyMode) {
+            badge.innerText = "Closed";
+            badge.className = "status-badge text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100 animate-fadeIn";
+          } else {
+            badge.innerText = "Draft";
+            badge.className = "status-badge text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600";
+          }
+        }
         document.getElementById('inputBasicSalary').value = formatIDRValue(data.basicSalary || 0);
 
         const actionInputsA = document.getElementById('masterAllowanceSelect').parentElement;
@@ -540,7 +564,7 @@ function addDeductionField() {
           const konsumsiItem = arrAllow.find(a => (a.componentName || a.name).includes('Konsumsi'));
           if(konsumsiItem) {
              attendanceSummary.totalDays = 1; 
-             attendanceAllowanceContainer.innerHTML = `<div class="flex items-center gap-2 allowance-row animate-fadeIn"><input type="text" value="${konsumsiItem.componentName || konsumsiItem.name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span><input type="text" value="${formatIDRValue(konsumsiItem.amount)}" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20" readonly></div><div class="w-8 h-8"></div></div>`;
+             attendanceAllowanceContainer.innerHTML = `<div class="flex items-center gap-2 allowance-row animate-fadeIn"><input type="text" value="${konsumsiItem.componentName || konsumsiItem.name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span><input type="text" value="${formatIDRValue(konsumsiItem.amount)}" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none" readonly></div><div class="w-8 h-8"></div></div>`;
           }
 
           if(data.overtime && data.overtime.amount > 0) {
@@ -551,6 +575,7 @@ function addDeductionField() {
           const arrDed = data.deductions || [];
           arrDed.forEach(item => {
             const cName = item.componentName || item.name;
+            // Force true (Fixed) saat History agar generateRowHTML memicu mode Rupiah
             deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML(cName, item.amount, true, 'deduction'));
           });
 
@@ -586,6 +611,58 @@ function addDeductionField() {
           loadAttendance(employeeId);
         }
       });
+  }
+
+  async function triggerTutupBuku(event) {
+    event.preventDefault();
+    
+    const currentPeriod = document.getElementById('filterPeriod').value;
+    
+    if (!confirm(`Apakah Anda yakin ingin melakukan Tutup Buku periode ${currentPeriod} untuk 3 pegawai target? Data yang dikunci tidak dapat diubah kembali.`)) {
+      return;
+    }
+
+    const allCards = document.querySelectorAll('.employee-card');
+    const targetUsernames = ["fajarjaniko", "abdulaziz", "ongkidwi"];
+    const matchedEmployeeIds = [];
+
+    allCards.forEach(card => {
+      const nameText = card.querySelector('h4').innerText.toLowerCase().replace(/\s/g, "");
+      const empId = card.getAttribute('data-id');
+      
+      const isTarget = targetUsernames.some(target => nameText.includes(target));
+      if (isTarget && empId) {
+        matchedEmployeeIds.push(empId);
+      }
+    });
+
+    if (matchedEmployeeIds.length === 0) {
+      alert("❌ Gagal memetakan ID Pegawai. Pastikan profil 3 pegawai target ada di database.");
+      return;
+    }
+
+    try {
+      const response = await fetch('/payroll/close-book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employeeIds: matchedEmployeeIds,
+          periodMonth: currentPeriod
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`🔒 Sukses! ${result.message}`);
+        window.location.reload();
+      } else {
+        alert(`❌ Gagal: ${result.message}`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan koneksi sistem.");
+    }
   }
 
   function submitPayrollData() {

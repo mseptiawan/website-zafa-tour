@@ -246,3 +246,128 @@ export const getEmployeeAttendanceSummary = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const closePayrollForSpecificEmployees = async (req, res) => {
+  try {
+    const { employeeIds, periodMonth } = req.body;
+
+    if (!employeeIds || employeeIds.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Tidak ada ID pegawai yang terpilih." });
+    }
+
+    const processedResults = [];
+
+    for (const empId of employeeIds) {
+      // 1. Dapatkan besaran Gaji Pokok
+      const salaryDoc = await EmployeeSalary.findOne({ employeeId: empId });
+      const basicSalary = salaryDoc ? salaryDoc.basicSalary : 0;
+
+      // 2. Ambil snapshot tunjangan dinamis dari tabel EmployeeAllowance
+      const savedAllowances = await EmployeeAllowance.find({ employeeId: empId }).populate(
+        "componentId"
+      );
+
+      const allowances = [];
+      const deductions = [];
+      let totalEarnings = basicSalary;
+      let totalDeductions = 0;
+
+      // =========================================================================
+      // REVISI LOGIKA AMAN: Hitung nilai final murni berdasarkan skema master DB
+      // =========================================================================
+      // 2. Ambil snapshot tunjangan dinamis dari tabel EmployeeAllowance
+      // 2. Ambil snapshot tunjangan dinamis dari tabel EmployeeAllowance
+      savedAllowances.forEach((item) => {
+        if (!item.componentId) return;
+
+        let finalAmount = item.amount || 0;
+        let displayName = item.componentId.name;
+
+        // Bersihkan nama dari sisa-sisa string persen bawaan UI jika ada
+        displayName = displayName.split("(")[0].trim();
+
+        if (
+          item.componentId.calculationType === "PERCENTAGE" &&
+          item.componentId.basedOnComponent === "GAPOK"
+        ) {
+          // Ambil nilai persen asli (Jika di DB terlanjur besar karena bug lama, paksa set ke 2)
+          const percentageValue = finalAmount < 100 ? finalAmount : 2;
+
+          // Hitung nilai rupiah dari Gaji Pokok (2 / 100 * 4.000.000 = 80.000)
+          finalAmount = (percentageValue / 100) * basicSalary;
+
+          // Gabungkan nama komponen dengan teks persen baru
+          displayName = `${displayName} (${percentageValue}%)`;
+        }
+
+        const componentData = {
+          componentName: displayName,
+          amount: finalAmount,
+        };
+
+        if (item.componentId.category === "EARNING") {
+          allowances.push(componentData);
+          totalEarnings += finalAmount;
+        } else if (item.componentId.category === "DEDUCTION") {
+          deductions.push(componentData);
+          totalDeductions += finalAmount;
+        }
+      });
+      // 3. Tarik potongan cicilan pinjaman aktif bulan berjalan (jika ada)
+      const activeLoanPayment = await LoanPayment.findOne({
+        employeeId: empId,
+        periodMonth: periodMonth,
+        isPaid: false,
+      });
+
+      let loanDeductionData = { loanPaymentId: null, amount: 0 };
+      if (activeLoanPayment) {
+        loanDeductionData = {
+          loanPaymentId: activeLoanPayment._id,
+          amount: activeLoanPayment.amount,
+        };
+        totalDeductions += activeLoanPayment.amount;
+      }
+
+      // 4. Update data atau buat baru (Upsert) ke koleksi Payroll dengan status CLOSED
+      const finalPayroll = await Payroll.findOneAndUpdate(
+        { employeeId: empId, periodMonth: periodMonth },
+        {
+          employeeId: empId,
+          periodMonth: periodMonth,
+          basicSalary,
+          allowances,
+          deductions,
+          loanDeduction: loanDeductionData,
+          totalEarnings,
+          totalDeductions,
+          netTakeHomePay: totalEarnings - totalDeductions,
+          status: "CLOSED",
+        },
+        { upsert: true, new: true }
+      );
+
+      // 5. Ubah status pembayaran cicilan menjadi lunas
+      if (activeLoanPayment) {
+        await LoanPayment.findByIdAndUpdate(activeLoanPayment._id, {
+          $set: {
+            isPaid: true,
+            paidAt: new Date(),
+          },
+        });
+      }
+
+      processedResults.push(finalPayroll);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Tutup buku periode ${periodMonth} berhasil diproses untuk target pegawai.`,
+      data: processedResults,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

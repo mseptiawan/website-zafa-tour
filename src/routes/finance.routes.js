@@ -8,8 +8,11 @@ import {
   paymentHistoryPage,
   paymentHistoryDetail,
   processPayment,
+  getFinancePage,
   uploadPaymentProof,
   confirmPayment,
+  getAllPayrollRecords,
+  verifyIndividualPayment,
 } from "../controllers/finance.controller.js";
 
 const router = express.Router();
@@ -31,6 +34,9 @@ router.get(
   paymentHistoryDetail
 );
 
+router.get("/payroll", getFinancePage); //
+router.get("/all-records", getAllPayrollRecords);
+router.post("/verify-payment", uploadFile.single("mutationFile"), verifyIndividualPayment);
 router.get("/:id", roleMiddleware("MANAGER_KEUANGAN"), financeTripDetail);
 
 router.post("/:id/process", roleMiddleware("MANAGER_KEUANGAN"), processPayment);
