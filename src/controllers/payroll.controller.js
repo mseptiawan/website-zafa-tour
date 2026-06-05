@@ -1,4 +1,6 @@
 import Employee from "../models/employee/Employee.model.js";
+import EmployeeCareer from "../models/employee/EmployeeCareer.js";
+import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
 import { getAttendanceSummary } from "../services/attendanceSummary.service.js";
 import * as payrollService from "../services/payroll.service.js";
 import Payroll from "../models/payroll/Payroll.model.js";
@@ -369,5 +371,39 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getMySlipPage = async (req, res, next) => {
+  try {
+    // 1. Cari data profil pegawai yang sedang login beserta virtual data pendukungnya
+    const employee = await Employee.findOne({ userId: req.user._id })
+      .populate({
+        path: "careerData",
+        populate: { path: "bidangId unitId positionId", select: "name" },
+      })
+      .populate("financialData");
+
+    if (!employee) {
+      return res.status(404).render("errors/404", {
+        title: "Not Found",
+        message: "Profil pegawai Anda belum dikonfigurasi di sistem.",
+      });
+    }
+
+    // 2. Tarik SEMUA riwayat payroll milik karyawan ini yang berstatus CLOSED atau PAID
+    const payrolls = await Payroll.find({
+      employeeId: employee._id,
+      status: { $in: ["CLOSED", "PAID"] },
+    }).sort({ periodMonth: -1 }); // Urutkan dari bulan terbaru
+
+    return res.render("payroll/my-slip", {
+      title: "Slip Gaji Saya",
+      employee,
+      payrolls, // Lempar semua list slip ke EJS
+      user: req.user,
+    });
+  } catch (error) {
+    next(error);
   }
 };

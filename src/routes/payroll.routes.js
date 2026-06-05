@@ -5,6 +5,7 @@ import {
   getEmployeeAttendanceSummary,
   calculateEmployeePayroll,
   closePayrollForSpecificEmployees,
+  getMySlipPage,
 } from "../controllers/payroll.controller.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -18,5 +19,5 @@ router.post("/save", saveEmployeeAllowances);
 router.get("/attendance-summary/:employeeId", getEmployeeAttendanceSummary);
 router.get("/calculate/:employeeId", calculateEmployeePayroll);
 router.post("/close-book", closePayrollForSpecificEmployees);
-router.get("/my-slip", renderPayrollPage);
+router.get("/my-slip", getMySlipPage);
 export default router;

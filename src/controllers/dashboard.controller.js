@@ -2,9 +2,8 @@ import moment from "moment";
 import Attendance from "../models/Attendance.model.js";
 import DailyLog from "../models/DailyLog.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
-import { Overtime } from "../models/Overtime.model.js";
-import Kpi from "../models/kpi/Kpi.model.js";
 import Holiday from "../models/calender/Holiday.model.js";
+import Announcement from "../models/Announcement.model.js";
 
 export const index = async (req, res, next) => {
   try {
@@ -22,15 +21,14 @@ export const index = async (req, res, next) => {
     const endToday = new Date();
     endToday.setHours(23, 59, 59, 999);
 
+    // Ambil data paralel riil dari MongoDB
     const [
       attendanceToday,
       monthlyAttendance,
       dailyLogsToday,
       myActiveTrips,
-      myLastKpi,
       nextHoliday,
-      pendingOvertimeApprovals,
-      pendingTripApprovals,
+      latestAnnouncements,
     ] = await Promise.all([
       Attendance.findOne({ userId, checkIn: { $gte: startToday, $lte: endToday } }),
 
@@ -46,32 +44,19 @@ export const index = async (req, res, next) => {
 
       BusinessTrip.find({ userId }).sort({ createdAt: -1 }).limit(3),
 
-      Kpi.findOne({ employeeId: user.employeeData?._id || userId }).sort({ periode: -1 }),
-
       Holiday.findOne({
         date: { $gte: startToday },
         $or: [{ year: currentYear }, { isRecurring: true }],
       }).sort({ date: 1 }),
 
-      user.role === "MANAGER_ADMINISTRASI"
-        ? Overtime.find({ status: "Pending Manager", userId: { $ne: userId } })
-            .populate("userId")
-            .sort({ createdAt: -1 })
-            .limit(5)
-        : [],
-
-      ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(user.role)
-        ? BusinessTrip.find({ status: "PENDING_APPROVAL" })
-            .populate("userId")
-            .sort({ createdAt: -1 })
-            .limit(5)
-        : [],
+      Announcement.find({ status: "PUBLISHED" }).sort({ createdAt: -1 }).limit(3),
     ]);
 
     const hadirCount = monthlyAttendance.filter((a) => a.status === "HADIR").length;
     const telatCount = monthlyAttendance.filter((a) => a.status === "TELAT").length;
     const alpaCount = monthlyAttendance.filter((a) => a.status === "ALPA").length;
 
+    // Render ke view EJS dengan data variabel lengkap
     return res.render("dashboard/main", {
       title: "Dashboard Zafa Tour",
       user,
@@ -87,11 +72,8 @@ export const index = async (req, res, next) => {
 
       initialLogs: dailyLogsToday,
       myTrips: myActiveTrips,
-      kpiTerakhir: myLastKpi,
       nextHoliday,
-
-      pendingOvertimeApprovals,
-      pendingTripApprovals,
+      latestAnnouncements,
     });
   } catch (error) {
     console.error("Error Dashboard Controller:", error);

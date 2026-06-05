@@ -1,4 +1,4 @@
-import Announcement from "../models/Announcement.mode.js";
+import Announcement from "../models/Announcement.model.js";
 import { getPaginationMeta } from "../utils/pagination.js";
 
 const POPULATE_CREATED_BY = {

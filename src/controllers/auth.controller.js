@@ -6,7 +6,7 @@ import crypto from "crypto";
 import Attendance from "../models/Attendance.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
-import Announcement from "../models/Announcement.mode.js";
+import Announcement from "../models/Announcement.model.js";
 export const showLogin = (req, res) => {
   if (req.session.user) {
     return res.redirect("/dashboard");
