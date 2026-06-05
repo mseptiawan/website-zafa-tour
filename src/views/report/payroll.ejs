@@ -1,0 +1,264 @@
+<%- layout('layouts/main', { title }) %>
+
+<style>
+  /* =========================================================================
+     KONTROL PRINT & LAYOUT MINIMALIS DOKUMEN KUNING
+     ========================================================================= */
+  #report-print-zone {
+    display: none;
+  }
+
+  @media print {
+    html, body, body * {
+      visibility: hidden !important;
+      background: transparent !important;
+    }
+    #report-print-zone, #report-print-zone * {
+      visibility: visible !important;
+    }
+    #report-print-zone {
+      display: block !important;
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      color: black !important;
+    }
+    .yellow-print-header {
+      background-color: #facc15 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color: black !important;
+    }
+  }
+
+  .formal-print-text {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: normal !important;
+  }
+  .formal-print-text th, .formal-print-text td {
+    font-weight: normal !important;
+  }
+</style>
+
+<div class="ml-72 min-h-screen bg-[#f8fafc] p-8 antialiased text-slate-800">
+  <div class="mx-auto max-w-7xl space-y-6">
+
+    <!-- HEADER MONITOR UTAMA (PURE CLEAN & FLAT) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/60 rounded-xl p-6 shadow-xs no-print">
+      <div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Financial Operations</span>
+        <h1 class="text-base font-bold tracking-tight text-slate-950">Rekapitulasi Penggajian Karyawan</h1>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <!-- FORM FILTER BULAN (NETRAL) -->
+        <form method="GET" action="/report/payroll" class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1">
+          <div class="flex items-center gap-2 px-2">
+            <i class="fa-solid fa-filter text-slate-400 text-[10px]"></i>
+            <span class="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">Periode:</span>
+            <!-- Input type diganti "month" karena basis payroll adalah periodMonth[cite: 5] -->
+            <input type="month" name="periodMonth" id="filterPeriod" value="<%= filters.periodMonth %>" class="bg-transparent text-[11px] font-bold text-slate-700 outline-none cursor-pointer">
+          </div>
+          <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-semibold h-7 px-3 rounded-md transition-all">
+            Saring
+          </button>
+        </form>
+
+        <!-- TOMBOL EXPORT MONOKROM -->
+        <button onclick="executePrintPayrollReport()" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-medium h-9 px-4 rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-file-pdf text-[12px]"></i> Export PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- DIAGRAM GRID KONTEMPORER - FLAT PURE CLEAN (NO-PRINT) -->
+    <div class="grid grid-cols-1 gap-4 no-print">
+      
+      <!-- LAYER ATAS: METRICS CARD FLAT -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Boks 1: Bruto -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1 bg-slate-300"></div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Akumulasi Gaji Bruto</span>
+          <div class="flex items-baseline gap-1 mt-2">
+            <span class="text-[12px] font-medium text-slate-400">Rp</span>
+            <span class="text-xl font-bold tracking-tight text-slate-950 tabular-nums"><%= new Intl.NumberFormat('id-ID').format(analytics.totalEarnings) %></span>
+          </div>
+        </div>
+
+        <!-- Boks 2: Potongan -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1 bg-slate-400"></div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Retensi & Potongan</span>
+          <div class="flex items-baseline gap-1 mt-2">
+            <span class="text-[12px] font-medium text-slate-400">Rp</span>
+            <span class="text-xl font-bold tracking-tight text-slate-950 tabular-nums"><%= new Intl.NumberFormat('id-ID').format(analytics.totalDeductions) %></span>
+          </div>
+        </div>
+
+        <!-- Boks 3: THP Bersih -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1 bg-slate-900"></div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Beban Bersih (Take Home Pay)</span>
+          <div class="flex items-baseline gap-1 mt-2">
+            <span class="text-[12px] font-medium text-slate-400">Rp</span>
+            <span class="text-xl font-bold tracking-tight text-slate-950 tabular-nums"><%= new Intl.NumberFormat('id-ID').format(analytics.totalNet) %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAYER BAWAH: DIAGRAM KARTU MATRIKS (PURE MONOKROM GRID) -->
+      <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Matriks Komparasi Gaji Pegawai</h3>
+          <span class="text-[10px] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-600 font-medium tracking-wide">PAYROLL DATA SHEET</span>
+        </div>
+
+        <!-- Grid Layout Otomatis Kartu Flat Netral -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <% if (listPayroll.length === 0) { %>
+            <div class="col-span-full p-6 text-center text-slate-400 text-xs border border-dashed border-slate-300 rounded-xl">
+              Belum ada data slip gaji yang di-generate (Tutup Buku) untuk periode ini.
+            </div>
+          <% } else { %>
+            <% listPayroll.forEach((p) => { 
+                 let empName = p.employeeId && p.employeeId.fullName ? p.employeeId.fullName : "Anonim";
+            %>
+              <div class="p-3 bg-slate-50 border border-slate-200/70 rounded-xl text-xs space-y-2 transition-all hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
+                <!-- Nama Karyawan & Status -->
+                <div class="flex justify-between items-start border-b border-slate-200/60 pb-1.5">
+                  <span class="font-bold text-slate-900 truncate pr-2"><%= empName %></span>
+                  <span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-bold tracking-widest uppercase shrink-0"><%= p.status %></span>
+                </div>
+                
+                <!-- Informasi Indikator Keuangan -->
+                <div class="flex justify-between items-center text-slate-500 font-mono text-[11px]">
+                  <div class="space-y-0.5">
+                    <span class="block">Bruto : <span class="text-slate-900">Rp <%= new Intl.NumberFormat('id-ID').format(p.totalEarnings) %></span></span>
+                    <span class="block">Potongan : <span class="text-slate-900">Rp <%= new Intl.NumberFormat('id-ID').format(p.totalDeductions) %></span></span>
+                  </div>
+                  <div class="text-right border-l border-slate-200 pl-3">
+                    <span class="block text-[9px] text-slate-400 uppercase tracking-wider">Take Home Pay</span>
+                    <span class="block font-bold text-slate-900">Rp <%= new Intl.NumberFormat('id-ID').format(p.netTakeHomePay) %></span>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTAINER CETAK FORMAL KUNING -->
+    <div id="report-print-zone" class="bg-white p-2 space-y-6 text-black formal-print-text"></div>
+
+  </div>
+</div>
+
+<script>
+  const clientPayrollData = <%- JSON.stringify(listPayroll) %>;
+  const analyticsData = <%- JSON.stringify(analytics) %>;
+
+  function executePrintPayrollReport() {
+    const period = document.getElementById('filterPeriod').value; // cth: 2026-05
+
+    let summaryRowsHTML = '';
+    let counter = 1;
+
+    clientPayrollData.forEach(p => {
+      let empName = p.employeeId && p.employeeId.fullName ? p.employeeId.fullName : "Anonim";
+      
+      summaryRowsHTML += `
+        <tr class="h-8" style="font-family: 'Times New Roman', Times, serif;">
+          <td class="p-2 border-r border-black text-center" style="font-weight: normal !important;">${counter++}</td>
+          <td class="p-2 border-r border-black" style="font-weight: normal !important; text-align: left;">${empName}</td>
+          <td class="p-2 text-right border-r border-black" style="font-weight: normal !important;">Rp ${new Intl.NumberFormat('id-ID').format(p.totalEarnings)}</td>
+          <td class="p-2 text-right border-r border-black" style="font-weight: normal !important;">Rp ${new Intl.NumberFormat('id-ID').format(p.totalDeductions)}</td>
+          <td class="p-2 text-right" style="font-weight: normal !important;">Rp ${new Intl.NumberFormat('id-ID').format(p.netTakeHomePay)}</td>
+        </tr>`;
+    });
+
+    const finalPrintTemplate = `
+      <div class="flex justify-between items-start">
+        <div class="border border-black px-6 py-1 mt-2">
+          <span class="text-xs tracking-wide" style="color: #f43f5e; font-weight: normal !important;">Dokumen Keuangan & Audit</span>
+        </div>
+        <div class="text-center space-y-0.5">
+          <div class="inline-flex flex-col items-center justify-center">
+            <span class="text-2xl tracking-tighter" style="font-family: 'Times New Roman', Times, serif; font-weight: normal !important;">ZM</span>
+            <span class="text-[8px] tracking-widest uppercase -mt-1" style="font-weight: normal !important;">ZAFA TOUR</span>
+          </div>
+          <div class="text-[10px] uppercase tracking-tight" style="font-weight: normal !important;">Zafa Mulia Mandiri</div>
+        </div>
+      </div>
+
+      <div class="pt-1">
+        <h2 class="text-xs" style="font-weight: normal !important; text-align: left;">PT Zafa Mulia Mandiri</h2>
+      </div>
+
+      <div class="space-y-0.5" style="text-align: left;">
+        <h3 class="text-xs" style="font-weight: normal !important;">Laporan Rekapitulasi Beban Penggajian (Payroll)</h3>
+        <p class="text-xs" style="font-weight: normal !important;">Buku Periode : ${period}</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 text-xs pt-2">
+        <div class="border border-black p-2" style="text-align: left;">
+          <span class="block text-[10px] text-gray-500">Akumulasi Gaji Bruto</span>
+          <span class="text-sm" style="font-weight: normal !important;">Rp ${new Intl.NumberFormat('id-ID').format(analyticsData.totalEarnings)}</span>
+        </div>
+        <div class="border border-black p-2" style="text-align: left;">
+          <span class="block text-[10px] text-gray-500">Total Retensi & Potongan</span>
+          <span class="text-sm" style="font-weight: normal !important;">Rp ${new Intl.NumberFormat('id-ID').format(analyticsData.totalDeductions)}</span>
+        </div>
+        <div class="border border-black p-2" style="text-align: left;">
+          <span class="block text-[10px] text-gray-500">Beban Bersih (Take Home Pay)</span>
+          <span class="text-sm" style="font-weight: normal !important;">Rp ${new Intl.NumberFormat('id-ID').format(analyticsData.totalNet)}</span>
+        </div>
+      </div>
+
+      <div class="border border-black mt-4">
+        <table class="w-full text-xs border-collapse">
+          <thead>
+            <tr class="yellow-print-header border-b border-black">
+              <th class="p-2 border-r border-black font-normal text-center" style="font-weight: normal !important; width: 5%;">No</th>
+              <th class="p-2 border-r border-black font-normal text-left" style="font-weight: normal !important; width: 35%;">Nama Pegawai</th>
+              <th class="p-2 border-r border-black text-right font-normal" style="font-weight: normal !important; width: 20%;">Total Bruto</th>
+              <th class="p-2 border-r border-black text-right font-normal" style="font-weight: normal !important; width: 15%;">Potongan</th>
+              <th class="p-2 text-right font-normal" style="font-weight: normal !important; width: 25%;">Net Take Home Pay</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-black">
+            ${summaryRowsHTML}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pt-6 flex justify-between items-start text-xs">
+        <div class="text-[10px] text-gray-400 italic">
+          *Dokumen diunduh secara digital melalui Sistem HRIS Divisi Keuangan.
+        </div>
+        <div class="text-center pr-12 space-y-12">
+          <span class="block" style="font-weight: normal !important;">Manager Keuangan (Finance)</span>
+          <span class="block border-t border-black pt-1 w-40" style="font-weight: normal !important;">Otorisasi Sistem</span>
+        </div>
+      </div>
+
+      <div class="border-b border-black pt-4"></div>
+
+      <div class="flex items-center gap-1.5 text-[10px] pt-1">
+        <span style="font-family: 'Times New Roman', Times, serif; font-weight: normal !important;">ZM</span>
+        <span style="font-weight: normal !important;">PT Zafa Mulia Mandiri</span>
+      </div>
+    `;
+
+    const printZone = document.getElementById('report-print-zone');
+    if (printZone) {
+      printZone.innerHTML = finalPrintTemplate;
+      window.print();
+    }
+  }
+</script>

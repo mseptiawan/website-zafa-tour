@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import Announcement from "../../models/Announcement.mode.js";
+import Announcement from "../../models/Announcement.model.js";
 import User from "../../models/basic/User.model.js";
 
 dotenv.config();

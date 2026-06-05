@@ -71,28 +71,36 @@
       <!-- =========================================================================
            TAMPILAN 1: LIST SLIP GAJI DI WEB (MINIMALIS, BERSIH, LIST BIASA)
            ========================================================================= -->
-      <div class="bg-white border border-slate-200/60 rounded-2xl p-2 shadow-2xs no-print divide-y divide-slate-100">
-        <% payrolls.forEach((pay, index) => { %>
-          <div class="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors">
-            <div class="space-y-1">
-              <span class="text-xs font-bold text-slate-800">Periode Bulan: <%= pay.periodMonth %></span>
-              <div class="text-[11px] text-slate-400 font-normal">
-                Take Home Pay: <span class="font-medium text-slate-700">Rp <%= pay.netTakeHomePay.toLocaleString('id-ID') %></span>
-              </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full <%= pay.status === 'PAID' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' %>">
-                <%= pay.status === 'PAID' ? 'Lunas' : 'Diterbitkan' %>
-              </span>
-              <button type="button" onclick="executePrintSlip(<%= index %>)" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-medium h-8 px-3.5 rounded-xl transition-all active:scale-[0.97] cursor-pointer flex items-center gap-1.5 shadow-sm">
-                <i class="fa-solid fa-print text-[10px]"></i> Cetak
-              </button>
-            </div>
-          </div>
-        <% }) %>
+   <div class="bg-white border border-slate-200/60 rounded-2xl p-2 shadow-2xs no-print divide-y divide-slate-100">
+  <% payrolls.forEach((pay, index) => { %>
+    <div class="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors">
+      <div class="space-y-1">
+        <span class="text-xs font-bold text-slate-800">Periode Bulan: <%= pay.periodMonth %></span>
+        <div class="text-[11px] text-slate-400 font-normal">
+          Take Home Pay: <span class="font-medium text-slate-700">Rp <%= pay.netTakeHomePay.toLocaleString('id-ID') %></span>
+        </div>
       </div>
+      
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full <%= pay.status === 'PAID' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' %>">
+          <%= pay.status === 'PAID' ? 'Lunas' : 'Diterbitkan' %>
+        </span>
 
+        <% if (pay.status === 'PAID' && pay.mutationFile) { %>
+          <a href="<%= pay.mutationFile %>" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-[11px] font-semibold h-8 px-3 rounded-xl transition-all active:scale-[0.97] inline-flex items-center gap-1.5 border border-emerald-100">
+            <i class="fa-solid fa-file-invoice-dollar text-[11px]"></i> Bukti TF
+          </a>
+        <% } else if (pay.status === 'PAID') { %>
+          <span class="text-[10px] text-slate-400 italic font-normal px-2">Processed by Bank</span>
+        <% } %>
+
+        <button type="button" onclick="executePrintSlip(<%= index %>)" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-medium h-8 px-3.5 rounded-xl transition-all active:scale-[0.97] cursor-pointer flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-print text-[10px]"></i> Cetak
+        </button>
+      </div>
+    </div>
+  <% }) %>
+</div>
     <% } %>
 
     <!-- =========================================================================

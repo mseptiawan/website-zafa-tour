@@ -151,7 +151,7 @@
           show: true,
           submenus: [
             { name: "Lembar Kerja", path: "/daily-log", show: !!user.permissions.daily_log_create },
-            { name: "Riwayat Jurnal", path: "/daily-log/review", show: true }
+            { name: "Riwayat Jurnal", path: "/daily-log/review", show: user.role !== "PEGAWAI" }
 
           ]
         }
@@ -192,21 +192,21 @@
         },
         {
           id: "payroll",
-          name: "Manajemen Payroll",
+          name: user.role === "PEGAWAI" ? "Penggajian" : "Manajemen Payroll",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />`,
           show: true,
           submenus: [
             { name: "Slip Gaji Saya", path: "/payroll/my-slip", show: !!user.permissions.payroll_view },
             { name: "Proses Hitung Gaji", path: "/payroll/manage", show: !!user.permissions.payroll_manage },
             { name: "Kelola Komponen Gaji", path: "/components/manage", show: !!user.permissions.payroll_component_manage },
-            { name: "Verifikasi & Pembayaran", path: "/finance/payroll", show: !!user.permissions.payroll_finance_approval },
+            { name: "Verifikasi & Pembayaran", path: "/finance/payroll", show: user.role === "MANAGER_KEUANGAN" }
           ]
         }
       ]
     },
     {
       title: "Laporan",
-      show: true,
+      show: user.role !== "PEGAWAI", 
       menus: [
         {
           id: "report",
@@ -214,9 +214,12 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h6v6m-7 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-2-2h-4L7 5H4a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
           show: true,
           submenus: [
-            { name: "Laporan Kunjungan Sales", path: "/sales/report", show: true },
-            { name: "Laporan Lembur", path: "/report/overtime", show: !!user.permissions.report_overtime },
-            { name: "Laporan Absensi", path: "/report/attendance", show: !!user.permissions.report_attendance }
+            { name: "Laporan Data Pegawai", path: "/report/employees", show: true },
+            { name: "Laporan Lembur", path: "/report/overtime", show: true},
+            { name: "Laporan Absensi", path: "/report/attendance", show: true},
+            { name: "Laporan Pengeluaran Gaji", path: "/report/payroll", show: true },
+            { name: "Laporan Mutasi Pinjaman", path: "/report/loans", show: true }
+
           ]
         }
       ]

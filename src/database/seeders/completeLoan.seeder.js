@@ -224,10 +224,10 @@ const completeLoanSeeder = async () => {
     }
 
     console.log("\n✅ SEEDING SELESAI: Data kombinasi sukses dikonfigurasi untuk sidang!");
-    process.exit(0);
+    // process.exit(0);
   } catch (error) {
     console.error("❌ Terjadi kegagalan seeding data kombinasi:", error);
-    process.exit(1);
+    // process.exit(1);
   }
 };
 

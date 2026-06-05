@@ -7,18 +7,11 @@ import EmployeeCareer from "../../models/employee/EmployeeCareer.js";
 import Role from "../../models/basic/Role.model.js";
 import Bidang from "../../models/basic/Bidang.model.js";
 
-const START_DATE = new Date("2026-04-27T00:00:00Z");
-const END_DATE = new Date("2026-05-26T23:59:59Z");
+// ─── FIX 1: SESUAIKAN TANGGAL MASUK KE SIKLUS PAYROLL JUNI 2026 ───
+const START_DATE = new Date("2026-05-27T00:00:00Z");
+const END_DATE = new Date("2026-06-25T23:59:59Z");
 
-const TARGET_EMPLOYEES = [
-  "Abdul Aziz",
-  "Baso Herman",
-  "Melti Sundari",
-  "Duwi Hartati",
-  "Ongki Dwi",
-  "Fadhilah",
-  "Nurul",
-];
+const TARGET_EMPLOYEES = ["Abdul Aziz", "Ongki Dwi", "Fajar Janiko"];
 
 const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const randomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -45,6 +38,9 @@ const WORK_DESCRIPTIONS = [
 
 const seedOvertime = async () => {
   try {
+    // Bersihkan dulu data lemburan lama biar ga numpuk double
+    await Overtime.deleteMany({ payrollPeriodId: "2026-06" });
+
     const defaultRoleMaster = await Role.findOne({ name: "WAKIL_DIREKTUR" });
     const defaultRoleName = defaultRoleMaster ? defaultRoleMaster.name : "WAKIL_DIREKTUR";
 
@@ -72,32 +68,9 @@ const seedOvertime = async () => {
       const bidangId = career?.bidangId?._id || defaultBidangMaster._id;
       const requiredManagerRole = career?.bidangId?.managerRoleId?.name || defaultRoleName;
 
-      let approver = await User.findOne({ role: requiredManagerRole });
-      if (!approver) approver = await User.findOne({ role: "WAKIL_DIREKTUR" });
-      if (!approver)
-        approver = await User.findOne({ role: { $in: ["WADIR", "ADMIN", "MANAGER"] } });
-
-      if (!approver) {
-        let targetRoleDoc = await Role.findOne({ name: requiredManagerRole });
-        if (!targetRoleDoc) targetRoleDoc = await Role.findOne({ name: "WAKIL_DIREKTUR" });
-        if (!targetRoleDoc) targetRoleDoc = await Role.findOne();
-
-        approver = await User.findOneAndUpdate(
-          { username: "wadir_auto" },
-          {
-            $setOnInsert: {
-              username: "wadir_auto",
-              fullName: "Wakil Direktur Utama",
-              role: requiredManagerRole,
-              roleId: targetRoleDoc ? targetRoleDoc._id : new mongoose.Types.ObjectId(),
-              email: "wadir_auto@zafatour.com",
-              password: "password123",
-              isActive: true,
-            },
-          },
-          { upsert: true, returnDocument: "after" }
-        );
-      }
+      // Cari approver pake fallback aman
+      let approver = await User.findOne({ username: "wadir" }); // sesuaikan username akun wadir asli lu
+      if (!approver) approver = await User.findOne({}); // fallback ambil user pertama gpp buat bypass seeder
 
       const timesToOvertime = randomInt(2, 4);
 
@@ -119,7 +92,7 @@ const seedOvertime = async () => {
           userId: user._id,
           employeeId: employee._id,
           employeeName: employee.fullName,
-          date: workDate,
+          date: workDate, // Tanggal real sekarang berada di antara 27 Mei - 25 Juni
           startTime,
           endTime,
           totalHours,
@@ -129,10 +102,11 @@ const seedOvertime = async () => {
             type: "OFFICE",
             detail: "Kantor Pusat Zafa Tour",
           },
-          status: "APPROVED",
+          status: "APPROVED", // <--- WAJIB APPROVED BIAR MASUK HITUNGAN PAYROLL
           approvedBy: approver._id,
           approvedAt: new Date(workDate.getTime() + 1000 * 60 * 60 * 24),
           payrollPeriodId,
+          periodMonth: payrollPeriodId, // ─── FIX 2: SINKRONKAN KEDUA NAMA FIELD NYA BIAR AMAN ───
           payrollStatus: "PENDING",
           overtimeRateSnapshot: overtimeRate,
           multiplierSnapshot: 1.5,
@@ -160,21 +134,12 @@ const seedOvertime = async () => {
 
     if (overtimeRecords.length > 0) {
       await Overtime.insertMany(overtimeRecords);
-      console.log(`Berhasil membuat ${overtimeRecords.length} data lembur.`);
+      console.log(`✅ Berhasil membuat ${overtimeRecords.length} data lembur siklus Juni 2026.`);
     } else {
-      console.log(
-        "0 data masuk. Pastikan userSeeder dan employeeSeeder sudah dijalankan di DB ini."
-      );
+      console.log("0 data masuk.");
     }
   } catch (error) {
-    if (error.name === "ValidationError") {
-      console.error("Gagal karena Validasi Mongoose Error:");
-      for (let field in error.errors) {
-        console.error(`- Field [${field}]: ${error.errors[field].message}`);
-      }
-    } else {
-      console.error("Seeder Lembur Gagal Terjadi Error:", error);
-    }
+    console.error("Seeder Lembur Gagal:", error);
     throw error;
   }
 };

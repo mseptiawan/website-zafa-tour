@@ -1,20 +1,19 @@
 import SalaryComponent from "../../models/payroll/SalaryComponent.model.js";
 
 const salaryComponents = [
-{
-  code: "TJ_KONSUMSI",
-  name: "Tunjangan Konsumsi",
-  type: "FLEXIBLE",
-  category: "EARNING",
-  sourceType: "DYNAMIC",
-  calculationType: "FIXED_AMOUNT",
-  defaultAmount: 25000,
-  basedOnComponent: "TOTAL_HADIR",
-  isLocked: true,
-  isActive: true,
-  description:
-    "Tunjangan konsumsi dihitung dari jumlah hadir × tarif per hari pegawai."
-}
+  {
+    code: "TJ_KONSUMSI",
+    name: "Tunjangan Konsumsi",
+    type: "FLEXIBLE",
+    category: "EARNING",
+    sourceType: "DYNAMIC",
+    calculationType: "FIXED_AMOUNT",
+    defaultAmount: 25000,
+    basedOnComponent: "TOTAL_HADIR",
+    isLocked: true,
+    isActive: true,
+    description: "Tunjangan konsumsi dihitung dari jumlah hadir × tarif per hari pegawai.",
+  },
   {
     code: "TJ_LEMBUR",
     name: "Tunjangan Lembur per Jam",

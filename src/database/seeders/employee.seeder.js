@@ -319,16 +319,20 @@ const employeeSeeder = async () => {
 
   for (let i = 0; i < rawEmployees.length; i++) {
     const emp = rawEmployees[i];
-    const orderNumber = (i + 1).toString().padStart(3, "0");
-    const generatedId = `EMP-${orderNumber}`;
 
-    const generatedKtp = `320101${(i + 1).toString().padStart(10, "0")}`;
+    // 1. Simulasi NIK KTP Mentah 16 Digit asli karyawan
+    const generatedKtpMentah = `320101${(i + 1).toString().padStart(10, "0")}`;
 
+    // 2. POTONG AMBIL 6 ANGKA TERAKHIR SAJA (Hasil rapi: ZFT-000001)
+    const shortIdFromKtp = generatedKtpMentah.slice(-6);
+    const professionalId = `ZFT-${shortIdFromKtp}`;
+
+    // 3. MURNI CREATE BARU (Gak pake findOneAndUpdate lagi)
     const newEmployee = await Employee.create({
       userId: emp.userId,
-      employeeIdNumber: generatedId,
+      employeeIdNumber: professionalId,
       fullName: emp.fullName,
-      nomor_ktp: generatedKtp,
+      nomor_ktp: generatedKtpMentah,
       tempat_lahir: "Palembang",
       tanggal_lahir: new Date("1998-01-01"),
       jenis_kelamin: emp.gender === "Laki-Laki" ? "Laki-Laki" : "Perempuan",
@@ -336,6 +340,7 @@ const employeeSeeder = async () => {
       status_pernikahan: "Lajang",
     });
 
+    // 4. MURNI CREATE KARIR BARU
     if (emp.positionId || emp.bidangId || emp.unitId) {
       await EmployeeCareer.create({
         employee_id: newEmployee._id,

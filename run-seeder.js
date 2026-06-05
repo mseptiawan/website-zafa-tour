@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import completePayrollHistorySeeder from "./src/database/seeders/attendance.seeder.js";
+import completePayrollHistorySeeder from "./src/database/seeders/seedAttendanceMassal.js";
 
 dotenv.config();
 const MONGO_URI = process.env.MONGODB_URI;

@@ -17,6 +17,9 @@ import leaveSeeder from "./leave.seeder.js";
 import assignmentSeeder from "./assignment.seeder.js";
 import announcementSeeder from "./announcement.seeder.js";
 import salesVisitSeeder from "./salesVisit.seeder.js";
+import completeLoanSeeder from "./completeLoan.seeder.js";
+import completePayrollHistorySeeder from "./completePayrollHistory.seeder.js";
+import attendanceSeeder from "./attendance.seeder.js";
 import businessTripSeeder from "./businessTrip.seeder.js";
 import overtimeSeeder from "./overtime.seeder.js";
 import expenseCategorySeeder from "./expenseCategory.seeder.js";
@@ -38,18 +41,19 @@ const seeders = [
   userSeeder,
   employeeSeeder,
   employeeSalarySeeder,
-
+  attendanceSeeder,
   holidaySeeder,
   leaveSeeder,
+  completeLoanSeeder,
+  overtimeSeeder,
 
   assignmentSeeder,
   announcementSeeder,
   salesVisitSeeder,
   businessTripSeeder,
-  overtimeSeeder,
   expenseCategorySeeder,
   expenseSeeder,
-
+  completePayrollHistorySeeder,
   kpiTemplateSeeder,
   kpiTemplateDetailSeeder,
   unitKpiMappingSeeder,

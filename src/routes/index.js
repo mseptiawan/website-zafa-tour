@@ -25,7 +25,7 @@ import notificationRoutes from "./notification.routes.js";
 import componentPageRoutes from "./componentPage.routes.js";
 import salaryComponentRoutes from "./salaryComponent.routes.js";
 import payrollRoutes from "./payroll.routes.js";
-
+import reportRoutes from "./report.routes.js";
 const router = express.Router();
 
 router.use("/", authRoutes);
@@ -52,5 +52,6 @@ router.use("/components", componentPageRoutes);
 router.use("/api/components", salaryComponentRoutes);
 router.use("/payroll", payrollRoutes);
 router.use("/api", notificationRoutes);
+router.use("/report", reportRoutes);
 
 export default router;
