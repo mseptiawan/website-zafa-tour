@@ -119,8 +119,6 @@ app.use((err, req, res, next) => {
     });
   }
 
-  // Jika error terjadi di view/halaman biasa, tampilkan flash/redirect bukan JSON
-
   return res.status(status).json({
     success: false,
     message: err.message || "Terjadi kesalahan internal pada server.",

@@ -263,7 +263,7 @@ export const renderReviewPage = async (req, res) => {
     }
 
     res.render("dailylog/review", {
-      title: "Review Log Aktivitas Karyawan",
+      title: "Review Log Aktivitas Pegawai",
       user: req.session.user,
       bidangs: filterBidang,
     });

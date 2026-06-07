@@ -1,11 +1,12 @@
-<%- layout('layouts/main', { title: "Tambah Karyawan" }) %>
+<%- layout('layouts/main', { title: "Tambah Pegawai" }) %>
 
-<div class="max-w-6xl mx-auto min-h-screen bg-white p-8 antialiased ml-72">
-
+<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased">
+  
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
 <%- include('../partials/page-header', {
   section: 'Area Kerja',
-  module: 'Tambah Karyawan',
-  title: 'Daftarkan Karyawan Baru',
+  module: 'Tambah Pegawai',
+  title: 'Daftarkan Pegawai Baru',
   description: 'Langkah awal pembuatan akun kredensial dan penempatan posisi kerja staf baru.'
 }) %>
 
@@ -179,7 +180,7 @@
       </a>
       <button type="submit" 
               class="text-xs font-medium text-white bg-blue-500 px-5 py-2.5 rounded-md hover:bg-blue-600 active:bg-blue-700 transition-colors tracking-wide">
-        Simpan Karyawan
+        Simpan Pegawai
       </button>
     </div>
 
@@ -272,3 +273,4 @@
     }
   });
 </script>
+</div>

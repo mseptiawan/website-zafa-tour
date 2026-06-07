@@ -22,7 +22,7 @@
           iconBoxClass: 'bg-emerald-50 text-emerald-600 border-emerald-100' 
         },
         { 
-          label: isAdmin && !isPersonalView ? 'Total Terlambat (Karyawan)' : 'Terlambat Saya', 
+          label: isAdmin && !isPersonalView ? 'Total Terlambat (Pegawai)' : 'Terlambat Saya', 
           value: analytics.totalLateDays, 
           unit: 'Kali', 
           icon: 'fa-solid fa-user-clock', 
@@ -33,7 +33,7 @@
           iconBoxClass: 'bg-white text-rose-500 border-rose-100' 
         },
         { 
-          label: isAdmin && !isPersonalView ? 'Akumulasi Menit (Karyawan)' : 'Akumulasi Menit Saya', 
+          label: isAdmin && !isPersonalView ? 'Akumulasi Menit (Pegawai)' : 'Akumulasi Menit Saya', 
           value: analytics.totalLateMinutes, 
           unit: 'Menit', 
           icon: 'fa-solid fa-stopwatch', 
@@ -51,7 +51,7 @@
         <div class="bg-white rounded-2xl border border-slate-200/60 p-1.5 shadow-xs inline-flex items-center gap-1">
           <a href="/attendance/history" 
              class="px-5 py-2.5 text-xs rounded-xl transition-all duration-200 outline-none cursor-pointer <%= !isPersonalView ? 'font-bold bg-blue-600 text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50' %>">
-            Semua Karyawan
+            Semua Pegawai
           </a>
           <a href="/attendance/history?view=personal" 
              class="px-5 py-2.5 text-xs rounded-xl transition-all duration-200 outline-none cursor-pointer <%= isPersonalView ? 'font-bold bg-blue-600 text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50' %>">

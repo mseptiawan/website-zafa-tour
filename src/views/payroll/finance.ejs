@@ -42,7 +42,7 @@
         <div class="space-y-1">
           <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Belum Dibayar (Closed)</span>
           <span id="statPendingCount" class="text-2xl font-bold text-amber-600 tracking-tight tabular-nums block">
-            0 <span class="text-xs font-medium text-slate-500">Karyawan</span>
+            0 <span class="text-xs font-medium text-slate-500">Pegawai</span>
           </span>
         </div>
         <div class="w-10 h-10 rounded-xl flex items-center justify-center border bg-amber-50 text-amber-600 border-amber-100">
@@ -55,7 +55,7 @@
         <div class="space-y-1">
           <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Selesai Dibayar (Paid)</span>
           <span id="statPaidCount" class="text-2xl font-bold text-emerald-600 tracking-tight tabular-nums block">
-            0 <span class="text-xs font-medium text-slate-500">Karyawan</span>
+            0 <span class="text-xs font-medium text-slate-500">Pegawai</span>
           </span>
         </div>
         <div class="w-10 h-10 rounded-xl flex items-center justify-center border bg-emerald-50 text-emerald-600 border-emerald-100">
@@ -82,7 +82,7 @@
         <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="relative max-w-xs w-full">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchPendingInput" oninput="filterTable('pending')" placeholder="Cari nama karyawan..." class="w-full bg-[#f2f2f7]/60 border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
+            <input type="text" id="searchPendingInput" oninput="filterTable('pending')" placeholder="Cari nama pegawai..." class="w-full bg-[#f2f2f7]/60 border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
           </div>
           
           <!-- BATCH ACTION UNTUK MULTIPLE MARK AS PAID -->
@@ -96,7 +96,7 @@
             <thead>
               <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                 <th class="p-4 w-12 text-center"><input type="checkbox" id="selectAllPending" onchange="toggleSelectAll(this)" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"></th>
-                <th class="p-4">Karyawan</th>
+                <th class="p-4">Pegawai</th>
                 <th class="p-4">Gaji Pokok</th>
                 <th class="p-4">Tunjangan</th>
                 <th class="p-4">Potongan</th>
@@ -116,7 +116,7 @@
         <div class="p-5 border-b border-slate-100">
           <div class="relative max-w-xs">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchHistoryInput" oninput="filterTable('history')" placeholder="Cari riwayat karyawan..." class="w-full bg-[#f2f2f7]/60 border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
+            <input type="text" id="searchHistoryInput" oninput="filterTable('history')" placeholder="Cari riwayat pegawai..." class="w-full bg-[#f2f2f7]/60 border-none rounded-lg px-3 py-1.5 pl-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-shadow">
           </div>
         </div>
 
@@ -124,7 +124,7 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="p-4">Karyawan</th>
+                <th class="p-4">Pegawai</th>
                 <th class="p-4">Net Gaji</th>
                 <th class="p-4">Waktu Dibayar</th>
                 <th class="p-4">Bukti Mutasi</th>
@@ -155,7 +155,7 @@
       <input type="hidden" id="modalEmployeeId">
       
       <div>
-        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide block mb-1">Nama Karyawan</label>
+        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide block mb-1">Nama Pegawai</label>
         <input type="text" id="modalEmployeeName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] font-semibold text-slate-700 focus:outline-none" readonly>
       </div>
 
@@ -295,8 +295,8 @@
 
     // Pasang hasil akumulasi statistik ke boks atas (Style sesuai modifikasi lu)
     document.getElementById('statTotalDisburse').innerHTML = `${formatIDR(totalDisburse)} <span class="text-xs font-medium text-slate-500">IDR</span>`;
-    document.getElementById('statPendingCount').innerHTML = `${pendingCount} <span class="text-xs font-medium text-slate-500">Karyawan</span>`;
-    document.getElementById('statPaidCount').innerHTML = `${paidCount} <span class="text-xs font-medium text-slate-500">Karyawan</span>`;
+    document.getElementById('statPendingCount').innerHTML = `${pendingCount} <span class="text-xs font-medium text-slate-500">Pegawai</span>`;
+    document.getElementById('statPaidCount').innerHTML = `${paidCount} <span class="text-xs font-medium text-slate-500">Pegawai</span>`;
 
     if(pendingCount === 0) {
       pendingBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-medium"><i class="fa-solid fa-folder-open text-xl block mb-2 opacity-50"></i> Antrean Pembayaran Bersih! Tidak ada payroll berstatus Closed.</td></tr>`;
@@ -417,7 +417,7 @@
     const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
     const employeeIds = Array.from(checkedBoxes).map(cb => cb.value);
 
-    if(!confirm(`Konfirmasi pembayaran sekaligus untuk ${employeeIds.length} karyawan?\nStatus akan langsung berubah menjadi Paid.`)) return;
+    if(!confirm(`Konfirmasi pembayaran sekaligus untuk ${employeeIds.length} pegawai?\nStatus akan langsung berubah menjadi Paid.`)) return;
 
     try {
       const response = await fetch('/finance/verify-payment-batch', {

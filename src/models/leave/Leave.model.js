@@ -33,7 +33,6 @@ const leaveSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     documentPath: {
       type: String,
     },

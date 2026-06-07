@@ -36,12 +36,6 @@ const announcementSchema = new mongoose.Schema(
       default: null,
     },
 
-    signedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
-
     publishDate: {
       type: Date,
       default: null,
