@@ -10,7 +10,7 @@ const bidangSchema = new mongoose.Schema(
     managerRoleId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",
-      required: true,
+      required: false,
     },
   },
   {

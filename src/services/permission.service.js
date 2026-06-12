@@ -307,6 +307,7 @@ export function getPermissions(role) {
 
     case "DIREKTUR_UTAMA":
       permissions.employee_list = true;
+      permissions.phk = true;
 
       permissions.loan_manage_center = true;
 

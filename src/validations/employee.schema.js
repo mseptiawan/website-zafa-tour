@@ -107,11 +107,11 @@ export const updateFinancialSchema = z.object({
     .min(3, "Nama pemilik wajib diisi")
     .trim(),
 
-  nomor_npwp: z
+  npwp: z
     .preprocess((val) => (val === "" || val === undefined ? null : val), z.string().nullable())
     .optional(),
 
-  nomor_bpjs_ketenagakerjaan: z
+  bpjstk: z
     .preprocess((val) => (val === "" || val === undefined ? null : val), z.string().nullable())
     .optional(),
 
@@ -119,6 +119,20 @@ export const updateFinancialSchema = z.object({
     .preprocess(
       (val) => (val === "" || val === undefined ? 0 : Number(val)),
       z.number().min(0, "Overtime rate tidak boleh negatif")
+    )
+    .optional(),
+
+  basicSalary: z
+    .preprocess(
+      (val) => {
+        if (!val) return 0;
+        if (typeof val === "string") {
+          const cleanString = val.replace(/[^0-9]/g, "");
+          return Number(cleanString);
+        }
+        return Number(val);
+      },
+      z.number().min(0, "Gaji pokok tidak boleh negatif")
     )
     .optional(),
 });

@@ -4,93 +4,88 @@
 
   <div class="max-w-2xl mx-auto">
 
-    <!-- HEADER & BREADCRUMB -->
-   <%- include('../partials/page-header', { 
-    section: 'Area Kerja', 
-    module: 'Lembur', 
-    title: 'Catat Lembur', 
-    description: 'Isi detail lembur yang dilakukan' 
-}) %>
+    <%- include('../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Lembur', 
+        title: 'Catat Lembur', 
+        description: 'Isi detail lembur yang dilakukan' 
+    }) %>
 
-    <!-- CARD -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
-<% if (errors && Object.keys(errors).length > 0) { %>
-  <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-    <ul class="space-y-1">
-      <% Object.values(errors).forEach(function(message) { %>
-        <li class="text-xs text-red-600">
-          <%= message %>
-        </li>
-      <% }) %>
-    </ul>
-  </div>
-<% } %>
-      <form action="/overtime/" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+      <% if (errors && Object.keys(errors).length > 0) { %>
+        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <ul class="space-y-1">
+            <% Object.values(errors).forEach(function(message) { %>
+              <li class="text-xs text-red-600">
+                <%= message %>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+      
+      <form id="overtime-form" action="/overtime/" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
 
-        <!-- TANGGAL LEMBUR -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">
-            Tanggal Lembur
+            Tanggal Lembur <span class="text-red-500">*</span>
           </label>
-        <input
-  type="date"
-  id="dateInput"
-  name="date"
-  min="<%= dateLimit.min %>"
-  max="<%= dateLimit.max %>"
-  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3
-         text-[13px] text-slate-700
-         focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-         outline-none transition-all"
-/>
+          <input
+            type="date"
+            id="dateInput"
+            name="date"
+            required
+            min="<%= dateLimit.min %>"
+            max="<%= dateLimit.max %>"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3
+                   text-[13px] text-slate-700
+                   focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+                   outline-none transition-all"
+          />
         </div>
 
-        <!-- JAM (GRID) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">Jam Mulai</label>
-            <input type="text" id="startTime" name="startTime"  placeholder="08:00" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
+            <label class="text-[13px] font-bold text-slate-700">Jam Mulai <span class="text-red-500">*</span></label>
+            <input type="text" id="startTime" name="startTime" required placeholder="16:30" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
           </div>
 
           <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">Jam Selesai</label>
-            <input type="text" id="endTime" name="endTime"  placeholder="17:00" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
+            <label class="text-[13px] font-bold text-slate-700">Jam Selesai <span class="text-red-500">*</span></label>
+            <input type="text" id="endTime" name="endTime" required placeholder="21:00" class="timepicker w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all cursor-pointer" />
           </div>
         </div>
 
-        <!-- DESKRIPSI PEKERJAAN -->
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">
-            Pekerjaan
+            Pekerjaan <span class="text-red-500">*</span>
           </label>
-          <textarea name="workDescription" rows="4" minlength="10" maxlength="500"  placeholder="Jelaskan pekerjaan lembur..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+          <textarea name="workDescription" required rows="4" minlength="10" maxlength="500" placeholder="Jelaskan pekerjaan lembur..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
             focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
             outline-none resize-none transition-all"></textarea>
         </div>
-<!-- LOKASI LEMBUR -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <!-- Tipe Lokasi -->
-  <div class="space-y-1.5">
-    <label class="text-[13px] font-bold text-slate-700">Lokasi Kerja</label>
-    <select id="locationType" name="location[type]"  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-      focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-      outline-none transition-all cursor-pointer">
-      <option value="OFFICE">Kantor (Office)</option>
-      <option value="REMOTE">Remote (WFH)</option>
-      <option value="CLIENT_SITE">Lokasi Klien (Client Site)</option>
-      <option value="OTHER">Lainnya</option>
-    </select>
-  </div>
 
-  <!-- Detail Lokasi -->
-  <div class="space-y-1.5">
-    <label class="text-[13px] font-bold text-slate-700">Detail Lokasi</label>
-    <input type="text" id="locationDetail" name="location[detail]" placeholder="Contoh: Gedung A atau Alamat Klien" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
-      focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
-      outline-none transition-all" />
-  </div>
-</div>
-        <!-- HASIL (OPSIONAL) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Lokasi Kerja <span class="text-red-500">*</span></label>
+            <select id="locationType" name="location[type]" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+              focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+              outline-none transition-all cursor-pointer">
+              <option value="OFFICE">Kantor (Office)</option>
+              <option value="REMOTE">Remote (WFH)</option>
+              <option value="CLIENT_SITE">Lokasi Klien (Client Site)</option>
+              <option value="OTHER">Lainnya</option>
+            </select>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[13px] font-bold text-slate-700">Detail Lokasi <span class="text-red-500">*</span></label>
+            <input type="text" id="locationDetail" name="location[detail]" required placeholder="Contoh: Gedung A atau Alamat Klien" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 
+              focus:bg-white text-xs focus:ring-4 focus:ring-slate-100 focus:border-slate-400
+              outline-none transition-all" />
+          </div>
+        </div>
+
         <div class="space-y-1.5">
           <label class="text-[13px] font-bold text-slate-700">
             Hasil <span class="text-slate-400 font-normal">(Opsional)</span>
@@ -100,43 +95,32 @@
             outline-none resize-none transition-all"></textarea>
         </div>
 
-        <!-- BUKTI / LAMPIRAN FILE -->
         <div class="space-y-1.5">
           <label class="block text-[13px] font-bold text-slate-700 mb-1.5">
             Bukti Lampiran <span class="text-slate-400 font-normal">(Opsional)</span>
           </label>
 
-          <!-- EMPTY STATE (Upload Box) -->
           <div id="dropzone-empty" class="relative w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
-
             <input type="file" name="proofFile" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
-
             <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
             </svg>
-
             <span class="text-[13px] font-medium text-slate-600">
               Pilih Berkas atau Drop File Disini
             </span>
-
             <span class="text-xs text-slate-400 mt-0.5">
               PNG, JPG, PDF, atau DOCX (maks 5MB)
             </span>
           </div>
 
-          <!-- FILLED STATE (Preview Box) -->
           <div id="dropzone-filled" class="hidden flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
-
             <div class="flex items-center gap-3 min-w-0 flex-1">
-              <!-- Thumbnail Preview -->
               <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
                 <img id="img-preview" class="w-full h-full object-cover hidden" />
-                <!-- Fallback Icon -->
                 <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>
               </div>
-
               <div class="min-w-0 flex-1">
                 <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
                   file_name.jpg
@@ -146,8 +130,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Actions (View & Ganti) -->
             <div class="flex items-center gap-2 ml-4 flex-shrink-0">
               <a id="view-file-btn" href="#" target="_blank" class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">
                 View
@@ -156,34 +138,23 @@
                 Ganti File
               </button>
             </div>
-
           </div>
         </div>
 
-        <!-- FORM ACTIONS -->
         <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-
-          <!-- BUTTON BATAL -->
           <a href="/overtime/my" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
             Batal
           </a>
-
-          <!-- BUTTON SUBMIT -->
           <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
             Kirim
           </button>
-
         </div>
 
       </form>
-
     </div>
-
   </div>
-
 </div>
 
-<!-- CLIENT-SIDE SCRIPT -->
 <script>
   let currentFileUrl = null;
 
@@ -230,47 +201,62 @@
     document.getElementById("file-input").click();
   }
 </script>
+
 <script>
   flatpickr(".timepicker", {
-  enableTime: true,
-  noCalendar: true,
-  dateFormat: "H:i",
-  time_24hr: true,
-
-  minTime: "16:30",
-  maxTime: "23:59",
-});
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    minTime: "16:30",
+    maxTime: "23:59",
+  });
 </script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const dateInput = document.getElementById("dateInput");
-
   dateInput.min = dateInput.getAttribute("min");
   dateInput.max = dateInput.getAttribute("max");
 });
 </script>
+
 <script>
   const locationType = document.getElementById('locationType');
   const locationDetail = document.getElementById('locationDetail');
 
-  // 1. Fungsi untuk mengatur nilai detail berdasarkan lokasi
   function updateDetailLocation() {
     if (locationType.value === 'OFFICE') {
       locationDetail.value = 'Kantor pusat zafa tour palembang';
     } else {
-      // Jika pilih yang lain (atau halaman baru dimuat dan bukan OFFICE), 
-      // Anda bisa menentukan apakah ingin dikosongkan atau dibiarkan.
-      // Jika ingin tetap kosong saat bukan OFFICE:
       if (locationDetail.value === 'Kantor pusat zafa tour palembang') {
           locationDetail.value = '';
       }
     }
   }
 
-  // 2. Jalankan fungsi saat ada perubahan (event listener)
   locationType.addEventListener('change', updateDetailLocation);
-
-  // 3. JALANKAN SAAT HALAMAN PERTAMA KALI DIMUAT (Initial load)
   document.addEventListener('DOMContentLoaded', updateDetailLocation);
+</script>
+
+<script>
+  document.getElementById('overtime-form').addEventListener('submit', function (e) {
+    const startTimeRaw = document.getElementById('startTime').value;
+    const endTimeRaw = document.getElementById('endTime').value;
+
+    if (startTimeRaw && endTimeRaw) {
+      // Mengonversi waktu string HH:MM ke total menit untuk perbandingan akurat
+      const [startHour, startMin] = startTimeRaw.split(':').map(Number);
+      const [endHour, endMin] = endTimeRaw.split(':').map(Number);
+
+      const totalStartMinutes = startHour * 60 + startMin;
+      const totalEndMinutes = endHour * 60 + endMin;
+
+      if (totalEndMinutes <= totalStartMinutes) {
+        e.preventDefault(); // Mencegah form tersubmit
+        alert('Jam Selesai lembur harus lebih besar dari Jam Mulai!');
+        return false;
+      }
+    }
+  });
 </script>

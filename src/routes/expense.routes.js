@@ -2,6 +2,8 @@ import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
+import { validate } from "../middlewares/validate.v2.js";
+import { createExpenseSchema } from "../validations/expense.schema.js";
 
 import {
   formExpense,
@@ -18,7 +20,13 @@ import {
 const router = express.Router();
 
 router.get("/expense/create", authMiddleware, formExpense);
-router.post("/expense/create", authMiddleware, uploadFile.single("proofFile"), createExpense);
+router.post(
+  "/expense/create",
+  authMiddleware,
+  uploadFile.single("proofFile"),
+  validate(createExpenseSchema),
+  createExpense
+);
 
 router.get("/expense/my", authMiddleware, myExpenses);
 router.get(

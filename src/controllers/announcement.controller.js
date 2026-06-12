@@ -11,14 +11,25 @@ export const newForm = (req, res) => {
     ...RENDER_DEFAULTS(req),
     title: "Buat Pengumuman",
     old: {},
+    errors: {},
   });
 };
 
 // ─── CREATE ───────────────────────────────────────────────────────────────────
+
 export const create = async (req, res, next) => {
   try {
+    if (req.validationErrors) {
+      return res.status(400).render("announcement/create", {
+        ...RENDER_DEFAULTS(req),
+        title: "Buat Pengumuman",
+        errors: req.validationErrors,
+        old: req.body,
+      });
+    }
+
     await announcementService.create({
-      body: req.validated,
+      body: req.body,
       userId: req.session.user._id,
       file: req.file,
     });

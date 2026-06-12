@@ -56,14 +56,21 @@ export const create = async (req, res, next) => {
         },
       };
     } else {
-      customFieldsError = { _errors: [err.message || "Terjadi kesalahan pada sistem."] };
+      return res.status(400).render("assignment/create", {
+        title: "Buat Penugasan",
+        employees,
+        errors: customFieldsError,
+        old: req.body,
+        today: new Date().toISOString().split("T")[0],
+      });
     }
 
     return res.status(400).render("assignment/create", {
       title: "Buat Penugasan",
       employees,
-      errors: customFieldsError,
+      errors: fieldErrors,
       old: req.body,
+      today: new Date().toISOString().split("T")[0],
     });
   }
 };

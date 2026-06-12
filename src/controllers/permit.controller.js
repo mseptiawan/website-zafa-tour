@@ -47,7 +47,7 @@ export const createPermit = async (req, res) => {
     });
 
     await newPermit.save();
-    res.redirect("/permit");
+    res.redirect("/permit/history");
   } catch (error) {
     if (req.file) {
       fs.unlinkSync(req.file.path);

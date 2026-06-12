@@ -18,11 +18,11 @@
       <% } %>
 
       <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
-        <form method="POST" enctype="multipart/form-data" class="p-8 space-y-6" action="/assignment/">
+        <form id="assignment-form" method="POST" enctype="multipart/form-data" class="p-8 space-y-6" action="/assignment/">
 
           <div class="space-y-1.5">
-            <label class="text-[13px] font-semibold text-slate-700">Judul Penugasan</label>
-            <input name="title" value="<%= typeof old !== 'undefined' && old.title ? old.title : '' %>" placeholder="Ketik judul penugasan..."
+            <label class="text-[13px] font-semibold text-slate-700">Judul Penugasan <span class="text-red-500">*</span></label>
+            <input name="title" required value="<%= typeof old !== 'undefined' && old.title ? old.title : '' %>" placeholder="Ketik judul penugasan..."
               class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.title ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:border-slate-400 transition-all" />
             <% if (typeof errors !== 'undefined' && errors.title) { %>
               <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.title._errors[0] %></p>
@@ -30,8 +30,8 @@
           </div>
 
           <div class="space-y-1.5">
-            <label class="text-[13px] font-semibold text-slate-700">Deskripsi</label>
-            <textarea name="description" rows="5" placeholder="Tulis detail penugasan..."
+            <label class="text-[13px] font-semibold text-slate-700">Deskripsi <span class="text-red-500">*</span></label>
+            <textarea name="description" required rows="5" placeholder="Tulis detail penugasan..."
               class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.description ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:border-slate-400 transition-all"><%= typeof old !== 'undefined' && old.description ? old.description : '' %></textarea>
             <% if (typeof errors !== 'undefined' && errors.description) { %>
               <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.description._errors[0] %></p>
@@ -39,7 +39,7 @@
           </div>
 
           <div class="space-y-2">
-            <label class="text-[13px] font-medium text-slate-500 block">Tipe Penugasan</label>
+            <label class="text-[13px] font-medium text-slate-500 block">Tipe Penugasan <span class="text-red-500">*</span></label>
             <div class="relative w-full" id="assignment-type-dropdown">
               <% 
                 let currentType = "INTERNAL";
@@ -81,30 +81,30 @@
           </div>
 
           <div class="space-y-1.5">
-            <label class="text-[13px] font-semibold text-slate-700">Lokasi</label>
-            <input name="location" value="<%= typeof old !== 'undefined' && old.location ? old.location : '' %>" placeholder="Lokasi kegiatan"
+            <label class="text-[13px] font-semibold text-slate-700">Lokasi <span class="text-red-500">*</span></label>
+            <input name="location" required value="<%= typeof old !== 'undefined' && old.location ? old.location : '' %>" placeholder="Lokasi kegiatan"
               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:border-slate-400 transition-all" />
           </div>
 
-        <div class="grid grid-cols-2 gap-4">
-  <div class="space-y-1.5">
-    <label class="text-[13px] font-semibold text-slate-700">Tanggal Mulai</label>
-    <input type="date" name="startDate" min="<%= today %>" value="<%= typeof old !== 'undefined' && old.startDate ? old.startDate : '' %>"
-      class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.startDate ? 'border-red-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 transition-all" />
-    <% if (typeof errors !== 'undefined' && errors.startDate) { %>
-      <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.startDate._errors[0] %></p>
-    <% } %>
-  </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="text-[13px] font-semibold text-slate-700">Tanggal Mulai <span class="text-red-500">*</span></label>
+              <input type="date" id="startDate" name="startDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.startDate ? old.startDate : '' %>"
+                class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.startDate ? 'border-red-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 transition-all" />
+              <% if (typeof errors !== 'undefined' && errors.startDate) { %>
+                <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.startDate._errors[0] %></p>
+              <% } %>
+            </div>
 
-  <div class="space-y-1.5">
-    <label class="text-[13px] font-semibold text-slate-700">Tanggal Selesai</label>
-    <input type="date" name="endDate" min="<%= today %>" value="<%= typeof old !== 'undefined' && old.endDate ? old.endDate : '' %>"
-      class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.endDate ? 'border-red-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 transition-all" />
-    <% if (typeof errors !== 'undefined' && errors.endDate) { %>
-      <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.endDate._errors[0] %></p>
-    <% } %>
-  </div>
-</div>
+            <div class="space-y-1.5">
+              <label class="text-[13px] font-semibold text-slate-700">Tanggal Selesai <span class="text-red-500">*</span></label>
+              <input type="date" id="endDate" name="endDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.endDate ? old.endDate : '' %>"
+                class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.endDate ? 'border-red-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 transition-all" />
+              <% if (typeof errors !== 'undefined' && errors.endDate) { %>
+                <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.endDate._errors[0] %></p>
+              <% } %>
+            </div>
+          </div>
 
           <div class="space-y-1.5">
             <label class="text-[13px] font-semibold text-slate-700">Surat Penugasan <span class="text-slate-400 font-normal">(opsional)</span></label>
@@ -139,7 +139,7 @@
           </div>
 
           <div class="space-y-2">
-            <label class="text-[13px] font-medium text-slate-500 block">Pilih Pegawai</label>
+            <label class="text-[13px] font-medium text-slate-500 block">Pilih Pegawai <span class="text-red-500">*</span></label>
             <div class="relative w-full">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,13 +161,15 @@
                 %>
                 <label class="employee-item flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-200/40 cursor-pointer transition-all duration-150 group" data-name="<%= e.fullName.toLowerCase() %>">
                   <input type="checkbox" name="employees" value="<%= e._id %>" <%= isChecked ? 'checked' : '' %>
-                    class="w-4 h-4 rounded border-slate-300 text-blue-600 cursor-pointer accent-blue-600 transition-colors" />
+                    class="employee-checkbox w-4 h-4 rounded border-slate-300 text-blue-600 cursor-pointer accent-blue-600 transition-colors" />
                   <div class="flex flex-col">
                     <span class="text-[13px] font-medium text-slate-600 group-hover:text-slate-900 transition-colors"><%= e.fullName %></span>
                   </div>
                 </label>
               <% }) %>
             </div>
+            <p id="employee-error-msg" class="text-xs text-red-500 font-medium hidden">Wajib memilih minimal satu Pegawai yang didelegasikan.</p>
+            
             <% if (typeof errors !== 'undefined' && errors.employees) { %>
               <p class="text-xs text-red-500 font-medium"><%= errors.employees._errors[0] %></p>
             <% } %>
@@ -185,6 +187,47 @@
   </div>
 
   <script>
+    // 🔴 VALIDASI SISI KLIEN UNTUK TANGGAL DAN CHECKBOX PEGAWAI
+    document.getElementById('assignment-form').addEventListener('submit', function(e) {
+      const checkboxes = document.querySelectorAll('.employee-checkbox');
+      const errorMsg = document.getElementById('employee-error-msg');
+      const listContainer = document.getElementById('employee-list');
+      
+      // 1. Cek Apakah ada pegawai yang dicentang
+      let isOneChecked = false;
+      for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+          isOneChecked = true;
+          break;
+        }
+      }
+
+      if (!isOneChecked) {
+        e.preventDefault(); // Stop form submit
+        errorMsg.classList.remove('hidden');
+        listContainer.classList.add('border-red-400', 'bg-red-50/10');
+        listContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+      } else {
+        errorMsg.classList.add('hidden');
+        listContainer.classList.remove('border-red-400', 'bg-red-50/10');
+      }
+
+      // 2. Validasi Logika Tanggal (Tanggal Selesai tidak boleh mendahului Tanggal Mulai)
+      const start = new Date(document.getElementById('startDate').value);
+      const end = new Date(document.getElementById('endDate').value);
+      if (end < start) {
+        e.preventDefault();
+        alert('Tanggal Selesai tidak boleh sebelum Tanggal Mulai!');
+        return false;
+      }
+    });
+
+    // Otomatis update min-date untuk tanggal selesai saat tanggal mulai diubah
+    document.getElementById('startDate').addEventListener('change', function() {
+      document.getElementById('endDate').min = this.value;
+    });
+
     function handleFileSelect(input) {
       if (input.files && input.files[0]) {
         const file = input.files[0];

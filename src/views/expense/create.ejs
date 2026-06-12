@@ -3,7 +3,6 @@
 <div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
   <div class="max-w-3xl mx-auto space-y-6">
 
-    <!-- HEADER -->
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Finance', 
@@ -11,36 +10,33 @@
         description: 'Catat pengeluaran operasional Anda dan lampirkan bukti transaksi yang valid.' 
     }) %>
 
-    <!-- FORM CONTAINER -->
     <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
       <form action="/expense/create" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 space-y-8">
 
-        <!-- SECTION 1: INFO DASAR -->
         <div class="space-y-5">
           <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">Informasi Transaksi</h3>
           
           <div class="space-y-1.5">
             <label class="text-[12px] font-bold text-slate-700">Judul Pengeluaran</label>
-            <input type="text" name="title" required placeholder="Contoh: Pembelian Tinta Printer & Kertas HVS"
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-blue-50/50 focus:border-blue-400 transition-all" />
+            <input type="text" name="title" value="<%= old?.title || '' %>" placeholder="Contoh: Pembelian Tinta Printer & Kertas HVS"
+              class="w-full bg-slate-50 border <%= errors?.title ? 'border-rose-400 focus:ring-rose-100' : 'border-slate-200 focus:ring-blue-50/50' %> rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 transition-all" />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="space-y-1.5">
               <label class="text-[12px] font-bold text-slate-700">Kategori Beban</label>
-              <select name="category" required
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-blue-50/50 focus:border-blue-400 transition-all cursor-pointer appearance-none">
-                <option value="" disabled selected>-- Pilih Kategori Operasional --</option>
+              <select name="category" class="w-full bg-slate-50 border <%= errors?.category ? 'border-rose-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-blue-50/50 transition-all cursor-pointer">
+                <option value="" disabled <%= !old?.category ? 'selected' : '' %>>-- Pilih Kategori Operasional --</option>
                 <% categories.forEach(cat => { %>
-                  <option value="<%= cat.code %>"><%= cat.name %></option>
+                  <option value="<%= cat._id %>" <%= old?.category === String(cat._id) ? 'selected' : '' %>><%= cat.name %></option>
                 <% }) %>
               </select>
             </div>
             
             <div class="space-y-1.5">
               <label class="text-[12px] font-bold text-slate-700">Tanggal Nota</label>
-              <input type="date" name="expenseDate" required
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-blue-50/50 focus:border-blue-400 transition-all cursor-pointer" />
+              <input type="date" id="expenseDate" name="expenseDate" value="<%= old?.expenseDate || '' %>"
+                class="w-full bg-slate-50 border <%= errors?.expenseDate ? 'border-rose-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-blue-50/50 transition-all cursor-pointer" />
             </div>
           </div>
 
@@ -50,82 +46,73 @@
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <span class="text-slate-400 font-bold text-[13px]">Rp</span>
               </div>
-              <input type="text" id="nominalInput" required placeholder="0"
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[14px] font-bold text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-blue-50/50 focus:border-blue-400 transition-all tabular-nums" />
-              <!-- Hidden input to store pure number for backend -->
-              <input type="hidden" name="amount" id="amountReal" />
+              <input type="text" id="nominalInput" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[14px] font-bold text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-blue-50/50 transition-all tabular-nums" />
+              
+              <input type="hidden" name="amount" id="amountReal" value="<%= old?.amount || '' %>" />
             </div>
           </div>
         </div>
 
-        <!-- SECTION 2: LAMPIRAN & DEKLARASI -->
         <div class="space-y-5 pt-4">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Bukti Dokumen</h3>
-            
-            <!-- Toggle Mode -->
             <label class="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" id="noReceipt" name="noReceipt" onchange="toggleReceiptMode()"
-                class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+              <input type="checkbox" id="noReceipt" name="noReceipt" <%= old?.noReceipt ? 'checked' : '' %> onchange="toggleReceiptMode()" class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
               <span class="text-[11px] font-medium text-slate-500 group-hover:text-slate-800 transition-colors">Nota Hilang / Tidak Ada (Self Dec)</span>
             </label>
           </div>
 
-          <!-- AREA DROP FILE -->
-          <div id="fileSection" class="transition-all duration-300">
-            <div id="dropzone-empty"
-              class="relative w-full border-2 border-slate-200 border-dashed rounded-xl p-8 bg-slate-50/50 hover:bg-blue-50/30 hover:border-blue-300 transition-all flex flex-col items-center justify-center text-center cursor-pointer group">
-              
-              <input type="file" name="proofFile" id="file-input" required accept="image/*,application/pdf"
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
-              
-              <div class="w-12 h-12 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <i class="fa-solid fa-cloud-arrow-up text-slate-400 text-lg group-hover:text-blue-500 transition-colors"></i>
+          <div id="fileSection" class="<%= old?.noReceipt ? 'hidden' : '' %> transition-all duration-300">
+            <div id="dropzone-empty" class="relative w-full border-2 <%= errors?.proofFile ? 'border-rose-400 bg-rose-50/10' : 'border-slate-200 bg-slate-50/50' %> border-dashed rounded-xl p-8 hover:bg-blue-50/30 hover:border-blue-300 transition-all flex flex-col items-center justify-center text-center cursor-pointer group">
+              <input type="file" name="proofFile" id="file-input" accept="image/*,application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
+              <div class="w-12 h-12 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-3">
+                <i class="fa-solid fa-cloud-arrow-up text-slate-400 text-lg group-hover:text-blue-500"></i>
               </div>
               <span class="text-[13px] font-bold text-slate-700">Pilih Berkas atau Tarik File Kesini</span>
-              <span class="text-[11px] font-medium text-slate-400 mt-1">Mendukung format JPG, PNG, atau PDF (Max 5MB)</span>
+              <p class="text-[11px] font-medium text-slate-400 mt-1">Mendukung format JPG, PNG, atau PDF (Max 5MB)</p>
+              <% if (errors?.proofFile) { %>
+                <span class="text-rose-500 text-xs font-bold mt-2"><%= errors.proofFile %></span>
+              <% } %>
             </div>
 
-            <!-- PREVIEW FILE TERPILIH -->
             <div id="dropzone-filled" class="hidden flex items-center justify-between border border-slate-200 rounded-xl p-3 bg-white shadow-sm">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-                  <i class="fa-solid fa-file-check"></i>
-                </div>
+                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100"><i class="fa-solid fa-file-check"></i></div>
                 <div>
                   <p class="text-[12px] font-bold text-slate-700" id="name-preview">file.jpg</p>
                   <p class="text-[10px] text-slate-400">Siap diunggah</p>
                 </div>
               </div>
-              <button type="button" onclick="resetFile()" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 text-[11px] font-bold transition-colors">Ganti File</button>
+              <button type="button" onclick="resetFile()" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 text-[11px] font-bold">Ganti File</button>
             </div>
           </div>
 
-          <!-- AREA SELF DECLARATION (HIDDEN BY DEFAULT) -->
-          <div id="extraSections" class="hidden space-y-4">
+          <div id="extraSections" class="<%= old?.noReceipt ? '' : 'hidden' %> space-y-4">
             <div class="space-y-1.5">
               <label class="text-[12px] font-bold text-slate-700">Alasan Ketiadaan Nota</label>
               <textarea id="reasonInput" name="noReceiptReason" rows="2" placeholder="Jelaskan secara singkat kenapa nota tidak tersedia..."
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 focus:ring-amber-50/50 focus:border-amber-400 transition-all resize-none"></textarea>
+                class="w-full bg-slate-50 border <%= errors?.noReceiptReason ? 'border-rose-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-4 transition-all resize-none"><%= old?.noReceiptReason || '' %></textarea>
+              <% if (errors?.noReceiptReason) { %>
+                <p class="text-rose-600 text-[11px] font-bold"><%= errors.noReceiptReason %></p>
+              <% } %>
             </div>
 
-            <label class="flex items-start gap-3 bg-amber-50/50 border border-amber-200/60 p-4 rounded-xl cursor-pointer">
-              <input type="checkbox" id="declarationCheck" name="selfDeclaration"
-                class="mt-0.5 w-4 h-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500 cursor-pointer" />
+            <label class="flex items-start gap-3 bg-amber-50/50 border <%= errors?.selfDeclaration ? 'border-rose-400' : 'border-amber-200/60' %> p-4 rounded-xl cursor-pointer">
+              <input type="checkbox" id="declarationCheck" name="selfDeclaration" <%= old?.selfDeclaration ? 'checked' : '' %> class="mt-0.5 w-4 h-4 rounded border-amber-300 text-amber-600" />
               <div>
                 <p class="text-[12px] font-bold text-amber-900">Pernyataan Tanggung Jawab Mutlak</p>
                 <p class="text-[11px] text-amber-700/80 mt-0.5 leading-relaxed">Saya menyatakan bahwa pengeluaran ini benar dilakukan untuk kepentingan operasional perusahaan, dan saya bersedia mempertanggungjawabkannya apabila terdapat kekeliruan di kemudian hari.</p>
+                <% if (errors?.selfDeclaration) { %>
+                  <p class="text-rose-600 text-[11px] font-bold mt-1.5"><%= errors.selfDeclaration %></p>
+                <% } %>
               </div>
             </label>
           </div>
         </div>
 
-        <!-- FORM ACTIONS -->
         <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-          <a href="/expense/my" class="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13px] font-bold transition-colors">Batal</a>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl text-[13px] font-bold transition-all shadow-sm shadow-blue-200 active:scale-95">
-            Submit Pengajuan
-          </button>
+          <a href="/expense/my" class="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13px] font-bold">Batal</a>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl text-[13px] font-bold shadow-sm active:scale-95 transition-all">Submit Pengajuan</button>
         </div>
 
       </form>
@@ -138,72 +125,56 @@
     const isChecked = document.getElementById("noReceipt").checked;
     const fileSection = document.getElementById("fileSection");
     const extraSections = document.getElementById("extraSections");
-    
-    // Inputs yang akan dikontrol validasinya
     const fileInput = document.getElementById("file-input");
-    const reasonInput = document.getElementById("reasonInput");
-    const declarationCheck = document.getElementById("declarationCheck");
 
     if (isChecked) {
-      // Sembunyikan File Upload & Nonaktifkan validasi required-nya
       fileSection.classList.add("hidden");
-      fileInput.required = false;
-      fileInput.value = ""; // Bersihkan file jika ada
-      
-      // Tampilkan Self Declaration & Aktifkan validasi required
+      fileInput.value = ""; 
       extraSections.classList.remove("hidden");
-      reasonInput.required = true;
-      declarationCheck.required = true;
     } else {
-      // Kembalikan ke mode Normal (Wajib Nota)
       fileSection.classList.remove("hidden");
-      fileInput.required = true;
-      
-      // Sembunyikan Self Declaration & Nonaktifkan validasi
       extraSections.classList.add("hidden");
-      reasonInput.required = false;
-      declarationCheck.required = false;
     }
   }
 
   function handleFileSelect(input) {
     if (input.files.length > 0) {
       let fileName = input.files[0].name;
-      // Potong nama file jika terlalu panjang
       if(fileName.length > 30) fileName = fileName.substring(0, 25) + '...';
-      
       document.getElementById("name-preview").textContent = fileName;
       document.getElementById("dropzone-empty").classList.add("hidden");
       document.getElementById("dropzone-filled").classList.remove("hidden");
-      document.getElementById("dropzone-filled").classList.add("flex");
     }
   }
 
   function resetFile() {
-    const fileInput = document.getElementById("file-input");
-    fileInput.value = "";
+    document.getElementById("file-input").value = "";
     document.getElementById("dropzone-empty").classList.remove("hidden");
-    
-    const dropzoneFilled = document.getElementById("dropzone-filled");
-    dropzoneFilled.classList.add("hidden");
-    dropzoneFilled.classList.remove("flex");
+    document.getElementById("dropzone-filled").classList.add("hidden");
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    toggleReceiptMode();
+
+    const expenseDateInput = document.getElementById("expenseDate");
+    if (expenseDateInput) {
+      const today = new Date();
+      const formattedToday = today.toISOString().split('T')[0];
+      expenseDateInput.setAttribute("max", formattedToday);
+    }
+
     const nominalInput = document.getElementById("nominalInput");
     const amountReal = document.getElementById("amountReal");
 
     if (nominalInput && amountReal) {
-      nominalInput.addEventListener("input", function (e) {
-        // Hanya ambil angka
-        let value = this.value.replace(/[^0-9]/g, "");
-        amountReal.value = value; // Simpan angka murni untuk backend
+      if (amountReal.value) {
+        nominalInput.value = formatRupiah(amountReal.value);
+      }
 
-        if (value) {
-          this.value = formatRupiah(value); // Format untuk tampilan di layar
-        } else {
-          this.value = "";
-        }
+      nominalInput.addEventListener("input", function () {
+        let value = this.value.replace(/[^0-9]/g, "");
+        amountReal.value = value;
+        this.value = value ? formatRupiah(value) : "";
       });
     }
 

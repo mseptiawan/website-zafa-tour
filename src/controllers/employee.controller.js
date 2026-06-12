@@ -107,7 +107,8 @@ export const getEmployeeDetailWeb = async (req, res, next) => {
         message: "Data informasi pegawai tidak ditemukan atau sudah dihapus.",
       });
     }
-
+    console.log("=== BENTUK DATA SALARY ===");
+    console.log(employee.salaryDetail);
     // Render ke file EJS detail terpisah (bukan file edit)
     res.render("employee/detail", {
       title: "Profil Detail Pegawai",
@@ -264,7 +265,7 @@ export const updateFinansialApi = async (req, res) => {
   try {
     const payload = { ...req.body };
     const userRole = req.session.user.role; // Ambil role dari sesi
-
+    console.log("=== CCTV 1: req.body DARI FORM ===", req.body);
     // Jika yang mengedit BUKAN HR / Wakil Direktur, hapus payload gaji!
     if (userRole !== "HR" && userRole !== "WAKIL_DIREKTUR") {
       delete payload.basicSalary;

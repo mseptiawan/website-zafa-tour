@@ -8,6 +8,8 @@ export const formExpense = async (req, res) => {
     res.render("expense/create", {
       title: "Ajukan Klaim Beban",
       categories,
+      errors: {},
+      old: {},
     });
   } catch (err) {
     console.log(err);
@@ -17,74 +19,63 @@ export const formExpense = async (req, res) => {
 
 export const createExpense = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      category,
-      amount,
-      expenseDate,
-      noReceiptReason,
-      selfDeclaration,
-      noReceipt,
-    } = req.body;
+    const categories = await ExpenseCategory.find({ isActive: true }).sort({ name: 1 });
+
+    if (req.validationErrors) {
+      return res.status(400).render("expense/create", {
+        title: "Ajukan Klaim Beban",
+        categories,
+        errors: req.validationErrors,
+        old: req.body,
+      });
+    }
+
+    const { title, category, amount, expenseDate, noReceiptReason, selfDeclaration, noReceipt } =
+      req.body;
 
     const user = req.session.user;
+    if (!user) return res.status(401).send("Unauthorized");
 
-    if (!user) {
-      return res.status(401).send("Unauthorized");
-    }
     const employee = await Employee.findOne({ userId: user._id });
+    if (!employee) return res.status(404).send("Employee data tidak ditemukan");
 
-    if (!employee) {
-      return res.status(404).send("Employee data tidak ditemukan");
-    }
-    const isNoReceipt = noReceipt === "on";
+    const isNoReceipt = !!noReceipt;
     const hasFile = !!req.file;
 
     if (!isNoReceipt && !hasFile) {
-      return res
-        .status(400)
-        .send("Upload bukti transaksi wajib jika tidak memilih 'tidak ada bukti'");
+      return res.status(400).render("expense/create", {
+        title: "Ajukan Klaim Beban",
+        categories,
+        errors: { proofFile: "Upload bukti transaksi wajib jika nota tersedia." },
+        old: req.body,
+      });
     }
 
-    if (isNoReceipt && !selfDeclaration) {
-      return res.status(400).send("Self declaration wajib dicentang jika tidak ada bukti");
-    }
-
-    if (isNoReceipt && !noReceiptReason) {
-      return res.status(400).send("Alasan tidak ada bukti wajib diisi");
-    }
-
-    await Employee.findOne({ userId: user._id });
-
+    const cleanAmount = Number(amount) || 0;
     let status = "PENDING_FINANCE";
-    if (Number(amount) > 200000) {
+    if (cleanAmount > 200000) {
       status = "PENDING_MANAGER";
     }
+
     await ExpenseClaim.create({
       userId: user._id,
       employeeId: employee._id,
       title,
       category,
-      amount,
+      amount: cleanAmount,
       expenseDate,
-
       noReceiptReason: isNoReceipt ? noReceiptReason : null,
-
-      selfDeclaration: isNoReceipt ? true : false,
-
+      selfDeclaration: isNoReceipt ? !!selfDeclaration : false,
       status,
-
       proofFile: hasFile ? req.file.filename : null,
     });
 
     return res.redirect("/expense/my");
   } catch (err) {
-    console.log(err);
-    return res.status(500).send("Create expense error");
+    console.error("CREATE EXPENSE ERROR:", err);
+    return res.status(500).send("Create expense error: " + err.message);
   }
 };
-
 export const myExpenses = async (req, res) => {
   try {
     const user = req.session.user;

@@ -11,7 +11,9 @@
           show: true,
           submenus: [
             { name: "Data Pegawai", path: "/employee", show: !!user.permissions.employee_list },
-            { name: "Tambah Pegawai", path: "/employee/create", show: !!user.permissions.employee_add }
+            { name: "Tambah Pegawai", path: "/employee/create", show: !!user.permissions.employee_add },
+            { name: "Persetujuan PHK", path: "/approvals/pending", show: !!user.permissions.phk }
+
           ]
         },
         {
@@ -218,7 +220,6 @@
             { name: "Laporan Lembur", path: "/report/overtime", show: true},
             { name: "Laporan Absensi", path: "/report/attendance", show: true},
             { name: "Laporan Pengeluaran Gaji", path: "/report/payroll", show: true },
-            { name: "Laporan Mutasi Pinjaman", path: "/report/loans", show: true }
 
           ]
         }

@@ -375,9 +375,23 @@
           </div>
           <div class="space-y-1.5"><label class="label-custom">Nomor Rekening</label><input name="nomor_rekening" type="text" value="<%= employee.financialData?.nomor_rekening || '' %>" class="input-custom" /></div>
           <div class="space-y-1.5"><label class="label-custom">Nama Pemilik Rekening</label><input name="nama_pemilik_rekening" type="text" value="<%= employee.financialData?.nama_pemilik_rekening || '' %>" class="input-custom" /></div>
-          <div class="space-y-1.5"><label class="label-custom">Nomor NPWP</label><input name="npwp" type="text" value="<%= employee.financialData?.npwp || '' %>" class="input-custom" /></div>
-          <div class="space-y-1.5"><label class="label-custom">Nomor BPJS Ketenagakerjaan</label><input name="bpjstk" type="text" value="<%= employee.financialData?.bpjstk || '' %>" class="input-custom" /></div>
+        <div class="space-y-1.5">
+  <label class="label-custom">Nomor NPWP</label>
+  <input name="npwp" type="text" value="<%= old?.npwp || employee.financialData?.npwp || '' %>" class="input-custom <%= errors?.npwp ? 'border-red-500' : '' %>" />
+  
+  <% if (errors?.npwp) { %>
+    <p class="text-red-500 text-xs mt-1"><%= errors.npwp %></p>
+  <% } %>
+</div>
 
+<div class="space-y-1.5">
+  <label class="label-custom">Nomor BPJS Ketenagakerjaan</label>
+  <input name="bpjstk" type="text" value="<%= old?.bpjstk || employee.financialData?.bpjstk || '' %>" class="input-custom <%= errors?.bpjstk ? 'border-red-500' : '' %>" />
+  
+  <% if (errors?.bpjstk) { %>
+    <p class="text-red-500 text-xs mt-1"><%= errors.bpjstk %></p>
+  <% } %>
+</div>
           <% if (!isMandiri) { %>
           <div class="space-y-1.5">
             <label class="label-custom">Gaji Pokok (Rp) <span class="text-rose-500">*</span></label>

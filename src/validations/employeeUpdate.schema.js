@@ -145,6 +145,8 @@ export const updateEmployeeSchema = z.object({
     .string()
     .optional()
     .nullable()
+    // 🌟 TRANSFORM: Hapus semua karakter selain angka secara otomatis
+    .transform((val) => (val ? val.replace(/[^0-9]/g, "") : val))
     .refine((val) => !val || /^\d{15,16}$/.test(val), {
       message: "Nomor NPWP harus berupa angka sepanjang 15 atau 16 digit",
     }),
@@ -153,6 +155,8 @@ export const updateEmployeeSchema = z.object({
     .string()
     .optional()
     .nullable()
+    // 🌟 TRANSFORM: Hapus semua karakter selain angka secara otomatis
+    .transform((val) => (val ? val.replace(/[^0-9]/g, "") : val))
     .refine((val) => !val || /^\d{11}$/.test(val), {
       message: "Nomor BPJS Ketenagakerjaan harus berupa 11 digit angka",
     }),

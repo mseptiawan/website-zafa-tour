@@ -201,30 +201,24 @@
               <div>
                 <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Jenjang Pendidikan / Gelar</div>
                 <div class="text-[14px] text-slate-900">
-                  <%= employee.educationData?.jenjang || '-' %>
+                  <%= employee.educationData?.pendidikan_terakhir || '-' %>
                 </div>
               </div>
 
               <div>
                 <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Nama Instansi / Universitas</div>
                 <div class="text-[14px] text-slate-900">
-                  <%= employee.educationData?.nama_instansi || '-' %>
-                </div>
-              </div>
-
-              <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Jurusan / Program Studi</div>
-                <div class="text-[14px] text-slate-900">
-                  <%= employee.educationData?.jurusan || '-' %>
+                  <%= employee.educationData?.institusi_pendidikan || '-' %>
                 </div>
               </div>
 
               <div>
                 <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Tahun Kelulusan</div>
-                <div class="text-[14px] text-slate-900 ">
-                  <%= employee.educationData?.tahun_lulus || '-' %>
+                <div class="text-[14px] text-slate-900">
+                  <%= employee.educationData?.tahun_kelulusan || '-' %>
                 </div>
               </div>
+
 
               <% if (employee.educationData?.file_ijazah) { %>
               <div class="sm:col-span-2 pt-2">
@@ -427,7 +421,7 @@
                   <span class="text-slate-800"><%= fam.nama %></span>
                   <span class="text-[9px] px-1.5 py-0.5 bg-white rounded-md border border-slate-200 uppercase text-slate-600"><%= fam.hubungan %></span>
                 </div>
-                <p class="text-[10px] text-slate-400 ">No. Identitas NIK: <%= fam.nik_keluarga || '-' %></p>
+                <p class="text-[10px] text-slate-400 ">No. Identitas NIK: <%= fam.nik || '-' %></p>
               </div>
             <% }) %>
           </div>

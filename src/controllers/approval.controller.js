@@ -1,20 +1,31 @@
 import Termination from "../models/Termination.model.js";
 import User from "../models/basic/User.model.js";
 import Employee from "../models/employee/Employee.model.js";
-
 export const listPendingApprovals = async (req, res) => {
   try {
     const pendingList = await Termination.find({ status: "Waiting" })
       .populate({
         path: "employeeId",
-        populate: [{ path: "userId" }, { path: "positionId" }, { path: "bidangId" }],
+        populate: [
+          { path: "userId" }, // Mengambil data User (username, email, dll)
+          {
+            path: "careerData",
+            populate: [{ path: "bidangId" }, { path: "positionId" }],
+          },
+        ],
       })
       .sort({ createdAt: -1 });
 
     const historyList = await Termination.find({ status: "Approved" })
       .populate({
         path: "employeeId",
-        populate: [{ path: "userId" }, { path: "positionId" }, { path: "bidangId" }],
+        populate: [
+          { path: "userId" },
+          {
+            path: "careerData",
+            populate: [{ path: "bidangId" }, { path: "positionId" }],
+          },
+        ],
       })
       .populate("approvedBy", "username email")
       .sort({ updatedAt: -1 });
@@ -48,7 +59,7 @@ export const approvePHK = async (req, res) => {
     await termination.save();
 
     await User.findByIdAndUpdate(termination.employeeId.userId, {
-      isActive: false,
+      status: "Inactive",
     });
 
     res.redirect("/approvals/pending");

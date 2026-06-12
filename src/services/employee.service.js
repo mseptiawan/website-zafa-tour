@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import Employee from "../models/employee/Employee.model.js";
-import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
 import User from "../models/basic/User.model.js";
 import Termination from "../models/Termination.model.js";
 import Role from "../models/basic/Role.model.js";
@@ -10,6 +9,7 @@ import Bidang from "../models/basic/Bidang.model.js";
 import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
 import EmployeeDocument from "../models/employee/EmployeeDocument.js";
+import EmployeeSalary from "../models/employee/EmployeeSalary.model.js";
 import EmployeeFamily from "../models/employee/EmployeeFamily.model.js";
 import EmployeeContact from "../models/employee/EmployeeContact.js";
 import EmployeeEducation from "../models/employee/EmployeeEducation.js";
@@ -18,26 +18,25 @@ import bcrypt from "bcrypt";
 export const EmployeeService = {
   findAllEmployees: async () => {
     const employeesData = await Employee.find()
-      .populate("userId") // Untuk narik status ("Active"/"Inactive")
-      .populate("salaryDetail") // TAMBAHKAN INI untuk narik basicSalary
+      .populate("userId")
+      .populate("salaryDetail")
       .populate({
         path: "careerData",
         populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
       });
 
-    const approvedTerminations = await Termination.find({ status: "Approved" }).populate(
-      "approvedBy",
-      "username"
-    );
+    const terminations = await Termination.find({
+      status: { $in: ["Waiting", "Approved"] },
+    }).populate("approvedBy", "username");
 
     return employeesData.map((emp) => {
       const empObj = emp.toObject();
-      const termInfo = approvedTerminations.find(
-        (t) => t.employeeId?.toString() === emp._id.toString()
-      );
+
+      const termInfo = terminations.find((t) => t.employeeId?.toString() === emp._id.toString());
 
       if (termInfo) {
         empObj.terminationInfo = {
+          statusPHK: termInfo.status,
           reason: termInfo.reason,
           approvedBy: termInfo.approvedBy?.username || "System",
           date: new Date(termInfo.updatedAt).toLocaleDateString("id-ID", {
@@ -50,7 +49,6 @@ export const EmployeeService = {
       return empObj;
     });
   },
-
   getFormData: async (currentUserRole) => {
     let roleQuery = {};
 
@@ -324,22 +322,19 @@ export const EmployeeService = {
           bpjstk: data.bpjstk,
           overtimeRate: data.overtimeRate ?? 0,
         },
-        { new: true, upsert: true }
+        { returnDocument: "after", upsert: true }
       ),
 
-      // Update data Gaji Pokok di model EmployeeSalary
-      // Pastikan lo sudah meng-import model EmployeeSalary di bagian atas file service ini!
       EmployeeSalary.findOneAndUpdate(
-        { employeeId: id }, // Perhatikan field-nya 'employeeId' sesuai skema lo
+        { employeeId: id },
         {
           basicSalary: data.basicSalary ?? 0,
           effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : Date.now(),
         },
-        { new: true, upsert: true }
+        { returnDocument: "after", upsert: true }
       ),
     ]);
 
-    // 2. Kembalikan gabungan datanya dalam satu objek untuk mempermudah response controller/frontend
     return {
       financial: financialUpdate,
       salary: salaryUpdate,

@@ -1,0 +1,1238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="MongoDb" database="MongoDb" id="fff5c287-c50a-4505-a2b6-88900137e81d" >
+	<schema name="hris_zafa_tour" >
+		<table name="announcements" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="title" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="content" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="category" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="createdBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="attachment" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="signedBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="publishDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="createdAt_-1" unique="NORMAL" >
+				<column name="createdAt" />
+			</index>
+			<index name="status_1_createdAt_-1" unique="NORMAL" >
+				<column name="status" />
+				<column name="createdAt" />
+			</index>
+			<index name="category_1_status_1" unique="NORMAL" >
+				<column name="category" />
+				<column name="status" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="createdBy" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="signedBy" pk="_id" />
+			</fk>
+		</table>
+		<table name="assignments" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="title" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="description" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="type" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="location" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="startDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="endDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="attachment" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="createdBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employees" type="array[objectid]" length="800" decimal="0" mandatory="y" />
+			<column name="reportFile" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employees" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="createdBy" pk="_id" />
+			</fk>
+		</table>
+		<table name="attendances" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" />
+			<column name="checkIn" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="checkOut" type="date" length="800" decimal="0" />
+			<column name="workDuration" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="lateDuration" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="type" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="checkInPhoto" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="checkOutPhoto" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="note" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="location" type="object" length="800" decimal="0" >
+				<column name="lat" type="double" length="800" decimal="0" mandatory="y" />
+				<column name="lng" type="double" length="800" decimal="0" mandatory="y" />
+				<column name="accuracy" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="address" type="string" length="800" decimal="0" mandatory="y" />
+			</column>
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="idx_userId_checkIn" unique="NORMAL" >
+				<column name="checkIn" />
+			</index>
+			<index name="idx_checkIn_userId" unique="NORMAL" >
+				<column name="checkIn" />
+			</index>
+			<index name="idx_status_checkIn" unique="NORMAL" >
+				<column name="status" />
+				<column name="checkIn" />
+			</index>
+			<fk name="fk_attendances_employees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="bidangs" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="managerRoleId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="name_1" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="roles" >
+				<fk_column name="managerRoleId" pk="_id" />
+			</fk>
+		</table>
+		<table name="businesstrips" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" />
+			<column name="requesterRole" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="title" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="purpose" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="meetWith" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="startDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="endDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="destination" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="description" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="timeline" type="array[object]" length="800" decimal="0" mandatory="y" >
+				<column name="address" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="order" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="tripReport" type="object" length="800" decimal="0" mandatory="y" >
+				<column name="isSubmitted" type="Boolean" length="800" decimal="0" mandatory="y" />
+				<column name="submittedAt" type="date" length="800" decimal="0" mandatory="y" />
+				<column name="description" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="attachments" type="array" length="800" decimal="0" mandatory="y" >
+					<column name="filename" type="string" length="800" decimal="0" mandatory="y" />
+					<column name="url" type="string" length="800" decimal="0" mandatory="y" />
+					<column name="mimetype" type="string" length="800" decimal="0" mandatory="y" />
+					<column name="size" type="int" length="800" decimal="0" mandatory="y" />
+					<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+				</column>
+				<column name="attachments" type="array[object]" length="800" decimal="0" />
+			</column>
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="currentStep" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="approvals" type="array[object]" length="800" decimal="0" >
+				<column name="step" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="actor" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="userId" type="objectId" length="800" decimal="0" mandatory="y" />
+				<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="date" type="date" length="800" decimal="0" mandatory="y" />
+				<column name="note" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="delegation" type="object" length="800" decimal="0" mandatory="y" >
+				<column name="active" type="Boolean" length="800" decimal="0" mandatory="y" />
+				<column name="from" type="string" length="800" decimal="0" />
+				<column name="to" type="string" length="800" decimal="0" />
+				<column name="delegatedBy" type="objectId" length="800" decimal="0" />
+				<column name="delegatedAt" type="date" length="800" decimal="0" />
+				<column name="note" type="string" length="800" decimal="0" />
+			</column>
+			<column name="payment" type="object" length="800" decimal="0" mandatory="y" >
+				<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="proof" type="string" length="800" decimal="0" mandatory="y" >
+					<column name="filename" type="string" length="800" decimal="0" mandatory="y" />
+					<column name="url" type="string" length="800" decimal="0" mandatory="y" />
+					<column name="uploadedAt" type="date" length="800" decimal="0" mandatory="y" />
+				</column>
+				<column name="amount" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="paidAt" type="date" length="800" decimal="0" mandatory="y" />
+				<column name="paidBy" type="objectId" length="800" decimal="0" mandatory="y" />
+				<column name="note" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="proof" type="object" length="800" decimal="0" />
+			</column>
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" />
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="delegation.delegatedBy" pk="_id" />
+			</fk>
+			<fk name="fk_businesstrips_employees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="companysettings" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="lat" type="double" length="800" decimal="0" mandatory="y" />
+			<column name="lng" type="double" length="800" decimal="0" mandatory="y" />
+			<column name="radiusMeter" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="entryTimeLimit" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+		</table>
+		<table name="dailylogs" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" />
+			<column name="tanggal" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="kategori" type="string" length="800" decimal="0" />
+			<column name="judul" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="penjelasanHasil" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="fileLampiran" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="kpiTemplateId" type="objectId" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="userId_1_tanggal_1" unique="NORMAL" >
+				<column name="tanggal" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="kpitemplatedetails" >
+				<fk_column name="kpiTemplateId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" />
+			<fk name="fk_dailylogs_employees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="employeeallowances" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="componentId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="amount" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employeeId_1_componentId_1" unique="UNIQUE_KEY" >
+				<column name="employeeId" />
+				<column name="componentId" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="salarycomponents" >
+				<fk_column name="componentId" pk="_id" />
+			</fk>
+		</table>
+		<table name="employeecareers" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employee_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="tanggal_mulai_bergabung" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="bidangId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="unitId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="positionId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="status_pegawai" type="string" length="800" decimal="0" />
+			<column name="tanggal_berakhir_kontrak" type="string" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="bidangs" >
+				<fk_column name="bidangId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employee_id" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="positions" >
+				<fk_column name="positionId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="units" >
+				<fk_column name="unitId" pk="_id" />
+			</fk>
+		</table>
+		<table name="employeecontacts" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employee_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="alamat" type="string" length="800" decimal="0" />
+			<column name="hubungan_kontak_darurat" type="string" length="800" decimal="0" />
+			<column name="nama_kontak_darurat" type="string" length="800" decimal="0" />
+			<column name="nomor_kontak_darurat" type="string" length="800" decimal="0" />
+			<column name="nomor_telp" type="string" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employee_id_1" unique="UNIQUE_KEY" >
+				<column name="employee_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employee_id" pk="_id" />
+			</fk>
+		</table>
+		<table name="employeedocuments" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employee_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="file_ktp" type="string" length="800" decimal="0" />
+			<column name="file_kk" type="string" length="800" decimal="0" />
+			<column name="file_skck" type="string" length="800" decimal="0" />
+			<column name="tanggal_kadaluarsa_skck" type="date" length="800" decimal="0" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="sertifikat_kompetensi" type="array[object]" length="800" decimal="0" >
+				<column name="nama_sertifikat" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="penerbit" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="nomor_sertifikat" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="tanggal_terbit" type="date" length="800" decimal="0" mandatory="y" />
+				<column name="tanggal_kadaluarsa" type="date" length="800" decimal="0" mandatory="y" />
+				<column name="file_sertifikat" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employee_id_1" unique="UNIQUE_KEY" >
+				<column name="employee_id" />
+			</index>
+		</table>
+		<table name="employeeeducations" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employee_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="pendidikan_terakhir" type="string" length="800" decimal="0" />
+			<column name="institusi_pendidikan" type="string" length="800" decimal="0" />
+			<column name="tahun_kelulusan" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="sertifikat_profesional" type="array[string]" length="800" decimal="0" />
+			<column name="keahlian_utama" type="array[string]" length="800" decimal="0" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="file_ijazah" type="string" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employee_id" pk="_id" />
+			</fk>
+		</table>
+		<table name="employeefamilies" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employee_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="anggota_keluarga" type="array[object]" length="800" decimal="0" >
+				<column name="nama" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="hubungan" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="nik" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="pekerjaan" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="status_tanggungan" type="Boolean" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employee_id_1" unique="UNIQUE_KEY" >
+				<column name="employee_id" />
+			</index>
+		</table>
+		<table name="employeefinancials" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employee_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="nomor_rekening" type="string" length="800" decimal="0" />
+			<column name="nama_bank" type="string" length="800" decimal="0" />
+			<column name="nama_pemilik_rekening" type="string" length="800" decimal="0" />
+			<column name="npwp" type="string" length="800" decimal="0" />
+			<column name="bpjstk" type="string" length="800" decimal="0" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="overtimeRate" type="int" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employee_id_1" unique="UNIQUE_KEY" >
+				<column name="employee_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employee_id" pk="_id" />
+			</fk>
+		</table>
+		<table name="employees" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeIdNumber" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="userId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="fullName" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="nomor_ktp" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="tempat_lahir" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="tanggal_lahir" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="jenis_kelamin" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="agama" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="status_pernikahan" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="foto_profile" type="string" length="800" decimal="0" />
+			<column name="golongan_darah" type="string" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employeeIdNumber_1" unique="UNIQUE_KEY" >
+				<column name="employeeIdNumber" />
+			</index>
+			<index name="userId_1" unique="UNIQUE_KEY" >
+				<column name="userId" />
+			</index>
+			<index name="nomor_ktp_1" unique="UNIQUE_KEY" >
+				<column name="nomor_ktp" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="userId" pk="_id" />
+			</fk>
+		</table>
+		<table name="employeesalaries" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="basicSalary" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="effectiveDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employeeId_1" unique="UNIQUE_KEY" >
+				<column name="employeeId" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+			<fk name="fk_employeesalaries_employees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="expensecategories" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="isActive" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="name_1" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="expenseclaims" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="title" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="category" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="amount" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="expenseDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="proofFile" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="selfDeclaration" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="financeApprovedBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="transferProofFile" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="paidAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="expensecategories" >
+				<fk_column name="category" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" />
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="financeApprovedBy" pk="_id" />
+			</fk>
+		</table>
+		<table name="holidays" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="date" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="description" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="isActive" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="isDeductLeave" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="type" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="year" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="endDate" type="date" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+		</table>
+		<table name="kpis" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="periode" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="kpiTemplateId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="results" type="array[object]" length="800" decimal="0" mandatory="y" >
+				<column name="kpiTemplateDetailId" type="objectId" length="800" decimal="0" mandatory="y" />
+				<column name="areaKinerja" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="indikator" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="bobot" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="target" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="realisasi" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="score" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="finalScore" type="object" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="totalKpiScore" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="evaluatedBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employeeId_1_periode_1" unique="UNIQUE_KEY" >
+				<column name="employeeId" />
+				<column name="periode" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="kpitemplatedetails" >
+				<fk_column name="results.kpiTemplateDetailId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="kpitemplates" >
+				<fk_column name="kpiTemplateId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="evaluatedBy" pk="_id" />
+			</fk>
+		</table>
+		<table name="kpitemplatedetails" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="kpiTemplateId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="areaKinerja" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="indikator" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="bobot" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="target" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="kpitemplates" >
+				<fk_column name="kpiTemplateId" pk="_id" />
+			</fk>
+		</table>
+		<table name="kpitemplates" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="isActive" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="name_1" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="leaveapprovals" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="leaveId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="step" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="approverId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="note" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="actionDate" type="date" length="800" decimal="0" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="leaves" >
+				<fk_column name="leaveId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="approverId" pk="_id" />
+			</fk>
+		</table>
+		<table name="leavebalances" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" />
+			<column name="year" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="totalQuota" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="used" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="remaining" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="fk_leavebalances_employeees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="leavecancellations" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="leaveId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="requestedBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="cancelReason" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="processedBy" type="objectId" length="800" decimal="0" />
+			<column name="processAt" type="date" length="800" decimal="0" />
+			<column name="note" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="leaves" >
+				<fk_column name="leaveId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="requestedBy" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="processedBy" pk="_id" />
+			</fk>
+		</table>
+		<table name="leaves" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" prior="employeeID" type="objectId" />
+			<column name="leaveTypeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="startDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="endDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="totalDays" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="reason" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="documentPath" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="handoverUserId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="leavetypes" >
+				<fk_column name="leaveTypeId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" />
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="handoverUserId" pk="_id" />
+			</fk>
+			<fk name="fk_leaves_employees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="leavetypes" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="code" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="maxDays" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="minAdvanceDays" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="requiresAttachment" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="isDeductBalance" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="isActive" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="description" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="code_1" unique="UNIQUE_KEY" >
+				<column name="code" />
+			</index>
+		</table>
+		<table name="loanapprovals" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="loanId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="step" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="approverId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="actionDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="loans" >
+				<fk_column name="loanId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="approverId" pk="_id" />
+			</fk>
+		</table>
+		<table name="loanpayments" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="loanId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="installmentNumber" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="amount" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="periodMonth" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="isPaid" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="loanId_1" unique="NORMAL" >
+				<column name="loanId" />
+			</index>
+			<index name="employeeId_1" unique="NORMAL" >
+				<column name="employeeId" />
+			</index>
+			<index name="isPaid_1" unique="NORMAL" >
+				<column name="isPaid" />
+			</index>
+			<index name="loanId_1_installmentNumber_1" unique="UNIQUE_KEY" >
+				<column name="loanId" />
+				<column name="installmentNumber" />
+			</index>
+			<index name="employeeId_1_periodMonth_1" unique="NORMAL" >
+				<column name="employeeId" />
+				<column name="periodMonth" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="loans" >
+				<fk_column name="loanId" pk="_id" />
+			</fk>
+		</table>
+		<table name="loans" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="amountRequested" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="tenorMonths" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="monthlyDeduction" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="reason" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="paymentProof" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="disbursementDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employeeId_1" unique="NORMAL" >
+				<column name="employeeId" />
+			</index>
+			<index name="status_1" unique="NORMAL" >
+				<column name="status" />
+			</index>
+			<index name="employeeId_1_status_1" unique="NORMAL" >
+				<column name="employeeId" />
+				<column name="status" />
+			</index>
+			<index name="createdAt_-1" unique="NORMAL" >
+				<column name="createdAt" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="notifications" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+		</table>
+		<table name="overtimes" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="userId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeName" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="date" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="startTime" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="endTime" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="totalHours" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="workDescription" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="result" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="location" type="object" length="800" decimal="0" mandatory="y" >
+				<column name="type" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="detail" type="string" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="approvedBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="approvedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="approvalHistory" type="array[object]" length="800" decimal="0" mandatory="y" >
+				<column name="action" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="by" type="objectId" length="800" decimal="0" mandatory="y" />
+				<column name="note" type="string" length="800" decimal="0" />
+				<column name="at" type="date" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+				<column name="role" type="string" length="800" decimal="0" />
+			</column>
+			<column name="payrollPeriodId" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="payrollStatus" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="overtimeRateSnapshot" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="multiplierSnapshot" type="double" length="800" decimal="0" mandatory="y" />
+			<column name="bidangId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="requiredManagerRole" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="proofFile" type="string" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="bidangs" >
+				<fk_column name="bidangId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="userId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="approvedBy" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" >
+				<fk_column name="approvalHistory.by" pk="_id" />
+			</fk>
+		</table>
+		<table name="payrolls" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="periodMonth" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="basicSalary" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="allowances" type="array[object]" length="800" decimal="0" mandatory="y" >
+				<column name="componentName" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="amount" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="deductions" type="array[object]" length="800" decimal="0" mandatory="y" >
+				<column name="componentName" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="amount" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="loanDeduction" type="object" length="800" decimal="0" mandatory="y" >
+				<column name="loanPaymentId" type="objectId" length="800" decimal="0" mandatory="y" />
+				<column name="amount" type="int" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="totalEarnings" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="totalDeductions" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="netTakeHomePay" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="mutationFile" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="paidAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="employeeId_1_periodMonth_1" unique="UNIQUE_KEY" >
+				<column name="employeeId" />
+				<column name="periodMonth" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="loanpayments" >
+				<fk_column name="loanDeduction.loanPaymentId" pk="_id" />
+			</fk>
+		</table>
+		<table name="permits" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" />
+			<column name="type" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="startDate" type="date" length="800" decimal="0" />
+			<column name="endDate" type="date" length="800" decimal="0" />
+			<column name="reason" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="document" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="notesByApprover" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="approvalDate" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="approvedBy" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="date" type="date" length="800" decimal="0" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="users" />
+			<fk name="fk_permits_employees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="positions" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="name_1" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="roles" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="name_1" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="salarycomponents" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="code" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="type" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="sourceType" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="category" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="calculationType" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="defaultAmount" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="basedOnComponent" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="isLocked" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="isActive" type="Boolean" length="800" decimal="0" mandatory="y" />
+			<column name="description" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="code_1" unique="UNIQUE_KEY" >
+				<column name="code" />
+			</index>
+		</table>
+		<table name="salesvisits" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="employeeId" type="objectId" />
+			<column name="title" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="address" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="meetWith" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="result" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="attachments" type="array[object]" length="800" decimal="0" >
+				<column name="filename" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="originalName" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="mimetype" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="size" type="int" length="800" decimal="0" mandatory="y" />
+				<column name="path" type="string" length="800" decimal="0" mandatory="y" />
+				<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			</column>
+			<column name="visitTime" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="fk_salesvisits_employees" to_schema="hris_zafa_tour" to_table="employees" >
+				<fk_column name="employeeId" pk="_id" />
+			</fk>
+		</table>
+		<table name="terminations" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+		</table>
+		<table name="unitkpimappings" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="unitId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="positionId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="kpiTemplateId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="kpitemplates" >
+				<fk_column name="kpiTemplateId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="positions" >
+				<fk_column name="positionId" pk="_id" />
+			</fk>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="units" >
+				<fk_column name="unitId" pk="_id" />
+			</fk>
+		</table>
+		<table name="units" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="bidangId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="name" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="bidangs" >
+				<fk_column name="bidangId" pk="_id" />
+			</fk>
+		</table>
+		<table name="users" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="username" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="email" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="password" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="roleId" type="objectId" length="800" decimal="0" mandatory="y" />
+			<column name="status" type="string" length="800" decimal="0" mandatory="y" />
+			<column name="__v" type="int" length="800" decimal="0" mandatory="y" />
+			<column name="createdAt" type="date" length="800" decimal="0" mandatory="y" />
+			<column name="updatedAt" type="date" length="800" decimal="0" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="username_1" unique="UNIQUE_KEY" >
+				<column name="username" />
+			</index>
+			<index name="email_1" unique="UNIQUE_KEY" >
+				<column name="email" />
+			</index>
+			<fk name="Relationship" virtual="y" to_schema="hris_zafa_tour" to_table="roles" >
+				<fk_column name="roleId" pk="_id" />
+			</fk>
+		</table>
+	</schema>
+	<diagram_group name="Default" id="284d91b0-a0f5-4df7-98de-f8c4fbf6de8e" >
+		<diagram name="Main Diagram" id="7e294064-efcb-49ab-a9bb-2cfc35ce9ecf" hide_fks="Relationship,Relationship,Relationship,Relationship,Relationship," show_relation="fk_name" >
+			<entity schema="hris_zafa_tour" name="announcements" color="3986C1" x="2641" y="323" />
+			<entity schema="hris_zafa_tour" name="assignments" color="3986C1" x="1159" y="1216" />
+			<entity schema="hris_zafa_tour" name="attendances" color="3986C1" x="1349" y="1216" />
+			<entity schema="hris_zafa_tour" name="bidangs" color="3986C1" x="2185" y="323" />
+			<entity schema="hris_zafa_tour" name="businesstrips" color="3986C1" x="931" y="627" />
+			<entity schema="hris_zafa_tour" name="companysettings" color="3986C1" x="1102" y="627" />
+			<entity schema="hris_zafa_tour" name="dailylogs" color="3986C1" x="1273" y="627" />
+			<entity schema="hris_zafa_tour" name="employeeallowances" color="3986C1" x="1482" y="646" />
+			<entity schema="hris_zafa_tour" name="employeecareers" color="3986C1" x="2641" y="1235" />
+			<entity schema="hris_zafa_tour" name="employeecontacts" color="3986C1" x="2128" y="1368" />
+			<entity schema="hris_zafa_tour" name="employeedocuments" color="3986C1" x="2128" y="1064" />
+			<entity schema="hris_zafa_tour" name="employeeeducations" color="3986C1" x="2128" y="551" />
+			<entity schema="hris_zafa_tour" name="employeefamilies" color="3986C1" x="2128" y="855" />
+			<entity schema="hris_zafa_tour" name="employeefinancials" color="3986C1" x="2660" y="893" />
+			<entity schema="hris_zafa_tour" name="employees" color="3986C1" x="2451" y="798" />
+			<entity schema="hris_zafa_tour" name="employeesalaries" color="3986C1" x="1691" y="912" />
+			<entity schema="hris_zafa_tour" name="expensecategories" color="3986C1" x="1710" y="665" />
+			<entity schema="hris_zafa_tour" name="expenseclaims" color="3986C1" x="1900" y="646" />
+			<entity schema="hris_zafa_tour" name="holidays" color="3986C1" x="3173" y="950" />
+			<entity schema="hris_zafa_tour" name="kpis" color="3986C1" x="3344" y="950" />
+			<entity schema="hris_zafa_tour" name="kpitemplatedetails" color="3986C1" x="3515" y="950" />
+			<entity schema="hris_zafa_tour" name="kpitemplates" color="3986C1" x="3686" y="950" />
+			<entity schema="hris_zafa_tour" name="leaveapprovals" color="3986C1" x="3287" y="684" />
+			<entity schema="hris_zafa_tour" name="leavebalances" color="3986C1" x="3477" y="665" />
+			<entity schema="hris_zafa_tour" name="leavecancellations" color="3986C1" x="3648" y="627" />
+			<entity schema="hris_zafa_tour" name="leaves" color="3986C1" x="3325" y="304" />
+			<entity schema="hris_zafa_tour" name="leavetypes" color="3986C1" x="3686" y="1216" />
+			<entity schema="hris_zafa_tour" name="loanapprovals" color="3986C1" x="3515" y="1292" />
+			<entity schema="hris_zafa_tour" name="loanpayments" color="3986C1" x="3154" y="1292" />
+			<entity schema="hris_zafa_tour" name="loans" color="3986C1" x="3344" y="1292" />
+			<entity schema="hris_zafa_tour" name="notifications" color="3986C1" x="3876" y="1387" />
+			<entity schema="hris_zafa_tour" name="overtimes" color="3986C1" x="3895" y="950" />
+			<entity schema="hris_zafa_tour" name="payrolls" color="3986C1" x="2926" y="1178" />
+			<entity schema="hris_zafa_tour" name="permits" color="3986C1" x="2888" y="722" />
+			<entity schema="hris_zafa_tour" name="positions" color="3986C1" x="2698" y="646" />
+			<entity schema="hris_zafa_tour" name="roles" color="3986C1" x="2926" y="513" />
+			<entity schema="hris_zafa_tour" name="salarycomponents" color="3986C1" x="1577" y="1197" />
+			<entity schema="hris_zafa_tour" name="salesvisits" color="3986C1" x="1786" y="1197" />
+			<entity schema="hris_zafa_tour" name="terminations" color="3986C1" x="1938" y="1197" />
+			<entity schema="hris_zafa_tour" name="unitkpimappings" color="3986C1" x="2451" y="285" />
+			<entity schema="hris_zafa_tour" name="units" color="3986C1" x="2470" y="513" />
+			<entity schema="hris_zafa_tour" name="users" color="3986C1" x="3135" y="513" />
+			<callout x="57" y="57" pointer="Round" >
+				<comment><![CDATA[Double-click the table headers, columns, or foreign keys to edit.
+
+Create multiple diagrams with the same or different tables.
+The diagrams will be saved to the model file and can be later reopen.]]></comment>
+			</callout>
+		</diagram>
+		<diagram name="~Diagram with Sample Tools" id="8278261b-0e5f-4b81-a9cb-c80b3e32d292" show_column_type="y" show_relation="columns" >
+			<entity schema="hris_zafa_tour" name="announcements" color="C7F4BE" x="2546" y="1102" />
+			<entity schema="hris_zafa_tour" name="assignments" color="D1BEF4" x="912" y="2527" />
+			<entity schema="hris_zafa_tour" name="attendances" color="BED3F4" x="1273" y="2527" />
+			<entity schema="hris_zafa_tour" name="bidangs" color="C7F4BE" x="2869" y="456" />
+			<entity schema="hris_zafa_tour" name="businesstrips" color="C7F4BE" x="2527" y="513" />
+			<entity schema="hris_zafa_tour" name="companysettings" color="BED3F4" x="1805" y="1862" />
+			<entity schema="hris_zafa_tour" name="dailylogs" color="BED3F4" x="627" y="722" />
+			<entity schema="hris_zafa_tour" name="employeeallowances" color="F4DDBE" x="1995" y="589" />
+			<entity schema="hris_zafa_tour" name="employeecareers" color="BED3F4" x="627" y="342" />
+			<entity schema="hris_zafa_tour" name="employeecontacts" color="F4DDBE" x="2527" y="1577" />
+			<entity schema="hris_zafa_tour" name="employeedocuments" color="BED3F4" x="2109" y="1862" />
+			<entity schema="hris_zafa_tour" name="employeeeducations" color="F4DDBE" x="1615" y="589" />
+			<entity schema="hris_zafa_tour" name="employeefamilies" color="BED3F4" x="1520" y="1577" />
+			<entity schema="hris_zafa_tour" name="employeefinancials" color="F4DDBE" x="1615" y="1045" />
+			<entity schema="hris_zafa_tour" name="employees" color="F4DDBE" x="1273" y="1045" />
+			<entity schema="hris_zafa_tour" name="employeesalaries" color="BEBEF4" x="2185" y="2527" />
+			<entity schema="hris_zafa_tour" name="expensecategories" color="C7F4BE" x="2869" y="779" />
+			<entity schema="hris_zafa_tour" name="expenseclaims" color="C7F4BE" x="3534" y="779" />
+			<entity schema="hris_zafa_tour" name="holidays" color="BED3F4" x="1501" y="2052" />
+			<entity schema="hris_zafa_tour" name="kpis" color="BED3F4" x="931" y="1121" />
+			<entity schema="hris_zafa_tour" name="kpitemplatedetails" color="BED3F4" x="57" y="988" />
+			<entity schema="hris_zafa_tour" name="kpitemplates" color="BED3F4" x="361" y="988" />
+			<entity schema="hris_zafa_tour" name="leaveapprovals" color="C7F4BE" x="931" y="1634" />
+			<entity schema="hris_zafa_tour" name="leavebalances" color="D1BEF4" x="2527" y="2109" />
+			<entity schema="hris_zafa_tour" name="leavecancellations" color="C7F4BE" x="931" y="2033" />
+			<entity schema="hris_zafa_tour" name="leaves" color="C7F4BE" x="589" y="2033" />
+			<entity schema="hris_zafa_tour" name="leavetypes" color="C7F4BE" x="589" y="1634" />
+			<entity schema="hris_zafa_tour" name="loanapprovals" color="F4DDBE" x="1330" y="247" />
+			<entity schema="hris_zafa_tour" name="loanpayments" color="F4DDBE" x="1995" y="228" />
+			<entity schema="hris_zafa_tour" name="loans" color="F4DDBE" x="1615" y="190" />
+			<entity schema="hris_zafa_tour" name="notifications" color="BED3F4" x="1273" y="1862" />
+			<entity schema="hris_zafa_tour" name="overtimes" color="C7F4BE" x="3534" y="95" />
+			<entity schema="hris_zafa_tour" name="payrolls" color="F4DDBE" x="1995" y="969" />
+			<entity schema="hris_zafa_tour" name="permits" color="C7F4BE" x="3173" y="779" />
+			<entity schema="hris_zafa_tour" name="positions" color="BED3F4" x="361" y="722" />
+			<entity schema="hris_zafa_tour" name="roles" color="C7F4BE" x="2869" y="1102" />
+			<entity schema="hris_zafa_tour" name="salarycomponents" color="F4DDBE" x="1273" y="589" />
+			<entity schema="hris_zafa_tour" name="salesvisits" color="BEBEF4" x="2527" y="2527" />
+			<entity schema="hris_zafa_tour" name="terminations" color="BED3F4" x="1273" y="1672" />
+			<entity schema="hris_zafa_tour" name="unitkpimappings" color="BED3F4" x="931" y="722" />
+			<entity schema="hris_zafa_tour" name="units" color="BED3F4" x="76" y="703" />
+			<entity schema="hris_zafa_tour" name="users" color="C7F4BE" x="3230" y="399" />
+			<group name="attendancecorrections" color="ECF0F7" >
+				<entity schema="hris_zafa_tour" name="companysettings" />
+				<entity schema="hris_zafa_tour" name="employeedocuments" />
+				<entity schema="hris_zafa_tour" name="employeefamilies" />
+				<entity schema="hris_zafa_tour" name="holidays" />
+				<entity schema="hris_zafa_tour" name="notifications" />
+				<entity schema="hris_zafa_tour" name="terminations" />
+			</group>
+			<group name="employeecontacts" color="F7F2EC" >
+				<entity schema="hris_zafa_tour" name="employeecontacts" />
+			</group>
+			<group name="leavebalances" color="F0ECF7" >
+				<entity schema="hris_zafa_tour" name="leavebalances" />
+			</group>
+			<group name="salesvisits" color="ECECF7" >
+				<entity schema="hris_zafa_tour" name="salesvisits" />
+			</group>
+			<group name="attendances" color="ECF0F7" >
+				<entity schema="hris_zafa_tour" name="attendances" />
+			</group>
+			<group name="employeesalaries" color="ECECF7" >
+				<entity schema="hris_zafa_tour" name="employeesalaries" />
+			</group>
+			<group name="assignments" color="F0ECF7" >
+				<entity schema="hris_zafa_tour" name="assignments" />
+			</group>
+			<group name="leavetypes" color="EEF7EC" >
+				<entity schema="hris_zafa_tour" name="leaveapprovals" />
+				<entity schema="hris_zafa_tour" name="leavecancellations" />
+				<entity schema="hris_zafa_tour" name="leaves" />
+				<entity schema="hris_zafa_tour" name="leavetypes" />
+			</group>
+			<group name="kpitemplates" color="ECF0F7" >
+				<entity schema="hris_zafa_tour" name="dailylogs" />
+				<entity schema="hris_zafa_tour" name="employeecareers" />
+				<entity schema="hris_zafa_tour" name="kpis" />
+				<entity schema="hris_zafa_tour" name="kpitemplatedetails" />
+				<entity schema="hris_zafa_tour" name="kpitemplates" />
+				<entity schema="hris_zafa_tour" name="positions" />
+				<entity schema="hris_zafa_tour" name="unitkpimappings" />
+				<entity schema="hris_zafa_tour" name="units" />
+			</group>
+			<group name="salarycomponents" color="F7F2EC" >
+				<entity schema="hris_zafa_tour" name="employeeallowances" />
+				<entity schema="hris_zafa_tour" name="employeeeducations" />
+				<entity schema="hris_zafa_tour" name="employeefinancials" />
+				<entity schema="hris_zafa_tour" name="employees" />
+				<entity schema="hris_zafa_tour" name="loanapprovals" />
+				<entity schema="hris_zafa_tour" name="loanpayments" />
+				<entity schema="hris_zafa_tour" name="loans" />
+				<entity schema="hris_zafa_tour" name="payrolls" />
+				<entity schema="hris_zafa_tour" name="salarycomponents" />
+			</group>
+			<group name="expensecategories" color="EEF7EC" >
+				<entity schema="hris_zafa_tour" name="announcements" />
+				<entity schema="hris_zafa_tour" name="bidangs" />
+				<entity schema="hris_zafa_tour" name="businesstrips" />
+				<entity schema="hris_zafa_tour" name="expensecategories" />
+				<entity schema="hris_zafa_tour" name="expenseclaims" />
+				<entity schema="hris_zafa_tour" name="overtimes" />
+				<entity schema="hris_zafa_tour" name="permits" />
+				<entity schema="hris_zafa_tour" name="roles" />
+				<entity schema="hris_zafa_tour" name="users" />
+			</group>
+			<script name="Query Editor" id="d21ecb2b-c739-4578-8def-81144f91b5fb" language="SQL" >
+				<string><![CDATA[hris_zafa_tour.users.find()
+
+//OR
+
+USE hris_zafa_tour;
+db.users.find()
+
+//OR
+
+USE hris_zafa_tour;
+db.getCollection('users').find()]]></string>
+			</script>
+			<browser id="9853dfc6-42ca-4b18-9b03-eb9161a71b2b" name="Relational Data Editor" confirm_updates="y" >
+				<browse_table schema="hris_zafa_tour" entity="users" fk_out="n" x="20" y="20" width="270" height="-60" record_view="y" />
+			</browser>
+			<query id="a20630eb-5bd4-459a-8e6a-b61648685bc6" name="Query Builder" >
+				<query_table schema="hris_zafa_tour" name="users" alias="" x="57" y="57" >
+					<column name="_id" />
+					<column name="username" />
+					<column name="email" />
+					<column name="password" />
+					<column name="roleId" />
+					<column name="status" />
+					<column name="__v" />
+					<column name="createdAt" />
+					<column name="updatedAt" />
+				</query_table>
+			</query>
+		</diagram>
+	</diagram_group>
+</project>
