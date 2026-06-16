@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/60 p-8 antialiased">
+<div class="ml-0 md:ml-72 min-h-screen bg-white md:bg-slate-50/30 p-4 md:p-8 antialiased text-slate-900 pb-24 md:pb-8">
   <div class="max-w-6xl mx-auto">
 
     <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR') { %>
@@ -21,15 +21,15 @@
 
     <% const currentStatus = employee.userId?.status || 'Active'; %>
     <% if (currentStatus === 'Inactive') { %>
-    <div class="border border-rose-100 bg-rose-50/30 rounded-xl p-5 flex items-center justify-between mb-6 shadow-[0_1px_3px_rgba(15,23,42,0.03)]">
+    <div class="border border-rose-100 bg-rose-50/30 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 shadow-[0_1px_3px_rgba(15,23,42,0.03)]">
       <div>
-        <h2 class="text-sm text-rose-900">Berkas Pegawai Dinonaktifkan (Arsip PHK)</h2>
+        <h2 class="text-sm font-bold text-rose-900">Berkas Pegawai Dinonaktifkan (Arsip PHK)</h2>
         <p class="text-[13px] text-rose-700/90 mt-0.5">
           Pegawai ini sudah tidak aktif bekerja di organisasi. Seluruh hak akses sistem ditangguhkan.
         </p>
       </div>
       <% if (employee.terminationInfo?.reason) { %>
-      <div class="text-xs text-rose-600 italic bg-white border border-rose-100 px-3 py-1.5 rounded-lg max-w-sm truncate">
+      <div class="text-xs text-rose-600 italic bg-white border border-rose-100 px-3 py-1.5 rounded-lg max-w-full sm:max-w-sm truncate self-start sm:self-auto">
         Alasan: "<%= employee.terminationInfo.reason %>"
       </div>
       <% } %>
@@ -40,91 +40,85 @@
 
       <div class="lg:col-span-2 space-y-6">
 
-        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-          <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
+        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.02)] overflow-hidden">
+          <div class="p-5 sm:px-8 sm:py-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between bg-white gap-4">
             <div class="flex items-center gap-4">
-            <div class="relative w-16 h-16 rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-500 shrink-0 overflow-hidden group/avatar">
-    <% if (employee.foto_profile) { %>
-      <img id="avatar-preview" src="<%= employee.foto_profile %>" alt="Foto Profil" class="w-full h-full object-cover">
-    <% } else { %>
-      <i id="avatar-icon" class="fa-solid fa-user-tie text-xl"></i>
-    <% } %>
+              <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-500 shrink-0 overflow-hidden group/avatar">
+                <% if (employee.foto_profile) { %>
+                  <img id="avatar-preview" src="<%= employee.foto_profile %>" alt="Foto Profil" class="w-full h-full object-cover">
+                <% } else { %>
+                  <i id="avatar-icon" class="fa-solid fa-user-tie text-lg sm:text-xl"></i>
+                <% } %>
 
-    <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || String(employee._id) === String(user.employeeId)) { %>
-      <label for="avatar-input" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer text-white text-[11px]">
-        <i class="fa-solid fa-camera text-xs"></i>
-      </label>
-      <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="uploadFotoProfil('<%= employee._id %>')">
-    <% } %>
-  </div>
-              <div>
-                <h1 class="text-[15px] text-slate-900 tracking-tight leading-none mb-2">
+                <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || String(employee._id) === String(user.employeeId)) { %>
+                  <label for="avatar-input" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer text-white text-[11px]">
+                    <i class="fa-solid fa-camera text-xs"></i>
+                  </label>
+                  <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="uploadFotoProfil('<%= employee._id %>')">
+                <% } %>
+              </div>
+              <div class="min-w-0">
+                <h1 class="text-sm sm:text-[15px] font-bold text-slate-900 tracking-tight leading-none mb-2 truncate">
                   <%= employee.fullName %>
                 </h1>
 
                 <p class="text-[11px] text-slate-400 mb-1.5 leading-none">
-                  Nomor Induk Pegawai: <span class="text-slate-900"><%= employee.employeeIdNumber %></span>
+                  NIP: <span class="text-slate-900 font-medium"><%= employee.employeeIdNumber %></span>
                 </p>
 
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] mt-2">
-                  <span class="text-slate-500 flex items-center gap-1">
-                    <i class="fa-solid fa-briefcase text-slate-400 text-[10px]"></i>
-                    Posisi:
-                    <span class="text-slate-700">
-                      <%= employee.careerData?.positionId?.name || '-' %>
-                    </span>
+                  <span class="text-slate-500 flex items-center gap-1 min-w-0">
+                    <i class="fa-solid fa-briefcase text-slate-400 text-[10px] shrink-0"></i>
+                    <span class="truncate">Posisi: <span class="text-slate-700 font-medium"><%= employee.careerData?.positionId?.name || '-' %></span></span>
                   </span>
 
                   <span class="text-slate-300 hidden sm:inline">•</span>
 
-                  <span class="text-slate-500 flex items-center gap-1">
-                    <i class="fa-solid fa-network-wired text-slate-400 text-[10px]"></i>
-                    Bidang:
-                    <span class="text-slate-700">
-                      <%= employee.careerData?.bidangId?.name || '-' %>
-                    </span>
+                  <span class="text-slate-500 flex items-center gap-1 min-w-0">
+                    <i class="fa-solid fa-network-wired text-slate-400 text-[10px] shrink-0"></i>
+                    <span class="truncate">Bidang: <span class="text-slate-700 font-medium"><%= employee.careerData?.bidangId?.name || '-' %></span></span>
                   </span>
                 </div>
               </div>
             </div>
 
-            <div>
-              <span class="text-[10px] px-3 py-1 rounded-full uppercase tracking-wider border
-                <%= currentStatus === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : currentStatus === 'Suspended' ? 'bg-amber-50 text-amber-700 border-amber-200'
-                  : 'bg-rose-50 text-rose-700 border-rose-200'
+            <div class="self-start sm:self-auto">
+              <span class="text-[10px] px-3 py-1 rounded-full uppercase tracking-wider border font-semibold
+                <%= currentStatus === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
+                  : currentStatus === 'Suspended' ? 'bg-amber-50 text-amber-700 border-amber-200/50'
+                  : 'bg-rose-50 text-rose-700 border-rose-200/50'
                 %>">
                 <%= currentStatus === 'Active' ? 'AKTIF' : currentStatus === 'Suspended' ? 'SUSPENDED' : 'NONAKTIF' %>
               </span>
             </div>
           </div>
 
-          <div class="p-8 space-y-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+          <div class="p-5 sm:p-8 space-y-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5 sm:gap-y-6">
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Unit Kerja Penempatan</div>
-                <div class="text-[14px] text-slate-900">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Unit Kerja Penempatan</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.careerData?.unitId?.name || '-' %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Status Kontrak Kerja</div>
-                <div class="text-[14px] text-slate-900">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Status Kontrak Kerja</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.careerData?.status_pegawai || '-' %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Tanggal Mulai Bergabung</div>
-                <div class="text-[14px] text-slate-900">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Tanggal Mulai Bergabung</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.careerData?.tanggal_mulai_bergabung ? new Date(employee.careerData.tanggal_mulai_bergabung).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Tanggal Berakhir Kontrak</div>
-                <div class="text-[14px] <%= employee.careerData?.tanggal_berakhir_kontrak ? 'text-rose-600' : 'text-slate-900' %>">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Tanggal Berakhir Kontrak</div>
+                <div class="text-sm font-medium <%= employee.careerData?.tanggal_berakhir_kontrak ? 'text-rose-600' : 'text-slate-900' %>">
                   <%= employee.careerData?.tanggal_berakhir_kontrak ? new Date(employee.careerData.tanggal_berakhir_kontrak).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Sifatnya Permanen / Tetap' %>
                 </div>
               </div>
@@ -132,55 +126,55 @@
           </div>
         </div>
 
-        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-          <div class="px-8 py-5 border-b border-slate-100 bg-white/50 flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.02)] overflow-hidden">
+          <div class="px-5 sm:px-8 py-4 sm:py-5 border-b border-slate-100 bg-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/30">
               <i class="fa-solid fa-money-check-dollar text-xs"></i>
             </div>
-            <h3 class="text-sm text-slate-800">Parameter Finansial & Informasi Rekening</h3>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-800">Parameter Finansial & Rekening</h3>
           </div>
           
-          <div class="p-8 space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+          <div class="p-5 sm:p-8 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5 sm:gap-y-6">
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Gaji Pokok (Basic Salary)</div>
-                <div class="text-[16px] text-slate-900 tabular-nums">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Gaji Pokok (Basic Salary)</div>
+                <div class="text-base text-slate-900 font-bold tracking-tight tabular-nums">
                   Rp <%= (employee.salaryDetail?.basicSalary || 0).toLocaleString('id-ID') %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Upah Lembur Per Jam</div>
-                <div class="text-[15px] text-slate-900 tabular-nums">
-                  Rp <%= (employee.financialData?.overtimeRate || 0).toLocaleString('id-ID') %> <span class="text-xs text-slate-400">/ jam kerja</span>
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Upah Lembur Per Jam</div>
+                <div class="text-sm sm:text-[15px] text-slate-900 font-semibold tabular-nums">
+                  Rp <%= (employee.financialData?.overtimeRate || 0).toLocaleString('id-ID') %> <span class="text-xs text-slate-400 font-normal">/ jam</span>
                 </div>
               </div>
 
-              <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Akun Bank Penyalur</div>
-                <div class="text-[14px] text-slate-800">
-                  <%= employee.financialData?.nama_bank || '-' %> — <span class=" text-xs"><%= employee.financialData?.nomor_rekening || '-' %></span>
+              <div class="min-w-0">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Akun Bank Penyalur</div>
+                <div class="text-sm text-slate-800 font-semibold truncate">
+                  <%= employee.financialData?.nama_bank || '-' %> — <span class="text-xs font-mono font-normal text-slate-600"><%= employee.financialData?.nomor_rekening || '-' %></span>
                 </div>
-                <div class="text-[11px] text-slate-400 mt-0.5">A.n. <%= employee.financialData?.nama_pemilik_rekening || '-' %></div>
+                <div class="text-[11px] text-slate-400 font-medium mt-0.5 truncate">A.n. <%= employee.financialData?.nama_pemilik_rekening || '-' %></div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Nomor Registrasi NPWP</div>
-                <div class="text-[14px] text-slate-900 ">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Nomor Registrasi NPWP</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.financialData?.npwp || 'Tidak Dilampirkan' %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Nomor BPJS Ketenagakerjaan (BPJSTK)</div>
-                <div class="text-[14px] text-slate-900 ">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Nomor BPJS Ketenagakerjaan</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.financialData?.bpjstk || 'Tidak Terdaftar' %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Tanggal Efektif Gaji Berjalan</div>
-                <div class="text-[14px] text-slate-900">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Tanggal Efektif Gaji Berjalan</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.salaryDetail?.effectiveDate ? new Date(employee.salaryDetail.effectiveDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %>
                 </div>
               </div>
@@ -188,51 +182,50 @@
           </div>
         </div>
 
-        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-          <div class="px-8 py-5 border-b border-slate-100 bg-white/50 flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.02)] overflow-hidden">
+          <div class="px-5 sm:px-8 py-4 sm:py-5 border-b border-slate-100 bg-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/30">
               <i class="fa-solid fa-graduation-cap text-xs"></i>
             </div>
-            <h3 class="text-sm text-slate-800">Riwayat Pendidikan Terakhir</h3>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-800">Riwayat Pendidikan Terakhir</h3>
           </div>
 
-          <div class="p-8 space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+          <div class="p-5 sm:p-8 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5 sm:gap-y-6">
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Jenjang Pendidikan / Gelar</div>
-                <div class="text-[14px] text-slate-900">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Jenjang Pendidikan / Gelar</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.educationData?.pendidikan_terakhir || '-' %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Nama Instansi / Universitas</div>
-                <div class="text-[14px] text-slate-900">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Nama Instansi / Universitas</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.educationData?.institusi_pendidikan || '-' %>
                 </div>
               </div>
 
               <div>
-                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">Tahun Kelulusan</div>
-                <div class="text-[14px] text-slate-900">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Tahun Kelulusan</div>
+                <div class="text-sm text-slate-900 font-medium">
                   <%= employee.educationData?.tahun_kelulusan || '-' %>
                 </div>
               </div>
 
-
               <% if (employee.educationData?.file_ijazah) { %>
               <div class="sm:col-span-2 pt-2">
                 <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-2">Berkas Ijazah Digital</div>
-                <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors max-w-md">
+                <div class="flex items-center justify-between border border-slate-200/60 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors w-full max-w-md gap-2">
                   <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
-                      <i class="fa-solid fa-file-pdf text-[12px]"></i>
+                    <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-rose-500 shrink-0">
+                      <i class="fa-solid fa-file-pdf text-sm"></i>
                     </div>
                     <div class="min-w-0">
-                      <span class="text-[12px] text-slate-700 truncate block">Salinan_Ijazah_Terakhir.pdf</span>
+                      <span class="text-xs font-medium text-slate-700 truncate block">Salinan_Ijazah_Terakhir.pdf</span>
                     </div>
                   </div>
-                  <a href="<%= employee.educationData.file_ijazah %>" target="_blank" class="text-[10px] text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg tracking-wider">
+                  <a href="<%= employee.educationData.file_ijazah %>" target="_blank" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg tracking-wider shrink-0 active:scale-95 transition-all">
                     VIEW
                   </a>
                 </div>
@@ -242,15 +235,15 @@
           </div>
         </div>
 
-        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
-          <div class="px-8 py-5 border-b border-slate-100 bg-white/50 flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.02)] overflow-hidden">
+          <div class="px-5 sm:px-8 py-4 sm:py-5 border-b border-slate-100 bg-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/30">
               <i class="fa-solid fa-folder-open text-xs"></i>
             </div>
-            <h3 class="text-sm text-slate-800">Berkas Legalitas & Sertifikasi Kompetensi</h3>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-800">Berkas Legalitas & Sertifikasi</h3>
           </div>
 
-          <div class="p-8 space-y-6">
+          <div class="p-5 sm:p-8 space-y-6">
             <% 
               const documents = [
                 { label: 'Kartu Tanda Penduduk (KTP)', path: employee.documentData?.file_ktp, name: 'Berkas_KTP_Pegawai.pdf' },
@@ -262,27 +255,27 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <% documents.forEach(doc => { %>
                 <% if (doc.path) { %>
-                <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors">
+                <div class="flex items-center justify-between border border-slate-200/50 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors gap-2">
                   <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
-                      <i class="fa-solid fa-file-pdf text-[12px]"></i>
+                    <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-rose-500 shrink-0">
+                      <i class="fa-solid fa-file-pdf text-sm"></i>
                     </div>
                     <div class="min-w-0">
-                      <p class="text-[11px] text-slate-500 leading-none mb-1"><%= doc.label %></p>
+                      <p class="text-[11px] text-slate-500 font-medium leading-none mb-1 truncate"><%= doc.label %></p>
                       <span class="text-[10px] text-slate-400 truncate block"><%= doc.name %></span>
                     </div>
                   </div>
-                  <a href="<%= doc.path %>" target="_blank" class="text-[10px] text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg tracking-wider">
+                  <a href="<%= doc.path %>" target="_blank" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg tracking-wider shrink-0 active:scale-95 transition-all">
                     VIEW
                   </a>
                 </div>
                 <% } else { %>
-                <div class="flex items-center justify-between border border-slate-100/70 border-dashed rounded-xl p-3 bg-white">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300">
+                <div class="flex items-center justify-between border border-slate-200/50 border-dashed rounded-xl p-3 bg-white">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300 shrink-0">
                       <i class="fa-solid fa-file-circle-xmark text-xs"></i>
                     </div>
-                    <span class="text-[11px] text-slate-400"><%= doc.label %> (Kosong)</span>
+                    <span class="text-[11px] text-slate-400 font-medium truncate"><%= doc.label %> (Kosong)</span>
                   </div>
                 </div>
                 <% } %>
@@ -290,8 +283,8 @@
             </div>
 
             <% if (employee.documentData?.tanggal_kadaluarsa_skck) { %>
-            <div class="text-[11px] text-slate-500 bg-amber-50/60 border border-amber-100/70 px-4 py-2 rounded-xl inline-block">
-              Masa Kadaluarsa Dokumen SKCK: <span class=" text-amber-800"><%= new Date(employee.documentData.tanggal_kadaluarsa_skck).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %></span>
+            <div class="text-[11px] font-medium text-slate-500 bg-amber-50/60 border border-amber-100/50 px-4 py-2 rounded-xl inline-block">
+              Masa Kadaluarsa Dokumen SKCK: <span class="font-bold text-amber-800"><%= new Date(employee.documentData.tanggal_kadaluarsa_skck).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %></span>
             </div>
             <% } %>
 
@@ -300,19 +293,19 @@
                 <div class="text-[10px] text-slate-400 uppercase tracking-widest mb-3">Sertifikat Sertifikasi Keahlian</div>
                 <div class="space-y-2.5">
                   <% employee.documentData.sertifikat_kompetensi.forEach(cert => { %>
-                    <div class="flex items-center justify-between p-3 border border-slate-100 bg-slate-50/20 rounded-xl text-xs">
-                      <div class="flex items-center gap-3">
-                        <div class="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-500"><i class="fa-solid fa-award"></i></div>
-                        <div>
-                          <p class="text-slate-800"><%= cert.nama_sertifikat %></p>
-                          <p class="text-[10px] text-slate-400">Penerbit: <%= cert.penerbit %> • No: <%= cert.nomor_sertifikat %></p>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-slate-200/50 bg-slate-50/20 rounded-xl gap-3">
+                      <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100/50 flex items-center justify-center text-indigo-500 shrink-0"><i class="fa-solid fa-award text-xs"></i></div>
+                        <div class="min-w-0">
+                          <p class="text-xs font-bold text-slate-800 truncate"><%= cert.nama_sertifikat %></p>
+                          <p class="text-[10px] text-slate-400 font-medium truncate">Penerbit: <%= cert.penerbit %> • No: <%= cert.nomor_sertifikat %></p>
                           <% if (cert.tanggal_terbit) { %>
-                            <p class="text-[9px] text-slate-400">Masa Berlaku: <%= new Date(cert.tanggal_terbit).toLocaleDateString('id-ID', {year: 'numeric', month: 'short'}) %> s/d <%= cert.tanggal_kadaluarsa ? new Date(cert.tanggal_kadaluarsa).toLocaleDateString('id-ID', {year: 'numeric', month: 'short'}) : 'Seterusnya' %></p>
+                            <p class="text-[9px] text-slate-400 font-medium">Masa Berlaku: <%= new Date(cert.tanggal_terbit).toLocaleDateString('id-ID', {year: 'numeric', month: 'short'}) %> s/d <%= cert.tanggal_kadaluarsa ? new Date(cert.tanggal_kadaluarsa).toLocaleDateString('id-ID', {year: 'numeric', month: 'short'}) : 'Seterusnya' %></p>
                           <% } %>
                         </div>
                       </div>
                       <% if (cert.file_sertifikat) { %>
-                        <a href="<%= cert.file_sertifikat %>" target="_blank" class="text-[9px] text-slate-600 border border-slate-200 bg-white px-2.5 py-1 rounded-md">PREVIEW</a>
+                        <a href="<%= cert.file_sertifikat %>" target="_blank" class="text-[10px] font-bold text-center text-slate-600 border border-slate-200 bg-white px-3 py-1.5 rounded-xl shrink-0 active:scale-95 transition-all w-full sm:w-auto">PREVIEW</a>
                       <% } %>
                     </div>
                   <% }) %>
@@ -327,26 +320,26 @@
       <div class="space-y-6">
         
         <% if (user && (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()))) { %>
-        <div class="bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-200 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)]">
-          <h3 class="text-sm text-slate-800 mb-4 flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.015)]">
+          <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <i class="fa-solid fa-sliders text-xs"></i>
             </div>
             <div>
               <div class="text-xs text-slate-900 leading-none mb-1">Aksi Profil</div>
-              <div class="text-[10px] text-slate-400">Kelola informasi berkas</div>
+              <div class="text-[10px] text-slate-400 font-normal">Kelola informasi berkas</div>
             </div>
           </h3>
 
           <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR') { %>
-            <p class="text-[11px] text-slate-500 leading-relaxed mb-4">Anda memiliki hak akses tinggi untuk memodifikasi rekam jejak atau berkas personal milik pegawai ini.</p>
-            <a href="/employee/edit/<%= employee._id %>" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-xl shadow-md transition active:scale-[0.98]">
+            <p class="text-[11px] text-slate-500 leading-relaxed mb-4 font-medium">Anda memiliki hak akses tinggi untuk memodifikasi rekam jejak atau berkas personal milik pegawai ini.</p>
+            <a href="/employee/edit/<%= employee._id %>" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.97]">
               <i class="fa-solid fa-user-pen text-[11px]"></i>
-              Buka Form Edit Pegawai (Full HR)
+              Edit Pegawai (Full HR)
             </a>
           <% } else if (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()) { %>
-            <p class="text-[11px] text-slate-500 leading-relaxed mb-4">Anda dapat memperbarui data personal mandiri Anda (Kontak, Alamat, Keluarga, Rekening, & Sertifikat).</p>
-            <a href="/employee/my-profile/edit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-xl shadow-md transition active:scale-[0.98]">
+            <p class="text-[11px] text-slate-500 leading-relaxed mb-4 font-medium">Anda dapat memperbarui data personal mandiri Anda (Kontak, Alamat, Keluarga, Rekening, & Sertifikat).</p>
+            <a href="/employee/my-profile/edit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.97]">
               <i class="fa-solid fa-user-pen text-[11px]"></i>
               Edit Profil Mandiri
             </a>
@@ -354,52 +347,52 @@
         </div>
         <% } %>
 
-        <div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
+        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.015)] p-5 sm:p-6">
           <div class="mb-6">
-            <h2 class="text-sm text-slate-900 tracking-tight">Biodata Personal & Kontak</h2>
+            <h2 class="text-sm font-bold text-slate-900 tracking-tight">Biodata Personal & Kontak</h2>
             <p class="text-xs text-slate-400 mt-0.5">Informasi kependudukan eksternal</p>
           </div>
 
           <div class="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
             
             <div class="relative group">
-              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-sm bg-slate-400"></div>
+              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-xs bg-slate-400"></div>
               <div class="flex flex-col gap-0.5 text-xs">
-                <span class="text-[10px] text-slate-400 uppercase tracking-wide">Tempat, Tanggal Lahir</span>
-                <span class="text-slate-800"><%= employee.tempat_lahir || '-' %>, <%= employee.tanggal_lahir ? new Date(employee.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %></span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Tempat, Tanggal Lahir</span>
+                <span class="text-slate-800 font-semibold"><%= employee.tempat_lahir || '-' %>, <%= employee.tanggal_lahir ? new Date(employee.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %></span>
               </div>
             </div>
 
             <div class="relative group">
-              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-sm bg-slate-400"></div>
+              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-xs bg-slate-400"></div>
               <div class="flex flex-col gap-0.5 text-xs">
-                <span class="text-[10px] text-slate-400 uppercase tracking-wide">Agama & Hubungan Kependudukan</span>
-                <span class="text-slate-700"><%= employee.agama %> <span class="text-slate-300">|</span> <%= employee.status_pernikahan || 'Lajang' %></span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Agama & Pernikahan</span>
+                <span class="text-slate-700 font-semibold"><%= employee.agama %> <span class="text-slate-300">|</span> <%= employee.status_pernikahan || 'Lajang' %></span>
               </div>
             </div>
 
             <div class="relative group">
-              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-sm bg-slate-400"></div>
+              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-xs bg-slate-400"></div>
               <div class="flex flex-col gap-0.5 text-xs">
-                <span class="text-[10px] text-slate-400 uppercase tracking-wide">Nomor Handphone Aktif</span>
-                <span class=" text-slate-800"><%= employee.contactData?.nomor_telp || '-' %></span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Nomor Handphone Aktif</span>
+                <span class="text-slate-800 font-bold font-mono tracking-tight"><%= employee.contactData?.nomor_telp || '-' %></span>
               </div>
             </div>
 
             <div class="relative group">
-              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-sm bg-slate-400"></div>
+              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-xs bg-slate-400"></div>
               <div class="flex flex-col gap-0.5 text-xs">
-                <span class="text-[10px] text-slate-400 uppercase tracking-wide">Kontak Darurat (Emergency)</span>
-                <span class="text-slate-800"><%= employee.contactData?.nama_kontak_darurat || '-' %> (<%= employee.contactData?.hubungan_kontak_darurat || '-' %>)</span>
-                <span class=" text-slate-500 text-[11px]"><%= employee.contactData?.nomor_kontak_darurat || '-' %></span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Kontak Darurat (Emergency)</span>
+                <span class="text-slate-800 font-bold"><%= employee.contactData?.nama_kontak_darurat || '-' %> (<%= employee.contactData?.hubungan_kontak_darurat || '-' %>)</span>
+                <span class="text-slate-500 text-[11px] font-mono mt-0.5 font-medium"><%= employee.contactData?.nomor_kontak_darurat || '-' %></span>
               </div>
             </div>
 
             <div class="relative group">
-              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-sm bg-slate-400"></div>
+              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full border-4 border-white flex items-center justify-center shadow-xs bg-slate-400"></div>
               <div class="flex flex-col gap-0.5 text-xs">
-                <span class="text-[10px] text-slate-400 uppercase tracking-wide">Alamat Sesuai KTP</span>
-                <p class="text-slate-600 leading-relaxed italic text-[11px] bg-slate-50 border border-slate-100 p-2.5 rounded-lg mt-1">
+                <span class="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Alamat Sesuai KTP</span>
+                <p class="text-slate-600 leading-relaxed italic text-[11px] bg-slate-50 border border-slate-200/50 p-3 rounded-xl mt-1.5 font-medium">
                   "<%= employee.contactData?.alamat || 'Tidak ada info alamat' %>"
                 </p>
               </div>
@@ -409,19 +402,19 @@
         </div>
 
         <% if (employee.familyData && employee.familyData.anggota_keluarga && employee.familyData.anggota_keluarga.length > 0) { %>
-        <div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
+        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.015)] p-5 sm:p-6">
           <div class="mb-4">
-            <h2 class="text-sm text-slate-900 tracking-tight">Tanggungan / Anggota Keluarga</h2>
+            <h2 class="text-sm font-bold text-slate-900 tracking-tight">Tanggungan / Keluarga</h2>
             <p class="text-xs text-slate-400 mt-0.5">Daftar keluarga terdaftar sistem</p>
           </div>
           <div class="space-y-3">
             <% employee.familyData.anggota_keluarga.forEach(fam => { %>
-              <div class="p-3 bg-slate-50/50 border border-slate-100 rounded-xl text-xs">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-slate-800"><%= fam.nama %></span>
-                  <span class="text-[9px] px-1.5 py-0.5 bg-white rounded-md border border-slate-200 uppercase text-slate-600"><%= fam.hubungan %></span>
+              <div class="p-3 bg-slate-50/50 border border-slate-200/40 rounded-xl text-xs">
+                <div class="flex items-center justify-between mb-1 gap-2">
+                  <span class="text-slate-800 font-bold truncate"><%= fam.nama %></span>
+                  <span class="text-[9px] px-1.5 py-0.5 bg-white rounded-md border border-slate-200 uppercase text-slate-600 font-bold shrink-0"><%= fam.hubungan %></span>
                 </div>
-                <p class="text-[10px] text-slate-400 ">No. Identitas NIK: <%= fam.nik || '-' %></p>
+                <p class="text-[10px] text-slate-400 font-medium font-mono">NIK: <%= fam.nik || '-' %></p>
               </div>
             <% }) %>
           </div>
@@ -434,6 +427,7 @@
 
   </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   async function uploadFotoProfil(employeeId) {
@@ -442,7 +436,6 @@
     
     if (!file) return;
 
-    // Validasi ukuran file (Contoh: Max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       Swal.fire({ icon: 'error', title: 'Gagal', text: 'Ukuran file maksimal adalah 2MB!' });
       fileInput.value = '';
@@ -452,7 +445,6 @@
     const formData = new FormData();
     formData.append('foto_profile', file);
 
-    // Tampilkan Loading
     Swal.fire({
       title: 'Mengupload...',
       text: 'Mohon tunggu sebentar.',
@@ -471,12 +463,10 @@
       if (response.ok && result.success) {
         Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Foto profil berhasil diperbarui!', timer: 1500, showConfirmButton: false });
         
-        // Update preview foto di UI secara langsung tanpa reload
         const previewImg = document.getElementById('avatar-preview');
         if (previewImg) {
           previewImg.src = result.imageUrl;
         } else {
-          // Jika sebelumnya pakai icon tie, ganti dengan tag img
           const container = document.getElementById('avatar-icon').parentElement;
           container.innerHTML = `<img id="avatar-preview" src="${result.imageUrl}" alt="Foto Profil" class="w-full h-full object-cover">` + container.innerHTML;
           document.getElementById('avatar-icon').remove();
