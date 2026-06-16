@@ -1,52 +1,57 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-0  min-h-screen bg-[#FCFCFD] p-4 md:p-8 antialiased selection:bg-blue-50 selection:text-blue-600 pb-24 md:pb-8">
-  <div class="max-w-4xl mx-auto">
+<!-- MD-KAN BG: Di mobile full putih bersih, di desktop mengambang elegan di atas background abu-abu tipis -->
+<div class="ml-0 md:ml-72 min-h-screen bg-white md:bg-[#FCFCFD] p-4 md:p-8 antialiased selection:bg-slate-100 pb-24 md:pb-8 text-slate-800">
+  <div class="w-full max-w-none mx-auto mt-14 md:mt-0 px-0 md:px-4">
 
-    <div class="mb-6 flex flex-col gap-2">
-     
-
+    <!-- Tombol Kembali: Dibuat lebih tipis dan anggun -->
+    <div class="mb-4 flex flex-col gap-2 mb-6">
       <a href="/announcement"
-        class="inline-flex items-center mt-2 gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors group w-fit">
-        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        class="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-400 hover:text-slate-800 transition-colors group w-fit">
+        <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5 stroke-[2.3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Kembali ke Daftar
+        Back
       </a>
     </div>
 
-    <div class="bg-white border border-slate-200/70 rounded-2xl overflow-hidden shadow-sm">
+    <!-- MAIN CARD: Menghilangkan border kaku di mobile agar menyatu rapi dengan screen -->
+    <div class="bg-white border-0 md:border md:border-slate-200/80 rounded-2xl overflow-hidden md:shadow-xs">
 
-      <div class="px-4 sm:px-10 pt-6 sm:pt-8 pb-6 border-b border-slate-100 bg-white">
-        <div class="flex flex-col gap-3.5">
+      <!-- HEADER CONTAINER -->
+      <div class="px-0 sm:px-10 pt-4 sm:pt-8 pb-5 border-b border-slate-100 bg-white">
+        <div class="flex flex-col gap-3">
           
-          <div class="flex items-center gap-2">
+          <!-- Tag Kategori: Mengganti biru mencolok dengan Slate/Indigo yang mewah -->
+          <div class="flex items-center gap-2 mb-6">
             <% if(announcement.category === "OFFICIAL") { %>
-              <span class="inline-flex items-center bg-blue-50 text-blue-700 border border-blue-200/40 px-3 py-1 rounded-lg text-[10px] font-bold tracking-wider uppercase">
+              <span class="inline-flex items-center bg-indigo-50/60 text-indigo-950 border border-indigo-100/50 px-2.5 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold tracking-wider uppercase">
                 Official Release
               </span>
             <% } else { %>
-              <span class="inline-flex items-center bg-slate-50 text-slate-600 border border-slate-200/50 px-3 py-1 rounded-lg text-[10px] font-bold tracking-wider uppercase">
+              <span class="inline-flex items-center bg-slate-50 text-slate-600 border border-slate-200/60 px-2.5 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold tracking-wider uppercase">
                 General Info
               </span>
             <% } %>
           </div>
 
-          <h1 class="text-xl sm:text-3xl font-semibold text-slate-950 leading-snug tracking-tighter break-words">
+          <!-- Judul Utama: Menggunakan font-semibold agar ramah & tracking-tight agar padat estetik -->
+          <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 leading-snug tracking-tight break-words">
             <%= announcement.title %>
           </h1>
 
+          <!-- Info Kreator & Tanggal -->
           <div class="flex items-center gap-3 mt-1">
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-[12px] sm:text-[13px] font-bold text-slate-700 uppercase shrink-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center text-[12px] font-bold text-slate-600 uppercase shrink-0">
               <%= announcement.createdBy?.employeeData?.fullName ? announcement.createdBy?.employeeData?.fullName.charAt(0) : '?' %>
             </div>
 
             <div class="flex flex-col min-w-0">
-              <span class="text-xs sm:text-sm font-bold text-slate-800 truncate">
+              <span class="text-xs sm:text-[13px] font-semibold text-slate-700 truncate">
                 <%= announcement.createdBy?.employeeData?.fullName || announcement.createdBy?.username || 'Tidak Diketahui' %>
               </span>
 
-              <span class="text-[10px] sm:text-[11.5px] font-medium text-slate-400 mt-0.5 flex items-center gap-1.5">
+              <span class="text-[10.5px] sm:text-[11px] font-medium text-slate-400 mt-0.5 flex items-center gap-1">
                 <svg class="w-3.5 h-3.5 text-slate-400 stroke-[2] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -58,54 +63,60 @@
         </div>
       </div>
 
-      <div class="px-4 sm:px-10 pt-6 pb-8 sm:pb-10">
-        <article class="text-[14px] sm:text-[15px] text-slate-600 leading-6 sm:leading-7 whitespace-pre-line tracking-normal break-words">
+      <!-- KONTEN UTAMA -->
+      <div class="px-0 sm:px-10 pt-5 pb-8 sm:pb-10">
+        <!-- Teks Artikel: Font size disesuaikan agar super nyaman dibaca di segala device -->
+        <article class="text-[13.5px] sm:text-[14.5px] text-slate-600 leading-relaxed whitespace-pre-line tracking-normal break-words">
           <%= announcement.content ? announcement.content.trim() : '' %>
         </article>
 
+        <!-- AREA LAMPIRAN -->
         <% if(announcement.attachment) { %>
-          <div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-100">
+          <div class="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-slate-100">
             
-            <div class="mb-4 flex items-center gap-2">
-              <svg class="w-4 h-4 text-slate-400 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="mb-3 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-400 stroke-[2.3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <h3 class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
                 Dokumen Lampiran
               </h3>
             </div>
 
-            <div class="border border-slate-200/70 rounded-2xl overflow-hidden bg-slate-50/50">
+            <div class="border border-slate-200/60 rounded-xl overflow-hidden bg-slate-50/30">
               
+              <!-- Preview Gambar (Jika Berkas Gambar) -->
               <% if (announcement.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)) { %>
-                <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200/60 flex items-center justify-center">
-                  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm max-w-full">
+                <div class="p-2 sm:p-3 bg-slate-50/60 border-b border-slate-200/50 flex items-center justify-center">
+                  <div class="overflow-hidden rounded-lg border border-slate-200/60 bg-white shadow-xs max-w-full">
                     <img src="/uploads/files/<%= announcement.attachment %>" alt="Lampiran Preview"
-                      class="w-full max-h-[320px] sm:max-h-[480px] object-contain hover:scale-[1.01] transition-transform duration-200">
+                      class="w-full max-h-[280px] sm:max-h-[420px] object-contain transition-transform duration-200">
                   </div>
                 </div>
               <% } %>
 
-              <div class="p-4 sm:p-5 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-3.5 min-w-0">
-                  <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
-                    <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- Bar Unduh File -->
+              <div class="p-3.5 sm:p-4 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 shrink-0">
+                    <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
 
                   <div class="min-w-0 flex-1">
-                    <p class="text-xs sm:text-sm font-bold text-slate-800 truncate">
+                    <p class="text-[12px] font-semibold text-slate-700 truncate">
                       <%= announcement.attachment %>
                     </p>
-                    <p class="text-[11px] sm:text-xs font-medium text-slate-400 mt-0.5 whitespace-normal leading-tight">
-                      Klik tombol untuk meninjau atau mengunduh berkas resmi.
+                    <p class="text-[11px] font-medium text-slate-400 mt-0.5 leading-tight">
+                      Klik untuk meninjau atau mengunduh berkas resmi.
                     </p>
                   </div>
                 </div>
 
+                <!-- Tombol Lihat File: Ganti dari bg-white shadow tebal ke minimal outline -->
                 <a href="/uploads/files/<%= announcement.attachment %>" target="_blank"
-                  class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-950 border border-slate-200 rounded-xl px-4 py-2.5 sm:px-5 sm:py-3 text-[12px] font-bold transition-all shadow-sm active:scale-[0.98] shrink-0 w-full sm:w-fit">
+                  class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-4 py-2 text-[12px] font-semibold transition-colors shrink-0 w-full sm:w-fit">
                   Lihat File Lengkap
                 </a>
               </div>

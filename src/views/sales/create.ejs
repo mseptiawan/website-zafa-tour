@@ -1,192 +1,131 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
+<!-- 1. GLOBAL ISLAND CANVAS LAYER -->
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] px-4 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
-  <div class="max-w-2xl mx-auto">
+    <!-- 2. REUSABLE PAGE HEADER COMPONENT -->
+    <%- include('../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Kunjungan', 
+        title: 'Catat Kunjungan', 
+        description: 'Catat kunjungan customer, mitra, atau prospek bisnis baru Anda.' 
+    }) %>
 
-    <div class="mb-8">
+    <!-- 3. MAIN CARD WRAPPER (Anti-Lancip di Mobile, Premium di Desktop) -->
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 shadow-2xs md:shadow-sm overflow-hidden">
 
-      <nav class="flex items-center gap-2 mb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-        <span>Area Kerja</span>
-        <span class="text-slate-300">/</span>
-        <span class="text-slate-900">Kunjungan</span>
-      </nav>
-
-      <h1 class="text-2xl font-bold text-slate-900">
-        Catat Kunjungan
-      </h1>
-
-      <p class=" text-slate-500 mt-1 text-sm">
-        Catat kunjungan customer, atau prospek
-      </p>
-
-    </div>
-
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
-
-      <form action="/sales/" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+      <form action="/sales/" method="POST" enctype="multipart/form-data" class="space-y-5">
 
         <% if (typeof errors !== 'undefined' && errors.global) { %>
-        <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+        <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
           <%= errors.global %>
         </div>
         <% } %>
 
-        <div class="space-y-1.5">
-
-          <label class="text-[13px] font-bold text-slate-700">
-            Judul Kunjungan
-          </label>
-
-          <input type="text" name="title" value="<%= old?.title || '' %>" placeholder="Contoh: Mempererat kerjasama dengan mitra" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.title ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 outline-none transition-all" />
-
+        <!-- Row: Judul Kunjungan -->
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Kunjungan</label>
+          <input type="text" name="title" value="<%= old?.title || '' %>" placeholder="Contoh: Mempererat kerjasama dengan mitra" 
+                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.title ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
           <% if (typeof errors !== 'undefined' && errors.title) { %>
-            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.title %></p>
+            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.title %></p>
           <% } %>
-
         </div>
 
-        <div class="space-y-1.5">
-
-          <label class="text-[13px] font-bold text-slate-700">
-            Alamat
-          </label>
-
-          <input type="text" name="address" value="<%= old?.address || '' %>" placeholder="Alamat lengkap customer" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.address ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 outline-none transition-all" />
-
+        <!-- Row: Alamat -->
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alamat</label>
+          <input type="text" name="address" value="<%= old?.address || '' %>" placeholder="Alamat lengkap lokasi customer" 
+                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.address ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
           <% if (typeof errors !== 'undefined' && errors.address) { %>
-            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.address %></p>
+            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.address %></p>
           <% } %>
-
         </div>
 
-        <div class="space-y-1.5">
-
-          <label class="text-[13px] font-bold text-slate-700">
-            Bertemu Dengan
-          </label>
-
-          <input type="text" name="meetWith" value="<%= old?.meetWith || '' %>" placeholder="M Septiawan" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.meetWith ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 outline-none transition-all" />
-
+        <!-- Row: Bertemu Dengan -->
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Bertemu Dengan</label>
+          <input type="text" name="meetWith" value="<%= old?.meetWith || '' %>" placeholder="Nama PIC yang ditemui" 
+                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.meetWith ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
           <% if (typeof errors !== 'undefined' && errors.meetWith) { %>
-            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.meetWith %></p>
+            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.meetWith %></p>
           <% } %>
-
         </div>
 
-        <div class="space-y-1.5">
-
-          <label class="text-[13px] font-bold text-slate-700">
-            Hasil Kunjungan
-          </label>
-
-          <textarea name="result" rows="5" maxlength="500" placeholder="Jelaskan hasil kunjungan" class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.result ? 'border-red-400 focus:ring-red-500/10 focus:border-red-400' : 'border-slate-200 focus:ring-slate-100 focus:border-slate-400' %> rounded-xl px-4 py-3 
-            focus:bg-white text-xs focus:ring-4 outline-none resize-none transition-all"><%= old?.result || '' %></textarea>
-
+        <!-- Row: Hasil Kunjungan -->
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Hasil Kunjungan</label>
+          <textarea name="result" rows="5" maxlength="500" placeholder="Jelaskan poin-poin penting hasil diskusi kunjungan di sini..." 
+                    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.result ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none resize-none transition-all leading-relaxed text-slate-800"><%= old?.result || '' %></textarea>
           <% if (typeof errors !== 'undefined' && errors.result) { %>
-            <p class="text-[11px] font-medium text-red-500 mt-1 pl-1"><%= errors.result %></p>
+            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.result %></p>
           <% } %>
-
         </div>
 
-        <div class="space-y-1.5">
-          <label class="block text-[13px] font-medium text-slate-700 mb-1.5">
+        <!-- Row: Lampiran File -->
+        <div class="space-y-2 mb-2">
+          <label class="block text-[12px] font-semibold text-slate-700 tracking-wide">
             Lampiran <span class="text-slate-400 font-normal">(Opsional)</span>
           </label>
 
-          <div id="dropzone-empty" class="relative w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
-
-            <input type="file" name="attachments" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
-
-            <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <div id="dropzone-empty" class="relative w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center justify-center text-center">
+            <input type="file" name="attachments" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
+            <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
             </svg>
-
-            <span class="text-[13px] font-medium text-slate-600">
-              Pilih Berkas atau Drop File Disini
-            </span>
-
-            <span class="text-xs text-slate-400 mt-0.5">
-              PNG, JPG, PDF, atau DOCX (maks 5MB)
-            </span>
+            <span class="text-[12px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
+            <span class="text-[11px] text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (maks 5MB)</span>
           </div>
 
-          <div id="dropzone-filled" class="hidden flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
-
+          <div id="dropzone-filled" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
             <div class="flex items-center gap-3 min-w-0 flex-1">
-              <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
+              <div class="w-9 h-9 rounded-lg overflow-hidden border border-slate-200/60 bg-slate-50 flex-shrink-0 flex items-center justify-center">
                 <img id="img-preview" class="w-full h-full object-cover hidden" />
-                <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg id="file-icon-fallback" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>
               </div>
-
               <div class="min-w-0 flex-1">
-                <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
-                  file_name.jpg
-                </div>
-                <div id="size-preview" class="text-xs text-slate-400 mt-0.5">
-                  0 KB
-                </div>
+                <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">file_name.jpg</div>
+                <div id="size-preview" class="text-[11px] text-slate-400 mt-0.5">0 KB</div>
               </div>
             </div>
-
-            <div class="flex items-center gap-2 ml-4 flex-shrink-0">
-              <a id="view-file-btn" href="#" target="_blank" class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">
-                View
-              </a>
-              <button type="button" onclick="triggerChangeFile()" class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">
-                Ganti File
-              </button>
+            <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto relative z-20">
+              <a id="view-file-btn" href="#" target="_blank" class="text-[11px] font-medium text-center text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">View</a>
+              <button type="button" onclick="triggerChangeFile()" class="text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">Ganti</button>
             </div>
-
           </div>
         </div>
 
-        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-
-          <a href="/sales/my" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
-            Batal
-          </a>
-
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
-            Simpan
+        <!-- 4. ACTION BUTTONS FOOTER (Fokus Tunggal & Ukuran Fleksibel Proporsional) -->
+        <div class="pt-5 border-t border-slate-100 flex items-center justify-end">
+          <button type="submit" class="w-auto text-center bg-slate-900 hover:bg-black text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs">
+            Simpan Kunjungan
           </button>
-
         </div>
+
       </form>
-
     </div>
-
   </div>
-
 </div>
+
 <script>
   let currentFileUrl = null;
 
   function handleFileSelect(input) {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-
-      if (currentFileUrl) {
-        URL.revokeObjectURL(currentFileUrl);
-      }
+      if (currentFileUrl) URL.revokeObjectURL(currentFileUrl);
 
       currentFileUrl = URL.createObjectURL(file);
-      const viewBtn = document.getElementById("view-file-btn");
-      viewBtn.href = currentFileUrl;
-
+      document.getElementById("view-file-btn").href = currentFileUrl;
       document.getElementById("name-preview").textContent = file.name;
 
       const fileSizeInKB = file.size / 1024;
-      if (fileSizeInKB < 1024) {
-        document.getElementById("size-preview").textContent = fileSizeInKB.toFixed(1) + " KB";
-      } else {
-        document.getElementById("size-preview").textContent = (fileSizeInKB / 1024).toFixed(2) + " MB";
-      }
+      document.getElementById("size-preview").textContent = fileSizeInKB < 1024 
+        ? fileSizeInKB.toFixed(1) + " KB" 
+        : (fileSizeInKB / 1024).toFixed(2) + " MB";
 
       const imgPreview = document.getElementById("img-preview");
       const fileIconFallback = document.getElementById("file-icon-fallback");

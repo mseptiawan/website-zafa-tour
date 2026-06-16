@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x15.png" />
   <link class="apple-touch-icon" href="/images/apple-touch-icon.png" />
   <link rel="manifest" href="/images/site.webmanifest" />
 
@@ -25,7 +25,8 @@
   <div class="flex h-screen w-screen overflow-hidden pb-16 md:pb-0">
     <%- include('../partials/sidebar') %>
 
-    <main class="relative flex h-full flex-1 flex-col overflow-y-auto px-4 py-5 pt-6 md:px-8 md:pt-20">
+   <!-- KODE BARU: Tambahkan bg-slate-50/70 agar semua device punya dasar abu-abu tipis yang mewah -->
+<main class="relative flex h-full flex-1 flex-col overflow-y-auto bg-slate-50/70 px-4 py-5 pt-6 md:px-8 md:pt-20">
       <div class="absolute top-5 right-4 z-[100] hidden md:right-8 md:block" id="notificationDropdown">
         <button id="notifButton" class="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/60 bg-white shadow-xs transition-all duration-200 hover:bg-slate-50 focus:outline-none active:scale-[0.96]">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="stroke-[2.2] text-slate-600 transition-colors group-hover:text-slate-900">
@@ -50,7 +51,7 @@
         </div>
       </div>
 
-      <div class="ml-0 min-h-screen flex-1 bg-slate-50/30 p-2 antialiased md: md:p-8">
+      <div class="ml-0 min-h-screen flex-1  p-2 antialiased md: md:p-8">
 
         <% if (typeof title !== 'undefined' && title.toLowerCase().includes('dashboard')) { %>
         <div class="mb-6 block rounded-3xl  shadow-[0_4px_20px_rgba(0,0,0,0.015)] md:hidden">
@@ -120,7 +121,7 @@
             </a>
 
             <!-- SALES VISIT -->
-            <a href="/sales/new" class="group flex flex-col items-center gap-2 text-center">
+            <a href="/sales/my" class="group flex flex-col items-center gap-2 text-center">
               <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-rose-50/70 text-rose-600 border border-rose-100/20 shadow-[0_6px_16px_rgba(244,63,94,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-rose-100/50">
                 <i class="fa-solid fa-map-pin text-base"></i>
               </div>
@@ -270,12 +271,13 @@
       <i class="fa-solid fa-clock-rotate-left text-lg"></i>
       <span class="text-[10px] font-medium">Absensi</span>
     </a>
-    <div class="flex-1 flex justify-center relative -top-4">
-      <button type="button" onclick="toggleQuickMenuMobile()" class="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md shadow-blue-600/20 active:scale-95 transition border-4 border-white">
-        <i id="quickMenuIconMobile" class="fa-solid fa-plus text-lg transition-transform duration-200"></i>
-      </button>
-    </div>
-
+   <div class="flex-1 flex justify-center relative -top-2.5">
+  <button type="button" 
+          onclick="toggleQuickMenuMobile()" 
+          class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-slate-900/15 active:scale-95 transition-all">
+    <i id="quickMenuIconMobile" class="fa-solid fa-plus text-sm transition-transform duration-200"></i>
+  </button>
+</div>
     <a href="/leave/manage-requests" class="relative flex flex-1 flex-col items-center gap-1 text-slate-500 transition hover:text-blue-600">
       <i class="fa-solid fa-envelope-open-text text-lg"></i>
       <span class="text-[10px] font-medium">Persetujuan</span>
