@@ -10,6 +10,7 @@ import multer from "multer";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import methodOverride from "method-override";
 import session from "express-session";
+import useragent from "express-useragent";
 import MongoStore from "connect-mongo";
 import injectUser from "./middlewares/injectUser.js";
 import routes from "./routes/index.js";
@@ -43,7 +44,7 @@ app.use(cookieParser());
 app.use(methodOverride("_method"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
+app.use(useragent.express());
 // ==========================================
 // 2. STATIC FILES
 // ==========================================

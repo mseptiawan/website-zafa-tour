@@ -160,52 +160,59 @@
             </a>
 
           </div>
-<div class="mt-10 px-1">
-    <h3 class="text-xs font-bold uppercase tracking-wider mb-6">Management Hub</h3>
-    <div class="grid grid-cols-4 gap-3">
-      
-      <a href="/management/employees" class="group flex flex-col items-center gap-1.5 text-center">
-        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white shadow-xs transition-all active:scale-95">
-          <i class="fa-solid fa-users text-sm"></i>
-        </div>
-        <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Data Pegawai</span>
-      </a>
+          <div class="mt-10 px-1">
+            <h3 class="text-xs font-bold uppercase tracking-wider mb-6">Management Hub</h3>
+            <div class="grid grid-cols-4 gap-3">
 
-      <a href="/management/kpi" class="group flex flex-col items-center gap-1.5 text-center">
-        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-100/30 shadow-xs transition-all active:scale-95">
-          <i class="fa-solid fa-chart-simple text-sm"></i>
-        </div>
-        <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lihat KPI</span>
-      </a>
+              <a href="/management/employees" class="group flex flex-col items-center gap-1.5 text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white  shadow-xs transition-all active:scale-95">
+                  <i class="fa-solid fa-users text-sm"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Data Pegawai</span>
+              </a>
 
-      <a href="/management/report/attendance" class="group flex flex-col items-center gap-1.5 text-center">
-        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100/30 shadow-xs transition-all active:scale-95">
-          <i class="fa-solid fa-calendar-check text-sm"></i>
-        </div>
-        <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Absen</span>
-      </a>
+              <a href="/management/kpi" class="group flex flex-col items-center gap-1.5 text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-100/30 shadow-xs transition-all active:scale-95">
+                  <i class="fa-solid fa-chart-simple text-sm"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lihat KPI</span>
+              </a>
 
-      <a href="/management/report/analytics" class="group flex flex-col items-center gap-1.5 text-center">
-        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100/30 shadow-xs transition-all active:scale-95">
-          <i class="fa-solid fa-chart-line text-sm"></i>
-        </div>
-        <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Lengkap</span>
-      </a>
+              <a href="/management/report/attendance" class="group flex flex-col items-center gap-1.5 text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100/30 shadow-xs transition-all active:scale-95">
+                  <i class="fa-solid fa-calendar-check text-sm"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Absen</span>
+              </a>
 
-    </div>
-  </div>
-          <div class="mt-8 border-t border-slate-100 pt-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Pengumuman Terbaru</h3>
-              <div class="flex items-center gap-3">
-      <a href="/announcement/create" class="text-[11px] font-bold text-blue-500  transition">
-        <i class="fa-solid fa-plus text-[10px] mr-0.5"></i> Buat
-      </a>
-      <span class="text-slate-200 text-xs">|</span>
-    
-    <a href="/announcement" class="text-[11px] font-bold text-blue-600 hover:text-blue-700 transition">Lihat Semua</a>
-  </div>
+              <a href="/management/report/analytics" class="group flex flex-col items-center gap-1.5 text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100/30 shadow-xs transition-all active:scale-95">
+                  <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Lengkap</span>
+              </a>
+
             </div>
+          </div>
+          <div class="mt-8 border-t border-slate-100 pt-6">
+           <div class="flex items-center justify-between mb-5 border-b border-slate-100/80 pb-3">
+  <h3 class="text-[13px] font-semibold text-slate-700 tracking-tight">
+    Pengumuman Terbaru
+  </h3>
+  
+  <div class="flex items-center gap-4">
+    <a href="/announcement/new" class="inline-flex items-center gap-1 text-[12px] font-medium text-slate-500 hover:text-blue-600 transition-colors">
+      <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      <span class="hidden sm:inline">Buat</span>
+    </a>
+
+    <a href="/announcement" class="text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
+      Lihat Semua
+    </a>
+  </div>
+</div>
             <div class="space-y-3">
               <% if (typeof latestAnnouncements !== 'undefined' && latestAnnouncements.length > 0) { %>
               <% latestAnnouncements.slice(0, 2).forEach(ann => { %>
