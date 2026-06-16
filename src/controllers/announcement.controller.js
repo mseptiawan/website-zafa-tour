@@ -7,6 +7,7 @@ const RENDER_DEFAULTS = (req) => ({
 
 // ─── NEW FORM ─────────────────────────────────────────────────────────────────
 export const newForm = (req, res) => {
+  console.log("ANNOUNCEMENT NEW HIT");
   res.render("announcement/create", {
     ...RENDER_DEFAULTS(req),
     title: "Buat Pengumuman",

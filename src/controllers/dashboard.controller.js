@@ -7,6 +7,7 @@ import Announcement from "../models/Announcement.model.js";
 
 export const index = async (req, res, next) => {
   try {
+    console.log("DASHBOARD HIT");
     const user = req.session.user;
     if (!user) {
       return res.redirect("/?error=SESSION_EXPIRED");
@@ -21,7 +22,6 @@ export const index = async (req, res, next) => {
     const endToday = new Date();
     endToday.setHours(23, 59, 59, 999);
 
-    // Ambil data paralel riil dari MongoDB
     const [
       attendanceToday,
       monthlyAttendance,

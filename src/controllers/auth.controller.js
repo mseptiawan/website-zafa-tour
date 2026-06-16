@@ -3,6 +3,7 @@ import transporter from "../config/mailer.js";
 import bcrypt from "bcrypt";
 import User from "../models/basic/User.model.js";
 import crypto from "crypto";
+import { getPermissions } from "../services/permission.service.js";
 import Attendance from "../models/Attendance.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
@@ -37,6 +38,9 @@ export const login = async (req, res) => {
       userId: user._id,
     });
 
+    const roleName = user.roleId?.name?.toUpperCase();
+    console.log("ROLE:", roleName);
+    console.log("PERMISSIONS:", getPermissions(roleName));
     req.session.user = {
       _id: user._id,
       username: user.username,
@@ -45,30 +49,33 @@ export const login = async (req, res) => {
       foto_profile: employee?.foto_profile || null,
       employeeId: employee?._id || null,
       gender: employee?.jenis_kelamin || "Laki-Laki",
-      role: user.roleId?.name?.toUpperCase() || "UNKNOWN",
+      role: roleName,
       roleId: user.roleId?._id || null,
+      permissions: getPermissions(roleName),
     };
 
+    console.log("SESSION USER:", req.session.user);
     if (remember) {
       req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000;
     }
 
     req.session.save(() => {
+      res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
       return res.redirect("/dashboard");
     });
   } catch (err) {
     console.log(err);
+    console.log("LOGIN SUCCESS -> /dashboard");
     return res.redirect("/?error=SERVER_ERROR");
   }
 };
-
 export const logout = (req, res) => {
-  req.session.destroy(() => {
+  req.session.destroy((err) => {
+    if (err) console.error(err);
     res.clearCookie("connect.sid");
-    res.redirect("/");
+    return res.redirect("/");
   });
 };
-
 export const showForgotPassword = (req, res) => {
   res.render("auth/forgot-password", {
     query: req.query || {},

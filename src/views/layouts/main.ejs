@@ -2,108 +2,230 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
-
     <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
-
     <link rel="manifest" href="/images/site.webmanifest" />
+
     <title><%= typeof title !== 'undefined' ? title : 'Zafa Tour HRIS' %></title>
+    
     <link rel="stylesheet" href="/css/output.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   </head>
 
-  <body
-    class="h-screen overflow-hidden bg-[#f1f5f9] text-slate-800 antialiased selection:bg-indigo-50 selection:text-indigo-600"
-  >
+  <body class="h-screen overflow-hidden bg-[#f1f5f9] text-slate-800 antialiased selection:bg-indigo-50 selection:text-indigo-600">
+    
+    <!-- 1. BACKDROP OVERLAY MOBILE -->
+    <div id="sidebarOverlay" class="fixed inset-0 z-[90] hidden cursor-pointer bg-slate-900/40 backdrop-blur-sm transition-opacity md:hidden"></div>
+
     <div class="flex h-screen w-screen overflow-hidden">
-      <%- include('../partials/sidebar') %>
-
-      <main class="relative flex h-full flex-1 flex-col overflow-y-auto px-8 py-5 pt-20">
-        <div class="absolute top-5 right-8 z-[100]" id="notificationDropdown">
-          <button
-            id="notifButton"
-            class="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 bg-white shadow-sm transition-all duration-200 hover:bg-slate-50 focus:outline-none active:scale-[0.96]"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              class="stroke-[2.2] text-slate-600 transition-colors group-hover:text-slate-900"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-              />
-            </svg>
-
-            <span
-              id="notifBadge"
-              class="absolute top-2 right-2 hidden h-2 w-2 rounded-full bg-amber-500 ring-2 ring-white"
-            >
-              <span
-                class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"
-              ></span>
-            </span>
-          </button>
-
-          <div
-            id="notifMenu"
-            class="absolute right-0 z-[100] mt-2.5 flex hidden w-96 origin-top-right flex-col rounded-2xl border border-slate-200/70 bg-white shadow-xl shadow-slate-950/[0.05] transition-all duration-200"
-          >
-            <div
-              class="flex items-center justify-between rounded-t-2xl border-b border-slate-100 bg-white px-5 py-4"
-            >
-              <h1
-                class="flex items-center gap-2 text-[13px] font-bold tracking-tight text-slate-950"
-              >
-                Notifikasi
-                <span
-                  id="notifCountText"
-                  class="hidden inline-flex min-w-[18px] items-center justify-center rounded-md bg-blue-600 px-2 py-0.5 text-[10px] font-bold text-white"
-                >
-                  0
-                </span>
-              </h1>
-              <button
-                id="markAllReadBtn"
-                class="text-[11px] font-bold text-blue-600 transition-colors hover:text-blue-700"
-              >
-                Tandai semua dibaca
-              </button>
-            </div>
-
-            <div id="notifContainer" class="max-h-[380px] divide-y divide-slate-50 overflow-y-auto">
-              <div class="p-6 text-center text-xs font-medium text-slate-400">
-                Memuat notifikasi...
-              </div>
+      
+      <!-- 2. SIDEBAR NAVIGATION -->
+      <aside id="sidebar" class="fixed inset-y-0 left-0 z-[100] flex w-72 -translate-x-full transform flex-col bg-white text-black transition-transform duration-300 ease-in-out shadow-2xl md:translate-x-0 md:shadow-none">
+        <div class="h-20 flex items-center px-8 border-b border-slate-100 relative shrink-0">
+          <div class="flex items-center gap-4 relative z-10">
+            <div class="leading-tight">
+              <h1 class="text-lg font-bold tracking-wide text-slate-800">Zafa Tour</h1>
+              <p class="text-[10px] text-slate-500 uppercase tracking-[0.25em] font-medium">PT Zafa Mulia Mandiri</p>
             </div>
           </div>
         </div>
-        <div class="flex-1"><%- body -%></div>
+        <nav id="sidebarNav" class="flex-1 overflow-y-auto scrollbar-hide px-4 py-6 space-y-7 pb-10">
+          <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group border border-transparent">
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+            </svg>
+            <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">Dashboard</span>
+          </a>
+          <% if (typeof sidebarSections !== 'undefined') { %>
+            <% sidebarSections.forEach(section => { %>
+              <% if (section.show && section.menus.some(m => m.show)) { %>
+                <section>
+                  <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]"><%= section.title %></p>
+                  <div class="space-y-1">
+                    <% section.menus.forEach(menu => { %>
+                      <% if (menu.show && menu.submenus.some(s => s.show)) { %>
+                        <details class="group outline-none" data-menu="<%= menu.id %>">
+                          <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent">
+                            <div class="flex items-center gap-3">
+                              <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><%- menu.icon %></svg>
+                              <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800"><%= menu.name %></span>
+                            </div>
+                            <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                          </summary>
+                          <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+                            <% menu.submenus.forEach(sub => { %>
+                              <% if (sub.show) { %>
+                                <a href="<%= sub.path %>" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-slate-800 transition"><%= sub.name %></a>
+                              <% } %>
+                            <% }); %>
+                          </div>
+                        </details>
+                      <% } %>
+                    <% }); %>
+                  </div>
+                </section>
+              <% } %>
+            <% }); %>
+          <% } %>
+        </nav>
+
+        <div class="p-4 relative shrink-0 border-t border-slate-100 bg-white">
+          <div class="relative flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-slate-100">
+            <% if (typeof user !== 'undefined') { %>
+              <a href="/employee/detail/<%= user.employeeId %>" class="flex items-center gap-3 min-w-0 flex-1 group/profile">
+                <div class="relative shrink-0 w-10 h-10">
+                  <div class="w-full h-full rounded-full flex items-center justify-center bg-slate-200 border border-slate-300 overflow-hidden transition-all duration-200 group-hover/profile:ring-2 group-hover/profile:ring-blue-500 group-hover/profile:border-transparent">
+                    <% 
+                      let profilePic = user.foto_profile 
+                        ? user.foto_profile 
+                        : (user.gender === "Perempuan" 
+                           ? "https://img.freepik.com/premium-vector/smiling-woman-avatar_937492-6135.jpg" 
+                           : "https://img.freepik.com/vektor-premium/avatar-kartun-pengusaha-muda-pria-mengenakan-setelan-jas-dan-dasi_645574-600.jpg");
+                    %>
+                    <img src="<%= profilePic %>" class="w-full h-full object-cover" />
+                  </div>
+                </div>
+                <div class="min-w-0 flex-1 leading-normal">
+                  <p class="text-xs font-semibold text-slate-800 truncate group-hover/profile:text-blue-600 transition-colors duration-200"><%= user.fullName || 'User' %></p>
+                  <p class="text-[8px] font-medium uppercase tracking-[0.15em] text-slate-400 truncate mt-0.5"><%= user.role || 'Pegawai' %></p>
+                </div>
+              </a>
+            <% } %>
+            <a href="/logout" title="Keluar Aplikasi" class="group p-2 ml-2 rounded-xl transition-all duration-200 hover:bg-red-50 border border-transparent hover:border-red-100 shrink-0">
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-red-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT CONTAINER -->
+      <main class="relative flex h-full flex-1 flex-col overflow-y-auto px-4 py-5 pt-24 md:px-8 md:pt-20">
+        
+        <!-- TOMBOL MENU HAMBURGER MOBILE -->
+        <div class="absolute left-4 top-5 z-[999] md:hidden">
+          <button id="mobileMenuBtn" type="button" class="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:bg-slate-50 focus:outline-none active:scale-95">
+            <svg class="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- NOTIFICATION CONTAINER -->
+        <div class="absolute right-4 top-5 z-[100] md:right-8" id="notificationDropdown">
+          <button id="notifButton" class="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 bg-white shadow-sm transition-all duration-200 hover:bg-slate-50 focus:outline-none active:scale-[0.96]">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="stroke-[2.2] text-slate-600 transition-colors group-hover:text-slate-900">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
+            </svg>
+            <span id="notifBadge" class="absolute top-2 right-2 hidden h-2 w-2 rounded-full bg-amber-500 ring-2 ring-white">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+            </span>
+          </button>
+
+          <div id="notifMenu" class="absolute right-0 z-[100] mt-2.5 hidden w-[calc(100vw-2rem)] origin-top-right flex-col rounded-2xl border border-slate-200/70 bg-white shadow-xl shadow-slate-950/[0.05] transition-all duration-200 sm:w-96">
+            <div class="flex items-center justify-between rounded-t-2xl border-b border-slate-100 bg-white px-5 py-4">
+              <h1 class="flex items-center gap-2 text-[13px] font-bold tracking-tight text-slate-950">
+                Notifikasi
+                <span id="notifCountText" class="hidden inline-flex min-w-[18px] items-center justify-center rounded-md bg-blue-600 px-2 py-0.5 text-[10px] font-bold text-white">0</span>
+              </h1>
+              <button id="markAllReadBtn" class="text-[11px] font-bold text-blue-600 transition-colors hover:text-blue-700">Tandai semua dibaca</button>
+            </div>
+            <div id="notifContainer" class="max-h-[380px] divide-y divide-slate-50 overflow-y-auto">
+              <div class="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi baru.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. AREA HALAMAN DINAMIS (RESPONSIVE SEBAGAI WRAPPER UTAMA BODY) -->
+        <div class="flex-1 ml-0 md:ml-72 min-h-screen bg-slate-50/50 p-2 md:p-8 antialiased">
+          <%- body -%>
+        </div>
+
       </main>
     </div>
-    <%- include('../partials/modals/confirm-modal') %>
 
+    <!-- 5. MODALS -->
+    <div id="confirmModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+      <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-[0_25px_80px_-12px_rgba(15,23,42,0.25)]">
+        <div class="relative border-b border-slate-100 px-6 py-5">
+          <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500"></div>
+          <div class="flex items-start gap-4">
+            <div id="confirmModalIcon" class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-50">
+              <i class="fas fa-triangle-exclamation text-xl text-amber-600"></i>
+            </div>
+            <div class="flex-1">
+              <h3 id="confirmModalTitle" class="text-lg font-semibold text-slate-900">Konfirmasi Tindakan</h3>
+              <p class="mt-1 text-sm text-slate-500">Mohon periksa kembali sebelum melanjutkan.</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-5">
+          <p id="confirmModalMessage" class="text-sm leading-relaxed text-slate-600">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+        </div>
+        <div class="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-4">
+          <button type="button" onclick="closeConfirmModal()" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Batal</button>
+          <button type="button" id="confirmModalButton" class="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700">Ya, Lanjutkan</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="pointer-events-auto fixed top-5 right-5 z-[99999] flex flex-col gap-3.5"></div>
+
+    <!-- SCRIPTS HANDLERS -->
     <script src="/js/custom-modal.js"></script>
     <script src="/js/sidebar-handler.js"></script>
     <script src="/js/notification-handler.js"></script>
 
-    <%- include('../partials/flash') %>
+    <script>
+      function triggerGlobalToast({ title = "Info", message = "", type = "success" }) {
+        const container = document.getElementById("toastContainer");
+        if (!container) return;
+
+        const styles = {
+          success: { icon: "fa-circle-check", iconColor: "text-emerald-500", accentBorder: "border-l-emerald-500" },
+          error: { icon: "fa-circle-xmark", iconColor: "text-rose-500", accentBorder: "border-l-rose-500" }
+        };
+
+        const s = styles[type] || styles.success;
+        const toast = document.createElement("div");
+        toast.className = "w-[360px] rounded-xl border border-slate-200/60 border-l-4 " + s.accentBorder + " bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-4 transform translate-x-20 opacity-0 transition-all duration-300 ease-out";
+
+        toast.innerHTML =
+          '<div class="flex items-start gap-3">' +
+            '<div class="flex-shrink-0 mt-0.5"><i class="fa-solid ' + s.icon + ' ' + s.iconColor + ' text-lg"></i></div>' +
+            '<div class="flex-1 min-w-0 text-left">' +
+              '<h4 class="text-[13px] font-bold text-slate-900 tracking-tight">' + title + '</h4>' +
+              '<p class="mt-0.5 text-xs font-medium text-slate-500 leading-relaxed break-words">' + message + '</p>' +
+            '</div>' +
+            '<button class="text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0 p-0.5 hover:bg-slate-100 rounded-lg"><i class="fa-solid fa-xmark text-xs"></i></button>' +
+          '</div>';
+
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.classList.remove("translate-x-20", "opacity-0");
+          toast.classList.add("translate-x-0", "opacity-100");
+        }, 50);
+
+        const closeToast = () => {
+          toast.classList.remove("translate-x-0", "opacity-100");
+          toast.classList.add("translate-x-10", "opacity-0");
+          setTimeout(() => toast.remove(), 300);
+        };
+
+        toast.querySelector("button").addEventListener("click", closeToast);
+        setTimeout(closeToast, 4000);
+      }
+    </script>
   </body>
 </html>

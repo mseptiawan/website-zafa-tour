@@ -1,4 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // ==========================================
+  // 1. HANDLER UNTUK MOBILE SIDEBAR (TOGGLE)
+  // ==========================================
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+
+  const toggleSidebar = () => {
+    if (sidebar && overlay) {
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    }
+  };
+
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener("click", toggleSidebar);
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", toggleSidebar);
+  }
+
+  // ==========================================
+  // 2. HANDLER UNTUK ACTIVE MENU & SCROLL
+  // ==========================================
   const currentPath = window.location.pathname;
   const sidebarNav = document.getElementById("sidebarNav");
 

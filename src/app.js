@@ -2,7 +2,6 @@ import { sessionMiddleware } from "./config/session.js";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { attachPermissions } from "./middlewares/permission.middleware.js";
 import ejsMate from "ejs-mate";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -64,7 +63,6 @@ app.use(flash());
 
 // Custom Middlewares Pemohon Data
 app.use(injectUser);
-app.use(attachPermissions);
 
 // ==========================================
 // 4. GLOBAL LOCALS (HARUS SEBELUM ROUTES)
