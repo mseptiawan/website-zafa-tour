@@ -1,28 +1,20 @@
 <%- layout('layouts/main', { title }) %>
 
 <style>
-  /* =========================================================================
-     1. KONTROL VISIBILITAS MEDIA (WEB VS PRINT REPLIKA FORMAT FORMAL)
-     ========================================================================= */
-  
-  /* Sembunyikan boks print master dari layar monitor web normal */
   #invoice-print-zone {
     display: none;
   }
 
   @media print {
-    /* Sembunyikan total seluruh komponen dashboard web agar tidak merusak kertas */
     html, body, body * {
       visibility: hidden !important;
       background: transparent !important;
     }
     
-    /* Pengecualian: Aktifkan KEMBALI khusus boks cetak dinamis */
     #invoice-print-zone, #invoice-print-zone * {
       visibility: visible !important;
     }
     
-    /* Paksa boks cetak mengambil porsi kertas penuh di pojok kiri atas */
     #invoice-print-zone {
       display: block !important;
       position: absolute !important;
@@ -37,7 +29,6 @@
       color: black !important;
     }
 
-    /* Memastikan warna background Yellow header tabel ikut tercetak di kertas */
     .yellow-header-badge {
       background-color: #facc15 !important;
       -webkit-print-color-adjust: exact !important;
@@ -52,10 +43,9 @@
   }
 </style>
 
-<div class="ml-72 min-h-screen bg-slate-50/50 p-8 antialiased text-slate-900">
-  <div class="mx-auto max-w-2xl space-y-5">
+<div class="ml-0  min-h-screen bg-slate-50/50 p-4 md:p-8 antialiased text-slate-900 pb-24 md:pb-8">
+  <div class="mx-auto w-full space-y-5">
 
-    <!-- HEADER PAGE (NO-PRINT) -->
     <div class="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.02)] no-print">
       <h1 class="text-base font-bold tracking-tight text-slate-900">Riwayat Slip Gaji</h1>
       <p class="text-[11px] text-slate-400 mt-0.5">Daftar dokumen slip pendapatan resmi Anda di PT Zafa Mulia Mandiri</p>
@@ -68,53 +58,57 @@
       </div>
     <% } else { %>
 
-      <!-- =========================================================================
-           TAMPILAN 1: LIST SLIP GAJI DI WEB (MINIMALIS, BERSIH, LIST BIASA)
-           ========================================================================= -->
-   <div class="bg-white border border-slate-200/60 rounded-2xl p-2 shadow-2xs no-print divide-y divide-slate-100">
-  <% payrolls.forEach((pay, index) => { %>
-    <div class="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors">
-      <div class="space-y-1">
-        <span class="text-xs font-bold text-slate-800">Periode Bulan: <%= pay.periodMonth %></span>
-        <div class="text-[11px] text-slate-400 font-normal">
-          Take Home Pay: <span class="font-medium text-slate-700">Rp <%= pay.netTakeHomePay.toLocaleString('id-ID') %></span>
-        </div>
-      </div>
-      
-      <div class="flex items-center gap-2">
-        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full <%= pay.status === 'PAID' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' %>">
-          <%= pay.status === 'PAID' ? 'Lunas' : 'Diterbitkan' %>
-        </span>
+      <div class="no-print grid grid-cols-1 gap-4 md:block md:bg-white md:border md:border-slate-200/60 md:rounded-2xl md:p-2 md:shadow-2xs md:divide-y md:divide-slate-100">
+        <% payrolls.forEach((pay, index) => { %>
+          
+          <div class="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-[0_4px_12px_rgba(15,23,42,0.03)] md:bg-transparent md:border-none md:rounded-none md:p-4 md:shadow-none hover:bg-slate-50/50 transition-colors flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            
+            <div class="flex items-start justify-between md:justify-start gap-4">
+              <div class="md:hidden w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0 mt-0.5">
+                <i class="fa-solid fa-file-invoice-dollar text-base"></i>
+              </div>
+              
+              <div class="space-y-1.5 md:space-y-1 min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-sm md:text-xs font-bold text-slate-800 tracking-tight">Periode: <%= pay.periodMonth %></span>
+                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full <%= pay.status === 'PAID' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/50' : 'bg-amber-50 text-amber-600 border border-amber-100/50' %>">
+                    <%= pay.status === 'PAID' ? 'Lunas' : 'Diterbitkan' %>
+                  </span>
+                </div>
+                <div class="text-xs md:text-[11px] text-slate-400 font-normal">
+                  Take Home Pay: <span class="font-bold text-slate-700">Rp <%= pay.netTakeHomePay.toLocaleString('id-ID') %></span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-4 md:border-none md:pt-0">
+              <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                
+                <% if (pay.status === 'PAID' && pay.mutationFile) { %>
+                  <a href="<%= pay.mutationFile %>" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs md:text-[11px] font-semibold h-9 md:h-8 px-4 md:px-3 rounded-xl transition-all active:scale-[0.97] inline-flex items-center justify-center gap-1.5 border border-emerald-100 flex-1 md:flex-none">
+                    <i class="fa-solid fa-cloud-download text-[11px]"></i> Bukti TF
+                  </a>
+                <% } else if (pay.status === 'PAID') { %>
+                  <span class="text-[10px] text-slate-400 italic font-normal px-2 hidden md:inline-block">Processed by Bank</span>
+                <% } %>
 
-        <% if (pay.status === 'PAID' && pay.mutationFile) { %>
-          <a href="<%= pay.mutationFile %>" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-[11px] font-semibold h-8 px-3 rounded-xl transition-all active:scale-[0.97] inline-flex items-center gap-1.5 border border-emerald-100">
-            <i class="fa-solid fa-file-invoice-dollar text-[11px]"></i> Bukti TF
-          </a>
-        <% } else if (pay.status === 'PAID') { %>
-          <span class="text-[10px] text-slate-400 italic font-normal px-2">Processed by Bank</span>
-        <% } %>
+                <button type="button" onclick="executePrintSlip(<%= index %>)" class="bg-slate-900 hover:bg-slate-800 text-white text-xs md:text-[11px] font-medium h-9 md:h-8 px-4 md:px-3.5 rounded-xl transition-all active:scale-[0.97] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm flex-1 md:flex-none">
+                  <i class="fa-solid fa-print text-[10px]"></i> Cetak
+                </button>
+              </div>
+            </div>
 
-        <button type="button" onclick="executePrintSlip(<%= index %>)" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-medium h-8 px-3.5 rounded-xl transition-all active:scale-[0.97] cursor-pointer flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-print text-[10px]"></i> Cetak
-        </button>
+          </div>
+        <% }) %>
       </div>
-    </div>
-  <% }) %>
-</div>
     <% } %>
 
-    <!-- =========================================================================
-         TAMPILAN 2: MASTER INJECTION ZONE FOR PRINT (REPLIKA TOTAL image_a7a626.jpg)
-         ========================================================================= -->
-    <div id="invoice-print-zone" class="bg-white p-2 space-y-6 text-black">
-      <!-- Diisi secara dinamis via fungsi JavaScript tanpa error teks mentah -->
-    </div>
+    <div id="invoice-print-zone" class="bg-white p-2 space-y-6 text-black"></div>
 
   </div>
 </div>
 
 <script>
-  // Ambil dan konversi data EJS ke objek array JavaScript secara aman
   const payrollsList = <%- JSON.stringify(payrolls) %>;
   const employeeProfile = <%- JSON.stringify(employee) %>;
 
@@ -124,7 +118,6 @@
 
     const overtimePay = payroll.overtime?.amount || 0;
 
-    // 1. Ambil Baris Dinamis Tunjangan (Earnings)
     let allowancesRowsHTML = '';
     payroll.allowances.forEach(allow => {
       allowancesRowsHTML += `
@@ -137,7 +130,6 @@
       allowancesRowsHTML += `<tr class="h-7"><td>&nbsp;</td><td class="border-l border-black"></td></tr>`;
     }
 
-    // 2. Ambil Baris Dinamis Potongan (Deductions)
     let deductionsRowsHTML = '';
     payroll.deductions.forEach(ded => {
       deductionsRowsHTML += `
@@ -160,7 +152,6 @@
 
     const joinDateRaw = employeeProfile.careerData?.tanggal_mulai_bergabung ? new Date(employeeProfile.careerData.tanggal_mulai_bergabung).toISOString().split('T')[0] : '-';
 
-    // 3. Bangun Struktur Template dengan Evaluasi Variabel yang Benar (Tanpa Backslash)
     const finalPrintTemplate = `
       <div class="flex justify-between items-start">
         <div class="border border-black px-6 py-1 mt-2">
@@ -233,7 +224,6 @@
       </div>
 
       <div class="grid grid-cols-2 gap-6 items-start">
-        <!-- Tabel Pendapatan (Header Kustom Kuning / Yellow) -->
         <div class="border border-black">
           <table class="w-full text-xs text-left border-collapse">
             <thead>
@@ -262,7 +252,6 @@
           </table>
         </div>
 
-        <!-- Tabel Potongan (Header Kustom Kuning / Yellow) -->
         <div class="border border-black">
           <table class="w-full text-xs text-left border-collapse">
             <thead>
@@ -316,7 +305,6 @@
       </div>
     `;
 
-    // Suntikkan kode rakitan murni ke boks cetak rahasia, lalu eksekusi print
     const printZone = document.getElementById('invoice-print-zone');
     if (printZone) {
       printZone.innerHTML = finalPrintTemplate;

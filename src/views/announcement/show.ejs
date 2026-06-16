@@ -1,25 +1,13 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-72 min-h-screen bg-[#FCFCFD] p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+<div class="ml-0  min-h-screen bg-[#FCFCFD] p-4 md:p-8 antialiased selection:bg-blue-50 selection:text-blue-600 pb-24 md:pb-8">
   <div class="max-w-4xl mx-auto">
 
-    <div class="mb-8 flex flex-col gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-          Area Kerja
-        </span>
-        <div class="h-3 w-px bg-slate-300"></div>
-        <a href="/announcement" class="text-[10px] font-semibold tracking-[0.2em] text-slate-500 hover:text-blue-600 uppercase transition-colors">
-          Pengumuman
-        </a>
-        <div class="h-3 w-px bg-slate-300"></div>
-        <span class="text-[10px] font-semibold tracking-[0.2em] text-slate-800 uppercase truncate max-w-[200px]">
-          Detail
-        </span>
-      </div>
+    <div class="mb-6 flex flex-col gap-2">
+     
 
       <a href="/announcement"
-        class="inline-flex items-center mt-4 gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors group w-fit">
+        class="inline-flex items-center mt-2 gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors group w-fit">
         <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
@@ -29,8 +17,8 @@
 
     <div class="bg-white border border-slate-200/70 rounded-2xl overflow-hidden shadow-sm">
 
-      <div class="px-10 pt-8 pb-6 border-b border-slate-100 bg-white">
-        <div class="flex flex-col gap-4">
+      <div class="px-4 sm:px-10 pt-6 sm:pt-8 pb-6 border-b border-slate-100 bg-white">
+        <div class="flex flex-col gap-3.5">
           
           <div class="flex items-center gap-2">
             <% if(announcement.category === "OFFICIAL") { %>
@@ -44,25 +32,25 @@
             <% } %>
           </div>
 
-          <h1 class="text-3xl font-semibold text-slate-950 leading-snug tracking-tighter break-words">
+          <h1 class="text-xl sm:text-3xl font-semibold text-slate-950 leading-snug tracking-tighter break-words">
             <%= announcement.title %>
           </h1>
 
-          <div class="flex items-center gap-3.5 mt-1">
-            <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-[13px] font-bold text-slate-700 uppercase">
-              <%= announcement.createdBy?.employeeData.fullName ? announcement.createdBy?.employeeData?.fullName.charAt(0) : '?' %>
+          <div class="flex items-center gap-3 mt-1">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-[12px] sm:text-[13px] font-bold text-slate-700 uppercase shrink-0">
+              <%= announcement.createdBy?.employeeData?.fullName ? announcement.createdBy?.employeeData?.fullName.charAt(0) : '?' %>
             </div>
 
-            <div class="flex flex-col">
-              <span class="text-sm font-bold text-slate-800">
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs sm:text-sm font-bold text-slate-800 truncate">
                 <%= announcement.createdBy?.employeeData?.fullName || announcement.createdBy?.username || 'Tidak Diketahui' %>
               </span>
 
-              <span class="text-[11.5px] font-medium text-slate-400 mt-0.5 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-slate-400 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span class="text-[10px] sm:text-[11.5px] font-medium text-slate-400 mt-0.5 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-slate-400 stroke-[2] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Dipublikasikan pada <%= new Date(announcement.publishDate || announcement.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }) %>
+                <span class="truncate">Dipublikasikan pada <%= new Date(announcement.publishDate || announcement.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }) %></span>
               </span>
             </div>
           </div>
@@ -70,13 +58,13 @@
         </div>
       </div>
 
-      <div class="px-10 pt-7 pb-10">
-   <article class="text-[15px] text-slate-600 leading-7 whitespace-pre-line tracking-normal break-words">
-    <%= announcement.content ? announcement.content.trim() : '' %>
-  </article>
+      <div class="px-4 sm:px-10 pt-6 pb-8 sm:pb-10">
+        <article class="text-[14px] sm:text-[15px] text-slate-600 leading-6 sm:leading-7 whitespace-pre-line tracking-normal break-words">
+          <%= announcement.content ? announcement.content.trim() : '' %>
+        </article>
 
         <% if(announcement.attachment) { %>
-          <div class="mt-12 pt-8 border-t border-slate-100">
+          <div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-100">
             
             <div class="mb-4 flex items-center gap-2">
               <svg class="w-4 h-4 text-slate-400 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,34 +78,34 @@
             <div class="border border-slate-200/70 rounded-2xl overflow-hidden bg-slate-50/50">
               
               <% if (announcement.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)) { %>
-                <div class="p-4 bg-slate-50 border-b border-slate-200/60 flex items-center justify-center">
+                <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200/60 flex items-center justify-center">
                   <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm max-w-full">
                     <img src="/uploads/files/<%= announcement.attachment %>" alt="Lampiran Preview"
-                      class="w-full max-h-[480px] object-contain hover:scale-[1.01] transition-transform duration-200">
+                      class="w-full max-h-[320px] sm:max-h-[480px] object-contain hover:scale-[1.01] transition-transform duration-200">
                   </div>
                 </div>
               <% } %>
 
-              <div class="p-5 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div class="p-4 sm:p-5 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="flex items-center gap-3.5 min-w-0">
-                  <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 flex-shrink-0">
+                  <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
                     <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
 
-                  <div class="min-w-0">
-                    <p class="text-sm font-bold text-slate-800 truncate">
+                  <div class="min-w-0 flex-1">
+                    <p class="text-xs sm:text-sm font-bold text-slate-800 truncate">
                       <%= announcement.attachment %>
                     </p>
-                    <p class="text-xs font-medium text-slate-400 mt-0.5">
-                      Klik tombol kanan untuk meninjau atau mengunduh berkas resmi.
+                    <p class="text-[11px] sm:text-xs font-medium text-slate-400 mt-0.5 whitespace-normal leading-tight">
+                      Klik tombol untuk meninjau atau mengunduh berkas resmi.
                     </p>
                   </div>
                 </div>
 
                 <a href="/uploads/files/<%= announcement.attachment %>" target="_blank"
-                  class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-950 border border-slate-200 rounded-xl px-5 py-3 text-[12px] font-bold transition-all shadow-sm active:scale-[0.98] flex-shrink-0 w-full sm:w-fit">
+                  class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-950 border border-slate-200 rounded-xl px-4 py-2.5 sm:px-5 sm:py-3 text-[12px] font-bold transition-all shadow-sm active:scale-[0.98] shrink-0 w-full sm:w-fit">
                   Lihat File Lengkap
                 </a>
               </div>

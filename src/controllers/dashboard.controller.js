@@ -58,7 +58,7 @@ export const index = async (req, res, next) => {
 
     // Render ke view EJS dengan data variabel lengkap
     return res.render("dashboard/main", {
-      title: "Dashboard Zafa Tour",
+      title: "Dashboard",
       user,
 
       attendance: attendanceToday,

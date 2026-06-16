@@ -1,22 +1,18 @@
-<div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 z-[90] hidden md:hidden transition-opacity backdrop-blur-sm cursor-pointer"></div>
+<%- include('./sidebar-config') %>
 
-<aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white text-black flex flex-col z-[100] transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
+<!-- SEKARANG ASIDE DIKUNCI HANYA UNTUK VISIBLE DI DESKTOP (md:flex) -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white text-black flex flex-col z-[100] border-r border-slate-100 shadow-sm hidden md:flex">
   
   <div class="h-20 flex items-center px-8 border-b border-slate-100 relative shrink-0">
     <div class="flex items-center gap-4 relative z-10">
       <div class="leading-tight">
-        <h1 class="text-lg font-bold tracking-wide text-slate-800">
-          Zafa Tour
-        </h1>
-        <p class="text-[10px] text-slate-500 uppercase tracking-[0.25em] font-medium">
-          PT Zafa Mulia Mandiri
-        </p>
+        <h1 class="text-lg font-bold tracking-wide text-slate-800">Zafa Tour</h1>
+        <p class="text-[10px] text-slate-500 uppercase tracking-[0.25em] font-medium">PT Zafa Mulia Mandiri</p>
       </div>
     </div>
   </div>
 
-<nav id="sidebarNav" class="flex-1 overflow-y-auto scrollbar-hide px-4 py-6 space-y-7 pb-10">
-
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto scrollbar-hide px-4 py-6 space-y-7 pb-10">
     <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group border border-transparent">
       <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
@@ -24,304 +20,63 @@
       <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">Dashboard</span>
     </a>
 
-    <%
-      const menuSections = [
-        {
-          title: "Manajemen Pegawai",
-          show: true,
-          menus: [
-            {
-              id: "Pegawai",
-              name: "Pegawai",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m10-4a4 4 0 10-8 0 4 4 0 008 0z" />`,
-              show: true,
-              submenus: [
-                { name: "Data Pegawai", path: "/employee", show: true },
-                { name: "Tambah Pegawai", path: "/employee/create", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Persetujuan PHK", path: "/approvals/pending", show: locals.user?.role === "DIREKTUR_UTAMA" }
-              ]
-            },
-            {
-              id: "organization",
-              name: "Struktur Organisasi",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />`,
-              show: true, 
-              submenus: [
-                { name: "Kelola Bidang & Unit", path: "/organization-structure", show: true }
-              ]
-            },
-            {
-              id: "loan",
-              name: "Peminjaman Uang",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`,
-              show: true,
-              submenus: [
-                { name: "Buat Pengajuan", path: "/loans/new", show: true },
-                { name: "Riwayat Pengajuan", path: "/loans/my", show: true },
-                { name: "Persetujuan Pinjaman", path: "/loans/approval", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Penyaluran Dana", path: "/loans/disbursement", show: locals.user?.role === "MANAGER_KEUANGAN" }
-              ]
-            },
-            {
-              id: "kpi",
-              name: "KPI Pegawai",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />`,
-              show: true,
-              submenus: [
-                { name: "Catat KPI", path: "/kpi/appraisal-list", show: true },
-                { name: "Daftar KPI Pegawai", path: "/kpi/history-list", show: true }
-              ]
-            },
-            {
-              id: "assignment",
-              name: "Penugasan",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />`,
-              show: true,
-              submenus: [
-                { name: "Buat Penugasan", path: "/assignment/new", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Penugasan Masuk", path: "/assignment/my", show: true },
-                { name: "Semua Penugasan", path: "/assignment/", show: locals.user?.role !== "PEGAWAI" }
-              ]
-            }
-          ]
-        },
-        {
-          title: "Absensi & Izin",
-          show: true,
-          menus: [
-            {
-              id: "leave",
-              name: "Cuti",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
-              show: true,
-              submenus: [
-                { name: "Buat Pengajuan", path: "/leave/apply", show: true },
-                { name: "Riwayat Pengajuan", path: "/leave/my-history", show: true },
-                { name: "Permintaan Delegasi", path: "/leave/my-delegations", show: true },
-                { name: "Manajemen Cuti", path: "/leave/manage-requests", show: locals.user?.role !== "PEGAWAI" }
-              ]
-            },
-            {
-              id: "permit",
-              name: "Izin",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
-              show: true,
-              submenus: [
-                { name: "Buat Pengajuan", path: "/permit/new", show: true },
-                { name: "Riwayat Pengajuan", path: "/permit/history", show: true },
-                { name: "Persetujuan Izin", path: "/permit/incoming", show: locals.user?.role !== "PEGAWAI" }
-              ]
-            },
-            {
-              id: "overtime",
-              name: "Lembur",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />`,
-              show: true,
-              submenus: [
-                { name: "Catat Lembur", path: "/overtime/new", show: true },
-                { name: "Riwayat Lembur", path: "/overtime/my", show: true },
-                { name: "Persetujuan Lembur", path: "/overtime/approval", show: locals.user?.role !== "PEGAWAI" }
-              ]
-            },
-            {
-              id: "attendance",
-              name: "Kehadiran",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
-              show: true,
-              submenus: [
-                { name: "Input Absensi", path: "/attendance", show: true },
-                { name: "Riwayat Absensi", path: "/attendance/history", show: true }
-              ]
-            },
-            {
-              id: "trip",
-              name: "Dinas Luar",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.104-.896-2-2-2s-2 .896-2 2 .896 2 2 2 2-.896 2-2zm0 0v10m6-10c0-3.314-2.686-6-6-6S6 7.686 6 11m12 0v10" />`,
-              show: true,
-              submenus: [
-                { name: "Buat Pengajuan", path: "/trip/new", show: true },
-                { name: "Riwayat Pengajuan", path: "/trip/my", show: true },
-                { name: "Persetujuan Dinas", path: "/trip/approval", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Verifikasi Finance", path: "/finance", show: locals.user?.role === "MANAGER_KEUANGAN" },
-                { name: "Riwayat Verifikasi", path: "/finance/history", show: locals.user?.role === "MANAGER_KEUANGAN" }
-              ]
-            }
-          ]
-        },
-        {
-          title: "Aktivitas Lapangan",
-          show: locals.user?.role !== "DIREKTUR_UTAMA",
-          menus: [
-            {
-              id: "sales",
-              name: "Kunjungan Sales",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />`,
-              show: true,
-              submenus: [
-                { name: "Catat Kunjungan", path: "/sales/new", show: true },
-                { name: "Daftar Kunjungan", path: "/sales/my", show: true }
-              ]
-            },
-            {
-              id: "daily-log",
-              name: "Jurnal Harian",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />`,
-              show: true,
-              submenus: [
-                { name: "Lembar Kerja", path: "/daily-log", show: true },
-                { name: "Riwayat Jurnal", path: "/daily-log/review", show: locals.user?.role !== "PEGAWAI" }
-              ]
-            }
-          ]
-        },
-        {
-          title: "Internal Communication",
-          show: true,
-          menus: [
-            {
-              id: "announcement",
-              name: "Pengumuman",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5l-7 7h4v7h6v-4h2v4h6v-7h4l-7-7z" />`,
-              show: true,
-              submenus: [
-                { name: "Buat Pengumuman", path: "/announcement/new", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Daftar Pengumuman", path: "/announcement", show: true }
-              ]
-            }
-          ]
-        },
-        {
-          title: "Pengajuan Klaim",
-          show: true,
-          menus: [
-            {
-              id: "expense",
-              name: "Pengajuan Klaim",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6v2m0 16v2m8-10h2M2 12H4" />`,
-              show: true,
-              submenus: [
-                { name: "Set Kategori Klaim", path: "/expense-categories", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Buat Pengajuan", path: "/expense/create", show: true },
-                { name: "Riwayat Pengajuan", path: "/expense/my", show: true },
-                { name: "Verifikasi Manager", path: "/expense/approval/manager", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Verifikasi Finance", path: "/expense/finance", show: locals.user?.role === "MANAGER_KEUANGAN" }
-              ]
-            },
-            {
-              id: "payroll",
-              name: locals.user?.role === "PEGAWAI" ? "Penggajian" : "Manajemen Payroll",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />`,
-              show: true,
-              submenus: [
-                { name: "Slip Gaji Saya", path: "/payroll/my-slip", show: true },
-                { name: "Proses Hitung Gaji", path: "/payroll/manage", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Kelola Komponen Gaji", path: "/components/manage", show: locals.user?.role !== "PEGAWAI" },
-                { name: "Verifikasi & Pembayaran", path: "/finance/payroll", show: locals.user?.role === "MANAGER_KEUANGAN" }
-              ]
-            }
-          ]
-        },
-        {
-          title: "Laporan",
-          show: locals.user?.role !== "PEGAWAI", 
-          menus: [
-            {
-              id: "report",
-              name: "Laporan",
-              icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h6v6m-7 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-2-2h-4L7 5H4a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
-              show: true,
-              submenus: [
-                { name: "Laporan Data Pegawai", path: "/report/employees", show: true },
-                { name: "Laporan Lembur", path: "/report/overtime", show: true },
-                { name: "Laporan Absensi", path: "/report/attendance", show: true },
-                { name: "Laporan Pengeluaran Gaji", path: "/report/payroll", show: true }
-              ]
-            }
-          ]
-        }
-      ];
-    %>
-
-    <% if (locals.menuSections) { %>
-      <% locals.menuSections.forEach(section => { %>
+    <% if (locals.sidebarSections) { %>
+      <% locals.sidebarSections.forEach(section => { %>
         <% if (section.show && section.menus.some(m => m.show && m.submenus.some(s => s.show))) { %>
         <section>
-          <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]">
-            <%= section.title %>
-          </p>
-
+          <p class="text-[7px] text-slate-500 font-bold px-4 mb-3 uppercase tracking-[0.2em]"><%= section.title %></p>
           <div class="space-y-1">
             <% section.menus.forEach(menu => { %>
-            <% if (menu.show && menu.submenus.some(s => s.show)) { %>
-            <details class="group outline-none" data-menu="<%= menu.id %>">
-              <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent">
-                <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <%- menu.icon %>
+              <% if (menu.show && menu.submenus.some(s => s.show)) { %>
+              <details class="group outline-none" data-menu="<%= menu.id %>">
+                <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer list-none transition-all border border-transparent">
+                  <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><%- menu.icon %></svg>
+                    <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800"><%= menu.name %></span>
+                  </div>
+                  <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
-                  <span class="text-xs font-medium text-slate-600 group-hover:text-slate-800">
-                    <%= menu.name %>
-                  </span>
+                </summary>
+                <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
+                  <% menu.submenus.forEach(sub => { %>
+                    <% if (sub.show) { %>
+                    <a href="<%= sub.path %>" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-slate-800 transition"><%= sub.name %></a>
+                    <% } %>
+                  <% }); %>
                 </div>
-                <svg class="w-4 h-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </summary>
-
-              <div class="mt-1 ml-9 flex flex-col border-l border-slate-200 space-y-1">
-                <% menu.submenus.forEach(sub => { %>
-                <% if (sub.show) { %>
-                <a href="<%= sub.path %>" class="sidebar-link py-2 px-4 text-xs text-slate-500 hover:text-slate-800 transition">
-                  <%= sub.name %>
-                </a>
-                <% } %>
-                <% }); %>
-              </div>
-            </details>
-            <% } %>
+              </details>
+              <% } %>
             <% }); %>
           </div>
         </section>
         <% } %>
       <% }); %>
     <% } %>
-
   </nav>
 
-  <div class="p-4 relative shrink-0 border-t border-slate-100 bg-white">
-    <div class="relative flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-slate-100">
-      <% if (typeof user !== 'undefined') { %>
+  <div class="p-4 border-t border-slate-100 bg-white">
+    <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-slate-100">
+      <% if (typeof user !== 'undefined' && user !== null) { %>
         <a href="/employee/detail/<%= user.employeeId %>" class="flex items-center gap-3 min-w-0 flex-1 group/profile">
-          <div class="relative shrink-0 w-10 h-10">
-            <div class="w-full h-full rounded-full flex items-center justify-center bg-slate-200 border border-slate-300 overflow-hidden transition-all duration-200 group-hover/profile:ring-2 group-hover/profile:ring-blue-500 group-hover/profile:border-transparent">
-              <% 
-                let profilePic = user.foto_profile 
-                  ? user.foto_profile 
-                  : (user.gender === "Perempuan" 
-                     ? "https://img.freepik.com/premium-vector/smiling-woman-avatar_937492-6135.jpg" 
-                     : "https://img.freepik.com/vektor-premium/avatar-kartun-pengusaha-muda-pria-mengenakan-setelan-jas-dan-dasi_645574-600.jpg");
-              %>
-              <img src="<%= profilePic %>" class="w-full h-full object-cover" />
-            </div>
-            <div class="absolute -bottom-0.5 -right-0.5 bg-blue-600 text-white p-1 rounded-full opacity-0 scale-75 group-hover/profile:opacity-100 group-hover/profile:scale-100 transition-all duration-200 shadow-sm z-10">
-              <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </div>
+          <div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-300 overflow-hidden shrink-0">
+            <% 
+              let profilePic = user.foto_profile 
+                ? user.foto_profile 
+                : (user.gender === "Perempuan" 
+                   ? "https://img.freepik.com/premium-vector/smiling-woman-avatar_937492-6135.jpg" 
+                   : "https://img.freepik.com/vektor-premium/avatar-kartun-pengusaha-mYoung-pria-mengenakan-setelan-jas-dan-dasi_645574-600.jpg");
+            %>
+            <img src="<%= profilePic %>" class="w-full h-full object-cover" />
           </div>
           <div class="min-w-0 flex-1 leading-normal">
-            <p class="text-xs font-semibold text-slate-800 truncate group-hover/profile:text-blue-600 transition-colors duration-200">
-              <%= user.fullName || 'User' %>
-            </p>
-            <p class="text-[8px] font-medium uppercase tracking-[0.15em] text-slate-400 truncate mt-0.5">
-              <%= user.role || 'Pegawai' %>
-            </p>
+            <p class="text-xs font-semibold text-slate-800 truncate"><%= user.fullName || 'User' %></p>
+            <p class="text-[8px] font-medium uppercase tracking-[0.15em] text-slate-400 truncate mt-0.5"><%= user.role || 'Pegawai' %></p>
           </div>
         </a>
       <% } %>
-
-      <a href="/logout" title="Keluar Aplikasi" onclick="localStorage.clear();" class="group p-2 ml-2 rounded-xl transition-all duration-200 hover:bg-red-50 border border-transparent hover:border-red-100 shrink-0">
-        <svg class="w-4 h-4 text-slate-400 group-hover:text-red-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <a href="/logout" title="Keluar Aplikasi" onclick="localStorage.clear();" class="p-2 ml-2 text-slate-400 hover:text-red-500 rounded-xl hover:bg-red-50 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
       </a>
