@@ -39,8 +39,6 @@ export const login = async (req, res) => {
     });
 
     const roleName = user.roleId?.name?.toUpperCase();
-    console.log("ROLE:", roleName);
-    console.log("PERMISSIONS:", getPermissions(roleName));
     req.session.user = {
       _id: user._id,
       username: user.username,
@@ -54,7 +52,6 @@ export const login = async (req, res) => {
       permissions: getPermissions(roleName),
     };
 
-    console.log("SESSION USER:", req.session.user);
     if (remember) {
       req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000;
     }

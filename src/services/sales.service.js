@@ -1,3 +1,4 @@
+import { getPaginationMeta } from "../utils/pagination.js";
 import SalesVisit from "../models/SalesVisit.model.js";
 import { createSalesVisitSchema, updateSalesVisitSchema } from "../validations/sales.schema.js";
 import { validateData } from "../utils/validateData.js";
@@ -31,7 +32,14 @@ const create = async ({ body, file, userId }) => {
   });
 };
 
-const findMine = (userId) => SalesVisit.find({ userId }).sort({ createdAt: -1 });
+export const findMinePaged = async ({ userId, page, limit, skip }) => {
+  const queryFilter = { userId: userId };
+  const [data, total] = await Promise.all([
+    SalesVisit.find(queryFilter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    SalesVisit.countDocuments(queryFilter),
+  ]);
+  return { data, meta: getPaginationMeta({ page, limit, total }) };
+};
 
 const findAll = () => SalesVisit.find().populate("userId").sort({ createdAt: -1 });
 
@@ -82,7 +90,7 @@ const update = async ({ id, userId, body, file }) => {
 export default {
   create,
   update,
-  findMine,
+  findMinePaged,
   findAll,
   findById,
 };

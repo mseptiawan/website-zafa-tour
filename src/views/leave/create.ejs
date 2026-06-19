@@ -1,245 +1,234 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
+<!-- 1. GLOBAL ISLAND CANVAS LAYER (Menghapus batasan lebar menggunakan max-w-none sesuai keputusan lo) -->
+<div class="ml-0 md:ml-72  min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] p-4 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
-  <div class="max-w-2xl mx-auto">
-
-    <%- include('../partials/page-header.ejs', { 
-    section: 'Area Kerja', 
-    module: mode === 'CREATE' ? 'Input Pengajuan Cuti' : (mode === 'EDIT' ? 'Ubah Pengajuan Cuti' : 'Ajukan Ulang Cuti'), 
-    title: mode === 'CREATE' ? 'Input Pengajuan Cuti' : (mode === 'EDIT' ? 'Ubah Pengajuan Cuti' : 'Ajukan Ulang Cuti'), 
-    description: 'Pastikan informasi rentang tanggal dan sisa kuota Anda telah sesuai sebelum mengirimkan form.' 
-}) %>
-
-   <div class="mb-6 p-5 bg-white border border-slate-200 rounded-2xl shadow-sm flex items-center justify-between">
-  <div class="flex items-center gap-3">
-    <!-- Icon diubah dari hijau menjadi Slate netral -->
-    <div class="p-2.5 bg-slate-100 text-slate-600 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-      </svg>
-    </div>
-    <div>
-      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Hak Kuota Cuti Anda</p>
-      <p class="text-[13px] font-medium text-slate-500 mt-0.5">Tahun Periode Berjalan</p>
-    </div>
-  </div>
-  
-  <div class="text-right flex flex-col items-end">
-    <div class="flex items-baseline gap-1">
-      <!-- Jika sisa cuti 0, angka otomatis meredup (text-slate-400). Jika > 0, berwarna gelap tegas (text-slate-800) -->
-      <span class="text-3xl font-black <%= leaveBalance.remaining === 0 ? 'text-slate-400' : 'text-slate-800' %> tabular-nums">
-        <%= leaveBalance.remaining %>
-      </span>
-      <span class="text-[13px] font-bold text-slate-400">Hari Tersisa</span>
+    <!-- 2. REUSABLE PAGE HEADER COMPONENT -->
+    <div class="mb-6 border-b border-slate-200/60 pb-5">
+      <%- include('../partials/page-header.ejs', { 
+          section: 'Area Kerja', 
+          module: mode === 'CREATE' ? 'Input Pengajuan Cuti' : (mode === 'EDIT' ? 'Ubah Pengajuan Cuti' : 'Ajukan Ulang Cuti'), 
+          title: mode === 'CREATE' ? 'Input Pengajuan Cuti' : (mode === 'EDIT' ? 'Ubah Pengajuan Cuti' : 'Ajukan Ulang Cuti'), 
+          description: 'Pastikan informasi rentang tanggal dan sisa kuota Anda telah sesuai sebelum mengirimkan form.' 
+      }) %>
     </div>
 
-    <!-- Informasi Tambahan (Badge Amber) jika kuota sudah habis terpotong -->
-    <% if (leaveBalance.remaining === 0) { %>
-      <div class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-md mt-1 whitespace-nowrap">
-        Terpotong Cuti Bersama
+    <!-- 3. PANEL INFORMASI KUOTA (Clean Island Look) -->
+    <div class="mb-6 p-4 sm:p-5 bg-white border border-slate-200/60 rounded-xl shadow-3xs flex items-center justify-between max-w-2xl">
+      <div class="flex items-center gap-3">
+        <div>
+          <p class="text-[10.5px] font-medium text-slate-400 uppercase tracking-wider">Hak Kuota Cuti Anda</p>
+          <p class="text-[12px] font-semibold text-slate-500 mt-0.5">Tahun Periode Berjalan</p>
+        </div>
       </div>
-    <% } %>
-  </div>
-</div>
+      
+      <div class="text-right flex flex-col items-end">
+        <div class="flex items-baseline gap-1">
+          <span class=" font-bold <%= leaveBalance.remaining === 0 ? 'text-slate-300' : 'text-slate-900' %> tabular-nums">
+            <%= leaveBalance.remaining %>
+          </span>
+          <span class="text-[11px] font-medium text-slate-400">Hari Tersisa</span>
+        </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+        <% if (leaveBalance.remaining === 0) { %>
+          <div class="text-[9px] font-medium text-slate-600 bg-slate-100 border border-slate-200/60 px-2 py-0.5 rounded-md mt-1 whitespace-nowrap uppercase tracking-wider">
+            Terpotong Cuti Bersama
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- 4. MAIN FORM SHEET CONTAINER -->
+    <div class="bg-white border-0 md:border md:border-slate-200/60 rounded-2xl shadow-3xs overflow-hidden max-w-2xl">
 
       <% let formAction="/leave/apply" ; if (mode==='EDIT' ) formAction="/leave/update/" + leave._id; if (mode==='RESUBMIT' ) formAction="/leave/apply" ; %>
 
-      <form action="<%= formAction %>" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+      <form action="<%= formAction %>" method="POST" enctype="multipart/form-data" class="p-4 sm:p-6 md:p-8 space-y-5">
 
         <% if (typeof error !== 'undefined' && error && String(error).trim() !== '') { %>
-        <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
-          <%= String(error) %>
-        </div>
+          <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[12px] font-semibold border border-rose-100 shadow-3xs animate-pulse-slow">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i> <%= String(error) %>
+          </div>
         <% } %>
 
+        <!-- DROPDOWN TIPE CUTI -->
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
-            Kategori / Tipe Cuti <span class="text-red-500">*</span>
+          <label class="text-[12px] font-bold text-slate-700 uppercase tracking-wide">
+            Kategori / Tipe Cuti <span class="text-rose-500">*</span>
           </label>
 
           <div class="relative w-full" id="leave-dropdown">
             <input type="hidden" name="leaveTypeId" id="leaveTypeId" value="<%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId._id : '' %>" required>
-            <button type="button" onclick="toggleLeaveDropdown()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
-              <span id="leave-label" class="<%= (mode === 'EDIT' && leave.leaveTypeId) ? 'text-[14px] text-slate-800 font-semibold' : 'text-xs italic text-slate-400/90 font-normal' %>">
+            <button type="button" onclick="toggleLeaveDropdown()" class="w-full h-11 bg-slate-50 border border-slate-200/80 rounded-xl px-4 text-[12.5px] font-semibold text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:border-slate-400 transition-colors shadow-3xs cursor-pointer">
+              <span id="leave-label" class="<%= (mode === 'EDIT' && leave.leaveTypeId) ? 'text-slate-800 font-semibold' : 'italic text-slate-400 font-normal' %>">
                 <%= (mode === 'EDIT' && leave.leaveTypeId) ? leave.leaveTypeId.name : '-- Silahkan pilih jenis cuti --' %>
               </span>
 
-              <!-- optional warning badge -->
-              <span id="leave-warning" class="hidden text-[10px] text-rose-500 font-semibold mr-2">
+              <span id="leave-warning" class="hidden text-[10px] text-rose-500 font-bold mr-2 uppercase tracking-wider">
                 Tidak tersedia
               </span>
 
-              <svg id="leave-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg id="leave-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
-            <div id="leave-menu" class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
-              <%
-  const isMale = (employee?.jenis_kelamin || '').toLowerCase() === 'laki-laki';
-%>
-
+            
+            <div id="leave-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-md p-1 space-y-0.5">
+              <% const isMale = (employee?.jenis_kelamin || '').toLowerCase() === 'laki-laki'; %>
               <% leaveTypes.forEach(type => { %>
-
-              <% if (isMale && type.code === 'BL') return; %>
-
-              <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>', '<%= type.code %>')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-                <%= type.name %>
-              </button>
-
+                <% if (isMale && type.code === 'BL') return; %>
+                <button type="button" onclick="selectLeave('<%= type._id %>', '<%= type.name %>', '<%= type.code %>')" class="w-full text-left px-3 py-2.5 text-[12px] font-semibold text-slate-700 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer">
+                  <%= type.name %>
+                </button>
               <% }) %>
             </div>
           </div>
         </div>
 
+        <!-- RENTANG TANGGAL INPUT -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">
-              Tanggal Mulai <span class="text-red-500">*</span>
+            <label class="text-[12px] font-bold text-slate-700 uppercase tracking-wide">
+              Tanggal Mulai <span class="text-rose-500">*</span>
             </label>
-            <input type="date" id="startDate" name="startDate" required class="date-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs italic text-slate-400/90 font-normal focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" value="<%= leave ? new Date(leave.startDate).toISOString().split('T')[0] : '' %>">
-
-            <p id="date-warning" class="hidden text-[11px] text-red-500 font-medium pl-1">
+            <input type="date" id="startDate" name="startDate" required class="date-input w-full h-11 bg-slate-50 border border-slate-200/80 rounded-xl px-4 text-[12.5px] font-semibold text-slate-700 focus:bg-white focus:border-slate-400 outline-none transition-colors shadow-3xs" value="<%= leave ? new Date(leave.startDate).toISOString().split('T')[0] : '' %>">
+            <p id="date-warning" class="hidden text-[10.5px] text-rose-500 font-semibold pl-1 leading-tight">
               Pengajuan cuti harus dilakukan minimal 7 hari sebelum tanggal mulai.
             </p>
           </div>
 
           <div class="space-y-1.5">
-            <label class="text-[13px] font-bold text-slate-700">
-              Tanggal Selesai <span class="text-red-500">*</span>
+            <label class="text-[12px] font-bold text-slate-700 uppercase tracking-wide">
+              Tanggal Selesai <span class="text-rose-500">*</span>
             </label>
-            <input type="date" id="endDate" name="endDate" required class="date-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs italic text-slate-400/90 font-normal focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" value="<%= leave ? new Date(leave.endDate).toISOString().split('T')[0] : '' %>">
+            <input type="date" id="endDate" name="endDate" required class="date-input w-full h-11 bg-slate-50 border border-slate-200/80 rounded-xl px-4 text-[12.5px] font-semibold text-slate-700 focus:bg-white focus:border-slate-400 outline-none transition-colors shadow-3xs" value="<%= leave ? new Date(leave.endDate).toISOString().split('T')[0] : '' %>">
           </div>
         </div>
 
+        <!-- HITUNGAN DURASI -->
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
+          <label class="text-[12px] font-bold text-slate-700 uppercase tracking-wide">
             Durasi Pengajuan Cuti
           </label>
           <div class="relative flex items-center">
-
-            <input type="number" id="totalDays" name="totalDays" readonly required class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-4 pr-24 py-3 text-[14px] font-bold text-slate-700 outline-none select-none" value="<%= leave ? leave.totalDays : 0 %>" />
-            <span class="absolute right-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              <span id="displayDays"><%= leave ? leave.totalDays : 0 %></span>
+            <input type="number" id="totalDays" name="totalDays" readonly required class="w-full h-11 bg-slate-50 border border-slate-200/60 rounded-xl pl-4 pr-24 text-[13.5px] font-bold text-slate-800 outline-none select-none shadow-3xs" value="<%= leave ? leave.totalDays : 0 %>" />
+            <span class="absolute right-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1 select-none">
+              <span id="displayDays" class="text-slate-800 font-extrabold"><%= leave ? leave.totalDays : 0 %></span>
               <span id="duration-label-text">Hari Kerja</span>
             </span>
           </div>
         </div>
 
+        <!-- REKAN DELEGASI HANDOVER -->
         <div class="space-y-1.5" id="handover-wrapper">
           <div class="flex justify-between items-center">
-            <label class="text-[13px] font-bold text-slate-700">
+            <label class="text-[12px] font-bold text-slate-700 uppercase tracking-wide">
               Delegasi Pengganti / Handover
             </label>
-            <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <span class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md uppercase tracking-wider border border-slate-200/40 select-none">
               Opsional
             </span>
           </div>
 
           <div class="relative w-full">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <input type="text" id="handover-search" placeholder="Cari rekan handover..." onkeyup="filterHandoverList()" class="w-full bg-slate-50/60 border border-slate-200/60 rounded-xl pl-10 pr-4 py-3 text-[13px] font-medium text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all shadow-sm shadow-slate-100/50" />
+            <input type="text" id="handover-search" placeholder="Cari nama rekan handover..." encoding="utf-8" onkeyup="filterHandoverList()" class="w-full h-11 bg-slate-50 border border-slate-200/80 rounded-xl pl-9 pr-4 text-[12.5px] font-medium text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-400 transition-colors shadow-3xs" />
           </div>
 
-          <div id="handover-list" class="border border-slate-200/60 rounded-xl p-1.5 max-h-56 overflow-y-auto bg-slate-50/50 space-y-0.5 shadow-inner shadow-slate-50">
+          <div id="handover-list" class="border border-slate-200/60 rounded-xl p-1 max-h-48 overflow-y-auto bg-slate-50/40 space-y-0.5 shadow-3xs">
             <% 
-                  const excludedOwners = ['rafika fitrianti', 'gusti diansyah'];
-                  const filteredEmployees = employees.filter(emp => 
-                    emp.employeeData && 
-                    !excludedOwners.includes(emp.employeeData.fullName.toLowerCase())
-                  );
-
-                  filteredEmployees.forEach(emp => { 
-                %>
-            <label class="handover-item flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-200/40 cursor-pointer transition-all duration-150 group" data-name="<%= emp.employeeData.fullName.toLowerCase() %>">
-
-              <input type="radio" name="handoverUserId" value="<%= emp._id %>" <%=(leave && leave.handoverUserId && leave.handoverUserId.toString()===emp._id.toString()) ? 'checked' : '' %> class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-100 cursor-pointer accent-blue-600 transition-colors" />
-
+              const excludedOwners = ['rafika fitrianti', 'gusti diansyah'];
+              const filteredEmployees = employees.filter(emp => 
+                emp.employeeData && 
+                !excludedOwners.includes(emp.employeeData.fullName.toLowerCase())
+              );
+              filteredEmployees.forEach(emp => { 
+            %>
+            <label class="handover-item flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white border border-transparent hover:border-slate-200/40 cursor-pointer transition-colors group" data-name="<%= emp.employeeData.fullName.toLowerCase() %>">
+              <input type="radio" name="handoverUserId" value="<%= emp._id %>" <%=(leave && leave.handoverUserId && leave.handoverUserId.toString()===emp._id.toString()) ? 'checked' : '' %> class="w-3.5 h-3.5 text-slate-900 border-slate-300 focus:ring-0 cursor-pointer accent-slate-900 transition-colors shadow-3xs" />
               <div class="flex flex-col">
-                <span class="text-[13px] font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+                <span class="text-[12px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
                   <%= emp.employeeData.fullName %>
                 </span>
-                <span class="text-[10px] text-slate-400 font-medium">@<%= emp.username %></span>
+                <span class="text-[10px] text-slate-400 font-medium leading-none mt-0.5">@<%= emp.username %></span>
               </div>
             </label>
             <% }) %>
           </div>
 
           <p class="text-[11px] text-slate-400 pl-1 leading-normal">
-            Sistem memerlukan persetujuan dari rekan handover sebelum diteruskan ke alur otorisasi manajerial.
+            Sistem memerlukan konfirmasi persetujuan dari rekan handover terkait sebelum pengajuan diteruskan.
           </p>
         </div>
 
-        <!-- ALASAN CUTI -->
+        <!-- ALASAN / KETERANGAN -->
         <div class="space-y-1.5">
-          <label class="text-[13px] font-bold text-slate-700">
-            Alasan atau Keterangan Tambahan <span class="text-red-500">*</span>
+          <label class="text-[12px] font-bold text-slate-700 uppercase tracking-wide">
+            Alasan atau Keterangan Tambahan <span class="text-rose-500">*</span>
           </label>
-          <textarea name="reason" rows="4" placeholder="Jelaskan alasan pengajuan cuti Anda secara detail..." required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-800 outline-none resize-none transition-all
-           placeholder:text-[12.5px] placeholder:text-slate-400/80 placeholder:font-normal
-           focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400"><%= leave ? leave.reason : '' %></textarea>
+          <textarea name="reason" rows="3" placeholder="Jelaskan alasan pengajuan cuti Anda secara detail..." required class="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-3 text-[12.5px] text-slate-800 font-medium outline-none resize-none transition-colors placeholder:text-slate-400/80 focus:bg-white focus:border-slate-400 shadow-3xs"><%= leave ? leave.reason : '' %></textarea>
         </div>
-        <!-- ATTACHMENT -->
+
+        <!-- LAMPIRAN BERKAS / DROPZONE -->
         <div class="space-y-1.5">
-          <label class="block text-[13px] font-bold text-slate-700">
-            Surat Keterangan / Lampiran <span id="label-required-star" class="text-red-500 hidden">*</span>
-            <span id="label-optional-text" class="text-slate-400 font-normal ml-0.5">(Opsional)</span>
+          <label class="block text-[12px] font-bold text-slate-700 uppercase tracking-wide">
+            Surat Keterangan / Lampiran <span id="label-required-star" class="text-rose-500 hidden">*</span>
+            <span id="label-optional-text" class="text-slate-400 font-normal ml-0.5 lowercase">((opsional))</span>
           </label>
 
-          <div id="dropzone-empty" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'hidden' : 'relative' %> w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
+          <div id="dropzone-empty" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'hidden' : 'relative' %> w-full border border-slate-200 border-dashed rounded-xl p-6 bg-slate-50/20 hover:bg-slate-50 transition flex flex-col items-center justify-center text-center shadow-3xs">
             <input type="file" name="attachments" id="file-input" accept="image/*,.pdf,.docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
-            <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-slate-400 mb-1.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
             </svg>
-            <span class="text-[13px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
-            <span class="text-xs text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (maks 5MB)</span>
+            <span class="text-[12px] font-semibold text-slate-700">Pilih Berkas atau Tarik File Kemari</span>
+            <span class="text-[10.5px] text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (Maksimal 5MB)</span>
           </div>
 
-          <div id="dropzone-filled" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'flex' : 'hidden' %> items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
+          <div id="dropzone-filled" class="<%= (mode === 'EDIT' && leave.documentPath) ? 'flex' : 'hidden' %> items-center justify-between border border-slate-200/80 rounded-xl px-4 py-3 bg-white shadow-3xs">
             <div class="flex items-center gap-3 min-w-0 flex-1">
-              <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
+              <div class="w-9 h-9 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center shadow-3xs">
                 <% 
-                      let isImage = false;
-                      if (mode === 'EDIT' && leave.documentPath) {
-                        const ext = leave.documentPath.split('.').pop().toLowerCase();
-                        isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
-                      }
-                    %>
+                  let isImage = false;
+                  if (mode === 'EDIT' && leave.documentPath) {
+                    const ext = leave.documentPath.split('.').pop().toLowerCase();
+                    isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
+                  }
+                %>
                 <img id="img-preview" src="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '' %>" class="w-full h-full object-cover <%= isImage ? '' : 'hidden' %>" />
-                <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400 <%= isImage ? 'hidden' : '' %>" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg id="file-icon-fallback" class="w-4 h-4 text-slate-400 <%= isImage ? 'hidden' : '' %> stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>
               </div>
 
               <div class="min-w-0 flex-1">
-                <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
+                <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">
                   <%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath.split('/').pop() : 'file_name.jpg' %>
                 </div>
-                <div id="size-preview" class="text-xs text-slate-400 mt-0.5">
+                <div id="size-preview" class="text-[10.5px] text-slate-400 mt-0.5 font-medium">
                   <%= (mode === 'EDIT' && leave.documentPath) ? 'Berkas Tersimpan' : '0 KB' %>
                 </div>
               </div>
             </div>
 
-            <div class="flex items-center gap-2 ml-4 flex-shrink-0">
-              <a id="view-file-btn" href="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '#' %>" target="_blank" class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">View</a>
-              <button type="button" onclick="triggerChangeFile()" class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">Ganti File</button>
+            <div class="flex items-center gap-1.5 ml-4 flex-shrink-0">
+              <a id="view-file-btn" href="<%= (mode === 'EDIT' && leave.documentPath) ? leave.documentPath : '#' %>" target="_blank" class="h-7 text-[11px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 px-2.5 rounded-lg transition inline-flex items-center justify-center">Lihat</a>
+              <button type="button" onclick="triggerChangeFile()" class="h-7 text-[11px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 px-2.5 rounded-lg transition cursor-pointer">Ganti</button>
             </div>
           </div>
         </div>
 
-        <!-- BUTTON PANELS -->
-        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-          <a href="/leave/my-history" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
+        <!-- CRITICAL ACTION FOOTER PANELS -->
+        <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-2.5">
+          <a href="/leave/my-history" class="inline-flex items-center justify-center h-9 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl px-5 text-[11.5px] font-semibold transition-all active:scale-[0.99]">
             Batal
           </a>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
+          <button type="submit" class="bg-slate-900 hover:bg-black text-white h-9 px-6 rounded-xl text-[11.5px] font-semibold transition-all active:scale-[0.99] cursor-pointer shadow-3xs outline-none">
             <%= mode==='CREATE' ? 'Kirim Pengajuan' : (mode==='EDIT' ? 'Simpan Perubahan' : 'Kirim Ulang Form' ) %>
           </button>
         </div>
@@ -249,10 +238,10 @@
 
   </div>
 </div>
+
 <script>
   console.log("=== DEBUG LEAVE FORM INIT ===");
 
-  // Deklarasi Elemen Utama
   const startInput = document.getElementById('startDate');
   const endInput = document.getElementById('endDate');
   const totalInput = document.getElementById('totalDays');
@@ -264,11 +253,9 @@
   const employeeGender = "<%= employee && employee.jenis_kelamin ? employee.jenis_kelamin.toLowerCase() : '' %>";
   let currentFileUrl = null;
 
-  // --- 1. FUNGSI UTAMA HITUNG HARI KERJA (API BACKEND) ---
   async function calculateDays() {
     const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
 
-    // Jika cuti melahirkan, abaikan hitungan hari kerja biasa
     if (selectedLeaveType.includes('melahirkan')) {
       return;
     }
@@ -280,21 +267,18 @@
       try {
         if (displayDays) displayDays.innerText = "...";
         
-        // Sesuaikan endpoint API di bawah ini dengan route backend Anda yang benar (/api/leave/... atau /api/leaves/...)
         const response = await fetch(`/api/leave/calculate-days?startDate=${start}&endDate=${end}`);
         const data = await response.json();
 
         if (data.success) {
           const totalDays = data.totalDays;
           
-          // Update ke UI
           displayDays.innerText = totalDays;
           totalInput.value = totalDays;
 
-          // PROTEKSI JIKA HARI KERJA = 0 (WEEKEND / HARI LIBUR)
           if (totalDays === 0) {
-            startInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
-            endInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
+            startInput.classList.add('border-rose-500', 'focus:border-rose-500');
+            endInput.classList.add('border-rose-500', 'focus:border-rose-500');
             
             if (warningDiv) {
               warningDiv.textContent = "Tanggal yang Anda pilih adalah Hari Libur Resmi atau Akhir Pekan. Silahkan pilih tanggal lain.";
@@ -302,14 +286,11 @@
             }
             if (submitBtn) {
               submitBtn.disabled = true;
-              submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+              submitBtn.classList.add('opacity-40', 'cursor-not-allowed');
             }
           } else {
-            // Kondisi Normal (Hari Kerja > 0)
-            startInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
-            endInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-100');
-            
-            // Tetap jalankan validasi aturan H-7
+            startInput.classList.remove('border-rose-500', 'focus:border-rose-500');
+            endInput.classList.remove('border-rose-500', 'focus:border-rose-500');
             validateDateGap();
           }
         }
@@ -320,7 +301,6 @@
     }
   }
 
-  // --- 2. OTOMATISASI CUTI MELAHIRKAN (90 HARI KALENDER) ---
   function calculateMaternityDuration() {
     if (startInput.value) {
       const start = new Date(startInput.value);
@@ -331,16 +311,14 @@
       displayDays.innerText = 90;
       totalInput.value = 90;
       
-      // Reset status tombol jika cuti melahirkan
       if (warningDiv) warningDiv.classList.add('hidden');
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        submitBtn.classList.remove('opacity-40', 'cursor-not-allowed');
       }
     }
   }
 
-  // --- 3. VALIDASI ATURAN TANGGAL LAMPAU & MINIMAL H-7 ---
   function validateDateGap() {
     if (startInput.value === "") return;
 
@@ -350,7 +328,6 @@
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Cek Apakah Tanggal Lampau
     if (startDate < today) {
       if (warningDiv) {
         warningDiv.textContent = "Pengajuan cuti tidak boleh menggunakan tanggal masa lalu.";
@@ -358,12 +335,11 @@
       }
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.classList.add('opacity-40', 'cursor-not-allowed');
       }
       return; 
     }
 
-    // Cek Aturan Minimal 7 Hari
     const diffTime = startDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -373,20 +349,18 @@
         warningDiv.classList.remove('hidden');
       }
       if (submitBtn) {
-        // Jika kebijakan cuti sakit/darurat boleh bypass H-7, logic ini bisa Anda sesuaikan
         submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.classList.add('opacity-40', 'cursor-not-allowed');
       }
     } else {
       if (warningDiv) warningDiv.classList.add('hidden');
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        submitBtn.classList.remove('opacity-40', 'cursor-not-allowed');
       }
     }
   }
 
-  // --- 4. HANDLE PERUBAHAN JENIS CUTI ---
   function handleLeaveTypeChange(typeName) {
     const name = typeName.toLowerCase();
     const starLabel = document.getElementById('label-required-star');
@@ -418,7 +392,6 @@
     }
   }
 
-  // --- 5. EVENT LISTENERS INPUT TANGGAL ---
   startInput.addEventListener('change', () => {
     const selectedLeaveType = document.getElementById('leave-label').textContent.toLowerCase();
     if (selectedLeaveType.includes('melahirkan')) {
@@ -432,7 +405,6 @@
     calculateDays();
   });
 
-  // --- 6. UI DROPDOWN JENIS CUTI ---
   function toggleLeaveDropdown() {
     const menu = document.getElementById('leave-menu');
     const arrow = document.getElementById('leave-arrow');
@@ -466,7 +438,6 @@
     }
   });
 
-  // --- 7. FILE ATTACHMENT HANDLERS ---
   window.handleFileSelect = function(input) {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
@@ -506,7 +477,6 @@
     filledZone.classList.add('hidden');
   }
 
-  // --- 8. FILTER HANDOVER LIST ---
   window.filterHandoverList = function() {
     const searchInput = document.getElementById('handover-search').value.toLowerCase();
     const items = document.getElementsByClassName('handover-item');

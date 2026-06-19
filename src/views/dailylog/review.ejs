@@ -1,56 +1,74 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="bg-slate-50 min-h-screen antialiased font-sans lg: p-4 md:p-8 text-slate-800">
+<div class="bg-slate-50 min-h-screen antialiased font-sans p-4 md:p-8 text-slate-800">
   <div class="max-w-6xl mx-auto space-y-6">
 
-    <!-- Header Panel -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm shadow-slate-100/50">
-      <div>
-        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Review Aktivitas Harian</h1>
-        <p class="text-[12px] text-slate-500 mt-1">Pantau progres dan hasil kerja anggota tim Anda secara tersentralisasi.</p>
-      </div>
+   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm shadow-slate-100/50 select-none">
+  
+  <div class="flex items-center justify-between gap-3 w-full sm:w-auto">
+    <div>
+      <h1 class="text-xl font-bold text-slate-900 tracking-tight">Review Aktivitas Harian</h1>
+      <p class="text-[12px] text-slate-500 mt-1">Pantau progres dan hasil kerja anggota tim Anda secara tersentralisasi.</p>
+    </div>
+    
+    <a href="/daily-log" class="inline-flex sm:hidden items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold rounded-full shadow-sm shadow-blue-100 transition-all active:scale-95 cursor-pointer outline-none shrink-0 decoration-none">
+      <i class="fa-solid fa-plus text-[9px] text-blue-100"></i>
+      <span>Buat</span>
+    </a>
+  </div>
 
-      <div class="flex flex-col sm:flex-row items-center gap-4 border-t sm:border-0 pt-4 sm:pt-0 border-slate-100 w-full sm:w-auto">
-        <div class="w-full sm:w-auto">
-          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Bidang</label>
-          <select id="filter-bidang" onchange="loadReviewData()" class="w-full sm:w-48 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition">
-            <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'DIREKTUR_UTAMA') { %>
-              <option value="">Semua Bidang</option>
-            <% } %>
-            <% bidangs.forEach(b => { %>
-              <option value="<%= b._id %>"><%= b.name %></option>
-            <% }) %>
-          </select>
-        </div>
-
-        <div class="w-full sm:w-auto">
-          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</label>
-          <input type="date" id="filter-date" onchange="loadReviewData()" class="w-full sm:w-40 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition" />
-        </div>
-      </div>
+  <div class="flex flex-col sm:flex-row items-end sm:items-center gap-4 border-t sm:border-0 pt-4 sm:pt-0 border-slate-100 w-full sm:w-auto">
+    <div class="w-full sm:w-auto">
+      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Bidang</label>
+      <select id="filter-bidang" onchange="loadReviewData()" class="w-full sm:w-48 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition">
+        <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'DIREKTUR_UTAMA') { %>
+          <option value="">Semua Bidang</option>
+        <% } %>
+        <% bidangs.forEach(b => { %>
+          <option value="<%= b._id %>"><%= b.name %></option>
+        <% }) %>
+      </select>
     </div>
 
-    <!-- Table Container -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm shadow-slate-100/50 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50/70 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              <th class="py-4 px-5">Nama Pegawai</th>
-              <th class="py-4 px-5">Bidang Kerja</th>
-              <th class="py-4 px-5 text-center">Tugas Selesai</th>
-              <th class="py-4 px-5 text-center">Tugas Pending</th>
-              <th class="py-4 px-5 text-center w-32">Akumulasi KPI</th>
-              <th class="py-4 px-5 text-center w-24">Detail</th>
-            </tr>
-          </thead>
-          <tbody id="review-table-body" class="divide-y divide-slate-100">
-            <!-- Data will be injected here via JS -->
-          </tbody>
-        </table>
+    <div class="w-full sm:w-auto">
+      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</label>
+      <input type="date" id="filter-date" onchange="loadReviewData()" class="w-full sm:w-40 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition" />
+    </div>
+
+    <div class="w-full sm:w-auto pt-2 sm:pt-0">
+      <label class="hidden sm:block text-[10px] font-bold text-transparent mb-1">Aksi</label>
+      <a href="/daily-log" class="hidden sm:inline-flex items-center justify-center gap-1.5 h-9.5 px-4 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-bold rounded-xl shadow-sm shadow-blue-100 transition-all active:scale-95 cursor-pointer outline-none w-full sm:w-auto decoration-none">
+        <i class="fa-solid fa-plus text-[10px] text-blue-100"></i>
+        <span>Buat Jurnal</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+    <div>
+      <div class="hidden md:block bg-white border border-slate-200/80 rounded-2xl shadow-sm shadow-slate-100/50 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/70 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="py-4 px-5">Nama Pegawai</th>
+                <th class="py-4 px-5">Bidang Kerja</th>
+                <th class="py-4 px-5 text-center">Tugas Selesai</th>
+                <th class="py-4 px-5 text-center">Tugas Pending</th>
+                <th class="py-4 px-5 text-center w-32">Akumulasi KPI</th>
+                <th class="py-4 px-5 text-center w-24">Detail</th>
+              </tr>
+            </thead>
+            <tbody id="review-table-body" class="divide-y divide-slate-100">
+              </tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- Empty State -->
+      <div id="review-cards-mobile" class="grid grid-cols-1 gap-3.5 md:hidden">
+        </div>
+
       <div id="empty-state" class="hidden p-12 text-center max-w-sm mx-auto my-4">
         <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 mx-auto border border-slate-200/60 mb-3">
           <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,127 +81,233 @@
     </div>
 
   </div>
+</div>
 
-  <script>
-    // Inisialisasi Tanggal Hari Ini
-    const datePicker = document.getElementById('filter-date');
-    datePicker.value = new Date().toISOString().split('T')[0];
+<div id="bottomSheet" class="fixed inset-0 z-[150] hidden select-none" role="dialog" aria-modal="true">
+  <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity duration-300" onclick="closeBottomSheet()"></div>
+  <div class="absolute bottom-0 inset-x-0 mx-3 mb-18 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col max-h-[75vh] transform translate-y-full transition-transform duration-300 ease-out" id="bottomSheetContent">
+    <div class="w-full flex justify-center py-3 shrink-0" onclick="closeBottomSheet()">
+      <div class="w-12 h-1.5 bg-slate-200 rounded-full cursor-pointer"></div>
+    </div>
+    
+    <div class="px-5 pb-3 border-b border-slate-100 shrink-0">
+      <h3 class="text-[14px] font-bold text-slate-900" id="sheet-employee-name">-</h3>
+      <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-0.5" id="sheet-employee-bidang">-</p>
+    </div>
+    
+    <div class="p-5 overflow-y-auto space-y-3 flex-1 pb-8" id="sheet-logs-body">
+      </div>
+  </div>
+</div>
 
-    async function loadReviewData() {
-      const date = datePicker.value;
-      const bidang = document.getElementById('filter-bidang').value;
-      
-      const tbody = document.getElementById('review-table-body');
-      const emptyState = document.getElementById('empty-state');
-      
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-xs text-slate-400">Memuat data...</td></tr>`;
+<script>
+  // Simpan data mentah dari API untuk dipanggil bottom sheet secara lokal tanpa hit API ulang
+  let currentFetchedData = [];
 
-      try {
-        const response = await fetch(`/daily-log/api/review-data?tanggal=${date}&bidangId=${bidang}`);
-        const result = await response.json();
+  const datePicker = document.getElementById('filter-date');
+  datePicker.value = new Date().toISOString().split('T')[0];
 
-        if (result.success) {
-          renderTable(result.data, tbody, emptyState);
-        }
-      } catch (err) {
-        console.error(err);
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-xs text-rose-500">Gagal memuat data</td></tr>`;
+  async function loadReviewData() {
+    const date = datePicker.value;
+    const bidang = document.getElementById('filter-bidang').value;
+    
+    const tbody = document.getElementById('review-table-body');
+    const mobileContainer = document.getElementById('review-cards-mobile');
+    const emptyState = document.getElementById('empty-state');
+    
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-xs text-slate-400">Memuat data...</td></tr>`;
+    mobileContainer.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">Memuat data...</div>`;
+    emptyState.classList.add('hidden');
+
+    try {
+      const response = await fetch(`/daily-log/api/review-data?tanggal=${date}&bidangId=${bidang}`);
+      const result = await response.json();
+
+      if (result.success) {
+        currentFetchedData = result.data || [];
+        renderResponsiveData(currentFetchedData, tbody, mobileContainer, emptyState);
       }
+    } catch (err) {
+      console.error(err);
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-xs text-rose-500">Gagal memuat data</td></tr>`;
+      mobileContainer.innerHTML = `<div class="text-center py-8 text-xs text-rose-500">Gagal memuat data</div>`;
     }
+  }
 
-    function renderTable(data, tbody, emptyState) {
-      tbody.innerHTML = "";
-      
-      // Filter karyawan yang punya setidaknya 1 task ATAU tampilkan semua? (Pilih tampilkan semua karyawan di bidang itu)
-      if (!data || data.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
+  function renderResponsiveData(data, tbody, mobileContainer, emptyState) {
+    tbody.innerHTML = "";
+    mobileContainer.innerHTML = "";
+    
+    if (!data || data.length === 0) {
+      emptyState.classList.remove('hidden');
+      return;
+    }
+    emptyState.classList.add('hidden');
+
+    data.forEach(emp => {
+      // 1. Logika Penentuan Warna KPI
+      let kpiColor = "bg-rose-500";
+      if (emp.kpiPercentage >= 80) kpiColor = "bg-emerald-500";
+      else if (emp.kpiPercentage >= 50) kpiColor = "bg-amber-500";
+      else if (emp.kpiPercentage > 0) kpiColor = "bg-blue-500";
+
+      // ==========================================
+      // RENDERING KODE VERSION DESKTOP TABLE ROW
+      // ==========================================
+      let logsHTML = "";
+      if (emp.logs.length === 0) {
+        logsHTML = `<div class="text-[11px] text-slate-400 italic py-2">Pegawai ini tidak mengerjakan aktivitas apapun hari ini.</div>`;
+      } else {
+        emp.logs.forEach(log => {
+          let statusColor = log.status === 'Completed' ? 'text-emerald-600 bg-emerald-50' : (log.status === 'Pending' ? 'text-amber-600 bg-amber-50' : 'text-slate-500 bg-slate-50');
+          const kpiName = log.kpiTemplateId?.indikator || "Lainnya (Non-KPI)";
+          logsHTML += `
+            <div class="flex items-start justify-between gap-4 p-3 border border-slate-100 rounded-xl mb-2 bg-white">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-slate-200/60 ${statusColor}">${log.status}</span>
+                  <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded truncate max-w-[150px]">${kpiName}</span>
+                </div>
+                <p class="text-[12.5px] font-semibold text-slate-800">${log.judul}</p>
+                ${log.penjelasanHasil ? `<p class="text-[11px] text-slate-500 italic mt-0.5">Hasil: ${log.penjelasanHasil}</p>` : ''}
+              </div>
+              ${log.fileLampiran ? `
+                <a href="/uploads/files/${log.fileLampiran}" target="_blank" class="text-[10px] font-bold text-slate-600 hover:text-blue-600 hover:bg-blue-50 bg-slate-100 px-3 py-1.5 rounded-lg transition whitespace-nowrap">📎 Buka Bukti</a>
+              ` : ''}
+            </div>
+          `;
+        });
       }
-      emptyState.classList.add('hidden');
 
-      data.forEach(emp => {
-        // Tentukan warna bar progress KPI
-        let kpiColor = "bg-rose-500";
-        if (emp.kpiPercentage >= 80) kpiColor = "bg-emerald-500";
-        else if (emp.kpiPercentage >= 50) kpiColor = "bg-amber-500";
-        else if (emp.kpiPercentage > 0) kpiColor = "bg-blue-500";
+      const tableRow = `
+        <tr class="hover:bg-slate-50/40 transition-colors border-b border-slate-100">
+          <td class="py-4 px-5"><p class="text-[13px] font-semibold text-slate-800">${emp.fullName}</p></td>
+          <td class="py-4 px-5"><span class="text-[11px] font-medium text-slate-600 border border-slate-200 bg-slate-50 px-2.5 py-1 rounded-lg">${emp.bidang}</span></td>
+          <td class="py-4 px-5 text-center"><span class="text-[13px] font-bold text-emerald-600">${emp.completedTasks}</span> <span class="text-[11px] text-slate-400">Tugas</span></td>
+          <td class="py-4 px-5 text-center"><span class="text-[13px] font-bold text-amber-500">${emp.pendingTasks}</span> <span class="text-[11px] text-slate-400">Tugas</span></td>
+          <td class="py-4 px-5">
+            <div class="flex items-center gap-3">
+              <div class="w-full bg-slate-100 rounded-full h-1.5"><div class="${kpiColor} h-1.5 rounded-full" style="width: ${emp.kpiPercentage}%"></div></div>
+              <span class="text-[11.5px] font-bold text-slate-700 w-8 text-right">${emp.kpiPercentage}%</span>
+            </div>
+          </td>
+          <td class="py-4 px-5 text-center">
+            <button onclick="toggleExpand('detail-${emp._id}')" class="text-[11.5px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Rincian</button>
+          </td>
+        </tr>
+        <tr id="detail-${emp._id}" class="hidden bg-slate-50/40 shadow-inner">
+          <td colspan="6" class="p-4 border-b border-slate-200"><div class="max-w-4xl mx-auto"><h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Rincian Laporan Kerja</h4>${logsHTML}</div></td>
+        </tr>
+      `;
+      tbody.insertAdjacentHTML('beforeend', tableRow);
 
-        // Generate Rincian Tugas untuk Row Expandable
-        let logsHTML = "";
-        if (emp.logs.length === 0) {
-          logsHTML = `<div class="text-[11px] text-slate-400 italic py-2">Pegawai ini tidak mengerjakan aktivitas apapun hari ini.</div>`;
-        } else {
-          emp.logs.forEach(log => {
-            let statusColor = log.status === 'Completed' ? 'text-emerald-600 bg-emerald-50' : (log.status === 'Pending' ? 'text-amber-600 bg-amber-50' : 'text-slate-500 bg-slate-50');
-            const kpiName = log.kpiTemplateId?.indikator || "Lainnya (Non-KPI)";
-            
-            logsHTML += `
-              <div class="flex items-start justify-between gap-4 p-3 border border-slate-100 rounded-xl mb-2 bg-white">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-slate-200/60 ${statusColor}">${log.status}</span>
-                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded truncate max-w-[150px]">${kpiName}</span>
-                  </div>
-                  <p class="text-[12.5px] font-semibold text-slate-800">${log.judul}</p>
-                  ${log.penjelasanHasil ? `<p class="text-[11px] text-slate-500 italic mt-0.5">Hasil: ${log.penjelasanHasil}</p>` : ''}
-                </div>
-                ${log.fileLampiran ? `
-                  <a href="/uploads/files/${log.fileLampiran}" target="_blank" class="text-[10px] font-bold text-slate-600 hover:text-blue-600 hover:bg-blue-50 bg-slate-100 px-3 py-1.5 rounded-lg transition whitespace-nowrap">📎 Buka Bukti</a>
-                ` : ''}
-              </div>
-            `;
-          });
-        }
+      // ==========================================
+      // RENDERING KODE VERSION MOBILE CARD VIEW
+      // ==========================================
+      const mobileCard = `
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-4 shadow-xs space-y-4">
+          <div class="flex items-start justify-between min-w-0">
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[13.5px] font-bold text-slate-800 truncate">${emp.fullName}</h3>
+              <span class="inline-flex mt-1.5 px-2 py-0.5 rounded-md bg-slate-50 border border-slate-200 text-[10px] font-medium text-slate-500">${emp.bidang}</span>
+            </div>
+            <div class="text-right shrink-0 ml-2">
+              <p class="text-[18px] font-extrabold text-slate-800 tracking-tight">${emp.kpiPercentage}%</p>
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">KPI</p>
+            </div>
+          </div>
 
-        const rowHTML = `
-          <tr class="hover:bg-slate-50/40 transition-colors border-b border-slate-100">
-            <td class="py-4 px-5">
-              <p class="text-[13px] font-semibold text-slate-800">${emp.fullName}</p>
-            </td>
-            <td class="py-4 px-5">
-              <span class="text-[11px] font-medium text-slate-600 border border-slate-200 bg-slate-50 px-2.5 py-1 rounded-lg">${emp.bidang}</span>
-            </td>
-            <td class="py-4 px-5 text-center">
-              <span class="text-[13px] font-bold text-emerald-600">${emp.completedTasks}</span> <span class="text-[11px] text-slate-400">Tugas</span>
-            </td>
-            <td class="py-4 px-5 text-center">
-              <span class="text-[13px] font-bold text-amber-500">${emp.pendingTasks}</span> <span class="text-[11px] text-slate-400">Tugas</span>
-            </td>
-            <td class="py-4 px-5">
-              <div class="flex items-center gap-3">
-                <div class="w-full bg-slate-100 rounded-full h-1.5">
-                  <div class="${kpiColor} h-1.5 rounded-full" style="width: ${emp.kpiPercentage}%"></div>
-                </div>
-                <span class="text-[11.5px] font-bold text-slate-700 w-8 text-right">${emp.kpiPercentage}%</span>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="text-slate-500 font-medium">✓ Tugas Selesai</span>
+              <span class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">${emp.completedTasks} Tugas</span>
+            </div>
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="text-slate-500 font-medium">⏳ Tugas Pending</span>
+              <span class="font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">${emp.pendingTasks} Tugas</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-1.5 pt-0">
+              <div class="${kpiColor} h-1.5 rounded-full transition-all" style="width: ${emp.kpiPercentage}%"></div>
+            </div>
+          </div>
+
+          <button onclick="openBottomSheet('${emp._id}')" class="w-full h-9 bg-blue-500 hover:bg-blue-700 active:scale-[0.98] text-white text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-sm outline-none">
+            LIHAT RINCIAN
+          </button>
+        </div>
+      `;
+      mobileContainer.insertAdjacentHTML('beforeend', mobileCard);
+    });
+  }
+
+  // DESKTOP ONLY LOGIC: EXPAND TABLE ROW
+  function toggleExpand(id) {
+    const row = document.getElementById(id);
+    if(row) row.classList.toggle('hidden');
+  }
+
+  // MOBILE ONLY LOGIC: BOTTOM SHEET INTERACTION
+  function openBottomSheet(employeeId) {
+    const emp = currentFetchedData.find(item => item._id === employeeId);
+    if (!emp) return;
+
+    // Set Info Kepala Sheet
+    document.getElementById('sheet-employee-name').innerText = emp.fullName;
+    document.getElementById('sheet-employee-bidang').innerText = emp.bidang;
+
+    // Render List Log ke dalam Sheet Body
+    const container = document.getElementById('sheet-logs-body');
+    container.innerHTML = "";
+
+    if (emp.logs.length === 0) {
+      container.innerHTML = `<div class="text-[12px] text-slate-400 italic text-center py-6">Pegawai ini belum mengisi aktivitas kerja hari ini.</div>`;
+    } else {
+      emp.logs.forEach(log => {
+        let statusClass = log.status === 'Completed' ? 'text-emerald-600 bg-emerald-50' : (log.status === 'Pending' ? 'text-amber-600 bg-amber-50' : 'text-slate-500 bg-slate-50');
+        const indicator = log.kpiTemplateId?.indikator || "Non-KPI (Aktivitas Umum)";
+        
+        const block = `
+          <div class="p-3.5 border border-slate-100 bg-slate-50/50 rounded-xl space-y-2">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-slate-200/50 ${statusClass}">${log.status}</span>
+              <span class="text-[9.5px] font-bold text-blue-600 max-w-[180px] truncate">${indicator}</span>
+            </div>
+            <div>
+              <h4 class="text-[12px] font-bold text-slate-800 leading-snug">${log.judul}</h4>
+              ${log.penjelasanHasil ? `<p class="text-[11px] text-slate-500 bg-white border border-slate-100 p-2 rounded-lg italic mt-1.5">Hasil: ${log.penjelasanHasil}</p>` : ''}
+            </div>
+            ${log.fileLampiran ? `
+              <div class="pt-1">
+                <a href="/uploads/files/${log.fileLampiran}" target="_blank" class="inline-flex items-center justify-center text-[10px] font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:text-blue-600 w-full transition">📎 Buka Lampiran Bukti</a>
               </div>
-            </td>
-            <td class="py-4 px-5 text-center">
-              <button onclick="toggleExpand('detail-${emp._id}')" class="text-[11.5px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Rincian</button>
-            </td>
-          </tr>
-          <tr id="detail-${emp._id}" class="hidden bg-slate-50/40 shadow-inner">
-            <td colspan="6" class="p-4 border-b border-slate-200">
-              <div class="max-w-4xl mx-auto">
-                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Rincian Laporan Kerja</h4>
-                ${logsHTML}
-              </div>
-            </td>
-          </tr>
+            ` : ''}
+          </div>
         `;
-        tbody.insertAdjacentHTML('beforeend', rowHTML);
+        container.insertAdjacentHTML('beforeend', block);
       });
     }
 
-    function toggleExpand(id) {
-      const row = document.getElementById(id);
-      if (row.classList.contains('hidden')) {
-        row.classList.remove('hidden');
-      } else {
-        row.classList.add('hidden');
-      }
-    }
+    // Munculkan Struktur Elemen DOM Sheet
+    const sheet = document.getElementById('bottomSheet');
+    const content = document.getElementById('bottomSheetContent');
+    
+    sheet.classList.remove('hidden');
+    setTimeout(() => {
+      content.classList.remove('translate-y-full');
+    }, 10);
+  }
 
-    // Load data saat halaman pertama kali dibuka
-    window.onload = loadReviewData;
-  </script>
-</div>
+ function closeBottomSheet() {
+  const sheet = document.getElementById('bottomSheet');
+  const content = document.getElementById('bottomSheetContent');
+  
+  // Menggunakan 120% untuk memastikan sheet benar-benar tenggelam di bawah navigasi saat ditutup
+  content.style.transform = 'translateY(120%)'; 
+  setTimeout(() => {
+    sheet.classList.add('hidden');
+    content.style.transform = ''; // Reset inline style
+  }, 250);
+}
+
+  window.onload = loadReviewData;
+</script>

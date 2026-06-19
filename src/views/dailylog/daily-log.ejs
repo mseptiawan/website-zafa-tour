@@ -1,113 +1,109 @@
 <%- layout('layouts/main', { title }) %>
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] px-4 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-none mx-auto mt-4 md:mt-0 space-y-4 md:space-y-6">
 
-  <div class="bg-slate-50 min-h-screen antialiased font-sans lg: p-4 md:p-8 text-slate-800">
-    <div class="max-w-5xl mx-auto space-y-6">
-
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm shadow-slate-100/50">
-        <div>
-          <h1 class="text-xl font-bold text-slate-900 tracking-tight">Daily Activity Log</h1>
-          <p class="text-[12px] text-slate-500 mt-1">Selamat bekerja, <%= user.fullName %>! Kelola log aktivitas harian Anda dengan ringkas.</p>
-        </div>
-
-        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-0 pt-4 sm:pt-0 border-slate-100">
-          <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tanggal</label>
-          <input type="date" id="log-date"
-            class="bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2 text-[13px] font-semibold text-slate-700 outline-none focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 transition transition-all duration-200 cursor-pointer w-full sm:w-auto min-w-[160px] shadow-xs" />
-        </div>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/60 p-4 sm:p-5 rounded-xl md:rounded-2xl shadow-3xs">
+      <div>
+        <h1 class="text-sm sm:text-base font-medium tracking-tight text-slate-900">Daily Activity Log</h1>
+        <p class="text-[11px] sm:text-[11.5px] text-slate-400 mt-0.5">Kelola log aktivitas harian Anda dengan ringkas.</p>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-slate-200/80 p-4 rounded-2xl shadow-sm shadow-slate-100/50">
-        <div class="flex items-center gap-2.5 pl-1">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-          </span>
-          <span id="date-status" class="text-[12.5px] font-semibold text-slate-600">Memuat data lembar kerja...</span>
-        </div>
+      <div class="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-0 pt-3 sm:pt-0 border-slate-100 w-full sm:w-auto">
+        <label class="text-[10px] font-medium text-slate-400 uppercase tracking-wider select-none">Tanggal</label>
+        <input type="date" id="log-date"
+          class="bg-slate-50 border border-slate-200 rounded-xl px-3 h-8.5 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition-colors cursor-pointer w-full sm:w-auto min-w-[150px] shadow-3xs" />
+      </div>
+    </div>
 
-        <button type="button" id="btn-carry-over" onclick="executeCarryOver()"
-          class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 py-2.5 text-[12px] font-semibold transition transition-all active:scale-[0.97] shadow-sm shadow-blue-100 cursor-pointer">
-          <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.656 48.656 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l-3 3m3-3l3 3" />
-          </svg>
-          Salin Tugas Pending Kemarin
-        </button>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white border border-slate-200/60 p-3.5 rounded-xl shadow-3xs">
+      <div class="flex items-center gap-2 pl-1">
+        <span class="relative flex h-1.5 w-1.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-slate-900"></span>
+        </span>
+        <span id="date-status" class="text-[11.5px] font-semibold text-slate-600">Memuat lembar kerja...</span>
       </div>
 
-      <div id="container-form-add" class="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm shadow-slate-100/50">
-        <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <div class="flex items-center justify-center w-6 h-6 rounded-lg bg-blue-50 text-blue-600">
-            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-          </div>
-          Tambah Aktivitas Baru
-        </h2>
+      <button type="button" id="btn-carry-over" onclick="executeCarryOver()"
+        class="hidden w-full sm:w-auto h-8 inline-flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg px-3 text-[11px] font-medium transition-all active:scale-[0.99] shadow-3xs cursor-pointer outline-none">
+        <i class="fa-solid fa-rotate text-[10px] text-slate-400"></i>
+        Salin Tugas Pending
+      </button>
+    </div>
 
-        <form id="form-create-activity" onsubmit="submitFormCreate(event)" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-          <div class="md:col-span-6">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Judul Aktivitas / Tugas</label>
-            <input type="text" id="add-judul" name="judul" placeholder="Contoh: Rekap data bulanan" required
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] font-medium text-slate-800 outline-none focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 transition transition-all duration-200" />
-          </div>
+    <div id="container-form-add" class="bg-white border border-slate-200/60 p-4 rounded-xl md:rounded-2xl shadow-3xs">
+      <h2 class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-1.5 select-none">
+        <div class="flex items-center justify-center w-5 h-5 rounded-md bg-slate-50 border border-slate-200/60 text-slate-800 shadow-3xs">
+          <i class="fa-solid fa-plus text-[9px]"></i>
+        </div>
+        Aktivitas Baru
+      </h2>
 
-          <div class="md:col-span-3">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Target KPI</label>
-            <div class="relative">
-              <select id="add-kpiTemplateId" name="kpiTemplateId" required
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] font-medium text-slate-700 outline-none focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 transition transition-all duration-200 appearance-none cursor-pointer">
-                <% initialKpis.forEach(kpi => { %>
-                  <option value="<%= kpi._id %>"><%= kpi.indikator %></option>
-                <% }) %>
-                <option value="lainnya">Lainnya (Aktivitas Non-KPI)</option>
-              </select>
-              <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-              </div>
+      <form id="form-create-activity" onsubmit="submitFormCreate(event)" class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-end">
+        <div class="md:col-span-6">
+          <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1 ml-0.5">Judul Aktivitas</label>
+          <input type="text" id="add-judul" name="judul" placeholder="Contoh: Rekap data bulanan penjualan" required
+            class="w-full h-9 md:h-10 bg-slate-50 border border-slate-200/80 rounded-xl px-3 text-[12px] md:text-[12.5px] font-semibold text-slate-800 placeholder-slate-400/70 outline-none focus:bg-white focus:border-slate-400 transition-colors shadow-3xs" />
+        </div>
+
+        <div class="md:col-span-3">
+          <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1 ml-0.5">Target KPI</label>
+          <div class="relative">
+            <select id="add-kpiTemplateId" name="kpiTemplateId" required
+              class="w-full h-9 md:h-10 bg-slate-50 border border-slate-200/80 rounded-xl pl-3 pr-8 text-[12px] md:text-[12.5px] font-semibold text-slate-700 outline-none focus:bg-white focus:border-slate-400 transition-colors appearance-none cursor-pointer shadow-3xs">
+              <% initialKpis.forEach(kpi => { %>
+                <option value="<%= kpi._id %>"><%= kpi.indikator %></option>
+              <% }) %>
+              <option value="lainnya">Lainnya (Non-KPI)</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
             </div>
           </div>
-
-          <div class="md:col-span-3">
-            <button type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[12.5px] px-5 py-2.5 rounded-xl transition transition-all duration-150 active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm shadow-blue-100 cursor-pointer h-[42px]">
-              Simpan Aktivitas
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm shadow-slate-100/50 overflow-hidden">
-        <div class="hidden md:block overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50/70 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="py-4 px-5 w-36 text-center">Status</th>
-                <th class="py-4 px-5 w-48">Target KPI</th>
-                <th class="py-4 px-5">Judul Aktivitas / Tugas</th>
-                <th class="py-4 px-5 w-48">Lampiran Bukti</th>
-                <th class="py-4 px-5 w-16 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="task-table-body" class="divide-y divide-slate-100">
-            </tbody>
-          </table>
         </div>
 
-        <div id="task-mobile-list" class="block md:hidden divide-y divide-slate-100">
+        <div class="md:col-span-3 w-full">
+          <button type="submit"
+            class="w-full h-9 md:h-10 bg-blue-500 hover:bg-blue-700 text-white font-medium text-[11px] md:text-[11.5px] rounded-xl transition-all active:scale-[0.99] flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer outline-none">
+            <i class="fa-solid fa-floppy-disk text-[10px]"></i>
+            Simpan Aktivitas
+          </button>
         </div>
-
-        <div id="empty-state" class="hidden p-12 text-center max-w-sm mx-auto my-4">
-          <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 mx-auto border border-slate-200/60 mb-3">
-            <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 2.24l-.4 2.055a2.25 2.25 0 001.542 2.58l.107.031" />
-            </svg>
-          </div>
-          <p class="text-[13px] font-bold text-slate-700">Tidak ada aktivitas harian</p>
-          <p class="text-[11.5px] text-slate-400 mt-0.5">Silakan tambahkan agenda aktivitas baru melalui kolom form di atas.</p>
-        </div>
-      </div>
-
+      </form>
     </div>
+
+    <div class="bg-white border border-slate-200/60 rounded-xl md:rounded-2xl shadow-3xs overflow-hidden w-full">
+      
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200/60 text-[10.5px] font-medium text-slate-400 uppercase tracking-wider select-none">
+              <th class="py-3.5 px-5 w-36 text-center">Status</th>
+              <th class="py-3.5 px-5 w-52">Target KPI</th>
+              <th class="py-3.5 px-5">Judul Aktivitas / Tugas</th>
+              <th class="py-3.5 px-5 w-56">Lampiran Bukti</th>
+              <th class="py-3.5 px-5 w-16 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="task-table-body" class="divide-y divide-slate-100">
+            </tbody>
+        </table>
+      </div>
+
+      <div id="task-mobile-list" class="block md:hidden divide-y divide-slate-100">
+        </div>
+
+      <div id="empty-state" class="hidden py-14 text-center max-w-sm mx-auto px-4">
+        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/60 text-slate-400 mx-auto mb-2.5 shadow-3xs">
+          <i class="fa-solid fa-list-check text-xs"></i>
+        </div>
+        <p class="text-[12px] font-semibold text-slate-700">Tidak ada aktivitas harian</p>
+        <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">Silakan tambahkan agenda aktivitas baru melalui kolom form di atas.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
 
     <script>
       const todayStr = new Date().toISOString().split('T')[0];
@@ -182,11 +178,11 @@ kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>La
           const formInnerHTML = `
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div class="sm:col-span-2">
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Judul Tugas</label>
+              <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Judul Tugas</label>
               <input type="text" name="judul" value="${task.judul}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[12.5px] font-medium text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition" required />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Target KPI</label>
+              <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Target KPI</label>
               <div class="relative">
                 <select name="kpiTemplateId" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[12.5px] font-medium text-slate-600 outline-none focus:bg-white focus:border-slate-400 transition appearance-none cursor-pointer" required>
                   ${kpiOptionsHTML}
@@ -197,9 +193,9 @@ kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>La
               </div>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Status Kerja</label>
+              <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Status Kerja</label>
               <div class="relative">
-                <select name="status" class="w-full border rounded-xl px-3.5 py-2 text-[11px] font-bold ${statusStyles[task.status]} outline-none focus:bg-white focus:border-slate-400 transition appearance-none cursor-pointer">
+                <select name="status" class="w-full border rounded-xl px-3.5 py-2 text-[11px] font-medium ${statusStyles[task.status]} outline-none focus:bg-white focus:border-slate-400 transition appearance-none cursor-pointer">
                   <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
                   <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                   <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
@@ -212,16 +208,16 @@ kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>La
             </div>
           </div>
           <div class="pt-1">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Penjelasan Hasil / Kendala Kerja</label>
-            <textarea name="penjelasanHasil" rows="2" placeholder="Tulis rincian hasil pengerjaan atau kendala lapangan di sini..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[12.5px] font-medium text-slate-700 outline-none resize-none focus:bg-white focus:border-slate-400 transition">${task.penjelasanHasil || ''}</textarea>
+            <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Penjelasan Hasil / Kendala Kerja</label>
+            <textarea name="penjelasanHasil" rows="2" placeholder="Tulis rincian hasil pengerjaan atau kendala lapangan di sini..." class="w-full bg-slate-50 border border-slate-200 placeholder:text-[11.5px] rounded-xl px-3.5 py-2 text-[12.5px] font-medium text-slate-700 outline-none resize-none focus:bg-white focus:border-slate-400 transition">${task.penjelasanHasil || ''}</textarea>
           </div>
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-slate-100">
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Lampiran Bukti</label>
+              <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Lampiran Bukti</label>
               ${task.fileLampiran ? `
                 <div id="file-status-container-${task._id}" class="flex items-center gap-2">
                   <span class="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg truncate max-w-[180px]">📎 ${task.fileLampiran}</span>
-                  <button type="button" onclick="switchToEditFile('${task._id}')" class="text-[10px] font-bold text-slate-600 hover:text-slate-900 bg-slate-100/80 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 transition cursor-pointer">Ubah</button>
+                  <button type="button" onclick="switchToEditFile('${task._id}')" class="text-[10px] font-medium text-slate-600 hover:text-slate-900 bg-slate-100/80 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 transition cursor-pointer">Ubah</button>
                 </div>
                 <input type="file" id="input-file-${task._id}" name="attachment" class="hidden text-[11.5px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border file:border-slate-200 file:bg-white file:text-[11px] file:font-semibold cursor-pointer" />
               ` : `
@@ -239,7 +235,7 @@ kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>La
           <tr class="hover:bg-slate-50/40 transition-colors group border-b border-slate-100 last:border-0" id="row-view-${task._id}">
             <td class="py-3.5 px-5 text-center whitespace-nowrap">
               <div class="relative inline-block w-[115px]">
-                <select onchange="quickUpdateStatus('${task._id}', this.value)" class="w-full text-[10px] font-bold rounded-full px-2.5 py-1 outline-none border cursor-pointer transition appearance-none text-center tracking-wide ${statusStyles[task.status]}">
+                <select onchange="quickUpdateStatus('${task._id}', this.value)" class="w-full text-[10px] font-medium rounded-full px-2.5 py-1 outline-none border cursor-pointer transition appearance-none text-center tracking-wide ${statusStyles[task.status]}">
                   <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
                   <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                   <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
@@ -248,7 +244,7 @@ kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>La
               </div>
             </td>
             <td class="py-3.5 px-5">
-              <span class="text-[10px] font-bold text-blue-600 bg-blue-50/60 border-blue-200/40 px-2.5 py-0.5 rounded-full border tracking-wide block truncate max-w-[180px]" title="${currentKpiName}">
+              <span class="text-[10px] font-medium text-blue-600 bg-blue-50/60 border-blue-200/40 px-2.5 py-0.5 rounded-full border tracking-wide block truncate max-w-[180px]" title="${currentKpiName}">
                 ${currentKpiName}
               </span>
             </td>
@@ -287,7 +283,7 @@ kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>La
           <div class="p-4 space-y-3.5 bg-white transition-colors" id="mobile-card-${task._id}">
             <div class="flex items-start justify-between gap-3">
               <div class="space-y-1.5 flex-1 min-w-0">
-                <span class="text-[9px] font-bold text-blue-600 bg-blue-50 border-blue-200/40 px-2 py-0.5 rounded-full border tracking-wide inline-block truncate max-w-[200px]" title="${currentKpiName}">
+                <span class="text-[9px] font-medium text-blue-600 bg-blue-50 border-blue-200/40 px-2 py-0.5 rounded-full border tracking-wide inline-block truncate max-w-[200px]" title="${currentKpiName}">
                   ${currentKpiName}
                 </span>
                 <h3 class="${titleStyle} pt-0.5 break-words">${task.judul}</h3>
@@ -299,7 +295,7 @@ kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>La
             </div>
             <div class="flex items-center justify-between gap-4 pt-2 border-t border-slate-100/80">
               <div class="relative w-[115px]">
-                <select onchange="quickUpdateStatus('${task._id}', this.value)" class="w-full text-[10px] font-bold rounded-full px-2.5 py-1.5 outline-none border cursor-pointer text-center tracking-wide appearance-none ${statusStyles[task.status]}">
+                <select onchange="quickUpdateStatus('${task._id}', this.value)" class="w-full text-[10px] font-medium rounded-full px-2.5 py-1.5 outline-none border cursor-pointer text-center tracking-wide appearance-none ${statusStyles[task.status]}">
                   <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
                   <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                   <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>

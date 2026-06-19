@@ -1,17 +1,23 @@
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-<%= items.length %> gap-5">
+<div class="grid grid-cols-3 gap-1.5 sm:gap-3 md:gap-5 w-full select-none">
   <% items.forEach(item => { %>
-    <div class="<%= item.bgClass || 'bg-white border-slate-200/60' %> border rounded-2xl p-5 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
-      <div class="space-y-1">
-        <span class="text-[11px] font-bold <%= item.labelClass || 'text-slate-400' %> uppercase tracking-wider block">
+    
+    <div class="bg-white rounded-xl md:rounded-2xl p-2 md:p-5 flex items-center justify-between shadow-sm border border-slate-100/50 w-full min-w-0">
+      
+      <div class="space-y-0.5 md:space-y-1 min-w-0 flex-1">
+        <span class="text-[8.5px] sm:text-[11px] md:text-[12px] font-bold <%= item.labelClass || 'text-slate-400' %> uppercase tracking-wider block whitespace-normal break-words leading-tight md:truncate">
           <%= item.label %>
         </span>
-        <span class="text-2xl font-bold <%= item.valueClass || 'text-slate-900' %> tracking-tight tabular-nums block">
-          <%= item.value %> <span class="text-xs font-medium <%= item.unitClass || 'text-slate-500' %>"><%= item.unit %></span>
+        
+        <span class="text-sm sm:text-base md:text-2xl font-bold <%= item.valueClass || 'text-slate-900' %> tracking-tight tabular-nums block truncate">
+          <%= item.value %> <span class="text-[8px] sm:text-[9.5px] md:text-xs font-semibold <%= item.unitClass || 'text-slate-500' %> inline-block"><%= item.unit %></span>
         </span>
       </div>
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center border <%= item.iconBoxClass || 'bg-slate-50 text-slate-600 border-slate-100' %>">
+
+      <div class="hidden md:flex w-10 h-10 rounded-xl items-center justify-center <%= item.iconBoxClass || 'bg-slate-50 text-slate-600' %> shrink-0 ml-2">
         <i class="<%= item.icon %> text-sm"></i>
       </div>
+
     </div>
+
   <% }) %>
 </div>

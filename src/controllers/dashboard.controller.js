@@ -7,7 +7,7 @@ import Announcement from "../models/Announcement.model.js";
 
 export const index = async (req, res, next) => {
   try {
-    console.log("DASHBOARD HIT");
+    console.log("debug");
     const user = req.session.user;
     if (!user) {
       return res.redirect("/?error=SESSION_EXPIRED");
@@ -60,10 +60,15 @@ export const index = async (req, res, next) => {
     return res.render("dashboard/main", {
       title: "Dashboard",
       user,
+      moment,
 
       attendance: attendanceToday,
       already: !!attendanceToday,
       hasCheckedOut: !!attendanceToday?.checkOut,
+      checkInTimeStr:
+        attendanceToday && attendanceToday.checkIn
+          ? moment(attendanceToday.checkIn).format("HH:mm")
+          : null,
       rekapAbsen: {
         hadir: hadirCount,
         telat: telatCount,

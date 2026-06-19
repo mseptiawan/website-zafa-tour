@@ -1,146 +1,169 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-4xl mx-auto">
+<!-- 1. GLOBAL ISLAND CANVAS LAYER -->
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] px-4 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-none mx-auto mt-4 md:mt-0">
 
-  <div class="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200/60 pb-5 mb-6">
-    
-    <div class="flex-1">
-      <%- include('../partials/page-header', { 
-          section: 'Area Kerja', 
-          module: 'Sales', 
-          title: 'Riwayat Sales Visit', 
-          description: 'Daftar pelacakan dan laporan kunjungan klien yang telah Anda lakukan.' 
-      }) %>
-    </div>
-    
-    <% if (visits.length > 0) { %>
-      <div class="no-print shrink-0 md:mt-6">
-        <a href="/sales/my/export-pdf" class="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-blue-600 h-9 px-4 rounded-xl text-[11px] font-semibold transition-all shadow-xs active:scale-[0.98] group cursor-pointer">
-          <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    <!-- 2. HEADER CONTAINER (Tombol "+ Baru" Sejajar Di Kanan Atas) -->
+    <div class="w-full flex items-center justify-between border-b border-slate-200/60 pb-5 mb-6 gap-4">
+      <div class="flex-1">
+        <%- include('../partials/page-header', { 
+            section: 'Area Kerja', 
+            module: 'Sales', 
+            title: 'Riwayat Kunjungan', 
+            description: 'Daftar pelacakan dan laporan kunjungan klien yang telah Anda lakukan.' 
+        }) %>
+      </div>
+      
+      <div class="shrink-0 flex items-center gap-2">
+        <!-- Tombol Export PDF (Sembunyi di Mobile demi Kebersihan Visual) -->
+        <% if (visits && visits.length > 0) { %>
+          <a href="/sales/my/export-pdf" title="Export PDF" class="hidden sm:inline-flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 h-9 px-4 rounded-xl text-[11px] font-semibold transition-all shadow-3xs active:scale-[0.98]">
+            <svg class="w-3.5 h-3.5 text-slate-400 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="ml-1.5">Export PDF</span>
+          </a>
+        <% } %>
+
+        <!-- Tombol Tambah Utama (Teks Otomatis Menyusut di Mobile) -->
+        <a href="/sales/new" class="inline-flex items-center gap-1 bg-blue-500 hover:bg-blue-700 text-white h-9 px-4 rounded-xl text-[11px] font-semibold transition-all shadow-3xs active:scale-[0.98]">
+          <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Export PDF Riwayat
+          <span class="hidden sm:inline">Catat Kunjungan</span>
+          <span class="sm:hidden">Baru</span>
         </a>
       </div>
-    <% } %>
-
-  </div>
-    <!-- EMPTY STATE -->
-    <% if (visits.length===0) { %>
-    <div class="bg-white border border-slate-200/60 rounded-2xl py-16 text-center shadow-sm shadow-slate-100/40 px-4">
-      <div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mx-auto mb-3.5 text-slate-400">
-        <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      </div>
-      <p class="text-[13.5px] font-medium text-slate-700">Belum Ada Data Kunjungan</p>
-      <p class="text-[12.5px] text-slate-400 max-w-xs mx-auto mt-0.5">Semua log riwayat kunjungan sales ke merchant
-        atau klien akan tercatat di sini.</p>
     </div>
+
+    <!-- 3. EMPTY STATE (Jika Belum Ada Data Kunjungan) -->
+    <% if (!visits || visits.length === 0) { %>
+      <div class="bg-white border border-slate-200/60 rounded-2xl py-16 text-center shadow-3xs px-4">
+        <div class="w-10 h-10 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-center mx-auto mb-3.5 text-slate-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <p class="text-[12.5px] font-semibold text-slate-700">Belum Ada Data Kunjungan</p>
+        <p class="text-[11.5px] text-slate-400 max-w-xs mx-auto mt-0.5 leading-relaxed">Semua log riwayat kunjungan sales ke merchant atau klien akan tercatat di sini.</p>
+      </div>
     <% } else { %>
 
-    <!-- VISITS LOOP CONTAINER -->
-    <div class="space-y-3.5">
-      <% visits.forEach(v=> { %>
+      <!-- 4. VISITS LOOP CONTAINER -->
+      <div class="space-y-3">
+        <% visits.forEach(v => { %>
+          <div class="bg-white border border-slate-200/60 rounded-xl p-4 sm:p-5 shadow-3xs flex flex-col gap-2.5 relative overflow-hidden">
+            
+            <div class="flex items-start justify-between gap-4">
+              
+              <!-- LEFT CONTENT COLUMN -->
+              <div class="min-w-0 flex-1 space-y-1.5">
+                
+                <!-- Kunjungan Title -->
+                <h2 class="text-[13.5px] font-semibold text-slate-800 tracking-tight break-words">
+                  <%= v.title %>
+                </h2>
 
-      <div class="group bg-white border border-slate-200/70 rounded-2xl p-5 hover:border-slate-300 hover:shadow-md hover:shadow-slate-100/60 transition-all duration-200 relative overflow-hidden">
-
-        <div class="flex items-start justify-between gap-5">
-
-          <!-- LEFT DATA GRID -->
-          <div class="min-w-0 flex-1 space-y-2">
-
-            <!-- VISIT TITLE -->
-            <h2 class="text-[14.5px] font-semibold text-slate-800 tracking-tight break-words group-hover:text-blue-600 transition-colors pr-2">
-              <%= v.title %>
-            </h2>
-
-            <!-- CLIENT ADDRESS WITH ICON -->
-            <div class="flex items-start gap-1.5 text-slate-500">
-              <svg class="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p class="text-[12.5px] leading-relaxed truncate text-slate-500">
-                <%= v.address %>
-              </p>
-            </div>
-
-            <!-- SEPARATOR DECORATION (Fine line) -->
-            <div class="w-full h-[1px] bg-slate-100/80 my-1"></div>
-
-            <!-- SYSTEM METADATA BLOCK -->
-            <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-slate-400 font-medium pt-0.5">
-
-              <div class="flex items-center gap-1.5">
-                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                <span>Bertemu dengan: <strong class="text-slate-600 font-semibold ml-0.5">
-                    <%= v.meetWith %>
-                  </strong></span>
-              </div>
-
-              <div class="flex items-center gap-1.5">
-                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                <span>Waktu: <strong class="text-slate-600 font-semibold ml-0.5">
-                    <%= new Date(v.visitTime).toLocaleDateString("id-ID", { day: "numeric" , month: "short" ,
-                              year: "numeric" }) %>
-                  </strong></span>
-              </div>
-
-              <% if (v.attachments && v.attachments.length> 0 && v.attachments[0].filename) { %>
-              <div class="flex items-center gap-1.5">
-                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                <a href="/uploads/files/<%= v.attachments[0].filename %>" target="_blank" class="inline-flex items-center gap-1 bg-slate-50 hover:bg-blue-50 border border-slate-200/60 hover:border-blue-200/60 rounded-md px-2 py-0.5 text-[11px] font-semibold text-slate-500 hover:text-blue-600 transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
-                  <svg class="w-3 h-3 stroke-[2] text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                <!-- Alamat Toko / Merchant -->
+                <div class="flex items-start gap-1.5 text-slate-500">
+                  <svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>Lihat Lampiran</span>
-                </a>
+                  <p class="text-[12px] leading-relaxed text-slate-500 line-clamp-1">
+                    <%= v.address %>
+                  </p>
+                </div>
+
+                <!-- Pembatas Garis Tipis Halus -->
+                <div class="w-full h-[1px] bg-slate-100/80 my-1"></div>
+
+                <!-- Blok Informasi Sistem & Metadata -->
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-400 font-medium">
+                  <div class="flex items-center gap-1">
+                    <span>PIC: <strong class="text-slate-600 font-semibold"><%= v.meetWith %></strong></span>
+                  </div>
+                  
+                  <div class="flex items-center gap-1">
+                    <span class="text-slate-300">•</span>
+                    <span>Waktu: <strong class="text-slate-600 font-semibold">
+                      <%= new Date(v.visitTime).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) %>
+                    </strong></span>
+                  </div>
+
+                  <!-- Tombol File Lampiran Minimalis (Jika Ada) -->
+                  <% if (v.attachments && v.attachments.length > 0 && v.attachments[0].filename) { %>
+                    <div class="flex items-center gap-1">
+                      <span class="text-slate-300">•</span>
+                      <a href="/uploads/files/<%= v.attachments[0].filename %>" target="_blank" class="inline-flex items-center gap-1 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 rounded-md px-1.5 py-0.5 font-semibold text-slate-500 transition-colors">
+                        <svg class="w-2.5 h-2.5 stroke-[2] text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        <span>Lampiran</span>
+                      </a>
+                    </div>
+                  <% } %>
+                </div>
+
+                <!-- Hasil Diskusi Kunjungan (The Core Summary Report) -->
+                <% if (v.result) { %>
+                  <div class="mt-2.5 bg-slate-50/60 border border-slate-100 p-2.5 rounded-xl">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Hasil Kunjungan</p>
+                    <p class="text-[12px] text-slate-600 leading-relaxed line-clamp-2 break-words">
+                      <%= v.result %>
+                    </p>
+                  </div>
+                <% } %>
+
               </div>
-              <% } %>
-            </div>
 
-            <!-- SUMMARY RESULT REPORT -->
-            <% if (v.result) { %>
-            <div class="mt-3 bg-slate-50/60 border border-slate-100 p-3 rounded-xl">
-              <p class="text-[12px] font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-1">Hasil
-                Kunjungan</p>
-              <p class="text-[12.5px] text-slate-600 leading-relaxed line-clamp-2 break-words">
-                <%= v.result %>
-              </p>
+              <!-- RIGHT COLUMN: CONTROL EDIT LOCKING (Security Rule 24 Jam) -->
+              <div class="flex items-start flex-shrink-0">
+                <% const diffHours = (new Date() - new Date(v.createdAt)) / (1000 * 60 * 60); %>
+                <% if (diffHours <= 24) { %>
+                  <a href="/sales/<%= v._id %>/edit" title="Ubah data kunjungan" class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/40 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-all shadow-3xs active:scale-95">
+                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </a>
+                <% } else { %>
+                  <div class="w-7 h-7 flex items-center justify-center text-slate-300" title="Akses edit telah terkunci (>24 jam)">
+                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                <% } %>
+              </div>
+
             </div>
-            <% } %>
 
           </div>
+        <% }) %>
+      </div>
+    <% } %>
+<% if (pagination.totalPages > 1) { %>
+    <!-- Jarak atas diperdekat (mt-8), tanpa background, dan rata kanan (justify-end) -->
+    <div class="flex items-center justify-end mt-8 w-full border-t border-slate-100 pt-2 ">
 
-          <!-- RIGHT ACTION TIMELOCK CONTROL -->
-          <div class="flex items-start flex-shrink-0">
-            <% const diffHours=(new Date() - new Date(v.createdAt)) / (1000 * 60 * 60); %>
+      <!-- Hanya tombol navigasi Next & Prev -->
+      <div class="flex items-center gap-6">
+        <a href="?page=<%= pagination.page - 1 %>" class="py-1 text-[12px] font-semibold transition-all flex items-center gap-1.5 <%= pagination.hasPrev ? 'text-slate-600 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %>">
+          <svg class="w-3.5 h-3.5 stroke-[2.3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Prev
+        </a>
 
-            <% if (diffHours <=24) { %>
-            <a href="/sales/<%= v._id %>/edit" title="Ubah data kunjungan (Tersedia dalam 24 jam)" class="w-8 h-8 rounded-lg bg-slate-50 hover:bg-amber-50 text-slate-400 hover:text-amber-600 border border-slate-200/40 hover:border-amber-200/60 flex items-center justify-center transition-all shadow-sm active:scale-95 group/btn">
-              <!-- Premium Outline Pen Icon -->
-              <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </a>
-            <% } else { %>
-            <div class="w-8 h-8 flex items-center justify-center text-slate-300" title="Akses edit telah terkunci (>24 jam)">
-              <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <% } %>
-          </div>
-
-        </div>
+        <a href="?page=<%= pagination.page + 1 %>" class="py-1 text-[12px] font-semibold transition-all flex items-center gap-1.5 <%= pagination.hasNext ? 'text-slate-600 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %>">
+          Next
+          <svg class="w-3.5 h-3.5 stroke-[2.3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
       </div>
 
-      <% }) %>
     </div>
-
     <% } %>
-
   </div>
 </div>
+ 

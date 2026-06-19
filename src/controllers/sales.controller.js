@@ -1,3 +1,4 @@
+import { getPagination } from "../utils/pagination.js";
 import salesService from "../services/sales.service.js";
 import PDFDocument from "pdfkit";
 export const newForm = (req, res) => {
@@ -33,14 +34,25 @@ export const create = async (req, res) => {
     });
   }
 };
-
 export const myVisits = async (req, res, next) => {
   try {
-    const visits = await salesService.findMine(req.session.user._id);
+    // 1. Tentukan limit dinamis: mobile = 5, desktop = 9 agar pas dengan viewport perangkat
+    const determinedLimit = req.useragent?.isMobile ? 5 : 7;
+
+    // 2. Olah parameter pagination menggunakan utilitas yang sudah lo punya
+    const { page, limit, skip } = getPagination({
+      page: req.query.page,
+      limit: determinedLimit,
+    });
+
+    // 3. Ambil data spesifik milik user yang sedang login dengan membawa parameter pagination
+    const userId = req.session.user._id;
+    const result = await salesService.findMinePaged({ userId, page, limit, skip });
 
     res.render("sales/my", {
       title: "Daftar Kunjungan Ku",
-      visits,
+      visits: result.data,
+      pagination: result.meta,
       error: null,
     });
   } catch (err) {

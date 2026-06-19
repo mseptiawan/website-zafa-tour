@@ -5,15 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign In | Zafa Tour</title>
 
-  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS -->
   <link rel="stylesheet" href="/css/output.css" />
   
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -23,106 +20,101 @@
   </style>
 </head>
 
-<body class="md:bg-[#f8fafc] min-h-screen flex antialiased items-center justify-center md:items-stretch md:justify-start">
+<body class="bg-[#f1f5f9] md:bg-[#f8fafc] min-h-screen flex antialiased items-center justify-center md:items-stretch md:justify-start">
 
   <div class="w-full flex flex-col md:flex-row min-h-screen">
 
-    <!-- LEFT SIDE: LOGIN PANEL (DI MOBILE JADI CARD KETENGAH) -->
-    <div class="w-full md:w-[45%] lg:w-[40%] p-4 sm:p-12 md:p-16 flex flex-col justify-between z-10 my-auto md:my-0 md:bg-white min-h-screen md:min-h-0">
+    <div class="w-full md:w-[45%] lg:w-[40%] p-6 sm:p-12 md:p-16 flex flex-col justify-between z-10 my-auto md:my-0 bg-transparent md:bg-white min-h-screen md:min-h-0">
       
-      <!-- Top Brand Mark (Hidden di mobile agar card fokus di tengah) -->
       <div class="hidden md:flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center">
-        </div>
         <span class="text-slate-900 font-extrabold tracking-tight text-base">Zafa Tour</span>
       </div>
 
-      <!-- CENTER AUTH CARD (MOBILE: KETENGAH & DIBUNGKUS CARD) -->
-     <!-- CENTER AUTH CARD (MOBILE: MINIMALIS & SUPER SMOOTH) -->
-   <div class="w-full max-w-md mx-auto mt-52 mb-auto md:my-auto bg-white md:bg-transparent rounded-3xl p-6 sm:p-8 md:p-0">
+      <div class="w-full max-w-md mx-auto my-auto bg-white md:bg-transparent rounded-[32px] md:rounded-none p-8 sm:p-10 md:p-0 shadow-xl shadow-slate-200/50 md:shadow-none flex flex-col items-center md:items-stretch">
         
-        <!-- Mobile Brand Mark -->
-     <!-- Mobile Brand & User Info Header -->
-        <!-- Mobile Brand & System Authentication Header -->
-        <div class="flex md:hidden items-center justify-between border-b border-slate-200/40 pb-4 mb-5">
-          <div class="space-y-1">
-            <h2 class="text-base font-bold text-slate-900 tracking-tight leading-none">
-              Zafa Tour HRIS
-            </h2>
-            <p class="text-[10px] text-slate-400 font-medium tracking-wide leading-none uppercase">
-              Portal Log Masuk Pegawai
-            </p>
-          </div>
-          
-        
-        </div>
-        <div class="mb-6 md:mb-8">
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Sign In</h1>
-          <p class="text-xs text-slate-400 font-medium mt-1">Silakan masuk ke akun Anda menggunakan kredensial resmi.</p>
+        <div class="w-full flex justify-center mb-6">
+          <svg class="w-44 h-auto" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="115" y="108" width="14" height="32" rx="3" fill="#1e293b" />
+            <rect x="136" y="92" width="14" height="48" rx="3" fill="#1e293b" />
+            <path d="M102 126 C 118 112, 128 98, 146 94" stroke="#1e293b" stroke-width="2" stroke-linecap="round" />
+            <path d="M138 52 H144 M141 49 V55" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+            <path d="M146 78 H152 M149 75 V81" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <path d="M122 62 H126 M124 60 V64" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="90" cy="55" r="18" fill="#fef08a" />
+            <path d="M78 50 C 76 38, 92 30, 102 42 C 108 48, 102 62, 92 62 Z" fill="#fbbf24" />
+            <circle cx="88" cy="52" r="1.5" fill="#1e293b" />
+            <path d="M86 58 Q 90 62 94 58" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M68 110 C 68 85, 112 85, 112 110 L 110 140 H 70 Z" fill="#2563eb" />
+            <rect x="104" y="70" width="14" height="22" rx="3" transform="rotate(15 104 70)" fill="#38bdf8" />
+            <rect x="80" y="95" width="15" height="25" rx="3" transform="rotate(-10 80 95)" fill="#fbbf24" />
+            <circle cx="113" cy="84" r="5" fill="#fff" stroke="#1e293b" stroke-width="1" />
+            <circle cx="78" cy="114" r="5" fill="#fff" stroke="#1e293b" stroke-width="1" />
+          </svg>
         </div>
 
-        <!-- ERROR MESSAGE BANNER -->
+        <div class="text-center w-full mb-6">
+          <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Sign In</h1>
+          <p class="text-xs text-slate-400 font-medium mt-1.5">Enter valid user name & password to continue</p>
+        </div>
+
         <% if (typeof query !== 'undefined' && query?.error) { %>
-          <div class="mb-5 p-3 px-4 bg-rose-50/50 border border-rose-100/30 rounded-2xl flex items-center gap-2.5 text-rose-800">
-            <i data-lucide="shield-alert" class="w-3.5 h-3.5 shrink-0 text-rose-500"></i>
-            <span class="text-[11px] font-medium tracking-tight">Periksa kembali username atau password Anda.</span>
+          <div class="w-full mb-4 p-3 px-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2.5 text-rose-800">
+            <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-rose-500"></i>
+            <span class="text-xs font-medium tracking-tight">Periksa kembali username atau password Anda.</span>
           </div>
         <% } %>
 
-        <!-- FORM -->
-        <form action="/login" method="POST" class="space-y-4">
+        <form action="/login" method="POST" class="w-full space-y-4">
           
-          <!-- Input Identifier -->
-         <div class="space-y-1.5">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-0.5">Username / Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </div>
             <input
               type="text"
               name="identifier"
               required
-              placeholder="Ketik username atau email Anda..."
-              class="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-200/40 rounded-xl text-sm transition-all focus:outline-none focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 placeholder:text-slate-400/70 placeholder:text-xs placeholder:font-normal"
+              placeholder="User name"
+              class="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400"
             />
           </div>
 
-          <!-- Input Password -->
-          <div class="space-y-1.5">
-            <label class="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-0.5">Password</label>
-            <div class="relative">
-            <input
-                id="passwordInput"
-                type="password"
-                name="password"
-                required
-                placeholder="Ketik password akun Anda..."
-                class="w-full pl-4 pr-12 py-2.5 bg-slate-50/50 border border-slate-200/40 rounded-xl text-sm transition-all focus:outline-none focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 placeholder:text-slate-400/70 placeholder:text-xs placeholder:font-normal"
-              />
-              <button 
-                type="button" 
-                id="toggleIcon"
-                class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
-              >
-                <i data-lucide="eye" class="w-4 h-4"></i>
-              </button>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="lock" class="w-4 h-4"></i>
             </div>
+            <input
+              id="passwordInput"
+              type="password"
+              name="password"
+              required
+              placeholder="Password"
+              class="w-full pl-11 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400"
+            />
+            <button 
+              type="button" 
+              id="toggleIcon"
+              class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
+            >
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
           </div>
 
-          <!-- Options Grid -->
-          <div class="flex items-center justify-between gap-2 text-xs pt-1">
-            <label class="flex items-center gap-2 text-slate-400 cursor-pointer select-none font-medium text-[11px]">
+          <div class="flex items-center justify-between gap-2 text-xs pt-0.5">
+            <label class="flex items-center gap-2 text-slate-400 cursor-pointer select-none font-medium">
               <input 
                 type="checkbox" 
                 name="remember" 
-                class="w-3.5 h-3.5 rounded border-slate-300 text-slate-700 focus:ring-slate-500/10 accent-slate-700 cursor-pointer"
+                class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 accent-blue-600 cursor-pointer"
               />
               <span>Ingat saya</span>
             </label>
-            <a href="/forgot-password" class="font-semibold text-slate-500 hover:text-slate-800 transition text-[11px]">Lupa password?</a>
+            <a href="/forgot-password" class="font-semibold text-blue-600 hover:text-blue-700 transition">Forget password</a>
           </div>
 
-          <!-- Submit Button -->
           <button 
             type="submit"
-            class="w-full py-3 bg-slate-900 text-white font-semibold text-xs rounded-xl hover:bg-slate-800 active:scale-[0.99] transition-all duration-150 shadow-xs cursor-pointer flex items-center justify-center gap-2 mt-5"
+            class="w-full py-3.5 bg-[#2563eb] text-white font-semibold text-sm rounded-xl hover:bg-blue-700 active:scale-[0.99] transition-all duration-150 shadow-md shadow-blue-500/10 cursor-pointer flex items-center justify-center gap-2 mt-2"
           >
             <span>Masuk</span>
           </button>
@@ -130,13 +122,11 @@
         </form>
       </div>
 
-      <!-- Bottom Copyright -->
-      <p class="text-center md:text-left text-xs text-slate-400 font-medium px-0.5 mt-auto md:mt-0 pt-4">
+      <p class="text-center md:text-left text-xs text-slate-400 font-medium px-0.5 mt-auto md:mt-0 pt-4 w-full">
         &copy; 2026 Zafa Tour. All rights reserved.
       </p>
     </div>
 
-    <!-- RIGHT SIDE: HERO PANEL -->
     <div class="hidden md:block relative flex-1 bg-slate-900 overflow-hidden border-l border-slate-200/40">
       
       <img 
@@ -166,11 +156,10 @@
 
   </div>
 
-  <!-- Lucide Icon Interactivity Logic -->
   <script>
     lucide.createIcons({
       attrs: {
-        'stroke-width': 2.5
+        'stroke-width': 2.2
       }
     });
 
@@ -187,7 +176,7 @@
       
       lucide.createIcons({
         attrs: {
-          'stroke-width': 2.5
+          'stroke-width': 2.2
         }
       });
     });

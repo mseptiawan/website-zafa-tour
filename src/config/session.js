@@ -19,6 +19,5 @@ export const sessionMiddleware = session({
     sameSite: "lax",
     maxAge: 3 * 24 * 60 * 60 * 1000,
     path: "/",
-    domain: "localhost",
   },
 });

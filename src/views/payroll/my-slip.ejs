@@ -43,59 +43,67 @@
   }
 </style>
 
-<div class="ml-0  min-h-screen bg-slate-50/50 p-4 md:p-8 antialiased text-slate-900 pb-24 md:pb-8">
-  <div class="mx-auto w-full space-y-5">
+<!-- 1. GLOBAL ISLAND CANVAS LAYER -->
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] p-4 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-none mx-auto mt-4 md:mt-0">
 
-    <div class="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.02)] no-print">
-      <h1 class="text-base font-bold tracking-tight text-slate-900">Riwayat Slip Gaji</h1>
-      <p class="text-[11px] text-slate-400 mt-0.5">Daftar dokumen slip pendapatan resmi Anda di PT Zafa Mulia Mandiri</p>
+    <!-- 2. REUSABLE PAGE HEADER COMPONENT -->
+    <div class="mb-6 border-b border-slate-200/60 pb-5">
+      <%- include('../partials/page-header', { 
+          section: 'Area Kerja', 
+          module: 'Keuangan', 
+          title: 'Riwayat Slip Gaji', 
+          description: 'Daftar dokumen slip pendapatan resmi Anda di PT Zafa Mulia Mandiri' 
+      }) %>
     </div>
 
-    <% if (payrolls.length === 0) { %>
-      <div class="bg-white border border-slate-200/60 rounded-2xl p-12 text-center text-slate-400 font-medium no-print">
-        <i class="fa-solid fa-receipt text-3xl block mb-3 text-slate-300"></i> 
-        Belum ada riwayat dokumen slip gaji yang diterbitkan untuk akun Anda.
+    <!-- 3. DATA CONDITION STATE -->
+    <% if (!payrolls || payrolls.length === 0) { %>
+      <div class="bg-white border border-slate-200/60 rounded-2xl py-16 text-center shadow-3xs px-4 no-print">
+        <div class="w-10 h-10 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-center mx-auto mb-3.5 text-slate-400">
+          <i class="fa-solid fa-receipt text-lg"></i>
+        </div>
+        <p class="text-[12.5px] font-semibold text-slate-700">Belum Ada Riwayat Slip Gaji</p>
+        <p class="text-[11.5px] text-slate-400 max-w-xs mx-auto mt-0.5 leading-relaxed">Belum ada riwayat dokumen slip gaji yang diterbitkan untuk akun Anda hari ini.</p>
       </div>
     <% } else { %>
 
-      <div class="no-print grid grid-cols-1 gap-4 md:block md:bg-white md:border md:border-slate-200/60 md:rounded-2xl md:p-2 md:shadow-2xs md:divide-y md:divide-slate-100">
+      <!-- List Container (Gaya Bersih Monokrom) -->
+      <div class="no-print grid grid-cols-1 gap-3 md:block md:bg-white md:border md:border-slate-200/60 md:rounded-xl md:p-1.5 md:shadow-3xs md:divide-y md:divide-slate-100">
         <% payrolls.forEach((pay, index) => { %>
           
-          <div class="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-[0_4px_12px_rgba(15,23,42,0.03)] md:bg-transparent md:border-none md:rounded-none md:p-4 md:shadow-none hover:bg-slate-50/50 transition-colors flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="bg-white border border-slate-200/60 rounded-xl p-4 md:bg-transparent md:border-none md:rounded-none md:p-4 hover:bg-slate-50/60 transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             
-            <div class="flex items-start justify-between md:justify-start gap-4">
-              <div class="md:hidden w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0 mt-0.5">
-                <i class="fa-solid fa-file-invoice-dollar text-base"></i>
+            <div class="flex items-center gap-3.5 min-w-0">
+              <!-- Ikon slip khusus layar HP -->
+              <div class="sm:hidden w-8 h-8 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 shrink-0">
+                <i class="fa-solid fa-file-invoice-dollar text-[13px]"></i>
               </div>
               
-              <div class="space-y-1.5 md:space-y-1 min-w-0 flex-1">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="text-sm md:text-xs font-bold text-slate-800 tracking-tight">Periode: <%= pay.periodMonth %></span>
-                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full <%= pay.status === 'PAID' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/50' : 'bg-amber-50 text-amber-600 border border-amber-100/50' %>">
-                    <%= pay.status === 'PAID' ? 'Lunas' : 'Diterbitkan' %>
-                  </span>
+              <div class="space-y-1 min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[13px] font-semibold text-slate-800 tracking-tight">Periode: <%= pay.periodMonth %></span>
+                 
                 </div>
-                <div class="text-xs md:text-[11px] text-slate-400 font-normal">
-                  Take Home Pay: <span class="font-bold text-slate-700">Rp <%= pay.netTakeHomePay.toLocaleString('id-ID') %></span>
+                <div class="text-[11.5px] text-slate-400 font-medium">
+                  Take Home Pay: <span class="font-semibold text-slate-700">Rp <%= pay.netTakeHomePay.toLocaleString('id-ID') %></span>
                 </div>
               </div>
             </div>
             
-            <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-4 md:border-none md:pt-0">
-              <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                
-                <% if (pay.status === 'PAID' && pay.mutationFile) { %>
-                  <a href="<%= pay.mutationFile %>" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs md:text-[11px] font-semibold h-9 md:h-8 px-4 md:px-3 rounded-xl transition-all active:scale-[0.97] inline-flex items-center justify-center gap-1.5 border border-emerald-100 flex-1 md:flex-none">
-                    <i class="fa-solid fa-cloud-download text-[11px]"></i> Bukti TF
-                  </a>
-                <% } else if (pay.status === 'PAID') { %>
-                  <span class="text-[10px] text-slate-400 italic font-normal px-2 hidden md:inline-block">Processed by Bank</span>
-                <% } %>
+            <!-- Tombol Aksi Kanan -->
+            <div class="flex items-center justify-end gap-2 border-t border-slate-100 sm:border-none pt-3 sm:pt-0 shrink-0">
+              <% if (pay.status === 'PAID' && pay.mutationFile) { %>
+                <a href="<%= pay.mutationFile %>" target="_blank" class="bg-slate-50 hover:bg-slate-100 text-slate-600 text-[11px] font-semibold h-8 px-3 rounded-xl transition-all border border-slate-200 flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 active:scale-[0.99]">
+                  <i class="fa-solid fa-cloud-download text-[10px]"></i> Bukti TF
+                </a>
+              <% } else if (pay.status === 'PAID') { %>
+                <span class="text-[10.5px] text-slate-400 italic font-medium px-2 hidden sm:inline-block">Processed by Bank</span>
+              <% } %>
 
-                <button type="button" onclick="executePrintSlip(<%= index %>)" class="bg-slate-900 hover:bg-slate-800 text-white text-xs md:text-[11px] font-medium h-9 md:h-8 px-4 md:px-3.5 rounded-xl transition-all active:scale-[0.97] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm flex-1 md:flex-none">
-                  <i class="fa-solid fa-print text-[10px]"></i> Cetak
-                </button>
-              </div>
+              <button type="button" onclick="executePrintSlip(<%= index %>)" class="bg-blue-500 text-white text-[11px] font-semibold h-8 px-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-3xs flex-1 sm:flex-none active:scale-[0.99] outline-none">
+                <i class="fa-solid fa-print text-[10px]"></i> Cetak
+              </button>
             </div>
 
           </div>
@@ -103,6 +111,7 @@
       </div>
     <% } %>
 
+    <!-- Area Tersembunyi Khusus Print Out Kertas Dokumen Resmi -->
     <div id="invoice-print-zone" class="bg-white p-2 space-y-6 text-black"></div>
 
   </div>
@@ -123,7 +132,7 @@
       allowancesRowsHTML += `
         <tr class="h-7">
           <td class="p-1.5 font-normal">${allow.componentName}</td>
-          <td class="p-1.5 text-right border-l border-black font-normal">${allow.amount}</td>
+          <td class="p-1.5 text-right border-l border-black font-normal">Rp ${Number(allow.amount).toLocaleString('id-ID')}</td>
         </tr>`;
     });
     if (payroll.allowances.length < 1) {
@@ -135,14 +144,14 @@
       deductionsRowsHTML += `
         <tr class="h-7">
           <td class="p-1.5 font-normal">${ded.componentName}</td>
-          <td class="p-1.5 text-right border-l border-black font-normal">${ded.amount}</td>
+          <td class="p-1.5 text-right border-l border-black font-normal">Rp ${Number(ded.amount).toLocaleString('id-ID')}</td>
         </tr>`;
     });
     if (payroll.loanDeduction && payroll.loanDeduction.amount > 0) {
       deductionsRowsHTML += `
         <tr class="h-7">
           <td class="p-1.5 font-normal">Cicilan Pinjaman</td>
-          <td class="p-1.5 text-right border-l border-black font-normal">${payroll.loanDeduction.amount}</td>
+          <td class="p-1.5 text-right border-l border-black font-normal">Rp ${Number(payroll.loanDeduction.amount).toLocaleString('id-ID')}</td>
         </tr>`;
     }
     const totalDedCount = payroll.deductions.length + (payroll.loanDeduction?.amount > 0 ? 1 : 0);
@@ -150,7 +159,7 @@
       deductionsRowsHTML += `<tr class="h-7"><td>&nbsp;</td><td class="border-l border-black"></td></tr>`;
     }
 
-    const joinDateRaw = employeeProfile.careerData?.tanggal_mulai_bergabung ? new Date(employeeProfile.careerData.tanggal_mulai_bergabung).toISOString().split('T')[0] : '-';
+    const joinDateRaw = employeeProfile.careerData?.tanggal_mulai_bergabung ? new Date(employeeProfile.careerData.tanggal_mulai_bergabung).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '-';
 
     const finalPrintTemplate = `
       <div class="flex justify-between items-start">
@@ -175,7 +184,7 @@
         <p class="text-xs font-normal">Periode : ${payroll.periodMonth}</p>
       </div>
 
-      <div class="grid grid-cols-2 gap-x-12 text-xs">
+      <div class="grid grid-cols-2 gap-x-12 text-xs pt-2">
         <table class="w-full border-none">
           <tr class="h-5">
             <td class="w-28 font-normal">Nama</td>
@@ -223,30 +232,30 @@
         </table>
       </div>
 
-      <div class="grid grid-cols-2 gap-6 items-start">
+      <div class="grid grid-cols-2 gap-6 items-start pt-4">
         <div class="border border-black">
           <table class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="yellow-header-badge border-b border-black">
                 <th class="p-1.5 font-normal">Komponen Pendapatan</th>
-                <th class="p-1.5 text-center border-l border-black font-normal w-24">Jumlah</th>
+                <th class="p-1.5 text-center border-l border-black font-normal w-28">Jumlah</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-black">
               <tr class="h-7">
                 <td class="p-1.5 font-normal">Upah Pokok</td>
-                <td class="p-1.5 text-right border-l border-black font-normal">${payroll.basicSalary}</td>
+                <td class="p-1.5 text-right border-l border-black font-normal">Rp ${Number(payroll.basicSalary).toLocaleString('id-ID')}</td>
               </tr>
               ${overtimePay > 0 ? `
                 <tr class="h-7">
                   <td class="p-1.5 font-normal">Upah Kerja Lembur</td>
-                  <td class="p-1.5 text-right border-l border-black font-normal">${overtimePay}</td>
+                  <td class="p-1.5 text-right border-l border-black font-normal">Rp ${Number(overtimePay).toLocaleString('id-ID')}</td>
                 </tr>` : ''
               }
               ${allowancesRowsHTML}
-              <tr class="h-7 border-t border-black">
-                <td class="p-1.5 font-normal">Total Pendapatan</td>
-                <td class="p-1.5 text-right border-l border-black font-normal">${payroll.totalEarnings + overtimePay}</td>
+              <tr class="h-7 border-t border-black bg-slate-50/20">
+                <td class="p-1.5 font-semibold">Total Pendapatan</td>
+                <td class="p-1.5 text-right border-l border-black font-semibold">Rp ${Number(payroll.totalEarnings + overtimePay).toLocaleString('id-ID')}</td>
               </tr>
             </tbody>
           </table>
@@ -257,21 +266,21 @@
             <thead>
               <tr class="yellow-header-badge border-b border-black">
                 <th class="p-1.5 font-normal">Komponen Potongan</th>
-                <th class="p-1.5 text-center border-l border-black font-normal w-24">Jumlah</th>
+                <th class="p-1.5 text-center border-l border-black font-normal w-28">Jumlah</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-black">
               ${deductionsRowsHTML}
-              <tr class="h-7 border-t border-black">
-                <td class="p-1.5 font-normal">Total Potongan</td>
-                <td class="p-1.5 text-right border-l border-black font-normal">${payroll.totalDeductions}</td>
+              <tr class="h-7 border-t border-black bg-slate-50/20">
+                <td class="p-1.5 font-semibold">Total Potongan</td>
+                <td class="p-1.5 text-right border-l border-black font-semibold">Rp ${Number(payroll.totalDeductions).toLocaleString('id-ID')}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <div class="pt-2 flex justify-between items-start text-xs">
+      <div class="pt-4 flex justify-between items-start text-xs">
         <table class="w-auto border-none">
           <tr class="h-5">
             <td class="w-36 font-normal">Nama Bank</td>
@@ -290,16 +299,16 @@
           </tr>
         </table>
 
-        <div class="flex items-center gap-4 pr-16">
-          <span class="font-normal">Take Home Pay</span>
+        <div class="flex items-center gap-4 pr-6">
+          <span class="font-bold">Take Home Pay</span>
           <span>:</span>
-          <span class="font-normal">${payroll.netTakeHomePay}</span>
+          <span class="font-bold text-sm">Rp ${Number(payroll.netTakeHomePay).toLocaleString('id-ID')}</span>
         </div>
       </div>
 
-      <div class="border-b border-black pt-4"></div>
+      <div class="border-b border-black pt-6"></div>
 
-      <div class="flex items-center gap-1.5 text-[10px] font-normal pt-1">
+      <div class="flex items-center gap-1.5 text-[9px] font-normal pt-1.5">
         <span style="font-family: 'Times New Roman', Times, serif;">ZM</span>
         <span>PT Zafa Mulia Mandiri</span>
       </div>
