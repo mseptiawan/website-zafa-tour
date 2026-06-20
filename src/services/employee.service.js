@@ -16,8 +16,28 @@ import EmployeeEducation from "../models/employee/EmployeeEducation.js";
 import bcrypt from "bcrypt";
 
 export const EmployeeService = {
-  findAllEmployees: async () => {
-    const employeesData = await Employee.find()
+  findAllEmployees: async (currentUser) => {
+    let queryFilter = {};
+
+    // 1. Jika user yang login adalah Manager dan memiliki bidangId di sesinya
+    if (currentUser?.isManager && currentUser?.bidangId) {
+      // Cari ID berkas CareerData yang memiliki bidangId sama dengan bidang si Manager
+      // Menggunakan Mongoose model dinamis untuk menghindari circular dependency jika ada
+      const matchingCareers = await mongoose
+        .model("Career")
+        .find({
+          bidangId: currentUser.bidangId,
+        })
+        .select("_id");
+
+      const careerIds = matchingCareers.map((c) => c._id);
+
+      // Filter query Employee: Hanya ambil pegawai yang careerData-nya masuk list di atas
+      queryFilter = { careerData: { $in: careerIds } };
+    }
+
+    // 2. Tarik data pegawai berdasarkan filter (jika Admin/Superadmin, queryFilter tetap kosong `{}` sehingga narik semua)
+    const employeesData = await Employee.find(queryFilter)
       .populate("userId")
       .populate("salaryDetail")
       .populate({
@@ -25,13 +45,14 @@ export const EmployeeService = {
         populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
       });
 
+    // 3. Ambil data pengajuan PHK / Termination
     const terminations = await Termination.find({
       status: { $in: ["Waiting", "Approved"] },
     }).populate("approvedBy", "username");
 
+    // 4. Map data untuk response ke client
     return employeesData.map((emp) => {
       const empObj = emp.toObject();
-
       const termInfo = terminations.find((t) => t.employeeId?.toString() === emp._id.toString());
 
       if (termInfo) {

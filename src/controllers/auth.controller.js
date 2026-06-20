@@ -34,22 +34,54 @@ export const login = async (req, res) => {
       return res.redirect("/?error=INVALID_PASSWORD");
     }
 
-    const employee = await Employee.findOne({
-      userId: user._id,
+    const employee = await Employee.findOne({ userId: user._id }).populate({
+      path: "careerData",
+      populate: [{ path: "bidangId" }, { path: "unitId" }],
     });
 
     const roleName = user.roleId?.name?.toUpperCase();
+
+    // Cek apakah role user saat ini adalah salah satu manager/wakil direktur berdasarkan seeder
+    const managerRoles = [
+      "MANAGER_KEUANGAN",
+      "MANAGER_ADMINISTRASI",
+      "MANAGER_HAJI_UMRAH",
+      "WAKIL_DIREKTUR",
+    ];
+    const isManager = managerRoles.includes(roleName);
+
+    // Ambil bidangId milik si user/manager tersebut
+    const bidangId = employee?.careerData?.bidangId?._id || null;
+    const unitId = employee?.careerData?.unitId?._id || null;
+
     req.session.user = {
       _id: user._id,
       username: user.username,
       email: user.email,
-      fullName: employee?.fullName || user.username,
-      foto_profile: employee?.foto_profile || null,
-      employeeId: employee?._id || null,
-      gender: employee?.jenis_kelamin || "Laki-Laki",
+
+      employeeId: employee?._id,
+      employeeNumber: employee?.employeeIdNumber,
+
+      fullName: employee?.fullName,
+      foto_profile: employee?.foto_profile,
+      gender: employee?.jenis_kelamin,
+
       role: roleName,
-      roleId: user.roleId?._id || null,
+      roleId: user.roleId?._id,
       permissions: getPermissions(roleName),
+
+      isManager,
+
+      bidangId,
+      bidangName,
+
+      unitId,
+      unitName,
+
+      careerId,
+
+      positionId,
+      positionName,
     };
 
     if (remember) {

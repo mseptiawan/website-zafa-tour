@@ -1,20 +1,22 @@
 <%- layout('layouts/main', { title: "Data Pegawai" }) %>
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD]  sm:p-6 md:p-10 antialiased pb-24 md:pb-8 text-slate-800">
+  <div class="w-full max-w-none mx-auto space-y-6">
 
-<div class=" p-8 bg-slate-50 min-h-screen">
-  <%- include('../partials/page-header', {
+    
+    <%- include('../partials/page-header', {
     section: 'Area Kerja',
     module: 'SDM',
     title: 'Data Pegawai',
     description: 'Kelola informasi, peran, dan lacak status keanggotaan seluruh organisasi.'
   }) %>
 
-  <% 
+    <% 
     const totalPegawai = employees ? employees.length : 0;
     const pegawaiAktif = employees ? employees.filter(e => (e.userId && e.userId.status === 'Active') && !(e.terminationInfo && e.terminationInfo.statusPHK === 'Waiting')).length : 0;
     const pegawaiPhk = totalPegawai - employees.filter(e => e.userId && e.userId.status === 'Active').length;
   %>
-  <div class="mb-6">
-    <%- include('../partials/_stats-grid', {
+    <div class="mb-6">
+      <%- include('../partials/_stats-grid', {
       items: [
         { 
           label: 'Total Pegawai', 
@@ -45,12 +47,12 @@
         }
       ]
     }) %>
-  </div>
+    </div>
 
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+  <div class="bg-transparent md:bg-white md:border md:border-slate-200 md:rounded-2xl md:shadow-xs overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead class="bg-slate-50/50 border-b border-slate-200">
+      <table class="w-full text-left border-collapse block md:table">
+        <thead class="bg-slate-50/50 border-b border-slate-200 hidden md:table-header-group">
           <tr>
             <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Pegawai</th>
             <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Posisi / Bidang</th>
@@ -60,7 +62,7 @@
           </tr>
         </thead>
 
-        <tbody class="divide-y divide-slate-100">
+        <tbody class="divide-y divide-slate-100 block md:table-row-group space-y-4 md:space-y-0">
           <% if (employees && employees.length > 0) { %>
           <% employees.forEach(e => { %>
           <% 
@@ -77,16 +79,15 @@
               rowClass = 'bg-amber-50/45 border-l-4 border-l-amber-500 hover:bg-amber-50/70';
             }
           %>
-          <tr class="transition-all duration-200 <%= rowClass %>">
+          <tr class="transition-all duration-200 <%= rowClass %> block md:table-row bg-white border border-slate-200/70 md:border-none rounded-2xl p-4 md:p-0 shadow-xs md:shadow-none">
 
-            <!-- 1. NAMA PEGAWAI (DITAMBAH INDIKATOR TEKS 'PROSES PHK') -->
-            <td class="px-6 py-4">
+            <td class="px-2 md:px-6 py-2 md:py-4 block md:table-cell border-b border-slate-100 md:border-none pb-3 md:pb-4">
               <div class="flex items-center gap-3">
                 <div>
-                  <div class="font-semibold text-sm <%= isApprovedPHK ? 'text-slate-500 line-through decoration-slate-400' : 'text-slate-800' %>">
+                  <div class="font-semibold text-sm <%= isApprovedPHK ? 'text-slate-500 line-through decoration-slate-400' : 'text-slate-800' %> flex flex-wrap items-center gap-2">
                     <%= e.fullName %>
                     <% if (isWaitingPHK) { %>
-                      <span class="ml-2 inline-flex items-center text-[10px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200 shadow-2xs">Proses PHK</span>
+                    <span class="inline-flex items-center text-[10px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200 shadow-2xs">Proses PHK</span>
                     <% } %>
                   </div>
                   <div class="text-[11px] text-slate-400 mt-0.5">
@@ -96,46 +97,55 @@
               </div>
             </td>
 
-            <td class="px-6 py-4">
-              <div class="text-sm font-medium <%= isApprovedPHK ? 'text-slate-400' : 'text-slate-700' %>">
-                <%= e.careerData?.positionId?.name || '-' %>
-              </div>
-              <div class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">
-                Bidang: <%= e.careerData?.bidangId?.name || '-' %>
-              </div>
-            </td>
-
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-600 bg-slate-50 border border-slate-100">
-                <%= e.careerData?.unitId?.name || '-' %>
-              </span>
-              <div class="text-[11px] text-slate-400 font-medium mt-1">
-                <%= e.careerData?.status_pegawai || '-' %>
+            <td class="px-2 md:px-6 py-2.5 md:py-4 flex justify-between items-start md:table-cell border-b border-slate-100 md:border-none">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider md:hidden pt-0.5">Posisi</span>
+              <div class="text-right md:text-left">
+                <div class="text-sm font-medium <%= isApprovedPHK ? 'text-slate-400' : 'text-slate-700' %>">
+                  <%= e.careerData?.positionId?.name || '-' %>
+                </div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">
+                  Bidang: <%= e.careerData?.bidangId?.name || '-' %>
+                </div>
               </div>
             </td>
 
-            <td class="px-6 py-4">
-              <div class="text-sm font-bold text-slate-800">
-                Rp <%= (e.salaryDetail?.basicSalary || 0).toLocaleString('id-ID') %>
-              </div>
-              <div class="text-[10px] text-slate-400 mt-0.5">
-                Lembur: Rp <%= (e.financialData?.overtimeRate || 0).toLocaleString('id-ID') %>/jam
+            <td class="px-2 md:px-6 py-2.5 md:py-4 flex justify-between items-center md:table-cell border-b border-slate-100 md:border-none">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider md:hidden">Unit Kerja</span>
+              <div class="text-right md:text-left">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-600 bg-slate-50 border border-slate-100">
+                  <%= e.careerData?.unitId?.name || '-' %>
+                </span>
+                <div class="text-[11px] text-slate-400 font-medium mt-1">
+                  <%= e.careerData?.status_pegawai || '-' %>
+                </div>
               </div>
             </td>
 
-            <td class="px-6 py-4 text-right">
+            <td class="px-2 md:px-6 py-2.5 md:py-4 flex justify-between items-start md:table-cell border-b border-slate-100 md:border-none">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider md:hidden pt-0.5">Finansial</span>
+              <div class="text-right md:text-left">
+                <div class="text-sm font-bold text-slate-800">
+                  Rp <%= (e.salaryDetail?.basicSalary || 0).toLocaleString('id-ID') %>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5">
+                  Lembur: Rp <%= (e.financialData?.overtimeRate || 0).toLocaleString('id-ID') %>/jam
+                </div>
+              </div>
+            </td>
+
+            <td class="px-2 md:px-6 py-3 md:py-4 flex justify-between items-center md:table-cell text-right pt-3">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider md:hidden">Status & Aksi</span>
               <div class="flex items-center justify-end gap-3">
-                
-                <!-- 2. STATUS BADGE (DITAMBAH AMBER ANIMATE PULSE UNTUK WAITING APPROVAL) -->
+
                 <div>
                   <% if (isWaitingPHK) { %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white border border-amber-600 shadow-xs animate-pulse">Waiting Approval</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white border border-amber-600 shadow-xs animate-pulse">Waiting Approval</span>
                   <% } else if (currentStatus === 'Active') { %>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">Active</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">Active</span>
                   <% } else if (currentStatus === 'Suspended') { %>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">Suspended</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">Suspended</span>
                   <% } else { %>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100">Inactive</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100">Inactive</span>
                   <% } %>
                 </div>
 
@@ -149,7 +159,7 @@
                   </button>
                   <% } else { %>
                   <div class="flex items-center gap-1.5">
-                    
+
                     <a href="/employee/detail/<%= e._id %>" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition active:scale-[0.95] cursor-pointer shadow-sm" title="Lihat Detail Profil">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -164,7 +174,6 @@
                       </svg>
                     </a>
 
-                    <!-- 3. TOMBOL AJUKAN DI-DISABLE & BERPUTAR JIKA SEDANG PROSES WAITING -->
                     <% if (isWaitingPHK) { %>
                     <button type="button" disabled class="w-8 h-8 flex items-center justify-center bg-amber-50 border border-amber-200 rounded-lg text-amber-600 cursor-not-allowed" title="Pengajuan sedang ditinjau Direktur Utama">
                       <svg class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -188,8 +197,8 @@
           </tr>
           <% }) %>
           <% } else { %>
-          <tr>
-            <td colspan="5" class="px-6 py-12 text-center text-sm font-medium text-slate-400 bg-slate-50/30">
+          <tr class="block md:table-row">
+            <td colspan="5" class="px-6 py-12 text-center text-sm font-medium text-slate-400 bg-slate-50/30 block md:table-cell">
               Tidak ada data Pegawai yang ditemukan.
             </td>
           </tr>
@@ -198,14 +207,15 @@
       </table>
     </div>
 
-    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30">
+    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30 hidden md:block">
       <p class="text-xs text-slate-500">Menampilkan <%= employees ? employees.length : 0 %> Pegawai</p>
     </div>
   </div>
 </div>
+  </div>
 
-<div id="phkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-  <form id="phkForm" action="/api/employee/phk" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl w-96 shadow-xl border border-slate-100">
+<div id="phkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <form id="phkForm" action="/api/employee/phk" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl w-full max-w-md shadow-xl border border-slate-100">
     <h3 class="font-bold text-base text-slate-800 mb-2">Ajukan Pemutusan Hubungan Kerja</h3>
     <p class="text-xs text-slate-400 mb-4">Pengajuan ini akan dikirim ke Pusat Otorisasi Pimpinan untuk divalidasi.</p>
 
@@ -228,8 +238,8 @@
   </form>
 </div>
 
-<div id="historyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-  <div class="bg-white p-6 rounded-2xl w-96 shadow-xl border border-slate-100">
+<div id="historyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div class="bg-white p-6 rounded-2xl w-full max-w-md shadow-xl border border-slate-100">
     <div class="flex items-center gap-2 text-slate-800 mb-3">
       <div class="h-7 w-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

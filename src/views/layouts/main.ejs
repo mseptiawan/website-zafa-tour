@@ -218,12 +218,14 @@
             <h3 class="text-xs font-bold uppercase tracking-wider mb-6">Management Hub</h3>
             <div class="grid grid-cols-4 gap-3">
 
-              <a href="/management/employees" class="group flex flex-col items-center gap-1.5 text-center">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white  shadow-xs transition-all active:scale-95">
-                  <i class="fa-solid fa-users text-sm"></i>
-                </div>
-                <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Data Pegawai</span>
-              </a>
+             <% if (user.role !== 'PEGAWAI') { %>
+  <a href="/employee/" class="group flex flex-col items-center gap-1.5 text-center">
+    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white shadow-xs transition-all active:scale-95">
+      <i class="fa-solid fa-users text-sm"></i>
+    </div>
+    <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Data Pegawai</span>
+  </a>
+<% } %>
 
               <a href="/management/kpi" class="group flex flex-col items-center gap-1.5 text-center">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-100/30 shadow-xs transition-all active:scale-95">
