@@ -46,7 +46,7 @@ router.use("/sales", salesRoutes);
 router.use("/assignment", assignmentRoutes);
 router.use("/announcement", announcementRoutes);
 router.use("/expense-categories", expenseCategoryRoutes);
-router.use("/", expenseRoutes);
+router.use("/expense", expenseRoutes);
 router.use("/loans", loanRoutes);
 router.use("/components", componentPageRoutes);
 router.use("/api/components", salaryComponentRoutes);

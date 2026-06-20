@@ -2,10 +2,22 @@
 
 <style>
   /* =========================================================================
-     KONTROL PRINT & LAYOUT MINIMALIS DOKUMEN KUNING
+     DESAIN PREMIUM & KONTROL CETAK ELEGAN
      ========================================================================= */
   #report-print-zone {
     display: none;
+  }
+
+  /* Efek Glassmorphism Halus untuk UI Monitor */
+  .dashboard-card {
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    transition: all 0.2s ease-in-out;
+  }
+  .dashboard-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    border-color: rgba(191, 219, 254, 1); 
   }
 
   @media print {
@@ -29,56 +41,48 @@
       padding: 0 !important;
       border: none !important;
       box-shadow: none !important;
-      color: black !important;
+      color: #0f172a !important;
     }
 
     .yellow-print-header {
-      background-color: #facc15 !important;
+      background-color: #fef08a !important; 
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
-      color: black !important;
+      color: #1e293b !important;
     }
+
+    tr { page-break-inside: avoid; }
   }
 
   .formal-print-text {
-    font-family: 'Times New Roman', Times, serif;
-    font-weight: normal !important;
-  }
-  
-  .formal-print-text th, 
-  .formal-print-text td, 
-  .formal-print-text span, 
-  .formal-print-text h2, 
-  .formal-print-text h3, 
-  .formal-print-text p {
-    font-weight: normal !important;
-  }
-
-  .yellow-print-header {
-    background-color: #facc15;
-    color: black;
+    color: #1e293b;
   }
 </style>
 
-<div class=" min-h-screen bg-[#f8fafc] p-8 antialiased text-slate-800">
-  <div class="mx-auto max-w-7xl space-y-6">
+<div class="min-h-screen ml-72 bg-[#f8fafc] p-8 antialiased text-slate-800">
+  <div class="mx-auto max-w-7xl space-y-8">
 
-    <!-- HEADER MONITOR UTAMA (PURE CLEAN & FLAT) -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/60 rounded-xl p-6 shadow-xs no-print">
-      <div>
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Internal Operations</span>
-        <h1 class="text-base font-bold tracking-tight text-slate-950">Laporan Eksekutif Data Pegawai</h1>
-      </div>
-      
-      <div class="flex items-center gap-3">
-        <!-- TOMBOL EXPORT MONOKROM -->
-        <button onclick="executePrintEmployeeReport()" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-medium h-9 px-4 rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-file-pdf text-[12px]"></i> Export PDF Data Induk
-        </button>
+    <div class="mb-6 border-b border-slate-200/60 pb-5 no-print">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        
+        <div class="grow">
+          <%- include('../partials/page-header', { 
+              section: 'Operasional Internal', 
+              module: 'Informasi', 
+              title: 'Daftar Data Karyawan', 
+              description: 'Halaman terpusat untuk melihat profil ringkas dan sebaran biodata rekan-rekan kerja.' 
+          }) %>
+        </div>
+
+        <div class="flex items-center gap-3 self-end md:self-center shrink-0">
+          <button onclick="executePrintEmployeeReport()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-10 px-5 rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95">
+            <i class="fa-solid fa-file-pdf text-sm"></i> Cetak Data Karyawan
+          </button>
+        </div>
+
       </div>
     </div>
 
-    <!-- DIAGRAM 1: BLOK PROPORSI DEMOGRAFI GENDER MURNI MONOKROM -->
     <% 
       let lakiCount = 0; let perempuanCount = 0;
       employees.forEach(emp => {
@@ -89,78 +93,101 @@
       let pctLaki = Math.round((lakiCount / totalEmp) * 100);
       let pctPerempuan = Math.round((perempuanCount / totalEmp) * 100);
     %>
-    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs no-print">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Diagram Proporsi Demografi Gender</h3>
-        <span class="text-[10px] text-slate-400 font-mono">Kekuatan SDM: <%= employees.length %> Orang</span>
+    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs no-print space-y-4 select-none">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Komposisi Gender Karyawan</h3>
+          <p class="text-[11px] text-slate-500">Perimbangan profil tim berdasarkan jenis kelamin</p>
+        </div>
+        <span class="text-xs bg-slate-50 text-slate-600 font-bold px-3 py-1 rounded-lg border border-slate-200/60">
+          Total: <%= employees.length %> Orang
+        </span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Blok Laki-Laki -->
-        <div class="p-4 bg-slate-50 border border-slate-200/70 rounded-xl flex items-center justify-between transition-colors hover:bg-slate-100/40">
-          <div class="space-y-1">
-            <span class="text-[11px] font-semibold text-slate-800 flex items-center gap-2">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-900 block"></span> Pegawai Laki-Laki
-            </span>
-            <span class="text-xs text-slate-400 block"><%= lakiCount %> Orang terdaftar</span>
+        <div class="dashboard-card p-4 rounded-xl flex items-center justify-between bg-white border border-slate-100">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600">
+              <i class="fa-solid fa-mars text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-xs font-bold text-slate-900 block mb-0.5">Laki-Laki</span>
+              <span class="text-[11px] text-slate-500 block truncate font-medium"><%= lakiCount %> Rekan kerja</span>
+            </div>
           </div>
-          <div class="text-right">
-            <span class="text-xl font-bold text-slate-900 tracking-tight font-mono"><%= pctLaki %>%</span>
+          <div class="text-right shrink-0">
+            <span class="inline-flex items-center justify-center bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-md text-xs border border-blue-100">
+              <%= pctLaki %>%
+            </span>
           </div>
         </div>
 
-        <!-- Blok Perempuan -->
-        <div class="p-4 bg-slate-50 border border-slate-200/70 rounded-xl flex items-center justify-between transition-colors hover:bg-slate-100/40">
-          <div class="space-y-1">
-            <span class="text-[11px] font-semibold text-slate-700 flex items-center gap-2">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-400 block"></span> Pegawai Perempuan
-            </span>
-            <span class="text-xs text-slate-400 block"><%= perempuanCount %> Orang terdaftar</span>
+        <div class="dashboard-card p-4 rounded-xl flex items-center justify-between bg-white border border-slate-100">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-blue-50/60 border border-blue-100/70 flex items-center justify-center shrink-0 text-blue-400">
+              <i class="fa-solid fa-venus text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-xs font-bold text-slate-900 block mb-0.5">Perempuan</span>
+              <span class="text-[11px] text-slate-500 block truncate font-medium"><%= perempuanCount %> Rekan kerja</span>
+            </div>
           </div>
-          <div class="text-right">
-            <span class="text-xl font-bold text-slate-700 tracking-tight font-mono"><%= pctPerempuan %>%</span>
+          <div class="text-right shrink-0">
+            <span class="inline-flex items-center justify-center bg-blue-50 text-blue-600 font-bold px-2.5 py-1 rounded-md text-xs border border-blue-100">
+              <%= pctPerempuan %>%
+            </span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- DIAGRAM 2: MATRIKS DATA SHEET (PURE MONOKROM GRID) -->
-    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 no-print">
+    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-4 no-print">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Matriks Master Registrasi Pegawai</h3>
-        <span class="text-[10px] bg-slate-50 border border-slate-200 px-2 py-0.5 rounded text-slate-600 font-medium tracking-wide">MASTER DATA SHEET</span>
+        <div>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Biodata Lengkap Karyawan</h3>
+          <p class="text-[11px] text-slate-500">Informasi ringkas profil dan status pernikahan setiap anggota tim</p>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <% employees.forEach((emp) => { %>
-          <!-- Semua kartu seragam memakai bg-slate-50 tanpa highlight warna mencolok -->
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-2 transition-all hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-            <div class="flex justify-between items-start border-b border-slate-200/60 pb-1.5">
-              <span class="font-bold text-slate-900 truncate pr-2"><%= emp.fullName %></span>
-              <span class="text-[10px] bg-slate-200 border border-slate-300/50 px-1.5 py-0.5 rounded text-slate-700 font-mono font-semibold shrink-0"><%= emp.employeeIdNumber %></span>
+          <div class="dashboard-card p-4 rounded-xl text-xs space-y-3">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-2">
+              <div class="truncate pr-2">
+                <span class="font-bold text-slate-900 block truncate text-sm">
+                  <%= emp.fullName %>
+                </span>
+              </div>
+              <span class="text-[10px] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded font-bold text-blue-700 shrink-0 shadow-3xs">
+                <%= emp.employeeIdNumber %>
+              </span>
             </div>
             
-            <div class="grid grid-cols-2 gap-y-1 text-slate-500 font-mono text-[11px]">
-              <span>Gender:</span>
-              <span class="text-slate-900 font-medium text-right"><%= emp.jenis_kelamin %></span>
-              <span>Asal / Lahir:</span>
-              <span class="text-slate-900 font-medium text-right truncate"><%= emp.tempat_lahir %></span>
-              <span>Pernikahan:</span>
-              <span class="text-slate-900 font-medium text-right"><%= emp.status_pernikahan %></span>
+            <div class="space-y-1.5 text-[11px]">
+              <div class="flex justify-between">
+                <span class="text-slate-400 font-medium">Jenis Kelamin</span>
+                <span class="text-slate-800 font-semibold"><%= emp.jenis_kelamin %></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400 font-medium">Tempat Lahir</span>
+                <span class="text-slate-800 font-semibold truncate max-w-[140px] text-right"><%= emp.tempat_lahir %></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400 font-medium">Status</span>
+                <span class="text-slate-800 font-semibold"><%= emp.status_pernikahan %></span>
+              </div>
             </div>
           </div>
         <% }) %>
       </div>
     </div>
 
-    <!-- AREA INJEKSI CETAK FORMAL KUNING -->
-    <div id="report-print-zone" class="bg-white p-2 space-y-6 text-black formal-print-text"></div>
+    <div id="report-print-zone" class="bg-white p-4 space-y-6 text-black formal-print-text"></div>
 
   </div>
 </div>
 
 <script>
-  // Ambil data mentah dari server ke client-side
   const clientEmployeeData = <%- JSON.stringify(employees) %>;
 
   function executePrintEmployeeReport() {
@@ -168,73 +195,72 @@
     
     clientEmployeeData.forEach((emp, idx) => {
       employeeRowsHTML += `
-        <tr class="h-8" style="font-family: 'Times New Roman', Times, serif;">
-          <td class="p-2 border-r border-black text-center" style="font-weight: normal !important;">${idx + 1}</td>
-          <td class="p-2 border-r border-black font-normal" style="font-weight: normal !important; text-align: left;">${emp.employeeIdNumber}</td>
-          <td class="p-2 border-r border-black font-normal" style="font-weight: normal !important; text-align: left;">${emp.fullName}</td>
-          <td class="p-2 border-r border-black text-center" style="font-weight: normal !important;">${emp.jenis_kelamin}</td>
-          <td class="p-2 border-r border-black text-center" style="font-weight: normal !important;">${emp.tempat_lahir}</td>
-          <td class="p-2 text-center" style="font-weight: normal !important;">${emp.status_pernikahan}</td>
+        <tr style="border-bottom: 0.5px solid #000;">
+          <td class="p-2 border-r border-black text-center">${idx + 1}</td>
+          <td class="p-2 border-r border-black text-left">${emp.employeeIdNumber}</td>
+          <td class="p-2 border-r border-black text-left" style="font-weight: bold !important;">${emp.fullName}</td>
+          <td class="p-2 border-r border-black text-center">${emp.jenis_kelamin}</td>
+          <td class="p-2 border-r border-black text-left">${emp.tempat_lahir}</td>
+          <td class="p-2 text-center">${emp.status_pernikahan}</td>
         </tr>`;
     });
 
     const finalPrintTemplate = `
-      <div class="flex justify-between items-start">
-        <div class="border border-black px-6 py-1 mt-2">
-          <span class="text-xs tracking-wide" style="color: #f43f5e; font-weight: normal !important;">Master Induk Dokumen</span>
+      <div class="flex justify-between items-center border-b-2 border-black pb-4">
+        <div class="text-left">
+          <div class="text-xl font-bold uppercase tracking-tight">PT ZAFA MULIA MANDIRI</div>
+          <div class="text-[10px] tracking-wide text-gray-600">Jalan Utama Kantor Pusat, Kota Palembang</div>
+          <div class="text-[9px] text-gray-500">Sistem Aplikasi Karyawan Terintegrasi</div>
         </div>
-        <div class="text-center space-y-0.5">
-          <div class="inline-flex flex-col items-center justify-center">
-            <span class="text-2xl tracking-tighter" style="font-family: 'Times New Roman', Times, serif; font-weight: normal !important;">ZM</span>
-            <span class="text-[8px] tracking-widest uppercase -mt-1" style="font-weight: normal !important;">ZAFA TOUR</span>
+        <div class="text-right flex flex-col items-end">
+          <div class="border border-black px-4 py-1 rounded-sm bg-slate-50">
+            <span class="text-[10px] font-bold tracking-widest uppercase text-slate-700">DATA UTAMA</span>
           </div>
-          <div class="text-[10px] uppercase tracking-tight" style="font-weight: normal !important;">Zafa Mulia Mandiri</div>
+          <span class="text-[16px] font-bold tracking-widest text-amber-500 mt-1">ZAFA TOUR</span>
         </div>
       </div>
 
-      <div class="pt-1">
-        <h2 class="text-xs" style="font-weight: normal !important; text-align: left;">PT Zafa Mulia Mandiri</h2>
+      <div class="pt-4 flex justify-between items-end text-xs">
+        <div class="space-y-0.5">
+          <h2 class="text-sm font-bold uppercase tracking-wide">Laporan Data Karyawan Aktif</h2>
+          <p class="text-gray-600">Status Dokumen: Keperluan Arsip Internal Kerja</p>
+        </div>
+        <div class="text-right text-[11px]">
+          <div>Tanggal Cetak: <span class="font-bold">${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
+        </div>
       </div>
 
-      <div class="space-y-0.5" style="text-align: left;">
-        <h3 class="text-xs" style="font-weight: normal !important;">Laporan Data Induk Pegawai Terdaftar</h3>
-        <p class="text-xs" style="font-weight: normal !important;">Tanggal Unduh : ${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-      </div>
-
-      <!-- Tabel Berformat Cetakan Kuning Slip Gaji Formal -->
-      <div class="border border-black mt-4">
+      <div class="border-2 border-black mt-4 overflow-hidden rounded-xs">
         <table class="w-full text-xs border-collapse">
           <thead>
-            <tr class="yellow-print-header border-b border-black">
-              <th class="p-2 border-r border-black font-normal text-center" style="font-weight: normal !important; width: 5%;">No</th>
-              <th class="p-2 border-r border-black font-normal text-left" style="font-weight: normal !important; width: 15%;">ID Pegawai</th>
-              <th class="p-2 border-r border-black font-normal text-left" style="font-weight: normal !important; width: 35%;">Nama Lengkap</th>
-              <th class="p-2 border-r border-black font-normal text-center" style="font-weight: normal !important; width: 15%;">Gender</th>
-              <th class="p-2 border-r border-black font-normal text-center" style="font-weight: normal !important; width: 15%;">Tempat Lahir</th>
-              <th class="p-2 font-normal text-center" style="font-weight: normal !important; width: 15%;">Status</th>
+            <tr class="yellow-print-header border-b-2 border-black">
+              <th class="p-2 border-r border-black text-center font-bold" style="width: 5%;">NO</th>
+              <th class="p-2 border-r border-black text-left font-bold" style="width: 15%;">ID KARYAWAN</th>
+              <th class="p-2 border-r border-black text-left font-bold" style="width: 35%;">NAMA LENGKAP</th>
+              <th class="p-2 border-r border-black text-center font-bold" style="width: 15%;">GENDER</th>
+              <th class="p-2 border-r border-black text-left font-bold" style="width: 15%;">TEMPAT LAHIR</th>
+              <th class="p-2 text-center font-bold" style="width: 15%;">STATUS</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-black">
+          <tbody class="divide-y divide-black bg-white">
             ${employeeRowsHTML}
           </tbody>
         </table>
       </div>
 
-      <div class="pt-6 flex justify-between items-start text-xs">
-        <div class="text-[10px] text-gray-400 italic">
-          *Dokumen diunduh secara resmi melalui Database Inti HRIS Kantor Utama Palembang.
+      <div class="pt-8 flex justify-between items-start text-xs">
+        <div class="text-[9px] text-gray-400 italic max-w-sm">
+          *Data yang tercantum di atas diambil langsung dari sistem administrasi personalia kantor pusat PT Zafa Mulia Mandiri secara sah.
         </div>
-        <div class="text-center pr-12 space-y-12">
-          <span class="block" style="font-weight: normal !important;">Manager Administrasi (HRD)</span>
-          <span class="block border-t border-black pt-1 w-40" style="font-weight: normal !important;">Otorisasi Sistem</span>
+        <div class="text-center pr-8 space-y-16">
+          <div class="space-y-1">
+            <span class="block font-medium">Palembang, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <span class="block font-bold uppercase">Manajer Administrasi / HRD</span>
+          </div>
+          <div class="inline-block border-t-2 border-black pt-1 px-8 font-bold">
+            Verifikasi Aplikasi HRIS
+          </div>
         </div>
-      </div>
-
-      <div class="border-b border-black pt-4"></div>
-
-      <div class="flex items-center gap-1.5 text-[10px] pt-1">
-        <span style="font-family: 'Times New Roman', Times, serif; font-weight: normal !important;">ZM</span>
-        <span style="font-weight: normal !important;">PT Zafa Mulia Mandiri</span>
       </div>
     `;
 

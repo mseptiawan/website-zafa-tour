@@ -10,7 +10,6 @@ import {
   createExpense,
   rejectManagerExpense,
   myExpenses,
-  allExpenses,
   approvalManagerExpense,
   approveManagerExpense,
   financeExpensePage,
@@ -19,7 +18,7 @@ import {
 
 const router = express.Router();
 
-router.get("/expense/create", authMiddleware, formExpense);
+router.get("/create", authMiddleware, formExpense);
 router.post(
   "/expense/create",
   authMiddleware,
@@ -28,41 +27,30 @@ router.post(
   createExpense
 );
 
-router.get("/expense/my", authMiddleware, myExpenses);
-router.get(
-  "/expense/all",
-  authMiddleware,
-  roleMiddleware(["WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI", "DIREKTUR_UTAMA"]),
-  allExpenses
-);
+router.get("/my", authMiddleware, myExpenses);
 
 router.get(
-  "/expense/approval/manager",
+  "/approval/manager",
   authMiddleware,
   roleMiddleware(["MANAGER_ADMINISTRASI"]),
   approvalManagerExpense
 );
 
 router.post(
-  "/expense/:id/approve/manager",
+  "/:id/approve/manager",
   authMiddleware,
   roleMiddleware(["MANAGER_ADMINISTRASI"]),
   approveManagerExpense
 );
 router.post(
-  "/expense/:id/reject/manager",
+  "/:id/reject/manager",
   authMiddleware,
   roleMiddleware(["MANAGER_ADMINISTRASI"]),
   rejectManagerExpense
 );
-router.get(
-  "/expense/finance",
-  authMiddleware,
-  roleMiddleware("MANAGER_KEUANGAN"),
-  financeExpensePage
-);
+router.get("/finance", authMiddleware, roleMiddleware("MANAGER_KEUANGAN"), financeExpensePage);
 router.post(
-  "/expense/:id/pay",
+  "/:id/pay",
   authMiddleware,
   roleMiddleware("MANAGER_KEUANGAN"),
   uploadFile.single("transferProof"),

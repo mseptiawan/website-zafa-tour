@@ -47,7 +47,7 @@ const expenseSeeder = async () => {
   for (const user of users) {
     const employee = await Employee.findOne({ userId: user._id });
 
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 5; i++) {
       const amount = Math.floor(Math.random() * 500000) + 50000;
       const date = randomDate();
       const status = randomItem(finalStatuses);

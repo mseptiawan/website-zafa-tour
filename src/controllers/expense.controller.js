@@ -94,20 +94,6 @@ export const myExpenses = async (req, res) => {
   }
 };
 
-export const allExpenses = async (req, res) => {
-  try {
-    const expenses = await ExpenseClaim.find().populate("userId").sort({ createdAt: -1 });
-
-    res.render("expense/all", {
-      title: "Semua Klaim",
-      expenses,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error");
-  }
-};
-
 export const approvalManagerExpense = async (req, res) => {
   try {
     const expenses = await ExpenseClaim.find()
