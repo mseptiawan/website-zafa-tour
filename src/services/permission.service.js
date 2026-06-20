@@ -142,6 +142,8 @@ export function getPermissions(role) {
       permissions.daily_log_create = true;
 
       permissions.claim_new = true;
+      permissions.claim_approval = true;
+
       permissions.claim_my = true;
       permissions.claim_verify = true;
 
@@ -292,6 +294,8 @@ export function getPermissions(role) {
       permissions.daily_log_create = true;
 
       permissions.claim_new = true;
+      permissions.claim_approval = true;
+
       permissions.claim_my = true;
       permissions.claim_category_manage = true;
 

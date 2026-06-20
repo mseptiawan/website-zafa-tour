@@ -17,6 +17,52 @@ const usernames = [
 
 const finalStatuses = ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"];
 
+// Bank data judul klaim yang realistis berdasarkan kata kunci nama kategori
+const realisticTitles = {
+  transport: [
+    "Bensin & Tol Kunjungan Klien",
+    "Ganti Rugi Parkir & Tiket Tol",
+    "GrabCar Menemui Vendor Luar",
+    "Tiket Kereta Dinas Luar Kota",
+    "Sewa Mobil Operasional Lapangan",
+  ],
+  konsumsi: [
+    "Makan Siang Meeting Team",
+    "Snack & Kopi Jamuan Tamu",
+    "Konsumsi Rapat Evaluasi Bulanan",
+    "Makan Malam Lembur Kerja",
+    "Pembelian Air Galon Kantor",
+  ],
+  ATK: [
+    "Pembelian Kertas A4 & Pulpen",
+    "Tinta Printer & Logistik Arsip",
+    "Kebutuhan Stopmap & Amplop Kantor",
+    "Penjilidan Dokumen Proposal",
+    "Buku Catatan & Lakban Packing",
+  ],
+  medis: [
+    "Klaim Obat Resep Dokter Klinik",
+    "Reimbursement Vitamin Karyawan",
+    "Check-up Kesehatan Rutin",
+    "Pembelian Kotak P3K Kantor",
+    "Penggantian Biaya Kacamata Kerja",
+  ],
+  internet: [
+    "Paket Data Tethering Lapangan",
+    "Langganan Wi-Fi Router Backup",
+    "Pulsa Komunikasi Koordinasi Lapangan",
+    "Token Listrik Gudang Operasional",
+    "Ganti Pulsa Nelpon Klien Luar",
+  ],
+  default: [
+    "Biaya Operasional Tak Terduga",
+    "Perbaikan Fasilitas Ruang Kerja",
+    "Biaya Cetak Banner & Brosur",
+    "Penggantian Pembelian Perlengkapan Kebersihan",
+    "Dana Darurat Keperluan Kantor",
+  ],
+};
+
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -27,55 +73,117 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
+// Fungsi pembantu untuk menentukan judul yang realistis secara pintar
+function generateRealisticTitle(categoryName) {
+  const nameLower = categoryName.toLowerCase();
+
+  if (
+    nameLower.includes("trans") ||
+    nameLower.includes("perjalanan") ||
+    nameLower.includes("bensin")
+  ) {
+    return randomItem(realisticTitles.transport);
+  } else if (
+    nameLower.includes("makan") ||
+    nameLower.includes("konsumsi") ||
+    nameLower.includes("kuliner")
+  ) {
+    return randomItem(realisticTitles.konsumsi);
+  } else if (
+    nameLower.includes("atk") ||
+    nameLower.includes("tulis") ||
+    nameLower.includes("print")
+  ) {
+    return randomItem(realisticTitles.ATK);
+  } else if (
+    nameLower.includes("sehat") ||
+    nameLower.includes("medis") ||
+    nameLower.includes("obat")
+  ) {
+    return randomItem(realisticTitles.medis);
+  } else if (
+    nameLower.includes("pulsa") ||
+    nameLower.includes("kuota") ||
+    nameLower.includes("internet") ||
+    nameLower.includes("komunikasi")
+  ) {
+    return randomItem(realisticTitles.internet);
+  }
+
+  return randomItem(realisticTitles.default);
+}
+
 const expenseSeeder = async () => {
-  const dbCategories = await ExpenseCategory.find({});
-  if (!dbCategories.length) {
-    console.log("Tidak ada Expense Category ditemukan. Seeding expense dibatalkan.");
-    return;
-  }
-
-  const users = await User.find({ username: { $in: usernames } });
-  if (!users.length) {
-    console.log("Tidak ada user ditemukan. Seeding expense dibatalkan.");
-    return;
-  }
-
-  await ExpenseClaim.deleteMany({});
-
-  const data = [];
-
-  for (const user of users) {
-    const employee = await Employee.findOne({ userId: user._id });
-
-    for (let i = 0; i < 5; i++) {
-      const amount = Math.floor(Math.random() * 500000) + 50000;
-      const date = randomDate();
-      const status = randomItem(finalStatuses);
-
-      const pickedCategory = randomItem(dbCategories);
-
-      data.push({
-        userId: user._id,
-        employeeId: employee ? employee._id : null,
-        title: `Klaim Operasional ${i + 1} - ${user.username}`,
-        category: pickedCategory._id,
-        amount: amount,
-        expenseDate: date,
-        status: status,
-        selfDeclaration: amount < 100000,
-        proofFile: amount >= 100000 ? "nota-kredit.png" : null,
-        transferProofFile:
-          status === "PAID" && Math.random() > 0.5 ? "file-1779435027076.jpeg" : null,
-        paidAt: status === "PAID" ? date : null,
-        financeApprovedBy: status === "PAID" ? user._id : null,
-        createdAt: date,
-        updatedAt: new Date(),
-      });
+  try {
+    const dbCategories = await ExpenseCategory.find({});
+    if (!dbCategories.length) {
+      console.log("Tidak ada Expense Category ditemukan. Seeding expense dibatalkan.");
+      return;
     }
-  }
 
-  await ExpenseClaim.insertMany(data);
-  console.log("Expense Claim seeded");
+    const users = await User.find({ username: { $in: usernames } });
+    if (!users.length) {
+      console.log("Tidak ada user ditemukan. Seeding expense dibatalkan.");
+      return;
+    }
+
+    // Bersihkan data lama
+    await ExpenseClaim.deleteMany({});
+
+    const data = [];
+
+    for (const user of users) {
+      // Pastikan data Employee ada untuk user terkait
+      const employee = await Employee.findOne({ userId: user._id });
+
+      // JIKA employee tidak ditemukan, lewati user ini agar tidak merusak validasi "required: true" di database
+      if (!employee) {
+        console.log(`User ${user.username} dilewati karena tidak memiliki profil Employee.`);
+        continue;
+      }
+
+      for (let i = 0; i < 100; i++) {
+        const amount = Math.floor(Math.random() * 500000) + 50000;
+        const date = randomDate();
+        const status = randomItem(finalStatuses);
+        const pickedCategory = randomItem(dbCategories);
+
+        // Ambil judul acak yang sesuai dengan kategori dokumen saat ini
+        const cleanTitle = generateRealisticTitle(pickedCategory.name);
+
+        data.push({
+          userId: user._id,
+          employeeId: employee._id, // Diambil langsung dari data valid
+          title: cleanTitle,
+          category: pickedCategory._id,
+          amount: amount,
+          expenseDate: date,
+          status: status,
+          selfDeclaration: amount < 100000,
+          proofFile: amount >= 100000 ? "nota-kredit.png" : null,
+          transferProofFile:
+            status === "PAID" && Math.random() > 0.5 ? "file-1779435027076.jpeg" : null,
+          paidAt: status === "PAID" ? date : null,
+          financeApprovedBy: status === "PAID" ? user._id : null,
+          createdAt: date,
+          updatedAt: new Date(),
+        });
+      }
+    }
+
+    if (data.length === 0) {
+      console.log(
+        "Tidak ada data klaim yang siap dimasukkan (Semua user tidak memiliki data Employee)."
+      );
+      return;
+    }
+
+    // ordered: false ditambahkan agar jika ada 1 baris data gagal, baris lainnya tetap dipaksa masuk ke database
+    await ExpenseClaim.insertMany(data, { ordered: false });
+    console.log(`Berhasil melakukan seeding ${data.length} berkas Expense Claim ke database.`);
+  } catch (error) {
+    console.error("Terjadi kegagalan saat menjalankan seeder:", error);
+  }
 };
 
 export default expenseSeeder;

@@ -1,6 +1,7 @@
 import ExpenseClaim from "../models/ExpenseClaim.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import ExpenseCategory from "../models/ExpenseCategory.model.js";
+import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 export const formExpense = async (req, res) => {
   try {
     const categories = await ExpenseCategory.find({ isActive: true }).sort({ name: 1 });
@@ -78,36 +79,55 @@ export const createExpense = async (req, res) => {
 };
 export const myExpenses = async (req, res) => {
   try {
-    const user = req.session.user;
+    const { page } = req.query;
+    const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
 
-    const expenses = await ExpenseClaim.find({
-      userId: user._id,
-    }).sort({ createdAt: -1 });
+    // Hitung total data klaim khusus milik user ini
+    const totalExpenses = await ExpenseClaim.countDocuments({ userId: req.user._id });
+    const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
+
+    // Ambil data dengan Mongoose Pagination
+    const expenses = await ExpenseClaim.find({ userId: req.user._id })
+      .populate("category")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.render("expense/my", {
-      title: "Klaim Saya",
+      title: "Klaim Pengeluaran Saya",
       expenses,
+      pagination, // <--- Wajib dikirim ke EJS
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error");
+    console.error(err);
+    res.status(500).send("Error loading my expenses");
   }
 };
 
 export const approvalManagerExpense = async (req, res) => {
   try {
-    const expenses = await ExpenseClaim.find()
-      .populate("userId")
-      .populate("employeeId")
-      .sort({ createdAt: -1 });
+    const { page } = req.query;
+    const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
 
-    res.render("expense/approval-manager", {
-      title: "Approval Klaim Manager",
+    // Hitung total seluruh klaim untuk dimanajemeni
+    const totalExpenses = await ExpenseClaim.countDocuments({});
+    const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
+
+    const expenses = await ExpenseClaim.find({})
+      .populate("employeeId")
+      .populate("category")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.render("expense/approval", {
+      title: "Approval Klaim Operasional",
       expenses,
+      pagination, // <--- Wajib dikirim ke EJS
     });
   } catch (err) {
-    console.log("Error approvalManagerExpense:", err);
-    res.status(500).send("Internal Server Error");
+    console.error(err);
+    res.status(500).send("Error loading approval page");
   }
 };
 export const approveManagerExpense = async (req, res) => {
@@ -126,22 +146,30 @@ export const approveManagerExpense = async (req, res) => {
 
 export const financeExpensePage = async (req, res) => {
   try {
-    const expenses = await ExpenseClaim.find({
-      status: {
-        $in: ["PENDING_FINANCE", "PAID", "REJECTED"],
-      },
-    })
-      .populate("userId")
+    const { page } = req.query;
+    const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
+
+    // Filter finance biasanya hanya melihat yang siap bayar atau rekam jejak lunas
+    const financeQuery = { status: { $in: ["PENDING_FINANCE", "PAID"] } };
+
+    const totalExpenses = await ExpenseClaim.countDocuments(financeQuery);
+    const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
+
+    const expenses = await ExpenseClaim.find(financeQuery)
       .populate("employeeId")
-      .sort({ createdAt: -1 });
+      .populate("category")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.render("expense/finance", {
-      title: "Validasi Finance",
+      title: "Manajemen Keuangan Klaim",
       expenses,
+      pagination, // <--- Wajib dikirim ke EJS
     });
   } catch (err) {
-    console.error("Error pada financeExpensePage:", err);
-    res.status(500).send("Internal Server Error");
+    console.error(err);
+    res.status(500).send("Error loading finance page");
   }
 };
 export const payExpense = async (req, res) => {

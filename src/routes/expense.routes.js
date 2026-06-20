@@ -18,6 +18,15 @@ import {
 
 const router = express.Router();
 
+// Definisikan daftar role yang berhak melakukan Approval Managerial agar kode lebih rapi (DRY)
+const ALL_MANAGERS = [
+  "MANAGER_ADMINISTRASI",
+  "WAKIL_DIREKTUR",
+  "MANAGER_KEUANGAN",
+  "MANAGER_HAJI_UMRAH",
+];
+
+// ROUTE UNTUK PEGAWAI (UMUM)
 router.get("/create", authMiddleware, formExpense);
 router.post(
   "/expense/create",
@@ -26,33 +35,38 @@ router.post(
   validate(createExpenseSchema),
   createExpense
 );
-
 router.get("/my", authMiddleware, myExpenses);
 
+// ROUTE APPROVAL MANAGER (Bisa diakses oleh Administrasi, Wakildi, Keuangan, & Haji Umrah)
 router.get(
   "/approval/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER_ADMINISTRASI"]),
+  roleMiddleware(ALL_MANAGERS),
   approvalManagerExpense
 );
 
 router.post(
   "/:id/approve/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER_ADMINISTRASI"]),
+  roleMiddleware(ALL_MANAGERS),
   approveManagerExpense
 );
+
 router.post(
   "/:id/reject/manager",
   authMiddleware,
-  roleMiddleware(["MANAGER_ADMINISTRASI"]),
+  roleMiddleware(ALL_MANAGERS),
   rejectManagerExpense
 );
-router.get("/finance", authMiddleware, roleMiddleware("MANAGER_KEUANGAN"), financeExpensePage);
+
+// ROUTE KHUSUS FINANCE / PENCAIRAN DANA
+// (Tetap dikunci untuk MANAGER_KEUANGAN, atau bisa ditambah WAKIL_DIREKTUR jika berhak mencairkan)
+router.get("/finance", authMiddleware, roleMiddleware(["MANAGER_KEUANGAN"]), financeExpensePage);
+
 router.post(
   "/:id/pay",
   authMiddleware,
-  roleMiddleware("MANAGER_KEUANGAN"),
+  roleMiddleware(["MANAGER_KEUANGAN"]),
   uploadFile.single("transferProof"),
   payExpense
 );

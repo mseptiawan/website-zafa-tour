@@ -94,27 +94,27 @@
 
               </div>
 
-             <% if (!already) { %>
-  <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-white text-slate-900 font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(255,255,255,0.15)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.25)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
-    <span class="relative flex h-2 w-2 shrink-0">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-    </span>
-    <i class="fa-solid fa-camera text-[13px] text-slate-500 group-hover/btn:text-slate-800 transition-colors"></i>
-    <span class="tracking-tight">Check In</span>
-  </a>
+              <% if (!already) { %>
+              <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-white text-slate-900 font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(255,255,255,0.15)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.25)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
+                <span class="relative flex h-2 w-2 shrink-0">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <i class="fa-solid fa-camera text-[13px] text-slate-500 group-hover/btn:text-slate-800 transition-colors"></i>
+                <span class="tracking-tight">Check In</span>
+              </a>
 
-<% } else if (already && !hasCheckedOut) { %>
-  <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-amber-500npm  text-white font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(245,158,11,0.2)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
-    <span class="tracking-tight">Check Out</span>
-  </a>
+              <% } else if (already && !hasCheckedOut) { %>
+              <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-amber-500npm  text-white font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(245,158,11,0.2)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
+                <span class="tracking-tight">Check Out</span>
+              </a>
 
-<% } else { %>
-  <div class="inline-flex items-center gap-2 h-10 px-4 bg-white/10 border border-white/20 text-white/90 font-bold text-xs rounded-xl backdrop-blur-md shrink-0 shadow-3xs">
-    <i class="fa-solid fa-circle-check text-emerald-400 text-[13px]"></i>
-    <span class="tracking-tight">Selesai Kerja</span>
-  </div>
-<% } %>
+              <% } else { %>
+              <div class="inline-flex items-center gap-2 h-10 px-4 bg-white/10 border border-white/20 text-white/90 font-bold text-xs rounded-xl backdrop-blur-md shrink-0 shadow-3xs">
+                <i class="fa-solid fa-circle-check text-emerald-400 text-[13px]"></i>
+                <span class="tracking-tight">Selesai Kerja</span>
+              </div>
+              <% } %>
             </div>
 
             <div class="w-full pt-4 relative z-10">
@@ -198,12 +198,12 @@
             </a>
 
             <!-- KLAIM -->
-            <a href="/expense/my" class="group flex flex-col items-center gap-2 text-center">
-              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-cyan-100/50">
+            <button onclick="openExpenseMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.02)] transition-all duration-200 active:scale-95">
                 <i class="fa-solid fa-file-invoice text-base"></i>
               </div>
               <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Klaim Beban</span>
-            </a>
+            </button>
 
             <!-- PINJAMAN -->
             <a href="/loans/new" class="group flex flex-col items-center gap-2 text-center">
@@ -308,11 +308,39 @@
         </div>
         <% } %>
 
-        <div class="<%= typeof title !== 'undefined' && title.toLowerCase().includes('dashboard') ? 'hidden md:block' : '' %>">
-          <%- body -%>
-        </div>
+        <% if (typeof title !== 'undefined' && !title.toLowerCase().includes('dashboard')) { %>
+
+  <div class="fixed top-0 inset-x-0 z-50 flex items-center justify-between border-b border-slate-100 bg-white/95 px-5 py-3.5 md:hidden backdrop-blur-xs">
+    <div class="flex items-center gap-3">
+      <a href="/dashboard" class="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200/70 bg-white text-slate-600 active:bg-slate-50 active:scale-95 transition-all">
+        <i class="fa-solid fa-chevron-left text-xs"></i>
+      </a>
+
+      <div>
+        <h1 class="text-sm font-medium tracking-tight text-slate-800">
+          <%= title %>
+        </h1>
+        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">
+          <%= typeof user !== 'undefined' ? user.role.replace(/_/g, ' ') : 'Zafa HRIS' %>
+        </p>
       </div>
-    </main>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="pt-16 md:pt-1">
+    <%- body -%>
+  </div>
+
+<% } else { %>
+  
+  <%- body -%>
+
+<% } %>
+
+</div>
+  </div>
+  </main>
   </div>
 
   <div class="fixed inset-x-0 bottom-0 z-[999] flex items-center justify-around border-t border-slate-200/60 bg-white px-2 py-2 shadow-[0_-4px_16px_rgba(0,0,0,0.02)] md:hidden">
@@ -414,6 +442,68 @@
           <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-clock-rotate-left text-sm"></i></div>
           <span class="text-xs font-bold text-slate-700">Riwayat Izin</span>
         </a>
+      </div>
+    </div>
+  </div>
+  <div id="expenseMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 backdrop-blur-xs md:hidden transition-opacity duration-200" onclick="toggleExpenseMenuMobile()">
+    <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
+
+      <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleExpenseMenuMobile()"></div>
+
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Klaim & Keuangan</h3>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+
+        <a href="/expense/create" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-cyan-50 border border-slate-100 text-center gap-2">
+          <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center">
+            <i class="fa-solid fa-file-circle-plus text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Buat Klaim</span>
+        </a>
+
+        <a href="/expense/my" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-100 text-center gap-2">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Riwayat Saya</span>
+        </a>
+
+        <% if (typeof user !== 'undefined' && user.role) { %>
+
+        <% 
+          const approverRoles = [
+            'MANAGER_ADMINISTRASI', 
+            'MANAGER_HAJI_UMRAH', 
+            'MANAGER_KEUANGAN', 
+            'WAKIL_DIREKTUR'
+          ];
+          if (approverRoles.includes(user.role)) { 
+        %>
+        <a href="/expense/approval/manager" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i class="fa-solid fa-user-shield text-sm"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-800 block">Persetujuan Klaim</span>
+            <span class="text-[10px] text-slate-500 font-medium">Validasi berkas klaim pending milik staf</span>
+          </div>
+        </a>
+        <% } %>
+
+        <% if (user.role === 'MANAGER_KEUANGAN') { %>
+        <a href="/expense/finance" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-emerald-50/60 hover:bg-emerald-50 border border-emerald-100 text-left">
+          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i class="fa-solid fa-money-bill-transfer text-sm"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-800 block">Validasi & Pencairan</span>
+            <span class="text-[10px] text-slate-500 font-medium">Transfer dana & upload bukti transfer resmi</span>
+          </div>
+        </a>
+        <% } %>
+
+        <% } %>
+
       </div>
     </div>
   </div>
@@ -520,6 +610,22 @@
       };
       toast.querySelector("button").addEventListener("click", closeToast);
       setTimeout(closeToast, 4000);
+    }
+
+    function openExpenseMenuMobile() {
+      const menu = document.getElementById('expenseMenuMobile');
+      menu.classList.remove('hidden');
+      setTimeout(() => {
+        menu.querySelector('.transform').classList.remove('translate-y-full');
+      }, 10);
+    }
+
+    function toggleExpenseMenuMobile() {
+      const menu = document.getElementById('expenseMenuMobile');
+      menu.querySelector('.transform').classList.add('translate-y-full');
+      setTimeout(() => {
+        menu.classList.add('hidden');
+      }, 200);
     }
   </script>
 </body>
