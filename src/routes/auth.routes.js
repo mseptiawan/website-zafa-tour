@@ -7,6 +7,8 @@ import {
   requestPasswordReset,
   showResetPasswordPage,
   handleResetPassword,
+  showChangePassword,
+  changePassword,
 } from "../controllers/auth.controller.js";
 
 import authMiddleware from "../middlewares/authMiddleware.js";
@@ -22,5 +24,8 @@ router.post("/forgot-password", requestPasswordReset);
 
 router.get("/reset-password", showResetPasswordPage);
 router.post("/reset-password", handleResetPassword);
+
+router.get("/change-password", authMiddleware, showChangePassword);
+router.post("/change-password", authMiddleware, changePassword);
 
 export default router;

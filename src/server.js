@@ -1,9 +1,10 @@
-import dotenv from "dotenv";
-dotenv.config();
+// 1. IMPORT DOTENV CONFIG PALING ATAS
+import "dotenv/config";
 
+// 2. Sekarang baru import hal lain
+import mongoose from "mongoose"; // opsional, cek apakah perlu
 import app from "./app.js";
 import { connectRedis } from "./config/redis.js";
-
 import connectDatabase from "./config/database.js";
 
 const PORT = process.env.PORT || 3000;

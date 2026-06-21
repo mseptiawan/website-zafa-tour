@@ -1,6 +1,7 @@
 import { redisClient } from "../config/redis.js";
 import transporter from "../config/mailer.js";
 import bcrypt from "bcrypt";
+import { sendEmail } from "../services/email.service.js";
 import User from "../models/basic/User.model.js";
 import crypto from "crypto";
 import { getPermissions } from "../services/permission.service.js";
@@ -36,12 +37,11 @@ export const login = async (req, res) => {
 
     const employee = await Employee.findOne({ userId: user._id }).populate({
       path: "careerData",
-      populate: [{ path: "bidangId" }, { path: "unitId" }],
+      populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
     });
 
     const roleName = user.roleId?.name?.toUpperCase();
 
-    // Cek apakah role user saat ini adalah salah satu manager/wakil direktur berdasarkan seeder
     const managerRoles = [
       "MANAGER_KEUANGAN",
       "MANAGER_ADMINISTRASI",
@@ -50,10 +50,15 @@ export const login = async (req, res) => {
     ];
     const isManager = managerRoles.includes(roleName);
 
-    // Ambil bidangId milik si user/manager tersebut
-    const bidangId = employee?.careerData?.bidangId?._id || null;
-    const unitId = employee?.careerData?.unitId?._id || null;
+    const career = employee?.careerData || null;
 
+    const careerId = career?._id || null;
+    const bidangId = career?.bidangId?._id || null;
+    const bidangName = career?.bidangId?.name || null;
+    const unitId = career?.unitId?._id || null;
+    const unitName = career?.unitId?.name || null;
+    const positionId = career?.positionId?._id || null;
+    const positionName = career?.positionId?.name || null;
     req.session.user = {
       _id: user._id,
       username: user.username,
@@ -90,11 +95,11 @@ export const login = async (req, res) => {
 
     req.session.save(() => {
       res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+      console.log("LOGIN SUCCESS -> /dashboard");
       return res.redirect("/dashboard");
     });
   } catch (err) {
-    console.log(err);
-    console.log("LOGIN SUCCESS -> /dashboard");
+    console.error(err);
     return res.redirect("/?error=SERVER_ERROR");
   }
 };
@@ -150,7 +155,6 @@ export const resetPassword = async (req, res) => {
 export const requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
-
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -158,41 +162,43 @@ export const requestPasswordReset = async (req, res) => {
     }
 
     const token = crypto.randomBytes(32).toString("hex");
-
     await redisClient.setEx(`reset:${token}`, 900, user.email);
 
-    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    await sendEmail({
       to: email,
-      subject: "Reset Password",
-      text: `Klik link ini untuk reset password: ${resetLink}`,
+      subject: "Reset Password Akun HRIS",
+      html: `
+        <h2>Reset Password</h2>
+        <p>Klik tombol di bawah ini untuk mengatur ulang password Anda:</p>
+        <a href="${resetLink}" style="padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+        <p>Link ini akan kedaluwarsa dalam 15 menit.</p>
+      `,
     });
 
     return res.redirect("/forgot-password?success=EMAIL_SENT");
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.redirect("/forgot-password?error=SERVER_ERROR");
   }
 };
 export const showResetPasswordPage = async (req, res) => {
   const { token } = req.query;
 
-  if (!token) {
-    return res.redirect("/forgot-password");
-  }
+  if (!token) return res.redirect("/forgot-password");
 
-  const email = await redisClient.get(`reset:${token}`);
+  const redisKey = `reset:${token}`;
+  const email = await redisClient.get(redisKey);
+
+  console.log("Mencari token di Redis dengan key:", redisKey);
+  console.log("Hasil ditemukan:", email);
 
   if (!email) {
-    return res.send("Token expired atau tidak valid");
+    return res.send(`Token tidak ditemukan di database. Token: ${token}`);
   }
 
-  res.render("auth/reset-password", {
-    token,
-    query: req.query || {},
-  });
+  res.render("auth/reset-password", { token, query: req.query || {} });
 };
 
 export const handleResetPassword = async (req, res) => {
@@ -223,5 +229,64 @@ export const handleResetPassword = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.redirect("/reset-password?error=SERVER_ERROR");
+  }
+};
+
+// ==========================================
+// SHOW CHANGE PASSWORD PAGE (RENDER VIEW)
+// ==========================================
+export const showChangePassword = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect("/");
+    }
+
+    res.render("auth/change-password", {
+      user: req.session.user,
+      query: req.query || {},
+    });
+  } catch (err) {
+    console.error("Error showing change password page:", err);
+    return res.redirect("/dashboard?error=SERVER_ERROR");
+  }
+};
+
+// ==========================================
+// HANDLE CHANGE PASSWORD (POST ACTION)
+// ==========================================
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, password, confirmPassword } = req.body;
+    const userId = req.session.user?._id;
+
+    if (!userId) {
+      return res.redirect("/");
+    }
+
+    if (!password || password.length < 6) {
+      return res.redirect("/change-password?error=WEAK_PASSWORD");
+    }
+
+    if (password !== confirmPassword) {
+      return res.redirect("/change-password?error=PASSWORD_MISMATCH");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.redirect("/?error=USER_NOT_FOUND");
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.redirect("/change-password?error=WRONG_CURRENT_PASSWORD");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.updateOne({ _id: userId }, { $set: { password: hashedPassword } });
+
+    return res.redirect("/change-password?success=PASSWORD_CHANGED");
+  } catch (err) {
+    console.error("Error handling change password:", err);
+    return res.redirect("/change-password?error=SERVER_ERROR");
   }
 };

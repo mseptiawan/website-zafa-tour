@@ -4,6 +4,7 @@ import { EmployeeService } from "../services/employee.service.js";
 import AppError from "../utils/AppError.js";
 import { successResponse } from "../utils/response.js";
 import Role from "../models/basic/Role.model.js";
+import { sendNewEmployeeEmail } from "../utils/emailHelper.js";
 import Position from "../models/basic/Position.model.js";
 import Unit from "../models/basic/Unit.model.js";
 import Bidang from "../models/basic/Bidang.model.js";
@@ -287,8 +288,22 @@ export const createEmployeeApi = async (req, res, next) => {
   try {
     const validatedBody = createEmployeeSchema.parse(req.body);
 
-    await EmployeeService.createNewEmployee(validatedBody);
+    // 1. Simpan ke database
+    const newEmployee = await EmployeeService.createNewEmployee(validatedBody);
 
+    // 2. Generate username untuk email (sama dengan logika di service)
+    const username = validatedBody.fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    // 3. Kirim Email (Gunakan await agar kita tahu jika gagal kirim)
+    try {
+      await sendNewEmployeeEmail(validatedBody.email, validatedBody.fullName, username);
+      console.log("Email kredensial berhasil dikirim ke:", validatedBody.email);
+    } catch (emailErr) {
+      // Kita log saja jika email gagal, tapi jangan sampai membatalkan proses pendaftaran
+      console.error("Gagal mengirim email kredensial:", emailErr);
+    }
+
+    // 4. Redirect sukses
     return res.redirect("/employee");
   } catch (err) {
     let positions = [],

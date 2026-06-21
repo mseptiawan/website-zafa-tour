@@ -1,7 +1,7 @@
 <%- layout('layouts/main', { title: "Tambah Pegawai" }) %>
 
 <div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] p-4 sm:p-6 md:p-10 antialiased pb-24 md:pb-8 text-slate-800">
-  <div class="w-full max-w-2xl mx-auto space-y-6">
+  <div class="w-full max-w-5xl mx-auto space-y-6">
 
     <%- include('../partials/page-header', {
       section: 'Area Kerja',
@@ -18,7 +18,7 @@
 
     <div id="units-data" data-json="<%= JSON.stringify(units) %>" class="hidden"></div>
 
-    <div class="bg-white p-5 md:p-8 rounded-2xl border border-slate-200 shadow-xs">
+    <div class="bg-white p-5 md:p-8 rounded-2xl border border-slate-200  ">
       <form action="/api/employee/create" method="POST" class="space-y-8">
         <% const formErrors = typeof errors !== 'undefined' ? errors : {} %>
         <% const oldData = typeof old !== 'undefined' ? old : {} %>
@@ -181,7 +181,7 @@
             Batal
           </a>
           <button type="submit" 
-                  class="w-full sm:w-auto text-xs font-medium text-white bg-blue-500 px-5 py-2.5 rounded-xl hover:bg-blue-600 active:bg-blue-700 transition-colors tracking-wide shadow-xs">
+                  class="w-full sm:w-auto text-xs font-medium text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 active:bg-blue-700 transition-colors tracking-wide  ">
             Simpan Pegawai
           </button>
         </div>

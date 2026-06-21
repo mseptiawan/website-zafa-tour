@@ -319,33 +319,50 @@
 
       <div class="space-y-6">
         
-        <% if (user && (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()))) { %>
-        <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.015)]">
-          <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-sliders text-xs"></i>
-            </div>
-            <div>
-              <div class="text-xs text-slate-900 leading-none mb-1">Aksi Profil</div>
-              <div class="text-[10px] text-slate-400 font-normal">Kelola informasi berkas</div>
-            </div>
-          </h3>
+       <% if (user && (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()))) { %>
+  <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.015)]">
+    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-sliders text-xs"></i>
+      </div>
+      <div>
+        <div class="text-xs text-slate-900 leading-none mb-1">Aksi Profil</div>
+        <div class="text-[10px] text-slate-400 font-normal">Kelola informasi berkas</div>
+      </div>
+    </h3>
 
-          <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR') { %>
-            <p class="text-[11px] text-slate-500 leading-relaxed mb-4 font-medium">Anda memiliki hak akses tinggi untuk memodifikasi rekam jejak atau berkas personal milik pegawai ini.</p>
-            <a href="/employee/edit/<%= employee._id %>" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.97]">
-              <i class="fa-solid fa-user-pen text-[11px]"></i>
-              Edit Pegawai (Full HR)
-            </a>
-          <% } else if (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()) { %>
-            <p class="text-[11px] text-slate-500 leading-relaxed mb-4 font-medium">Anda dapat memperbarui data personal mandiri Anda (Kontak, Alamat, Keluarga, Rekening, & Sertifikat).</p>
-            <a href="/employee/my-profile/edit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.97]">
-              <i class="fa-solid fa-user-pen text-[11px]"></i>
-              Edit Profil Mandiri
-            </a>
-          <% } %>
-        </div>
-        <% } %>
+    <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR') { %>
+      <p class="text-[11px] text-slate-500 leading-relaxed mb-4 font-medium">Anda memiliki hak akses tinggi untuk memodifikasi rekam jejak atau berkas personal milik pegawai ini.</p>
+      
+      <div class="flex flex-col gap-2">
+        <a href="/employee/edit/<%= employee._id %>" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.97] decoration-none">
+          <i class="fa-solid fa-user-pen text-[11px]"></i>
+          Edit Pegawai (Full HR)
+        </a>
+
+        <a href="/employee/change-password/<%= employee._id %>" class="hidden md:flex w-full items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition active:scale-[0.97] decoration-none border-none cursor-pointer">
+          <i class="fa-solid fa-key text-[11px] text-slate-400"></i>
+          Ganti Password Pegawai
+        </a>
+      </div>
+
+    <% } else if (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()) { %>
+      <p class="text-[11px] text-slate-500 leading-relaxed mb-4 font-medium">Anda dapat memperbarui data personal mandiri Anda (Kontak, Alamat, Keluarga, Rekening, & Sertifikat).</p>
+      
+      <div class="flex flex-col gap-2">
+        <a href="/employee/my-profile/edit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/10 transition active:scale-[0.97] decoration-none">
+          <i class="fa-solid fa-user-pen text-[11px]"></i>
+          Edit Profil Mandiri
+        </a>
+
+        <a href="/change-password" class="hidden md:flex w-full items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition active:scale-[0.97] decoration-none border-none cursor-pointer">
+          <i class="fa-solid fa-key text-[11px] text-slate-400"></i>
+          Ganti Password Akun
+        </a>
+      </div>
+    <% } %>
+  </div>
+<% } %>
 
         <div class="bg-white border border-slate-200/40 md:border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.015)] p-5 sm:p-6">
           <div class="mb-6">

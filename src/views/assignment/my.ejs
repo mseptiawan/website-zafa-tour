@@ -1,126 +1,121 @@
 <%- layout('layouts/main', { title: title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
-  <div class="mx-auto max-w-5xl">
-    <div class="mb-10">
-      <%- include('../partials/page-header.ejs', { 
-    section: 'Area Kerja', 
-    module: 'Penugasan', 
-    title: 'Penugasan Saya', 
-    description: 'Kelola daftar riwayat dan pantau penugasan aktif yang diberikan kepada Anda.' 
-}) %>
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50 md:bg-[#FCFCFD] p-4 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-none mx-auto">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 select-none">
+      <div class="flex-1 min-w-0">
+        <%- include('../partials/page-header.ejs', { 
+            section: 'Area Kerja', 
+            module: 'Penugasan', 
+            title: 'Penugasan Saya', 
+            description: 'Kelola daftar riwayat dan pantau penugasan aktif yang diberikan kepada Anda.' 
+        }) %>
+      </div>
     </div>
 
     <% if(assignments.length===0) { %>
-    <div class="rounded-2xl border border-slate-200/60 bg-white p-12 text-center shadow-sm">
-      <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-400">
-        <svg class="h-5 w-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
+      <div class="rounded-2xl border border-slate-200/60 bg-white p-12 text-center shadow-3xs px-4">
+        <div class="mx-auto mb-3.5 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-50 text-slate-400">
+          <svg class="h-5 w-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <p class="text-[12.5px] font-semibold text-slate-700">Belum Ada Penugasan</p>
+        <p class="mt-0.5 text-[11.5px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+          Saat ini Anda tidak memiliki surat perintah atau tugas aktif yang tercatat.
+        </p>
       </div>
-      <p class="text-[13px] font-medium text-slate-700">Belum ada penugasan</p>
-      <p class="mt-0.5 text-[11px] text-slate-400">
-        Saat ini Anda tidak memiliki surat perintah atau tugas aktif.
-      </p>
-    </div>
     <% } else { %>
 
-    <div class="space-y-3">
-      <% assignments.forEach(a=> { %>
-      <a href="/assignment/<%= a._id %>" class="group block rounded-2xl border border-slate-200/60 bg-white p-5 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50/30 hover:shadow-sm">
-        <div class="flex items-start justify-between gap-4">
-          <div class="min-w-0 space-y-1">
-            <h2 class="text-[14px] font-semibold break-words text-slate-800 transition-colors group-hover:text-blue-600">
-              <%= a.title %>
-            </h2>
-            <p class="line-clamp-1 pr-4 text-[13px] leading-relaxed break-words text-slate-400">
-              <%= a.description || 'Tidak ada deskripsi tambahan untuk penugasan ini' %>
-            </p>
-          </div>
+      <div class="grid grid-cols-1 gap-3 md:block md:bg-white md:border md:border-slate-200/60 md:rounded-2xl md:p-1.5 md:shadow-3xs md:divide-y md:divide-slate-100/80">
+        <% assignments.forEach(a=> { %>
+          
+          <div class="bg-white border border-slate-200/60 rounded-2xl p-4 md:bg-transparent md:border-none md:rounded-none md:p-5 flex flex-col gap-3.5 shadow-3xs md:shadow-none">
+            
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0 space-y-0.5">
+                <h2 class="text-[14px] font-bold tracking-tight text-slate-800 break-words">
+                  <%= a.title %>
+                </h2>
+                <p class="line-clamp-2 pr-4 text-[12px] leading-relaxed break-words text-slate-400 font-medium">
+                  <%= a.description || 'Tidak ada deskripsi tambahan untuk penugasan ini' %>
+                </p>
+              </div>
 
-          <div class="flex-shrink-0">
-            <% if(a.endDate && new Date(a.endDate)>= new Date()) { %>
-            <span class="inline-flex items-center rounded-lg border border-emerald-100 bg-emerald-50/60 px-2.5 py-1 text-[11px] font-medium tracking-wide text-emerald-600">
-              <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-              Active
-            </span>
-            <% } else { %>
-            <span class="inline-flex items-center rounded-lg border border-slate-200/60 bg-slate-50 px-2.5 py-1 text-[11px] font-medium tracking-wide text-slate-400">
-              <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-              Completed
-            </span>
-            <% } %>
-          </div>
-        </div>
+              <div class="flex-shrink-0 pt-0.5">
+                <% if(a.endDate && new Date(a.endDate)>= new Date()) { %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+                    <span class="h-1 w-1 rounded-full bg-emerald-500"></span> Active
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-200/50">
+                    <span class="h-1 w-1 rounded-full bg-slate-300"></span> Completed
+                  </span>
+                <% } %>
+              </div>
+            </div>
 
-        <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-100/70 pt-3.5 text-[12px] font-medium text-slate-400">
-          <div>
-            Tipe:
-            <span class="ml-0.5 text-slate-600"><%= a.type %></span>
-          </div>
-          <div class="flex items-center">
-            <span class="mr-4 hidden h-1 w-1 rounded-full bg-slate-200 sm:block"></span>
-            Lokasi:
-            <span class="ml-0.5 max-w-[120px] truncate text-slate-600 sm:max-w-none">
-              <%= a.location || '-' %>
-            </span>
-          </div>
-          <div class="flex items-center">
-            <span class="mr-4 hidden h-1 w-1 rounded-full bg-slate-200 sm:block"></span>
-            Durasi:
-            <span class="ml-0.5 text-slate-600">
-              <%= new Date(a.startDate).toLocaleDateString("id-ID", { day: 'numeric' , month:
-              'short' }) %> - <%= new Date(a.endDate).toLocaleDateString("id-ID", { day: 'numeric' ,
-              month: 'short' , year: 'numeric' }) %>
-            </span>
-          </div>
-        </div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3.5 border-t border-slate-100/80">
+              
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11.5px] font-semibold text-slate-400">
+                <div>
+                  Tipe: <span class="text-slate-600 font-bold"><%= a.type %></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="h-1 w-1 rounded-full bg-slate-200 hidden sm:block"></span>
+                  Lokasi: <span class="text-slate-600 font-bold"><%= a.location || '-' %></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="h-1 w-1 rounded-full bg-slate-200 hidden sm:block"></span>
+                  Durasi: <span class="text-slate-600 font-bold">
+                    <%= new Date(a.startDate).toLocaleDateString("id-ID", { day: 'numeric' , month: 'short' }) %> - <%= new Date(a.endDate).toLocaleDateString("id-ID", { day: 'numeric' , month: 'short' , year: 'numeric' }) %>
+                  </span>
+                </div>
+              </div>
 
-        <% if(a.attachment) { %>
-        <div class="mt-3.5 flex items-center justify-between border-t border-dashed border-slate-100 pt-3">
-          <div class="inline-flex items-center gap-1.5 rounded-md border border-blue-100/60 bg-blue-50/50 px-2.5 py-0.5 text-[11px] font-medium text-blue-600">
-            <svg class="h-3.5 w-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l4.5-4.5a4.5 4.5 0 011.243-0.88m6.364 6.364l-.001-.001m1.036-1.036a4.5 4.5 0 001.24-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364l4.5 4.5a4.5 4.5 0 001.242.88" />
-            </svg>
-            Surat Tugas Terlampir
-          </div>
+              <div class="flex items-center gap-2 justify-end">
+                <% if(a.attachment) { %>
+                  <a href="/uploads/files/<%= a.attachment %>" target="_blank" class="inline-flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg px-2 py-1 text-[11px] font-bold transition-colors decoration-none">
+                    <svg class="w-3 h-3 stroke-[2.5] text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l4.5-4.5a4.5 4.5 0 011.243-0.88m6.364 6.364l-.001-.001m1.036-1.036a4.5 4.5 0 001.24-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364l4.5 4.5a4.5 4.5 0 001.242.88" />
+                    </svg>
+                    <span>Surat Tugas</span>
+                  </a>
+                <% } %>
 
-          <span class="flex items-center gap-1 text-[11px] text-slate-400 transition-colors group-hover:text-blue-500">
-            Lihat Detail
-            <svg class="h-3 w-3 transform transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </span>
-        </div>
-        <% } %>
-      </a>
-      <% }) %>
-    </div>
-    <% } %> <% if (pagination.totalPages> 1) { %>
-    <div class="mt-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 text-[13px] antialiased shadow-sm">
-      <div class="font-medium text-slate-500">
-        Menampilkan halaman
-        <span class="font-bold text-slate-900"><%= pagination.page %></span>
-        dari
-        <span class="font-bold text-slate-900"><%= pagination.totalPages %></span>
+                <a href="/assignment/<%= a._id %>" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold h-7 px-3 rounded-lg flex items-center justify-center gap-1 transition-all active:scale-[0.98] decoration-none">
+                  Lihat Detail <i class="fa-solid fa-angle-right text-[9px] text-slate-400"></i>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        <% }) %>
       </div>
+    <% } %> 
 
-      <div class="flex items-center gap-2">
-        <a href="?page=<%= pagination.page - 1 %>" class="<%= pagination.hasPrev ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100">
-          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Prev
-        </a>
+    <% if (pagination.totalPages > 1) { %>
+      <div class="flex items-center justify-end mt-8 w-full border-t border-slate-200/60 pt-4 select-none">
+        <div class="flex items-center gap-4">
+          
+          <a href="?page=<%= pagination.page - 1 %>" class="py-1 text-[11.5px] font-bold transition-colors flex items-center gap-1 decoration-none <%= pagination.hasPrev ? 'text-slate-500 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %>">
+            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Prev
+          </a>
 
-        <a href="?page=<%= pagination.page + 1 %>" class="<%= pagination.hasNext ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %> flex items-center gap-1.5 rounded-xl border border-slate-100 border-slate-200 bg-slate-50/50 bg-white px-4 py-2 font-bold transition-all hover:bg-slate-50 focus:ring-4 focus:ring-slate-100">
-          Next
-          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
+          <a href="?page=<%= pagination.page + 1 %>" class="py-1 text-[11.5px] font-bold transition-colors flex items-center gap-1 decoration-none <%= pagination.hasNext ? 'text-slate-500 hover:text-slate-900' : 'text-slate-300 pointer-events-none' %>">
+            Next
+            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+          
+        </div>
       </div>
-    </div>
     <% } %>
   </div>
 </div>

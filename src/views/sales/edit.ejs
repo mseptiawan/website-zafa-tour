@@ -1,116 +1,109 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-2xl mx-auto">
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
-    <!-- HEADER -->
-    <div class="mb-8 space-y-1">
-      <h1 class="text-xl font-bold text-slate-900 tracking-tight">
-        Edit Sales Visit
-      </h1>
-      <p class="text-[13px] text-slate-500 font-medium">
-        Perbarui data kunjungan yang sudah dibuat
-      </p>
-    </div>
+    <%- include('../partials/page-header', { 
+        section: 'Monitoring', 
+        module: 'Sales Visits', 
+        title: 'Edit Kunjungan Sales', 
+        description: 'Perbarui data dan lampiran laporan kunjungan yang sudah dibuat.' 
+    }) %>
 
-    <!-- CARD -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm shadow-slate-100/40">
-
-      <form action="/sales/<%= visit._id %>/edit" method="POST" enctype="multipart/form-data" class="p-8 space-y-5">
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 shadow-2xs md:shadow-sm overflow-hidden">
+      
+      <form action="/sales/<%= visit._id %>/edit" method="POST" enctype="multipart/form-data" class="space-y-5">
 
         <% if (error) { %>
-        <div class="p-4 rounded-xl bg-red-50 text-red-600 text-[13px] font-medium border border-red-100">
+        <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
           <%= error %>
         </div>
         <% } %>
 
-        <!-- TITLE -->
-        <div class="space-y-1.5">
-          <label class="block text-[13px] font-medium text-slate-700">Judul Kunjungan</label>
-          <input type="text" name="title" value="<%= visit.title %>" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] font-medium text-slate-800 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Kunjungan</label>
+          <input type="text" name="title" value="<%= visit.title %>" required 
+                 class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
         </div>
 
-        <!-- ADDRESS -->
-        <div class="space-y-1.5">
-          <label class="block text-[13px] font-medium text-slate-700">Alamat</label>
-          <input type="text" name="address" value="<%= visit.address %>" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] font-medium text-slate-800 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alamat</label>
+          <input type="text" name="address" value="<%= visit.address %>" required 
+                 class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
         </div>
 
-        <!-- MEET WITH -->
-        <div class="space-y-1.5">
-          <label class="block text-[13px] font-medium text-slate-700">Bertemu Dengan</label>
-          <input type="text" name="meetWith" value="<%= visit.meetWith %>" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] font-medium text-slate-800 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all" />
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Bertemu Dengan</label>
+          <input type="text" name="meetWith" value="<%= visit.meetWith %>" required 
+                 class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
         </div>
 
-        <!-- RESULT -->
-        <div class="space-y-1.5">
-          <label class="block text-[13px] font-medium text-slate-700">Hasil Kunjungan</label>
-          <textarea name="result" rows="5" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] font-medium text-slate-800 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none resize-none transition-all"><%= visit.result %></textarea>
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Hasil Kunjungan</label>
+          <textarea name="result" rows="5" 
+                    class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800 font-medium"><%= visit.result %></textarea>
         </div>
 
-        <!-- DYNAMIC ATTACHMENT COMPONENT -->
-        <div class="space-y-1.5">
-          <label class="block text-[13px] font-medium text-slate-700">
+        <div class="space-y-2 mb-2">
+          <label class="block text-[12px] font-semibold text-slate-700 tracking-wide">
             Lampiran <span class="text-slate-400 font-normal">(Opsional)</span>
           </label>
+          
+          <div class="relative">
+            <input type="file" name="attachments" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
+            
+            <% const hasFile = visit.attachments && visit.attachments.length > 0 && visit.attachments[0].filename; %>
 
-          <!-- Check if database already has a file -->
-          <% const hasFile=visit.attachments && visit.attachments.length> 0 && visit.attachments[0].filename; %>
-
-          <!-- EMPTY STATE (Upload Box) -->
-          <div id="dropzone-empty" class="<%= hasFile ? 'hidden' : '' %> relative w-full border border-slate-200 border-dashed rounded-xl p-6 bg-white hover:bg-slate-50/50 transition flex flex-col items-center justify-center text-center">
-            <input type="file" name="attachments" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
-            <svg class="w-5 h-5 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-            </svg>
-            <span class="text-[13px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
-            <span class="text-xs text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (maks 5MB)</span>
-          </div>
-
-          <!-- FILLED STATE (Preview Box) -->
-          <div id="dropzone-filled" class="<%= hasFile ? '' : 'hidden' %> flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm">
-            <div class="flex items-center gap-3 min-w-0 flex-1">
-              <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center">
-                <!-- Logic deteksi tipe file server-side untuk thumbnail awal -->
-                <% let isImg=false; if (hasFile) { const mime=visit.attachments[0].mimetype || '' ;
-                          isImg=mime.startsWith('image/') ||
-                          /\.(jpg|jpeg|png|webp)$/i.test(visit.attachments[0].filename); } %>
-                <img id="img-preview" src="<%= hasFile ? '/uploads/files/' + visit.attachments[0].filename : '' %>" class="w-full h-full object-cover <%= isImg ? '' : 'hidden' %>" />
-                <svg id="file-icon-fallback" class="w-5 h-5 text-slate-400 <%= isImg ? 'hidden' : '' %>" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                </svg>
-              </div>
-
-              <div class="min-w-0 flex-1">
-                <div id="name-preview" class="text-[13px] font-medium text-slate-700 truncate">
-                  <%= hasFile ? (visit.attachments[0].originalName || visit.attachments[0].filename)
-                            : 'file_name.jpg' %>
-                </div>
-                <div id="size-preview" class="text-xs text-slate-400 mt-0.5">
-                  <%= hasFile && visit.attachments[0].size ? (visit.attachments[0].size / 1024).toFixed(1)
-                            + ' KB' : 'Database File' %>
-                </div>
-              </div>
+            <div id="dropzone-empty" class="<%= hasFile ? 'hidden' : '' %> w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center">
+              <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+              <span class="text-[12px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
+              <span class="text-[11px] text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (maks 5MB)</span>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2 ml-4 flex-shrink-0">
-              <a id="view-file-btn" href="<%= hasFile ? '/uploads/files/' + visit.attachments[0].filename : '#' %>" target="_blank" class="text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100/70 px-2.5 py-1.5 rounded-lg transition">
-                View
-              </a>
-              <button type="button" onclick="triggerChangeFile()" class="text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">
-                Ganti File
-              </button>
+            <div id="dropzone-filled" class="<%= hasFile ? '' : 'hidden' %> flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center shrink-0 overflow-hidden">
+                  <% 
+                    let isImg = false; 
+                    if (hasFile) { 
+                      const mime = visit.attachments[0].mimetype || '';
+                      isImg = mime.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(visit.attachments[0].filename); 
+                    } 
+                  %>
+                  <img id="img-preview" src="<%= hasFile ? '/uploads/files/' + visit.attachments[0].filename : '' %>" class="w-full h-full object-cover <%= isImg ? '' : 'hidden' %>" />
+                  <svg id="file-icon-fallback" class="w-4 h-4 text-slate-400 <%= isImg ? 'hidden' : '' %>" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                  </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">
+                    <%= hasFile ? (visit.attachments[0].originalName || visit.attachments[0].filename) : 'file_name.jpg' %>
+                  </div>
+                  <div id="size-preview" class="text-[11px] text-slate-400 mt-0.5">
+                    <%= hasFile && visit.attachments[0].size ? (visit.attachments[0].size / 1024).toFixed(1) + ' KB' : 'Database File' %>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto relative z-20">
+                <a id="view-file-btn" href="<%= hasFile ? '/uploads/files/' + visit.attachments[0].filename : '#' %>" target="_blank" class="text-[11px] font-medium text-center text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">
+                  View
+                </a>
+                <button type="button" onclick="document.getElementById('file-input').click()" class="text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">
+                  Ganti
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- ACTIONS FOOTER -->
-        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-          <a href="/sales/my" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm shadow-slate-100/50 active:scale-[0.98]">
+        <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
+          <a href="/sales/my" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-5 py-2.5 text-[12px] font-semibold transition-colors shadow-2xs">
             Batal
           </a>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm shadow-blue-100/50 active:scale-[0.98] cursor-pointer">
+          <button type="submit" class="w-auto text-center bg-blue-500 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs cursor-pointer">
             Update
           </button>
         </div>
@@ -162,9 +155,5 @@
       document.getElementById("dropzone-empty").classList.add("hidden");
       document.getElementById("dropzone-filled").classList.remove("hidden");
     }
-  }
-
-  function triggerChangeFile() {
-    document.getElementById("file-input").click();
   }
 </script>

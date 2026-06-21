@@ -12,7 +12,7 @@
       </a>
     </div>
 
-    <div class="bg-white border-0 md:border md:border-slate-200/60 rounded-2xl overflow-hidden md:shadow-3xs">
+    <div class="bg-white border-0 md:border md:border-slate-200/60 rounded-2xl overflow-hidden ">
 
       <div class="p-4 sm:p-6 md:p-8 border-b border-slate-100 bg-white space-y-3.5">
         
@@ -22,7 +22,8 @@
               Official Release
             </span>
           <% } else { %>
-            <span class="inline-flex items-center bg-amber-300 text-slate-600 border border-slate-200/40 px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase">
+            <span class="inline-flex items-center bg-slate-100
+text-slate-600  border border-slate-200/40 px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase">
               General Info
             </span>
           <% } %>
@@ -32,10 +33,18 @@
           <%= announcement.title %>
         </h1>
 
-        <div class="flex items-center gap-2.5 pt-1">
-          <div class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-[11.5px] font-bold text-slate-600 uppercase shrink-0 select-none shadow-3xs">
-            <%= announcement.createdBy?.employeeData?.fullName ? announcement.createdBy?.employeeData?.fullName.charAt(0) : '?' %>
-          </div>
+       <div class="flex items-center gap-3 pt-1">
+         <% if (announcement.createdBy?.employeeData?.foto_profile) { %>
+ <img
+  src="<%= announcement.createdBy.employeeData.foto_profile %>"
+  alt="Profile"
+class="w-10 h-10 rounded-full object-cover border border-slate-200/60 shrink-0"
+/>
+<% } else { %>
+  <div class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-[11.5px] font-bold text-slate-600 uppercase shrink-0 select-none">
+    <%= announcement.createdBy?.employeeData?.fullName?.charAt(0) || '?' %>
+  </div>
+<% } %>
 
           <div class="flex flex-col min-w-0">
             <span class="text-[12.5px] font-semibold text-slate-800 truncate leading-none">
@@ -71,7 +80,7 @@
               </h3>
             </div>
 
-            <div class="border border-slate-200/60 rounded-xl overflow-hidden bg-slate-50/30 shadow-3xs">
+            <div class="border border-slate-200/60 rounded-xl overflow-hidden bg-slate-50/30 ">
               
               <% if (announcement.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)) { %>
                 <div class="p-3 bg-slate-50/50 border-b border-slate-200/40 flex items-center justify-center">
@@ -91,9 +100,9 @@
                   </div>
 
                   <div class="min-w-0 flex-1">
-                    <p class="text-[11.5px] font-semibold text-slate-700 truncate">
-                      <%= announcement.attachment %>
-                    </p>
+                   <p class="text-[11.5px] font-semibold text-slate-700 truncate">
+    Lampiran Pengumuman
+  </p>
                     <p class="text-[10.5px] text-slate-400 mt-0.5 leading-tight">
                       Klik untuk melihat dokumen lampiran pengumuman.
                     </p>
@@ -101,7 +110,7 @@
                 </div>
 
                 <a href="/uploads/files/<%= announcement.attachment %>" target="_blank"
-                  class="inline-flex items-center justify-center h-8 bg-blue-500 text-white border border-slate-200 rounded-xl px-4 text-[11px] font-semibold transition-colors shrink-0 w-full sm:w-auto active:scale-[0.99]">
+                  class="inline-flex items-center justify-center h-8 bg-blue-500 text-white rounded-xl px-4 text-[11px] font-semibold transition-colors shrink-0 w-full sm:w-auto active:scale-[0.99]">
                   Lihat Berkas
                 </a>
               </div>

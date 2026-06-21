@@ -13,7 +13,7 @@
     }) %>
 
     <!-- 3. MAIN CARD WRAPPER (Anti-Lancip di Mobile, Premium di Desktop) -->
-    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 shadow-2xs md:shadow-sm overflow-hidden">
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8  overflow-hidden">
       <form method="POST" action="/announcement/" enctype="multipart/form-data" class="space-y-5">
 
         <% if (typeof errors !== 'undefined' && errors?.global) { %>
@@ -117,7 +117,7 @@
 
         <!-- 4. ACTION BUTTONS FOOTER (Fokus Tunggal & Ukuran Fleksibel Slate-900) -->
         <div class="pt-5 border-t border-slate-100 flex items-center justify-end">
-          <button type="submit" class="w-auto text-center bg-blue-500 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs">
+          <button type="submit" class="w-auto text-center bg-blue-500 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors ">
             Publish 
           </button>
         </div>

@@ -99,14 +99,24 @@ export const edit = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
+    // 1. Jika validasi input gagal (misal teks terlalu panjang/format salah)
     if (req.validationErrors) {
+      // Ambil kembali data visit dari DB agar form edit tidak crash (visit is not defined)
+      const visit = await salesService.findById(req.params.id);
+
+      // Ambil data yang barusan diketik user agar tidak hilang saat reload form
+      const updatedData = Object.assign(visit, req.body);
+
       return res.status(400).render("sales/edit", {
         title: "Edit Kunjungan",
+        visit: updatedData, // <-- WAJIB DIKIRIM BALIK BIAR EJS TIDAK ERROR
         errors: req.validationErrors,
         validationErrors: req.validationErrors,
+        error: "Validasi gagal, silakan periksa inputan Anda.",
       });
     }
 
+    // 2. Jalankan proses update ke service jika validasi aman
     await salesService.update({
       id: req.params.id,
       userId: req.session.user._id,
@@ -116,7 +126,17 @@ export const update = async (req, res, next) => {
 
     return res.redirect("/sales/my");
   } catch (err) {
-    next(err);
+    // 3. Jika terjadi error di level database/service (misal: sudah lewat 24 jam)
+    try {
+      const visit = await salesService.findById(req.params.id);
+      return res.status(400).render("sales/edit", {
+        title: "Edit Kunjungan",
+        visit, // <-- WAJIB DIKIRIM BALIK DI BLOK CATCH
+        error: err.message,
+      });
+    } catch (innerErr) {
+      next(err);
+    }
   }
 };
 export const exportPdf = async (req, res, next) => {
@@ -126,7 +146,7 @@ export const exportPdf = async (req, res, next) => {
 
     const doc = new PDFDocument({ size: "A4", margin: 42 });
 
-    const safeUsername = (user.name || "Sales").replace(/\s+/g, "_");
+    const safeUsername = user.fullName || "Sales";
     const filename = `Riwayat_Kunjungan_${safeUsername}_${Date.now()}.pdf`;
 
     res.setHeader("Content-Type", "application/pdf");
@@ -151,7 +171,7 @@ export const exportPdf = async (req, res, next) => {
       .font("Helvetica")
       .fontSize(10)
       .fillColor("#475569")
-      .text(`Nama Sales   : ${user.name || "-"}`)
+      .text(`Nama Sales : ${user.fullName || "-"}`)
       .text(`Email              : ${user.email || "-"}`)
       .text(
         `Tanggal Cetak : ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })} WIB`

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Data Karyawan</title>
+  <style>
+    @page {
+      size: A4;
+margin: 20mm 15mm 20mm 15mm;
+    }
+    
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+      background-color: #ffffff;
+      line-height: 1.4;
+    }
+
+    /* Container untuk menjaga jarak isi tabel dari hantaman header/footer */
+   .main-content {
+  padding: 0;
+}
+
+    .meta-container {
+      width: 100%;
+      margin-bottom: 20px;
+      border-collapse: collapse;
+    }
+
+    .doc-title {
+      font-size: 13pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #0f172a;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 35px;
+      font-size: 9pt;
+    }
+
+    .data-table th {
+      background-color: #1a365d;
+      color: #ffffff;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+      border: 1px solid #1a365d;
+      padding: 10px 12px;
+    }
+
+    .data-table td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 12px;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .font-bold { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <%- include('../partials/pdf-header') %>
+
+  <div class="main-content">
+    
+    <table class="meta-container">
+      <tr>
+        <td>
+          <h2 class="doc-title">Laporan Data Karyawan Aktif</h2>
+          <p style="font-size: 9pt; color: #64748b; margin: 3px 0 0 0;">Status Dokumen: Keperluan Arsip Internal Kerja</p>
+        </td>
+        <td style="text-align: right; font-size: 9.5pt; color: #334155; vertical-align: bottom;">
+          Tanggal Ekspor: <span class="font-bold"><%= exportDate %></span>
+        </td>
+      </tr>
+    </table>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 5%;" class="text-center">NO</th>
+          <th style="width: 20%;" class="text-left">ID KARYAWAN</th>
+          <th style="width: 35%;" class="text-left">NAMA LENGKAP</th>
+          <th style="width: 15%;" class="text-center">GENDER</th>
+          <th style="width: 25%;" class="text-left">TEMPAT LAHIR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (employees && employees.length > 0) { %>
+          <% employees.forEach((emp, idx) => { %>
+            <tr>
+              <td class="text-center"><%= idx + 1 %></td>
+              <td class="font-bold" style="color: #1a365d;"><%= emp.employeeIdNumber || '-' %></td>
+              <td class="font-bold"><%= emp.fullName %></td>
+              <td class="text-center"><%= emp.jenis_kelamin || '-' %></td>
+              <td><%= emp.tempat_lahir || '-' %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="text-center" style="padding: 20px; color: #94a3b8;">Tidak ada data karyawan ditemukan.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; page-break-inside: avoid;">
+      <tr>
+        <td style="font-size: 8pt; color: #94a3b8; font-style: italic; width: 60%; vertical-align: top; line-height: 1.5;">
+          * Dokumen ini dibuat otomatis secara legal melalui sistem manajemen operasional internal HRIS PT Zafa Mulia Mandiri dan sah digunakan untuk keperluan arsip korporat.
+        </td>
+        <td style="text-align: right; width: 40%;">
+          <div style="font-size: 9.5pt; color: #334155; margin-bottom: 60px;">
+            Palembang, <%= exportDate %><br>
+            <span class="font-bold" style="text-transform: uppercase; display: block; margin-top: 3px;">Manajer HRD</span>
+          </div>
+          <div style="font-weight: bold; color: #0f172a; border-top: 1.5px solid #0f172a; padding-top: 5px; display: inline-block; width: 180px; text-align: center; font-size: 9.5pt;">
+            Verifikasi Aplikasi HRIS
+          </div>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+
+</body>
+</html>

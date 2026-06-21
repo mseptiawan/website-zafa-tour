@@ -14,15 +14,15 @@ import EmployeeFamily from "../models/employee/EmployeeFamily.model.js";
 import EmployeeContact from "../models/employee/EmployeeContact.js";
 import EmployeeEducation from "../models/employee/EmployeeEducation.js";
 import bcrypt from "bcrypt";
+import puppeteer from "puppeteer";
+import ejs from "ejs";
+import path from "path";
 
 export const EmployeeService = {
   findAllEmployees: async (currentUser) => {
     let queryFilter = {};
 
-    // 1. Jika user yang login adalah Manager dan memiliki bidangId di sesinya
     if (currentUser?.isManager && currentUser?.bidangId) {
-      // Cari ID berkas CareerData yang memiliki bidangId sama dengan bidang si Manager
-      // Menggunakan Mongoose model dinamis untuk menghindari circular dependency jika ada
       const matchingCareers = await mongoose
         .model("Career")
         .find({
@@ -31,12 +31,9 @@ export const EmployeeService = {
         .select("_id");
 
       const careerIds = matchingCareers.map((c) => c._id);
-
-      // Filter query Employee: Hanya ambil pegawai yang careerData-nya masuk list di atas
       queryFilter = { careerData: { $in: careerIds } };
     }
 
-    // 2. Tarik data pegawai berdasarkan filter (jika Admin/Superadmin, queryFilter tetap kosong `{}` sehingga narik semua)
     const employeesData = await Employee.find(queryFilter)
       .populate("userId")
       .populate("salaryDetail")
@@ -45,12 +42,10 @@ export const EmployeeService = {
         populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
       });
 
-    // 3. Ambil data pengajuan PHK / Termination
     const terminations = await Termination.find({
       status: { $in: ["Waiting", "Approved"] },
     }).populate("approvedBy", "username");
 
-    // 4. Map data untuk response ke client
     return employeesData.map((emp) => {
       const empObj = emp.toObject();
       const termInfo = terminations.find((t) => t.employeeId?.toString() === emp._id.toString());
@@ -70,6 +65,56 @@ export const EmployeeService = {
       return empObj;
     });
   },
+
+  /**
+   * Mengonversi data list karyawan menjadi file PDF (Buffer) menggunakan Puppeteer.
+   * @param {Array} employeesData - Array berisi data lengkap karyawan.
+   * @returns {Promise<Buffer>} Buffer biner dari PDF hasil render.
+   */
+  generatePdf: async (employeesData) => {
+    const lakiCount = employeesData.filter((e) => e.jenis_kelamin === "Laki-Laki").length;
+    const perempuanCount = employeesData.filter((e) => e.jenis_kelamin === "Perempuan").length;
+    const totalEmp = employeesData.length || 1;
+
+    const stats = {
+      lakiCount,
+      perempuanCount,
+      pctLaki: Math.round((lakiCount / totalEmp) * 100),
+      pctPerempuan: Math.round((perempuanCount / totalEmp) * 100),
+    };
+
+    const exportDate = new Date().toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    const templatePath = path.resolve("src/views/pdf/employees.ejs");
+
+    const htmlContent = await ejs.renderFile(templatePath, {
+      employees: employeesData,
+      stats,
+      exportDate,
+    });
+
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: { top: "0px", bottom: "0px", left: "0px", right: "0px" },
+    });
+
+    await browser.close();
+    return pdfBuffer;
+  },
+
   getFormData: async (currentUserRole) => {
     let roleQuery = {};
 
@@ -86,6 +131,7 @@ export const EmployeeService = {
 
     return { positions, units, bidang, roles };
   },
+
   createNewEmployee: async (data) => {
     const username = data.fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
     const password = await bcrypt.hash("zafasecret", 10);
@@ -157,11 +203,7 @@ export const EmployeeService = {
       .populate("userId")
       .populate({
         path: "careerData",
-        populate: [
-          { path: "positionId" }, // Menarik nama posisi jabatan
-          { path: "unitId" }, // Menarik nama unit kerja penempatan
-          { path: "bidangId" }, // Menarik nama bidang kerja
-        ],
+        populate: [{ path: "positionId" }, { path: "unitId" }, { path: "bidangId" }],
       })
       .populate("contactData")
       .populate("educationData")
@@ -210,12 +252,9 @@ export const EmployeeService = {
   },
 
   updateKarir: async (id, data) => {
-    // 1. Cari data Employee terlebih dahulu untuk mendapatkan userId-nya
     const employee = await Employee.findById(id).select("userId");
 
-    // Siapkan array untuk menampung promise update paralel
     const updatePromises = [
-      // Update data karir di EmployeeCareer
       EmployeeCareer.findOneAndUpdate(
         { employee_id: id },
         {
@@ -287,6 +326,7 @@ export const EmployeeService = {
       }
     );
   },
+
   updatePendidikan: async (id, data, file) => {
     const updateData = {
       pendidikan_terakhir: data.pendidikan_terakhir,
@@ -312,6 +352,7 @@ export const EmployeeService = {
       }
     );
   },
+
   updateKeluarga: async (id, data) => {
     const listKeluarga = data.anggota_keluarga || [];
     const formattedFamily = listKeluarga.map((m) => ({
@@ -330,9 +371,7 @@ export const EmployeeService = {
   },
 
   updateFinansial: async (id, data) => {
-    // 1. Jalankan update untuk EmployeeFinancial dan EmployeeSalary secara bersamaan (Parallel)
     const [financialUpdate, salaryUpdate] = await Promise.all([
-      // Update data bank, npwp, bpjs, dan overtime rate
       EmployeeFinancial.findOneAndUpdate(
         { employee_id: id },
         {

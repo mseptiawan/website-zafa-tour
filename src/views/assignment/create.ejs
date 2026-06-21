@@ -1,312 +1,307 @@
 <%- layout('layouts/main', { title: title }) %>
 
-  <div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
-    <div class="max-w-2xl mx-auto">
-<%- include('../partials/page-header', {
-  section: 'Area Kerja',
-  module: 'Assignment',
-  title: 'Buat Penugasan',
-  description: 'Tambahkan tugas atau penugasan untuk Pegawai.'
-}) %>
-      <% if (typeof errors !== 'undefined' && errors._errors && errors._errors.length > 0) { %>
-        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl flex items-start gap-3">
-          <svg class="w-5 h-5 shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span><%= errors._errors[0] %></span>
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50 md:bg-[#FCFCFD] p-4 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto">
+
+    <div class="pb-5 select-none">
+      <%- include('../partials/page-header', {
+        section: 'Area Kerja',
+        module: 'Assignment',
+        title: 'Buat Penugasan',
+        description: 'Tambahkan tugas atau penugasan resmi baru untuk Pegawai.'
+      }) %>
+    </div>
+
+    <% if (typeof errors !== 'undefined' && errors._errors && errors._errors.length > 0) { %>
+      <div class="mb-5 p-4 bg-red-50 border border-red-100 text-red-700 text-[12.5px] font-bold rounded-xl flex items-start gap-2.5">
+        <svg class="w-4 h-4 shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span><%= errors._errors[0] %></span>
+      </div>
+    <% } %>
+
+    <div class="bg-white border border-slate-200/60 rounded-2xl shadow-3xs overflow-hidden">
+      <form id="assignment-form" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 space-y-5" action="/assignment/">
+
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-bold text-slate-500">Judul Penugasan <span class="text-red-500">*</span></label>
+          <input name="title" required value="<%= typeof old !== 'undefined' && old.title ? old.title : '' %>" placeholder="Ketik judul dokumen penugasan..."
+            class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.title ? 'border-red-400 focus:ring-red-50' : 'border-slate-200/60 focus:border-slate-300 focus:ring-slate-100/70' %> rounded-xl px-4 py-2.5 text-[13px] font-semibold text-slate-700 placeholder-slate-400/80 outline-none focus:bg-white focus:ring-4 transition-all" />
+          <% if (typeof errors !== 'undefined' && errors.title) { %>
+            <p class="text-xs text-red-500 mt-1 font-semibold"><%= errors.title._errors[0] %></p>
+          <% } %>
         </div>
-      <% } %>
 
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
-        <form id="assignment-form" method="POST" enctype="multipart/form-data" class="p-8 space-y-6" action="/assignment/">
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-bold text-slate-500">Deskripsi Detail <span class="text-red-500">*</span></label>
+          <textarea name="description" required rows="4" placeholder="Tulis rincian deskripsi tugas secara jelas..."
+            class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.description ? 'border-red-400 focus:ring-red-50' : 'border-slate-200/60 focus:border-slate-300 focus:ring-slate-100/70' %> rounded-xl px-4 py-2.5 text-[13px] font-semibold text-slate-700 placeholder-slate-400/80 outline-none resize-none focus:bg-white focus:ring-4 transition-all"><%= typeof old !== 'undefined' && old.description ? old.description : '' %></textarea>
+          <% if (typeof errors !== 'undefined' && errors.description) { %>
+            <p class="text-xs text-red-500 mt-1 font-semibold"><%= errors.description._errors[0] %></p>
+          <% } %>
+        </div>
 
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-bold text-slate-500">Tipe Penugasan <span class="text-red-500">*</span></label>
+          <div class="relative w-full select-none" id="assignment-type-dropdown">
+            <% 
+              let currentType = "INTERNAL";
+              let currentLabel = "Internal";
+              if (typeof old !== 'undefined' && old.type) {
+                currentType = old.type;
+                if (old.type === 'UNDANGAN') currentLabel = 'Undangan';
+                if (old.type === 'INTERNAL') currentLabel = 'Internal';
+                if (old.type === 'TRAINING') currentLabel = 'Training';
+                if (old.type === 'LAINNYA') currentLabel = 'Lainnya';
+              }
+            %>
+            <input type="hidden" name="type" id="assignment-type-value" value="<%= currentType %>" required>
+            <button type="button" onclick="toggleTypeDropdown()"
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.type ? 'border-red-400' : 'border-slate-200/60' %> rounded-xl px-4 py-2.5 h-10 text-[13px] font-bold text-slate-700 text-left flex items-center justify-between outline-none hover:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100/70 transition-all duration-150 cursor-pointer">
+              <span id="assignment-type-label"><%= currentLabel %></span>
+              <svg id="assignment-type-arrow" class="w-3.5 h-3.5 text-slate-400 stroke-[2.5] transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div id="assignment-type-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/60 rounded-xl shadow-xl p-1 space-y-0.5 origin-top transform opacity-0 scale-95 transition-all duration-150">
+              <button type="button" onclick="selectAssignmentType('UNDANGAN', 'Undangan')" class="w-full text-left px-3 py-2 text-[12.5px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Undangan</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+              </button>
+              <button type="button" onclick="selectAssignmentType('INTERNAL', 'Internal')" class="w-full text-left px-3 py-2 text-[12.5px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Internal</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+              </button>
+              <button type="button" onclick="selectAssignmentType('TRAINING', 'Training')" class="w-full text-left px-3 py-2 text-[12.5px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Training</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+              </button>
+              <button type="button" onclick="selectAssignmentType('LAINNYA', 'Lainnya')" class="w-full text-left px-3 py-2 text-[12.5px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Lainnya</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+              </button>
+            </div>
+          </div>
+          <% if (typeof errors !== 'undefined' && errors.type) { %>
+            <p class="text-xs text-red-500 font-semibold"><%= errors.type._errors[0] %></p>
+          <% } %>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-bold text-slate-500">Lokasi Tujuan / Tempat <span class="text-red-500">*</span></label>
+          <input name="location" required value="<%= typeof old !== 'undefined' && old.location ? old.location : '' %>" placeholder="Contoh: Kantor Cabang Palembang"
+            class="w-full bg-slate-50/60 border border-slate-200/60 rounded-xl px-4 py-2.5 text-[13px] font-semibold text-slate-700 placeholder-slate-400/80 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1.5">
-            <label class="text-[13px] font-semibold text-slate-700">Judul Penugasan <span class="text-red-500">*</span></label>
-            <input name="title" required value="<%= typeof old !== 'undefined' && old.title ? old.title : '' %>" placeholder="Ketik judul penugasan..."
-              class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.title ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:border-slate-400 transition-all" />
-            <% if (typeof errors !== 'undefined' && errors.title) { %>
-              <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.title._errors[0] %></p>
+            <label class="text-[12px] font-bold text-slate-500">Tanggal Mulai <span class="text-red-500">*</span></label>
+            <input type="date" id="startDate" name="startDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.startDate ? old.startDate : '' %>"
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.startDate ? 'border-red-400' : 'border-slate-200/60' %> rounded-xl px-4 py-2.5 h-10 text-[13px] font-bold text-slate-700 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all" />
+            <% if (typeof errors !== 'undefined' && errors.startDate) { %>
+              <p class="text-xs text-red-500 mt-1 font-semibold"><%= errors.startDate._errors[0] %></p>
             <% } %>
           </div>
 
           <div class="space-y-1.5">
-            <label class="text-[13px] font-semibold text-slate-700">Deskripsi <span class="text-red-500">*</span></label>
-            <textarea name="description" required rows="5" placeholder="Tulis detail penugasan..."
-              class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.description ? 'border-red-400 focus:ring-red-50' : 'border-slate-200 focus:ring-slate-100' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:border-slate-400 transition-all"><%= typeof old !== 'undefined' && old.description ? old.description : '' %></textarea>
-            <% if (typeof errors !== 'undefined' && errors.description) { %>
-              <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.description._errors[0] %></p>
+            <label class="text-[12px] font-bold text-slate-500">Tanggal Selesai <span class="text-red-500">*</span></label>
+            <input type="date" id="endDate" name="endDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.endDate ? old.endDate : '' %>"
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.endDate ? 'border-red-400' : 'border-slate-200/60' %> rounded-xl px-4 py-2.5 h-10 text-[13px] font-bold text-slate-700 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all" />
+            <% if (typeof errors !== 'undefined' && errors.endDate) { %>
+              <p class="text-xs text-red-500 mt-1 font-semibold"><%= errors.endDate._errors[0] %></p>
             <% } %>
           </div>
+        </div>
 
-          <div class="space-y-2">
-            <label class="text-[13px] font-medium text-slate-500 block">Tipe Penugasan <span class="text-red-500">*</span></label>
-            <div class="relative w-full" id="assignment-type-dropdown">
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-bold text-slate-500">Surat Penugasan <span class="text-slate-400 font-normal">(opsional)</span></label>
+          <div class="relative group">
+            <input type="file" name="attachment" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
+            
+            <div id="dropzone-empty" class="border-2 border-dashed border-slate-200/80 rounded-xl py-6 flex flex-col items-center justify-center bg-slate-50/50 group-hover:bg-slate-50 border-spacing-2 transition-all select-none">
+              <svg class="w-7 h-7 text-slate-400 mb-1.5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <p class="text-[12.5px] text-slate-600 font-bold">Klik atau taruh berkas di sini</p>
+              <p class="text-[10.5px] text-slate-400 mt-0.5 font-medium">Format PDF atau Gambar Dokumen Resmi</p>
+            </div>
+
+            <div id="dropzone-filled" class="hidden border border-slate-200/60 rounded-xl p-3.5 bg-white flex items-center justify-between shadow-3xs">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center overflow-hidden border border-slate-100 shrink-0">
+                  <img id="img-preview" class="hidden w-full h-full object-cover" />
+                  <i id="doc-icon" class="fa-solid fa-file-pdf text-[15px] text-slate-400"></i>
+                </div>
+                <div class="overflow-hidden">
+                  <p id="name-preview" class="text-[12.5px] font-bold text-slate-700 truncate max-w-[200px]">file.pdf</p>
+                  <p id="size-preview" class="text-[11px] text-slate-400 font-medium">1.2 MB</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0 select-none">
+                <a id="view-file-btn" href="#" target="_blank" class="text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors decoration-none">Lihat</a>
+                <button type="button" onclick="changeFile()" class="text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors border-none cursor-pointer">Ganti</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[12px] font-bold text-slate-500 block">Pilih Pegawai Delegasi <span class="text-red-500">*</span></label>
+          <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-magnifying-glass text-[11px]"></i>
+            </div>
+            <input type="text" id="employee-search" placeholder="Cari nama staf atau Pegawai..."
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.employees ? 'border-red-400' : 'border-slate-200/60' %> rounded-xl pl-9 pr-4 py-2.5 text-[13px] font-semibold text-slate-700 placeholder-slate-400/80 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100/70 transition-all" />
+          </div>
+
+          <div id="employee-list" class="border <%= typeof errors !== 'undefined' && errors.employees ? 'border-red-200 bg-red-50/10' : 'border-slate-200/60 bg-slate-50/50' %> rounded-xl p-1.5 max-h-52 overflow-y-auto space-y-0.5">
+            <% employees.forEach(e=> { %>
               <% 
-                let currentType = "INTERNAL";
-                let currentLabel = "Internal";
-                if (typeof old !== 'undefined' && old.type) {
-                  currentType = old.type;
-                  if (old.type === 'UNDANGAN') currentLabel = 'Undangan';
-                  if (old.type === 'INTERNAL') currentLabel = 'Internal';
-                  if (old.type === 'TRAINING') currentLabel = 'Training';
-                  if (old.type === 'LAINNYA') currentLabel = 'Lainnya';
+                let isChecked = false;
+                if (typeof old !== 'undefined' && old.employees) {
+                  const oldEmps = Array.isArray(old.employees) ? old.employees : [old.employees];
+                  isChecked = oldEmps.includes(e._id.toString());
                 }
               %>
-              <input type="hidden" name="type" id="assignment-type-value" value="<%= currentType %>" required>
-              <button type="button" onclick="toggleTypeDropdown()"
-                class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.type ? 'border-red-400' : 'border-slate-200/60' %> rounded-xl px-4 py-3 text-[13px] font-medium text-slate-700 text-left flex items-center justify-between outline-none hover:bg-slate-50 hover:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100/70 transition-all duration-200 cursor-pointer shadow-sm">
-                <span id="assignment-type-label" class="text-slate-700"><%= currentLabel %></span>
-                <svg id="assignment-type-arrow" class="w-4 h-4 text-slate-400 stroke-[2] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div id="assignment-type-menu" class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200/50 rounded-xl shadow-xl p-1.5 space-y-0.5 origin-top transform opacity-0 scale-95 transition-all duration-150">
-                <button type="button" onclick="selectAssignmentType('UNDANGAN', 'Undangan')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
-                  <span>Undangan</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                </button>
-                <button type="button" onclick="selectAssignmentType('INTERNAL', 'Internal')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
-                  <span>Internal</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                </button>
-                <button type="button" onclick="selectAssignmentType('TRAINING', 'Training')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
-                  <span>Training</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                </button>
-                <button type="button" onclick="selectAssignmentType('LAINNYA', 'Lainnya')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
-                  <span>Lainnya</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                </button>
-              </div>
-            </div>
-            <% if (typeof errors !== 'undefined' && errors.type) { %>
-              <p class="text-xs text-red-500 font-medium"><%= errors.type._errors[0] %></p>
-            <% } %>
+              <label class="employee-item flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white border border-transparent hover:border-slate-200/40 cursor-pointer transition-all duration-100 group" data-name="<%= e.fullName.toLowerCase() %>">
+                <input type="checkbox" name="employees" value="<%= e._id %>" <%= isChecked ? 'checked' : '' %>
+                  class="employee-checkbox w-3.5 h-3.5 rounded border-slate-300 text-blue-600 cursor-pointer accent-blue-600 transition-colors" />
+                <span class="text-[12.5px] font-bold text-slate-600 group-hover:text-slate-800 transition-colors"><%= e.fullName %></span>
+              </label>
+            <% }) %>
           </div>
+          
+          <p id="employee-error-msg" class="text-xs text-red-500 font-semibold hidden">Wajib memilih minimal satu Pegawai yang didelegasikan.</p>
+          <% if (typeof errors !== 'undefined' && errors.employees) { %>
+            <p class="text-xs text-red-500 font-semibold"><%= errors.employees._errors[0] %></p>
+          <% } %>
+          <p class="text-[11px] text-slate-400 font-medium pl-0.5 leading-normal">Cari nama di atas, lalu centang satu atau beberapa Pegawai yang akan didelegasikan.</p>
+        </div>
 
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-semibold text-slate-700">Lokasi <span class="text-red-500">*</span></label>
-            <input name="location" required value="<%= typeof old !== 'undefined' && old.location ? old.location : '' %>" placeholder="Lokasi kegiatan"
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:border-slate-400 transition-all" />
-          </div>
+        <div class="pt-5 border-t border-slate-100/80 flex items-center justify-end gap-2.5 select-none">
+          <a href="/assignment" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-600 h-9.5 px-4 text-[12px] font-bold rounded-xl transition-all active:scale-[0.98] decoration-none">Batal</a>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white h-9.5 px-5 text-[12px] font-bold rounded-xl transition-all border-none shadow-xs active:scale-[0.98] cursor-pointer">Kirim Penugasan</button>
+        </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label class="text-[13px] font-semibold text-slate-700">Tanggal Mulai <span class="text-red-500">*</span></label>
-              <input type="date" id="startDate" name="startDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.startDate ? old.startDate : '' %>"
-                class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.startDate ? 'border-red-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 transition-all" />
-              <% if (typeof errors !== 'undefined' && errors.startDate) { %>
-                <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.startDate._errors[0] %></p>
-              <% } %>
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="text-[13px] font-semibold text-slate-700">Tanggal Selesai <span class="text-red-500">*</span></label>
-              <input type="date" id="endDate" name="endDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.endDate ? old.endDate : '' %>"
-                class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.endDate ? 'border-red-400' : 'border-slate-200' %> rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 transition-all" />
-              <% if (typeof errors !== 'undefined' && errors.endDate) { %>
-                <p class="text-xs text-red-500 mt-1 font-medium"><%= errors.endDate._errors[0] %></p>
-              <% } %>
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-[13px] font-semibold text-slate-700">Surat Penugasan <span class="text-slate-400 font-normal">(opsional)</span></label>
-            <div class="relative group">
-              <input type="file" name="attachment" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
-              <div id="dropzone-empty" class="border-2 border-dashed border-slate-200 rounded-xl py-8 flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 transition-all">
-                <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <p class="text-sm text-slate-600 font-medium">Klik untuk upload file</p>
-                <p class="text-xs text-slate-400 mt-1">PDF atau gambar dokumen</p>
-              </div>
-              <div id="dropzone-filled" class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm">
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
-                    <img id="img-preview" class="hidden w-full h-full object-cover" />
-                    <svg id="doc-icon" class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="1.5" />
-                    </svg>
-                  </div>
-                  <div class="overflow-hidden">
-                    <p id="name-preview" class="text-sm font-medium text-slate-700 truncate max-w-[220px]">file.pdf</p>
-                    <p id="size-preview" class="text-xs text-slate-400">1.2 MB</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <a id="view-file-btn" href="#" class="text-xs font-medium text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition">View</a>
-                  <button type="button" onclick="changeFile()" class="text-xs font-medium text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-lg transition">Change</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label class="text-[13px] font-medium text-slate-500 block">Pilih Pegawai <span class="text-red-500">*</span></label>
-            <div class="relative w-full">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input type="text" id="employee-search" placeholder="Cari nama staf atau Pegawai..."
-                class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.employees ? 'border-red-400' : 'border-slate-200/60' %> rounded-xl pl-10 pr-4 py-3 text-[13px] font-medium text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 transition-all" />
-            </div>
-
-            <div id="employee-list" class="border <%= typeof errors !== 'undefined' && errors.employees ? 'border-red-300 bg-red-50/10' : 'border-slate-200/60 bg-slate-50/50' %> rounded-xl p-1.5 max-h-64 overflow-y-auto space-y-0.5">
-              <% employees.forEach(e=> { %>
-                <% 
-                  let isChecked = false;
-                  if (typeof old !== 'undefined' && old.employees) {
-                    const oldEmps = Array.isArray(old.employees) ? old.employees : [old.employees];
-                    isChecked = oldEmps.includes(e._id.toString());
-                  }
-                %>
-                <label class="employee-item flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-200/40 cursor-pointer transition-all duration-150 group" data-name="<%= e.fullName.toLowerCase() %>">
-                  <input type="checkbox" name="employees" value="<%= e._id %>" <%= isChecked ? 'checked' : '' %>
-                    class="employee-checkbox w-4 h-4 rounded border-slate-300 text-blue-600 cursor-pointer accent-blue-600 transition-colors" />
-                  <div class="flex flex-col">
-                    <span class="text-[13px] font-medium text-slate-600 group-hover:text-slate-900 transition-colors"><%= e.fullName %></span>
-                  </div>
-                </label>
-              <% }) %>
-            </div>
-            <p id="employee-error-msg" class="text-xs text-red-500 font-medium hidden">Wajib memilih minimal satu Pegawai yang didelegasikan.</p>
-            
-            <% if (typeof errors !== 'undefined' && errors.employees) { %>
-              <p class="text-xs text-red-500 font-medium"><%= errors.employees._errors[0] %></p>
-            <% } %>
-            <p class="text-[11px] text-slate-400 pl-1 leading-normal">Cari nama di atas, lalu centang satu atau beberapa Pegawai yang akan didelegasikan.</p>
-          </div>
-
-          <div class="pt-6 border-t border-slate-100/80 flex items-center justify-end gap-3">
-            <a href="/assignment" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-5 py-2.5 text-[13px] font-medium transition-all shadow-sm active:scale-[0.98]">Batal</a>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all border border-blue-700/30 shadow-sm active:scale-[0.98] cursor-pointer">Kirim Penugasan</button>
-          </div>
-
-        </form>
-      </div>
+      </form>
     </div>
+
   </div>
+</div>
 
-  <script>
-    // 🔴 VALIDASI SISI KLIEN UNTUK TANGGAL DAN CHECKBOX PEGAWAI
-    document.getElementById('assignment-form').addEventListener('submit', function(e) {
-      const checkboxes = document.querySelectorAll('.employee-checkbox');
-      const errorMsg = document.getElementById('employee-error-msg');
-      const listContainer = document.getElementById('employee-list');
-      
-      // 1. Cek Apakah ada pegawai yang dicentang
-      let isOneChecked = false;
-      for (let i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked) {
-          isOneChecked = true;
-          break;
-        }
-      }
+<script>
+  // Validasi dan logika Javascript tetap utuh & aman sesuai kode bawaanmu...
+  document.getElementById('assignment-form').addEventListener('submit', function(e) {
+    const checkboxes = document.querySelectorAll('.employee-checkbox');
+    const errorMsg = document.getElementById('employee-error-msg');
+    const listContainer = document.getElementById('employee-list');
+    
+    let isOneChecked = false;
+    for (let i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) { isOneChecked = true; break; }
+    }
 
-      if (!isOneChecked) {
-        e.preventDefault(); // Stop form submit
-        errorMsg.classList.remove('hidden');
-        listContainer.classList.add('border-red-400', 'bg-red-50/10');
-        listContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return false;
+    if (!isOneChecked) {
+      e.preventDefault();
+      errorMsg.classList.remove('hidden');
+      listContainer.classList.add('border-red-400', 'bg-red-50/10');
+      listContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    } else {
+      errorMsg.classList.add('hidden');
+      listContainer.classList.remove('border-red-400', 'bg-red-50/10');
+    }
+
+    const start = new Date(document.getElementById('startDate').value);
+    const end = new Date(document.getElementById('endDate').value);
+    if (end < start) {
+      e.preventDefault();
+      alert('Tanggal Selesai tidak boleh sebelum Tanggal Mulai!');
+      return false;
+    }
+  });
+
+  document.getElementById('startDate').addEventListener('change', function() {
+    document.getElementById('endDate').min = this.value;
+  });
+
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      document.getElementById("name-preview").textContent = file.name;
+      document.getElementById("size-preview").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+      const fileUrl = URL.createObjectURL(file);
+      document.getElementById("view-file-btn").href = fileUrl;
+      const reader = new FileReader();
+      if (file.type.startsWith("image/")) {
+        reader.onload = e => {
+          document.getElementById("img-preview").src = e.target.result;
+          document.getElementById("img-preview").classList.remove("hidden");
+          document.getElementById("doc-icon").classList.add("hidden");
+        };
+        reader.readAsDataURL(file);
       } else {
-        errorMsg.classList.add('hidden');
-        listContainer.classList.remove('border-red-400', 'bg-red-50/10');
+        document.getElementById("img-preview").classList.add("hidden");
+        document.getElementById("doc-icon").classList.remove("hidden");
       }
-
-      // 2. Validasi Logika Tanggal (Tanggal Selesai tidak boleh mendahului Tanggal Mulai)
-      const start = new Date(document.getElementById('startDate').value);
-      const end = new Date(document.getElementById('endDate').value);
-      if (end < start) {
-        e.preventDefault();
-        alert('Tanggal Selesai tidak boleh sebelum Tanggal Mulai!');
-        return false;
-      }
-    });
-
-    // Otomatis update min-date untuk tanggal selesai saat tanggal mulai diubah
-    document.getElementById('startDate').addEventListener('change', function() {
-      document.getElementById('endDate').min = this.value;
-    });
-
-    function handleFileSelect(input) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        document.getElementById("name-preview").textContent = file.name;
-        document.getElementById("size-preview").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-        const fileUrl = URL.createObjectURL(file);
-        document.getElementById("view-file-btn").href = fileUrl;
-        const reader = new FileReader();
-        if (file.type.startsWith("image/")) {
-          reader.onload = e => {
-            document.getElementById("img-preview").src = e.target.result;
-            document.getElementById("img-preview").classList.remove("hidden");
-            document.getElementById("doc-icon").classList.add("hidden");
-          };
-          reader.readAsDataURL(file);
-        } else {
-          document.getElementById("img-preview").classList.add("hidden");
-          document.getElementById("doc-icon").classList.remove("hidden");
-        }
-        document.getElementById("dropzone-empty").classList.add("hidden");
-        document.getElementById("dropzone-filled").classList.remove("hidden");
-      }
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
     }
-    function changeFile() {
-      const input = document.getElementById("file-input");
-      input.value = "";
-      input.click();
-    }
+  }
+  function changeFile() {
+    const input = document.getElementById("file-input");
+    input.value = "";
+    input.click();
+  }
 
-    const searchInput = document.getElementById("employee-search");
-    searchInput.addEventListener("keyup", function () {
-      const keyword = this.value.toLowerCase();
-      document.querySelectorAll(".employee-item").forEach(item => {
-        const name = item.dataset.name;
-        if (name.includes(keyword)) {
-          item.style.display = "flex";
-        } else {
-          item.style.display = "none";
-        }
-      });
-    });
-
-    function toggleTypeDropdown() {
-      const menu = document.getElementById('assignment-type-menu');
-      const arrow = document.getElementById('assignment-type-arrow');
-      if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        setTimeout(() => {
-          menu.classList.remove('opacity-0', 'scale-95');
-          menu.classList.add('opacity-100', 'scale-100');
-        }, 10);
-        arrow.classList.add('rotate-180');
+  const searchInput = document.getElementById("employee-search");
+  searchInput.addEventListener("keyup", function () {
+    const keyword = this.value.toLowerCase();
+    document.querySelectorAll(".employee-item").forEach(item => {
+      const name = item.dataset.name;
+      if (name.includes(keyword)) {
+        item.style.display = "flex";
       } else {
-        closeTypeDropdown();
+        item.style.display = "none";
       }
-    }
+    });
+  });
 
-    function closeTypeDropdown() {
-      const menu = document.getElementById('assignment-type-menu');
-      const arrow = document.getElementById('assignment-type-arrow');
-      menu.classList.remove('opacity-100', 'scale-100');
-      menu.classList.add('opacity-0', 'scale-95');
-      arrow.classList.remove('rotate-180');
+  function toggleTypeDropdown() {
+    const menu = document.getElementById('assignment-type-menu');
+    const arrow = document.getElementById('assignment-type-arrow');
+    if (menu.classList.contains('hidden')) {
+      menu.classList.remove('hidden');
       setTimeout(() => {
-        menu.classList.add('hidden');
-      }, 150);
-    }
-
-    function selectAssignmentType(value, label) {
-      document.getElementById('assignment-type-value').value = value;
-      const labelEl = document.getElementById('assignment-type-label');
-      labelEl.textContent = label;
+        menu.classList.remove('opacity-0', 'scale-95');
+        menu.classList.add('opacity-100', 'scale-100');
+      }, 10);
+      arrow.classList.add('rotate-180');
+    } else {
       closeTypeDropdown();
     }
+  }
 
-    window.addEventListener('click', function (e) {
-      const dropdown = document.getElementById('assignment-type-dropdown');
-      if (dropdown && !dropdown.contains(e.target)) {
-        closeTypeDropdown();
-      }
-    });
-  </script>
+  function closeTypeDropdown() {
+    const menu = document.getElementById('assignment-type-menu');
+    const arrow = document.getElementById('assignment-type-arrow');
+    menu.classList.remove('opacity-100', 'scale-100');
+    menu.classList.add('opacity-0', 'scale-95');
+    arrow.classList.remove('rotate-180');
+    setTimeout(() => {
+      menu.classList.add('hidden');
+    }, 150);
+  }
+
+  function selectAssignmentType(value, label) {
+    document.getElementById('assignment-type-value').value = value;
+    const labelEl = document.getElementById('assignment-type-label');
+    labelEl.textContent = label;
+    closeTypeDropdown();
+  }
+
+  window.addEventListener('click', function (e) {
+    const dropdown = document.getElementById('assignment-type-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+      closeTypeDropdown();
+    }
+  });
+</script>

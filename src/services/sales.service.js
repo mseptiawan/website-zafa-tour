@@ -87,9 +87,13 @@ const update = async ({ id, userId, body, file }) => {
   return visit.save();
 };
 
+const findMine = (userId) => {
+  return SalesVisit.find({ userId }).sort({ createdAt: -1 }).lean();
+};
 export default {
   create,
   update,
+  findMine,
   findMinePaged,
   findAll,
   findById,

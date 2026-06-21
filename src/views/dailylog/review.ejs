@@ -1,26 +1,24 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="bg-slate-50 min-h-screen antialiased font-sans p-4 md:p-8 text-slate-800">
-  <div class="max-w-6xl mx-auto space-y-6">
+<div class="bg-slate-50/50 md:bg-[#FCFCFD] md:ml-72 min-h-screen antialiased font-sans  md:p-8 text-slate-800">
+  <div class="max-w-none mx-auto space-y-6">
 
-   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm shadow-slate-100/50 select-none">
+   <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 select-none">
   
-  <div class="flex items-center justify-between gap-3 w-full sm:w-auto">
-    <div>
-      <h1 class="text-xl font-bold text-slate-900 tracking-tight">Review Aktivitas Harian</h1>
-      <p class="text-[12px] text-slate-500 mt-1">Pantau progres dan hasil kerja anggota tim Anda secara tersentralisasi.</p>
-    </div>
-    
-    <a href="/daily-log" class="inline-flex sm:hidden items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold rounded-full shadow-sm shadow-blue-100 transition-all active:scale-95 cursor-pointer outline-none shrink-0 decoration-none">
-      <i class="fa-solid fa-plus text-[9px] text-blue-100"></i>
-      <span>Buat</span>
-    </a>
+  <div class="flex-1 min-w-0">
+    <%- include('../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Jurnal', 
+        title: 'Review Aktivitas Harian', 
+        description: 'Pantau progres dan hasil kerja anggota tim Anda secara tersentralisasi.' 
+    }) %>
   </div>
 
-  <div class="flex flex-col sm:flex-row items-end sm:items-center gap-4 border-t sm:border-0 pt-4 sm:pt-0 border-slate-100 w-full sm:w-auto">
-    <div class="w-full sm:w-auto">
+  <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+    
+    <div class="w-full sm:w-44">
       <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Bidang</label>
-      <select id="filter-bidang" onchange="loadReviewData()" class="w-full sm:w-48 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition">
+      <select id="filter-bidang" onchange="loadReviewData()" class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-700 outline-none focus:border-slate-400 transition shadow-3xs">
         <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'DIREKTUR_UTAMA') { %>
           <option value="">Semua Bidang</option>
         <% } %>
@@ -30,20 +28,20 @@
       </select>
     </div>
 
-    <div class="w-full sm:w-auto">
+    <div class="w-full sm:w-38">
       <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</label>
-      <input type="date" id="filter-date" onchange="loadReviewData()" class="w-full sm:w-40 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 focus:bg-white transition" />
+      <input type="date" id="filter-date" onchange="loadReviewData()" class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 transition shadow-3xs" />
     </div>
 
     <div class="w-full sm:w-auto pt-2 sm:pt-0">
       <label class="hidden sm:block text-[10px] font-bold text-transparent mb-1">Aksi</label>
-      <a href="/daily-log" class="hidden sm:inline-flex items-center justify-center gap-1.5 h-9.5 px-4 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-bold rounded-xl shadow-sm shadow-blue-100 transition-all active:scale-95 cursor-pointer outline-none w-full sm:w-auto decoration-none">
+      <a href="/daily-log" class="inline-flex items-center justify-center gap-1.5 h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold rounded-xl shadow-xs transition-all active:scale-[0.98] w-full sm:w-auto decoration-none">
         <i class="fa-solid fa-plus text-[10px] text-blue-100"></i>
         <span>Buat Jurnal</span>
       </a>
     </div>
-  </div>
 
+  </div>
 </div>
 
     <div>
@@ -61,13 +59,13 @@
               </tr>
             </thead>
             <tbody id="review-table-body" class="divide-y divide-slate-100">
-              </tbody>
+            </tbody>
           </table>
         </div>
       </div>
 
       <div id="review-cards-mobile" class="grid grid-cols-1 gap-3.5 md:hidden">
-        </div>
+      </div>
 
       <div id="empty-state" class="hidden p-12 text-center max-w-sm mx-auto my-4">
         <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 mx-auto border border-slate-200/60 mb-3">
@@ -89,14 +87,14 @@
     <div class="w-full flex justify-center py-3 shrink-0" onclick="closeBottomSheet()">
       <div class="w-12 h-1.5 bg-slate-200 rounded-full cursor-pointer"></div>
     </div>
-    
+
     <div class="px-5 pb-3 border-b border-slate-100 shrink-0">
       <h3 class="text-[14px] font-bold text-slate-900" id="sheet-employee-name">-</h3>
       <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-0.5" id="sheet-employee-bidang">-</p>
     </div>
-    
+
     <div class="p-5 overflow-y-auto space-y-3 flex-1 pb-8" id="sheet-logs-body">
-      </div>
+    </div>
   </div>
 </div>
 
@@ -110,11 +108,11 @@
   async function loadReviewData() {
     const date = datePicker.value;
     const bidang = document.getElementById('filter-bidang').value;
-    
+
     const tbody = document.getElementById('review-table-body');
     const mobileContainer = document.getElementById('review-cards-mobile');
     const emptyState = document.getElementById('empty-state');
-    
+
     tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-xs text-slate-400">Memuat data...</td></tr>`;
     mobileContainer.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">Memuat data...</div>`;
     emptyState.classList.add('hidden');
@@ -137,7 +135,7 @@
   function renderResponsiveData(data, tbody, mobileContainer, emptyState) {
     tbody.innerHTML = "";
     mobileContainer.innerHTML = "";
-    
+
     if (!data || data.length === 0) {
       emptyState.classList.remove('hidden');
       return;
@@ -231,7 +229,7 @@
             </div>
           </div>
 
-          <button onclick="openBottomSheet('${emp._id}')" class="w-full h-9 bg-blue-500 hover:bg-blue-700 active:scale-[0.98] text-white text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-sm outline-none">
+          <button onclick="openBottomSheet('${emp._id}')" class="w-full h-9 bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-[0.98]  text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-sm outline-none">
             LIHAT RINCIAN
           </button>
         </div>
@@ -243,7 +241,7 @@
   // DESKTOP ONLY LOGIC: EXPAND TABLE ROW
   function toggleExpand(id) {
     const row = document.getElementById(id);
-    if(row) row.classList.toggle('hidden');
+    if (row) row.classList.toggle('hidden');
   }
 
   // MOBILE ONLY LOGIC: BOTTOM SHEET INTERACTION
@@ -265,7 +263,7 @@
       emp.logs.forEach(log => {
         let statusClass = log.status === 'Completed' ? 'text-emerald-600 bg-emerald-50' : (log.status === 'Pending' ? 'text-amber-600 bg-amber-50' : 'text-slate-500 bg-slate-50');
         const indicator = log.kpiTemplateId?.indikator || "Non-KPI (Aktivitas Umum)";
-        
+
         const block = `
           <div class="p-3.5 border border-slate-100 bg-slate-50/50 rounded-xl space-y-2">
             <div class="flex items-center justify-between gap-2 flex-wrap">
@@ -290,24 +288,24 @@
     // Munculkan Struktur Elemen DOM Sheet
     const sheet = document.getElementById('bottomSheet');
     const content = document.getElementById('bottomSheetContent');
-    
+
     sheet.classList.remove('hidden');
     setTimeout(() => {
       content.classList.remove('translate-y-full');
     }, 10);
   }
 
- function closeBottomSheet() {
-  const sheet = document.getElementById('bottomSheet');
-  const content = document.getElementById('bottomSheetContent');
-  
-  // Menggunakan 120% untuk memastikan sheet benar-benar tenggelam di bawah navigasi saat ditutup
-  content.style.transform = 'translateY(120%)'; 
-  setTimeout(() => {
-    sheet.classList.add('hidden');
-    content.style.transform = ''; // Reset inline style
-  }, 250);
-}
+  function closeBottomSheet() {
+    const sheet = document.getElementById('bottomSheet');
+    const content = document.getElementById('bottomSheetContent');
+
+    // Menggunakan 120% untuk memastikan sheet benar-benar tenggelam di bawah navigasi saat ditutup
+    content.style.transform = 'translateY(120%)';
+    setTimeout(() => {
+      sheet.classList.add('hidden');
+      content.style.transform = ''; // Reset inline style
+    }, 250);
+  }
 
   window.onload = loadReviewData;
 </script>

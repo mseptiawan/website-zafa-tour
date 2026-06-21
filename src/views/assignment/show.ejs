@@ -1,71 +1,92 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/60 p-8 antialiased">
-  <div class="max-w-4xl mx-auto">
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50 md:bg-[#FCFCFD] p-4 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-none mx-auto">
 
     <a href="/assignment"
-      class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
-      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      class="inline-flex items-center gap-1.5 text-[12px] font-bold text-slate-400 hover:text-slate-700 mb-5 transition-colors group decoration-none select-none">
+      <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
       </svg>
-      Kembali ke Daftar
+      <span>Kembali ke Daftar</span>
     </a>
 
-    <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
+    <div class="bg-white border border-slate-200/60 rounded-2xl shadow-3xs overflow-hidden">
       
-      <div class="px-8 py-6 border-b border-slate-100 flex items-start justify-between bg-white gap-6">
-        <div>
-          <h1 class="text-[17px] font-semibold text-slate-900 tracking-tight leading-none mb-2"><%= assignment.title %></h1>
-          <p class="text-[12px] font-medium text-slate-500 uppercase tracking-wider">Tipe: <%= assignment.type %></p>
+      <div class="px-6 py-5 border-b border-slate-100 flex items-start justify-between bg-white gap-6 select-none">
+        <div class="space-y-1">
+          <h1 class="text-xl font-bold text-slate-900 tracking-tight"><%= assignment.title %></h1>
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tipe: <span class="text-slate-600"><%= assignment.type %></span></p>
         </div>
-        <span class="px-3 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= new Date(assignment.endDate) >= new Date() ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200' %>">
-          <%= new Date(assignment.endDate) >= new Date() ? 'Active' : 'Completed' %>
-        </span>
+        
+        <div class="shrink-0 pt-0.5">
+          <% if (new Date(assignment.endDate) >= new Date()) { %>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+              <span class="h-1 w-1 rounded-full bg-emerald-500"></span> Active
+            </span>
+          <% } else { %>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-200/50">
+              <span class="h-1 w-1 rounded-full bg-slate-300"></span> Completed
+            </span>
+          <% } %>
+        </div>
       </div>
 
-      <div class="p-8 space-y-8">
-        <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+      <div class="p-6 space-y-6">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-b border-slate-100 pb-6">
           <div>
-            <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Lokasi Tujuan</div>
-            <div class="text-[15px] font-semibold text-slate-900"><%= assignment.location || '-' %></div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Lokasi Tujuan</div>
+            <div class="text-[13px] font-bold text-slate-700"><%= assignment.location || '-' %></div>
           </div>
           <div>
-            <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Durasi</div>
-            <div class="text-[15px] font-semibold text-slate-900">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Durasi Penugasan</div>
+            <div class="text-[13px] font-bold text-slate-700">
               <%= new Date(assignment.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %> 
-              - 
+              <span class="text-slate-300 font-normal mx-1">s/d</span> 
               <%= new Date(assignment.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
             </div>
           </div>
         </div>
 
-        <div class="relative pl-5 border-l-2 border-slate-200">
-          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Deskripsi Penugasan</div>
-          <p class="text-[13px] text-slate-600 leading-relaxed italic">"<%= assignment.description || 'Tidak ada deskripsi tambahan.' %>"</p>
+        <div class="space-y-1.5">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Deskripsi Penugasan</div>
+          <p class="text-[13px] text-slate-600 leading-relaxed break-words whitespace-pre-line font-medium bg-slate-50/50 border border-slate-100 p-3.5 rounded-xl">
+            <%= assignment.description || 'Tidak ada deskripsi tambahan untuk penugasan ini.' %>
+          </p>
         </div>
 
-        <div class="pt-6 border-t border-slate-100">
-          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Pegawai Ditugaskan</div>
-          <div class="flex flex-wrap gap-2">
+        <div class="pt-2">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Pegawai Ditugaskan</div>
+          <div class="flex flex-wrap gap-2 select-none">
             <% assignment.employees.forEach(e => { %>
-              <span class="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-100 text-slate-700 text-[11px] font-semibold px-3 py-1.5 rounded-lg">
-                <i class="fa-solid fa-user text-[10px] text-slate-400"></i> <%= e.fullName %>
+              <span class="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg">
+                <i class="fa-solid fa-user text-[9px] text-slate-400"></i> <%= e.fullName %>
               </span>
             <% }) %>
           </div>
         </div>
 
         <% if (assignment.attachment) { %>
-        <div class="pt-6 border-t border-slate-100">
-          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Surat Perintah Kerja (SPK)</div>
-          <div class="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:border-slate-300 transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400"><i class="fa-solid fa-file-pdf text-[12px]"></i></div>
-              <span class="text-[12px] font-medium text-slate-700">Lampiran_Penugasan.pdf</span>
+          <div class="pt-4 border-t border-slate-100">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Surat Perintah Kerja (SPK)</div>
+            <div class="flex items-center justify-between border border-slate-200/60 rounded-xl p-3 bg-white shadow-3xs select-none">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-rose-500 shrink-0">
+                  <i class="fa-solid fa-file-pdf text-[13px]"></i>
+                </div>
+                <div class="truncate">
+                  <p class="text-[12px] font-bold text-slate-700 truncate">Lampiran_Penugasan.pdf</p>
+                  <p class="text-[10px] text-slate-400 font-medium">Dokumen Resmi SPK</p>
+                </div>
+              </div>
+              
+              <a href="/uploads/files/<%= assignment.attachment %>" target="_blank" 
+                 class="text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3.5 py-1.5 h-8 inline-flex items-center justify-center rounded-lg transition-all active:scale-[0.98] decoration-none shrink-0">
+                Lihat File
+              </a>
             </div>
-            <a href="/uploads/files/<%= assignment.attachment %>" target="_blank" class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">VIEW</a>
           </div>
-        </div>
         <% } %>
 
       </div>

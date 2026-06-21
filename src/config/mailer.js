@@ -1,13 +1,6 @@
-import dotenv from "dotenv";
-dotenv.config();
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+// Ambil API Key dari .env (Contoh: res_123abc...)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-export default transporter;
+export default resend;
