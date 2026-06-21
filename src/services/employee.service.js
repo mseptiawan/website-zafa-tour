@@ -66,55 +66,6 @@ export const EmployeeService = {
     });
   },
 
-  /**
-   * Mengonversi data list karyawan menjadi file PDF (Buffer) menggunakan Puppeteer.
-   * @param {Array} employeesData - Array berisi data lengkap karyawan.
-   * @returns {Promise<Buffer>} Buffer biner dari PDF hasil render.
-   */
-  generatePdf: async (employeesData) => {
-    const lakiCount = employeesData.filter((e) => e.jenis_kelamin === "Laki-Laki").length;
-    const perempuanCount = employeesData.filter((e) => e.jenis_kelamin === "Perempuan").length;
-    const totalEmp = employeesData.length || 1;
-
-    const stats = {
-      lakiCount,
-      perempuanCount,
-      pctLaki: Math.round((lakiCount / totalEmp) * 100),
-      pctPerempuan: Math.round((perempuanCount / totalEmp) * 100),
-    };
-
-    const exportDate = new Date().toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-
-    const templatePath = path.resolve("src/views/pdf/employees.ejs");
-
-    const htmlContent = await ejs.renderFile(templatePath, {
-      employees: employeesData,
-      stats,
-      exportDate,
-    });
-
-    const browser = await puppeteer.launch({
-      headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      margin: { top: "0px", bottom: "0px", left: "0px", right: "0px" },
-    });
-
-    await browser.close();
-    return pdfBuffer;
-  },
-
   getFormData: async (currentUserRole) => {
     let roleQuery = {};
 

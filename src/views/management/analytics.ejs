@@ -1,0 +1,167 @@
+<!-- Bagian Atas: Hanya muncul di Mobile (md:hidden) -->
+<div class="block space-y-4 md:hidden">
+  <div class="px-1">
+    <span class="block text-[10px] font-bold tracking-widest text-blue-600 uppercase">
+      Ringkasan Eksekutif
+    </span>
+    <p class="mt-0.5 text-xs text-slate-400">
+      Berikut adalah rangkuman dari 4 sektor operasional utama.
+    </p>
+  </div>
+
+  <!-- Form Filter Ringkas -->
+  <form
+    method="GET"
+    class="shadow-3xs space-y-3 rounded-2xl border border-slate-200/60 bg-white p-4"
+  >
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <label class="mb-1 block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          Dari
+        </label>
+        <input
+          type="date"
+          name="startDate"
+          value="<%= filters.startDate %>"
+          class="w-full rounded-xl border border-slate-200 bg-slate-50 p-2 text-xs font-semibold text-slate-700 outline-none"
+        />
+      </div>
+      <div>
+        <label class="mb-1 block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          Sampai
+        </label>
+        <input
+          type="date"
+          name="endDate"
+          value="<%= filters.endDate %>"
+          class="w-full rounded-xl border border-slate-200 bg-slate-50 p-2 text-xs font-semibold text-slate-700 outline-none"
+        />
+      </div>
+    </div>
+    <button
+      type="submit"
+      class="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-[11px] font-bold text-white transition-all active:scale-95"
+    >
+      <i class="fa-solid fa-rotate text-[10px]"></i>
+      Refresh Data
+    </button>
+  </form>
+
+  <!-- 4 Ringkasan Laporan (Mobile View Stack) -->
+  <div class="space-y-3">
+    <!-- 1. LAPORAN PEGAWAI -->
+    <div
+      class="shadow-3xs flex items-center justify-between rounded-2xl border border-slate-200/60 bg-white p-4"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-100/30 bg-blue-50 text-blue-600"
+        >
+          <i class="fa-solid fa-users text-sm"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-slate-800">Laporan Data Pegawai</h4>
+          <p class="mt-0.5 text-[11px] font-medium text-slate-400">Total internal SDM aktif</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-base font-black text-slate-900 tabular-nums">
+          <%= summary.employees.total %>
+        </span>
+        <span class="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+          Orang
+        </span>
+      </div>
+    </div>
+
+    <!-- 2. LAPORAN ABSENSI -->
+    <div
+      class="shadow-3xs flex items-center justify-between rounded-2xl border border-slate-200/60 bg-white p-4"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-100/30 bg-amber-50 text-amber-600"
+        >
+          <i class="fa-solid fa-calendar-check text-sm"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-slate-800">Rekapitulasi Absensi</h4>
+          <p class="mt-0.5 text-[11px] font-medium text-slate-400">Kehadiran log masuk lapangan</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-base font-black text-slate-900 tabular-nums">
+          <%= summary.attendance.totalHadir %>
+        </span>
+        <span class="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+          Log Presensi
+        </span>
+      </div>
+    </div>
+
+    <!-- 3. LAPORAN LEMBUR -->
+    <div
+      class="shadow-3xs flex items-center justify-between rounded-2xl border border-slate-200/60 bg-white p-4"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-100/30 bg-purple-50 text-purple-600"
+        >
+          <i class="fa-solid fa-user-clock text-sm"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-slate-800">Akumulasi Lembur</h4>
+          <p class="mt-0.5 text-[11px] font-medium text-slate-400">
+            Total durasi:
+            <b><%= summary.overtime.hours %> Jam</b>
+          </p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-black text-purple-600 tabular-nums">
+          Rp <%= new Intl.NumberFormat('id-ID').format(summary.overtime.cost) %>
+        </span>
+        <span class="block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          Estimasi Beban
+        </span>
+      </div>
+    </div>
+
+    <!-- 4. LAPORAN PAYROLL -->
+    <div
+      class="shadow-3xs flex items-center justify-between rounded-2xl border border-slate-200/60 bg-white p-4"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-rose-100/30 bg-rose-50 text-rose-600"
+        >
+          <i class="fa-solid fa-receipt text-sm"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-slate-800">Rekapitulasi Payroll</h4>
+          <p class="mt-0.5 text-[11px] font-medium text-slate-400">
+            Buku tertutup:
+            <b><%= summary.payroll.count %> Slip</b>
+          </p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-black text-rose-600 tabular-nums">
+          Rp <%= new Intl.NumberFormat('id-ID').format(summary.payroll.totalNet) %>
+        </span>
+        <span class="block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          Total THP
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bagian Bawah: Tampilan Desktop Asli / Tabel Detail (hidden md:block) -->
+<div class="mt-6 hidden md:block">
+  <!-- Taruh kode markup tabel detail, grafik analitik, atau komponen desktop lamamu disini -->
+  <div class="rounded-3xl border border-slate-200 bg-white p-6">
+    <h3 class="mb-4 text-base font-bold text-slate-900">Detail Laporan Analitik (Desktop Mode)</h3>
+    <!-- Konten desktop asli kamu -->
+  </div>
+</div>

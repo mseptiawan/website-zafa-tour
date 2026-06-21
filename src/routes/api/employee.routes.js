@@ -11,7 +11,6 @@ import {
   uploadAvatarWeb,
   updateFinansialApi,
 } from "../../controllers/employee.controller.js";
-import employeePdfController from "../../controllers/employeePdf.controller.js"; // Import controller PDF terpisah
 import { uploadFile } from "../../middlewares/uploadFile.js";
 import {
   updateFinancialSchema,
@@ -21,12 +20,6 @@ import {
 import { validate } from "../../middlewares/validate.js";
 
 const router = express.Router();
-
-// ==========================================
-// 1. EXPORT DOCUMENTS (Taruh paling atas agar tidak bentrok dengan /:id)
-// ==========================================
-router.get("/export-pdf", employeePdfController.exportPdf);
-// router.get("/export-docs", employeeDocsController.exportDocs);
 
 // ==========================================
 // 2. OPERASIONAL CRUD & PROSES DATA

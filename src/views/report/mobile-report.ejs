@@ -1,0 +1,148 @@
+<%- layout('layouts/main', { title }) %>
+
+<style>
+  .report-card {
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+  }
+  .report-card:active {
+    transform: scale(0.98);
+    background-color: #f8fafc;
+  }
+</style>
+
+<div class="min-h-screen md:ml-72 bg-[#f8fafc] p-4 md:p-8 antialiased text-slate-800">
+  <div class="mx-auto max-w-md md:max-w-7xl space-y-6">
+
+    <div>
+      <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Ringkasan Eksekutif</span>
+      <h1 class="text-xl font-bold text-slate-900 tracking-tight">Pusat Laporan HRIS</h1>
+      <p class="text-xs text-slate-500 mt-0.5">Pantauan data operasional finansial dan internal PT Zafa Mulia Mandiri dalam satu dasbor.</p>
+    </div>
+
+    <div class="bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs">
+      <form method="GET" action="/report/dashboard" class="space-y-3">
+        <div class="grid grid-cols-2 gap-2">
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mulai Tanggal</label>
+            <input type="date" name="startDate" value="<%= filters.startDate %>" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-700 outline-none">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sampai Tanggal</label>
+            <input type="date" name="endDate" value="<%= filters.endDate %>" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-700 outline-none">
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Buku Periode Gaji (Payroll)</label>
+          <input type="month" name="periodMonth" value="<%= filters.periodMonth %>" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 outline-none">
+        </div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-9 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs">
+          <i class="fa-solid fa-arrows-rotate"></i> Perbarui Sinkronisasi Data
+        </button>
+      </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div class="report-card flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <div class="space-y-1">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sektor Internal</span>
+            <h3 class="text-sm font-bold text-slate-900">Laporan SDM / Pegawai</h3>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+            <i class="fa-solid fa-users text-xs"></i>
+          </div>
+        </div>
+        <div class="my-4">
+          <span class="text-2xl font-bold text-slate-900 tabular-nums"><%= summary.employees.total %></span>
+          <span class="text-xs font-medium text-slate-500 ml-1">Karyawan Terdata</span>
+        </div>
+        <a href="/report/employees" class="text-[11px] font-bold text-blue-600 flex items-center gap-1 mt-1 justify-end hover:underline">
+          Detail Selengkapnya <i class="fa-solid fa-angle-right"></i>
+        </a>
+      </div>
+
+      <div class="report-card flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <div class="space-y-1">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Kedisiplinan Lapangan</span>
+            <h3 class="text-sm font-bold text-slate-900">Rekapitulasi Absensi</h3>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+            <i class="fa-solid fa-calendar-check text-xs"></i>
+          </div>
+        </div>
+        <div class="my-3 space-y-1 text-xs text-slate-600">
+          <div class="flex justify-between">
+            <span>Hadir Sukses:</span>
+            <span class="font-bold text-slate-900"><%= summary.attendance.totalHadir %> Log</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Total Terlambat:</span>
+            <span class="font-bold text-red-600"><%= summary.attendance.totalLateDays %> Hari (<%= summary.attendance.totalLateMinutes %> mnt)</span>
+          </div>
+        </div>
+        <a href="/report/attendance" class="text-[11px] font-bold text-blue-600 flex items-center gap-1 mt-1 justify-end hover:underline">
+          Detail Selengkapnya <i class="fa-solid fa-angle-right"></i>
+        </a>
+      </div>
+
+      <div class="report-card flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <div class="space-y-1">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Kompensasi Kerja</span>
+            <h3 class="text-sm font-bold text-slate-900">Akumulasi Lembur</h3>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+            <i class="fa-solid fa-business-time text-xs"></i>
+          </div>
+        </div>
+        <div class="my-3 space-y-1 text-xs text-slate-600">
+          <div class="flex justify-between">
+            <span>Durasi Kerja:</span>
+            <span class="font-bold text-slate-900"><%= summary.overtime.hours %> Jam</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Estimasi Beban:</span>
+            <span class="font-bold text-emerald-600">Rp <%= new Intl.NumberFormat('id-ID').format(summary.overtime.cost) %></span>
+          </div>
+        </div>
+        <a href="/report/overtime" class="text-[11px] font-bold text-blue-600 flex items-center gap-1 mt-1 justify-end hover:underline">
+          Detail Selengkapnya <i class="fa-solid fa-angle-right"></i>
+        </a>
+      </div>
+
+      <div class="report-card flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <div class="space-y-1">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Audit Finansial</span>
+            <h3 class="text-sm font-bold text-slate-900">Rekapitulasi Payroll</h3>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
+            <i class="fa-solid fa-money-bill-wave text-xs"></i>
+          </div>
+        </div>
+        <div class="my-3 space-y-1 text-xs text-slate-600">
+          <div class="flex justify-between">
+            <span>Slip Terbit (Tutup Buku):</span>
+            <span class="font-bold text-slate-900"><%= summary.payroll.count %> Berkas</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Total Take Home Pay:</span>
+            <span class="font-bold text-purple-700">Rp <%= new Intl.NumberFormat('id-ID').format(summary.payroll.totalNet) %></span>
+          </div>
+        </div>
+        <a href="/report/payroll" class="text-[11px] font-bold text-blue-600 flex items-center gap-1 mt-1 justify-end hover:underline">
+          Detail Selengkapnya <i class="fa-solid fa-angle-right"></i>
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</div>

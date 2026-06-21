@@ -1,13 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
 <style>
-  /* =========================================================================
-     DESAIN PREMIUM & KONTROL CETAK ELEGAN
-     ========================================================================= */
-  #report-print-zone {
-    display: none;
-  }
-
   /* Efek Glassmorphism Halus untuk UI Monitor */
   .dashboard-card {
     background: #ffffff;
@@ -19,178 +12,113 @@
   .dashboard-card:hover {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
     border-color: rgba(191, 219, 254, 1);
-    /* Border biru lembut saat hover */
-  }
-
-  @media print {
-
-    html,
-    body,
-    body * {
-      visibility: hidden !important;
-      background: transparent !important;
-    }
-
-    #report-print-zone,
-    #report-print-zone * {
-      visibility: visible !important;
-    }
-
-    #report-print-zone {
-      display: block !important;
-      position: absolute !important;
-      left: 0 !important;
-      top: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      color: black !important;
-    }
-
-    .yellow-print-header {
-      background-color: #fef08a !important;
-      /* Warna kuning pastel yang lebih elegan saat dicetak */
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      color: #1e293b !important;
-    }
-
-    tr {
-      page-break-inside: avoid;
-    }
-  }
-
-  .formal-print-text {
-    color: #1e293b;
   }
 </style>
 
 <div class="min-h-screen ml-72 bg-[#f8fafc] p-8 antialiased text-slate-800">
   <div class="mx-auto max-w-7xl space-y-8">
 
-   <div class="mb-6 border-b border-slate-200/60 pb-5 no-print">
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    
-    <div class="grow">
-      <%- include('../partials/page-header', { 
-          section: 'Operasional Keuangan', 
-          module: 'Laporan', 
-          title: 'Rekap Jam Lembur', 
-          description: 'Pantau waktu kerja tambahan rekan tim beserta perkiraan kompensasi secara real-time.' 
-      }) %>
-    </div>
-
-    <div class="flex flex-wrap items-center gap-3 self-end md:self-center shrink-0">
-      <form method="GET" action="/report/overtime" class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 h-10 shadow-2xs">
-        <div class="flex items-center gap-1 px-2">
-          <input type="date" name="startDate" id="filterStartDate" value="<%= filters.startDate %>" class="bg-transparent text-xs font-semibold text-slate-600 outline-none">
-          <span class="text-slate-300 text-xs">-</span>
-          <input type="date" name="endDate" id="filterEndDate" value="<%= filters.endDate %>" class="bg-transparent text-xs font-semibold text-slate-600 outline-none">
-        </div>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-8 px-4 rounded-lg transition-all cursor-pointer">
-          Saring
-        </button>
-      </form>
-
-      <button onclick="executePrintOvertimeReport()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-10 px-5 rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95">
-        <i class="fa-solid fa-file-pdf text-sm"></i> Cetak Laporan
-      </button>
-    </div>
-
-  </div>
-</div>
-
-    <div class="grid grid-cols-1 gap-6 no-print">
-
-     <%
-  const statItems = [
-    {
-      label: 'Total Pengajuan',
-      value: analytics.totalCount,
-      unit: 'Kali disetujui',
-      icon: 'fa-solid fa-circle-check',
-      labelClass: 'text-slate-400',
-      valueClass: 'text-slate-900',
-      unitClass: 'text-slate-500',
-      iconBoxClass: 'bg-blue-50 text-blue-600'
-    },
-    {
-      label: 'Akumulasi Waktu',
-      value: analytics.totalHours,
-      unit: 'Jam kerja',
-      icon: 'fa-solid fa-clock',
-      labelClass: 'text-slate-400',
-      valueClass: 'text-slate-900',
-      unitClass: 'text-slate-500',
-      iconBoxClass: 'bg-blue-50 text-blue-600'
-    },
-    {
-      label: 'Total Perkiraan Biaya',
-      value: `Rp ${new Intl.NumberFormat('id-ID').format(analytics.estimatedCost)}`,
-      unit: '',
-      icon: 'fa-solid fa-wallet',
-      labelClass: 'text-slate-400',
-      valueClass: 'text-slate-900',
-      unitClass: 'text-slate-500',
-      iconBoxClass: 'bg-emerald-50 text-emerald-600'
-    }
-  ];
-%>
-
-<div class="grid grid-cols-3 gap-1.5 sm:gap-3 md:gap-5 w-full select-none no-print">
-  <% statItems.forEach(item => { %>
-    
-    <div class="bg-white rounded-xl md:rounded-2xl p-2 md:p-5 flex items-center justify-between shadow-xs border border-slate-200/80 w-full min-w-0 dashboard-card">
-      
-      <div class="space-y-0.5 md:space-y-1 min-w-0 flex-1">
-        <span class="text-[8.5px] sm:text-[11px] md:text-[12px] font-bold <%= item.labelClass || 'text-slate-400' %> uppercase tracking-wider block whitespace-normal break-words leading-tight md:truncate">
-          <%= item.label %>
-        </span>
+    <div class="mb-6 border-b border-slate-200/60 pb-5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         
-        <span class="text-sm sm:text-base md:text-2xl font-bold <%= item.valueClass || 'text-slate-900' %> tracking-tight tabular-nums block truncate">
-          <%= item.value %> 
-          <% if (item.unit) { %>
-            <span class="text-[8px] sm:text-[9.5px] md:text-xs font-semibold <%= item.unitClass || 'text-slate-500' %> inline-block"><%= item.unit %></span>
-          <% } %>
-        </span>
-      </div>
+        <div class="grow">
+          <%- include('../partials/page-header', { 
+              section: 'Operasional Keuangan', 
+              module: 'Laporan', 
+              title: 'Rekap Jam Lembur', 
+              description: 'Pantau waktu kerja tambahan rekan tim beserta perkiraan kompensasi secara real-time.' 
+          }) %>
+        </div>
 
-      <div class="hidden md:flex w-10 h-10 rounded-xl items-center justify-center <%= item.iconBoxClass || 'bg-slate-50 text-slate-600' %> shrink-0 ml-2">
-        <i class="<%= item.icon %> text-sm"></i>
-      </div>
+        <div class="flex flex-wrap items-center gap-3 self-end md:self-center shrink-0">
+          <form method="GET" action="/report/overtime" class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 h-10 shadow-2xs">
+            <div class="flex items-center gap-1 px-2">
+              <input type="date" name="startDate" id="filterStartDate" value="<%= filters.startDate %>" class="bg-transparent text-xs font-semibold text-slate-600 outline-none">
+              <span class="text-slate-300 text-xs">-</span>
+              <input type="date" name="endDate" id="filterEndDate" value="<%= filters.endDate %>" class="bg-transparent text-xs font-semibold text-slate-600 outline-none">
+            </div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-8 px-4 rounded-lg transition-all cursor-pointer">
+              Saring
+            </button>
+          </form>
 
+          <a href="/report/overtime/download-pdf?startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" 
+             class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-10 px-5 rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95">
+            <i class="fa-solid fa-file-pdf text-sm"></i> Unduh PDF Laporan
+          </a>
+        </div>
+
+      </div>
     </div>
 
-  <% }) %>
-</div>
+    <div class="grid grid-cols-1 gap-6">
+      <%
+        const statItems = [
+          {
+            label: 'Total Pengajuan',
+            value: analytics.totalCount,
+            unit: 'Kali disetujui',
+            icon: 'fa-solid fa-circle-check',
+            iconBoxClass: 'bg-blue-50 text-blue-600'
+          },
+          {
+            label: 'Akumulasi Waktu',
+            value: analytics.totalHours,
+            unit: 'Jam kerja',
+            icon: 'fa-solid fa-clock',
+            iconBoxClass: 'bg-blue-50 text-blue-600'
+          },
+          {
+            label: 'Total Perkiraan Biaya',
+            value: `Rp ${new Intl.NumberFormat('id-ID').format(analytics.estimatedCost)}`,
+            unit: '',
+            icon: 'fa-solid fa-wallet',
+            iconBoxClass: 'bg-emerald-50 text-emerald-600'
+          }
+        ];
+      %>
+
+      <div class="grid grid-cols-3 gap-5 w-full select-none">
+        <% statItems.forEach(item => { %>
+          <div class="bg-white rounded-2xl p-5 flex items-center justify-between shadow-xs border border-slate-200/80 w-full dashboard-card">
+            <div class="space-y-1 min-w-0 flex-1">
+              <span class="text-[12px] font-bold text-slate-400 uppercase tracking-wider block md:truncate">
+                <%= item.label %>
+              </span>
+              <span class="text-2xl font-bold text-slate-900 tracking-tight tabular-nums block truncate">
+                <%= item.value %> 
+                <% if (item.unit) { %>
+                  <span class="text-xs font-semibold text-slate-500 inline-block"><%= item.unit %></span>
+                <% } %>
+              </span>
+            </div>
+            <div class="flex w-10 h-10 rounded-xl items-center justify-center <%= item.iconBoxClass %> shrink-0 ml-2">
+              <i class="<%= item.icon %> text-sm"></i>
+            </div>
+          </div>
+        <% }) %>
+      </div>
 
       <%
         let overtimeMap = {};
         listOvertime.forEach(item => { 
           let name = item.employeeName || "Anonim";
-          
           if (!overtimeMap[name]) {
             overtimeMap[name] = { frekuensi: 0, totalJam: 0, estBiaya: 0 };
           }
-          
           if (item.status === "APPROVED") {
             overtimeMap[name].frekuensi++;
             overtimeMap[name].totalJam += (item.totalHours || 0);
-            
             let biaya = (item.totalHours || 0) * (item.overtimeRateSnapshot || 0) * (item.multiplierSnapshot || 1.5);
             overtimeMap[name].estBiaya += biaya;
           }
         });
       %>
       <div class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rincian Lembur Rekan Kerja</h3>
-            <p class="text-[11px] text-slate-500">Perbandingan durasi kerja tambahan beserta perkiraan kompensasi</p>
-          </div>
+        <div>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rincian Lembur Rekan Kerja</h3>
+          <p class="text-[11px] text-slate-500">Perbandingan durasi kerja tambahan beserta perkiraan kompensasi</p>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <% Object.keys(overtimeMap).sort().forEach((name) => { 
                let oData = overtimeMap[name];
@@ -198,7 +126,6 @@
           %>
           <div class="dashboard-card p-4 rounded-xl text-xs space-y-3">
             <span class="font-bold text-slate-900 block border-b border-slate-100 pb-2 text-sm truncate"><%= name %></span>
-
             <div class="flex justify-between items-center text-[11px]">
               <div class="space-y-1 font-medium text-slate-500">
                 <span class="block">Total Durasi : <span class="text-slate-800 font-bold"><%= oData.totalJam %> Jam</span></span>
@@ -215,142 +142,7 @@
           %>
         </div>
       </div>
+
     </div>
-
-    <div id="report-print-zone" class="bg-white p-4 space-y-6 text-black formal-print-text"></div>
-
   </div>
 </div>
-
-<script>
-  const clientOvertimeData = <%- JSON.stringify(listOvertime) %>;
-
-  function executePrintOvertimeReport() {
-    const sDate = document.getElementById('filterStartDate').value;
-    const eDate = document.getElementById('filterEndDate').value;
-
-    let dynamicMap = {};
-    let dynamicTotalJam = 0;
-    let dynamicTotalKasus = 0;
-    let dynamicTotalCost = 0;
-
-    clientOvertimeData.forEach(item => {
-      let name = item.employeeName || "Tanpa Nama";
-
-      if (!dynamicMap[name]) {
-        dynamicMap[name] = {
-          jam: 0,
-          kasus: 0,
-          biaya: 0
-        };
-      }
-
-      if (item.status === 'APPROVED') {
-        dynamicMap[name].kasus++;
-        dynamicMap[name].jam += (item.totalHours || 0);
-
-        let cost = (item.totalHours || 0) * (item.overtimeRateSnapshot || 0) * (item.multiplierSnapshot || 1.5);
-        dynamicMap[name].biaya += cost;
-
-        dynamicTotalJam += (item.totalHours || 0);
-        dynamicTotalKasus++;
-        dynamicTotalCost += cost;
-      }
-    });
-
-    let summaryRowsHTML = '';
-    let counter = 1;
-    Object.keys(dynamicMap).sort().forEach(name => {
-      const oData = dynamicMap[name];
-      if (oData.kasus > 0) {
-        summaryRowsHTML += `
-          <tr style="border-bottom: 0.5px solid #000;">
-            <td class="p-2 border-r border-black text-center">${counter++}</td>
-            <td class="p-2 border-r border-black text-left" style="font-weight: bold !important;">${name}</td>
-            <td class="p-2 text-center border-r border-black">${oData.kasus} Kali</td>
-            <td class="p-2 text-center border-r border-black">${oData.jam} Jam</td>
-            <td class="p-2 text-right font-mono">Rp ${new Intl.NumberFormat('id-ID').format(Math.round(oData.biaya))}</td>
-          </tr>`;
-      }
-    });
-
-    const finalPrintTemplate = `
-      <div class="flex justify-between items-center border-b-2 border-black pb-4">
-        <div class="text-left">
-          <div class="text-xl font-bold uppercase tracking-tight">PT ZAFA MULIA MANDIRI</div>
-          <div class="text-[10px] tracking-wide text-gray-600">Jalan Utama Kantor Pusat, Kota Palembang</div>
-          <div class="text-[9px] text-gray-500">Sistem Aplikasi Keuangan Terintegrasi</div>
-        </div>
-        <div class="text-right flex flex-col items-end">
-          <div class="border border-black px-4 py-1 rounded-sm bg-slate-50">
-            <span class="text-[10px] font-bold tracking-widest uppercase text-slate-700">REKAPITULASI</span>
-          </div>
-          <span class="text-[16px] font-bold tracking-widest text-amber-500 mt-1">ZAFA TOUR</span>
-        </div>
-      </div>
-
-      <div class="pt-4 flex justify-between items-end text-xs">
-        <div class="space-y-0.5">
-          <h2 class="text-sm font-bold uppercase tracking-wide">Laporan Kerja Lembur Operasional</h2>
-          <p class="text-gray-600">Periode Rekam: ${sDate || '-'} s/d ${eDate || '-'}</p>
-        </div>
-        <div class="text-right text-[11px]">
-          <div>Tanggal Cetak: <span class="font-mono font-bold">${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-3 gap-4 text-xs pt-4">
-        <div class="border border-black p-3" style="text-align: left;">
-          <span class="block text-[10px] text-gray-500 uppercase font-bold tracking-wide">Total Pengajuan</span>
-          <span class="text-sm font-bold">${dynamicTotalKasus} Kali Kerja</span>
-        </div>
-        <div class="border border-black p-3" style="text-align: left;">
-          <span class="block text-[10px] text-gray-500 uppercase font-bold tracking-wide">Total Durasi</span>
-          <span class="text-sm font-bold">${dynamicTotalJam} Jam</span>
-        </div>
-        <div class="border border-black p-3" style="text-align: left;">
-          <span class="block text-[10px] text-gray-500 uppercase font-bold tracking-wide">Perkiraan Biaya</span>
-          <span class="text-sm font-bold">Rp ${new Intl.NumberFormat('id-ID').format(Math.round(dynamicTotalCost))}</span>
-        </div>
-      </div>
-
-      <div class="border-2 border-black mt-4 overflow-hidden rounded-xs">
-        <table class="w-full text-xs border-collapse">
-          <thead>
-            <tr class="yellow-print-header border-b-2 border-black">
-              <th class="p-2 border-r border-black text-center font-bold" style="width: 5%;">NO</th>
-              <th class="p-2 border-r border-black text-left font-bold" style="width: 35%;">NAMA REKAN KERJA</th>
-              <th class="p-2 border-r border-black text-center font-bold" style="width: 15%;">TOTAL PENGAJUAN</th>
-              <th class="p-2 border-r border-black text-center font-bold" style="width: 15%;">TOTAL DURASI</th>
-              <th class="p-2 text-right font-bold">AKUMULASI KOMPENSASI</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-black bg-white">
-            ${summaryRowsHTML}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pt-8 flex justify-between items-start text-xs">
-        <div class="text-[9px] text-gray-400 italic max-w-sm">
-          *Data lembur ini diunduh secara digital dari aplikasi HRIS kantor pusat PT Zafa Mulia Mandiri. Nilai tertera belum disesuaikan dengan potongan pajak PPh 21 final.
-        </div>
-        <div class="text-center pr-8 space-y-16">
-          <div class="space-y-1">
-            <span class="block font-medium">Palembang, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-            <span class="block font-bold uppercase">Manajer Keuangan / Finance</span>
-          </div>
-          <div class="inline-block border-t-2 border-black pt-1 px-8 font-bold">
-            Verifikasi Aplikasi HRIS
-          </div>
-        </div>
-      </div>
-    `;
-
-    const printZone = document.getElementById('report-print-zone');
-    if (printZone) {
-      printZone.innerHTML = finalPrintTemplate;
-      window.print();
-    }
-  }
-</script>

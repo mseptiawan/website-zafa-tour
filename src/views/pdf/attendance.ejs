@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Laporan Rekapitulasi Kerja Lembur</title>
+  <title>Laporan Rekapitulasi Absensi Pegawai</title>
   <style>
     @page {
       size: A4;
-      margin: 20mm 15mm 20mm 15mm; 
+      margin: 20mm 15mm 20mm 15mm;
     }
     
     *, *::before, *::after {
@@ -65,7 +65,7 @@
     }
 
     .stats-value {
-      font-size: 12pt;
+      font-size: 11.5pt;
       font-weight: bold;
       color: #0f172a;
       margin-top: 2px;
@@ -108,15 +108,17 @@
 </head>
 <body>
 
+  <!-- INCLUDE KOP SURAT TERPUSAT -->
   <%- include('../partials/pdf-header') %>
 
   <div class="main-content">
     
+    <!-- METADATA DOKUMEN -->
     <table class="meta-container" style="margin-top: 15px;">
       <tr>
         <td>
-          <h2 class="doc-title">Laporan Kerja Lembur Operasional</h2>
-          <p style="font-size: 9pt; color: #64748b; margin: 3px 0 0 0;">Periode Rekam: <%= period.startDate || '-' %> s/d <%= period.endDate || '-' %></p>
+          <h2 class="doc-title">Laporan Rekapitulasi Absensi Pegawai</h2>
+          <p style="font-size: 9pt; color: #64748b; margin: 3px 0 0 0;">Periode Saring : <span class="font-bold"><%= filters.startDate %> s/d <%= filters.endDate %></span></p>
         </td>
         <td style="text-align: right; font-size: 9.5pt; color: #334155; vertical-align: bottom;">
           Tanggal Cetak: <span class="font-bold"><%= exportDate %></span>
@@ -124,31 +126,34 @@
       </tr>
     </table>
 
+    <!-- RINGKASAN METRIK ANALYTICS -->
     <table class="stats-grid">
       <tr>
         <td class="stats-card">
-          <div class="stats-label">Total Pengajuan</div>
-          <div class="stats-value"><%= analytics.totalCount %> Kali Kerja</div>
+          <div class="stats-label">Total Presensi Sukses</div>
+          <div class="stats-value"><%= analytics.totalHadir %> Rekor</div>
         </td>
         <td class="stats-card">
-          <div class="stats-label">Total Durasi</div>
-          <div class="stats-value"><%= analytics.totalHours %> Jam</div>
+          <div class="stats-label">Total Kasus Terlambat</div>
+          <div class="stats-value" style="color: #ea580c;"><%= analytics.totalLateDays %> Hari</div>
         </td>
         <td class="stats-card">
-          <div class="stats-label">Perkiraan Biaya</div>
-          <div class="stats-value">Rp <%= new Intl.NumberFormat('id-ID').format(Math.round(analytics.estimatedCost)) %></div>
+          <div class="stats-label">Akumulasi Menit Terlambat</div>
+          <div class="stats-value" style="color: #dc2626;"><%= analytics.totalLateMinutes %> Menit</div>
         </td>
       </tr>
     </table>
 
+    <!-- TABEL DATA REKAP ABSENSI -->
     <table class="data-table">
       <thead>
         <tr>
-          <th style="width: 7%;" class="text-center">NO</th>
-          <th style="width: 38%;" class="text-left">NAMA REKAN KERJA</th>
-          <th style="width: 15%;" class="text-center">TOTAL PENGAJUAN</th>
-          <th style="width: 15%;" class="text-center">TOTAL DURASI</th>
-          <th style="width: 25%;" class="text-right">AKUMULASI KOMPENSASI</th>
+          <th style="width: 6%;" class="text-center">NO</th>
+          <th style="width: 34%;" class="text-left">NAMA REKAN KERJA</th>
+          <th style="width: 15%;" class="text-center">HADIR TEPAT WAKTU</th>
+          <th style="width: 15%;" class="text-center">FREKUENSI TELAT</th>
+          <th style="width: 15%;" class="text-right">DURASI TERLAMBAT</th>
+          <th style="width: 15%;" class="text-center">JUMLAH ALPA</th>
         </tr>
       </thead>
       <tbody>
@@ -157,28 +162,30 @@
             <tr>
               <td class="text-center"><%= idx + 1 %></td>
               <td class="font-bold" style="color: #1a365d;"><%= row.name %></td>
-              <td class="text-center"><%= row.kasus %> Kali</td>
-              <td class="text-center"><%= row.jam %> Jam</td>
-              <td class="text-right font-mono font-bold">Rp <%= new Intl.NumberFormat('id-ID').format(Math.round(row.biaya)) %></td>
+              <td class="text-center"><%= row.hadir %> Hari</td>
+              <td class="text-center" style="color: #ea580c; font-weight: 600;"><%= row.telat %> Kali</td>
+              <td class="text-right font-mono" style="color: #dc2626;"><%= row.menitTelat %> Menit</td>
+              <td class="text-center" style="color: #64748b;"><%= row.alpa %> Hari</td>
             </tr>
           <% }) %>
         <% } else { %>
           <tr>
-            <td colspan="5" class="text-center" style="padding: 20px; color: #94a3b8;">Tidak ada data lembur yang disetujui pada periode ini.</td>
+            <td colspan="6" class="text-center" style="padding: 20px; color: #94a3b8;">Tidak ada data log absensi dalam rentang tanggal ini.</td>
           </tr>
         <% } %>
       </tbody>
     </table>
 
+    <!-- SIGNATURE ZONE -->
     <table style="width: 100%; border-collapse: collapse; margin-top: 20px; page-break-inside: avoid;">
       <tr>
         <td style="font-size: 8pt; color: #94a3b8; font-style: italic; width: 55%; vertical-align: top; line-height: 1.5;">
-          * Data lembur ini diunduh secara digital dari aplikasi HRIS kantor pusat PT Zafa Mulia Mandiri. Nilai tertera belum disesuaikan dengan ketentuan potongan pajak PPh 21 final.
+          * Data rekapitulasi kehadiran ini diunduh secara digital langsung dari sistem administrasi HRIS Kantor Utama Palembang PT Zafa Mulia Mandiri.
         </td>
         <td style="text-align: right; width: 45%;">
           <div style="font-size: 9.5pt; color: #334155; margin-bottom: 65px;">
             Palembang, <%= exportDate %><br>
-            <span class="font-bold" style="text-transform: uppercase; display: block; margin-top: 3px;">Manajer Keuangan / Finance</span>
+            <span class="font-bold" style="text-transform: uppercase; display: block; margin-top: 3px;">Manajer Administrasi / HRD</span>
           </div>
           <div style="font-weight: bold; color: #0f172a; border-top: 1.5px solid #0f172a; padding-top: 5px; display: inline-block; width: 190px; text-align: center; font-size: 9.5pt;">
             Verifikasi Aplikasi HRIS

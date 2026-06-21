@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Rekapitulasi Beban Penggajian</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm; 
+    }
+    
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+      background-color: #ffffff;
+      line-height: 1.4;
+    }
+
+    .main-content {
+      padding: 0;
+    }
+
+    .meta-container {
+      width: 100%;
+      margin-bottom: 20px;
+      border-collapse: collapse;
+    }
+
+    .doc-title {
+      font-size: 13pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #1a365d;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-grid {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 12px 0;
+      margin: 0 -12px 20px -12px;
+    }
+
+    .stats-card {
+      width: 33.33%;
+      border: 1px solid #1a365d;
+      background-color: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+
+    .stats-label {
+      font-size: 7.5pt;
+      font-weight: bold;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-value {
+      font-size: 11.5pt;
+      font-weight: bold;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 35px;
+      font-size: 9pt;
+    }
+
+    .data-table th {
+      background-color: #1a365d;
+      color: #ffffff;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+      border: 1px solid #1a365d;
+      padding: 10px 12px;
+    }
+
+    .data-table td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 12px;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    .font-bold { font-weight: bold; }
+    .font-mono { font-family: monospace; }
+  </style>
+</head>
+<body>
+
+  <%- include('../partials/pdf-header') %>
+
+  <div class="main-content">
+    
+    <table class="meta-container" style="margin-top: 15px;">
+      <tr>
+        <td>
+          <h2 class="doc-title">Laporan Rekapitulasi Beban Penggajian (Payroll)</h2>
+          <p style="font-size: 9pt; color: #64748b; margin: 3px 0 0 0;">Buku Periode : <span class="font-bold"><%= filters.periodMonth || '-' %></span></p>
+        </td>
+        <td style="text-align: right; font-size: 9.5pt; color: #334155; vertical-align: bottom;">
+          Tanggal Cetak: <span class="font-bold"><%= exportDate %></span>
+        </td>
+      </tr>
+    </table>
+
+    <table class="stats-grid">
+      <tr>
+        <td class="stats-card">
+          <div class="stats-label">Akumulasi Gaji Bruto</div>
+          <div class="stats-value">Rp <%= new Intl.NumberFormat('id-ID').format(analytics.totalEarnings) %></div>
+        </td>
+        <td class="stats-card">
+          <div class="stats-label">Total Retensi & Potongan</div>
+          <div class="stats-value">Rp <%= new Intl.NumberFormat('id-ID').format(analytics.totalDeductions) %></div>
+        </td>
+        <td class="stats-card">
+          <div class="stats-label">Beban Netto (THP)</div>
+          <div class="stats-value" style="color: #16a34a;">Rp <%= new Intl.NumberFormat('id-ID').format(analytics.totalNet) %></div>
+        </td>
+      </tr>
+    </table>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 6%;" class="text-center">NO</th>
+          <th style="width: 34%;" class="text-left">NAMA PEGAWAI</th>
+          <th style="width: 20%;" class="text-right">TOTAL BRUTO</th>
+          <th style="width: 15%;" class="text-right">POTONGAN</th>
+          <th style="width: 25%;" class="text-right">NET TAKE HOME PAY</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listPayroll && listPayroll.length > 0) { %>
+          <% listPayroll.forEach((p, idx) => { 
+               let empName = p.employeeId && p.employeeId.fullName ? p.employeeId.fullName : "Anonim";
+          %>
+            <tr>
+              <td class="text-center"><%= idx + 1 %></td>
+              <td class="font-bold" style="color: #1a365d;"><%= empName %></td>
+              <td class="text-right font-mono">Rp <%= new Intl.NumberFormat('id-ID').format(p.totalEarnings) %></td>
+              <td class="text-right font-mono" style="color: #dc2626;">Rp <%= new Intl.NumberFormat('id-ID').format(p.totalDeductions) %></td>
+              <td class="text-right font-mono font-bold" style="color: #1e293b;">Rp <%= new Intl.NumberFormat('id-ID').format(p.netTakeHomePay) %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="text-center" style="padding: 20px; color: #94a3b8;">Belum ada data slip gaji yang ditutup buku pada periode ini.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; page-break-inside: avoid;">
+      <tr>
+        <td style="font-size: 8pt; color: #94a3b8; font-style: italic; width: 55%; vertical-align: top; line-height: 1.5;">
+          * Data rekapitulasi beban penggajian ini diunduh secara digital langsung dari sistem administrasi HRIS Divisi Keuangan PT Zafa Mulia Mandiri.
+        </td>
+        <td style="text-align: right; width: 45%;">
+          <div style="font-size: 9.5pt; color: #334155; margin-bottom: 65px;">
+            Palembang, <%= exportDate %><br>
+            <span class="font-bold" style="text-transform: uppercase; display: block; margin-top: 3px;">Manajer Keuangan / Finance</span>
+          </div>
+          <div style="font-weight: bold; color: #0f172a; border-top: 1.5px solid #0f172a; padding-top: 5px; display: inline-block; width: 190px; text-align: center; font-size: 9.5pt;">
+            Verifikasi Aplikasi HRIS
+          </div>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+</body>
+</html>
