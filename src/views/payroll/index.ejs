@@ -17,7 +17,7 @@
             Kunci transaksi & update pinjaman <br />periode <span class="font-bold text-blue-600"><%= currentPeriod %></span>
           </div>
           
-          <button type="submit" class="bg-slate-950 hover:bg-slate-800 text-white font-bold text-[11px] h-8.5 px-3.5 rounded-xl shadow-xs transition-all active:scale-[0.98] flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+          <button type="submit" class="bg-slate-950 hover:bg-slate-800 text-white font-bold text-[11px] h-8.5 px-3.5 rounded-xl  transition-all active:scale-[0.98] flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
             <i class="fa-solid fa-lock text-[9px] text-slate-400"></i> Tutup Buku
           </button>
         </form>
@@ -411,7 +411,7 @@
   function generateRowHTML(name, amount, isFixed, type) {
     const colorClass = type === 'allowance' ? 'blue' : 'rose';
     const readOnlyInput = isFixed || isReadOnlyMode ? 'readonly' : '';
-    const trashButton = (isFixed || isReadOnlyMode) ? `<div class="w-8 h-8"></div>` : `<button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-${colorClass}-600 flex items-center justify-center transition-all text-xs shadow-sm"><i class="fa-solid fa-trash-can text-[11px]"></i></button>`;
+    const trashButton = (isFixed || isReadOnlyMode) ? `<div class="w-8 h-8"></div>` : `<button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-${colorClass}-600 flex items-center justify-center transition-all text-xs "><i class="fa-solid fa-trash-can text-[11px]"></i></button>`;
     
     const isPercentage = name.toUpperCase().includes('BPJS') || name.toUpperCase().includes('PPH') || name.toUpperCase().includes('PAJAK');
     

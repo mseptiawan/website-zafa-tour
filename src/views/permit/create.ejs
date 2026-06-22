@@ -1,171 +1,153 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-2xl mx-auto">
+<!-- 1. GLOBAL ISLAND CANVAS LAYER -->
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
+    <!-- 2. REUSABLE PAGE HEADER COMPONENT -->
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Perizinan', 
         title: 'Pengajuan Izin & Cuti', 
-        description: 'Form permohonan izin absensi atau cuti pegawai' 
+        description: 'Form permohonan izin absensi atau cuti pegawai.' 
     }) %>
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+    <!-- 3. MAIN CARD WRAPPER (Anti-Lancip di Mobile, Premium di Desktop) -->
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
+      <form action="/permit" method="POST" enctype="multipart/form-data" class="space-y-5">
 
-      <form action="/permit" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+        <% if (typeof errors !== 'undefined' && errors?.global) { %>
+        <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
+          <%= errors.global %>
+        </div>
+        <% } %>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Jenis Izin / Cuti
-          </label>
-
+        <!-- Row: Jenis Izin / Cuti Dropdown -->
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jenis Izin / Cuti</label>
           <div class="relative w-full" id="custom-dropdown">
             <input type="hidden" name="type" id="leave-type-value" value="<%= typeof oldData !== 'undefined' && oldData.type ? oldData.type : '' %>" required>
 
-            <button type="button" onclick="toggleDropdown()" class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.type ? 'border-rose-400 focus:ring-rose-100' : 'border-slate-200/60 focus:ring-slate-100/70' %> rounded-xl px-4 py-3 text-[13px] font-medium text-slate-700 text-left flex items-center justify-between outline-none hover:bg-slate-50 hover:border-slate-300 focus:bg-white focus:border-slate-300 focus:ring-4 transition-all duration-200 cursor-pointer shadow-sm">
-              <span id="dropdown-label" class="<%= typeof oldData !== 'undefined' && oldData.type ? 'text-slate-700' : 'text-slate-400 text-xs' %>">
-                <%= typeof oldData !== 'undefined' && oldData.type ? (oldData.type === 'SAKIT' ? 'Izin Sakit (Dengan Surat Dokter)' : oldData.type === 'PENDAMPINGAN_MELAHIRKAN' ? 'Izin Mendampingi Istri Melahirkan' : oldData.type === 'MUSIBAH' ? 'Izin Terkena Musibah / Kemalangan' : 'Izin Keperluan Mendesak / Hal Penting') : 'Pilih jenis permohonan izin' %>
+            <button type="button" onclick="toggleDropdown()" 
+                    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.type ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-0 transition-all">
+              <span id="dropdown-label" class="<%= typeof oldData !== 'undefined' && oldData.type ? 'text-slate-800' : 'text-slate-400/60 text-[12px]' %>">
+                <%= typeof oldData !== 'undefined' && oldData.type ? (oldData.type === 'SAKIT' ? 'Izin Sakit (Dengan Surat Dokter)' : oldData.type === 'PENDAMPINGAN_MELAHIRKAN' ? 'Izin Mendampingi Istri Melahirkan' : oldData.type === 'MUSIBAH' ? 'Izin Terkena Musibah / Kemalangan' : 'Izin Keperluan Mendesak / Hal Penting') : 'Pilih jenis permohonan izin...' %>
               </span>
-              <svg id="dropdown-arrow" class="w-4 h-4 text-slate-400 stroke-[2] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg id="dropdown-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
-            <div id="dropdown-menu" class="hidden absolute z-30 w-full mt-2 bg-white border border-slate-200/50 rounded-xl shadow-xl p-1.5 space-y-0.5 origin-top transform opacity-0 scale-95 transition-all duration-150 backdrop-blur-sm">
-              <button type="button" onclick="selectOption('SAKIT', 'Izin Sakit (Dengan Surat Dokter)')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+            <div id="dropdown-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-lg p-1.5 space-y-0.5">
+              <button type="button" onclick="selectOption('SAKIT', 'Izin Sakit (Dengan Surat Dokter)')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Sakit (Dengan Surat Dokter)</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               </button>
-              <button type="button" onclick="selectOption('PENDAMPINGAN_MELAHIRKAN', 'Izin Mendampingi Istri Melahirkan')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+              <button type="button" onclick="selectOption('PENDAMPINGAN_MELAHIRKAN', 'Izin Mendampingi Istri Melahirkan')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Mendampingi Istri Melahirkan</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               </button>
-              <button type="button" onclick="selectOption('MUSIBAH', 'Izin Terkena Musibah / Kemalangan')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+              <button type="button" onclick="selectOption('MUSIBAH', 'Izin Terkena Musibah / Kemalangan')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Terkena Musibah / Kemalangan</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               </button>
-              <button type="button" onclick="selectOption('PENTING', 'Izin Keperluan Mendesak / Hal Penting')" class="w-full text-left px-3 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+              <button type="button" onclick="selectOption('PENTING', 'Izin Keperluan Mendesak / Hal Penting')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Keperluan Mendesak / Hal Penting</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               </button>
             </div>
           </div>
           <% if (typeof errors !== 'undefined' && errors.type) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <%= errors.type %>
-            </p>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.type %></p>
           <% } %>
         </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">Tanggal Ketidakhadiran</label>
-          <input type="date" id="permitDate" name="date" value="<%= typeof oldData !== 'undefined' && oldData.date ? oldData.date : '' %>" required class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.date ? 'border-rose-400 focus:ring-rose-100' : 'border-slate-200 focus:border-slate-400' %> rounded-xl text-xs px-4 py-3 text-slate-700 outline-none focus:bg-white focus:ring-4 transition-all" />
-          <p class="text-[10px] text-slate-400 font-medium">Sifatnya insidental, pilih hari ini saat halangan terjadi.</p>
+        <!-- Row: Tanggal Ketidakhadiran -->
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Ketidakhadiran</label>
+          <input type="date" id="permitDate" name="date" value="<%= typeof oldData !== 'undefined' && oldData.date ? oldData.date : '' %>" required 
+                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.date ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all" />
+          <p class="text-[10.5px] text-slate-400/80 font-medium pl-0.5">Sifatnya insidental, pilih hari ini saat halangan terjadi.</p>
           <% if (typeof errors !== 'undefined' && errors.date) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <%= errors.date %>
-            </p>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.date %></p>
           <% } %>
         </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700">
-            Alasan Pengajuan
-          </label>
-          <textarea name="reason" rows="4" required placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." class="w-full bg-slate-50 border <%= typeof errors !== 'undefined' && errors.reason ? 'border-rose-400 focus:ring-rose-100' : 'border-slate-200 focus:border-slate-400' %> rounded-xl text-xs px-4 py-3 text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 transition-all"><%= typeof oldData !== 'undefined' && oldData.reason ? oldData.reason : '' %></textarea>
+        <!-- Row: Alasan Pengajuan -->
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alasan Pengajuan</label>
+          <textarea name="reason" rows="4" required placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." 
+                    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.reason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= typeof oldData !== 'undefined' && oldData.reason ? oldData.reason : '' %></textarea>
           <% if (typeof errors !== 'undefined' && errors.reason) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <%= errors.reason %>
-            </p>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.reason %></p>
           <% } %>
         </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[13px] font-semibold text-slate-700 flex items-center gap-1">
-            <span>Dokumen Pendukung</span>
+        <!-- Row: Dokumen Pendukung Dropzone -->
+        <div class="space-y-2 mb-2">
+          <label class="block text-[12px] font-semibold text-slate-700 tracking-wide">
+            Dokumen Pendukung 
             <span id="required-mark" class="text-rose-500 hidden">*</span>
             <span id="optional-mark" class="text-slate-400 font-normal">(Opsional)</span>
           </label>
-
-          <div class="group relative border-2 border-dashed <%= typeof errors !== 'undefined' && errors.document ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-white' %> rounded-2xl p-6 transition-all duration-200 text-center cursor-pointer">
+          <div class="relative">
             <input type="file" name="document" id="file-upload" accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateFileName(this)" />
+            
+            <div id="dropzone-empty" class="w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center">
+              <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+              <span class="text-[12px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
+              <span class="text-[11px] text-slate-400 mt-0.5">PDF, JPG, JPEG, atau PNG (Maks. 2MB)</span>
+            </div>
 
-            <div class="space-y-2 pointer-events-none">
-              <div class="mx-auto w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-50 text-slate-400 group-hover:text-blue-500 flex items-center justify-center transition-colors">
-                <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                </svg>
+            <div id="dropzone-filled" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">file.pdf</div>
+                  <div id="size-preview" class="text-[11px] text-slate-400 mt-0.5">0 KB</div>
+                </div>
               </div>
-
-              <div class="text-xs font-medium text-slate-600">
-                Klik untuk upload atau drag dan drop berkas
+              <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto relative z-20">
+                <a id="view-file-btn" href="#" target="_blank" class="text-[11px] font-medium text-center text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">View</a>
+                <button type="button" onclick="document.getElementById('file-upload').click()" class="text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">Ganti</button>
               </div>
-              <p id="file-info" class="text-[11px] text-slate-400">PDF, JPG, JPEG, atau PNG (Maks. 2MB)</p>
             </div>
           </div>
           <% if (typeof errors !== 'undefined' && errors.document) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <%= errors.document %>
-            </p>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.document %></p>
           <% } %>
         </div>
 
-        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-          <a href="/permit" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-xl px-6 py-2.5 text-[13px] font-medium transition-all shadow-sm active:scale-[0.98]">
+        <!-- 4. ACTION BUTTONS FOOTER -->
+        <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
+          <a href="/permit" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
             Batal
           </a>
-
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm active:scale-[0.98] cursor-pointer">
+          <button type="submit" class="w-auto text-center bg-blue-600 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
             <%= typeof mode !== 'undefined' ? (mode === 'CREATE' ? 'Ajukan Izin' : 'Simpan Perubahan') : 'Ajukan Izin' %>
           </button>
         </div>
 
       </form>
     </div>
-
   </div>
 </div>
 
 <script>
   function toggleDropdown() {
     const menu = document.getElementById('dropdown-menu');
-    const arrow = document.getElementById('dropdown-arrow');
-
-    if (menu.classList.contains('hidden')) {
-      menu.classList.remove('hidden');
-      setTimeout(() => {
-        menu.classList.remove('opacity-0', 'scale-95');
-        menu.classList.add('opacity-100', 'scale-100');
-      }, 10);
-      arrow.classList.add('rotate-180');
-    } else {
-      closeDropdown();
-    }
-  }
-
-  function closeDropdown() {
-    const menu = document.getElementById('dropdown-menu');
-    const arrow = document.getElementById('dropdown-arrow');
-
-    menu.classList.remove('opacity-100', 'scale-100');
-    menu.classList.add('opacity-0', 'scale-95');
-    arrow.classList.remove('rotate-180');
-
-    setTimeout(() => {
-      menu.classList.add('hidden');
-    }, 150);
+    menu.classList.toggle('hidden');
+    document.getElementById('dropdown-arrow').classList.toggle('rotate-180');
   }
 
   function selectOption(value, label) {
     document.getElementById('leave-type-value').value = value;
     const labelEl = document.getElementById('dropdown-label');
     labelEl.textContent = label;
-    labelEl.classList.remove('text-slate-400');
-    labelEl.classList.add('text-slate-700');
+    labelEl.classList.remove('text-slate-400/60', 'text-[12px]');
+    labelEl.classList.add('text-slate-800');
     
     const fileUpload = document.getElementById('file-upload');
     const requiredMark = document.getElementById('required-mark');
@@ -181,30 +163,34 @@
       optionalMark.classList.remove('hidden');
     }
 
-    closeDropdown();
+    toggleDropdown();
   }
 
-  window.addEventListener('click', function(e) {
+  // Tutup dropdown otomatis jika user ngeklik luar area menu
+  document.addEventListener('click', function(e) {
     const dropdown = document.getElementById('custom-dropdown');
+    const menu = document.getElementById('dropdown-menu');
     if (dropdown && !dropdown.contains(e.target)) {
-      closeDropdown();
+      menu.classList.add('hidden');
+      document.getElementById('dropdown-arrow').classList.remove('rotate-180');
     }
   });
 
   function updateFileName(input) {
-    const fileInfo = document.getElementById('file-info');
     if (input.files && input.files.length > 0) {
-      const fileName = input.files[0].name;
-      fileInfo.textContent = `File terpilih: ${fileName}`;
-      fileInfo.classList.remove('text-slate-400');
-      fileInfo.classList.add('text-blue-600', 'font-semibold');
+      const file = input.files[0];
+      document.getElementById("name-preview").textContent = file.name;
+      document.getElementById("size-preview").textContent = (file.size / 1024).toFixed(1) + " KB";
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
+      document.getElementById("view-file-btn").href = URL.createObjectURL(file);
     } else {
-      fileInfo.textContent = "PDF, JPG, JPEG, atau PNG (Maks. 2MB)";
-      fileInfo.classList.remove('text-blue-600', 'font-semibold');
-      fileInfo.classList.add('text-slate-400');
+      document.getElementById("dropzone-empty").classList.remove("hidden");
+      document.getElementById("dropzone-filled").classList.add("hidden");
     }
   }
 
+  // Set minimum dan maksimum range tanggal pengajuan
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0'); 

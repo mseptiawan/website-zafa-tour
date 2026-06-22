@@ -22,11 +22,11 @@
 </head>
 
 <body class="min-h-dvh overflow-x-hidden md:bg-[#f8fafc] text-slate-800 antialiased">
-  <div class="flex h-screen w-screen overflow-hidden pb-16 md:pb-0">
+  <div class="flex min-h-screen w-full" pb-16 md:pb-0">
     <%- include('../partials/sidebar') %>
 
     <!-- KODE BARU: Tambahkan bg-slate-50/70 agar semua device punya dasar abu-abu tipis yang mewah -->
-    <main class="relative flex h-full flex-1 flex-col overflow-y-auto bg-slate-50/70 px-4 py-5 pt-6 md:px-8 md:pt-20">
+    <main class="relative flex h-full flex-1 flex-col overflow-visible bg-slate-50/70 px-4 py-5 pt-6 md:px-8 md:pt-20">
       <div class="absolute top-5 right-4 z-[100] hidden md:right-8 md:block" id="notificationDropdown">
         <button id="notifButton" class="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/60 bg-white shadow-xs transition-all duration-200 hover:bg-slate-50 focus:outline-none active:scale-[0.96]">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="stroke-[2.2] text-slate-600 transition-colors group-hover:text-slate-900">
@@ -58,14 +58,14 @@
           <div class="flex items-center justify-between mb-5 px-1">
             <div>
               <h1 class="text-xl font-extrabold tracking-tight text-slate-900">Beranda</h1>
-              <p class="text-[10px] font-medium text-slate-400 mt-0.5">Halo, <%= typeof user !== 'undefined' ? user.username : 'Pegawai' %> 👋</p>
+              <p class="text-[10px] font-medium text-slate-400 mt-0.5">Halo, <%= typeof user !== 'undefined' ? user.fullName : 'Pegawai' %> 👋</p>
             </div>
             <!-- Opsional: Sisi Kanan bisa diisi icon kecil info atau dibiarkan kosong agar clean -->
             <div class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400">
               <i class="fa-solid fa-sparkles text-xs text-amber-500"></i>
             </div>
           </div>
-          <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 rounded-3xl pt-8 pb-10 px-6 text-white shadow-[0_8px_30px_rgb(59,130,246,0.15)] relative overflow-hidden mb-6 min-h-[160px] flex flex-col justify-between">
+          <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 rounded-3xl pt-8 pb-10 px-6 text-white shadow relative overflow-hidden mb-6 min-h-[160px] flex flex-col justify-between">
 
             <div class="absolute -right-4 -top-10 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
             <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-indigo-500/20 rounded-full blur-xl pointer-events-none"></div>
@@ -105,12 +105,12 @@
               </a>
 
               <% } else if (already && !hasCheckedOut) { %>
-              <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-amber-500npm  text-white font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(245,158,11,0.2)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
+              <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-amber-500  text-white font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(245,158,11,0.2)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
                 <span class="tracking-tight">Check Out</span>
               </a>
 
               <% } else { %>
-              <div class="inline-flex items-center gap-2 h-10 px-4 bg-white/10 border border-white/20 text-white/90 font-bold text-xs rounded-xl backdrop-blur-md shrink-0 shadow-3xs">
+              <div class="inline-flex items-center gap-2 h-10 px-4 bg-white/10 border border-white/20 text-white/90 font-bold text-xs rounded-xl  shrink-0 shadow-3xs">
                 <i class="fa-solid fa-circle-check text-emerald-400 text-[13px]"></i>
                 <span class="tracking-tight">Selesai Kerja</span>
               </div>
@@ -130,31 +130,55 @@
 
 
 
-            <!-- CUTI -->
             <!-- CUTI & IZIN (AGREGATOR HUB) -->
-            <button onclick="openRiwayatMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
-              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.02)] transition-all duration-200 active:scale-95">
-                <i class="fa-solid fa-calendar-check text-base"></i>
-              </div>
-              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Cuti & Izin</span>
-            </button>
+          <button onclick="openLeaveMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+  <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.02)] transition-all duration-200 active:scale-95">
+    <i class="fa-solid fa-calendar-check text-base"></i>
+  </div>
+  <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Cuti</span>
+</button>
 
-            <!-- LEMBUR -->
-            <a href="/overtime/new" class="group flex flex-col items-center gap-2 text-center">
-              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-purple-50/70 text-purple-600 border border-purple-100/20 shadow-[0_6px_16px_rgba(139,92,246,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-purple-100/50">
+            <% 
+  // List role manajemen yang berwenang menyetujui lembur (Semua Manager Bidang & Wadir)
+  const overtimeApproverRoles = ['MANAGER_ADMINISTRASI', 'MANAGER_KEUANGAN', 'MANAGER_HAJI_UMRAH', 'WAKIL_DIREKTUR'];
+  
+  // Cek apakah user berhak melihat Bottom Sheet Lembur
+  const canAccessOvertimeMenu = typeof user !== 'undefined' && overtimeApproverRoles.includes(user.role);
+%>
+
+            <% if (canAccessOvertimeMenu) { %>
+            <!-- Jika Manajemen: Buka Bottom Sheet -->
+            <button onclick="openOvertimeMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-purple-50/70 text-purple-600 border border-purple-100/20 shadow-[0_6px_16px_rgba(139,92,246,0.03)] transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-user-clock text-base"></i>
+              </div>
+              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Lembur</span>
+            </button>
+            <% } else { %>
+            <!-- Jika Pegawai Biasa: Langsung lari ke Halaman Riwayat -->
+            <a href="/overtime/my" class="group flex flex-col items-center gap-2 text-center">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-purple-50/70 text-purple-600 border border-purple-100/20 shadow-[0_6px_16px_rgba(139,92,246,0.03)] transition-all duration-200 active:scale-95">
                 <i class="fa-solid fa-user-clock text-base"></i>
               </div>
               <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Lembur</span>
             </a>
+            <% } %>
 
-            <!-- DINAS LUAR -->
-            <a href="/trip/new" class="group flex flex-col items-center gap-2 text-center">
-              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
-                <i class="fa-solid fa-route text-base"></i>
-              </div>
-              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Dinas Luar</span>
-            </a>
-
+    <% if (typeof user !== 'undefined' && user?.role === 'WAKIL_DIREKTUR') { %>
+  <button type="button" onclick="openPermitMenuMobile()" class="group flex flex-col items-center gap-2 text-center w-full bg-transparent border-none p-0 cursor-pointer outline-none select-none">
+    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
+      <i class="fa-solid fa-file-signature text-base"></i>
+    </div>
+    <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
+  </button>
+<% } else { %>
+  <a href="/permit/history" class="group flex flex-col items-center gap-2 text-center select-none">
+    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
+      <i class="fa-solid fa-file-signature text-base"></i>
+    </div>
+    <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
+  </a>
+<% } %>
             <!-- SALES VISIT -->
             <a href="/sales/my" class="group flex flex-col items-center gap-2 text-center">
               <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-rose-50/70 text-rose-600 border border-rose-100/20 shadow-[0_6px_16px_rgba(244,63,94,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-rose-100/50">
@@ -189,7 +213,6 @@
               </span>
             </a>
 
-            <!-- SLIP GAJI -->
             <a href="/payroll/my-slip" class="group flex flex-col items-center gap-2 text-center">
               <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-orange-50/70 text-orange-600 border border-orange-100/20 shadow-[0_6px_16px_rgba(249,115,22,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-orange-100/50">
                 <i class="fa-solid fa-receipt text-base"></i>
@@ -197,36 +220,53 @@
               <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Slip Gaji</span>
             </a>
 
-            <!-- KLAIM -->
-           <% 
+            <% 
   const isManager = typeof user !== 'undefined' && 
                     ['MANAGER_ADMINISTRASI', 'MANAGER_HAJI_UMRAH', 'MANAGER_KEUANGAN', 'WAKIL_DIREKTUR'].includes(user.role);
 %>
 
-<% if (isManager) { %>
-  <button onclick="openExpenseMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
-    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.02)] transition-all duration-200 active:scale-95">
-      <i class="fa-solid fa-file-invoice text-base"></i>
-    </div>
-    <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Klaim Beban</span>
-  </button>
-<% } else { %>
-  <a href="/expense/my" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
-    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.02)] transition-all duration-200 active:scale-95">
-      <i class="fa-solid fa-file-invoice text-base"></i>
-    </div>
-    <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Klaim Beban</span>
-  </a>
-<% } %>
+            <% if (isManager) { %>
+            <button onclick="openExpenseMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.02)] transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-file-invoice text-base"></i>
+              </div>
+              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Klaim Beban</span>
+            </button>
+            <% } else { %>
+            <a href="/expense/my" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.02)] transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-file-invoice text-base"></i>
+              </div>
+              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Klaim Beban</span>
+            </a>
+            <% } %>
 
-            <!-- PINJAMAN -->
-            <a href="/loans/new" class="group flex flex-col items-center gap-2 text-center">
-              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-violet-50/70 text-violet-600 border border-violet-100/20 shadow-[0_6px_16px_rgba(109,40,217,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-violet-100/50">
+
+            <% 
+  // List role yang mendapatkan akses bottom sheet kasbon
+  const loanManagerRoles = ['MANAGER_ADMINISTRASI', 'MANAGER_HAJI_UMRAH', 'MANAGER_KEUANGAN'];
+  const direksiRoles = ['WAKIL_DIREKTUR', 'DIREKTUR_UTAMA'];
+  
+  // Apakah user termasuk yang bisa membuka menu Kasbon (Bottom Sheet)?
+  const canAccessLoanMenu = typeof user !== 'undefined' && 
+                           [...loanManagerRoles, ...direksiRoles].includes(user.role);
+%>
+
+            <% if (canAccessLoanMenu) { %>
+            <button onclick="openLoanMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-violet-50/70 text-violet-600 border border-violet-100/20 shadow-[0_6px_16px_rgba(109,40,217,0.03)] transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-hand-holding-dollar text-base"></i>
+              </div>
+              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Kasbon</span>
+            </button>
+            <% } else { %>
+            <a href="/loans/my" class="group flex flex-col items-center gap-2 text-center">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-violet-50/70 text-violet-600 border border-violet-100/20 shadow-[0_6px_16px_rgba(109,40,217,0.03)] transition-all duration-200 active:scale-95">
                 <i class="fa-solid fa-hand-holding-dollar text-base"></i>
               </div>
               <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Kasbon</span>
             </a>
-
+            <% } %>
           </div>
           <div class="mt-10 px-1">
             <h3 class="text-xs font-bold uppercase tracking-wider mb-6">Management Hub</h3>
@@ -241,30 +281,31 @@
               </a>
               <% } %>
 
-              <a href="/management/kpi" class="group flex flex-col items-center gap-1.5 text-center">
+              <!-- <a href="/management/kpi" class="group flex flex-col items-center gap-1.5 text-center">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-100/30 shadow-xs transition-all active:scale-95">
                   <i class="fa-solid fa-chart-simple text-sm"></i>
                 </div>
                 <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lihat KPI</span>
-              </a>
+              </a> -->
 
-              <a href="/management/report/attendance" class="group flex flex-col items-center gap-1.5 text-center">
+              <a href="/report/attendance" class="group flex flex-col items-center gap-1.5 text-center">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100/30 shadow-xs transition-all active:scale-95">
                   <i class="fa-solid fa-calendar-check text-sm"></i>
                 </div>
                 <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Absen</span>
               </a>
+              <% if (user.role == 'WAKIL_DIREKTUR') { %>
 
-             <a href="/report/overview" class="group flex flex-col items-center gap-1.5 text-center">
-  <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100/30 shadow-xs transition-all active:scale-95">
-    <i class="fa-solid fa-chart-line text-sm"></i>
-  </div>
-  <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Lengkap</span>
-</a>
-
+              <a href="/report/overview" class="group flex flex-col items-center gap-1.5 text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100/30 shadow-xs transition-all active:scale-95">
+                  <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Lengkap</span>
+              </a>
+              <% } %>
             </div>
           </div>
-          <div class="mt-8 border-t border-slate-100 pt-6">
+          <div class="mt-8 border-t border-slate-100 pt-6 pb-8">
             <div class="flex items-center justify-between mb-5 border-b border-slate-100/80 pb-3">
               <h3 class="text-[13px] font-semibold text-slate-700 tracking-tight">
                 Pengumuman Terbaru
@@ -326,22 +367,24 @@
 
         <% if (typeof title !== 'undefined' && !title.toLowerCase().includes('dashboard')) { %>
 
-        <div class="fixed top-0 inset-x-0 z-50 flex items-center justify-between border-b border-slate-100 bg-white/95 px-5 py-3.5 md:hidden backdrop-blur-xs">
-          <div class="flex items-center gap-3">
-            <a href="/dashboard" class="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200/70 bg-white text-slate-600 active:bg-slate-50 active:scale-95 transition-all">
+        <div class="fixed top-0 inset-x-0 z-50 md:hidden bg-white/95 border-b border-slate-200/60">
+          <div class="flex items-center gap-3 px-4 h-16">
+
+            <a href="/dashboard" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 active:scale-95">
               <i class="fa-solid fa-chevron-left text-xs"></i>
             </a>
 
-            <div>
-              <h1 class="text-sm font-medium tracking-tight text-slate-800">
+            <div class="min-w-0">
+              <h1 class="truncate text-[15px] font-semibold text-slate-900">
                 <%= title %>
               </h1>
-              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">
-                <%= typeof user !== 'undefined' ? user.role.replace(/_/g, ' ') : 'Zafa HRIS' %>
+
+              <p class="text-[11px] text-slate-400">
+                Zafa Tour HRIS
               </p>
             </div>
+
           </div>
-          <div></div>
         </div>
 
         <div class="pt-16 md:pt-1">
@@ -358,69 +401,96 @@
   </div>
   </main>
   </div>
+  <div class="fixed inset-x-0 bottom-0 z-[105] flex items-center justify-around border-t border-white/20 bg-white/70 backdrop-blur-lg px-2 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] md:hidden">
 
-  <div class="fixed inset-x-0 bottom-0 z-[999] flex items-center justify-around border-t border-slate-200/60 bg-white px-2 py-2 shadow-[0_-4px_16px_rgba(0,0,0,0.02)] md:hidden">
-    <a href="/dashboard" class="flex flex-1 flex-col items-center gap-1 text-blue-600 transition">
+    <a href="/dashboard" class="flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600">
       <i class="fa-solid fa-house text-lg"></i>
-      <span class="text-[10px] font-medium">Beranda</span>
+      <span class="text-[9px] font-bold uppercase tracking-wide">Beranda</span>
     </a>
-    <a href="/attendance/history" class="flex flex-1 flex-col items-center gap-1 text-slate-500 transition hover:text-blue-600">
+
+    <a href="/attendance/history" class="flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600">
       <i class="fa-solid fa-clock-rotate-left text-lg"></i>
-      <span class="text-[10px] font-medium">Absensi</span>
+      <span class="text-[9px] font-bold uppercase tracking-wide">Absensi</span>
     </a>
-    <div class="flex-1 flex justify-center relative -top-2.5">
-      <button type="button" onclick="toggleQuickMenuMobile()" class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-slate-900/15 active:scale-95 transition-all">
-        <i id="quickMenuIconMobile" class="fa-solid fa-plus text-sm transition-transform duration-200"></i>
+
+    <div class="flex-1 flex justify-center relative -top-6">
+      <button type="button" onclick="toggleQuickMenuMobile()" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30 active:scale-90 transition-all duration-300">
+        <i id="quickMenuIconMobile" class="fa-solid fa-plus text-xl transition-transform duration-300"></i>
       </button>
     </div>
-    <a href="/leave/manage-requests" class="relative flex flex-1 flex-col items-center gap-1 text-slate-500 transition hover:text-blue-600">
+
+    <a href="/leave/my-history" class="relative flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600">
       <i class="fa-solid fa-envelope-open-text text-lg"></i>
-      <span class="text-[10px] font-medium">Persetujuan</span>
-      <span class="absolute top-0 right-4 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-red-500 px-1 text-[8px] font-bold text-white">0</span>
+      <span class="text-[9px] font-bold uppercase tracking-wide">Cuti</span>
+      <span class="absolute -top-1 right-3 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-red-500 px-1 text-[8px] font-bold text-white">0</span>
     </a>
 
-    <div class="relative flex flex-1 flex-col items-center gap-1 text-slate-500 transition">
-      <button type="button" onclick="toggleAccountMenuMobile()" class="flex flex-col items-center gap-1 text-slate-500 hover:text-blue-600 focus:outline-none">
-        <i class="fa-solid fa-circle-user text-lg"></i>
-        <span class="text-[10px] font-medium">Akun</span>
+    <div class="relative flex flex-1 flex-col items-center gap-1 text-slate-600">
+      <button type="button" id="accountMenuBtnMobile" onclick="toggleAccountMenuMobile()" class="flex flex-col items-center gap-1 hover:text-blue-600 focus:outline-none">
+        <div class="w-6 h-6 rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 transition-all">
+          <% if (typeof user !== 'undefined' && user.foto_profile) { %>
+          <img src="<%= user.foto_profile %>" alt="Profil" class="w-full h-full object-cover">
+          <% } else { %>
+          <span class="text-[10px] font-bold text-slate-600 uppercase"><%= typeof user !== 'undefined' ? user.username.charAt(0) : 'A' %></span>
+          <% } %>
+        </div>
+        <span class="text-[9px] font-bold uppercase tracking-wide">Akun</span>
       </button>
 
-      <div id="accountDropdownMobile" class="hidden absolute bottom-14 right-2 w-44 bg-white border border-slate-200/60 rounded-2xl shadow-xl p-1.5 flex flex-col space-y-0.5 z-[1000]">
-        <a href="/employee/detail/<%= typeof user !== 'undefined' ? user?.employeeId : '' %>" class="w-full text-left px-3 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2">
-          <i class="fa-solid fa-user text-slate-400 w-3.5"></i> Lihat Informasi
+      <div id="accountDropdownMobile" class="hidden absolute bottom-16 right-2 w-44 bg-white/95 backdrop-blur-sm border border-slate-100 rounded-2xl shadow-2xl p-1.5 flex flex-col space-y-0.5 z-[1000]">
+        <a href="/employee/detail/<%= typeof user !== 'undefined' ? user?.employeeId : '' %>" class="px-3 py-2.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-user text-slate-400"></i> Lihat Informasi
         </a>
-        <a href="/change-password" class="w-full text-left px-3 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2">
-          <i class="fa-solid fa-user-gear text-slate-400 w-3.5"></i> Ganti Password
+        <a href="/change-password" class="px-3 py-2.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-user-gear text-slate-400"></i> Ganti Password
         </a>
         <div class="border-t border-slate-100 my-1"></div>
-        <a href="/logout" onclick="localStorage.clear();" class="w-full text-left px-3 py-2 text-[11px] font-bold text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2">
-          <i class="fa-solid fa-right-from-bracket text-red-400 w-3.5"></i> Keluar
+        <a href="/logout" onclick="localStorage.clear();" class="px-3 py-2.5 text-[11px] font-bold text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-right-from-bracket text-red-400"></i> Keluar
         </a>
       </div>
     </div>
   </div>
-
-  <div id="quickActionMenuMobile" class="fixed inset-0 z-[998] hidden bg-slate-950/30 backdrop-blur-xs md:hidden transition-opacity duration-200" onclick="toggleQuickMenuMobile()">
+  <div id="quickActionMenuMobile" class="fixed inset-0 z-[998] hidden bg-slate-950/30  md:hidden transition-opacity duration-200" onclick="toggleQuickMenuMobile()">
     <div class="absolute bottom-20 inset-x-4 bg-white rounded-3xl p-5 shadow-2xl space-y-3 transform translate-y-10 transition-transform duration-200" onclick="event.stopPropagation()">
-      <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">Buat Pengajuan</h3>
-      <div class="grid grid-cols-3 gap-2">
-        <a href="/leave/apply" class="flex flex-col items-center p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-100 text-center gap-1.5">
+      <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">Buat Pengajuan & Aktivitas</h3>
+
+      <div class="grid grid-cols-4 gap-2">
+        <a href="/leave/apply" class="flex flex-col items-center p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-100 text-center gap-1.5">
           <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-plane-departure text-xs"></i></div>
-          <span class="text-[10px] font-semibold text-slate-700">Cuti</span>
+          <span class="text-[9px] font-semibold text-slate-700 leading-tight">Cuti</span>
         </a>
-        <a href="/permit/new" class="flex flex-col items-center p-3 rounded-2xl bg-slate-50 hover:bg-amber-50 border border-slate-100 text-center gap-1.5">
+
+        <a href="/permit/new" class="flex flex-col items-center p-2.5 rounded-2xl bg-slate-50 hover:bg-amber-50 border border-slate-100 text-center gap-1.5">
           <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-shield-halved text-xs"></i></div>
-          <span class="text-[10px] font-semibold text-slate-700">Izin</span>
+          <span class="text-[9px] font-semibold text-slate-700 leading-tight">Izin</span>
         </a>
-        <a href="/loans/new" class="flex flex-col items-center p-3 rounded-2xl bg-slate-50 hover:bg-purple-50 border border-slate-100 text-center gap-1.5">
+
+        <a href="/loans/new" class="flex flex-col items-center p-2.5 rounded-2xl bg-slate-50 hover:bg-purple-50 border border-slate-100 text-center gap-1.5">
           <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-wallet text-xs"></i></div>
-          <span class="text-[10px] font-semibold text-slate-700">Pinjaman</span>
+          <span class="text-[9px] font-semibold text-slate-700 leading-tight">Kasbon</span>
+        </a>
+
+
+        <a href="/expense/create" class="flex flex-col items-center p-2.5 rounded-2xl bg-slate-50 hover:bg-rose-50 border border-slate-100 text-center gap-1.5">
+          <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center"><i class="fa-solid fa-file-invoice-dollar text-xs"></i></div>
+          <span class="text-[9px] font-semibold text-slate-700 leading-tight">Klaim Beban</span>
+        </a>
+
+        <a href="/sales/new" class="flex flex-col items-center p-2.5 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-1.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-map-location-dot text-xs"></i></div>
+          <span class="text-[9px] font-semibold text-slate-700 leading-tight">Sales Visit</span>
+        </a>
+
+        <a href="/overtime/new" class="flex flex-col items-center p-2.5 rounded-2xl bg-slate-50 hover:bg-orange-50 border border-slate-100 text-center gap-1.5">
+          <div class="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-cloud-moon text-xs"></i></div>
+          <span class="text-[9px] font-semibold text-slate-700 leading-tight">Lembur</span>
         </a>
       </div>
     </div>
   </div>
 
-  <div id="confirmModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+  <div id="confirmModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-950/50 p-4 ">
     <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
       <div class="relative border-b border-slate-100 px-6 py-5">
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500"></div>
@@ -443,7 +513,7 @@
       </div>
     </div>
   </div>
-  <div id="riwayatMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 backdrop-blur-xs md:hidden transition-opacity duration-200" onclick="toggleRiwayatMenuMobile()">
+  <div id="riwayatMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30  md:hidden transition-opacity duration-200" onclick="toggleRiwayatMenuMobile()">
     <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
       <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleRiwayatMenuMobile()"></div>
       <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Pilih Riwayat Pengajuan</h3>
@@ -461,7 +531,7 @@
       </div>
     </div>
   </div>
-  <div id="expenseMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 backdrop-blur-xs md:hidden transition-opacity duration-200" onclick="toggleExpenseMenuMobile()">
+  <div id="expenseMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30  md:hidden transition-opacity duration-200" onclick="toggleExpenseMenuMobile()">
     <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
 
       <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleExpenseMenuMobile()"></div>
@@ -523,6 +593,173 @@
       </div>
     </div>
   </div>
+  <div id="loanMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30  md:hidden transition-opacity duration-200" onclick="toggleLoanMenuMobile()">
+    <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
+      <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleLoanMenuMobile()"></div>
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Kasbon</h3>
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <a href="/loans/new" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-violet-50 border border-slate-100 text-center gap-2">
+          <div class="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center"><i class="fa-solid fa-plus text-sm"></i></div>
+          <span class="text-xs font-bold text-slate-700">Buat Kasbon</span>
+        </a>
+
+        <a href="/loans/my" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-violet-50 border border-slate-100 text-center gap-2">
+          <div class="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center"><i class="fa-solid fa-clock-rotate-left text-sm"></i></div>
+          <span class="text-xs font-bold text-slate-700">Riwayat Saya</span>
+        </a>
+
+        <% if (typeof user !== 'undefined' && ['WAKIL_DIREKTUR', 'DIREKTUR_UTAMA'].includes(user.role)) { %>
+        <a href="/loans/approval" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i class="fa-solid fa-user-shield text-sm"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-800 block">Persetujuan Kasbon</span>
+            <span class="text-[10px] text-slate-500 font-medium">Validasi pengajuan kasbon staf & manager</span>
+          </div>
+        </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <!-- BOTTOM SHEET MENU LEMBUR MOBILE -->
+  <div id="overtimeMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30  md:hidden transition-opacity duration-200" onclick="toggleOvertimeMenuMobile()">
+    <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
+
+      <!-- Handle Bar Modal -->
+      <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleOvertimeMenuMobile()"></div>
+
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Dinas Lembur</h3>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <!-- Tombol Catat Lembur Baru -->
+        <a href="/overtime/new" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-purple-50 border border-slate-100 text-center gap-2">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <i class="fa-solid fa-plus text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Catat Lembur</span>
+        </a>
+
+        <!-- Tombol Riwayat Lembur Sendiri -->
+        <a href="/overtime/my" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-purple-50 border border-slate-100 text-center gap-2">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Riwayat Saya</span>
+        </a>
+
+        <!-- Tombol Khusus Menu Persetujuan (Akan Muncul Penuh di baris bawah) -->
+        <a href="/overtime/approval" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i class="fa-solid fa-user-shield text-sm"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-800 block">Persetujuan Lembur</span>
+            <span class="text-[10px] text-slate-500 font-medium">Validasi dan akumulasi jam lembur aktual staf</span>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+<div id="leaveMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 md:hidden transition-opacity duration-200" onclick="toggleLeaveMenuMobile()">
+  <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
+
+    <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleLeaveMenuMobile()"></div>
+
+    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Pengajuan Cuti</h3>
+
+    <div class="grid grid-cols-2 gap-3 pt-2">
+      
+      <% if (typeof user !== 'undefined' && user?.permissions?.leave_new) { %>
+      <a href="/leave/apply" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <i class="fa-solid fa-calendar-plus text-sm"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-700">Ajukan Cuti</span>
+      </a>
+      <% } %>
+
+      <% if (typeof user !== 'undefined' && user?.permissions?.leave_my) { %>
+      <a href="/leave/my-history" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-700">Riwayat Saya</span>
+      </a>
+      <% } %>
+
+      <% if (typeof user !== 'undefined' && user?.permissions?.leave_delegation) { %>
+      <a href="/leave/my-delegations" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-left transition-colors">
+        <div class="w-10 h-10 rounded-xl bg-indigo-100/50 text-indigo-700 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-hands-sharing text-sm"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-slate-800 block">Permintaan Delegasi</span>
+          <span class="text-[10.5px] text-slate-500 font-medium leading-none">Konfirmasi pengalihan tugas dari rekan kerja</span>
+        </div>
+      </a>
+      <% } %>
+
+      <% if (typeof user !== 'undefined' && user?.permissions?.leave_manage) { %>
+      <a href="/leave/manage-requests" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left transition-colors">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+          <i class="fa-solid fa-user-shield text-sm"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-slate-800 block">Manajemen & Persetujuan Cuti</span>
+          <span class="text-[10.5px] text-slate-500 font-medium leading-none">Validasi kuota harian dan verifikasi dokumen pengajuan staf</span>
+        </div>
+      </a>
+      <% } %>
+    </div>
+
+  </div>
+</div>
+<div id="permitMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 md:hidden transition-opacity duration-200 opacity-0" onclick="togglePermitMenuMobile()">
+  <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
+
+    <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="togglePermitMenuMobile()"></div>
+
+    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Administrasi Izin</h3>
+
+    <div class="grid grid-cols-2 gap-3 pt-2">
+      
+      <% if (typeof user !== 'undefined' && user?.permissions?.permit_new) { %>
+      <a href="/permit/new" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <i class="fa-solid fa-file-circle-plus text-sm"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-700">Buat Pengajuan</span>
+      </a>
+      <% } %>
+
+      <% if (typeof user !== 'undefined' && user?.permissions?.permit_my) { %>
+      <a href="/permit/history" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-700">Riwayat Pengajuan</span>
+      </a>
+      <% } %>
+
+      <% if (typeof user !== 'undefined' && user?.role === 'WAKIL_DIREKTUR') { %>
+      <a href="/permit/incoming" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left transition-colors">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+          <i class="fa-solid fa-user-shield text-sm"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-slate-800 block">Persidangan & Persetujuan Izin</span>
+          <span class="text-[10.5px] text-slate-500 font-medium leading-tight block mt-0.5">Otorisasi dokumen dinas luar, penugasan, dan verifikasi berkas staf</span>
+        </div>
+      </a>
+      <% } %>
+    </div>
+
+  </div>
+</div>
+
+
   <div id="toastContainer" class="pointer-events-auto fixed top-5 right-5 z-[99999] flex flex-col gap-3.5"></div>
 
   <script src="/js/custom-modal.js"></script>
@@ -564,12 +801,20 @@
 
     function toggleAccountMenuMobile() {
       const dropdown = document.getElementById('accountDropdownMobile');
-      dropdown.classList.toggle('hidden');
+      if (dropdown) {
+        dropdown.classList.toggle('hidden');
+      }
     }
 
     document.addEventListener('click', function(e) {
       const dropdown = document.getElementById('accountDropdownMobile');
-      if (dropdown && !dropdown.contains(e.target) && !e.target.closest('button[onclick="toggleAccountMenuMobile()"]')) {
+
+      // PERBAIKAN UTAMA: Mencari elemen terdekat ke atas yang memiliki ID tombol akun
+      // Ini membuat klik pada gambar/avatar di dalam tombol tetap terhitung sebagai mengklik tombol
+      const isClickInsideButton = e.target.closest('#accountMenuBtnMobile');
+
+      // Jika dropdown sedang terbuka, dan yang diklik BUKAN area dalam dropdown, DAN BUKAN tombolnya, baru tutup menu.
+      if (dropdown && !dropdown.contains(e.target) && !isClickInsideButton) {
         dropdown.classList.add('hidden');
       }
     });
@@ -604,7 +849,7 @@
       };
       const s = styles[type] || styles.success;
       const toast = document.createElement("div");
-      toast.className = "w-[360px] rounded-xl border border-slate-200/60 border-l-4 " + s.accentBorder + " bg-white/95 backdrop-blur-md shadow-md p-4 transform translate-x-20 opacity-0 transition-all duration-300 ease-out";
+      toast.className = "w-[360px] rounded-xl border border-slate-200/60 border-l-4 " + s.accentBorder + " bg-white/95  shadow-md p-4 transform translate-x-20 opacity-0 transition-all duration-300 ease-out";
       toast.innerHTML =
         '<div class="flex items-start gap-3">' +
         '<div class="flex-shrink-0 mt-0.5"><i class="fa-solid ' + s.icon + ' ' + s.iconColor + ' text-lg"></i></div>' +
@@ -643,6 +888,73 @@
         menu.classList.add('hidden');
       }, 200);
     }
+
+    function openLoanMenuMobile() {
+      const menu = document.getElementById('loanMenuMobile');
+      menu.classList.remove('hidden');
+      setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10);
+    }
+
+    function toggleLoanMenuMobile() {
+      const menu = document.getElementById('loanMenuMobile');
+      menu.querySelector('.transform').classList.add('translate-y-full');
+      setTimeout(() => menu.classList.add('hidden'), 200);
+    }
+
+    function openOvertimeMenuMobile() {
+      const menu = document.getElementById('overtimeMenuMobile');
+      menu.classList.remove('hidden');
+      setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10);
+    }
+
+    function toggleOvertimeMenuMobile() {
+      const menu = document.getElementById('overtimeMenuMobile');
+      menu.querySelector('.transform').classList.add('translate-y-full');
+      setTimeout(() => menu.classList.add('hidden'), 200);
+    }
+
+    function openLeaveMenuMobile() {
+  const menu = document.getElementById('leaveMenuMobile');
+  menu.classList.remove('hidden');
+  // Berikan jeda mikro agar transisi transform Tailwind berjalan lancar
+  setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10);
+}
+
+function toggleLeaveMenuMobile() {
+  const menu = document.getElementById('leaveMenuMobile');
+  menu.querySelector('.transform').classList.add('translate-y-full');
+  // Sembunyikan container utama setelah animasi slide-down selesai
+  setTimeout(() => menu.classList.add('hidden'), 200);
+}
+function openPermitMenuMobile() {
+  const menu = document.getElementById('permitMenuMobile');
+  if (!menu) return;
+  
+  menu.classList.remove('hidden');
+  // Micro-delay untuk memastikan kelancaran transisi CSS opacity dan translate-y dari Tailwind
+  setTimeout(() => {
+    menu.classList.add('opacity-100');
+    menu.querySelector('.transform').classList.remove('translate-y-full');
+  }, 10);
+}
+
+function togglePermitMenuMobile() {
+  const menu = document.getElementById('permitMenuMobile');
+  if (!menu) return;
+
+  const content = menu.querySelector('.transform');
+  
+  // Jika menu sedang terbuka, kita slide-down ke bawah dan sembunyikan
+  if (!content.classList.contains('translate-y-full')) {
+    content.classList.add('translate-y-full');
+    menu.classList.remove('opacity-100');
+    setTimeout(() => {
+      menu.classList.add('hidden');
+    }, 200);
+  } else {
+    openPermitMenuMobile();
+  }
+}
   </script>
 </body>
 

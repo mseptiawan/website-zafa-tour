@@ -281,7 +281,7 @@
                   BELUM TERSEDIA
                 </button>
               <% } else { %>
-                <button class="openModal h-8.5 px-4.5 bg-slate-900 hover:bg-black text-white text-[11.5px] font-bold rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer shadow-3xs"
+                <button class="openModal h-8.5 px-4.5 bg-blue-50 text-blue-600 text-[11.5px] font-bold rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer shadow-3xs"
                   data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}) %>"
                   data-status="<%= row.status %>"
                   data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>"

@@ -245,3 +245,25 @@ export const getExecutiveReportSummary = async ({ startDate, endDate, periodMont
     payroll: { totalNet: totalPayrollNet, count: listPayroll.length },
   };
 };
+export const generateSingleSlipPdf = async (payrollData, employeeData) => {
+  const templatePath = path.resolve("src/views/pdf/slip.ejs");
+
+  // Penjagaan ekstra agar data array tidak melempar error crash saat diproses EJS loop
+  const allowances = payrollData.allowances || [];
+  const deductions = payrollData.deductions || [];
+
+  // Karena lembur tidak didefinisikan secara khusus di skema Payroll Anda,
+  // upah lembur otomatis melekat di totalEarnings atau masuk ke dalam sub-komponen allowances.
+  // Kita set default 0 agar aman.
+  const overtimePay = 0;
+
+  const htmlContent = await ejs.renderFile(templatePath, {
+    payroll: payrollData,
+    employee: employeeData,
+    overtimePay,
+    allowances,
+    deductions,
+  });
+
+  return await renderHtmlToPdf(htmlContent, 300);
+};

@@ -164,43 +164,69 @@ export const processCheckOut = async (userId, body, file) => {
  * @returns {{ listAttendance, analytics, isAdmin, isPersonalView, filters }}
  */
 
+/**
+ * Ambil riwayat absensi dengan Sistem Otomatis Cut-off Perusahaan (Tanggal 27 - 26)
+ * @param {Object} sessionUser – data user dari req.session.user
+ * @param {Object} query       – { startDate, endDate, view }
+ * @returns {{ listAttendance, analytics, isAdmin, isPersonalView, filters }}
+ */
 export const getAttendanceHistory = async (sessionUser, query) => {
   const { startDate, endDate, view } = query;
 
-  const ADMIN_ROLES = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI"];
+  // Sesuaikan kecocokan role admin Anda di backend
+  const ADMIN_ROLES = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI", "HRD", "ADMIN"];
   const isAdmin = ADMIN_ROLES.includes(sessionUser.role);
   const isPersonalView = isAdmin && view === "personal";
 
   let start;
-  if (startDate) {
+  let end;
+
+  // ===========================================================================
+  // LOGIKA UTAMA: PENETAPAN BULAN CUT-OFF (27 - 26) SECARA OTOMATIS
+  // ===========================================================================
+  if (startDate && endDate) {
+    // Jika HRD memfilter manual lewat form UI, pakai tanggal pilihan HRD
     start = new Date(startDate);
-  } else {
-    start = new Date();
     start.setHours(0, 0, 0, 0);
+
+    end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+  } else {
+    // Jika pertama kali dibuka (kosong), hitung periode cut-off berjalan saat ini
+    const now = new Date();
+
+    if (now.getDate() < 27) {
+      // Contoh: Sekarang 21 Juni 2026 -> Periode Cut-off: 27 Mei 2026 s/d 26 Juni 2026
+      start = new Date(now.getFullYear(), now.getMonth() - 1, 27, 0, 0, 0, 0);
+      end = new Date(now.getFullYear(), now.getMonth(), 26, 23, 59, 59, 999);
+    } else {
+      // Contoh: Sekarang 28 Juni 2026 -> Periode Cut-off: 27 Juni 2026 s/d 26 Juli 2026
+      start = new Date(now.getFullYear(), now.getMonth(), 27, 0, 0, 0, 0);
+      end = new Date(now.getFullYear(), now.getMonth() + 1, 26, 23, 59, 59, 999);
+    }
   }
 
-  const end = endDate ? new Date(endDate) : new Date();
-  end.setHours(23, 59, 59, 999);
-
-  // Query dasar untuk memfilter list tabel utama
+  // Query dasar MongoDB (Mencocokkan field checkIn dengan rentang waktu Date)
   const matchQuery = {
     checkIn: { $gte: start, $lte: end },
     ...(isAdmin && !isPersonalView ? {} : { userId: new mongoose.Types.ObjectId(sessionUser._id) }),
   };
-  // [PROSES LOGIKA FIND DAN POPULATE LIST ATTENDANCE TETAP SAMA SEPERTI SEBELUMNYA...]
+
+  // Ambil list kehadiran utama dari database
   let listAttendance = await Attendance.find(matchQuery)
     .populate("userId", "username")
     .sort({ checkIn: -1 });
 
   listAttendance = listAttendance.map((doc) => doc.toObject());
 
+  // Injeksi data User yang tidak melakukan absensi (BELUM ABSEN / MANGKIR)
   if (isAdmin && !isPersonalView) {
     const attendedInPeriod = await Attendance.find({
       checkIn: { $gte: start, $lte: end },
     }).distinct("userId");
 
     const missingUsers = await User.find({
-      role: { $nin: ADMIN_ROLES },
+      role: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] }, // Filter management agar tidak masuk daftar alpa
       _id: { $nin: attendedInPeriod },
     }).select("username");
 
@@ -219,6 +245,7 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     listAttendance = [...missingAttendanceData, ...listAttendance];
   }
 
+  // Map Nama Karyawan dari Koleksi Employee ke Objek Output
   const employees = await Employee.find({}).select("userId fullName");
   const employeeMap = new Map();
   employees.forEach((emp) => {
@@ -232,20 +259,16 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     const fullName = employeeMap.get(userIdStr) || item.userId?.username || "-";
     return { ...item, fullName };
   });
-  console.log("DEBUG MATCH QUERY:", JSON.stringify(matchQuery, null, 2));
 
-  // Jika sedang di tab "Semua Karyawan" (isAdmin && !isPersonalView), card akan menghitung total perusahaan.
-  // Jika sedang di tab "Absensi Saya", card hanya akan menghitung milik sessionUser._id yang sedang login.
+  // Perhitungan Agregasi untuk Analytics Summary Card di Atas
   const summary = await Attendance.aggregate([
     { $match: matchQuery },
     {
       $group: {
         _id: null,
-        // Akumulasi total menit terlambat (Konversi ke int jika tersimpan sebagai string)
         totalLateMinutes: {
           $sum: { $convert: { input: "$lateDuration", to: "int", onError: 0, onNull: 0 } },
         },
-        // Hitung berapa kali terlambat (Jika lateDuration > 0, otomatis dianggap 1 kali telat)
         totalLateDays: {
           $sum: {
             $cond: [
@@ -260,14 +283,13 @@ export const getAttendanceHistory = async (sessionUser, query) => {
             ],
           },
         },
-        // Hitung total hadir (Semua dokumen yang masuk filter kecuali status BELUM ABSEN atau ALFA)
         totalHadir: {
           $sum: {
             $cond: [
               {
                 $and: [
                   { $ne: ["$status", "BELUM ABSEN"] },
-                  { $ne: ["$status", "ALFA"] },
+                  { $ne: ["$status", "ALPHA"] },
                   { $ne: ["$status", ""] },
                 ],
               },
@@ -280,12 +302,14 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     },
   ]);
 
+  // Kembalikan objek data yang siap dibaca oleh berkas EJS Anda
   return {
     listAttendance,
     analytics: summary[0] || { totalLateMinutes: 0, totalLateDays: 0, totalHadir: 0 },
     isAdmin,
     isPersonalView,
     filters: {
+      // Mengonversi kembali format objek Date ke string YYYY-MM-DD untuk isi value di form HTML input
       startDate: start.toISOString().split("T")[0],
       endDate: end.toISOString().split("T")[0],
     },

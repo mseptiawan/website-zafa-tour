@@ -1,96 +1,127 @@
 <%- layout('layouts/main', { title: 'Catat Lembur' }) %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] px-4 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+<!-- 1. GLOBAL ISLAND CANVAS LAYER -->
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
   <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
+    <!-- 2. REUSABLE PAGE HEADER COMPONENT -->
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Lembur', 
         title: 'Catat Lembur', 
-        description: 'Isi rincian detail lembur yang dilakukan secara aktual.' 
+        description: 'Isi rincian detail dinas lembur yang dilakukan secara aktual.' 
     }) %>
 
-    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 shadow-2xs md:shadow-sm overflow-hidden">
-      
-      <% if (errors && Object.keys(errors).length > 0) { %>
-        <div class="mb-6 p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
-          <% Object.values(errors).forEach(function(message) { %>
-            <div class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> <%= message %></div>
-          <% }) %>
-        </div>
-      <% } %>
-      
+    <!-- 3. MAIN CARD WRAPPER (Anti-Lancip di Mobile, Premium di Desktop) -->
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
       <form id="overtime-form" action="/overtime/" method="POST" enctype="multipart/form-data" class="space-y-5">
 
+        <% if (typeof errors !== 'undefined' && errors && Object.keys(errors).length > 0) { %>
+        <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium space-y-1">
+          <% Object.values(errors).forEach(function(message) { %>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-circle-exclamation text-[10px]"></i> 
+              <span><%= message %></span>
+            </div>
+          <% }) %>
+        </div>
+        <% } %>
+
+        <!-- Row: Tanggal Lembur -->
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Lembur</label>
           <input type="date" id="dateInput" name="date" required min="<%= dateLimit.min %>" max="<%= dateLimit.max %>"
                  class="w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <!-- Row Grid: Jam Mulai & Jam Selesai (Vertikal di Mobile, Horizontal di Desktop) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4">
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jam Mulai</label>
-            <input type="text" id="startTime" name="startTime" required placeholder="16:30" class="timepicker w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800" />
+            <input type="text" id="startTime" name="startTime" required placeholder="Contoh: 16:30" 
+                   class="timepicker w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800" />
           </div>
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jam Selesai</label>
-            <input type="text" id="endTime" name="endTime" required placeholder="21:00" class="timepicker w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800" />
+            <input type="text" id="endTime" name="endTime" required placeholder="Contoh: 21:00" 
+                   class="timepicker w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800" />
           </div>
         </div>
 
+        <!-- Row: Pekerjaan Yang Dilakukan -->
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Pekerjaan Yang Dilakukan</label>
-          <textarea name="workDescription" required rows="4" maxlength="500" placeholder="Jelaskan detail tugas lembur Anda..." 
-                    class="w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:border-slate-400 outline-none resize-none transition-all leading-relaxed text-slate-800"></textarea>
+          <textarea name="workDescription" required rows="5" maxlength="500" placeholder="Jelaskan detail tugas dinas lembur Anda di sini..." 
+                    class="w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:border-slate-400 outline-none resize-none transition-all leading-relaxed text-slate-800"></textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <!-- Row Grid: Lokasi Kerja & Detail Lokasi (Dipaksa Vertikal total di Mobile via grid-cols-1) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4">
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Lokasi Kerja</label>
-            <select id="locationType" name="location[type]" required class="w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800 appearance-none">
-              <option value="OFFICE">Kantor (Office)</option>
-              <option value="REMOTE">Remote (WFH)</option>
-              <option value="CLIENT_SITE">Lokasi Klien</option>
-              <option value="OTHER">Lainnya</option>
-            </select>
+            <div class="relative">
+              <select id="locationType" name="location[type]" required 
+                      class="w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800 appearance-none pr-10 cursor-pointer">
+                <option value="OFFICE">Kantor (Office)</option>
+                <option value="REMOTE">Remote (WFH)</option>
+                <option value="CLIENT_SITE">Lokasi Klien</option>
+                <option value="OTHER">Lainnya</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Detail Lokasi</label>
-            <input type="text" id="locationDetail" name="location[detail]" required placeholder="Contoh: Gedung A" 
-                   class="w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800" />
+            <input type="text" id="locationDetail" name="location[detail]" required placeholder="Contoh: Lantai 2 / Nama Gedung" 
+                   class="w-full bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:border-slate-400 outline-none transition-all text-slate-800" />
           </div>
         </div>
 
+        <!-- Row: Bukti Lampiran Dropzone (Sesuai Gaya Announcement) -->
         <div class="space-y-2">
           <label class="block text-[12px] font-semibold text-slate-700 tracking-wide">
             Bukti Lampiran <span class="text-slate-400 font-normal">(Opsional)</span>
           </label>
-
-          <div id="dropzone-empty" class="relative w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center justify-center text-center">
+          <div class="relative">
             <input type="file" name="proofFile" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
-            <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" /></svg>
-            <span class="text-[12px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
-          </div>
+            
+            <div id="dropzone-empty" class="w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center">
+              <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+              <span class="text-[12px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
+              <span class="text-[11px] text-slate-400 mt-0.5">PNG, JPG, PDF (maks 5MB)</span>
+            </div>
 
-          <div id="dropzone-filled" class="hidden flex items-center justify-between border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
-            <div class="flex items-center gap-3 min-w-0 flex-1">
-              <div class="w-9 h-9 rounded-lg overflow-hidden border border-slate-200/60 bg-slate-50 flex items-center justify-center">
-                 <img id="img-preview" class="w-full h-full object-cover hidden" />
-                 <svg id="file-icon-fallback" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625..."/></svg>
+            <div id="dropzone-filled" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-9 h-9 rounded-lg overflow-hidden border border-slate-200/60 bg-slate-50 flex items-center justify-center shrink-0">
+                  <img id="img-preview" class="w-full h-full object-cover hidden" />
+                  <svg id="file-icon-fallback" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">file.jpg</div>
+                  <div id="size-preview" class="text-[11px] text-slate-400 mt-0.5">0 KB</div>
+                </div>
               </div>
-              <div>
-                <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">file.jpg</div>
-                <div id="size-preview" class="text-[11px] text-slate-400">0 KB</div>
+              <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto relative z-20">
+                <a id="view-file-btn" href="#" target="_blank" class="text-[11px] font-medium text-center text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">View</a>
+                <button type="button" onclick="triggerChangeFile()" class="text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">Ganti</button>
               </div>
             </div>
-            <button type="button" onclick="triggerChangeFile()" class="text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-3 py-1.5 rounded-lg">Ganti</button>
           </div>
         </div>
 
+        <!-- 4. ACTION BUTTONS FOOTER -->
         <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
-          <a href="/overtime/my" class="px-6 py-2.5 rounded-xl text-[12px] font-semibold text-slate-600 hover:bg-slate-100 transition-colors">Batal</a>
-          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs">
+          <a href="/overtime/my" class="px-5 py-2.5 rounded-xl text-[12px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all select-none">Batal</a>
+          <button type="submit" class="w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs">
             Simpan
           </button>
         </div>
@@ -98,6 +129,8 @@
     </div>
   </div>
 </div>
+
+<!-- SCRIPTS HANDLERS -->
 <script>
   let currentFileUrl = null;
 
@@ -110,9 +143,7 @@
       }
 
       currentFileUrl = URL.createObjectURL(file);
-      const viewBtn = document.getElementById("view-file-btn");
-      viewBtn.href = currentFileUrl;
-
+      document.getElementById("view-file-btn").href = currentFileUrl;
       document.getElementById("name-preview").textContent = file.name;
 
       const fileSizeInKB = file.size / 1024;
@@ -157,11 +188,13 @@
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const dateInput = document.getElementById("dateInput");
-  dateInput.min = dateInput.getAttribute("min");
-  dateInput.max = dateInput.getAttribute("max");
-});
+  document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("dateInput");
+    if (dateInput) {
+      dateInput.min = dateInput.getAttribute("min");
+      dateInput.max = dateInput.getAttribute("max");
+    }
+  });
 </script>
 
 <script>
@@ -169,16 +202,20 @@ document.addEventListener("DOMContentLoaded", function () {
   const locationDetail = document.getElementById('locationDetail');
 
   function updateDetailLocation() {
-    if (locationType.value === 'OFFICE') {
-      locationDetail.value = 'Kantor pusat zafa tour palembang';
-    } else {
-      if (locationDetail.value === 'Kantor pusat zafa tour palembang') {
-          locationDetail.value = '';
+    if (locationType && locationDetail) {
+      if (locationType.value === 'OFFICE') {
+        locationDetail.value = 'Kantor pusat zafa tour palembang';
+      } else {
+        if (locationDetail.value === 'Kantor pusat zafa tour palembang') {
+            locationDetail.value = '';
+        }
       }
     }
   }
 
-  locationType.addEventListener('change', updateDetailLocation);
+  if (locationType) {
+    locationType.addEventListener('change', updateDetailLocation);
+  }
   document.addEventListener('DOMContentLoaded', updateDetailLocation);
 </script>
 

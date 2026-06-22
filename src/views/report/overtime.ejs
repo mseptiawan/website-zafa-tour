@@ -1,148 +1,115 @@
 <%- layout('layouts/main', { title }) %>
 
-<style>
-  /* Efek Glassmorphism Halus untuk UI Monitor */
-  .dashboard-card {
-    background: #ffffff;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-    transition: all 0.2s ease-in-out;
-  }
+<div class="min-h-screen ml-0 md:ml-72 bg-[#f8fafc] p-6 antialiased text-slate-900 pb-24 md:pb-12">
+  <div class="mx-auto max-w-none space-y-6">
 
-  .dashboard-card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-    border-color: rgba(191, 219, 254, 1);
-  }
-</style>
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-200 pb-5">
+      <div class="min-w-0">
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">Rekap Jam Lembur</h1>
+        <p class="text-xs text-slate-500 mt-1">Laporan waktu kerja tambahan karyawan beserta akumulasi estimasi beban kompensasi.</p>
+      </div>
 
-<div class="min-h-screen ml-72 bg-[#f8fafc] p-8 antialiased text-slate-800">
-  <div class="mx-auto max-w-7xl space-y-8">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
+        <form method="GET" action="/report/overtime" class="flex flex-1 sm:flex-none items-center gap-2 bg-white border border-slate-200 rounded-lg p-1 h-9 shadow-xs">
+          <div class="flex items-center gap-1 px-2 text-xs font-medium text-slate-600">
+            <input type="date" name="startDate" id="filterStartDate" value="<%= filters.startDate %>" class="bg-transparent outline-none cursor-pointer">
+            <span class="text-slate-300">—</span>
+            <input type="date" name="endDate" id="filterEndDate" value="<%= filters.endDate %>" class="bg-transparent outline-none cursor-pointer">
+          </div>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium h-7 px-3 rounded-md transition-colors cursor-pointer">
+            Saring
+          </button>
+        </form>
 
-    <div class="mb-6 border-b border-slate-200/60 pb-5">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        
-        <div class="grow">
-          <%- include('../partials/page-header', { 
-              section: 'Operasional Keuangan', 
-              module: 'Laporan', 
-              title: 'Rekap Jam Lembur', 
-              description: 'Pantau waktu kerja tambahan rekan tim beserta perkiraan kompensasi secara real-time.' 
-          }) %>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3 self-end md:self-center shrink-0">
-          <form method="GET" action="/report/overtime" class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 h-10 shadow-2xs">
-            <div class="flex items-center gap-1 px-2">
-              <input type="date" name="startDate" id="filterStartDate" value="<%= filters.startDate %>" class="bg-transparent text-xs font-semibold text-slate-600 outline-none">
-              <span class="text-slate-300 text-xs">-</span>
-              <input type="date" name="endDate" id="filterEndDate" value="<%= filters.endDate %>" class="bg-transparent text-xs font-semibold text-slate-600 outline-none">
-            </div>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-8 px-4 rounded-lg transition-all cursor-pointer">
-              Saring
-            </button>
-          </form>
-
-          <a href="/report/overtime/download-pdf?startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" 
-             class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-10 px-5 rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95">
-            <i class="fa-solid fa-file-pdf text-sm"></i> Unduh PDF Laporan
-          </a>
-        </div>
-
+        <a href="/report/overtime/download-pdf?startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" 
+           class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+          Cetak Dokumen (PDF)
+        </a>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6">
-      <%
-        const statItems = [
-          {
-            label: 'Total Pengajuan',
-            value: analytics.totalCount,
-            unit: 'Kali disetujui',
-            icon: 'fa-solid fa-circle-check',
-            iconBoxClass: 'bg-blue-50 text-blue-600'
-          },
-          {
-            label: 'Akumulasi Waktu',
-            value: analytics.totalHours,
-            unit: 'Jam kerja',
-            icon: 'fa-solid fa-clock',
-            iconBoxClass: 'bg-blue-50 text-blue-600'
-          },
-          {
-            label: 'Total Perkiraan Biaya',
-            value: `Rp ${new Intl.NumberFormat('id-ID').format(analytics.estimatedCost)}`,
-            unit: '',
-            icon: 'fa-solid fa-wallet',
-            iconBoxClass: 'bg-emerald-50 text-emerald-600'
-          }
-        ];
-      %>
-
-      <div class="grid grid-cols-3 gap-5 w-full select-none">
-        <% statItems.forEach(item => { %>
-          <div class="bg-white rounded-2xl p-5 flex items-center justify-between shadow-xs border border-slate-200/80 w-full dashboard-card">
-            <div class="space-y-1 min-w-0 flex-1">
-              <span class="text-[12px] font-bold text-slate-400 uppercase tracking-wider block md:truncate">
-                <%= item.label %>
-              </span>
-              <span class="text-2xl font-bold text-slate-900 tracking-tight tabular-nums block truncate">
-                <%= item.value %> 
-                <% if (item.unit) { %>
-                  <span class="text-xs font-semibold text-slate-500 inline-block"><%= item.unit %></span>
-                <% } %>
-              </span>
-            </div>
-            <div class="flex w-10 h-10 rounded-xl items-center justify-center <%= item.iconBoxClass %> shrink-0 ml-2">
-              <i class="<%= item.icon %> text-sm"></i>
-            </div>
+    <%
+      const statItems = [
+        { label: 'Total Pengajuan', value: analytics.totalCount, unit: 'disetujui' },
+        { label: 'Akumulasi Waktu', value: analytics.totalHours, unit: 'jam kerja' },
+        { label: 'Estimasi Beban Kompensasi', value: `Rp ${new Intl.NumberFormat('id-ID').format(analytics.estimatedCost)}`, unit: '' }
+      ];
+    %>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 select-none">
+      <% statItems.forEach((item, index) => { %>
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
+          <span class="text-xs font-medium text-slate-500 block"><%= item.label %></span>
+          <div class="mt-2 flex items-baseline gap-1.5">
+            <span class="text-3xl font-semibold tracking-tight tabular-nums <%= index === 2 ? 'text-slate-900' : 'text-slate-900' %>">
+              <%= item.value %>
+            </span>
+            <% if (item.unit) { %>
+              <span class="text-xs font-medium text-slate-400"><%= item.unit %></span>
+            <% } %>
           </div>
-        <% }) %>
-      </div>
-
-      <%
-        let overtimeMap = {};
-        listOvertime.forEach(item => { 
-          let name = item.employeeName || "Anonim";
-          if (!overtimeMap[name]) {
-            overtimeMap[name] = { frekuensi: 0, totalJam: 0, estBiaya: 0 };
-          }
-          if (item.status === "APPROVED") {
-            overtimeMap[name].frekuensi++;
-            overtimeMap[name].totalJam += (item.totalHours || 0);
-            let biaya = (item.totalHours || 0) * (item.overtimeRateSnapshot || 0) * (item.multiplierSnapshot || 1.5);
-            overtimeMap[name].estBiaya += biaya;
-          }
-        });
-      %>
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-4">
-        <div>
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rincian Lembur Rekan Kerja</h3>
-          <p class="text-[11px] text-slate-500">Perbandingan durasi kerja tambahan beserta perkiraan kompensasi</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <% Object.keys(overtimeMap).sort().forEach((name) => { 
-               let oData = overtimeMap[name];
-               if(oData.frekuensi > 0) {
-          %>
-          <div class="dashboard-card p-4 rounded-xl text-xs space-y-3">
-            <span class="font-bold text-slate-900 block border-b border-slate-100 pb-2 text-sm truncate"><%= name %></span>
-            <div class="flex justify-between items-center text-[11px]">
-              <div class="space-y-1 font-medium text-slate-500">
-                <span class="block">Total Durasi : <span class="text-slate-800 font-bold"><%= oData.totalJam %> Jam</span></span>
-                <span class="block">Frekuensi : <span class="text-slate-800 font-bold"><%= oData.frekuensi %> Kali</span></span>
-              </div>
-              <div class="text-right border-l border-slate-100 pl-3 bg-blue-50/60 border border-blue-100 p-2 rounded-lg min-w-[110px]">
-                <span class="block text-[9px] text-blue-500 font-bold uppercase tracking-wider mb-0.5">Kompensasi</span>
-                <span class="block font-bold text-blue-700 font-mono text-xs">Rp <%= new Intl.NumberFormat('id-ID').format(Math.round(oData.estBiaya)) %></span>
-              </div>
-            </div>
-          </div>
-          <%   } 
-             }) 
-          %>
-        </div>
-      </div>
-
+      <% }) %>
     </div>
+
+    <%
+      let overtimeMap = {};
+      listOvertime.forEach(item => { 
+        let name = item.employeeName || "Anonim";
+        if (!overtimeMap[name]) {
+          overtimeMap[name] = { frekuensi: 0, totalJam: 0, estBiaya: 0 };
+        }
+        if (item.status === "APPROVED") {
+          overtimeMap[name].frekuensi++;
+          overtimeMap[name].totalJam += (item.totalHours || 0);
+          let biaya = (item.totalHours || 0) * (item.overtimeRateSnapshot || 0) * (item.multiplierSnapshot || 1.5);
+          overtimeMap[name].estBiaya += biaya;
+        }
+      });
+      const sortedNames = Object.keys(overtimeMap).sort();
+    %>
+
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+      <div class="p-6 border-b border-slate-200">
+        <h3 class="text-sm font-semibold text-slate-900">Rincian Lembur Karyawan</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Daftar komparatif durasi kerja tambahan, frekuensi pengajuan, dan nilai kompensasi bersih.</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <th class="p-4 pl-6">Nama Karyawan</th>
+              <th class="p-4 text-center">Frekuensi Lembur</th>
+              <th class="p-4 text-center">Total Durasi</th>
+              <th class="p-4 text-right pr-6">Estimasi Kompensasi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+            <% if (sortedNames.length > 0) { %>
+              <% sortedNames.forEach((name) => { 
+                   let oData = overtimeMap[name];
+                   if(oData.frekuensi > 0) {
+              %>
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                  <td class="p-4 pl-6 font-semibold text-slate-900"><%= name %></td>
+                  <td class="p-4 text-center tabular-nums text-slate-600"><%= oData.frekuensi %> kali</td>
+                  <td class="p-4 text-center tabular-nums text-slate-600"><%= oData.totalJam %> jam</td>
+                  <td class="p-4 text-right pr-6 tabular-nums font-mono font-semibold text-slate-900">
+                    Rp <%= new Intl.NumberFormat('id-ID').format(Math.round(oData.estBiaya)) %>
+                  </td>
+                </tr>
+              <%   } 
+                 }) 
+              %>
+            <% } else { %>
+              <tr>
+                <td colspan="4" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan record data lembur yang disetujui pada periode ini.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>

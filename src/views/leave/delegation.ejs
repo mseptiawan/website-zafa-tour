@@ -1,56 +1,68 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
-  <div class="max-w-6xl mx-auto space-y-8">
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] sm:p-6 md:p-10 antialiased pb-24 md:pb-8 selection:bg-blue-50 selection:text-blue-600">
+  <div class="w-full max-w-none mx-auto space-y-5 md:space-y-8">
 
     <!-- Page Header Komponen -->
-    <%- include('../partials/page-header', {
-      section: 'Area Kerja',
-      module: 'Penugasan & Backup',
-      title: 'Permintaan Delegasi Tugas',
-      description: 'Konfirmasi kesediaan Anda untuk mem-backup serta menjaga kontinuitas tugas rekan kerja yang sedang cuti.'
-    }) %>
+    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+      <%- include('../partials/page-header', {
+        section: 'Area Kerja',
+        module: 'Penugasan & Backup',
+        title: 'Permintaan Delegasi Tugas',
+        description: 'Konfirmasi kesediaan Anda untuk mem-backup serta menjaga kontinuitas tugas rekan kerja yang sedang cuti.'
+      }) %>
+    </div>
 
     <!-- Stats Grid Komponen -->
-    <%- include('../partials/_stats-grid', {
-      items: [
-        { 
-          label: 'Permintaan Aktif', 
-          value: delegations.length, 
-          unit: 'Berkas', 
-          icon: 'fa-solid fa-clock-rotate-left', 
-          bgClass: 'bg-white border-slate-200/60', 
-          iconBoxClass: 'bg-amber-50 text-amber-600 border-amber-100' 
-        },
-        { 
-          label: 'Riwayat Konfirmasi', 
-          value: historyDelegations.length, 
-          unit: 'Berkas', 
-          icon: 'fa-solid fa-circle-check', 
-          bgClass: 'bg-white border-slate-200/60', 
-          iconBoxClass: 'bg-blue-50 text-blue-600 border-blue-100' 
-        },
-        { 
-          label: 'Total Keterlibatan Backup', 
-          value: (delegations.length + historyDelegations.length), 
-          unit: 'Total Tugas', 
-          icon: 'fa-solid fa-briefcase', 
-          bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800', 
-          labelClass: 'text-slate-300', 
-          valueClass: 'text-white', 
-          unitClass: 'text-slate-400',
-          iconBoxClass: 'bg-white/10 text-white border-transparent' 
-        }
-      ]
-    }) %>
+    <div class="w-full">
+      <%- include('../partials/_stats-grid', {
+        gridClass: 'grid-cols-1 sm:grid-cols-3',
+        items: [
+          { 
+            label: 'Permintaan Aktif', 
+            value: delegations.length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-clock-rotate-left', 
+            labelClass: '!font-medium text-amber-600', 
+            valueClass: '!font-medium text-slate-800', 
+            iconBoxClass: 'bg-amber-50 text-amber-500 border border-amber-200/50' 
+          },
+          { 
+            label: 'Riwayat Konfirmasi', 
+            value: historyDelegations.length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-check', 
+            labelClass: '!font-medium text-slate-400', 
+            valueClass: '!font-medium text-slate-800', 
+            iconBoxClass: 'bg-blue-50 text-blue-600 border border-blue-100/50' 
+          },
+          { 
+            label: 'Total Keterlibatan Backup', 
+            value: (delegations.length + historyDelegations.length), 
+            unit: ' Tugas', 
+            icon: 'fa-solid fa-briefcase', 
+            labelClass: '!font-medium text-slate-500', 
+            valueClass: '!font-medium text-slate-900', 
+            iconBoxClass: 'bg-slate-100 text-slate-500 border border-slate-200/50' 
+          }
+        ]
+      }) %>
+    </div>
 
-    <!-- Tab Navigation Komponen (Mewah Capsule Style) -->
-    <%- include('../partials/_tab-nav', {
-      tabs: [
-        { id: 'active', label: `Permintaan Aktif (${delegations.length})` },
-        { id: 'history', label: `Riwayat Delegasi (${historyDelegations.length})` }
-      ]
-    }) %>
+    <!-- Tab Navigation Komponen & Action Bar (Mobile Responsive Layout) -->
+    <div class="flex flex-col gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none md:shadow-none select-none">
+      <div class="flex items-center justify-between gap-3 w-full md:hidden">
+        <h3 class="text-[14px] font-medium text-slate-800 tracking-tight">Daftar Penugasan</h3>
+        <span class="text-[11px] bg-slate-100 border border-slate-200 font-mono text-slate-500 px-2 py-0.5 rounded-md">BACKUP</span>
+      </div>
+
+      <%- include('../partials/_tab-nav', {
+        tabs: [
+          { id: 'active', label: `Permintaan Aktif (${delegations.length})`, isActive: true },
+          { id: 'history', label: `Riwayat Delegasi (${historyDelegations.length})`, isActive: false }
+        ]
+      }) %>
+    </div>
 
     <!-- Tab Content Panes dengan Smooth Opacity Transition -->
     <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
@@ -63,3 +75,35 @@
 
   </div>
 </div>
+
+<script>
+  function switchTab(tabName) {
+    // 1. Sinkronisasi Visibilitas & Animasi Pane Konten
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.add('hidden');
+      pane.classList.remove('block', 'opacity-100', 'translate-y-0');
+    });
+
+    const activeContent = document.getElementById(`tab-content-${tabName}`);
+    if (activeContent) {
+      activeContent.classList.remove('hidden');
+      activeContent.classList.add('block');
+      setTimeout(() => {
+        activeContent.classList.add('opacity-100', 'translate-y-0');
+      }, 10);
+    }
+
+    // 2. Reset Semua Tombol Tab ke Gaya Dasar (State Non-Aktif)
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+      btn.classList.add('font-medium', 'text-slate-500');
+    });
+
+    // 3. Terapkan Gaya Aktif Mutlak pada Tab yang Dipilih
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (activeBtn) {
+      activeBtn.classList.remove('font-medium', 'text-slate-500');
+      activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+    }
+  }
+</script>

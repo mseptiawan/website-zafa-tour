@@ -48,7 +48,7 @@ export const myLoans = async (req, res, next) => {
   try {
     const { loans, summary } = await loanService.getEmployeeLoanHistory(req.user._id);
     res.render("loans/my", {
-      title: "Riwayat Pinjaman Saya",
+      title: "Riwayat Pinjaman",
       loans,
       summary,
     });

@@ -77,19 +77,19 @@
         </div>
       </div>
 
-      <div class="mt-4">
-        <% if (!already) { %>
-          <button type="button" onclick="submitAttendance(event, 'checkin')" id="btn-submit"
-            class="w-full h-14 text-sm font-bold bg-blue-600 active:bg-blue-700 text-white rounded-2xl transition-all active:scale-[0.99] shadow-md shadow-blue-600/10 outline-none cursor-pointer flex items-center justify-center gap-2">
-            <i class="fa-solid fa-right-to-bracket text-xs"></i> Lakukan Check-In
-          </button>
-        <% } else { %>
-          <button type="button" onclick="submitAttendance(event, 'checkout')" id="btn-submit"
-            class="w-full h-14 text-sm font-bold bg-rose-600 active:bg-rose-700 text-white rounded-2xl transition-all active:scale-[0.99] shadow-md shadow-rose-600/10 outline-none cursor-pointer flex items-center justify-center gap-2">
-            <i class="fa-solid fa-right-from-bracket text-xs"></i> Lakukan Check-Out
-          </button>
-        <% } %>
-      </div>
+     <div class="mt-4">
+  <% if (!already) { %>
+    <button type="button" onclick="submitAttendance(event, 'checkin')" id="btn-submit"
+      class="w-full h-11.5 text-[12px] font-semibold bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-xl transition-colors outline-none cursor-pointer border-none flex items-center justify-center gap-2">
+      <i class="fa-solid fa-right-to-bracket text-[11px]"></i> Lakukan Check-In
+    </button>
+  <% } else { %>
+    <button type="button" onclick="submitAttendance(event, 'checkout')" id="btn-submit"
+      class="w-full h-11.5 text-[12px] font-semibold bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-xl transition-colors outline-none cursor-pointer border-none flex items-center justify-center gap-2">
+      <i class="fa-solid fa-right-from-bracket text-[11px]"></i> Lakukan Check-Out
+    </button>
+  <% } %>
+</div>
     <% } %>
 
   </div>

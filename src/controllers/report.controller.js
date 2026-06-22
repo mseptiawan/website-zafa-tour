@@ -10,6 +10,7 @@ import {
   generatePayrollPdf,
   generateAttendancePdf,
   getExecutiveReportSummary,
+  generateSingleSlipPdf,
 } from "../services/report.service.js";
 
 /**
@@ -17,43 +18,60 @@ import {
  */
 export const renderAttendanceReportPage = async (req, res, next) => {
   try {
-    const startDate = req.query.startDate || "2026-05-27";
-    const endDate = req.query.endDate || "2026-06-26";
+    // 1. Tentukan tanggal default otomatis jika filter tidak diisi
+    const now = new Date();
+    let defaultStart, defaultEnd;
+
+    if (now.getDate() < 27) {
+      defaultStart = new Date(now.getFullYear(), now.getMonth() - 1, 27);
+      defaultEnd = new Date(now.getFullYear(), now.getMonth(), 26);
+    } else {
+      defaultStart = new Date(now.getFullYear(), now.getMonth(), 27);
+      defaultEnd = new Date(now.getFullYear(), now.getMonth() + 1, 26);
+    }
+
+    const startDate = req.query.startDate || defaultStart.toISOString().split("T")[0];
+    const endDate = req.query.endDate || defaultEnd.toISOString().split("T")[0];
+
+    // 2. Cek Hak Akses Admin/HRD berdasarkan role user yang login
+    const ADMIN_ROLES = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI", "HRD", "ADMIN"];
+    const isAdmin = ADMIN_ROLES.includes(req.user?.role);
+    
+    // Jika bukan admin, kunci view ke 'personal' agar service menyaring data miliknya saja
+    const viewMode = isAdmin ? (req.query.view || "all") : "personal";
 
     const mockReq = {
       user: req.user,
       session: { user: req.user },
-      query: { startDate, endDate, view: "all" },
+      query: { startDate, endDate, view: viewMode },
     };
 
     const mockRes = {
       render: (viewPath, data) => {
         return res.render("report/attendance", {
-          title: "Laporan Absensi Karyawan",
+          title: isAdmin && viewMode !== "personal" ? "Laporan Absensi Karyawan" : "Laporan Absensi Saya",
           listAttendance: data.listAttendance,
           analytics: data.analytics,
           filters: { startDate, endDate },
           user: req.user,
+          isAdmin,
+          isPersonalView: viewMode === "personal"
         });
       },
-      status: function () {
-        return this;
-      },
-      json: function (obj) {
-        return res.json(obj);
-      },
+      status: function () { return this; },
+      json: function (obj) { return res.json(obj); },
     };
 
     const mockNext = (err) => {
       if (err) console.error("Log internal next attendance:", err);
     };
+
     await attendanceHistory(mockReq, mockRes, mockNext);
   } catch (error) {
     console.error("Gagal merender laporan absensi:", error);
     return res.status(500).send("Terjadi masalah saat memuat laporan absensi.");
   }
 };
-
 /**
  * Controller Laporan Pegawai (UI Dashboard)
  */
@@ -397,5 +415,47 @@ export const renderAnalyticsReport = async (req, res) => {
   } catch (error) {
     console.error("Error pada Analytics Report:", error);
     return res.status(500).send("Gagal memuat laporan lengkap.");
+  }
+};
+
+export const downloadSingleSlipPdf = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Ambil data payroll secara detail
+    const payroll = await Payroll.findById(id).lean();
+    if (!payroll) {
+      return res.status(404).send("Data dokumen slip gaji tidak ditemukan.");
+    }
+
+    // 2. Ambil data Employee BESERTA Virtual-nya (careerData & financialData)
+    // Jangan gunakan .lean() murni tanpa menyalakan virtuals, atau panggil manual populate-nya:
+    const employee = await Employee.findById(payroll.employeeId)
+      .populate({
+        path: "careerData",
+        populate: [
+          { path: "bidangId", model: "Bidang" }, // Sesuaikan nama model Bidang Anda jika ada hubungan reference internal
+          { path: "positionId", model: "Position" }, // Sesuaikan nama model Position Anda
+          { path: "unitId", model: "Unit" }, // Sesuaikan nama model Unit Anda
+        ],
+      })
+      .populate("financialData")
+      .lean({ virtuals: true }); // Mengizinkan virtual masuk ke dalam format plain object lean
+
+    if (!employee) {
+      return res.status(404).send("Profil karyawan pemilik dokumen tidak ditemukan.");
+    }
+
+    // 3. Render ke PDF via service Puppeteer
+    const pdfBuffer = await generateSingleSlipPdf(payroll, employee);
+
+    const safeFileName = `Slip_Gaji_${employee.fullName.replace(/\s+/g, "_")}_Periode_${payroll.periodMonth}.pdf`;
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=${safeFileName}`);
+
+    return res.end(pdfBuffer);
+  } catch (error) {
+    console.error("❌ Gagal mengekspor PDF Slip Gaji Individu:", error);
+    return res.status(500).send("Terjadi eror internal saat mencetak berkas PDF slip gaji.");
   }
 };

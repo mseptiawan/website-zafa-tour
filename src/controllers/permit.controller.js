@@ -36,8 +36,7 @@ export const createPermit = async (req, res) => {
       });
     }
 
-    const documentPath = req.file ? `/uploads/documents/${req.file.filename}` : null;
-
+    const documentPath = req.file ? `/uploads/files/${req.file.filename}` : null;
     const newPermit = new Permit({
       user: req.user._id,
       type,

@@ -1,61 +1,75 @@
-<div class="bg-white border border-slate-200/60 rounded-xl shadow-sm p-6">
-  <div class="mb-8">
+<div class="bg-white border border-slate-200/60 rounded-2xl shadow-2xs p-6">
+  <div class="mb-6 select-none">
     <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h2>
     <p class="text-[10px] text-slate-400 mt-0.5">Alur dan status persetujuan berkas</p>
   </div>
-  <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
-    <% approvals.forEach((app, index) => { %>
-    <% if (app.note === 'Dibatalkan oleh pemohon') { %>
-    <% return; %>
+  
+  <div class="relative pl-6 space-y-6 <%= approvals && approvals.length > 0 ? 'before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100' : '' %>">
+    
+    <% if (!approvals || approvals.length === 0) { %>
+      <!-- STATE KETIKA BELUM ADA LOG PERSETUJUAN SAMA SEKALI -->
+      <div class="flex flex-col items-center justify-center py-8 text-center select-none">
+        <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 mb-2.5">
+          <i class="fa-solid fa-folder-open text-xs"></i>
+        </div>
+        <p class="text-[11px] font-semibold text-slate-500">Belum ada tindakan persetujuan yang dicatat.</p>
+        <p class="text-[10px] text-slate-400 mt-0.5">Berkas baru saja masuk ke sistem antrean.</p>
+      </div>
+    <% } else { %>
+      
+      <% approvals.forEach((app, index) => { %>
+        <% if (app.note === 'Dibatalkan oleh pemohon') return; %>
+
+        <div class="relative">
+          <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center text-white
+          <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
+            <span class="text-[8px] font-bold"><%= index + 1 %></span>
+          </div>
+          
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase"><%= app.step %></span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200' %>">
+                <%= app.status === 'PENDING' ? 'MENUNGGU' : app.status %>
+              </span>
+            </div>
+            
+            <div class="flex items-center gap-1.5 text-[10px] text-slate-500">
+              <span class="font-semibold text-slate-700 truncate max-w-[120px]"><%= app.approverId?.employeeData?.fullName || 'Sistem' %></span>
+              <span class="text-slate-300">|</span>
+              <span class="font-medium text-slate-400">
+                <%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Dalam Antrean' %>
+              </span>
+            </div>
+            
+            <% if (app.status !== 'PENDING' && app.note) { %>
+              <div class="mt-1.5 text-[10.5px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic leading-relaxed">"<%= app.note %>"</div>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+
     <% } %>
 
-    <div class="relative mb-6">
-      <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center
-      <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
-        <span class="text-[8px] text-white font-bold"><%= index + 1 %></span>
-      </div>
-      <div class="flex flex-col gap-1">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase"><%= app.step %></span>
-          <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200' %>"><%= app.status %></span>
-        </div>
-        <div class="flex items-center gap-2 text-[10px] text-slate-500">
-          <span class="font-semibold text-slate-700"><%= app.approverId?.employeeData?.fullName || 'Sistem' %></span>
-          <span class="text-slate-300">|</span>
-          <span><%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Menunggu' %></span>
-        </div>
-        <% if (app.status !== 'PENDING' && app.note) { %>
-        <div class="mt-2 text-[10px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic">"<%= app.note %>"</div>
-        <% } %>
-      </div>
-    </div>
-    <% }) %>
-
+    <!-- HANDLING KONDISI KHUSUS STATUS CANCELLED OLEH PEMOHON -->
     <% if (typeof loan !== 'undefined' && loan.status === 'CANCELLED') { %>
-    <div class="relative mt-4 pl-3 border-l border-slate-200">
-      <div class="flex flex-col gap-1">
-
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] font-semibold text-slate-500 tracking-wide uppercase">
-            Pengajuan Dibatalkan
-          </span>
-          <span class="text-[9px] font-medium px-2 py-0.5 rounded-md uppercase border bg-slate-50 text-slate-600 border-slate-200">
-            Cancelled
-          </span>
+      <div class="relative pl-0 pt-2">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-500 tracking-wide uppercase">Pengajuan Dibatalkan</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border bg-slate-50 text-slate-500 border-slate-200">Cancelled</span>
+          </div>
+          <div class="flex items-center gap-2 text-[10px] text-slate-400">
+            <span class="font-semibold text-slate-600">Pemohon</span>
+            <span class="text-slate-200">|</span>
+            <span><%= new Date(loan.updatedAt).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) %></span>
+          </div>
+          <div class="mt-1.5 text-[10.5px] text-slate-500 bg-slate-50/50 p-2.5 rounded-lg border border-slate-100/80 italic leading-relaxed">
+            "Pengajuan pinjaman telah dibatalkan resmi oleh pemohon. Seluruh alur persetujuan otomatis dihentikan oleh sistem."
+          </div>
         </div>
-
-        <div class="flex items-center gap-2 text-[10px] text-slate-400">
-          <span class="font-medium text-slate-600">Pemohon (Anda)</span>
-          <span class="text-slate-200">|</span>
-          <span><%= new Date(loan.updatedAt).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) %></span>
-        </div>
-
-        <div class="mt-1.5 text-[10px] text-slate-500 bg-slate-50/50 p-2 rounded-lg border border-slate-100/80 italic leading-relaxed">
-          "Pengajuan pinjaman telah dibatalkan resmi oleh pemohon. Seluruh alur persetujuan otomatis dihentikan oleh sistem."
-        </div>
-
       </div>
-    </div>
     <% } %>
+    
   </div>
 </div>

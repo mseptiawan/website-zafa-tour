@@ -276,6 +276,7 @@ export function getPermissions(role) {
 
       permissions.overtime_new = true;
       permissions.overtime_my = true;
+      permissions.overtime_approval = true;
 
       permissions.attendance_new = true;
       permissions.attendance_my = true;

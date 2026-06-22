@@ -1,46 +1,21 @@
 <%- layout('layouts/main', { title }) %>
 
-<style>
-  /* Efek Glassmorphism Halus untuk UI Monitor */
-  .dashboard-card {
-    background: #ffffff;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-    transition: all 0.2s ease-in-out;
-  }
-  .dashboard-card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-    border-color: rgba(191, 219, 254, 1); 
-  }
-</style>
+<div class="min-h-screen ml-0 md:ml-72 bg-[#f8fafc] p-6 antialiased text-slate-900 pb-24 md:pb-12">
+  <div class="mx-auto max-w-none space-y-6">
 
-<div class="min-h-screen ml-72 bg-[#f8fafc] p-8 antialiased text-slate-800">
-  <div class="mx-auto max-w-7xl space-y-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
+      <div class="min-w-0">
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">Daftar Data Karyawan</h1>
+        <p class="text-xs text-slate-500 mt-1">Halaman pusat kendali administrasi berkas dan sebaran demografi staf.</p>
+      </div>
 
-    <!-- HEADER PAGE -->
-    <div class="mb-6 border-b border-slate-200/60 pb-5">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        
-        <div class="grow">
-          <%- include('../partials/page-header', { 
-              section: 'Operasional Internal', 
-              module: 'Informasi', 
-              title: 'Daftar Data Karyawan', 
-              description: 'Halaman terpusat untuk melihat profil ringkas dan sebaran biodata rekan-rekan kerja.' 
-          }) %>
-        </div>
-
-        <!-- Tombol Aksi Download PDF -->
-        <div class="flex items-center gap-3 self-end md:self-center shrink-0">
-          <button onclick="executeDownloadEmployeePdf()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-10 px-5 rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95">
-            <i class="fa-solid fa-file-pdf text-sm"></i> Unduh PDF Karyawan
-          </button>
-        </div>
-
+      <div class="shrink-0 w-full sm:w-auto">
+        <button onclick="executeDownloadEmployeePdf()" class="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer">
+          Cetak Berkas (PDF)
+        </button>
       </div>
     </div>
 
-    <!-- LOGIKA HITUNG GENDER -->
     <% 
       let lakiCount = 0; let perempuanCount = 0;
       employees.forEach(emp => {
@@ -52,94 +27,81 @@
       let pctPerempuan = Math.round((perempuanCount / totalEmp) * 100);
     %>
 
-    <!-- KOMPOSISI GENDER CARD -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-4 select-none">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs lg:col-span-4">
+        <span class="text-xs font-medium text-slate-500 block">Total Staf Aktif</span>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-4xl font-semibold tracking-tight text-slate-900 tabular-nums"><%= employees.length %></span>
+          <span class="text-xs font-medium text-slate-400">orang terdaftar</span>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs lg:col-span-8 flex flex-col justify-between">
         <div>
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Komposisi Gender Karyawan</h3>
-          <p class="text-[11px] text-slate-500">Perimbangan profil tim berdasarkan jenis kelamin</p>
+          <span class="text-xs font-medium text-slate-500 block">Proporsi Gender</span>
         </div>
-        <span class="text-xs bg-slate-50 text-slate-600 font-bold px-3 py-1 rounded-lg border border-slate-200/60">
-          Total: <%= employees.length %> Orang
-        </span>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="dashboard-card p-4 rounded-xl flex items-center justify-between bg-white border border-slate-100">
-          <div class="flex items-center gap-3.5 min-w-0">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600">
-              <i class="fa-solid fa-mars text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <span class="text-xs font-bold text-slate-900 block mb-0.5">Laki-Laki</span>
-              <span class="text-[11px] text-slate-500 block truncate font-medium"><%= lakiCount %> Rekan kerja</span>
-            </div>
+        
+        <div class="my-3 sm:my-0">
+          <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
+            <div class="bg-blue-600 h-full transition-all" style="width: <%= pctLaki %>%"></div>
+            <div class="bg-slate-400 h-full transition-all" style="width: <%= pctPerempuan %>%"></div>
           </div>
-          <div class="text-right shrink-0">
-            <span class="inline-flex items-center justify-center bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-md text-xs border border-blue-100">
-              <%= pctLaki %>%
-            </span>
-          </div>
-        </div>
-
-        <div class="dashboard-card p-4 rounded-xl flex items-center justify-between bg-white border border-slate-100">
-          <div class="flex items-center gap-3.5 min-w-0">
-            <div class="w-10 h-10 rounded-xl bg-blue-50/60 border border-blue-100/70 flex items-center justify-center shrink-0 text-blue-400">
-              <i class="fa-solid fa-venus text-sm"></i>
+          
+          <div class="flex items-center gap-4 mt-3 text-xs">
+            <div class="flex items-center gap-1.5 font-medium text-slate-600">
+              <span class="w-2 h-2 rounded-full bg-blue-600 block"></span>
+              <span>Laki-Laki (<%= lakiCount %> Karyawan — <%= pctLaki %>%)</span>
             </div>
-            <div class="min-w-0">
-              <span class="text-xs font-bold text-slate-900 block mb-0.5">Perempuan</span>
-              <span class="text-[11px] text-slate-500 block truncate font-medium"><%= perempuanCount %> Rekan kerja</span>
+            <div class="flex items-center gap-1.5 font-medium text-slate-600">
+              <span class="w-2 h-2 rounded-full bg-slate-400 block"></span>
+              <span>Perempuan (<%= perempuanCount %> Karyawan — <%= pctPerempuan %>%)</span>
             </div>
-          </div>
-          <div class="text-right shrink-0">
-            <span class="inline-flex items-center justify-center bg-blue-50 text-blue-600 font-bold px-2.5 py-1 rounded-md text-xs border border-blue-100">
-              <%= pctPerempuan %>%
-            </span>
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- LIST BIODATA KARYAWAN -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div>
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Biodata Lengkap Karyawan</h3>
-          <p class="text-[11px] text-slate-500">Informasi ringkas profil dan status pernikahan setiap anggota tim</p>
-        </div>
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+      <div class="p-6 border-b border-slate-200">
+        <h3 class="text-sm font-semibold text-slate-900">Biodata Lengkap Karyawan</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Daftar komparatif data identitas pokok dan status perkawinan personel.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <% employees.forEach((emp) => { %>
-          <div class="dashboard-card p-4 rounded-xl text-xs space-y-3">
-            <div class="flex justify-between items-start border-b border-slate-100 pb-2">
-              <div class="truncate pr-2">
-                <span class="font-bold text-slate-900 block truncate text-sm">
-                  <%= emp.fullName %>
-                </span>
-              </div>
-              <span class="text-[10px] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded font-bold text-blue-700 shrink-0 shadow-3xs">
-                <%= emp.employeeIdNumber %>
-              </span>
-            </div>
-            
-            <div class="space-y-1.5 text-[11px]">
-              <div class="flex justify-between">
-                <span class="text-slate-400 font-medium">Jenis Kelamin</span>
-                <span class="text-slate-800 font-semibold"><%= emp.jenis_kelamin %></span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400 font-medium">Tempat Lahir</span>
-                <span class="text-slate-800 font-semibold truncate max-w-[140px] text-right"><%= emp.tempat_lahir %></span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400 font-medium">Status</span>
-                <span class="text-slate-800 font-semibold"><%= emp.status_pernikahan %></span>
-              </div>
-            </div>
-          </div>
-        <% }) %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <th class="p-4 pl-6">Nama Karyawan</th>
+              <th class="p-4">Id</th>
+              <th class="p-4">Jenis Kelamin</th>
+              <th class="p-4">Tempat Lahir</th>
+              <th class="p-4 text-right pr-6">Status Pernikahan</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+            <% if (employees && employees.length > 0) { %>
+              <% employees.forEach((emp) => { %>
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                  <td class="p-4 pl-6 font-semibold text-slate-900"><%= emp.fullName %></td>
+                  <td class="p-4 tabular-nums text-slate-600">
+                    <span class="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[11px]">
+                      <%= emp.employeeIdNumber %>
+                    </span>
+                  </td>
+                  <td class="p-4 text-slate-600"><%= emp.jenis_kelamin %></td>
+                  <td class="p-4 text-slate-600"><%= emp.tempat_lahir || '—' %></td>
+                  <td class="p-4 text-right pr-6 text-slate-500"><%= emp.status_pernikahan %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="5" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan repositori data karyawan.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -147,12 +109,7 @@
 </div>
 
 <script>
-  /**
-   * Mengarahkan browser langsung ke endpoint export PDF di server hris.
-   * Server akan memproses Puppeteer dan memicu proses download file biner secara native.
-   */
   function executeDownloadEmployeePdf() {
-    // Sesuaikan prefix path jika rute router employee Anda menggunakan prefix tertentu (misal: /api/employees/export-pdf)
     window.location.href = "/report/employees/download-pdf";
   }
 </script>

@@ -1,16 +1,110 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-6xl mx-auto space-y-8">
-    
-    <%- include('../partials/page-header', {
-      section: 'Absensi & Izin',
-      module: 'Izin',
-      title: 'Riwayat Pengajuan Saya',
-      description: 'Pantau status permohonan izin yang telah Anda ajukan.'
-    }) %>
+<% 
+  // =========================================================================
+  // LOGIKA PEMISAH DATA (FILTERING DATA BERDASARKAN STATUS)
+  // =========================================================================
+  const activePermits = permits.filter(p => p.status === 'PENDING');
+  const historyPermits = permits.filter(p => p.status === 'APPROVED' || p.status === 'REJECTED');
 
-    <%- include('partials/_table', { permits: permits, type: 'history' }) %>
-    
+  // CONFIGURATION UNTUK DESAIN BADGE STATUS
+  const getStatusConfig = (status) => {
+    switch(status) {
+      case 'PENDING':
+        return { label: 'Pending Wadir', badge: 'bg-amber-50 text-amber-600 border-amber-200/50', dot: 'bg-amber-500' };
+      case 'APPROVED':
+        return { label: 'Approved', badge: 'bg-emerald-50 text-emerald-600 border-emerald-200/50', dot: 'bg-emerald-500 animate-pulse' };
+      case 'REJECTED':
+        return { label: 'Rejected', badge: 'bg-rose-50 text-rose-600 border-rose-200/50', dot: 'bg-rose-500' };
+      default:
+        return { label: status, badge: 'bg-slate-50 text-slate-600 border-slate-200/50', dot: 'bg-slate-500' };
+    }
+  };
+
+  const typeLabels = {
+    'SAKIT': 'Izin Sakit',
+    'PENDAMPINGAN_MELAHIRKAN': 'Mendampingi Istri Melahirkan',
+    'MUSIBAH': 'Terkena Musibah',
+    'PENTING': 'Keperluan Mendesak'
+  };
+%>
+
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] sm:p-6 md:p-10 antialiased pb-24 md:pb-8 text-slate-800">
+  <div class="w-full max-w-none mx-auto space-y-5 md:space-y-8">
+
+    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+      <%- include('../partials/page-header', {
+        section: 'Absensi & Izin',
+        module: 'Izin',
+        title: 'Riwayat Pengajuan Saya',
+        description: 'Pantau status permohonan izin atau dinas luar yang telah Anda ajukan.'
+      }) %>
+    </div>
+
+    <div class="flex flex-col gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none select-none">
+      <div class="flex items-center justify-between gap-3 w-full md:hidden">
+        <h3 class="text-[14px] font-medium text-slate-800 tracking-tight">Daftar Permohonan</h3>
+        <a href="/permit/new" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 text-white text-[11px] font-medium rounded-full transition-all active:scale-95 outline-none cursor-pointer">
+          <i class="fa-solid fa-plus text-[9px]"></i>
+          <span>Ajukan</span>
+        </a>
+      </div>
+
+      <%- include('../partials/_tab-nav', {
+        tabs: [
+          { 
+            id: 'active', 
+            label: `Menunggu Persetujuan (${activePermits.length})`,
+            isActive: true 
+          },
+          { 
+            id: 'history', 
+            label: `Riwayat Selesai (${historyPermits.length})`,
+            isActive: false 
+          }
+        ]
+      }) %>
+    </div>
+
+    <div id="tab-content-active" class="tab-pane space-y-4 block opacity-100 transition-all duration-300 transform translate-y-0">
+      <%- include('partials/_table', { permits: activePermits, type: 'active', getStatusConfig, typeLabels }) %>
+    </div>
+
+    <div id="tab-content-history" class="tab-pane space-y-4 hidden opacity-0 transition-all duration-300 transform translate-y-2">
+      <%- include('partials/_table', { permits: historyPermits, type: 'history', getStatusConfig, typeLabels }) %>
+    </div>
+
   </div>
 </div>
+
+<script>
+  function switchTab(tabName) {
+    // 1. Sinkronisasi Visibilitas & Animasi Pane Konten
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.add('hidden');
+      pane.classList.remove('block', 'opacity-100', 'translate-y-0');
+    });
+
+    const activeContent = document.getElementById(`tab-content-${tabName}`);
+    if (activeContent) {
+      activeContent.classList.remove('hidden');
+      activeContent.classList.add('block');
+      setTimeout(() => {
+        activeContent.classList.add('opacity-100', 'translate-y-0');
+      }, 10);
+    }
+
+    // 2. Reset Semua Tombol Tab ke Gaya Dasar (State Non-Aktif)
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+      btn.classList.add('font-medium', 'text-slate-500');
+    });
+
+    // 3. Terapkan Gaya Aktif Mutlak pada Tab yang Dipilih
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (activeBtn) {
+      activeBtn.classList.remove('font-medium', 'text-slate-500');
+      activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+    }
+  }
+</script>

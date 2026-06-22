@@ -7,44 +7,44 @@
     <form method="GET" class="space-y-3 rounded-2xl border border-slate-200/60 bg-white p-4 shadow-xs">
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="mb-1 block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          <label class="mb-1 block text-[9px]   font-medium tracking-wider text-slate-400 uppercase">
             Mulai
           </label>
           <input
             type="date"
             name="startDate"
             value="<%= filters.startDate %>"
-            class="w-full rounded-xl border border-slate-200/50 bg-slate-50 p-2.5 text-xs font-semibold text-slate-700 transition-all outline-none focus:border-blue-500"
+            class="w-full rounded-xl border border-slate-200/50 bg-slate-50 p-2.5 text-xs  font-medium text-slate-700 transition-all outline-none focus:border-blue-500"
           />
         </div>
         <div>
-          <label class="mb-1 block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          <label class="mb-1 block text-[9px]   font-medium tracking-wider text-slate-400 uppercase">
             Selesai
           </label>
           <input
             type="date"
             name="endDate"
             value="<%= filters.endDate %>"
-            class="w-full rounded-xl border border-slate-200/50 bg-slate-50 p-2.5 text-xs font-semibold text-slate-700 transition-all outline-none focus:border-blue-500"
+            class="w-full rounded-xl border border-slate-200/50 bg-slate-50 p-2.5 text-xs  font-medium text-slate-700 transition-all outline-none focus:border-blue-500"
           />
         </div>
       </div>
       
       <div>
-        <label class="mb-1 block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+        <label class="mb-1 block text-[9px]   font-medium tracking-wider text-slate-400 uppercase">
           Buku Periode Gaji (Payroll)
         </label>
         <input
           type="month"
           name="periodMonth"
           value="<%= filters.periodMonth %>"
-          class="w-full rounded-xl border border-slate-200/50 bg-slate-50 p-2.5 text-xs font-bold text-slate-700 transition-all outline-none focus:border-blue-500"
+          class="w-full rounded-xl border border-slate-200/50 bg-slate-50 p-2.5 text-xs   font-medium text-slate-700 transition-all outline-none focus:border-blue-500"
         />
       </div>
 
       <button
         type="submit"
-        class="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-[11px] font-bold text-white shadow-xs transition-all hover:bg-slate-800 active:scale-95 cursor-pointer"
+        class="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-[11px]   font-medium text-white shadow-xs transition-all hover:bg-slate-800 active:scale-95 cursor-pointer"
       >
         <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
         Perbarui Data Laporan
@@ -59,15 +59,15 @@
             <i class="fa-solid fa-users text-base"></i>
           </div>
           <div>
-            <h4 class="text-xs font-bold tracking-tight text-slate-800">Laporan Data Pegawai</h4>
+            <h4 class="text-xs   font-medium tracking-tight text-slate-800">Laporan Data Pegawai</h4>
             <p class="text-[11px] font-medium text-slate-400">Total internal SDM aktif</p>
           </div>
         </div>
         <div class="text-right">
-          <span class="text-lg font-black text-slate-900 tabular-nums">
+          <span class="text-lg  font-semibold text-slate-900 tabular-nums">
             <%= summary.employees.total %>
           </span>
-          <span class="block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          <span class="block text-[9px]   font-medium tracking-wider text-slate-400 uppercase">
             Anggota
           </span>
         </div>
@@ -79,15 +79,15 @@
             <i class="fa-solid fa-calendar-check text-base"></i>
           </div>
           <div>
-            <h4 class="text-xs font-bold tracking-tight text-slate-800">Laporan Rekap Absensi</h4>
+            <h4 class="text-xs   font-medium tracking-tight text-slate-800">Laporan Rekap Absensi</h4>
             <p class="text-[11px] font-medium text-slate-400">Akumulasi log presensi masuk</p>
           </div>
         </div>
         <div class="text-right">
-          <span class="text-lg font-black text-slate-900 tabular-nums">
+          <span class="text-lg  font-semibold text-slate-900 tabular-nums">
             <%= summary.attendance.totalHadir %>
           </span>
-          <span class="block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          <span class="block text-[9px]   font-medium tracking-wider text-slate-400 uppercase">
             Kehadiran
           </span>
         </div>
@@ -99,17 +99,17 @@
             <i class="fa-solid fa-user-clock text-base"></i>
           </div>
           <div>
-            <h4 class="text-xs font-bold tracking-tight text-slate-800">Laporan Rekap Lembur</h4>
+            <h4 class="text-xs   font-medium tracking-tight text-slate-800">Laporan Rekap Lembur</h4>
             <p class="text-[11px] font-medium text-slate-400">
-              Durasi: <b class="font-bold text-slate-700"><%= summary.overtime.hours %> Jam</b>
+              Durasi: <b class="  font-medium text-slate-700"><%= summary.overtime.hours %> Jam</b>
             </p>
           </div>
         </div>
         <div class="text-right">
-          <span class="text-xs font-black text-purple-600 tabular-nums block">
+          <span class="text-xs  font-semibold text-purple-600 tabular-nums block">
             Rp <%= new Intl.NumberFormat('id-ID').format(summary.overtime.cost) %>
           </span>
-          <span class="block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          <span class="block text-[9px]   font-medium tracking-wider text-slate-400 uppercase">
             Beban Lembur
           </span>
         </div>
@@ -121,17 +121,17 @@
             <i class="fa-solid fa-receipt text-base"></i>
           </div>
           <div>
-            <h4 class="text-xs font-bold tracking-tight text-slate-800">Laporan Gaji & Payroll</h4>
+            <h4 class="text-xs   font-medium tracking-tight text-slate-800">Laporan Gaji & Payroll</h4>
             <p class="text-[11px] font-medium text-slate-400">
-              Buku tutup: <b class="font-bold text-slate-700"><%= summary.payroll.count %> Slip</b>
+              Buku tutup: <b class="  font-medium text-slate-700"><%= summary.payroll.count %> Slip</b>
             </p>
           </div>
         </div>
         <div class="text-right">
-          <span class="text-xs font-black text-rose-600 tabular-nums block">
+          <span class="text-xs  font-semibold text-rose-600 tabular-nums block">
             Rp <%= new Intl.NumberFormat('id-ID').format(summary.payroll.totalNet) %>
           </span>
-          <span class="block text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+          <span class="block text-[9px]   font-medium tracking-wider text-slate-400 uppercase">
             Total THP
           </span>
         </div>

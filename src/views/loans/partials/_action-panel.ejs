@@ -1,124 +1,104 @@
 <% if (activeApproval) { %>
-<div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
-
-  <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
-    <div class="w-9 h-9 rounded-xl <%= user.role === 'MANAGER_KEUANGAN' ? 'bg-emerald-50' : 'bg-blue-50' %> flex items-center justify-center">
-      <i class="fa-solid <%= user.role === 'MANAGER_KEUANGAN' ? 'fa-money-bill-transfer text-emerald-700' : 'fa-check-double text-blue-700' %>"></i>
-    </div>
-    <%= user.role === 'MANAGER_KEUANGAN' ? 'Proses Pencairan Dana' : 'Evaluasi Pinjaman' %>
+<div class="w-full">
+  <!-- Judul Section -->
+  <h3 class="text-[11px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-2 select-none">
+    <div class="w-1.5 h-3 bg-blue-500 rounded-xs md:hidden"></div>
+    <span><%= (user.role || '').toUpperCase() === 'MANAGER_KEUANGAN' ? 'Proses Pencairan Dana' : 'Evaluasi Pengajuan Pinjaman' %></span>
   </h3>
 
-  <% if (user.role === 'MANAGER_KEUANGAN') { %>
-  <form action="/loans/approval/disburse/<%= activeApproval._id %>" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-
-    <div id="upload-section" class="mb-5">
-      <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">
-        Upload Bukti Transfer <span class="text-rose-500">*</span>
+  <% if ((user.role || '').toUpperCase() === 'MANAGER_KEUANGAN') { %>
+  <form action="/loans/approval/disburse/<%= activeApproval._id %>" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="m-0 space-y-3.5">
+    <div>
+      <label class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block select-none">
+        Upload Bukti Transfer Resmi <span class="text-rose-500">*</span>
       </label>
 
-      <div id="error-message" class="text-[10px] text-rose-500 mb-2 hidden font-bold">
+      <div id="error-message" class="text-[10px] text-rose-500 mb-2 hidden font-bold select-none">
         <i class="fa-solid fa-circle-exclamation mr-1"></i> Harap pilih file bukti transfer terlebih dahulu!
       </div>
 
       <input type="file" name="paymentProof" id="file-input" class="hidden" accept="image/*,application/pdf" onchange="handleFilePreview(this)">
 
-      <div id="file-preview-area" class="hidden flex items-center justify-between border border-slate-200 rounded-xl p-3 bg-white shadow-sm">
-        <div class="flex items-center gap-3 overflow-hidden">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-            <i id="file-icon" class="fa-solid fa-file-lines"></i>
+      <div id="file-preview-area" class="hidden flex items-center justify-between border border-slate-200 rounded-xl p-2.5 bg-slate-50/50">
+        <div class="flex items-center gap-2 overflow-hidden min-w-0 flex-1 pr-2">
+          <div class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+            <i id="file-icon" class="fa-solid fa-file-lines text-xs"></i>
           </div>
-          <span id="file-name" class="text-[12px] font-bold text-slate-700 truncate">file.pdf</span>
+          <span id="file-name" class="text-[11.5px] font-bold text-slate-700 truncate">file.pdf</span>
         </div>
-        <div class="flex items-center gap-1">
-          <button type="button" id="btn-view" onclick="viewFile()" class="text-[10px] font-bold text-blue-600 hover:text-blue-700 px-2 uppercase">View</button>
-          <button type="button" onclick="resetFile()" class="text-[10px] font-bold text-rose-600 hover:text-rose-700 px-2 uppercase">Hapus</button>
+        <div class="flex items-center gap-0.5 shrink-0 select-none">
+          <button type="button" id="btn-view" onclick="viewFile()" class="text-[10px] font-bold text-blue-600 hover:text-blue-700 px-2 py-1 uppercase tracking-wider">View</button>
+          <button type="button" onclick="resetFile()" class="text-[10px] font-bold text-rose-600 hover:text-rose-700 px-2 py-1 uppercase tracking-wider">Hapus</button>
         </div>
       </div>
 
-      <button type="button" id="btn-select-file" onclick="document.getElementById('file-input').click()" class="w-full py-3 border border-dashed border-slate-300 rounded-xl text-xs font-bold text-slate-500 hover:border-blue-400 hover:text-blue-600 transition">
-        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Pilih Bukti (JPG/PDF)
+      <button type="button" id="btn-select-file" onclick="document.getElementById('file-input').click()" class="w-full h-11 border border-dashed border-slate-300 rounded-xl text-[11.5px] font-bold text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-all bg-slate-50/20 active:scale-[0.99] cursor-pointer">
+        <i class="fa-solid fa-cloud-arrow-up mr-2 text-slate-400"></i> Pilih Bukti Transfer (JPG/PDF)
       </button>
     </div>
 
-    <div class="flex justify-end">
-      <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition active:scale-[0.98]">
-        MARK AS PAID
-      </button>
-    </div>
+    <button type="submit" class="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl tracking-wider transition-all active:scale-[0.97] cursor-pointer shadow-sm">
+      MARK AS PAID
+    </button>
   </form>
 
   <script>
     let currentFileUrl = null;
-
     function validateForm() {
       const fileInput = document.getElementById('file-input');
       const errorMessage = document.getElementById('error-message');
-
       if (!fileInput.files || fileInput.files.length === 0) {
         errorMessage.classList.remove('hidden');
         return false;
       }
       return true;
     }
-
     function handleFilePreview(input) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
         document.getElementById('error-message').classList.add('hidden');
         document.getElementById('file-name').textContent = file.name;
-
         const icon = document.getElementById('file-icon');
-        icon.className = file.type === 'application/pdf' ? 'fa-solid fa-file-pdf' : 'fa-solid fa-file-image';
-
+        icon.className = file.type === 'application/pdf' ? 'fa-solid fa-file-pdf text-xs' : 'fa-solid fa-file-image text-xs';
         if (currentFileUrl) URL.revokeObjectURL(currentFileUrl);
         currentFileUrl = URL.createObjectURL(file);
-
-        document.getElementById('file-preview-area').classList.remove('hidden');
+        document.getElementById('file-preview-area').classList.replace('hidden', 'flex');
         document.getElementById('btn-select-file').classList.add('hidden');
       }
     }
-
-    function viewFile() {
-      if (currentFileUrl) window.open(currentFileUrl, '_blank');
-    }
-
+    function viewFile() { if (currentFileUrl) window.open(currentFileUrl, '_blank'); }
     function resetFile() {
       document.getElementById('file-input').value = "";
-      document.getElementById('file-preview-area').classList.add('hidden');
+      document.getElementById('file-preview-area').classList.replace('flex', 'hidden');
       document.getElementById('btn-select-file').classList.remove('hidden');
-      if (currentFileUrl) {
-        URL.revokeObjectURL(currentFileUrl);
-        currentFileUrl = null;
-      }
+      if (currentFileUrl) { URL.revokeObjectURL(currentFileUrl); currentFileUrl = null; }
     }
   </script>
+
   <% } else { %>
-  <textarea id="evaluation-note" rows="4" class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Masukkan catatan evaluasi..."></textarea>
+  <div class="space-y-3.5">
+    <textarea 
+      id="evaluation-note" 
+      rows="3" 
+      class="w-full text-xs text-slate-700 bg-slate-50/50 border border-slate-200/80 rounded-xl p-3 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-400 resize-none" 
+      placeholder="Masukkan catatan keputusan pemeriksaan berkas di sini..."></textarea>
 
-  <div class="flex items-center justify-end gap-3 w-full">
-    <form action="/loans/approval/reject/<%= activeApproval._id %>" method="POST" onsubmit="appendNoteBeforeSubmit(this)">
-      <input type="hidden" name="note" class="hidden-note-field">
-      <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition active:scale-[0.98]">
-        Tolak
-      </button>
-    </form>
+    <div class="flex items-center gap-2.5 w-full justify-stretch">
+      <form action="/loans/approval/reject/<%= activeApproval._id %>" method="POST" onsubmit="appendNoteBeforeSubmit(this)" class="flex-1 m-0">
+        <input type="hidden" name="note" class="hidden-note-field">
+        <button type="submit" class="w-full h-11 rounded-xl border border-rose-200 bg-rose-50/50 text-rose-600 text-xs font-bold hover:bg-rose-50 hover:text-rose-700 transition-all active:scale-[0.96] cursor-pointer tracking-wide">
+          Tolak
+        </button>
+      </form>
 
-    <form action="/loans/approval/approve/<%= activeApproval._id %>" method="POST" onsubmit="appendNoteBeforeSubmit(this)">
-      <input type="hidden" name="note" class="hidden-note-field">
-      <button type="submit" class="cursor-pointer px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition active:scale-[0.98]">
-        Terima
-      </button>
-    </form>
+      <form action="/loans/approval/approve/<%= activeApproval._id %>" method="POST" onsubmit="appendNoteBeforeSubmit(this)" class="flex-1 m-0">
+        <input type="hidden" name="note" class="hidden-note-field">
+        <button type="submit" class="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all active:scale-[0.96] cursor-pointer tracking-wide shadow-sm">
+          Setujui
+        </button>
+      </form>
+    </div>
   </div>
   <% } %>
 </div>
 <% } %>
-<script>
-  function appendNoteBeforeSubmit(formElement) {
-    const noteValue = document.getElementById('evaluation-note').value;
-    const hiddenInput = formElement.querySelector('.hidden-note-field');
-    if (hiddenInput) {
-      hiddenInput.value = noteValue;
-    }
-  }
-</script>

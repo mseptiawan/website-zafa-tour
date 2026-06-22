@@ -94,7 +94,7 @@ export const myExpenses = async (req, res) => {
       .limit(limit);
 
     res.render("expense/my", {
-      title: "Klaim Pengeluaran Saya",
+      title: "Riwayat Klaim Beban",
       expenses,
       pagination, // <--- Wajib dikirim ke EJS
     });

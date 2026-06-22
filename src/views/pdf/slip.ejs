@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Slip Gaji - <%= employee.fullName %></title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 20mm 15mm 20mm 15mm; 
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      color: #1e293b; background-color: #ffffff;
+      line-height: 1.4; font-size: 11px;
+    }
+    .main-content { padding: 0; }
+    .badge-private { border: 1px solid #000000; padding: 4px 24px; margin-top: 8px; display: inline-block; }
+    .badge-private span { font-size: 12px; color: #f43f5e; font-weight: bold; }
+    .logo-container { text-align: right; line-height: 1.1; }
+    .logo-zm { font-family: 'Times New Roman', Times, serif; font-size: 24px; font-weight: bold; }
+    .logo-sub { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: -4px; }
+    .company-sub-title { font-size: 10px; text-transform: uppercase; }
+    .company-title h2 { font-size: 12px; font-weight: bold; margin: 15px 0 0 0; }
+    .doc-meta h3 { font-size: 12px; font-weight: bold; margin: 8px 0 2px 0; }
+    .doc-meta p { font-size: 12px; margin: 0; }
+    .profile-grid-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11px; }
+    .profile-grid-table td { padding: 3px 0; vertical-align: top; }
+    .financial-container { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .financial-col { width: 48%; vertical-align: top; }
+    .financial-spacer { width: 4%; }
+    .table-component { width: 100%; border-collapse: collapse; border: 1px solid #000000; font-size: 11px; }
+    .table-component th { background-color: #facc15; color: #000000; font-weight: bold; padding: 6px; text-align: left; border-bottom: 1px solid #000000; }
+    .table-component td { padding: 6px; border-bottom: 1px solid #000000; }
+    .table-component tr.total-row td { font-weight: bold; background-color: #f8fafc; }
+    .border-left-black { border-left: 1px solid #000000; }
+    .summary-bank-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+    .summary-bank-table td { padding: 3px 0; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .font-bold { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <%- include('../partials/pdf-header') %>
+
+  <div class="main-content">
+    
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr>
+        <td style="vertical-align: top;">
+          <div class="badge-private">
+            <span>Pribadi & Rahasia</span>
+          </div>
+        </td>
+        <td style="text-align: right; vertical-align: top;">
+          <div class="logo-container">
+            <span class="logo-zm">ZM</span>
+            <span class="logo-sub">ZAFA TOUR</span>
+            <span class="company-sub-title">Zafa Mulia Mandiri</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="company-title">
+      <h2>PT Zafa Mulia Mandiri</h2>
+    </div>
+
+    <div class="doc-meta">
+      <h3>Slip Gaji</h3>
+      <p>Periode : <strong><%= payroll.periodMonth %></strong></p>
+    </div>
+
+    <table class="profile-grid-table">
+      <tr>
+        <td style="width: 50%;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="width: 110px; color: #64748b;">Nama</td>
+              <td style="width: 12px;">:</td>
+              <td class="font-bold"><%= employee.fullName %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">ID Pegawai</td>
+              <td>:</td>
+              <td><%= employee.employeeIdNumber %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">Bagian</td>
+              <td>:</td>
+              <td><%= employee.careerData?.bidangId?.name || '-' %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">Job Title</td>
+              <td>:</td>
+              <td><%= employee.careerData?.positionId?.name || '-' %></td>
+            </tr>
+          </table>
+        </td>
+        <td style="width: 50%;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="width: 120px; color: #64748b;">Golongan / Unit</td>
+              <td style="width: 12px;">:</td>
+              <td><%= employee.careerData?.unitId?.name || '-' %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">Status Pegawai</td>
+              <td>:</td>
+              <td><%= employee.careerData?.status_pegawai || 'Pegawai Tetap' %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">Agama / Gender</td>
+              <td>:</td>
+              <td><%= employee.agama %> / <%= employee.jenis_kelamin %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">Tanggal Bergabung</td>
+              <td>:</td>
+              <td>
+                <%= employee.careerData?.tanggal_mulai_bergabung ? new Date(employee.careerData.tanggal_mulai_bergabung).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '-' %>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <table class="financial-container">
+      <tr>
+        <td class="financial-col">
+          <table class="table-component">
+            <thead>
+              <tr>
+                <th>Komponen Pendapatan</th>
+                <th style="width: 115px;" class="text-center border-left-black">Jumlah</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Upah Pokok</td>
+                <td class="text-right border-left-black">Rp <%= payroll.basicSalary.toLocaleString('id-ID') %></td>
+              </tr>
+              <% allowances.forEach(allow => { %>
+                <tr>
+                  <td><%= allow.componentName %></td>
+                  <td class="text-right border-left-black">Rp <%= allow.amount.toLocaleString('id-ID') %></td>
+                </tr>
+              <% }) %>
+              <% if (allowances.length < 2) { 
+                for(let i = allowances.length; i < 2; i++) { %>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td class="border-left-black"></td>
+                </tr>
+              <% } } %>
+              <tr class="total-row">
+                <td>Total Pendapatan Gross</td>
+                <td class="text-right border-left-black">Rp <%= payroll.totalEarnings.toLocaleString('id-ID') %></td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+
+        <td class="financial-spacer"></td>
+
+        <td class="financial-col">
+          <table class="table-component">
+            <thead>
+              <tr>
+                <th>Komponen Potongan</th>
+                <th style="width: 115px;" class="text-center border-left-black">Jumlah</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% deductions.forEach(ded => { %>
+                <tr>
+                  <td><%= ded.componentName %></td>
+                  <td class="text-right border-left-black">Rp <%= ded.amount.toLocaleString('id-ID') %></td>
+                </tr>
+              <% }) %>
+              <% if (payroll.loanDeduction && payroll.loanDeduction.amount > 0) { %>
+                <tr>
+                  <td>Cicilan Pinjaman</td>
+                  <td class="text-right border-left-black">Rp <%= payroll.loanDeduction.amount.toLocaleString('id-ID') %></td>
+                </tr>
+              <% } %>
+              <% 
+                let totalDedRows = deductions.length + (payroll.loanDeduction?.amount > 0 ? 1 : 0);
+                if (totalDedRows < 2) { 
+                  for(let i = totalDedRows; i < 2; i++) { %>
+                  <tr>
+                    <td>&nbsp;</td>
+                    <td class="border-left-black"></td>
+                  </tr>
+              <% } } %>
+              <tr class="total-row">
+                <td>Total Potongan Net</td>
+                <td class="text-right border-left-black">Rp <%= payroll.totalDeductions.toLocaleString('id-ID') %></td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <table class="summary-bank-table">
+      <tr>
+        <td style="vertical-align: top;">
+          <table style="width: auto; border-collapse: collapse;">
+            <tr>
+              <td style="width: 130px; color: #64748b;">Nama Bank Rekening</td>
+              <td style="width: 12px;">:</td>
+              <td class="font-bold"><%= employee.financialData?.nama_bank || '-' %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">Nomor Rekening</td>
+              <td>:</td>
+              <td><%= employee.financialData?.nomor_rekening || '-' %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b;">Atas Nama Pemilik</td>
+              <td>:</td>
+              <td><%= employee.financialData?.nama_pemilik_rekening || '-' %></td>
+            </tr>
+          </table>
+        </td>
+        <td style="text-align: right; vertical-align: middle; padding-right: 10px;">
+          <div style="display: inline-flex; align-items: center; gap: 12px;">
+            <span class="font-bold" style="font-size: 12px; color: #475569;">TAKE HOME PAY</span>
+            <span class="font-bold" style="font-size: 16px; color: #2563eb;">Rp <%= payroll.netTakeHomePay.toLocaleString('id-ID') %></span>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div style="border-bottom: 1px solid #000000; margin-top: 30px;"></div>
+
+    <div style="display: flex; align-items: center; gap: 6px; font-size: 9px; margin-top: 6px; color: #475569;">
+      <span style="font-family: 'Times New Roman', Times, serif; font-weight: bold; color: #0f172a;">ZM</span>
+      <span>PT Zafa Mulia Mandiri — Dokumen ini sah dikeluarkan secara elektronik melalui sistem HRIS Zafa Tour.</span>
+    </div>
+
+  </div>
+</body>
+</html>

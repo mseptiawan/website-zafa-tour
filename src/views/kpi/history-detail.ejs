@@ -1,7 +1,7 @@
 <%- layout('layouts/main', { title: 'Detail Penilaian KPI' }) %>
 
-<div class=" min-h-screen bg-slate-50/50 p-8">
-  <div class="max-w-4xl mx-auto">
+<div class=" min-h-screen md:ml-72 bg-slate-50/50 p-8">
+  <div class="max-w-none mx-auto">
 
     <div class="mb-6">
       <a href="/kpi/history-list" class="text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-2 transition">
@@ -14,7 +14,7 @@
 
 
 
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm mb-6 flex justify-between items-start">
+  <div class="bg-white border border-slate-200 rounded-2xl p-8  mb-6 flex justify-between items-start">
       <div>
         <h1 class="text-2xl font-bold text-slate-800"><%= kpi.employeeId.fullName %></h1>
         <p class="text-slate-500 mt-1">Periode: <span class="font-medium text-slate-700"><%= kpi.periode %></span></p>
@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-slate-200 rounded-2xl  overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
           <tr>

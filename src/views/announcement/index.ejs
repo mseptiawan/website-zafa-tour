@@ -21,25 +21,26 @@ hover:-translate-y-0.5 shadow-3xs flex sm:flex-col justify-between min-h-0 sm:mi
 
         <div class="flex-1 min-w-0 sm:flex-initial space-y-2">
 
-          <div class="flex items-center gap-1.5 flex-wrap">
-            <% if(a.isPinned) { %>
-            <span class="inline-flex items-center gap-0.5 bg-amber-50 border border-amber-200/40 text-amber-800 px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase select-none">
-              📌 Pinned
-            </span>
-            <% } %>
+        <div class="flex items-center gap-2 flex-wrap select-none">
+  <% if(a.isPinned) { %>
+    <span class="inline-flex items-center bg-amber-50 text-amber-700 border border-amber-200/60 px-2.5 py-1 rounded-lg text-[10px] font-medium tracking-wide uppercase">
+      <i class="fa-solid fa-thumbtack text-[9px] mr-1.5 text-amber-500 shrink-0"></i>
+      Pinned
+    </span>
+  <% } %>
 
-            <% if(a.category === "OFFICIAL") { %>
-            <span class="inline-flex items-center bg-blue-500 text-white px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase select-none">
-              Official
-            </span>
-            <% } else { %>
-            <span class="inline-flex items-center bg-slate-100
-text-slate-600 border border-slate-200/40 px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase select-none">
-              General
-            </span>
-            <% } %>
-          </div>
-
+  <% if(a.category === "OFFICIAL") { %>
+    <span class="inline-flex items-center bg-blue-50 text-blue-600 border border-blue-200/50 px-2.5 py-1 rounded-lg text-[10px] font-medium tracking-wide uppercase">
+      <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5 shrink-0"></span>
+      Official
+    </span>
+  <% } else { %>
+    <span class="inline-flex items-center bg-slate-50 text-slate-500 border border-slate-200/60 px-2.5 py-1 rounded-lg text-[10px] font-medium tracking-wide uppercase">
+      <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5 shrink-0"></span>
+      General
+    </span>
+  <% } %>
+</div> 
           <h2 class="text-[13px] sm:text-[13.5px] font-semibold text-slate-800 leading-snug tracking-tight break-words line-clamp-1 sm:line-clamp-2">
             <%= a.title %>
           </h2>

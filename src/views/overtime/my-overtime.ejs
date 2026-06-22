@@ -1,7 +1,7 @@
 <%- layout('layouts/main', { title: 'Riwayat Lembur' }) %>
 
-<div class=" min-h-screen  md:ml-72 bg-slate-50/50 p-8 antialiased">
-  <div class="max-w-none mx-auto">
+<div class="min-h-screen md:ml-72 bg-slate-50/50  md:p-8 antialiased">
+  <div class="max-w-none mx-auto space-y-6">
 
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
@@ -10,84 +10,111 @@
         description: 'Daftar lengkap pengajuan dan status aktivitas lembur Pegawai.' 
     }) %>
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+<div class="flex justify-end px-4 md:px-0">
+  <a
+    href="/overtime/new"
+    class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-semibold transition-all duration-200  hover:shadow active:scale-[0.98]"
+  >
+    <i class="fa-solid fa-plus"></i>
+    Catat Lembur
+  </a>
+</div>
+    <!-- TABLE CONTAINER -->
+    <div class="hidden sm:block bg-white border border-slate-200/60 rounded-2xl  overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-[1000px]">
-
-          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+        <table class="w-full text-left min-w-[800px]">
+          <thead class="bg-slate-50/50 border-b border-slate-100 text-[10px] tracking-[0.1em] text-slate-400 uppercase font-bold">
             <tr>
-              <th class="text-left px-6 py-4">Tanggal Lembur</th>
-              <th class="text-left px-6 py-4">Jam Pelaksanaan</th>
-              <th class="text-left px-6 py-4">Durasi</th>
-              <th class="text-center px-6 py-4">Status Akhir</th>
-              <th class="text-right px-6 py-4">Aksi</th>
+              <th class="px-8 py-5">Tanggal Lembur</th>
+              <th class="px-6 py-5 hidden md:table-cell">Waktu Pelaksanaan</th>
+              <th class="px-6 py-5">Durasi</th>
+              <th class="px-6 py-5 text-center">Status Akhir</th>
+              <th class="px-6 py-5 text-right pr-8">Aksi</th>
             </tr>
           </thead>
-
-          <tbody class="divide-y divide-slate-100">
-
+          <tbody class="divide-y divide-slate-50">
             <% if (overtimes.length === 0) { %>
             <tr>
-              <td colspan="5" class="text-center py-12 text-slate-400">
-                Belum ada riwayat pengajuan lembur
-              </td>
+              <td colspan="5" class="text-center py-16 text-slate-400 italic">Belum ada riwayat pengajuan lembur</td>
             </tr>
             <% } %>
 
             <% overtimes.forEach(o => { %>
-            <tr class="hover:bg-slate-50/50 transition">
-
-              <td class="px-6 py-4 text-slate-500 font-medium">
+            <tr class="group hover:bg-slate-50/80 transition-colors duration-200">
+              <td class="px-8 py-5 text-[13px] font-semibold text-slate-900">
                 <%= new Date(o.date).toLocaleDateString("id-ID", {day: '2-digit', month: 'short', year: 'numeric'}) %>
               </td>
-
-              <td class="px-6 py-4 text-slate-600 font-medium">
-                <span class="text-[11px] font-mono bg-slate-50 border border-slate-200/60 text-slate-600 px-2 py-0.5 rounded">
+              <td class="px-6 py-5 hidden md:table-cell">
+                <span class="text-[11px] font-mono font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
                   <%= o.startTime %> - <%= o.endTime %>
                 </span>
               </td>
-
-              <td class="px-6 py-4 font-semibold text-slate-700 tabular-nums">
-                <%= o.totalHours %> Jam
+              <td class="px-6 py-5 text-[13px] font-bold text-slate-700 tabular-nums tracking-tight">
+                <%= o.totalHours %> <span class="text-[10px] text-slate-400 font-normal">Jam</span>
               </td>
-
-              <td class="px-6 py-4 whitespace-nowrap align-middle text-center">
+              <td class="px-6 py-5 text-center">
                 <% 
                   const status = o.status ? o.status.toUpperCase() : '';
-                  let textStyle = 'text-amber-600', bgStyle = 'bg-amber-50/70', borderStyle = 'border-amber-200/50', dotStyle = 'bg-amber-500';
-
-                  if (status === 'APPROVED') {
-                    textStyle = 'text-emerald-600'; bgStyle = 'bg-emerald-50/70'; borderStyle = 'border-emerald-200/50'; dotStyle = 'bg-emerald-505';
-                  } else if (status === 'REJECTED') {
-                    textStyle = 'text-rose-600'; bgStyle = 'bg-rose-50/70'; borderStyle = 'border-rose-200/50'; dotStyle = 'bg-rose-500';
-                  }
+                  let color = 'bg-amber-50 text-amber-700 border-amber-200';
+                  if (status === 'APPROVED') color = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                  if (status === 'REJECTED') color = 'bg-rose-50 text-rose-700 border-rose-200';
                 %>
-
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide transition-all duration-200 <%= textStyle %> <%= bgStyle %> <%= borderStyle %>">
-                  <span class="w-1.5 h-1.5 rounded-full <%= dotStyle %> <%= status === 'APPROVED' ? 'animate-pulse' : '' %>"></span>
-                  <span><%= o.status %></span>
-                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wide <%= color %>">
+                  <span class="w-1.5 h-1.5 rounded-full <%= status === 'APPROVED' ? 'bg-emerald-500' : status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-500' %>"></span>
+                  <%= o.status %>
+                </span>
               </td>
-
-              <td class="px-6 py-4">
-                <div class="flex items-center justify-end">
-                  <a href="/overtime/detail/<%= o._id %>" 
-                     class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition active:scale-[0.95]" 
-                     title="Lihat Detail Lembur">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                    </svg>
-                  </a>
-                </div>
+              <td class="px-6 py-5 text-right pr-8">
+                <a href="/overtime/detail/<%= o._id %>" class="inline-flex items-center gap-2 text-[11px] font-bold text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest">
+                  Detail <i class="fa-solid fa-arrow-right"></i>
+                </a>
               </td>
-
             </tr>
             <% }) %>
-
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- MOBILE LIST -->
+    <div class="block sm:hidden space-y-4">
+      <% if (overtimes.length === 0) { %>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-400 text-sm">Belum ada riwayat</div>
+      <% } %>
+
+      <% overtimes.forEach(o => { %>
+        <div class="bg-white border border-slate-200 rounded-2xl p-5  space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <%= new Date(o.date).toLocaleDateString("id-ID", {day: '2-digit', month: 'short'}) %>
+            </span>
+            <% 
+              const status = o.status ? o.status.toUpperCase() : '';
+              let color = 'bg-amber-50 text-amber-700 border-amber-200';
+              if (status === 'APPROVED') color = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+              if (status === 'REJECTED') color = 'bg-rose-50 text-rose-700 border-rose-200';
+            %>
+            <span class="px-2.5 py-0.5 rounded-full border text-[9px] font-bold uppercase tracking-wide <%= color %>">
+              <%= o.status %>
+            </span>
+          </div>
+
+          <div class="flex items-baseline justify-between border-y border-slate-100 py-3">
+            <div>
+              <p class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Waktu</p>
+              <p class="text-xs font-mono font-medium text-slate-600 mt-0.5"><%= o.startTime %> - <%= o.endTime %></p>
+            </div>
+            <div class="text-right">
+              <p class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Durasi</p>
+              <p class="text-xs font-bold text-slate-800 mt-0.5"><%= o.totalHours %> Jam</p>
+            </div>
+          </div>
+
+          <a href="/overtime/detail/<%= o._id %>" class="w-full text-center inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-[11px] font-bold uppercase tracking-widest hover:bg-slate-50 transition active:scale-[0.98]">
+            Lihat Detail
+          </a>
+        </div>
+      <% }) %>
     </div>
 
   </div>

@@ -18,7 +18,7 @@
     
     <div class="w-full sm:w-44">
       <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Bidang</label>
-      <select id="filter-bidang" onchange="loadReviewData()" class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-700 outline-none focus:border-slate-400 transition shadow-3xs">
+      <select id="filter-bidang" onchange="loadReviewData()" class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-medium text-slate-700 outline-none focus:border-slate-400 transition ">
         <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'DIREKTUR_UTAMA') { %>
           <option value="">Semua Bidang</option>
         <% } %>
@@ -30,12 +30,12 @@
 
     <div class="w-full sm:w-38">
       <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</label>
-      <input type="date" id="filter-date" onchange="loadReviewData()" class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 transition shadow-3xs" />
+      <input type="date" id="filter-date" onchange="loadReviewData()" class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 transition " />
     </div>
 
     <div class="w-full sm:w-auto pt-2 sm:pt-0">
       <label class="hidden sm:block text-[10px] font-bold text-transparent mb-1">Aksi</label>
-      <a href="/daily-log" class="inline-flex items-center justify-center gap-1.5 h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold rounded-xl shadow-xs transition-all active:scale-[0.98] w-full sm:w-auto decoration-none">
+      <a href="/daily-log" class="inline-flex items-center justify-center gap-1.5 h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold rounded-xl  transition-all active:scale-[0.98] w-full sm:w-auto decoration-none">
         <i class="fa-solid fa-plus text-[10px] text-blue-100"></i>
         <span>Buat Jurnal</span>
       </a>
@@ -45,7 +45,7 @@
 </div>
 
     <div>
-      <div class="hidden md:block bg-white border border-slate-200/80 rounded-2xl shadow-sm shadow-slate-100/50 overflow-hidden">
+      <div class="hidden md:block bg-white border border-slate-200/80 rounded-2xl  shadow-slate-100/50 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -83,7 +83,7 @@
 
 <div id="bottomSheet" class="fixed inset-0 z-[150] hidden select-none" role="dialog" aria-modal="true">
   <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity duration-300" onclick="closeBottomSheet()"></div>
-  <div class="absolute bottom-0 inset-x-0 mx-3 mb-18 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col max-h-[75vh] transform translate-y-full transition-transform duration-300 ease-out" id="bottomSheetContent">
+  <div class="absolute bottom-0 inset-x-0 mx-3 mb-18 bg-white rounded-2xl  border border-slate-100 flex flex-col max-h-[75vh] transform translate-y-full transition-transform duration-300 ease-out" id="bottomSheetContent">
     <div class="w-full flex justify-center py-3 shrink-0" onclick="closeBottomSheet()">
       <div class="w-12 h-1.5 bg-slate-200 rounded-full cursor-pointer"></div>
     </div>
@@ -203,7 +203,7 @@
       // RENDERING KODE VERSION MOBILE CARD VIEW
       // ==========================================
       const mobileCard = `
-        <div class="bg-white border border-slate-200/60 rounded-2xl p-4 shadow-xs space-y-4">
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-4  space-y-4">
           <div class="flex items-start justify-between min-w-0">
             <div class="min-w-0 flex-1">
               <h3 class="text-[13.5px] font-bold text-slate-800 truncate">${emp.fullName}</h3>
@@ -229,7 +229,7 @@
             </div>
           </div>
 
-          <button onclick="openBottomSheet('${emp._id}')" class="w-full h-9 bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-[0.98]  text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-sm outline-none">
+          <button onclick="openBottomSheet('${emp._id}')" class="w-full h-9 bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-[0.98]  text-[11px] font-bold rounded-xl transition-all cursor-pointer  outline-none">
             LIHAT RINCIAN
           </button>
         </div>
