@@ -204,15 +204,12 @@ export const generateAttendancePdf = async (listAttendance, analytics, filters) 
  * @returns {Object} Data summary gabungan 4 laporan
  */
 export const getExecutiveReportSummary = async ({ startDate, endDate, periodMonth }) => {
-  // 1. Data Pegawai (Total Aktif)
   const totalEmployees = await Employee.countDocuments({});
 
-  // 2. Data Absensi (Total Log Hadir)
   const totalHadir = await Attendance.countDocuments({
     date: { $gte: new Date(startDate), $lte: new Date(endDate) },
   });
 
-  // 3. Data Lembur (Total Jam & Estimasi Biaya)
   const listOvertime = await Overtime.find({
     overtimeDate: { $gte: new Date(startDate), $lte: new Date(endDate) },
     status: "APPROVED",
@@ -226,7 +223,6 @@ export const getExecutiveReportSummary = async ({ startDate, endDate, periodMont
       (item.totalHours || 0) * (item.overtimeRateSnapshot || 0) * (item.multiplierSnapshot || 1.5);
   });
 
-  // 4. Data Payroll (Total Pengeluaran Gaji Net Bersih)
   const listPayroll = await Payroll.find({
     periodMonth: periodMonth,
     status: { $in: ["CLOSED", "PAID"] },
@@ -237,7 +233,6 @@ export const getExecutiveReportSummary = async ({ startDate, endDate, periodMont
     totalPayrollNet += p.netTakeHomePay || 0;
   });
 
-  // Kembalikan data yang sudah terstruktur rapi
   return {
     employees: { total: totalEmployees },
     attendance: { totalHadir },
@@ -248,13 +243,9 @@ export const getExecutiveReportSummary = async ({ startDate, endDate, periodMont
 export const generateSingleSlipPdf = async (payrollData, employeeData) => {
   const templatePath = path.resolve("src/views/pdf/slip.ejs");
 
-  // Penjagaan ekstra agar data array tidak melempar error crash saat diproses EJS loop
   const allowances = payrollData.allowances || [];
   const deductions = payrollData.deductions || [];
 
-  // Karena lembur tidak didefinisikan secara khusus di skema Payroll Anda,
-  // upah lembur otomatis melekat di totalEarnings atau masuk ke dalam sub-komponen allowances.
-  // Kita set default 0 agar aman.
   const overtimePay = 0;
 
   const htmlContent = await ejs.renderFile(templatePath, {

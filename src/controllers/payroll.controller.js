@@ -46,31 +46,25 @@ export const renderPayrollPage = async (req, res) => {
 export const calculateEmployeePayroll = async (req, res) => {
   try {
     const { employeeId } = req.params;
-    const period = req.query.period; // Contoh nilai: "2026-05"
+    const period = req.query.period;
 
-    // 1. Dapatkan format string bulan berjalan saat ini (Contoh: "2026-06")
     const now = new Date();
     const currentMonthRaw = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-    // 2. Cek apakah periode yang di-request adalah masa lalu
-    // Perbandingan string "2026-05" < "2026-06" akan menghasilkan TRUE
     const isPastPeriod = period < currentMonthRaw;
 
-    // 3. Cek data slip gaji yang sudah tersimpan di database
     const existingPayroll = await Payroll.findOne({ employeeId, periodMonth: period });
 
-    // KONDISI A: Slip gaji masa lalu (atau bulan ini) sudah pernah di-generate & disimpan
     if (existingPayroll) {
       return res.json({
-        isHistory: true, // Kunci UI
+        isHistory: true,
         data: existingPayroll,
       });
     }
 
-    // KONDISI B: Tidak ada data slip gaji, TAPI yang dipilih adalah bulan MASA LALU
     if (isPastPeriod) {
       return res.json({
-        isHistory: true, // Paksa Kunci UI!
+        isHistory: true,
         data: {
           basicSalary: 0,
           allowances: [],
@@ -81,7 +75,6 @@ export const calculateEmployeePayroll = async (req, res) => {
       });
     }
 
-    // KONDISI C: MODE INPUT AKTIF (Bulan Berjalan & Belum Ada Slip Gaji Tersimpan)
     const salaryDoc = await EmployeeSalary.findOne({ employeeId });
     const basicSalary = salaryDoc ? salaryDoc.basicSalary : 0;
 
@@ -92,7 +85,7 @@ export const calculateEmployeePayroll = async (req, res) => {
     });
 
     return res.json({
-      isHistory: false, // Buka Kunci UI, tampilkan tombol Simpan
+      isHistory: false,
       data: {
         basicSalary,
         loanDeduction: activeLoanPayment
@@ -262,11 +255,9 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
     const processedResults = [];
 
     for (const empId of employeeIds) {
-      // 1. Dapatkan besaran Gaji Pokok
       const salaryDoc = await EmployeeSalary.findOne({ employeeId: empId });
       const basicSalary = salaryDoc ? salaryDoc.basicSalary : 0;
 
-      // 2. Ambil snapshot tunjangan dinamis dari tabel EmployeeAllowance
       const savedAllowances = await EmployeeAllowance.find({ employeeId: empId }).populate(
         "componentId"
       );
@@ -276,31 +267,22 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
       let totalEarnings = basicSalary;
       let totalDeductions = 0;
 
-      // =========================================================================
-      // REVISI LOGIKA AMAN: Hitung nilai final murni berdasarkan skema master DB
-      // =========================================================================
-      // 2. Ambil snapshot tunjangan dinamis dari tabel EmployeeAllowance
-      // 2. Ambil snapshot tunjangan dinamis dari tabel EmployeeAllowance
       savedAllowances.forEach((item) => {
         if (!item.componentId) return;
 
         let finalAmount = item.amount || 0;
         let displayName = item.componentId.name;
 
-        // Bersihkan nama dari sisa-sisa string persen bawaan UI jika ada
         displayName = displayName.split("(")[0].trim();
 
         if (
           item.componentId.calculationType === "PERCENTAGE" &&
           item.componentId.basedOnComponent === "GAPOK"
         ) {
-          // Ambil nilai persen asli (Jika di DB terlanjur besar karena bug lama, paksa set ke 2)
           const percentageValue = finalAmount < 100 ? finalAmount : 2;
 
-          // Hitung nilai rupiah dari Gaji Pokok (2 / 100 * 4.000.000 = 80.000)
           finalAmount = (percentageValue / 100) * basicSalary;
 
-          // Gabungkan nama komponen dengan teks persen baru
           displayName = `${displayName} (${percentageValue}%)`;
         }
 
@@ -317,7 +299,6 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
           totalDeductions += finalAmount;
         }
       });
-      // 3. Tarik potongan cicilan pinjaman aktif bulan berjalan (jika ada)
       const activeLoanPayment = await LoanPayment.findOne({
         employeeId: empId,
         periodMonth: periodMonth,
@@ -333,7 +314,6 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
         totalDeductions += activeLoanPayment.amount;
       }
 
-      // 4. Update data atau buat baru (Upsert) ke koleksi Payroll dengan status CLOSED
       const finalPayroll = await Payroll.findOneAndUpdate(
         { employeeId: empId, periodMonth: periodMonth },
         {
@@ -351,7 +331,6 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
         { upsert: true, new: true }
       );
 
-      // 5. Ubah status pembayaran cicilan menjadi lunas
       if (activeLoanPayment) {
         await LoanPayment.findByIdAndUpdate(activeLoanPayment._id, {
           $set: {
@@ -376,7 +355,6 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
 
 export const getMySlipPage = async (req, res, next) => {
   try {
-    // 1. Cari data profil pegawai yang sedang login beserta virtual data pendukungnya
     const employee = await Employee.findOne({ userId: req.user._id })
       .populate({
         path: "careerData",
@@ -391,16 +369,15 @@ export const getMySlipPage = async (req, res, next) => {
       });
     }
 
-    // 2. Tarik SEMUA riwayat payroll milik karyawan ini yang berstatus CLOSED atau PAID
     const payrolls = await Payroll.find({
       employeeId: employee._id,
       status: { $in: ["CLOSED", "PAID"] },
-    }).sort({ periodMonth: -1 }); // Urutkan dari bulan terbaru
+    }).sort({ periodMonth: -1 });
 
     return res.render("payroll/my-slip", {
       title: "Slip Gaji Saya",
       employee,
-      payrolls, // Lempar semua list slip ke EJS
+      payrolls,
       user: req.user,
     });
   } catch (error) {

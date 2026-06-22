@@ -36,16 +36,13 @@ export const create = async (req, res) => {
 };
 export const myVisits = async (req, res, next) => {
   try {
-    // 1. Tentukan limit dinamis: mobile = 5, desktop = 9 agar pas dengan viewport perangkat
     const determinedLimit = req.useragent?.isMobile ? 5 : 7;
 
-    // 2. Olah parameter pagination menggunakan utilitas yang sudah lo punya
     const { page, limit, skip } = getPagination({
       page: req.query.page,
       limit: determinedLimit,
     });
 
-    // 3. Ambil data spesifik milik user yang sedang login dengan membawa parameter pagination
     const userId = req.session.user._id;
     const result = await salesService.findMinePaged({ userId, page, limit, skip });
 
@@ -99,24 +96,20 @@ export const edit = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
-    // 1. Jika validasi input gagal (misal teks terlalu panjang/format salah)
     if (req.validationErrors) {
-      // Ambil kembali data visit dari DB agar form edit tidak crash (visit is not defined)
       const visit = await salesService.findById(req.params.id);
 
-      // Ambil data yang barusan diketik user agar tidak hilang saat reload form
       const updatedData = Object.assign(visit, req.body);
 
       return res.status(400).render("sales/edit", {
         title: "Edit Kunjungan",
-        visit: updatedData, // <-- WAJIB DIKIRIM BALIK BIAR EJS TIDAK ERROR
+        visit: updatedData,
         errors: req.validationErrors,
         validationErrors: req.validationErrors,
         error: "Validasi gagal, silakan periksa inputan Anda.",
       });
     }
 
-    // 2. Jalankan proses update ke service jika validasi aman
     await salesService.update({
       id: req.params.id,
       userId: req.session.user._id,
@@ -126,12 +119,11 @@ export const update = async (req, res, next) => {
 
     return res.redirect("/sales/my");
   } catch (err) {
-    // 3. Jika terjadi error di level database/service (misal: sudah lewat 24 jam)
     try {
       const visit = await salesService.findById(req.params.id);
       return res.status(400).render("sales/edit", {
         title: "Edit Kunjungan",
-        visit, // <-- WAJIB DIKIRIM BALIK DI BLOK CATCH
+        visit,
         error: err.message,
       });
     } catch (innerErr) {

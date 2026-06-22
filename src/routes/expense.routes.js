@@ -18,7 +18,6 @@ import {
 
 const router = express.Router();
 
-// Definisikan daftar role yang berhak melakukan Approval Managerial agar kode lebih rapi (DRY)
 const ALL_MANAGERS = [
   "MANAGER_ADMINISTRASI",
   "WAKIL_DIREKTUR",

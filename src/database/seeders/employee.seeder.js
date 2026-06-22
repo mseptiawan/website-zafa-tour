@@ -320,14 +320,11 @@ const employeeSeeder = async () => {
   for (let i = 0; i < rawEmployees.length; i++) {
     const emp = rawEmployees[i];
 
-    // 1. Simulasi NIK KTP Mentah 16 Digit asli karyawan
     const generatedKtpMentah = `320101${(i + 1).toString().padStart(10, "0")}`;
 
-    // 2. POTONG AMBIL 6 ANGKA TERAKHIR SAJA (Hasil rapi: ZFT-000001)
     const shortIdFromKtp = generatedKtpMentah.slice(-6);
     const professionalId = `ZFT-${shortIdFromKtp}`;
 
-    // 3. MURNI CREATE BARU (Gak pake findOneAndUpdate lagi)
     const newEmployee = await Employee.create({
       userId: emp.userId,
       employeeIdNumber: professionalId,
@@ -340,7 +337,6 @@ const employeeSeeder = async () => {
       status_pernikahan: "Lajang",
     });
 
-    // 4. MURNI CREATE KARIR BARU
     if (emp.positionId || emp.bidangId || emp.unitId) {
       await EmployeeCareer.create({
         employee_id: newEmployee._id,

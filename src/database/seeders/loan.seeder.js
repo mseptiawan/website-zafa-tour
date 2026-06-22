@@ -40,13 +40,12 @@ export async function seedLoanSystem() {
     const employee = await Employee.findOne({});
     if (!employee) throw new Error("Tidak ada employee di database");
 
-    // set salary jika belum ada
     let salary = await EmployeeSalary.findOne({ employeeId: employee._id });
 
     if (!salary) {
       salary = await EmployeeSalary.create({
         employeeId: employee._id,
-        basicSalary: 5000000, // 5 juta
+        basicSalary: 5000000,
       });
     }
 
@@ -73,7 +72,7 @@ export async function seedLoanSystem() {
       status: "PENDING",
     });
 
-    console.log("✅ Loan created:", loan._id);
+    console.log("Loan created:", loan._id);
 
     // =========================================================
     // 4. CREATE APPROVAL CHAIN
@@ -94,7 +93,7 @@ export async function seedLoanSystem() {
 
     await LoanApproval.insertMany(approvals);
 
-    console.log("✅ Approval chain created");
+    console.log("Approval chain created");
 
     // =========================================================
     // 5. SIMULASI APPROVAL STEP 1 & 2 (OPTIONAL)
@@ -119,7 +118,7 @@ export async function seedLoanSystem() {
     step2.actionDate = new Date();
     await step2.save();
 
-    console.log("✅ Step 1 & 2 approved");
+    console.log("Step 1 & 2 approved");
 
     // =========================================================
     // 6. FINAL APPROVAL (MANAGER KEUANGAN)
@@ -139,8 +138,7 @@ export async function seedLoanSystem() {
     loan.status = "APPROVED_BY_MANAGEMENT";
     await loan.save();
 
-    console.log("✅ Final approval done");
-
+    console.log("Final approval done");
     // =========================================================
     // 7. CREATE PAYMENT SCHEDULE
     // =========================================================
@@ -165,10 +163,10 @@ export async function seedLoanSystem() {
 
     await LoanPayment.insertMany(payments);
 
-    console.log("✅ Payment schedule created");
+    console.log("ayment schedule created");
 
-    console.log("🎉 SEED COMPLETED SUCCESSFULLY");
+    console.log("SEED COMPLETED SUCCESSFULLY");
   } catch (err) {
-    console.error("❌ Seeder Error:", err.message);
+    console.error("Seeder Error:", err.message);
   }
 }

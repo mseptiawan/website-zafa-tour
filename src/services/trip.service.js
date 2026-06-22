@@ -4,7 +4,6 @@ import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import Bidang from "../models/basic/Bidang.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
 import { X } from "lucide-react";
-// Helper untuk validasi dan normalisasi objek budget baru
 
 const parseAndValidateBudget = (budgetData) => {
   let budgetItems = budgetData?.items;
@@ -255,14 +254,14 @@ export const getApprovalTripsService = async (user) => {
   });
 
   if (!career) {
-    console.log("❌ career NOT FOUND");
+    console.log(" career NOT FOUND");
     return [];
   }
 
   const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
 
   if (!bidang?.managerRoleId) {
-    console.log("❌ managerRole NOT FOUND");
+    console.log(" managerRole NOT FOUND");
     return [];
   }
 
@@ -302,7 +301,6 @@ export const updateTripService = async (id, userId, body) => {
     throw new Error("FORBIDDEN");
   }
 
-  // Ambil data budget yang sudah divalidasi lewat helper
   const processedBudget = parseAndValidateBudget(body.budget);
 
   Object.assign(trip, {
@@ -312,7 +310,7 @@ export const updateTripService = async (id, userId, body) => {
     meetWith: body.meetWith,
     startDate: body.startDate,
     endDate: body.endDate,
-    budget: processedBudget, // Pasang objek { total, items } baru
+    budget: processedBudget,
   });
 
   await trip.save();
@@ -327,7 +325,6 @@ export const resubmitTripService = async (id, userId, body) => {
     throw new Error("FORBIDDEN");
   }
 
-  // Ambil data budget yang sudah divalidasi lewat helper
   const processedBudget = parseAndValidateBudget(body.budget);
 
   Object.assign(trip, {
@@ -337,7 +334,7 @@ export const resubmitTripService = async (id, userId, body) => {
     meetWith: body.meetWith,
     startDate: body.startDate,
     endDate: body.endDate,
-    budget: processedBudget, // Pasang objek { total, items } baru
+    budget: processedBudget,
   });
 
   const lastRejected = [...trip.approvals].reverse().find((a) => a.status === "REJECTED");

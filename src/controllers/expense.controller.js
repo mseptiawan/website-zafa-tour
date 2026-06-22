@@ -82,11 +82,9 @@ export const myExpenses = async (req, res) => {
     const { page } = req.query;
     const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
 
-    // Hitung total data klaim khusus milik user ini
     const totalExpenses = await ExpenseClaim.countDocuments({ userId: req.user._id });
     const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
 
-    // Ambil data dengan Mongoose Pagination
     const expenses = await ExpenseClaim.find({ userId: req.user._id })
       .populate("category")
       .sort({ createdAt: -1 })
@@ -96,7 +94,7 @@ export const myExpenses = async (req, res) => {
     res.render("expense/my", {
       title: "Riwayat Klaim Beban",
       expenses,
-      pagination, // <--- Wajib dikirim ke EJS
+      pagination,
     });
   } catch (err) {
     console.error(err);
@@ -109,7 +107,6 @@ export const approvalManagerExpense = async (req, res) => {
     const { page } = req.query;
     const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
 
-    // Hitung total seluruh klaim untuk dimanajemeni
     const totalExpenses = await ExpenseClaim.countDocuments({});
     const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
 
@@ -123,7 +120,7 @@ export const approvalManagerExpense = async (req, res) => {
     res.render("expense/approval", {
       title: "Approval Klaim Operasional",
       expenses,
-      pagination, // <--- Wajib dikirim ke EJS
+      pagination,
     });
   } catch (err) {
     console.error(err);
@@ -149,7 +146,6 @@ export const financeExpensePage = async (req, res) => {
     const { page } = req.query;
     const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
 
-    // Filter finance biasanya hanya melihat yang siap bayar atau rekam jejak lunas
     const financeQuery = { status: { $in: ["PENDING_FINANCE", "PAID"] } };
 
     const totalExpenses = await ExpenseClaim.countDocuments(financeQuery);
@@ -165,7 +161,7 @@ export const financeExpensePage = async (req, res) => {
     res.render("expense/finance", {
       title: "Manajemen Keuangan Klaim",
       expenses,
-      pagination, // <--- Wajib dikirim ke EJS
+      pagination,
     });
   } catch (err) {
     console.error(err);

@@ -17,7 +17,6 @@ const usernames = [
 
 const finalStatuses = ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"];
 
-// Bank data judul klaim yang realistis berdasarkan kata kunci nama kategori
 const realisticTitles = {
   transport: [
     "Bensin & Tol Kunjungan Klien",
@@ -73,7 +72,6 @@ function randomDate() {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-// Fungsi pembantu untuk menentukan judul yang realistis secara pintar
 function generateRealisticTitle(categoryName) {
   const nameLower = categoryName.toLowerCase();
 
@@ -127,16 +125,13 @@ const expenseSeeder = async () => {
       return;
     }
 
-    // Bersihkan data lama
     await ExpenseClaim.deleteMany({});
 
     const data = [];
 
     for (const user of users) {
-      // Pastikan data Employee ada untuk user terkait
       const employee = await Employee.findOne({ userId: user._id });
 
-      // JIKA employee tidak ditemukan, lewati user ini agar tidak merusak validasi "required: true" di database
       if (!employee) {
         console.log(`User ${user.username} dilewati karena tidak memiliki profil Employee.`);
         continue;
@@ -148,12 +143,11 @@ const expenseSeeder = async () => {
         const status = randomItem(finalStatuses);
         const pickedCategory = randomItem(dbCategories);
 
-        // Ambil judul acak yang sesuai dengan kategori dokumen saat ini
         const cleanTitle = generateRealisticTitle(pickedCategory.name);
 
         data.push({
           userId: user._id,
-          employeeId: employee._id, // Diambil langsung dari data valid
+          employeeId: employee._id,
           title: cleanTitle,
           category: pickedCategory._id,
           amount: amount,
@@ -178,7 +172,6 @@ const expenseSeeder = async () => {
       return;
     }
 
-    // ordered: false ditambahkan agar jika ada 1 baris data gagal, baris lainnya tetap dipaksa masuk ke database
     await ExpenseClaim.insertMany(data, { ordered: false });
     console.log(`Berhasil melakukan seeding ${data.length} berkas Expense Claim ke database.`);
   } catch (error) {

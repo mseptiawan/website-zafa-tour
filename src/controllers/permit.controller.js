@@ -190,7 +190,6 @@ export const actionApproval = async (req, res) => {
       }
     }
 
-    // 5. Update status
     permit.status = status;
     permit.approvedBy = req.session.user._id;
     permit.approvalDate = new Date();

@@ -56,7 +56,6 @@ export const index = async (req, res, next) => {
     const telatCount = monthlyAttendance.filter((a) => a.status === "TELAT").length;
     const alpaCount = monthlyAttendance.filter((a) => a.status === "ALPA").length;
 
-    // Render ke view EJS dengan data variabel lengkap
     return res.render("dashboard/main", {
       title: "Dashboard",
       user,

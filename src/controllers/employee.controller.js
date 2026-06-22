@@ -72,7 +72,6 @@ export const editEmployeeWeb = async (req, res, next) => {
 
 export const editProfileMandiriWeb = async (req, res, next) => {
   try {
-    // Ambil ID pegawai dari sesi login yang sedang aktif
     const employeeId = req.session.user.employeeId;
 
     const employee = await EmployeeService.findEmployeeById(employeeId);
@@ -82,11 +81,10 @@ export const editProfileMandiriWeb = async (req, res, next) => {
     res.render("employee/edit", {
       title: "Edit Profil Mandiri",
       employee,
-      isMandiri: true, // FLAG UTAMA UNTUK EJS
+      isMandiri: true,
       error: null,
       errors: {},
       old: null,
-      // Kirim array kosong karena tab karir akan disembunyikan
       positions: [],
       units: [],
       bidang: [],
@@ -99,10 +97,8 @@ export const editProfileMandiriWeb = async (req, res, next) => {
 
 export const getEmployeeDetailWeb = async (req, res, next) => {
   try {
-    // Tarik data pegawai komplit berdasarkan ID dari parameter URL
     const employee = await EmployeeService.findEmployeeById(req.params.id);
 
-    // Jika objek pegawai tidak ditemukan di database
     if (!employee) {
       return res.status(404).render("errors/404", {
         message: "Data informasi pegawai tidak ditemukan atau sudah dihapus.",
@@ -110,13 +106,12 @@ export const getEmployeeDetailWeb = async (req, res, next) => {
     }
     console.log("=== BENTUK DATA SALARY ===");
     console.log(employee.salaryDetail);
-    // Render ke file EJS detail terpisah (bukan file edit)
     res.render("employee/detail", {
       title: "Profil Detail Pegawai",
       employee,
       user: req.user,
       error: null,
-      user: req.session?.user || req.user, // Sesuaikan dengan session login lo untuk verifikasi role di UI
+      user: req.session?.user || req.user,
     });
   } catch (err) {
     next(err);
@@ -265,9 +260,8 @@ export const updateKeluargaApi = async (req, res) => {
 export const updateFinansialApi = async (req, res) => {
   try {
     const payload = { ...req.body };
-    const userRole = req.session.user.role; // Ambil role dari sesi
+    const userRole = req.session.user.role;
     console.log("=== CCTV 1: req.body DARI FORM ===", req.body);
-    // Jika yang mengedit BUKAN HR / Wakil Direktur, hapus payload gaji!
     if (userRole !== "HR" && userRole !== "WAKIL_DIREKTUR") {
       delete payload.basicSalary;
       delete payload.overtimeRate;
@@ -288,22 +282,17 @@ export const createEmployeeApi = async (req, res, next) => {
   try {
     const validatedBody = createEmployeeSchema.parse(req.body);
 
-    // 1. Simpan ke database
     const newEmployee = await EmployeeService.createNewEmployee(validatedBody);
 
-    // 2. Generate username untuk email (sama dengan logika di service)
     const username = validatedBody.fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-    // 3. Kirim Email (Gunakan await agar kita tahu jika gagal kirim)
     try {
       await sendNewEmployeeEmail(validatedBody.email, validatedBody.fullName, username);
       console.log("Email kredensial berhasil dikirim ke:", validatedBody.email);
     } catch (emailErr) {
-      // Kita log saja jika email gagal, tapi jangan sampai membatalkan proses pendaftaran
       console.error("Gagal mengirim email kredensial:", emailErr);
     }
 
-    // 4. Redirect sukses
     return res.redirect("/employee");
   } catch (err) {
     let positions = [],
@@ -373,10 +362,8 @@ export const uploadAvatarWeb = async (req, res) => {
       return res.status(400).json({ success: false, message: "Tidak ada file diunggah" });
     }
 
-    // Path yang disimpan
     const imageUrl = `/uploads/files/${req.file.filename}`;
 
-    // Update ke database
     const updated = await Employee.findByIdAndUpdate(
       employeeId,
       { foto_profile: imageUrl },
@@ -387,12 +374,9 @@ export const uploadAvatarWeb = async (req, res) => {
       return res.status(404).json({ success: false, message: "Pegawai tidak ditemukan" });
     }
 
-    // --- UPDATE SESI SECARA MANUAL ---
-    // Memastikan data di sesi (sidebar) sinkron dengan database
     if (req.session && req.session.user) {
       req.session.user.foto_profile = imageUrl;
 
-      // Simpan perubahan sesi ke store (khusus jika menggunakan store eksternal/DB)
       req.session.save((err) => {
         if (err) {
           console.error("Gagal menyimpan sesi:", err);

@@ -7,7 +7,7 @@ export const listPendingApprovals = async (req, res) => {
       .populate({
         path: "employeeId",
         populate: [
-          { path: "userId" }, // Mengambil data User (username, email, dll)
+          { path: "userId" },
           {
             path: "careerData",
             populate: [{ path: "bidangId" }, { path: "positionId" }],

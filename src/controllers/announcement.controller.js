@@ -44,10 +44,8 @@ export const create = async (req, res, next) => {
 // ─── INDEX ────────────────────────────────────────────────────────────────────
 export const index = async (req, res, next) => {
   try {
-    // Tentukan limit dinamis: jika mobile = 5, jika desktop = 9 (sesuai grid-cols-3/4 kamu)
     const determinedLimit = req.useragent?.isMobile ? 5 : 9;
 
-    // Passing ditentukanLimit ke dalam utilitas kamu
     const { page, limit, skip } = getPagination({
       page: req.query.page,
       limit: determinedLimit,

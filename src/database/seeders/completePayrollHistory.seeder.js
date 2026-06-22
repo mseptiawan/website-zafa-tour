@@ -5,20 +5,20 @@ import LoanPayment from "../../models/loan/loanPayment.model.js";
 
 const completePayrollHistorySeeder = async () => {
   try {
-    console.log("🧹 Menghapus payroll lama...");
+    console.log("Menghapus payroll lama...");
 
     const deleteResult = await Payroll.deleteMany({});
 
-    console.log(`✅ Payroll lama dihapus (${deleteResult.deletedCount} records)`);
+    console.log(` lama dihapus (${deleteResult.deletedCount} records)`);
 
     const employees = await Employee.find({});
 
     if (!employees.length) {
-      console.log("❌ Tidak ada employee.");
+      console.log(" Tidak ada employee.");
       return;
     }
 
-    console.log(`👥 Employee ditemukan: ${employees.length}`);
+    console.log(` Employee ditemukan: ${employees.length}`);
 
     const salaries = await EmployeeSalary.find({
       employeeId: {
@@ -120,17 +120,17 @@ const completePayrollHistorySeeder = async () => {
       }
     }
 
-    console.log(`📦 Payroll yang akan dibuat: ${payrollRecords.length}`);
+    console.log(`Payroll yang akan dibuat: ${payrollRecords.length}`);
 
     if (payrollRecords.length > 0) {
       const inserted = await Payroll.insertMany(payrollRecords);
 
-      console.log(`🚀 Berhasil membuat ${inserted.length} payroll`);
+      console.log(` Berhasil membuat ${inserted.length} payroll`);
     }
 
-    console.log("✅ Payroll seeding selesai.");
+    console.log("Payroll seeding selesai.");
   } catch (error) {
-    console.error("❌ Payroll seeder gagal:", error);
+    console.error("Payroll seeder gagal:", error);
   }
 };
 

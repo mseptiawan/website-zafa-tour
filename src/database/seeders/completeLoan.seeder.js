@@ -16,21 +16,17 @@ import Position from "../../models/basic/Position.model.js";
 
 const completeLoanSeeder = async () => {
   try {
-    // 1. CLEAR TRANSAKSI PINJAMAN SAJA (Master Data Pegawai & Gaji Aman)
     await Loan.deleteMany({});
     await LoanApproval.deleteMany({});
     await LoanPayment.deleteMany({});
 
-    console.log("🧹 Data transaksi pinjaman masa lalu berhasil dibersihkan.");
+    console.log("Data transaksi pinjaman masa lalu berhasil dibersihkan.");
 
-    // Target khusus untuk demo sidang
     const targetKeys = ["ongkidwi", "fajarjaniko", "abdulaziz"];
     const regexFilters = targetKeys.map((key) => new RegExp(key, "i"));
 
-    // Tarik data User untuk mendapatkan jembatan _id
     const userDocs = await User.find({ username: { $in: regexFilters } });
 
-    // Tarik data Employee
     const employeeDocs = await Employee.find({
       $or: [{ fullName: { $in: regexFilters } }, { userId: { $in: userDocs.map((u) => u._id) } }],
     }).populate({
@@ -40,7 +36,7 @@ const completeLoanSeeder = async () => {
 
     if (employeeDocs.length === 0) {
       throw new Error(
-        "❌ Mongoose tidak menemukan data pegawai tersebut di database. Pastikan 'employeeSeeder' utama sudah dijalankan!"
+        "Mongoose tidak menemukan data pegawai tersebut di database. Pastikan 'employeeSeeder' utama sudah dijalankan!"
       );
     }
 
@@ -55,7 +51,6 @@ const completeLoanSeeder = async () => {
       }
     });
 
-    // Ambil ID User acak untuk penandatangan approval otomatis
     const anyUser = await User.findOne({ username: { $nin: regexFilters } });
     const approverId = anyUser ? anyUser._id : new mongoose.Types.ObjectId();
 
@@ -67,8 +62,6 @@ const completeLoanSeeder = async () => {
     // 2. INJEKSI DATA TRANSAKSI KOMBINASI (STRATEGI DEMO SIDANG)
     // =========================================================================
 
-    // --- KASUS 1: Ongki Dwi -> STATUS: LUNAS (Riwayat Masa Lalu) ---
-    // COCOK UNTUK DEMO: Menunjukkan filter "Riwayat Lunas" di aplikasi.
     const empOngki = empMap["ongkidwi"];
     if (empOngki) {
       const loanOngki = await Loan.create({
@@ -130,8 +123,6 @@ const completeLoanSeeder = async () => {
       console.log("⭐ [LUNAS] Data pinjaman historis Ongki Dwi berhasil disuntikkan.");
     }
 
-    // --- KASUS 2: Fajar Janiko -> STATUS: AKTIF BERJALAN ---
-    // COCOK UNTUK DEMO: Potongan pinjaman otomatis memotong slip gaji bulan Juni 2026 ini (isPaid: false).
     const empFajar = empMap["fajarjaniko"];
     if (empFajar) {
       const loanFajar = await Loan.create({
@@ -195,17 +186,13 @@ const completeLoanSeeder = async () => {
       console.log("⭐ [AKTIF] Data pinjaman berjalan Fajar Janiko berhasil disuntikkan.");
     }
 
-    // --- KASUS 3: Abdul Aziz -> STATUS: PENDING ---
-    // COCOK UNTUK DEMO LIVE: Lu bisa klik "Persetujuan / Approve" langsung di depan dosen penguji.
     const empAziz = empMap["abdulaziz"];
     if (empAziz) {
-      // Murni mengambil data gaji dari DB (Tanpa memodifikasi atau membuat data gaji baru)
       let baseSalaryInfo = 0;
       try {
         const currentSalary = await EmployeeSalary.findOne({ employeeId: empAziz._id });
         if (currentSalary) baseSalaryInfo = currentSalary.basicSalary;
       } catch (err) {
-        // Safe fallback kalau database master salary belum ke-seed sempurna
         baseSalaryInfo = 0;
       }
 
@@ -219,14 +206,14 @@ const completeLoanSeeder = async () => {
         disbursementDate: null,
       });
       console.log(
-        `⭐ [PENDING] Data pengajuan Abdul Aziz berhasil disuntikkan (Gaji terikat di DB: Rp ${baseSalaryInfo.toLocaleString("id-ID")}).`
+        `PENDING] Data pengajuan Abdul Aziz berhasil disuntikkan (Gaji terikat di DB: Rp ${baseSalaryInfo.toLocaleString("id-ID")}).`
       );
     }
 
-    console.log("\n✅ SEEDING SELESAI: Data kombinasi sukses dikonfigurasi untuk sidang!");
+    console.log("\nSEEDING SELESAI: Data kombinasi sukses dikonfigurasi untuk sidang!");
     // process.exit(0);
   } catch (error) {
-    console.error("❌ Terjadi kegagalan seeding data kombinasi:", error);
+    console.error("Terjadi kegagalan seeding data kombinasi:", error);
     // process.exit(1);
   }
 };

@@ -18,7 +18,6 @@ import {
  */
 export const renderAttendanceReportPage = async (req, res, next) => {
   try {
-    // 1. Tentukan tanggal default otomatis jika filter tidak diisi
     const now = new Date();
     let defaultStart, defaultEnd;
 
@@ -33,12 +32,16 @@ export const renderAttendanceReportPage = async (req, res, next) => {
     const startDate = req.query.startDate || defaultStart.toISOString().split("T")[0];
     const endDate = req.query.endDate || defaultEnd.toISOString().split("T")[0];
 
-    // 2. Cek Hak Akses Admin/HRD berdasarkan role user yang login
-    const ADMIN_ROLES = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI", "HRD", "ADMIN"];
+    const ADMIN_ROLES = [
+      "WAKIL_DIREKTUR",
+      "DIREKTUR_UTAMA",
+      "MANAGER_ADMINISTRASI",
+      "HRD",
+      "ADMIN",
+    ];
     const isAdmin = ADMIN_ROLES.includes(req.user?.role);
-    
-    // Jika bukan admin, kunci view ke 'personal' agar service menyaring data miliknya saja
-    const viewMode = isAdmin ? (req.query.view || "all") : "personal";
+
+    const viewMode = isAdmin ? req.query.view || "all" : "personal";
 
     const mockReq = {
       user: req.user,
@@ -49,17 +52,24 @@ export const renderAttendanceReportPage = async (req, res, next) => {
     const mockRes = {
       render: (viewPath, data) => {
         return res.render("report/attendance", {
-          title: isAdmin && viewMode !== "personal" ? "Laporan Absensi Karyawan" : "Laporan Absensi Saya",
+          title:
+            isAdmin && viewMode !== "personal"
+              ? "Laporan Absensi Karyawan"
+              : "Laporan Absensi Saya",
           listAttendance: data.listAttendance,
           analytics: data.analytics,
           filters: { startDate, endDate },
           user: req.user,
           isAdmin,
-          isPersonalView: viewMode === "personal"
+          isPersonalView: viewMode === "personal",
         });
       },
-      status: function () { return this; },
-      json: function (obj) { return res.json(obj); },
+      status: function () {
+        return this;
+      },
+      json: function (obj) {
+        return res.json(obj);
+      },
     };
 
     const mockNext = (err) => {
@@ -300,7 +310,7 @@ export const downloadPayrollPdfReport = async (req, res) => {
 
     return res.end(pdfBuffer);
   } catch (error) {
-    console.error("❌ Gagal mengekspor PDF Rekap Payroll:", error);
+    console.error("Gagal mengekspor PDF Rekap Payroll:", error);
     return res.status(500).send("Terjadi kesalahan internal saat memproses dokumen PDF Payroll.");
   }
 };
@@ -340,7 +350,7 @@ export const downloadAttendancePdfReport = async (req, res, next) => {
           );
           return res.end(pdfBuffer);
         } catch (pdfErr) {
-          console.error("❌ Gagal merender berkas PDF internal:", pdfErr);
+          console.error(" Gagal merender berkas PDF internal:", pdfErr);
           return res.status(500).send("Gagal mengolah dokumen PDF.");
         }
       },
@@ -353,12 +363,12 @@ export const downloadAttendancePdfReport = async (req, res, next) => {
     };
 
     const mockNext = (err) => {
-      if (err) console.error("⚠️ Log internal next download attendance PDF:", err);
+      if (err) console.error(" Log internal next download attendance PDF:", err);
     };
 
     await attendanceHistory(mockReq, mockRes, mockNext);
   } catch (error) {
-    console.error("❌ Gagal memproses unduhan PDF absensi:", error);
+    console.error("Gagal memproses unduhan PDF absensi:", error);
     return res.status(500).send("Terjadi masalah saat mencetak laporan absensi.");
   }
 };
@@ -376,7 +386,6 @@ export const renderMobileReportDashboard = async (req, res) => {
     const endDate = req.query.endDate || now.toISOString().split("T")[0];
     const periodMonth = req.query.periodMonth || currentMonthStr;
 
-    // Panggil layer Service untuk mengambil data summary
     const summary = await getExecutiveReportSummary({ startDate, endDate, periodMonth });
 
     return res.render("management/report-overview", {
@@ -404,7 +413,6 @@ export const renderAnalyticsReport = async (req, res) => {
     const endDate = req.query.endDate || now.toISOString().split("T")[0];
     const periodMonth = req.query.periodMonth || currentMonthStr;
 
-    // Panggil fungsi service yang sama demi konsistensi data
     const summary = await getExecutiveReportSummary({ startDate, endDate, periodMonth });
 
     return res.render("management/analytics", {
@@ -422,31 +430,27 @@ export const downloadSingleSlipPdf = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Ambil data payroll secara detail
     const payroll = await Payroll.findById(id).lean();
     if (!payroll) {
       return res.status(404).send("Data dokumen slip gaji tidak ditemukan.");
     }
 
-    // 2. Ambil data Employee BESERTA Virtual-nya (careerData & financialData)
-    // Jangan gunakan .lean() murni tanpa menyalakan virtuals, atau panggil manual populate-nya:
     const employee = await Employee.findById(payroll.employeeId)
       .populate({
         path: "careerData",
         populate: [
-          { path: "bidangId", model: "Bidang" }, // Sesuaikan nama model Bidang Anda jika ada hubungan reference internal
-          { path: "positionId", model: "Position" }, // Sesuaikan nama model Position Anda
-          { path: "unitId", model: "Unit" }, // Sesuaikan nama model Unit Anda
+          { path: "bidangId", model: "Bidang" },
+          { path: "positionId", model: "Position" }, 
+          { path: "unitId", model: "Unit" },
         ],
       })
       .populate("financialData")
-      .lean({ virtuals: true }); // Mengizinkan virtual masuk ke dalam format plain object lean
+      .lean({ virtuals: true }); 
 
     if (!employee) {
       return res.status(404).send("Profil karyawan pemilik dokumen tidak ditemukan.");
     }
 
-    // 3. Render ke PDF via service Puppeteer
     const pdfBuffer = await generateSingleSlipPdf(payroll, employee);
 
     const safeFileName = `Slip_Gaji_${employee.fullName.replace(/\s+/g, "_")}_Periode_${payroll.periodMonth}.pdf`;
@@ -455,7 +459,7 @@ export const downloadSingleSlipPdf = async (req, res) => {
 
     return res.end(pdfBuffer);
   } catch (error) {
-    console.error("❌ Gagal mengekspor PDF Slip Gaji Individu:", error);
+    console.error(" Gagal mengekspor PDF Slip Gaji Individu:", error);
     return res.status(500).send("Terjadi eror internal saat mencetak berkas PDF slip gaji.");
   }
 };

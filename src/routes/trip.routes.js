@@ -22,11 +22,7 @@ import {
 
 const router = express.Router();
 router.use((req, res, next) => {
-  console.log(`\n============== [DEBUG ROUTE] ==============`);
-  console.log(`👉 METHOD      : ${req.method}`);
-  console.log(`👉 ACTUAL URL  : ${req.originalUrl}`);
-  console.log(`👉 ROUTE PATH  : ${req.url}`);
-  console.log(`===========================================\n`);
+  console.log(`ROUTE PATH  : ${req.url}`);
   next();
 });
 // 1. Global Middleware

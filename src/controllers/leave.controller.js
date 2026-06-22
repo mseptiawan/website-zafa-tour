@@ -127,7 +127,6 @@ const calculateWorkDays = async (start, end) => {
   return count;
 };
 
-// 2. CONTROLLER YANG MEMANGGIL FUNGSI DI ATAS
 export const calculateLeaveDays = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -138,8 +137,6 @@ export const calculateLeaveDays = async (req, res) => {
         message: "Parameter tanggal tidak lengkap",
       });
     }
-
-    // Memanggil fungsi di atas
     const totalDays = await calculateWorkDays(startDate, endDate);
 
     return res.status(200).json({
@@ -401,7 +398,6 @@ export const generateOrResetLeaveBalance = async (req, res) => {
       ` Memulai proses Generate/Reset Saldo Cuti untuk seluruh Pegawai di tahun ${selectedYear}...`
     );
 
-    // FIX 1: Gunakan status: "Active" sesuai skema model User Anda
     const activeEmployees = await User.find({ status: "Active" });
 
     if (activeEmployees.length === 0) {
@@ -411,16 +407,14 @@ export const generateOrResetLeaveBalance = async (req, res) => {
       });
     }
 
-    // Ambil data semua hari libur jenis cuti bersama (isDeductLeave: true) di tahun tersebut
     const companyHolidays = await Holiday.find({
       year: selectedYear,
       isActive: true,
-      isDeductLeave: true, // Pastikan filter berdasarkan flag pemotong kuota
+      isDeductLeave: true,
     });
 
     let totalDeductedDays = 0;
 
-    // FIX 2: Hitung hari cuti bersama dengan presisi tanpa melibatkan hari Minggu
     companyHolidays.forEach((h) => {
       const start = new Date(h.date);
       start.setHours(0, 0, 0, 0);
@@ -429,7 +423,6 @@ export const generateOrResetLeaveBalance = async (req, res) => {
 
       let loop = new Date(start);
       while (loop <= end) {
-        // Hanya kurangi jika bukan hari Minggu (day 0)
         if (loop.getDay() !== 0) {
           totalDeductedDays++;
         }
@@ -441,15 +434,11 @@ export const generateOrResetLeaveBalance = async (req, res) => {
       `Ditemukan total ${totalDeductedDays} hari cuti bersama (memotong kuota) di tahun ${selectedYear}.`
     );
 
-    // FIX 3: Eksekusi sinkronisasi saldo tanpa merusak indikator "Cuti Terpakai" di UI
     await Promise.all(
       activeEmployees.map(async (employee) => {
-        // 1. SAFETY GUARD CRITICAL: Hitung total cuti mandiri pegawai yang sudah APPROVED di tahun ini
         const approvedLeaves = await Leave.find({
           userId: employee._id,
           status: "APPROVED",
-          // Pastikan hanya menghitung cuti yang tipenya memotong kuota tahunan (bukan sakit/melahirkan)
-          // Sesuaikan filter ini dengan skema tipe cuti Anda jika ada
           startDate: {
             $gte: new Date(`${selectedYear}-01-01`),
             $lte: new Date(`${selectedYear}-12-31`),
@@ -458,17 +447,14 @@ export const generateOrResetLeaveBalance = async (req, res) => {
 
         let totalCutiMandiriTerpakai = 0;
         approvedLeaves.forEach((leave) => {
-          totalCutiMandiriTerpakai += leave.totalDays; // Akumulasi hari kerja cuti yang sudah diambil
+          totalCutiMandiriTerpakai += leave.totalDays;
         });
 
-        // 2. Hitung sisa saku cuti baru yang adil
-        // Rumus: Hak Awal (12) - Cuti Bersama (misal 14) - Cuti Mandiri yang sudah terpakai
         const initialRemaining = Math.max(
           0,
           DEFAULT_LEAVE_QUOTA - totalDeductedDays - totalCutiMandiriTerpakai
         );
 
-        // 3. Eksekusi simpan/update ke database
         await LeaveBalance.findOneAndUpdate(
           {
             userId: employee._id,
@@ -479,8 +465,8 @@ export const generateOrResetLeaveBalance = async (req, res) => {
               userId: employee._id,
               year: selectedYear,
               allocated: DEFAULT_LEAVE_QUOTA,
-              remaining: initialRemaining, // Tetap akurat meskipun direset berkali-kali!
-              used: totalCutiMandiriTerpakai, // Riwayat cuti mandiri tidak hilang/terhapus menjadi 0
+              remaining: initialRemaining,
+              used: totalCutiMandiriTerpakai,
               updatedAt: new Date(),
             },
           },
@@ -569,16 +555,13 @@ export const applyLeave = async (req, res) => {
     const requester = req.session.user;
     const documentPath = req.file ? `/uploads/files/${req.file.filename}` : null;
 
-    // Ambil data pendukung untuk me-render ulang form jika terjadi error
-    const leaveTypes = await LeaveType.find({}); // Sesuaikan dengan query Anda
-    const employees = await Employee.find({}); // Sesuaikan dengan query Anda
+    const leaveTypes = await LeaveType.find({});
+    const employees = await Employee.find({});
     const currentYear = new Date(startDate || Date.now()).getFullYear();
     const balance = await LeaveBalance.findOne({ userId: requester._id, year: currentYear });
 
-    // Fungsi helper untuk merender ulang form dengan error
     const renderWithError = (errorMessage) => {
       return res.status(400).render("leave/create", {
-        // Sesuaikan dengan path file EJS Anda
         title: "Input Pengajuan Cuti",
         mode: "CREATE",
         error: errorMessage,
@@ -586,27 +569,22 @@ export const applyLeave = async (req, res) => {
         employees,
         leaveBalance: balance || { remaining: 0 },
         leave: { leaveTypeId, startDate, endDate, reason, handoverUserId, totalDays: 0 },
-        employee: requester, // atau data employee terkait
+        employee: requester,
       });
     };
 
-    // 1. Validasi Hari Kerja = 0
-    // 1. Hitung total hari kerja nyata menggunakan fungsi yang sudah diperbaiki
     const finalTotalDays = await calculateWorkDays(startDate, endDate);
 
-    // 2. PERBAIKAN: Lengkapi sintaks 'if' yang terpotong di bawah ini
     if (finalTotalDays === 0) {
       return renderWithError(
         "Pengajuan ditolak. Semua tanggal yang Anda pilih adalah hari libur atau cuti bersama."
       );
     }
 
-    // 2. Validasi Saldo Cuti
     if (!balance || balance.remaining < finalTotalDays) {
       return renderWithError("Saldo cuti tidak mencukupi untuk durasi tersebut.");
     }
 
-    // --- LOGIC INSERT DATABASE TETAP SAMA ---
     const newLeave = await Leave.create({
       userId: requester._id,
       leaveTypeId,
@@ -661,7 +639,6 @@ export const applyLeave = async (req, res) => {
     return res.redirect("/leave/my-history");
   } catch (error) {
     console.error("Error pada applyLeave:", error);
-    // Jika error internal, tetap render dengan alert merah
     return res.status(500).render("leave/apply-form", {
       title: "Input Pengajuan Cuti",
       mode: "CREATE",
@@ -946,7 +923,6 @@ export const requestCancelApprovedLeave = async (req, res) => {
     let targetStep = null;
     let targetApproverId = null;
 
-    // Pegawai -> Manager Bidang masing-masing
     if (userRole === "PEGAWAI") {
       const manager = await getManagerByBidang(sessionUser._id);
 
@@ -959,22 +935,13 @@ export const requestCancelApprovedLeave = async (req, res) => {
 
       targetStep = manager.step;
       targetApproverId = manager.approverId;
-    }
-
-    // Manager -> Wakil Direktur
-    else if (
+    } else if (
       ["MANAGER_ADMINISTRASI", "MANAGER_KEUANGAN", "MANAGER_HAJI_UMRAH"].includes(userRole)
     ) {
       targetStep = "WAKIL_DIREKTUR";
-    }
-
-    // Wakil Direktur -> Direktur Utama
-    else if (userRole === "WAKIL_DIREKTUR") {
+    } else if (userRole === "WAKIL_DIREKTUR") {
       targetStep = "DIREKTUR_UTAMA";
-    }
-
-    // Direktur Utama langsung final
-    else if (userRole === "DIREKTUR_UTAMA") {
+    } else if (userRole === "DIREKTUR_UTAMA") {
       targetStep = null;
     }
 
@@ -1004,7 +971,6 @@ export const requestCancelApprovedLeave = async (req, res) => {
       targetApproverId = approver._id;
     }
 
-    // Jika tidak ada approver berikutnya, langsung approve pembatalan
     if (!targetStep || !targetApproverId) {
       leave.status = "CANCELLED";
       await leave.save();

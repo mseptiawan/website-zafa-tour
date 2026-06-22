@@ -9,16 +9,13 @@ export const createOvertimeService = async ({ user, body, file }) => {
   const rawDate = new Date(body.date);
   const workDate = new Date(Date.UTC(rawDate.getFullYear(), rawDate.getMonth(), rawDate.getDate()));
 
-  // 1. Deklarasikan waktu mulai dan selesai
   const start = new Date(`${body.date}T${body.startTime}:00Z`);
   let end = new Date(`${body.date}T${body.endTime}:00Z`);
 
-  // 2. FIX CROSS-DAY BUG: Jika jam selesai < jam mulai, artinya melewati tengah malam (pindah hari)
   if (end < start) {
     end.setDate(end.getDate() + 1);
   }
 
-  // 3. Hitung total jam setelah mengamankan kondisi lintas hari
   const totalHours = (end - start) / (1000 * 60 * 60);
   const period = getPayrollPeriod(workDate);
 
@@ -31,7 +28,6 @@ export const createOvertimeService = async ({ user, body, file }) => {
     throw new Error("Employee ID tidak ditemukan di session");
   }
 
-  // 4. Inisialisasi variabel state awal lembur
   let status = "SUBMITTED";
   let approvedBy = null;
   let approvedAt = null;
@@ -39,40 +35,33 @@ export const createOvertimeService = async ({ user, body, file }) => {
   let multiplierSnapshot = undefined;
   let requiredManagerRole = null;
   let bidangId = null;
-
-  // Variabel penampung ID Employee yang benar-benar valid untuk query berikutnya
   let activeEmployeeId = employeeId;
 
   const historyAction = [];
 
-  // 5. DEFENSIVE BYPASS: Cek apakah user adalah WAKIL_DIREKTUR atau ber-role MANAGER_*
   const isWadirOrManager =
     user.role === "WAKIL_DIREKTUR" || (user.role || "").startsWith("MANAGER_");
 
   if (isWadirOrManager) {
-    // Jalankan skenario bypass Auto-Approved tanpa validasi atasan/managerRoleId
     status = "APPROVED";
     approvedBy = user._id;
     approvedAt = new Date();
 
-    // 1. Ambil data financial manager dengan pengaman (Cek Employee ID atau User ID)
     let financial = await EmployeeFinancial.findOne({
       employee_id: new mongoose.Types.ObjectId(employeeId),
     });
 
-    // 2. JIKA SINKRONISASI SESSION TERBALIK (Membawa User ID bukan Employee ID):
     if (!financial) {
       const fallbackEmployee = await Employee.findOne({ userId: user._id });
 
       if (fallbackEmployee) {
-        activeEmployeeId = fallbackEmployee._id; // Update ID aktif ke ID Employee yang benar
+        activeEmployeeId = fallbackEmployee._id;
         financial = await EmployeeFinancial.findOne({
           employee_id: fallbackEmployee._id,
         });
       }
     }
 
-    // 3. JIKA BENAR-BENAR TIDAK KETEMU DI KEDUA SKENARIO:
     if (!financial) {
       console.warn(
         `[WARN] Data finansial tidak ditemukan untuk EmployeeID: ${employeeId} maupun UserID: ${user._id}. Menggunakan rate default 0.`
@@ -84,18 +73,15 @@ export const createOvertimeService = async ({ user, body, file }) => {
 
     multiplierSnapshot = 1.5;
 
-    // Tarik data bidang dasar dari EmployeeCareer menggunakan ID Employee yang valid
     const basicCareer = await EmployeeCareer.findOne({ employee_id: activeEmployeeId });
 
     bidangId = basicCareer?.bidangId || null;
 
-    // FIX JIKA MANAJEMEN BELUM PUNYA BIDANG:
     if (!bidangId) {
       console.warn(
         `[WARN] ${user.fullName} tidak punya bidang di Karir. Mencari bidang default dari database...`
       );
 
-      // Ambil contoh ID bidang pertama apa saja yang ada di database kamu agar lolos dari 'required validation'
       const sampleBidang = await mongoose.model("Bidang").findOne({});
 
       if (sampleBidang) {
@@ -107,9 +93,8 @@ export const createOvertimeService = async ({ user, body, file }) => {
       }
     }
 
-    requiredManagerRole = user.role; // Set target role ke dirinya sendiri agar konsisten
+    requiredManagerRole = user.role;
 
-    // Catat log gabungan (SUBMITTED & AUTO APPROVED)
     historyAction.push(
       {
         action: "SUBMITTED",
@@ -126,7 +111,6 @@ export const createOvertimeService = async ({ user, body, file }) => {
       }
     );
   } else {
-    // 6. SKENARIO PEGAWAI BIASA: Tetap lakukan penelusuran hierarki atasan
     const career = await EmployeeCareer.findOne({
       employee_id: employeeId,
     }).populate({
@@ -151,10 +135,9 @@ export const createOvertimeService = async ({ user, body, file }) => {
     });
   }
 
-  // 7. Simpan data akhir ke MongoDB
   return await Overtime.create({
     userId: user._id,
-    employeeId: activeEmployeeId, // Menggunakan ID Karyawan yang sinkron
+    employeeId: activeEmployeeId,
     employeeName: user.fullName,
     date: workDate,
     startTime: body.startTime,

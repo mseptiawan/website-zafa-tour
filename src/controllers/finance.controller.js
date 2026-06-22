@@ -200,11 +200,9 @@ export const paymentHistoryDetail = async (req, res, next) => {
 };
 export const getFinancePage = async (req, res) => {
   try {
-    // Ambil list periode untuk dropdown filter
     const availablePeriods = ["2026-06", "2026-05", "2026-04"];
     const currentPeriod = "2026-06";
 
-    // DI SINI TEMPAT NYA RES.RENDER UNTUK HALAMAN FINANCE
     res.render("payroll/finance", {
       title: "Verifikasi Pembayaran Finance",
       availablePeriods,
@@ -224,7 +222,6 @@ export const getAllPayrollRecords = async (req, res) => {
         .json({ success: false, message: "Parameter periode bulan wajib diisi." });
     }
 
-    // Ambil data payroll bulanan, join dengan data Employee untuk dapet Nama & NIK
     const payrolls = await Payroll.find({ periodMonth: period })
       .populate({
         path: "employeeId",
@@ -252,20 +249,17 @@ export const verifyIndividualPayment = async (req, res) => {
       return res.status(400).json({ success: false, message: "Data verifikasi tidak lengkap." });
     }
 
-    // Ambil path file jika finance mengunggah bukti mutasi bank
     let mutationFilePath = null;
     if (req.file) {
       mutationFilePath = `/uploads/files/${req.file.filename}`;
     }
 
-    // Update status payroll dari CLOSED menjadi PAID
     const updatedPayroll = await Payroll.findOneAndUpdate(
       { employeeId, periodMonth, status: "CLOSED" },
       {
         $set: {
           status: "PAID",
           paidAt: new Date(),
-          // Kita simpan dinamis path file mutasinya di field tambahan (jika diunggah)
           mutationFile: mutationFilePath || "/uploads/files/default-receipt.pdf",
         },
       },

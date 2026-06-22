@@ -12,8 +12,18 @@ import employeeSeeder from "./employee.seeder.js";
 import employeeSalarySeeder from "./employeeSalary.seeder.js";
 
 import holidaySeeder from "./holidays.seeder.js";
+import leaveSeeder from "./leave.seeder.js";
 
+import assignmentSeeder from "./assignment.seeder.js";
+import announcementSeeder from "./announcement.seeder.js";
+import salesVisitSeeder from "./salesVisit.seeder.js";
+import completeLoanSeeder from "./completeLoan.seeder.js";
+import completePayrollHistorySeeder from "./completePayrollHistory.seeder.js";
+import attendanceSeeder from "./attendance.seeder.js";
+import businessTripSeeder from "./businessTrip.seeder.js";
+import overtimeSeeder from "./overtime.seeder.js";
 import expenseCategorySeeder from "./expenseCategory.seeder.js";
+import expenseSeeder from "./expense.seeder.js";
 
 import kpiTemplateSeeder from "./kpiTemplate.seeder.js";
 import kpiTemplateDetailSeeder from "./kpiTemplateDetail.seeder.js";
@@ -21,7 +31,6 @@ import unitKpiMappingSeeder from "./unitKpiMapping.seeder.js";
 
 dotenv.config();
 
-// Array ini sekarang hanya berisi seeder yang sudah di-import di atas
 const seeders = [
   roleSeeder,
   bidangSeeder,
@@ -32,11 +41,19 @@ const seeders = [
   userSeeder,
   employeeSeeder,
   employeeSalarySeeder,
-
+  attendanceSeeder,
   holidaySeeder,
+  leaveSeeder,
+  completeLoanSeeder,
+  overtimeSeeder,
 
+  assignmentSeeder,
+  announcementSeeder,
+  salesVisitSeeder,
+  businessTripSeeder,
   expenseCategorySeeder,
-
+  expenseSeeder,
+  completePayrollHistorySeeder,
   kpiTemplateSeeder,
   kpiTemplateDetailSeeder,
   unitKpiMappingSeeder,
