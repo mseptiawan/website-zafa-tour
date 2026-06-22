@@ -1813,6 +1813,12 @@
   .border-emerald-200 {
     border-color: var(--color-emerald-200);
   }
+  .border-emerald-200\/40 {
+    border-color: color-mix(in srgb, oklch(90.5% 0.093 164.15) 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-emerald-200) 40%, transparent);
+    }
+  }
   .border-emerald-200\/50 {
     border-color: color-mix(in srgb, oklch(90.5% 0.093 164.15) 50%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1935,6 +1941,12 @@
   }
   .border-rose-200 {
     border-color: var(--color-rose-200);
+  }
+  .border-rose-200\/40 {
+    border-color: color-mix(in srgb, oklch(89.2% 0.058 10.001) 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-rose-200) 40%, transparent);
+    }
   }
   .border-rose-200\/50 {
     border-color: color-mix(in srgb, oklch(89.2% 0.058 10.001) 50%, transparent);
@@ -2079,6 +2091,12 @@
   }
   .border-white {
     border-color: var(--color-white);
+  }
+  .border-white\/10 {
+    border-color: color-mix(in srgb, #fff 10%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-white) 10%, transparent);
+    }
   }
   .border-white\/20 {
     border-color: color-mix(in srgb, #fff 20%, transparent);
@@ -4754,6 +4772,13 @@
       }
     }
   }
+  .hover\:bg-emerald-100 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-emerald-100);
+      }
+    }
+  }
   .hover\:bg-emerald-200 {
     &:hover {
       @media (hover: hover) {
@@ -4845,6 +4870,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-rose-50);
+      }
+    }
+  }
+  .hover\:bg-rose-100 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-rose-100);
       }
     }
   }
@@ -5277,6 +5309,11 @@
       --tw-ring-color: var(--color-blue-50);
     }
   }
+  .focus\:ring-blue-500 {
+    &:focus {
+      --tw-ring-color: var(--color-blue-500);
+    }
+  }
   .focus\:ring-blue-500\/5 {
     &:focus {
       --tw-ring-color: color-mix(in srgb, oklch(62.3% 0.214 259.815) 5%, transparent);
@@ -5442,6 +5479,11 @@
   .active\:bg-slate-50 {
     &:active {
       background-color: var(--color-slate-50);
+    }
+  }
+  .active\:text-blue-600 {
+    &:active {
+      color: var(--color-blue-600);
     }
   }
   .disabled\:opacity-50 {

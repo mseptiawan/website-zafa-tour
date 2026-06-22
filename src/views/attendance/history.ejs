@@ -53,7 +53,7 @@
             value: analytics.totalHadir, 
             unit: 'Hari', 
             icon: 'fa-solid fa-user-check', 
-            bgClass: 'bg-white  border-slate-200/50 shadow-sm', 
+            bgClass: 'bg-white  border-slate-200/50 ', 
             iconBoxClass: 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' 
           },
           { 
@@ -61,7 +61,7 @@
             value: analytics.totalLateDays, 
             unit: 'Kali', 
             icon: 'fa-solid fa-user-clock', 
-            bgClass: 'bg-white border border-slate-200/50 shadow-sm', 
+            bgClass: 'bg-white border border-slate-200/50 ', 
             labelClass: 'text-rose-600', 
             valueClass: 'text-rose-700', 
             unitClass: 'text-rose-600',
@@ -72,17 +72,17 @@
             value: analytics.totalLateMinutes, 
             unit: 'Menit', 
             icon: 'fa-solid fa-stopwatch', 
-            bgClass: 'bg-white border border-slate-200/50 shadow-sm', 
+            bgClass: 'bg-white border border-slate-200/50 ', 
             iconBoxClass: 'bg-amber-50 text-amber-600 border border-amber-200/50' 
           }
         ]
       }) %>
     </div>
 
-    <div class="flex flex-col gap-3.5 w-full bg-white border border-slate-200/50 p-4 rounded-2xl shadow-sm select-none">
+    <div class="flex flex-col gap-3.5 w-full bg-white border border-slate-200/50 p-4 rounded-2xl  select-none">
       
       <div class="block md:hidden">
-        <h3 class="text-[15px] font-bold text-slate-800 tracking-tight">Log Kehadiran</h3>
+        <h3 class="text-[15px] font-medium text-slate-800 tracking-tight">Log Kehadiran</h3>
       </div>
 
       <div class="flex items-center justify-between gap-3 w-full">
@@ -90,20 +90,20 @@
           <% if (isAdmin) { %>
             <div class="inline-flex items-center p-0.5 bg-slate-100/80 rounded-full w-full sm:w-auto">
               <a href="/attendance/history" 
-                 class="flex-1 sm:flex-none text-center px-4 py-1.5 text-[11px] rounded-full transition-all duration-200 <%= !isPersonalView ? 'font-bold bg-white text-slate-900 shadow-sm' : 'font-semibold text-slate-400 hover:text-slate-600' %>">
+                 class="flex-1 sm:flex-none text-center px-4 py-1.5 text-[11px] rounded-full transition-all duration-200 <%= !isPersonalView ? 'font-medium bg-white text-slate-900 ' : 'font-semibold text-slate-400 hover:text-slate-600' %>">
                 Semua
               </a>
               <a href="/attendance/history?view=personal" 
-                 class="flex-1 sm:flex-none text-center px-4 py-1.5 text-[11px] rounded-full transition-all duration-200 <%= isPersonalView ? 'font-bold bg-white text-slate-900 shadow-sm' : 'font-semibold text-slate-400 hover:text-slate-600' %>">
+                 class="flex-1 sm:flex-none text-center px-4 py-1.5 text-[11px] rounded-full transition-all duration-200 <%= isPersonalView ? 'font-medium bg-white text-slate-900 ' : 'font-semibold text-slate-400 hover:text-slate-600' %>">
                 Saya
               </a>
             </div>
           <% } else { %>
-            <h3 class="hidden md:block text-[14px] font-bold text-slate-800 tracking-tight">Attendance log</h3>
+            <h3 class="hidden md:block text-[14px] font-medium text-slate-800 tracking-tight">Attendance log</h3>
           <% } %>
         </div>
 
-        <button onclick="openFilterModal()" type="button" class="inline-flex items-center justify-center gap-2 h-8.5 px-4 bg-blue-500 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-full shadow-sm transition-all active:scale-95 cursor-pointer outline-none shrink-0">
+        <button onclick="openFilterModal()" type="button" class="inline-flex items-center justify-center gap-2 h-8.5 px-4 bg-blue-500 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-full  transition-all active:scale-95 cursor-pointer outline-none shrink-0">
           <i class="fa-solid fa-filter text-[9px] text-slate-300"></i>
           <span>Filter</span>
         </button>
@@ -112,7 +112,7 @@
     </div>
 
     <% if (listAttendance.length === 0) { %>
-    <div class="bg-white border border-slate-200/50 rounded-2xl py-16 text-center shadow-sm px-4">
+    <div class="bg-white border border-slate-200/50 rounded-2xl py-16 text-center  px-4">
       <div class="w-10 h-10 bg-slate-50 border border-slate-200/50 rounded-xl flex items-center justify-center mx-auto mb-3 text-slate-400">
         <i class="fa-solid fa-clock-rotate-left text-sm"></i>
       </div>
@@ -121,7 +121,7 @@
     </div>
     <% } else { %>
 
-    <div class="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden w-full border border-slate-200/50">
+    <div class="hidden md:block bg-white rounded-2xl  overflow-hidden w-full border border-slate-200/50">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -140,7 +140,7 @@
             <tr class="hover:bg-slate-50 transition-colors text-[13px] font-medium text-slate-600">
 
               <% if (isAdmin && !isPersonalView) { %>
-              <td class="py-4 px-6 font-bold text-slate-800 truncate max-w-[180px]">
+              <td class="py-4 px-6 font-medium text-slate-800 truncate max-w-[180px]">
                 <%= row.fullName %>
               </td>
               <% } %>
@@ -176,7 +176,7 @@
                     badgeClass = 'bg-emerald-50 text-emerald-600 border border-emerald-200/50';
                   }
                 %>
-                <div class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider <%= badgeClass %> shadow-3xs">
+                <div class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wider <%= badgeClass %> ">
                   <%= statusText %>
                 </div>
               </td>
@@ -187,7 +187,7 @@
                   <i class="fa-solid fa-eye text-[11px]"></i>
                 </button>
                 <% } else { %>
-                <button class="openModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer shadow-3xs outline-none" 
+                <button class="openModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer  outline-none" 
                   data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}) %>" 
                   data-status="<%= row.status %>" 
                   data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>" 
@@ -227,17 +227,17 @@
           }
         %>
 
-        <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5 shadow-sm space-y-4">
+        <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5  space-y-4">
           
           <div class="flex items-center justify-between gap-2">
             <div class="flex flex-col">
               <% if (isAdmin && !isPersonalView) { %>
-                <span class="text-[13px] font-bold text-slate-800 block truncate max-w-[150px]"><%= row.fullName %></span>
+                <span class="text-[13px] font-medium text-slate-800 block truncate max-w-[150px]"><%= row.fullName %></span>
               <% } %>
-              <span class="text-[12px] font-bold text-slate-900 tracking-tight"><%= new Date(row.checkIn || row.createdAt).toLocaleDateString("id-ID", {day:'2-digit', month:'short', year:'numeric'}) %></span>
+              <span class="text-[12px] font-medium text-slate-900 tracking-tight"><%= new Date(row.checkIn || row.createdAt).toLocaleDateString("id-ID", {day:'2-digit', month:'short', year:'numeric'}) %></span>
             </div>
             
-            <div class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider <%= badgeClass %>">
+            <div class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wider <%= badgeClass %>">
               <%= statusText %>
             </div>
           </div>
@@ -245,11 +245,11 @@
           <div class="flex flex-col gap-2 bg-slate-50/50 rounded-xl px-4 py-3 select-none border border-slate-100/50">
             <div class="flex items-center gap-2.5 text-[13.5px] font-medium text-slate-700">
               <span class="text-slate-400 text-xs">⏱</span>
-              <span class="tabular-nums font-bold text-slate-800">
+              <span class="tabular-nums font-medium text-slate-800">
                 <%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
               </span>
               <span class="text-slate-300">→</span>
-              <span class="tabular-nums font-bold text-slate-800">
+              <span class="tabular-nums font-medium text-slate-800">
                 <%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
               </span>
             </div>
@@ -257,7 +257,7 @@
             <% const duration = calculateDurationSecure(row.checkIn, row.checkOut); %>
             <% if (duration) { %>
               <div class="text-[11px] font-medium text-slate-500 pl-6">
-                Durasi kerja: <span class="text-slate-700 font-bold"><%= duration %> jam</span>
+                Durasi kerja: <span class="text-slate-700 font-medium"><%= duration %> jam</span>
               </div>
             <% } %>
           </div>
@@ -267,11 +267,11 @@
             <div class="text-[11.5px] font-semibold text-slate-500 flex items-center gap-1.5">
               <% if (row.lateDuration > 0) { %>
                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                <span class="text-rose-600 font-bold">TELAT <%= row.lateDuration %> MNT</span>
+                <span class="text-rose-600 font-medium">TELAT <%= row.lateDuration %> MNT</span>
               <% } else if (row.status === 'BELUM ABSEN') { %>
                 <span class="text-slate-400">-</span>
               <% } else { %>
-                <span class="text-emerald-600 font-bold">TEPAT WAKTU</span>
+                <span class="text-emerald-600 font-medium">TEPAT WAKTU</span>
               <% } %>
             </div>
 
@@ -281,7 +281,7 @@
                   BELUM TERSEDIA
                 </button>
               <% } else { %>
-                <button class="openModal h-8.5 px-4.5 bg-blue-50 text-blue-600 text-[11.5px] font-bold rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer shadow-3xs"
+                <button class="openModal h-8.5 px-4.5 bg-blue-50 text-blue-600 text-[11.5px] font-medium rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer "
                   data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}) %>"
                   data-status="<%= row.status %>"
                   data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>"
@@ -311,7 +311,7 @@
     
     <div class="flex justify-between border-b border-slate-200/50 px-5 py-4 bg-white select-none">
       <div>
-        <h2 class="text-[13px] font-bold text-slate-800 tracking-tight">Rentang Tanggal</h2>
+        <h2 class="text-[13px] font-medium text-slate-800 tracking-tight">Rentang Tanggal</h2>
         <p class="text-[10.5px] font-medium text-slate-400 mt-0.5">Pilih periode riwayat absensi</p>
       </div>
       <button onclick="closeFilterModal()" class="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200/50 text-slate-400 hover:text-slate-800 flex items-center justify-center text-[10px] cursor-pointer outline-none">
@@ -336,7 +336,7 @@
       </div>
 
       <div class="pt-2">
-        <button type="submit" class="w-full h-9 bg-blue-500 hover:bg-blue-700 text-white text-[11.5px] font-bold tracking-wide uppercase rounded-xl transition-all active:scale-[0.99] shadow-3xs cursor-pointer flex items-center justify-center gap-1.5">
+        <button type="submit" class="w-full h-9 bg-blue-500 hover:bg-blue-700 text-white text-[11.5px] font-medium tracking-wide uppercase rounded-xl transition-all active:scale-[0.99]  cursor-pointer flex items-center justify-center gap-1.5">
           TERAPKAN FILTER
         </button>
       </div>

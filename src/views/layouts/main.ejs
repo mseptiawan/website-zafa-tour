@@ -131,12 +131,12 @@
 
 
             <!-- CUTI & IZIN (AGREGATOR HUB) -->
-          <button onclick="openLeaveMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
-  <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.02)] transition-all duration-200 active:scale-95">
-    <i class="fa-solid fa-calendar-check text-base"></i>
-  </div>
-  <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Cuti</span>
-</button>
+            <button onclick="openLeaveMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.02)] transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-calendar-check text-base"></i>
+              </div>
+              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Cuti</span>
+            </button>
 
             <% 
   // List role manajemen yang berwenang menyetujui lembur (Semua Manager Bidang & Wadir)
@@ -164,21 +164,21 @@
             </a>
             <% } %>
 
-    <% if (typeof user !== 'undefined' && user?.role === 'WAKIL_DIREKTUR') { %>
-  <button type="button" onclick="openPermitMenuMobile()" class="group flex flex-col items-center gap-2 text-center w-full bg-transparent border-none p-0 cursor-pointer outline-none select-none">
-    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
-      <i class="fa-solid fa-file-signature text-base"></i>
-    </div>
-    <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
-  </button>
-<% } else { %>
-  <a href="/permit/history" class="group flex flex-col items-center gap-2 text-center select-none">
-    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
-      <i class="fa-solid fa-file-signature text-base"></i>
-    </div>
-    <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
-  </a>
-<% } %>
+            <% if (typeof user !== 'undefined' && user?.role === 'WAKIL_DIREKTUR') { %>
+            <button type="button" onclick="openPermitMenuMobile()" class="group flex flex-col items-center gap-2 text-center w-full bg-transparent border-none p-0 cursor-pointer outline-none select-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
+                <i class="fa-solid fa-file-signature text-base"></i>
+              </div>
+              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
+            </button>
+            <% } else { %>
+            <a href="/permit/history" class="group flex flex-col items-center gap-2 text-center select-none">
+              <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
+                <i class="fa-solid fa-file-signature text-base"></i>
+              </div>
+              <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
+            </a>
+            <% } %>
             <!-- SALES VISIT -->
             <a href="/sales/my" class="group flex flex-col items-center gap-2 text-center">
               <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-rose-50/70 text-rose-600 border border-rose-100/20 shadow-[0_6px_16px_rgba(244,63,94,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-rose-100/50">
@@ -401,14 +401,14 @@
   </div>
   </main>
   </div>
-  <div class="fixed inset-x-0 bottom-0 z-[105] flex items-center justify-around border-t border-white/20 bg-white/70 backdrop-blur-lg px-2 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] md:hidden">
+  <div class="fixed inset-x-0 bottom-0 z-[105] flex items-center justify-around border-t border-white bg-white/70 backdrop-blur-lg px-2 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] md:hidden">
 
-    <a href="/dashboard" class="flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600">
+    <a href="/dashboard" class="flex flex-1 flex-col items-center gap-1 text-slate-600 active:text-blue-600 transition-all hover:text-blue-600">
       <i class="fa-solid fa-house text-lg"></i>
       <span class="text-[9px] font-bold uppercase tracking-wide">Beranda</span>
     </a>
 
-    <a href="/attendance/history" class="flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600">
+    <a href="/attendance/history" class="flex flex-1 flex-col items-center gap-1 active:text-blue-600 text-slate-600 transition-all hover:text-blue-600">
       <i class="fa-solid fa-clock-rotate-left text-lg"></i>
       <span class="text-[9px] font-bold uppercase tracking-wide">Absensi</span>
     </a>
@@ -419,13 +419,13 @@
       </button>
     </div>
 
-    <a href="/leave/my-history" class="relative flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600">
+    <a href="/leave/my-history" class="relative flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600 active:text-blue-600">
       <i class="fa-solid fa-envelope-open-text text-lg"></i>
       <span class="text-[9px] font-bold uppercase tracking-wide">Cuti</span>
       <span class="absolute -top-1 right-3 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-red-500 px-1 text-[8px] font-bold text-white">0</span>
     </a>
 
-    <div class="relative flex flex-1 flex-col items-center gap-1 text-slate-600">
+    <div class="relative flex flex-1 flex-col items-center gap-1 text-slate-600 active:text-blue-600">
       <button type="button" id="accountMenuBtnMobile" onclick="toggleAccountMenuMobile()" class="flex flex-col items-center gap-1 hover:text-blue-600 focus:outline-none">
         <div class="w-6 h-6 rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 transition-all">
           <% if (typeof user !== 'undefined' && user.foto_profile) { %>
@@ -662,102 +662,102 @@
 
     </div>
   </div>
-<div id="leaveMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 md:hidden transition-opacity duration-200" onclick="toggleLeaveMenuMobile()">
-  <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
+  <div id="leaveMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 md:hidden transition-opacity duration-200" onclick="toggleLeaveMenuMobile()">
+    <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
 
-    <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleLeaveMenuMobile()"></div>
+      <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="toggleLeaveMenuMobile()"></div>
 
-    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Pengajuan Cuti</h3>
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Pengajuan Cuti</h3>
 
-    <div class="grid grid-cols-2 gap-3 pt-2">
-      
-      <% if (typeof user !== 'undefined' && user?.permissions?.leave_new) { %>
-      <a href="/leave/apply" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
-        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-          <i class="fa-solid fa-calendar-plus text-sm"></i>
-        </div>
-        <span class="text-xs font-bold text-slate-700">Ajukan Cuti</span>
-      </a>
-      <% } %>
+      <div class="grid grid-cols-2 gap-3 pt-2">
 
-      <% if (typeof user !== 'undefined' && user?.permissions?.leave_my) { %>
-      <a href="/leave/my-history" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
-        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-          <i class="fa-solid fa-clock-rotate-left text-sm"></i>
-        </div>
-        <span class="text-xs font-bold text-slate-700">Riwayat Saya</span>
-      </a>
-      <% } %>
+        <% if (typeof user !== 'undefined' && user?.permissions?.leave_new) { %>
+        <a href="/leave/apply" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i class="fa-solid fa-calendar-plus text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Ajukan Cuti</span>
+        </a>
+        <% } %>
 
-      <% if (typeof user !== 'undefined' && user?.permissions?.leave_delegation) { %>
-      <a href="/leave/my-delegations" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-left transition-colors">
-        <div class="w-10 h-10 rounded-xl bg-indigo-100/50 text-indigo-700 flex items-center justify-center shrink-0">
-          <i class="fa-solid fa-hands-sharing text-sm"></i>
-        </div>
-        <div>
-          <span class="text-xs font-bold text-slate-800 block">Permintaan Delegasi</span>
-          <span class="text-[10.5px] text-slate-500 font-medium leading-none">Konfirmasi pengalihan tugas dari rekan kerja</span>
-        </div>
-      </a>
-      <% } %>
+        <% if (typeof user !== 'undefined' && user?.permissions?.leave_my) { %>
+        <a href="/leave/my-history" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Riwayat Saya</span>
+        </a>
+        <% } %>
 
-      <% if (typeof user !== 'undefined' && user?.permissions?.leave_manage) { %>
-      <a href="/leave/manage-requests" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left transition-colors">
-        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-          <i class="fa-solid fa-user-shield text-sm"></i>
-        </div>
-        <div>
-          <span class="text-xs font-bold text-slate-800 block">Manajemen & Persetujuan Cuti</span>
-          <span class="text-[10.5px] text-slate-500 font-medium leading-none">Validasi kuota harian dan verifikasi dokumen pengajuan staf</span>
-        </div>
-      </a>
-      <% } %>
+        <% if (typeof user !== 'undefined' && user?.permissions?.leave_delegation) { %>
+        <a href="/leave/my-delegations" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-left transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100/50 text-indigo-700 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-hands-sharing text-sm"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-800 block">Permintaan Delegasi</span>
+            <span class="text-[10.5px] text-slate-500 font-medium leading-none">Konfirmasi pengalihan tugas dari rekan kerja</span>
+          </div>
+        </a>
+        <% } %>
+
+        <% if (typeof user !== 'undefined' && user?.permissions?.leave_manage) { %>
+        <a href="/leave/manage-requests" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i class="fa-solid fa-user-shield text-sm"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-800 block">Manajemen & Persetujuan Cuti</span>
+            <span class="text-[10.5px] text-slate-500 font-medium leading-none">Validasi kuota harian dan verifikasi dokumen pengajuan staf</span>
+          </div>
+        </a>
+        <% } %>
+      </div>
+
     </div>
-
   </div>
-</div>
-<div id="permitMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 md:hidden transition-opacity duration-200 opacity-0" onclick="togglePermitMenuMobile()">
-  <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
+  <div id="permitMenuMobile" class="fixed inset-0 z-[9999] hidden bg-slate-950/30 md:hidden transition-opacity duration-200 opacity-0" onclick="togglePermitMenuMobile()">
+    <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 shadow-2xl space-y-4 transform translate-y-full transition-transform duration-200" onclick="event.stopPropagation()">
 
-    <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="togglePermitMenuMobile()"></div>
+      <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-2" onclick="togglePermitMenuMobile()"></div>
 
-    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Administrasi Izin</h3>
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Menu Administrasi Izin</h3>
 
-    <div class="grid grid-cols-2 gap-3 pt-2">
-      
-      <% if (typeof user !== 'undefined' && user?.permissions?.permit_new) { %>
-      <a href="/permit/new" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
-        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-          <i class="fa-solid fa-file-circle-plus text-sm"></i>
-        </div>
-        <span class="text-xs font-bold text-slate-700">Buat Pengajuan</span>
-      </a>
-      <% } %>
+      <div class="grid grid-cols-2 gap-3 pt-2">
 
-      <% if (typeof user !== 'undefined' && user?.permissions?.permit_my) { %>
-      <a href="/permit/history" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
-        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-          <i class="fa-solid fa-clock-rotate-left text-sm"></i>
-        </div>
-        <span class="text-xs font-bold text-slate-700">Riwayat Pengajuan</span>
-      </a>
-      <% } %>
+        <% if (typeof user !== 'undefined' && user?.permissions?.permit_new) { %>
+        <a href="/permit/new" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i class="fa-solid fa-file-circle-plus text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Buat Pengajuan</span>
+        </a>
+        <% } %>
 
-      <% if (typeof user !== 'undefined' && user?.role === 'WAKIL_DIREKTUR') { %>
-      <a href="/permit/incoming" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left transition-colors">
-        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-          <i class="fa-solid fa-user-shield text-sm"></i>
-        </div>
-        <div>
-          <span class="text-xs font-bold text-slate-800 block">Persidangan & Persetujuan Izin</span>
-          <span class="text-[10.5px] text-slate-500 font-medium leading-tight block mt-0.5">Otorisasi dokumen dinas luar, penugasan, dan verifikasi berkas staf</span>
-        </div>
-      </a>
-      <% } %>
+        <% if (typeof user !== 'undefined' && user?.permissions?.permit_my) { %>
+        <a href="/permit/history" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-700">Riwayat Pengajuan</span>
+        </a>
+        <% } %>
+
+        <% if (typeof user !== 'undefined' && user?.role === 'WAKIL_DIREKTUR') { %>
+        <a href="/permit/incoming" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100 text-left transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i class="fa-solid fa-user-shield text-sm"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-800 block">Persidangan & Persetujuan Izin</span>
+            <span class="text-[10.5px] text-slate-500 font-medium leading-tight block mt-0.5">Otorisasi dokumen dinas luar, penugasan, dan verifikasi berkas staf</span>
+          </div>
+        </a>
+        <% } %>
+      </div>
+
     </div>
-
   </div>
-</div>
 
 
   <div id="toastContainer" class="pointer-events-auto fixed top-5 right-5 z-[99999] flex flex-col gap-3.5"></div>
@@ -914,47 +914,48 @@
     }
 
     function openLeaveMenuMobile() {
-  const menu = document.getElementById('leaveMenuMobile');
-  menu.classList.remove('hidden');
-  // Berikan jeda mikro agar transisi transform Tailwind berjalan lancar
-  setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10);
-}
+      const menu = document.getElementById('leaveMenuMobile');
+      menu.classList.remove('hidden');
+      // Berikan jeda mikro agar transisi transform Tailwind berjalan lancar
+      setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10);
+    }
 
-function toggleLeaveMenuMobile() {
-  const menu = document.getElementById('leaveMenuMobile');
-  menu.querySelector('.transform').classList.add('translate-y-full');
-  // Sembunyikan container utama setelah animasi slide-down selesai
-  setTimeout(() => menu.classList.add('hidden'), 200);
-}
-function openPermitMenuMobile() {
-  const menu = document.getElementById('permitMenuMobile');
-  if (!menu) return;
-  
-  menu.classList.remove('hidden');
-  // Micro-delay untuk memastikan kelancaran transisi CSS opacity dan translate-y dari Tailwind
-  setTimeout(() => {
-    menu.classList.add('opacity-100');
-    menu.querySelector('.transform').classList.remove('translate-y-full');
-  }, 10);
-}
+    function toggleLeaveMenuMobile() {
+      const menu = document.getElementById('leaveMenuMobile');
+      menu.querySelector('.transform').classList.add('translate-y-full');
+      // Sembunyikan container utama setelah animasi slide-down selesai
+      setTimeout(() => menu.classList.add('hidden'), 200);
+    }
 
-function togglePermitMenuMobile() {
-  const menu = document.getElementById('permitMenuMobile');
-  if (!menu) return;
+    function openPermitMenuMobile() {
+      const menu = document.getElementById('permitMenuMobile');
+      if (!menu) return;
 
-  const content = menu.querySelector('.transform');
-  
-  // Jika menu sedang terbuka, kita slide-down ke bawah dan sembunyikan
-  if (!content.classList.contains('translate-y-full')) {
-    content.classList.add('translate-y-full');
-    menu.classList.remove('opacity-100');
-    setTimeout(() => {
-      menu.classList.add('hidden');
-    }, 200);
-  } else {
-    openPermitMenuMobile();
-  }
-}
+      menu.classList.remove('hidden');
+      // Micro-delay untuk memastikan kelancaran transisi CSS opacity dan translate-y dari Tailwind
+      setTimeout(() => {
+        menu.classList.add('opacity-100');
+        menu.querySelector('.transform').classList.remove('translate-y-full');
+      }, 10);
+    }
+
+    function togglePermitMenuMobile() {
+      const menu = document.getElementById('permitMenuMobile');
+      if (!menu) return;
+
+      const content = menu.querySelector('.transform');
+
+      // Jika menu sedang terbuka, kita slide-down ke bawah dan sembunyikan
+      if (!content.classList.contains('translate-y-full')) {
+        content.classList.add('translate-y-full');
+        menu.classList.remove('opacity-100');
+        setTimeout(() => {
+          menu.classList.add('hidden');
+        }, 200);
+      } else {
+        openPermitMenuMobile();
+      }
+    }
   </script>
 </body>
 

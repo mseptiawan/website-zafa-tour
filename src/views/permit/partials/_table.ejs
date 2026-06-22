@@ -1,7 +1,14 @@
 <%
 // =========================================================================
-// FUNCTION HELPERS: Mencegah error "getStatusConfig is not defined"
+// FUNCTION & OBJECT HELPERS: Mencegah error "not defined" global
 // =========================================================================
+const typeLabels = {
+  'SICK': 'Sakit',
+  'LEAVE': 'Cuti',
+  'PERMIT': 'Izin',
+  'OUT_OF_OFFICE': 'Dinas Luar'
+};
+
 function getStatusConfig(status) {
   switch (status) {
     case 'APPROVED':
@@ -26,16 +33,23 @@ function getStatusConfig(status) {
 }
 %>
 
+<!-- =========================================================================
+     DESKTOP MODE: RENDER DATA DALAM FORMAT TABEL ELEGAN (md:block)
+     ========================================================================= -->
 <div class="hidden md:block bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50 shadow-2xs">
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse text-[13px] table-fixed">
       <thead>
         <tr class="bg-slate-50/70 border-b border-slate-200/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider select-none">
-          <th class="py-4 px-6 w-[20%]">Jenis Izin</th>
-          <th class="py-4 px-6 w-[35%]">Alasan Pengajuan</th>
+          <% if (typeof type !== 'undefined' && type === 'history') { %>
+            <th class="py-4 px-6 w-[20%]">Jenis Izin</th>
+          <% } else { %>
+            <th class="py-4 px-6 w-[20%]">Pegawai</th>
+          <% } %>
+          <th class="py-4 px-6 w-[30%]">Alasan Pengajuan</th>
           <th class="py-4 px-6 w-[15%]">Tanggal Pelaksanaan</th>
           <th class="py-4 px-6 w-[15%] text-center">Dokumen</th>
-          <th class="py-4 px-6 w-[15%] text-center">Status</th>
+          <th class="py-4 px-6 w-[20%] text-center">Status / Aksi</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100 bg-white font-medium text-slate-600">
@@ -50,15 +64,23 @@ function getStatusConfig(status) {
         <% const config = getStatusConfig(permit.status); %>
         <tr class="hover:bg-slate-50/50 transition-colors">
 
+          <!-- 1. Kolom Kiri: Jenis Izin / Info Pegawai -->
           <td class="py-4 px-6 align-top">
-            <span class="font-semibold text-slate-800 block truncate">
-              <%= typeLabels[permit.type] || permit.type %>
-            </span>
+            <% if (typeof type !== 'undefined' && type === 'history') { %>
+              <span class="font-semibold text-slate-800 block truncate">
+                <%= typeLabels[permit.type] || permit.type %>
+              </span>
+            <% } else { %>
+              <span class="font-semibold text-slate-800 block truncate">
+                <%= permit.user && permit.user.employeeData ? permit.user.employeeData.fullName : (permit.user ? permit.user.name : 'Unknown') %>
+              </span>
+            <% } %>
             <span class="text-[10px] font-mono bg-slate-50 border border-slate-200/60 text-slate-500 px-1.5 py-0.5 rounded inline-block mt-1">
-              <%= permit.type %>
+              <%= typeLabels[permit.type] || permit.type %>
             </span>
           </td>
 
+          <!-- 2. Alasan Pengajuan -->
           <td class="py-4 px-6 align-top">
             <div class="w-full whitespace-normal break-words text-slate-600 font-medium leading-relaxed pr-2">
               <%= permit.reason %>
@@ -70,10 +92,12 @@ function getStatusConfig(status) {
             </div>
           </td>
 
+          <!-- 3. Tanggal Pelaksanaan -->
           <td class="py-4 px-6 font-medium text-slate-500 tabular-nums whitespace-nowrap align-top pt-4">
             <%= new Date(permit.date).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>
           </td>
 
+          <!-- 4. Dokumen Lampiran (Langsung Buka Blank Tab Baru) -->
           <td class="py-4 px-6 text-center align-top pt-3.5">
             <% if (permit.document) { %>
               <% const isImageDesktop = permit.document.match(/\.(jpeg|jpg|png|gif)$/i); %>
@@ -94,11 +118,30 @@ function getStatusConfig(status) {
             <% } %>
           </td>
 
+          <!-- 5. Status Badge / Tombol Validasi Atasan -->
           <td class="py-4 px-6 text-center align-top pt-3.5 select-none">
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide border <%= config.badge %>">
-              <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
-              <span><%= config.label.toUpperCase() %></span>
-            </div>
+            <% if (typeof type !== 'undefined' && type === 'history') { %>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide border <%= config.badge %>">
+                <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
+                <span><%= config.label.toUpperCase() %></span>
+              </div>
+            <% } else { %>
+              <% if (permit.status === 'PENDING') { %>
+                <div class="flex items-center justify-center gap-1.5">
+                  <button type="button" onclick="openApprovalModal('<%= permit._id %>', 'APPROVED')" class="h-8 px-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200/40 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+                    Setuju
+                  </button>
+                  <button type="button" onclick="openApprovalModal('<%= permit._id %>', 'REJECTED')" class="h-8 px-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200/40 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+                    Tolak
+                  </button>
+                </div>
+              <% } else { %>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide border <%= config.badge %>">
+                  <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
+                  <span><%= config.label.toUpperCase() %></span>
+                </div>
+              <% } %>
+            <% } %>
           </td>
 
         </tr>
@@ -109,6 +152,9 @@ function getStatusConfig(status) {
   </div>
 </div>
 
+<!-- =========================================================================
+     MOBILE MODE: RENDER DATA DALAM FORMAT CARD BOX PREMIUM (block md:hidden)
+     ========================================================================= -->
 <div class="block md:hidden space-y-3.5 w-full">
   <% if (permits.length === 0) { %>
   <div class="bg-white border border-slate-200/60 rounded-2xl py-10 text-center px-4">
@@ -119,10 +165,15 @@ function getStatusConfig(status) {
   <% const config = getStatusConfig(permit.status); %>
   <div class="bg-white border border-slate-200/60 rounded-2xl p-4 space-y-3.5 shadow-2xs">
 
+    <!-- Card Header -->
     <div class="flex items-center justify-between gap-2">
       <div>
         <h4 class="text-[13px] font-semibold text-slate-800 tracking-tight">
-          <%= typeLabels[permit.type] || permit.type %>
+          <% if (typeof type !== 'undefined' && type === 'history') { %>
+            <%= typeLabels[permit.type] || permit.type %>
+          <% } else { %>
+            <%= permit.user && permit.user.employeeData ? permit.user.employeeData.fullName : (permit.user ? permit.user.name : 'Unknown') %>
+          <% } %>
         </h4>
         <p class="text-[11px] text-slate-400 font-medium mt-0.5">
           <%= new Date(permit.date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
@@ -134,8 +185,9 @@ function getStatusConfig(status) {
       </div>
     </div>
     
+    <!-- Card Body: Alasan -->
     <div class="bg-slate-50/60 rounded-xl p-3 border border-slate-200/30 space-y-1 text-xs min-w-0">
-      <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wide">Alasan Pengajuan</p>
+      <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wide">Alasan Pengajuan (<%= typeLabels[permit.type] || permit.type %>)</p>
       <p class="text-[12px] font-medium text-slate-700 leading-relaxed whitespace-normal break-all sm:break-words"><%= permit.reason %></p>
 
       <% if (permit.status === 'REJECTED' && permit.notesByApprover) { %>
@@ -145,26 +197,49 @@ function getStatusConfig(status) {
       <% } %>
     </div>
 
+    <!-- Card Footer -->
     <div class="flex items-center justify-between gap-2 pt-0.5">
-      <span class="text-[11px] font-medium text-slate-500">
-        <i class="fa-solid fa-calendar-day text-slate-400 mr-1"></i>1 Hari Pelaksanaan
-      </span>
-
-      <% if (permit.document) { %>
-        <% const isImageMobile = permit.document.match(/\.(jpeg|jpg|png|gif)$/i); %>
-
-        <% if (isImageMobile) { %>
-          <a href="<%= permit.document %>" target="_blank" class="h-8 px-3.5 bg-amber-50 text-amber-600 text-[11px] font-medium rounded-lg flex items-center justify-center tracking-wide active:scale-95 border border-amber-100/30">
-            <i class="fa-solid fa-image mr-1 text-[10px]"></i> LIHAT GAMBAR
-          </a>
+      
+      <!-- Sisi Kiri Footer: Dokumen -->
+      <div>
+        <% if (permit.document) { %>
+          <% const isImageMobile = permit.document.match(/\.(jpeg|jpg|png|gif)$/i); %>
+          <% if (isImageMobile) { %>
+            <a href="<%= permit.document %>" target="_blank" class="h-8 px-3 bg-amber-50 text-amber-600 text-[11px] font-semibold rounded-lg inline-flex items-center border border-amber-100/30">
+              <i class="fa-solid fa-image mr-1 text-[10px]"></i> Berkas
+            </a>
+          <% } else { %>
+            <a href="<%= permit.document %>" target="_blank" class="h-8 px-3 bg-blue-50 text-blue-600 text-[11px] font-semibold rounded-lg inline-flex items-center border border-blue-100/30">
+              <i class="fa-solid fa-file-pdf mr-1 text-[10px]"></i> Berkas
+            </a>
+          <% } %>
         <% } else { %>
-          <a href="<%= permit.document %>" target="_blank" class="h-8 px-3.5 bg-blue-50 text-blue-600 text-[11px] font-medium rounded-lg flex items-center justify-center tracking-wide active:scale-95 border border-blue-100/30">
-            <i class="fa-solid fa-file-pdf mr-1 text-[10px]"></i> LIHAT BERKAS
-          </a>
+          <span class="text-[10.5px] text-slate-400 italic">Tanpa Lampiran</span>
         <% } %>
-      <% } else { %>
-        <span class="text-[10.5px] text-slate-400 italic">Tanpa Lampiran</span>
-      <% } %>
+      </div>
+
+      <!-- Sisi Kanan Footer: Validasi Aksi Atasan -->
+      <div>
+        <% if (typeof type !== 'undefined' && type === 'history') { %>
+          <span class="text-[11px] font-medium text-slate-500">
+            <i class="fa-solid fa-calendar-day text-slate-400 mr-1"></i>Selesai
+          </span>
+        <% } else { %>
+          <% if (permit.status === 'PENDING') { %>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="openApprovalModal('<%= permit._id %>', 'APPROVED')" class="h-8 px-3 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded-lg tracking-wide active:scale-95 border border-emerald-100">
+                Setuju
+              </button>
+              <button type="button" onclick="openApprovalModal('<%= permit._id %>', 'REJECTED')" class="h-8 px-3 bg-rose-50 text-rose-600 text-[11px] font-bold rounded-lg tracking-wide active:scale-95 border border-rose-100">
+                Tolak
+              </button>
+            </div>
+          <% } else { %>
+            <span class="text-[11px] font-medium text-slate-400 italic">Selesai Diproses</span>
+          <% } %>
+        <% } %>
+      </div>
+
     </div>
 
   </div>
