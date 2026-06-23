@@ -306,62 +306,66 @@
             </div>
           </div>
           <div class="mt-8 border-t border-slate-100 pt-6 pb-8">
-            <div class="flex items-center justify-between mb-5 border-b border-slate-100/80 pb-3">
-              <h3 class="text-[13px] font-semibold text-slate-700 tracking-tight">
-                Pengumuman Terbaru
-              </h3>
+  <div class="flex items-center justify-between mb-5 border-b border-slate-100/80 pb-3">
+    <h3 class="text-[13px] font-semibold text-slate-700 tracking-tight">
+      Pengumuman Terbaru
+    </h3>
 
-              <div class="flex items-center gap-4">
-                <a href="/announcement/new" class="inline-flex items-center gap-1 text-[12px] font-medium text-slate-500 hover:text-blue-600 transition-colors">
-                  <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                  <span class="hidden sm:inline">Buat</span>
-                </a>
+    <div class="flex items-center gap-4">
+      <a href="/announcement/new" class="inline-flex items-center gap-1 text-[12px] font-medium text-slate-500 hover:text-blue-600 transition-colors">
+        <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <span class="hidden sm:inline">Buat</span>
+      </a>
 
-                <a href="/announcement" class="text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
-                  Lihat Semua
-                </a>
-              </div>
+      <a href="/announcement" class="text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
+        Lihat Semua
+      </a>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    <% if (typeof latestAnnouncements !== 'undefined' && latestAnnouncements.length > 0) { %>
+      <% latestAnnouncements.slice(0, 2).forEach(ann => { %>
+        <!-- Tambahkan w-full dan max-w-full untuk kunci lebar -->
+        <a href="/announcement/<%= ann._id %>" class="flex items-center gap-4 p-4 rounded-2xl border border-slate-200/40 bg-slate-50/40 hover:bg-slate-50 transition w-full max-w-full overflow-hidden">
+          
+          <% if (ann.category === 'OFFICIAL') { %>
+            <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100/40 flex items-center justify-center text-blue-600 shrink-0">
+              <i class="fa-solid fa-bullhorn text-sm"></i>
             </div>
-            <div class="space-y-3">
-              <% if (typeof latestAnnouncements !== 'undefined' && latestAnnouncements.length > 0) { %>
-              <% latestAnnouncements.slice(0, 2).forEach(ann => { %>
-              <a href="/announcement/<%= ann._id %>" class="flex items-center gap-4 p-4 rounded-2xl border border-slate-200/40 bg-slate-50/40 hover:bg-slate-50 transition">
-
-                <% if (ann.category === 'OFFICIAL') { %>
-                <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100/40 flex items-center justify-center text-blue-600 shrink-0">
-                  <i class="fa-solid fa-bullhorn text-sm"></i>
-                </div>
-                <% } else { %>
-                <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200/50 flex items-center justify-center text-slate-500 shrink-0">
-                  <i class="fa-solid fa-leaf text-sm text-emerald-600"></i>
-                </div>
-                <% } %>
-
-                <div class="min-w-0 flex-1 space-y-0.5">
-                  <p class="text-xs font-bold text-slate-800 truncate tracking-tight"><%= ann.title %></p>
-
-                  <!-- DESKRIPSI ISI PENGUMUMAN DENGAN PEMBATASAN SATU BARIS -->
-                  <p class="text-[11px] text-slate-400 font-normal line-clamp-1 leading-tight">
-                    <%= ann.content %>
-                  </p>
-
-                  <p class="text-[10px] text-slate-400/80 font-medium tracking-wide pt-0.5">
-                    <%= ann.category === 'OFFICIAL' ? 'Resmi' : 'Umum' %> •
-                    <%= new Date(ann.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
-                  </p>
-                </div>
-              </a>
-              <% }) %>
-              <% } else { %>
-              <div class="p-5 text-center text-xs text-slate-400 bg-slate-50/50 rounded-2xl border border-slate-200/20">
-                Belum ada pengumuman terbaru.
-              </div>
-              <% } %>
+          <% } else { %>
+            <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200/50 flex items-center justify-center text-slate-500 shrink-0">
+              <i class="fa-solid fa-leaf text-sm text-emerald-600"></i>
             </div>
+          <% } %>
+
+          <!-- PENTING: Gunakan min-w-0 dan w-0 agar flex child tidak melebar -->
+          <div class="min-w-0 w-0 flex-1 space-y-0.5">
+            <p class="text-xs font-bold text-slate-800 truncate block tracking-tight">
+              <%= ann.title %>
+            </p>
+
+            <!-- PENTING: Tambahkan break-all agar teks panjang tanpa spasi terpotong -->
+            <p class="text-[11px] text-slate-400 font-normal line-clamp-1 leading-tight break-all">
+              <%= ann.content %>
+            </p>
+            
+            <p class="text-[10px] text-slate-400/80 font-medium tracking-wide pt-0.5 shrink-0">
+              <%= ann.category === 'OFFICIAL' ? 'Resmi' : 'Umum' %> •
+              <%= new Date(ann.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+            </p>
           </div>
-
+        </a>
+      <% }) %>
+    <% } else { %>
+      <div class="p-5 text-center text-xs text-slate-400 bg-slate-50/50 rounded-2xl border border-slate-200/20">
+        Belum ada pengumuman terbaru.
+      </div>
+    <% } %>
+  </div>
+</div>
         </div>
         <% } %>
 
