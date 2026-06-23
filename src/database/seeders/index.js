@@ -14,8 +14,8 @@ dotenv.config();
 
 const seeders = [
   // attendanceSeeder,
-  // completeLoanSeeder,
-  salaryComponentSeeder,
+  completeLoanSeeder,
+  // salaryComponentSeeder,
   // overtimeSeeder,
   // holidaysSeeder,
   // seedLeaveBalance,
