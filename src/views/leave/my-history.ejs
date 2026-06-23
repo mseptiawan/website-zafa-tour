@@ -96,15 +96,30 @@
     </div>
 
     <!-- TAB NAVIGATION & ACTION BAR (MOBILE) -->
-    <div class="flex flex-col gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none md:shadow-none select-none">
-      <div class="flex items-center justify-between gap-3 w-full md:hidden">
-        <h3 class="text-[14px] font-medium text-slate-800 tracking-tight">Daftar Berkas</h3>
-        <a href="/leave/apply" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 text-white text-[11px] font-medium rounded-full transition-all active:scale-95 outline-none cursor-pointer">
-          <i class="fa-solid fa-plus text-[9px]"></i>
-          <span>Ajukan</span>
-        </a>
-      </div>
+    <!-- TAB NAVIGATION & ACTION BAR -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none md:shadow-none select-none">
+  
+  <!-- Header & Tombol Aksi (Mobile View Only) -->
+  <div class="flex items-center justify-between gap-3 w-full md:hidden">
+    <h3 class="text-[14px] font-medium text-slate-800 tracking-tight">Daftar Berkas</h3>
+    <div class="flex items-center gap-2">
+      <!-- Tombol Cuti Bersama Mobile -->
+      <button onclick="openCompanyHolidayModal()" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-3 bg-indigo-50 border border-indigo-200/60 text-indigo-600 text-[11px] font-medium rounded-full active:scale-95 outline-none cursor-pointer">
+        <i class="fa-solid fa-calendar-days text-[10px]"></i>
+        <span>Libur</span>
+      </button>
+      <!-- Tombol Ajukan Mobile -->
+      <a href="/leave/apply" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 text-white text-[11px] font-medium rounded-full transition-all active:scale-95 outline-none cursor-pointer">
+        <i class="fa-solid fa-plus text-[9px]"></i>
+        <span>Ajukan</span>
+      </a>
+    </div>
+  </div>
 
+  <!-- Tab Bar & Tombol Desktop (Flex Container) -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+    <!-- Komponen Tab Navigasi bawaan Anda -->
+    <div class="flex-1">
       <%- include('../partials/_tab-nav', {
         tabs: [
           { 
@@ -121,6 +136,14 @@
       }) %>
     </div>
 
+    <!-- Tombol Cuti Bersama (Desktop View Only) -->
+    <button type="button" onclick="openCompanyHolidayModal()" class="hidden md:inline-flex items-center justify-center gap-2 h-10 px-4 bg-white border border-slate-200/80 hover:border-indigo-300 hover:bg-indigo-50/30 text-slate-600 hover:text-indigo-600 text-[12px] font-semibold rounded-xl transition-all  active:scale-98 cursor-pointer group">
+      <i class="fa-solid fa-calendar-days text-slate-400 group-hover:text-indigo-500 text-[13px] transition-colors"></i>
+      <span>Lihat Cuti Bersama</span>
+    </button>
+  </div>
+
+</div>
     <!-- =========================================================================
          TAB 1: CUTI BERJALAN / AKTIF
          ========================================================================= -->
