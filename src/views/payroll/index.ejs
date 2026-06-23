@@ -409,36 +409,49 @@
 
   // --- REVISI UTAMA FIX 404 & FIX RIBAUAN PERSEN DI HISTORY MODE ---
   function generateRowHTML(name, amount, isFixed, type) {
-    const colorClass = type === 'allowance' ? 'blue' : 'rose';
-    const readOnlyInput = isFixed || isReadOnlyMode ? 'readonly' : '';
-    const trashButton = (isFixed || isReadOnlyMode) ? `<div class="w-8 h-8"></div>` : `<button type="button" onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-${colorClass}-600 flex items-center justify-center transition-all text-xs "><i class="fa-solid fa-trash-can text-[11px]"></i></button>`;
-    
-    const isPercentage = name.toUpperCase().includes('BPJS') || name.toUpperCase().includes('PPH') || name.toUpperCase().includes('PAJAK');
-    
-    let formattedAmount = amount;
-    let unitSymbol = 'Rp';
-    let onInputHandler = 'oninput="formatRupiahInput(this)"';
+  const colorClass = type === 'allowance' ? 'blue' : 'rose';
 
-    if (isPercentage) {
-      // Jika statusnya DRAFT (nilai nominal kecil di database seperti angka 2)
-      if (!isReadOnlyMode && parseFloat(amount) < 100) {
-        unitSymbol = '%';
-        formattedAmount = amount;
-        onInputHandler = 'oninput="calculatePayroll()"';
-      } else {
-        // Jika statusnya HISTORY/CLOSED (nilainya sudah matang jadi rupiah 80000 di DB)
-        unitSymbol = 'Rp';
-        formattedAmount = formatIDRValue(amount);
-        onInputHandler = 'oninput="formatRupiahInput(this)"';
-      }
-    } else {
-      formattedAmount = type === 'allowance' && name.includes('Lembur') ? formatIDRValue(amount) : (isNumeric(amount) ? formatIDRValue(amount) : amount);
-    }
+  const isReadOnly = isFixed || isReadOnlyMode;
+  const readOnlyAttr = isReadOnly ? 'readonly' : '';
 
-    function isNumeric(n) { return !isNaN(parseFloat(n)) && isFinite(n); }
+  const trashButton = isReadOnly
+    ? `<div class="w-8 h-8"></div>`
+    : `<button type="button"
+        onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();"
+        class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-${colorClass}-600 flex items-center justify-center transition-all text-xs">
+        <i class="fa-solid fa-trash-can text-[11px]"></i>
+      </button>`;
 
-    return `<div class="flex items-center gap-2 ${type}-row animate-fadeIn"><input type="text" value="${name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">${unitSymbol}</span><input type="text" value="${formattedAmount}" ${onInputHandler} class="amount-input-${type} w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-${colorClass}-500/20" ${readOnlyInput}></div>${trashButton}</div>`;
-  }
+  const numericAmount = parseFloat(amount || 0);
+  const formattedAmount = formatIDRValue(numericAmount);
+
+  return `
+    <div class="flex items-center gap-2 ${type}-row animate-fadeIn">
+
+      <input type="text"
+        value="${name}"
+        class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px]"
+        readonly
+      >
+
+      <div class="w-32 relative">
+        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400">
+          Rp
+        </span>
+
+        <input type="text"
+          value="${formattedAmount}"
+          oninput="formatRupiahInput(this); calculatePayroll();"
+          class="amount-input-${type} w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none focus:ring-2 focus:ring-${colorClass}-500/20"
+          ${readOnlyAttr}
+        >
+      </div>
+
+      ${trashButton}
+
+    </div>
+  `;
+}
 
   function addAllowanceField() {
     const select = document.getElementById('masterAllowanceSelect');
@@ -582,9 +595,19 @@
             deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML(cName, item.amount, true, 'deduction'));
           });
 
-          if (data.loanDeduction && data.loanDeduction.amount > 0) {
-            deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML('Cicilan Pinjaman', data.loanDeduction.amount, true, 'deduction'));
-          }
+          if (data.loanDeduction && data.loanDeduction.length > 0) {
+  data.loanDeduction.forEach(loan => {
+    deductionContainer.insertAdjacentHTML(
+      'beforeend',
+      generateRowHTML(
+        'Cicilan Pinjaman',
+        loan.amount,
+        true,
+        'deduction'
+      )
+    );
+  });
+}
 
           updateContainerBackgrounds();
           calculatePayroll();
@@ -605,9 +628,19 @@
             deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML(item.componentName, item.amount, false, 'deduction'));
           });
 
-          if (data.loanDeduction && data.loanDeduction.amount > 0) {
-            deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML('Cicilan Pinjaman', data.loanDeduction.amount, true, 'deduction'));
-          }
+         if (data.loanDeduction && data.loanDeduction.length > 0) {
+  data.loanDeduction.forEach(loan => {
+    deductionContainer.insertAdjacentHTML(
+      'beforeend',
+      generateRowHTML(
+        'Cicilan Pinjaman',
+        loan.amount,
+        true,
+        'deduction'
+      )
+    );
+  });
+}
 
           updateContainerBackgrounds();
           loadOvertime(employeeId);
@@ -617,56 +650,59 @@
   }
 
   async function triggerTutupBuku(event) {
-    event.preventDefault();
+  event.preventDefault();
+  
+  const currentPeriod = document.getElementById('filterPeriod').value;
+  
+  // 1. Sesuaikan teks alert konfirmasi menjadi 5 pegawai target
+  if (!confirm(`Apakah Anda yakin ingin melakukan Tutup Buku periode ${currentPeriod} untuk 5 pegawai target? Data yang dikunci tidak dapat diubah kembali.`)) {
+    return;
+  }
+
+  const allCards = document.querySelectorAll('.employee-card');
+  
+  // 2. TAMBAHKAN USERNAME BARU DI SINI 👈
+  const targetUsernames = ["fajarjaniko", "adindarismayani", "abdulaziz", "meltisundari", "basoherman"];
+  const matchedEmployeeIds = [];
+
+  allCards.forEach(card => {
+    const nameText = card.querySelector('h4').innerText.toLowerCase().replace(/\s/g, "");
+    const empId = card.getAttribute('data-id');
     
-    const currentPeriod = document.getElementById('filterPeriod').value;
-    
-    if (!confirm(`Apakah Anda yakin ingin melakukan Tutup Buku periode ${currentPeriod} untuk 3 pegawai target? Data yang dikunci tidak dapat diubah kembali.`)) {
-      return;
+    const isTarget = targetUsernames.some(target => nameText.includes(target));
+    if (isTarget && empId) {
+      matchedEmployeeIds.push(empId);
     }
+  });
 
-    const allCards = document.querySelectorAll('.employee-card');
-    const targetUsernames = ["fajarjaniko", "abdulaziz", "ongkidwi"];
-    const matchedEmployeeIds = [];
+  if (matchedEmployeeIds.length === 0) {
+    alert("❌ Gagal memetakan ID Pegawai. Pastikan profil 5 pegawai target ada di database.");
+    return;
+  }
 
-    allCards.forEach(card => {
-      const nameText = card.querySelector('h4').innerText.toLowerCase().replace(/\s/g, "");
-      const empId = card.getAttribute('data-id');
-      
-      const isTarget = targetUsernames.some(target => nameText.includes(target));
-      if (isTarget && empId) {
-        matchedEmployeeIds.push(empId);
-      }
+  try {
+    const response = await fetch('/payroll/close-book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        employeeIds: matchedEmployeeIds,
+        periodMonth: currentPeriod
+      })
     });
 
-    if (matchedEmployeeIds.length === 0) {
-      alert("❌ Gagal memetakan ID Pegawai. Pastikan profil 3 pegawai target ada di database.");
-      return;
+    const result = await response.json();
+    
+    if (result.success) {
+      alert(`🔒 Sukses! ${result.message}`);
+      window.location.reload();
+    } else {
+      alert(`❌ Gagal: ${result.message}`);
     }
-
-    try {
-      const response = await fetch('/payroll/close-book', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          employeeIds: matchedEmployeeIds,
-          periodMonth: currentPeriod
-        })
-      });
-
-      const result = await response.json();
-      
-      if (result.success) {
-        alert(`🔒 Sukses! ${result.message}`);
-        window.location.reload();
-      } else {
-        alert(`❌ Gagal: ${result.message}`);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Terjadi kesalahan koneksi sistem.");
-    }
+  } catch (error) {
+    console.error(error);
+    alert("Terjadi kesalahan koneksi sistem.");
   }
+}
 
   function submitPayrollData() {
     const allCards = document.querySelectorAll('.employee-card');

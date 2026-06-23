@@ -67,8 +67,7 @@ export const confirmPayment = async (req, res, next) => {
     trip.status = "READY_TO_TRAVEL";
 
     await trip.save();
-
-    return res.redirect(`/finance/${trip._id}`);
+    return res.redirect(`/trip/approval/${trip._id}`);
   } catch (err) {
     next(err);
   }

@@ -6,6 +6,7 @@ import {
   getHistoryDetail,
   submitAppraisal,
   getHistoryList,
+  getMyKpiHistory,
 } from "../controllers/kpi.controller.js";
 
 const router = express.Router();
@@ -15,6 +16,10 @@ router.get("/kpi/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"])
 router.post("/kpi/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"]), submitAppraisal);
 
 router.get("/kpi/history-list", getHistoryList);
+
+router.get("/kpi/history-detail/:employeeId/:periode", getHistoryDetail);
+
+router.get("/kpi/my-history", roleMiddleware(["PEGAWAI"]), getMyKpiHistory);
 
 router.get("/kpi/history-detail/:employeeId/:periode", getHistoryDetail);
 export default router;

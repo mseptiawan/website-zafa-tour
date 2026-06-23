@@ -18,6 +18,17 @@ import puppeteer from "puppeteer";
 import ejs from "ejs";
 import path from "path";
 
+const generateRandomPassword = (length = 10) => {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
+  let password = "";
+
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  return password;
+};
+
 export const EmployeeService = {
   findAllEmployees: async (currentUser) => {
     let queryFilter = {};
@@ -85,7 +96,8 @@ export const EmployeeService = {
 
   createNewEmployee: async (data) => {
     const username = data.fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const password = await bcrypt.hash("zafasecret", 10);
+    const plainPassword = generateRandomPassword(12);
+    const password = await bcrypt.hash(plainPassword, 10);
 
     let createdUser = null;
     let createdEmployee = null;
@@ -126,7 +138,7 @@ export const EmployeeService = {
         EmployeeDocument.create({ employee_id: createdEmployee._id }),
       ]);
 
-      return createdEmployee;
+      return { createdEmployee, plainPassword };
     } catch (error) {
       console.log("[ROLLBACK] Gagal menyimpan data, memulai pembersihan database...");
 

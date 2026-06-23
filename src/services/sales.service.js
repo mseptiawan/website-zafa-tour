@@ -2,6 +2,9 @@ import { getPaginationMeta } from "../utils/pagination.js";
 import SalesVisit from "../models/SalesVisit.model.js";
 import { createSalesVisitSchema, updateSalesVisitSchema } from "../validations/sales.schema.js";
 import { validateData } from "../utils/validateData.js";
+import EmployeeCareer from "../models/employee/EmployeeCareer.js";
+import Bidang from "../models/basic/Bidang.model.js";
+import Employee from "../models/employee/Employee.model.js";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
@@ -90,6 +93,49 @@ const update = async ({ id, userId, body, file }) => {
 const findMine = (userId) => {
   return SalesVisit.find({ userId }).sort({ createdAt: -1 }).lean();
 };
+
+const findAllPaged = async ({ page, limit, skip, managerRoleId, isWadirOrDirektur }) => {
+  let queryFilter = {};
+
+  if (!isWadirOrDirektur && managerRoleId) {
+    const bidang = await Bidang.findOne({ managerRoleId });
+
+    if (bidang) {
+      const careers = await EmployeeCareer.find({ bidangId: bidang._id })
+        .select("employee_id")
+        .lean();
+      const employeeIds = careers.map((c) => c.employee_id);
+
+      const employees = await Employee.find({ _id: { $in: employeeIds } })
+        .select("userId")
+        .lean();
+      const userIdsUnderManager = employees.map((e) => e.userId);
+
+      queryFilter = { userId: { $in: userIdsUnderManager } };
+    } else {
+      queryFilter = { userId: null };
+    }
+  }
+
+  const [data, total] = await Promise.all([
+    SalesVisit.find(queryFilter)
+      .populate({
+        path: "userId",
+        select: "username",
+        populate: {
+          path: "employeeData",
+          select: "fullName foto_profile",
+        },
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    SalesVisit.countDocuments(queryFilter),
+  ]);
+
+  return { data, meta: getPaginationMeta({ page, limit, total }) };
+};
 export default {
   create,
   update,
@@ -97,4 +143,5 @@ export default {
   findMinePaged,
   findAll,
   findById,
+  findAllPaged,
 };

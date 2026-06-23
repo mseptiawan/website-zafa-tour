@@ -1,3 +1,4 @@
+import { getPayrollPeriod } from "../utils/payrollPeriod.js";
 import mongoose from "mongoose";
 import Attendance from "../models/Attendance.model.js";
 import Employee from "../models/employee/Employee.model.js";
@@ -181,29 +182,17 @@ export const getAttendanceHistory = async (sessionUser, query) => {
   let start;
   let end;
 
-  // ===========================================================================
-  // LOGIKA UTAMA: PENETAPAN BULAN CUT-OFF (27 - 26) SECARA OTOMATIS
-  // ===========================================================================
   if (startDate && endDate) {
-    // Jika HRD memfilter manual lewat form UI, pakai tanggal pilihan HRD
     start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
 
     end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
   } else {
-    // Jika pertama kali dibuka (kosong), hitung periode cut-off berjalan saat ini
-    const now = new Date();
+    const period = getPayrollPeriod();
 
-    if (now.getDate() < 27) {
-      // Contoh: Sekarang 21 Juni 2026 -> Periode Cut-off: 27 Mei 2026 s/d 26 Juni 2026
-      start = new Date(now.getFullYear(), now.getMonth() - 1, 27, 0, 0, 0, 0);
-      end = new Date(now.getFullYear(), now.getMonth(), 26, 23, 59, 59, 999);
-    } else {
-      // Contoh: Sekarang 28 Juni 2026 -> Periode Cut-off: 27 Juni 2026 s/d 26 Juli 2026
-      start = new Date(now.getFullYear(), now.getMonth(), 27, 0, 0, 0, 0);
-      end = new Date(now.getFullYear(), now.getMonth() + 1, 26, 23, 59, 59, 999);
-    }
+    start = period.start;
+    end = period.end;
   }
 
   // Query dasar MongoDB (Mencocokkan field checkIn dengan rentang waktu Date)

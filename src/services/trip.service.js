@@ -3,7 +3,19 @@ import Employee from "../models/employee/Employee.model.js";
 import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import Bidang from "../models/basic/Bidang.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
+
 import { X } from "lucide-react";
+
+export const attachEmployeeName = async (docs) => {
+  const employees = await Employee.find().select("userId fullName");
+
+  const map = new Map(employees.map((e) => [e.userId?.toString(), e.fullName]));
+
+  return docs.map((d) => ({
+    ...d.toObject(),
+    fullName: map.get(d.userId?.toString()) || "-",
+  }));
+};
 
 const parseAndValidateBudget = (budgetData) => {
   let budgetItems = budgetData?.items;
@@ -192,48 +204,36 @@ export const getApprovalTripsService = async (user) => {
   const baseFilter = {
     status: { $in: ["PENDING", "IN_REVIEW"] },
   };
-
-  /**
-   * =========================
-   * 1. DIREKTUR UTAMA
-   * =========================
-   */
+  // =========================
+  // 1. DIREKTUR UTAMA
+  // =========================
   if (role === "DIREKTUR_UTAMA") {
     baseFilter.currentStep = "DIREKTUR_UTAMA";
-
     console.log("FILTER (DIREKTUR):", baseFilter);
 
-    const trips = await BusinessTrip.find(baseFilter);
+    // TAMBAHKAN .populate("userId", "username") DI SINI
+    const trips = await BusinessTrip.find(baseFilter).populate("userId", "username");
     console.log("RESULT:", trips.length);
-
     return trips;
   }
 
-  /**
-   * =========================
-   * 2. WAKIL DIREKTUR
-   * =========================
-   * Bisa:
-   * - approve step dia sendiri
-   * - approve delegasi dari direktur
-   */
+  // =========================
+  // 2. WAKIL DIREKTUR
+  // =========================
   if (role === "WAKIL_DIREKTUR") {
     baseFilter.$or = [
-      {
-        currentStep: "WAKIL_DIREKTUR",
-      },
+      { currentStep: "WAKIL_DIREKTUR" },
       {
         currentStep: "DIREKTUR_UTAMA",
         "delegation.active": true,
         "delegation.to": "WAKIL_DIREKTUR",
       },
     ];
-
     console.log("FILTER (WAKIL DIREKTUR):", baseFilter);
 
-    const trips = await BusinessTrip.find(baseFilter);
+    // TAMBAHKAN .populate("userId", "username") DI SINI
+    const trips = await BusinessTrip.find(baseFilter).populate("userId", "username");
     console.log("RESULT:", trips.length);
-
     return trips;
   }
 
@@ -254,14 +254,15 @@ export const getApprovalTripsService = async (user) => {
   });
 
   if (!career) {
-    console.log(" career NOT FOUND");
+    console.log("❌ career NOT FOUND"); // Perbaikan: hapus panggilan bidang di sini
     return [];
   }
 
+  // Deklarasi bidang dilakukan di sini
   const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
 
   if (!bidang?.managerRoleId) {
-    console.log(" managerRole NOT FOUND");
+    console.log("❌ managerRole NOT FOUND");
     return [];
   }
 
@@ -269,13 +270,15 @@ export const getApprovalTripsService = async (user) => {
 
   console.log("FILTER (MANAGER):", baseFilter);
 
-  const trips = await BusinessTrip.find(baseFilter);
+  // Ambil data plus lakukan populate userId agar nama pengaju muncul di EJS
+  const trips = await BusinessTrip.find(baseFilter).populate("userId", "username");
 
   console.log("RESULT:", trips.length);
   console.log("==== APPROVAL DEBUG END ====\n");
 
   return trips;
 };
+
 const editableStatuses = ["PENDING", "REJECTED"];
 
 export const getEditableTripService = async (id, userId) => {

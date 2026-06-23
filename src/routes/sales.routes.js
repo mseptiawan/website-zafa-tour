@@ -12,6 +12,7 @@ import {
   edit,
   exportPdf,
   update,
+  employeeVisits,
 } from "../controllers/sales.controller.js";
 
 const router = express.Router();
@@ -30,8 +31,7 @@ router.post(
 // READ
 router.get("/my", myVisits);
 router.get("/my/export-pdf", exportPdf);
-router.get("/report", roleMiddleware(["HR", "MANAGER", "PIMPINAN"]), report);
-
+router.get("/employee-visits", employeeVisits);
 router.get("/:id/edit", authMiddleware, edit);
 
 router.post(

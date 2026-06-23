@@ -2,6 +2,8 @@ import ExpenseClaim from "../models/ExpenseClaim.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import ExpenseCategory from "../models/ExpenseCategory.model.js";
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
+import Bidang from "../models/basic/Bidang.model.js";
+import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 export const formExpense = async (req, res) => {
   try {
     const categories = await ExpenseCategory.find({ isActive: true }).sort({ name: 1 });
@@ -17,7 +19,6 @@ export const formExpense = async (req, res) => {
     res.status(500).send("Error loading expense form");
   }
 };
-
 export const createExpense = async (req, res) => {
   try {
     const categories = await ExpenseCategory.find({ isActive: true }).sort({ name: 1 });
@@ -37,7 +38,9 @@ export const createExpense = async (req, res) => {
     const user = req.session.user;
     if (!user) return res.status(401).send("Unauthorized");
 
-    const employee = await Employee.findOne({ userId: user._id });
+    const employee = await Employee.findOne({ userId: user._id }).populate({
+      path: "careerData",
+    });
     if (!employee) return res.status(404).send("Employee data tidak ditemukan");
 
     const isNoReceipt = !!noReceipt;
@@ -53,9 +56,39 @@ export const createExpense = async (req, res) => {
     }
 
     const cleanAmount = Number(amount) || 0;
+
     let status = "PENDING_FINANCE";
-    if (cleanAmount > 200000) {
+    let approverRoleId = null;
+
+    const currentUserRole = user.role?.toUpperCase();
+
+    const isManagerRole = [
+      "MANAGER_KEUANGAN",
+      "MANAGER_ADMINISTRASI",
+      "MANAGER_HAJI_UMRAH",
+      "WAKIL_DIREKTUR",
+      "DIREKTUR_UTAMA",
+    ].includes(currentUserRole);
+
+    if (cleanAmount > 200000 && !isManagerRole) {
       status = "PENDING_MANAGER";
+
+      const career = employee.careerData;
+      if (career && career.bidangId) {
+        const bidang = await Bidang.findById(career.bidangId);
+        if (bidang && bidang.managerRoleId) {
+          approverRoleId = bidang.managerRoleId;
+        }
+      }
+
+      if (!approverRoleId) {
+        return res
+          .status(400)
+          .send("Gagal: Bidang kerja atau Manager penanggung jawab tidak ditemukan.");
+      }
+    } else {
+      status = "PENDING_FINANCE";
+      approverRoleId = null;
     }
 
     await ExpenseClaim.create({
@@ -68,6 +101,7 @@ export const createExpense = async (req, res) => {
       noReceiptReason: isNoReceipt ? noReceiptReason : null,
       selfDeclaration: isNoReceipt ? !!selfDeclaration : false,
       status,
+      approverRoleId,
       proofFile: hasFile ? req.file.filename : null,
     });
 
@@ -101,19 +135,29 @@ export const myExpenses = async (req, res) => {
     res.status(500).send("Error loading my expenses");
   }
 };
-
 export const approvalManagerExpense = async (req, res) => {
   try {
     const { page } = req.query;
     const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
 
-    const totalExpenses = await ExpenseClaim.countDocuments({});
+    const currentUserRoleId = req.session.user.roleId;
+    const currentUserId = req.session.user._id;
+
+    const query = {
+      $or: [
+        { status: "PENDING_MANAGER", approverRoleId: currentUserRoleId },
+        { managerApprovedBy: currentUserId },
+        { status: "REJECTED", managerApprovedBy: currentUserId },
+      ],
+    };
+
+    const totalExpenses = await ExpenseClaim.countDocuments(query);
     const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
 
-    const expenses = await ExpenseClaim.find({})
+    const expenses = await ExpenseClaim.find(query)
       .populate("employeeId")
       .populate("category")
-      .sort({ createdAt: -1 })
+      .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit);
 

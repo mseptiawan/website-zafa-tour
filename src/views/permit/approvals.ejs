@@ -63,16 +63,15 @@
       ]
     }) %>
 
-    <!-- Tab Content -->
-    <div class="relative">
-      <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300">
-        <%- include('partials/_table', { permits: permits.filter(p => p.status === 'PENDING'), type: 'active' }) %>
-      </div>
+   <div class="relative">
+  <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300">
+    <%- include('partials/_table', { permits: permits.filter(p => p.status === 'PENDING'), type: 'active', isApprovalPage: true }) %>
+  </div>
 
-      <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300">
-        <%- include('partials/_table', { permits: permits.filter(p => p.status !== 'PENDING'), type: 'history' }) %>
-      </div>
-    </div>
+  <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300">
+    <%- include('partials/_table', { permits: permits.filter(p => p.status !== 'PENDING'), type: 'history', isApprovalPage: true }) %>
+  </div>
+</div>
 
   </div>
 
@@ -86,7 +85,7 @@
           <p class="text-sm text-slate-500 mt-2">Apakah Anda yakin ingin <span id="actionLabel"></span> pengajuan ini?</p>
 
           <div class="mt-6">
-            <textarea name="notes" placeholder="Tambahkan catatan (opsional)" class="w-full text-sm border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+            <textarea name="notesByApprover" placeholder="Tambahkan catatan (opsional)" class="w-full text-sm border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
           </div>
         </div>
 
@@ -121,7 +120,3 @@
     document.getElementById('approvalModal').classList.add('hidden');
   }
 </script>
-
-💡 Penjelasan Perbaikan:
-
-Dinamis action: Fungsi openApprovalModal sekarang secara otomatis mengubah form.action menjad

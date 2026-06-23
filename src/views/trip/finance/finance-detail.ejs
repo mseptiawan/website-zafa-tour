@@ -13,7 +13,7 @@
       </a>
 
       <!-- MAIN PANEL CARD -->
-      <div class="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden">
+      <div class="bg-white border border-slate-200/60 rounded-2xl  overflow-hidden">
 
         <!-- PANEL HEADER -->
         <div
@@ -139,7 +139,7 @@
             <div class="pt-6 border-t border-slate-100 flex justify-end">
               <form method="POST" action="/finance/<%= trip._id %>/process">
                 <button type="submit"
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm active:scale-[0.98]">
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[13px] font-medium transition-all  active:scale-[0.98]">
                   Proses Pembayaran
                 </button>
               </form>
@@ -176,7 +176,7 @@
 
                       <!-- FILLED STATE PREVIEW -->
                       <div id="dropzone-filled"
-                        class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-sm">
+                        class="hidden border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between ">
                         <div class="flex items-center gap-3 overflow-hidden">
                           <div
                             class="w-11 h-11 rounded-lg overflow-hidden border border-slate-200/80 bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -214,7 +214,7 @@
                     <!-- SUBMIT BUTTON -->
                     <div class="flex justify-end">
                       <button type="submit"
-                        class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-[13px] font-medium transition-all shadow-sm active:scale-[0.98]">
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[13px] font-medium transition-all  active:scale-[0.98]">
                         Kirim Bukti Transfer
                       </button>
                     </div>
@@ -232,7 +232,7 @@
                         class="p-4 border border-slate-200/60 rounded-xl bg-slate-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3 overflow-hidden">
                           <div
-                            class="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 font-semibold text-[11px] flex-shrink-0 shadow-sm">
+                            class="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 font-semibold text-[11px] flex-shrink-0 ">
                             FILE
                           </div>
                           <div class="overflow-hidden">
@@ -246,13 +246,13 @@
 
                         <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
                           <a href="<%= trip.payment.proof.url %>" target="_blank"
-                            class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[12px] font-medium text-slate-600 hover:bg-slate-50 transition-colors text-center shadow-sm">
+                            class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[12px] font-medium text-slate-600 hover:bg-slate-50 transition-colors text-center ">
                             Lihat Berkas
                           </a>
 
                           <form method="POST" action="/finance/<%= trip._id %>/confirm" class="w-full sm:w-auto">
                             <button type="submit"
-                              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-[12px] font-medium transition-all shadow-sm active:scale-[0.98]">
+                              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-[12px] font-medium transition-all  active:scale-[0.98]">
                               Konfirmasi Selesai (Paid)
                             </button>
                           </form>
@@ -267,7 +267,7 @@
                           <div
                             class="p-4 rounded-xl bg-emerald-50/40 border border-emerald-100/70 flex items-start gap-3">
                             <div
-                              class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[11px] flex-shrink-0 mt-0.5 shadow-sm">
+                              class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[11px] flex-shrink-0 mt-0.5 ">
                               ✓
                             </div>
                             <div class="space-y-0.5">

@@ -66,13 +66,13 @@
       }) %>
     </div>
 
-    <div id="tab-content-active" class="tab-pane space-y-4 block opacity-100 transition-all duration-300 transform translate-y-0">
-      <%- include('partials/_table', { permits: activePermits, type: 'active', getStatusConfig, typeLabels }) %>
-    </div>
+  <div id="tab-content-active" class="tab-pane space-y-4 block opacity-100 transition-all duration-300 transform translate-y-0">
+  <%- include('partials/_table', { permits: activePermits, type: 'active', isApprovalPage: false, getStatusConfig, typeLabels }) %>
+</div>
 
-    <div id="tab-content-history" class="tab-pane space-y-4 hidden opacity-0 transition-all duration-300 transform translate-y-2">
-      <%- include('partials/_table', { permits: historyPermits, type: 'history', getStatusConfig, typeLabels }) %>
-    </div>
+<div id="tab-content-history" class="tab-pane space-y-4 hidden opacity-0 transition-all duration-300 transform translate-y-2">
+  <%- include('partials/_table', { permits: historyPermits, type: 'history', isApprovalPage: false, getStatusConfig, typeLabels }) %>
+</div>
 
   </div>
 </div>

@@ -98,8 +98,8 @@ export const findMine = async ({ userId, page, limit }) => {
     }),
   };
 };
-
-export const findAll = async ({ page = 1, limit = 7 }) => {
+// Jalankan update pada fungsi findAll di assignment.service.js
+export const findAll = async ({ page = 1, limit = 7, currentUser }) => {
   const {
     skip,
     limit: perPage,
@@ -109,9 +109,20 @@ export const findAll = async ({ page = 1, limit = 7 }) => {
     limit,
   });
 
-  const total = await Assignment.countDocuments();
+  // Tentukan filter default kosong (untuk Wadir & Dirut bisa melihat semua secara default)
+  let filter = {};
+  const role = currentUser?.role?.toUpperCase();
 
-  const assignments = await Assignment.find()
+  // Logika Aturan Bisnis Baru:
+  if (["MANAGER_ADMINISTRASI", "MANAGER_HAJI_UMRAH", "MANAGER_KEUANGAN"].includes(role)) {
+    // Jika Manager Bidang, HANYA bisa melihat yang dibuat oleh dirinya sendiri
+    filter = { createdBy: currentUser._id };
+  }
+  // Jika Wadir atau Dirut, filter tetap kosong {} (artinya bisa melihat semua data buatan mereka + buatan para manager)
+
+  const total = await Assignment.countDocuments(filter);
+
+  const assignments = await Assignment.find(filter)
     .populate([{ path: "employees" }, { path: "createdBy" }])
     .sort({ createdAt: -1 })
     .skip(skip)

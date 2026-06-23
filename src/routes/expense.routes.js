@@ -28,7 +28,7 @@ const ALL_MANAGERS = [
 // ROUTE UNTUK PEGAWAI (UMUM)
 router.get("/create", authMiddleware, formExpense);
 router.post(
-  "/expense/create",
+  "/create",
   authMiddleware,
   uploadFile.single("proofFile"),
   validate(createExpenseSchema),

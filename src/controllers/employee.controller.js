@@ -282,12 +282,17 @@ export const createEmployeeApi = async (req, res, next) => {
   try {
     const validatedBody = createEmployeeSchema.parse(req.body);
 
-    const newEmployee = await EmployeeService.createNewEmployee(validatedBody);
+    const { newEmployee, plainPassword } = await EmployeeService.createNewEmployee(validatedBody);
 
     const username = validatedBody.fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
     try {
-      await sendNewEmployeeEmail(validatedBody.email, validatedBody.fullName, username);
+      await sendNewEmployeeEmail(
+        validatedBody.email,
+        validatedBody.fullName,
+        username,
+        plainPassword
+      );
       console.log("Email kredensial berhasil dikirim ke:", validatedBody.email);
     } catch (emailErr) {
       console.error("Gagal mengirim email kredensial:", emailErr);

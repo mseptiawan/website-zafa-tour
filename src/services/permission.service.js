@@ -46,6 +46,7 @@ export function getPermissions(role) {
 
     sales_new: false,
     sales_my: false,
+    sales_employee: false,
 
     announcement_new: true,
     announcement_all: true,
@@ -118,6 +119,7 @@ export function getPermissions(role) {
       permissions.leave_new = true;
       permissions.leave_my = true;
       permissions.leave_delegation = true;
+      permissions.leave_manage = true;
 
       permissions.permit_new = true;
       permissions.permit_my = true;
@@ -138,6 +140,7 @@ export function getPermissions(role) {
 
       permissions.sales_new = true;
       permissions.sales_my = true;
+      permissions.sales_employee = true;
 
       permissions.daily_log_create = true;
 
@@ -189,6 +192,7 @@ export function getPermissions(role) {
 
       permissions.sales_new = true;
       permissions.sales_my = true;
+      permissions.sales_employee = true;
 
       permissions.daily_log_create = true;
 
@@ -237,6 +241,7 @@ export function getPermissions(role) {
 
       permissions.sales_new = true;
       permissions.sales_my = true;
+      permissions.sales_employee = true;
 
       permissions.daily_log_create = true;
 
@@ -291,6 +296,7 @@ export function getPermissions(role) {
 
       permissions.sales_new = true;
       permissions.sales_my = true;
+      permissions.sales_employee = true;
 
       permissions.daily_log_create = true;
 
@@ -315,6 +321,8 @@ export function getPermissions(role) {
       permissions.phk = true;
 
       permissions.loan_manage_center = true;
+
+      permissions.leave_manage = true;
 
       permissions.kpi_list = true;
 

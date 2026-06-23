@@ -27,7 +27,7 @@ export const renderPayrollPage = async (req, res) => {
     periodsSet.add(currentMonthRaw);
 
     const availablePeriods = Array.from(periodsSet).sort((a, b) => b.localeCompare(a));
-
+    // const availablePeriods = ["2026-05", "2026-06", "2026-07"];
     res.render("payroll/index", {
       title: "Manajemen Payroll",
       user: req.user,
@@ -78,7 +78,7 @@ export const calculateEmployeePayroll = async (req, res) => {
     const salaryDoc = await EmployeeSalary.findOne({ employeeId });
     const basicSalary = salaryDoc ? salaryDoc.basicSalary : 0;
 
-    const activeLoanPayment = await LoanPayment.findOne({
+    const activeLoanPayments = await LoanPayment.find({
       employeeId,
       periodMonth: period,
       isPaid: false,
@@ -88,9 +88,10 @@ export const calculateEmployeePayroll = async (req, res) => {
       isHistory: false,
       data: {
         basicSalary,
-        loanDeduction: activeLoanPayment
-          ? { loanPaymentId: activeLoanPayment._id, amount: activeLoanPayment.amount }
-          : null,
+        loanDeduction: activeLoanPayments.map((l) => ({
+          loanPaymentId: l._id,
+          amount: l.amount,
+        })),
       },
     });
   } catch (error) {
@@ -299,20 +300,26 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
           totalDeductions += finalAmount;
         }
       });
-      const activeLoanPayment = await LoanPayment.findOne({
+      const activeLoanPayments = await LoanPayment.find({
         employeeId: empId,
         periodMonth: periodMonth,
         isPaid: false,
       });
 
-      let loanDeductionData = { loanPaymentId: null, amount: 0 };
-      if (activeLoanPayment) {
-        loanDeductionData = {
-          loanPaymentId: activeLoanPayment._id,
-          amount: activeLoanPayment.amount,
-        };
-        totalDeductions += activeLoanPayment.amount;
-      }
+      // let loanDeductionData = { loanPaymentId: null, amount: 0 };
+      let loanDeductionData = [];
+      let totalLoanDeduction = 0;
+      activeLoanPayments.forEach((loan) => {
+        loanDeductionData.push({
+          loanPaymentId: loan._id,
+          amount: loan.amount,
+        });
+
+        totalLoanDeduction += loan.amount;
+      });
+
+      // masuk ke total deduction payroll
+      totalDeductions += totalLoanDeduction;
 
       const finalPayroll = await Payroll.findOneAndUpdate(
         { employeeId: empId, periodMonth: periodMonth },
@@ -331,14 +338,19 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
         { upsert: true, new: true }
       );
 
-      if (activeLoanPayment) {
-        await LoanPayment.findByIdAndUpdate(activeLoanPayment._id, {
+      await LoanPayment.updateMany(
+        {
+          employeeId: empId,
+          periodMonth: periodMonth,
+          isPaid: false,
+        },
+        {
           $set: {
             isPaid: true,
             paidAt: new Date(),
           },
-        });
-      }
+        }
+      );
 
       processedResults.push(finalPayroll);
     }

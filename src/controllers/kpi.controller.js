@@ -99,3 +99,25 @@ export const getHistoryDetail = async (req, res, next) => {
     });
   }
 };
+export const getMyKpiHistory = async (req, res, next) => {
+  try {
+    const employeeId = req.session.user?.employeeId;
+
+    if (!employeeId) {
+      return res.status(403).send("Akses ditolak: Data pegawai tidak ditemukan pada session Anda.");
+    }
+
+    const kpiList = await kpiService.getKpiHistoryByEmployee(employeeId);
+
+    res.render("kpi/my-history", {
+      title: "Riwayat KPI Saya",
+      kpiList,
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).render("error", {
+      title: "Terjadi Kesalahan",
+      message: error.message,
+      statusCode: error.statusCode || 500,
+    });
+  }
+};

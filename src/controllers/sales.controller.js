@@ -230,3 +230,37 @@ export const exportPdf = async (req, res, next) => {
     next(err);
   }
 };
+export const employeeVisits = async (req, res, next) => {
+  try {
+    const determinedLimit = req.useragent?.isMobile ? 5 : 7;
+
+    const { page, limit, skip } = getPagination({
+      page: req.query.page,
+      limit: determinedLimit,
+    });
+
+    const userRoleName = req.session.user.role;
+    const userRoleId = req.session.user.roleId;
+
+    const isWadirOrDirektur = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(userRoleName);
+
+    const result = await salesService.findAllPaged({
+      page,
+      limit,
+      skip,
+      managerRoleId: userRoleId,
+      isWadirOrDirektur,
+    });
+
+    res.render("sales/employee-sales-visits", {
+      title: isWadirOrDirektur
+        ? "Monitoring Semua Kunjungan Sales"
+        : "Monitoring Kunjungan Bidang Anda",
+      visits: result.data,
+      pagination: result.meta,
+      error: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

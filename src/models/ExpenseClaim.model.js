@@ -40,6 +40,12 @@ const expenseClaimSchema = new mongoose.Schema(
       enum: ["PENDING_MANAGER", "PENDING_FINANCE", "PAID", "REJECTED"],
       default: "PENDING_FINANCE",
     },
+
+    approverRoleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
+      default: null,
+    },
     managerApprovedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

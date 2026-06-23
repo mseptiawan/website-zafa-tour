@@ -1,334 +1,281 @@
-<%- layout('layouts/main', { title }) %>
-
-  <% const isRejected=trip.status==="REJECTED" ; const action=isRejected ? `/trip/${trip._id}/resubmit` :
-    `/trip/${trip._id}`; const method=isRejected ? "POST" : "PUT" ; const lastReject=trip.approvals ?.slice() .reverse()
-    .find(a=> a.status === "REJECTED");
-    %>
-
-    <div class=" min-h-screen bg-slate-50/50 p-8 antialiased">
-
-      <div class="max-w-2xl mx-auto">
-
-        <!-- HEADER -->
-        <div class="mb-8">
-
-          <nav class="flex items-center gap-2 mb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-            <span>Area Kerja</span>
-            <span>/</span>
-            <span>Trip</span>
-            <span>/</span>
-            <span class="text-slate-700">
-              <%= isRejected ? "Resubmit" : "Edit" %>
-            </span>
-          </nav>
-
-          <h1 class="text-2xl font-semibold text-slate-800">
-            <%= isRejected ? "Resubmit Pengajuan Dinas" : "Edit Pengajuan Dinas" %>
-          </h1>
-
-          <p class="text-sm text-slate-500 mt-1">
-            <%= isRejected ? "Perbaiki pengajuan yang ditolak lalu ajukan kembali"
-              : "Perbarui data pengajuan perjalanan dinas" %>
-          </p>
-
-        </div>
-
-        <!-- ALERT -->
-        <% if (isRejected) { %>
-
-          <div class="mb-6 bg-red-50 border border-red-200 rounded-2xl p-5">
-
-            <div class="text-sm font-semibold text-red-700">
-              Pengajuan Ditolak
-            </div>
-
-            <p class="text-sm text-red-600 mt-1">
-              Perbaiki data pengajuan sebelum diajukan kembali.
-            </p>
-
-            <% if (lastReject?.note) { %>
-
-              <div class="mt-4 bg-white border border-red-100 rounded-xl p-4">
-
-                <div class="text-[11px] font-semibold uppercase tracking-wider text-red-500 mb-2">
-                  Catatan Penolakan
-                </div>
-
-                <div class="text-sm text-slate-700 leading-relaxed">
-                  <%= lastReject.note %>
-                </div>
-
-              </div>
-
-              <% } %>
-
-          </div>
-
-          <% } %>
-
-            <!-- CARD -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
-
-              <form action="<%= action %>?_method=<%= method %>" method="POST" class="p-8 space-y-6">
-
-                <!-- TITLE -->
-                <div class="space-y-1.5">
-
-                  <label class="text-[13px] font-semibold text-slate-700">
-                    Judul Perjalanan
-                  </label>
-
-                  <input type="text" name="title" value="<%= trip.title %>" minlength="5" maxlength="100" required
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-
-                </div>
-
-                <!-- PURPOSE -->
-                <div class="space-y-1.5">
-
-                  <label class="text-[13px] font-semibold text-slate-700">
-                    Tujuan Perjalanan
-                  </label>
-
-                  <select name="purpose" required
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all">
-
-                    <option value="">Pilih tujuan</option>
-
-                    <option value="KUNJUNGAN_SALES" <%=trip.purpose==="KUNJUNGAN_SALES" ? "selected" : "" %>>
-                      Kunjungan Sales
-                    </option>
-
-                    <option value="RAPAT" <%=trip.purpose==="RAPAT" ? "selected" : "" %>>
-                      Rapat
-                    </option>
-
-                    <option value="PELATIHAN" <%=trip.purpose==="PELATIHAN" ? "selected" : "" %>>
-                      Pelatihan
-                    </option>
-
-                    <option value="SURVEI" <%=trip.purpose==="SURVEI" ? "selected" : "" %>>
-                      Survei
-                    </option>
-
-                    <option value="LAINNYA" <%=trip.purpose==="LAINNYA" ? "selected" : "" %>>
-                      Lainnya
-                    </option>
-
-                  </select>
-
-                </div>
-
-                <!-- DATE -->
-                <div class="grid grid-cols-2 gap-4">
-
-                  <div class="space-y-1.5">
-
-                    <label class="text-[13px] font-semibold text-slate-700">
-                      Tanggal Mulai
-                    </label>
-
-                    <input type="date" name="startDate"
-                      value="<%= trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : '' %>" required
-                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-
-                  </div>
-
-                  <div class="space-y-1.5">
-
-                    <label class="text-[13px] font-semibold text-slate-700">
-                      Tanggal Selesai
-                    </label>
-
-                    <input type="date" name="endDate"
-                      value="<%= trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : '' %>" required
-                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-
-                  </div>
-
-                </div>
-
-                <!-- DESTINATION -->
-                <div class="space-y-1.5">
-
-                  <label class="text-[13px] font-semibold text-slate-700">
-                    Tujuan / Lokasi
-                  </label>
-
-                  <input type="text" name="destination" value="<%= trip.destination %>" minlength="3" maxlength="150"
-                    required
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-
-                </div>
-
-                <!-- DESCRIPTION -->
-                <div class="space-y-1.5">
-
-                  <label class="text-[13px] font-semibold text-slate-700">
-                    Deskripsi
-                  </label>
-
-                  <textarea name="description" rows="4" minlength="10" maxlength="1000" required
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none resize-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"><%= trip.description %></textarea>
-
-                </div>
-
-                <!-- BUDGET -->
-               <%
-  // Logika normalisasi data budget lama vs baru di level UI
-  let savedItems = [];
-  let currentTotal = 0;
-
-  if (trip.budget && typeof trip.budget === 'object' && Array.isArray(trip.budget.items)) {
-    savedItems = trip.budget.items;
-    currentTotal = trip.budget.total || 0;
-  } else if (typeof trip.budget === 'number' && trip.budget > 0) {
-    // Jalur fallback: Konversi data angka lama jadi format item default
-    savedItems = [{ title: 'Anggaran Pengajuan (Data Lama)', allocatedAmount: trip.budget, description: '' }];
-    currentTotal = trip.budget;
-  } else {
-    // Default jika data kosong melompong
-    savedItems = [{ title: '', allocatedAmount: 0, description: '' }];
-  }
+<% 
+  // 1. Inisialisasi variabel di posisi paling atas agar bisa diakses oleh fungsi layout di bawahnya
+  const isRejected = trip.status === "REJECTED"; 
+  const action = isRejected ? `/trip/${trip._id}/resubmit` : `/trip/${trip._id}`; 
+  const method = isRejected ? "POST" : "PUT"; 
+  const lastReject = trip.approvals?.slice().reverse().find(a => a.status === "REJECTED");
 %>
 
-<div class="space-y-3" id="budget-section">
-  <div class="flex items-center justify-between">
-    <label class="text-[13px] font-semibold text-slate-700">
-      Rincian Budget Kunjungan
-    </label>
-    <button type="button" id="add-budget-item" class="inline-flex items-center gap-1 text-[11.5px] font-bold text-blue-600 hover:text-blue-700 transition-colors">
-      <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
-      Tambah Item
-    </button>
-  </div>
+<%- layout('layouts/main', { title: isRejected ? "Resubmit Pengajuan Dinas" : "Edit Pengajuan Dinas" }) %>
 
-  <div id="budget-items-container" class="space-y-2.5">
-    <% savedItems.forEach(function(item, idx) { %>
-      <div class="budget-item bg-slate-50/50 border border-slate-200/60 rounded-xl p-3.5 space-y-2 relative group/item">
-        <div class="grid grid-cols-12 gap-2.5">
-          <div class="col-span-7">
-            <input type="text" name="budget[items][<%= idx %>][title]" value="<%= item.title %>" placeholder="Nama pengeluaran..." required
-              class="w-full bg-white border border-slate-200 rounded-lg text-[11.5px] px-3 py-2 text-slate-700 outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+<!-- 1. GLOBAL ISLAND CANVAS LAYER -->
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
+
+    <%- include('../../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Dinas Luar', 
+        title: isRejected ? 'Resubmit Pengajuan' : 'Edit Pengajuan Dinas', 
+        description: isRejected ? 'Perbaiki pengajuan yang ditolak lalu ajukan kembali ke sistem.' : 'Perbarui data pengajuan perjalanan dinas operasional resmi perusahaan.' 
+    }) %>
+
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
+      
+      <% if (isRejected) { %>
+        <div class="mb-6 bg-rose-50/60 border border-rose-100 rounded-2xl p-5">
+          <div class="text-[13px] font-bold text-rose-600 flex items-center gap-1.5">
+            <span>⚠️</span> Pengajuan Perjalanan Dinas Ditolak
           </div>
-          <div class="col-span-5 pr-7">
-            <input type="text" placeholder="Rp 0" value="Rp <%= (item.allocatedAmount || 0).toLocaleString('id-ID') %>" oninput="formatCurrency(this)"
-              class="budget-amount-display w-full bg-white border border-slate-200 rounded-lg text-[11.5px] px-3 py-2 text-slate-700 text-right outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-            <input type="hidden" name="budget[items][<%= idx %>][allocatedAmount]" class="budget-amount-raw" value="<%= item.allocatedAmount || 0 %>" />
+          <p class="text-[12px] text-rose-500/90 mt-1 font-medium">
+            Mohon sesuaikan kembali data pengeluaran anggaran atau rute rincian berdasarkan catatan di bawah.
+          </p>
+          <% if (lastReject?.note) { %>
+            <div class="mt-3.5 bg-white border border-rose-100/70 rounded-xl p-4 shadow-3xs">
+              <div class="text-[10px] font-bold uppercase tracking-wider text-rose-500 mb-1.5">
+                Catatan Penolakan Atasan:
+              </div>
+              <div class="text-[12.5px] text-slate-700 leading-relaxed font-medium">
+                <%= lastReject.note %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+
+      <form action="<%= action %>?_method=<%= method %>" method="POST" class="space-y-5">
+
+        <% if (typeof errors !== 'undefined' && errors?.global) { %>
+        <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
+          <%= errors.global %>
+        </div>
+        <% } %>
+
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Perjalanan</label>
+          <input type="text" name="title" placeholder="Masukkan judul agenda perjalanan..." minlength="5" maxlength="100" required
+                 value="<%= (typeof old !== 'undefined' && old?.title) ? old.title : trip.title %>" 
+                 class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.title) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
+          <% if (typeof errors !== 'undefined' && errors?.title) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.title %></p>
+          <% } %>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tujuan Perjalanan</label>
+          <div class="relative w-full" id="custom-dropdown">
+            <% 
+              let currentPurposeValue = (typeof old !== 'undefined' && old?.purpose) ? old.purpose : trip.purpose;
+              let currentPurposeLabel = 'Pilih tujuan perjalanan';
+              let labelClass = 'text-slate-400/60 font-normal italic';
+
+              const purposeOptions = {
+                'KUNJUNGAN_SALES': '💼 Kunjungan Sales',
+                'RAPAT': '🤝 Rapat / Meeting',
+                'PELATIHAN': '🎯 Pelatihan / Training',
+                'SURVEI': '🔍 Survei Lapangan',
+                'LAINNYA': '📌 Lainnya'
+              };
+
+              if (currentPurposeValue && purposeOptions[currentPurposeValue]) {
+                currentPurposeLabel = purposeOptions[currentPurposeValue];
+                labelClass = 'text-slate-800 font-medium';
+              }
+            %>
+            <input type="hidden" name="purpose" id="purpose-value" value="<%= currentPurposeValue %>" required>
+            <button type="button" onclick="toggleDropdown()" 
+                    class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.purpose) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-left flex items-center justify-between outline-none focus:bg-white focus:ring-0 transition-all">
+              <span id="dropdown-label" class="<%= labelClass %>">
+                <%= currentPurposeLabel %>
+              </span>
+              <svg id="dropdown-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div id="dropdown-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-lg p-1.5 space-y-0.5">
+              <% Object.keys(purposeOptions).forEach(key => { %>
+                <button type="button" onclick="selectOption('<%= key %>', '<%= purposeOptions[key] %>')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                  <span><%= purposeOptions[key] %></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                </button>
+              <% }) %>
+            </div>
+          </div>
+          <% if (typeof errors !== 'undefined' && errors?.purpose) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.purpose %></p>
+          <% } %>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Mulai</label>
+            <% const currentStartDate = (typeof old !== 'undefined' && old?.startDate) ? old.startDate : (trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : ''); %>
+            <input type="date" name="startDate" required value="<%= currentStartDate %>"
+                   class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.startDate) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] font-medium text-slate-700 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer" />
+            <% if (typeof errors !== 'undefined' && errors?.startDate) { %>
+              <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.startDate %></p>
+            <% } %>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Selesai</label>
+            <% const currentEndDate = (typeof old !== 'undefined' && old?.endDate) ? old.endDate : (trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : ''); %>
+            <input type="date" name="endDate" required value="<%= currentEndDate %>"
+                   class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.endDate) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] font-medium text-slate-700 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer" />
+            <% if (typeof errors !== 'undefined' && errors?.endDate) { %>
+              <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.endDate %></p>
+            <% } %>
           </div>
         </div>
-        <div>
-          <input type="text" name="budget[items][<%= idx %>][description]" value="<%= item.description %>" placeholder="Keterangan opsional..."
-            class="w-full bg-white border border-slate-200 rounded-lg text-[11px] px-3 py-1.5 text-slate-500 outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-        </div>
-        <button type="button" onclick="removeBudgetItem(this)" class="delete-budget-btn absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors <%= savedItems.length === 1 ? 'hidden' : '' %>">
-          <svg class="w-4 h-4 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v1a3 3 0 003 3h10M9 7h6" />
-          </svg>
-        </button>
-      </div>
-    <% }); %>
-  </div>
 
-  <div class="flex justify-between items-center bg-slate-100/60 rounded-xl px-4 py-2.5 text-[12px]">
-    <span class="font-medium text-slate-500">Estimasi Total Budget:</span>
-    <span id="budget-total-display" class="font-bold text-slate-800">Rp <%= currentTotal.toLocaleString('id-ID') %></span>
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tujuan / Lokasi</label>
+          <input type="text" name="destination" placeholder="Masukkan kota atau nama instansi tujuan..." minlength="3" maxlength="150" required
+                 value="<%= (typeof old !== 'undefined' && old?.destination) ? old.destination : trip.destination %>"
+                 class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.destination) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
+          <% if (typeof errors !== 'undefined' && errors?.destination) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.destination %></p>
+          <% } %>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Deskripsi Kegiatan</label>
+          <textarea name="description" rows="4" minlength="10" maxlength="1000" required placeholder="Jelaskan detail agenda dan target operasional perjalanan dinas Anda..."
+                    class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.description) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800 font-medium"><%= (typeof old !== 'undefined' && old?.description) ? old.description : trip.description %></textarea>
+          <% if (typeof errors !== 'undefined' && errors?.description) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.description %></p>
+          <% } %>
+        </div>
+
+        <%
+          let savedItems = [];
+          let currentTotal = 0;
+
+          if (trip.budget && typeof trip.budget === 'object' && Array.isArray(trip.budget.items)) {
+            savedItems = trip.budget.items;
+            currentTotal = trip.budget.total || 0;
+          } else if (typeof trip.budget === 'number' && trip.budget > 0) {
+            savedItems = [{ title: 'Anggaran Pengajuan (Data Lama)', allocatedAmount: trip.budget, description: '' }];
+            currentTotal = trip.budget;
+          } else {
+            savedItems = [{ title: '', allocatedAmount: 0, description: '' }];
+          }
+        %>
+        <div class="space-y-3 pt-2" id="budget-section">
+          <div class="flex items-center justify-between select-none">
+            <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Rincian Anggaran Kunjungan</label>
+            <button type="button" id="add-budget-item" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors outline-none cursor-pointer">
+              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Tambah Item
+            </button>
+          </div>
+
+          <div id="budget-items-container" class="space-y-2.5">
+            <% savedItems.forEach(function(item, idx) { %>
+              <div class="budget-item bg-slate-50/60 border border-slate-200/60 rounded-xl p-3.5 space-y-2 relative group/item">
+                <div class="grid grid-cols-12 gap-2.5">
+                  <div class="col-span-7">
+                    <input type="text" name="budget[items][<%= idx %>][title]" value="<%= item.title %>" placeholder="Nama pengeluaran (misal: Bensin & Tol)" required
+                      class="w-full h-9 bg-white border border-slate-200 rounded-lg text-[12px] font-medium px-3 text-slate-800 outline-none focus:border-slate-400 transition-colors shadow-2xs" />
+                  </div>
+                  <div class="col-span-5 pr-7">
+                    <input type="text" placeholder="Rp 0" value="Rp <%= (item.allocatedAmount || 0).toLocaleString('id-ID') %>" oninput="formatCurrency(this)"
+                      class="budget-amount-display w-full h-9 bg-white border border-slate-200 rounded-lg text-[12px] font-semibold px-3 text-slate-800 text-right outline-none focus:border-slate-400 transition-colors shadow-2xs tabular-nums" />
+                    <input type="hidden" name="budget[items][<%= idx %>][allocatedAmount]" class="budget-amount-raw" value="<%= item.allocatedAmount || 0 %>" />
+                  </div>
+                </div>
+                <div>
+                  <input type="text" name="budget[items][<%= idx %>][description]" value="<%= item.description %>" placeholder="Keterangan opsional..."
+                    class="w-full h-8 bg-white border border-slate-200 rounded-lg text-[11px] font-medium px-3 text-slate-400 placeholder:text-slate-400/50 outline-none focus:border-slate-400 transition-colors shadow-2xs" />
+                </div>
+                <button type="button" onclick="removeBudgetItem(this)" class="delete-budget-btn absolute top-3.5 right-3 text-slate-300 hover:text-rose-600 transition-colors <%= savedItems.length === 1 ? 'hidden' : '' %> cursor-pointer">
+                  <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v1a3 3 0 003 3h10M9 7h6" />
+                  </svg>
+                </button>
+              </div>
+            <% }); %>
+          </div>
+
+          <div class="flex justify-between items-center bg-slate-50/70 border border-slate-200/60 rounded-xl px-4 py-2.5 text-[12px] select-none shadow-2xs">
+            <span class="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Estimasi Total Anggaran:</span>
+            <span id="budget-total-display" class="font-bold text-slate-900 tabular-nums text-[13px]">Rp <%= currentTotal.toLocaleString('id-ID') %></span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Bertemu dengan (Klien / PIC)</label>
+          <input type="text" name="meetWith" placeholder="Contoh: M Septiawan" required 
+                 value="<%= (typeof old !== 'undefined' && old?.meetWith) ? old.meetWith : (trip.meetWith || '') %>"
+                 class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.meetWith) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
+          <% if (typeof errors !== 'undefined' && errors?.meetWith) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.meetWith %></p>
+          <% } %>
+        </div>
+
+        <div class="space-y-3 pt-1">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide block select-none">Timeline Rute Perjalanan</label>
+
+          <div class="relative pl-7 space-y-4 before:absolute before:left-[9px] before:top-3 before:bottom-3 before:w-[1.5px] before:bg-slate-200/60">
+            <div id="timelineBox" class="space-y-3.5">
+              <% if (trip.timeline && trip.timeline.length) { %>
+                <% trip.timeline.forEach((t, i) => { %>
+                  <div class="relative flex gap-3 items-center timeline-item group">
+                    <div class="absolute -left-[22px] flex items-center justify-center w-2 h-2 rounded-full bg-slate-900 ring-4 ring-slate-100/80 z-10 transition-all duration-200"></div>
+                    
+                    <input type="text" name="timeline[<%= i %>][address]" value="<%= t.address %>" placeholder="Alamat tujuan..." required
+                           class="flex-1 bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] font-medium text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-all focus:ring-0" />
+
+                    <input type="hidden" name="timeline[<%= i %>][order]" value="<%= i + 1 %>" />
+
+                    <button type="button" onclick="removeTimeline(this)"
+                            class="px-2.5 h-8.5 rounded-lg bg-slate-50 text-slate-400 border border-slate-200/40 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200/40 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-pointer shadow-2xs">
+                      <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                <% }) %>
+              <% } %>
+            </div>
+
+            <div class="relative flex items-center pt-1 select-none">
+              <div class="absolute -left-[26px] flex items-center justify-center w-4 h-4 rounded-full bg-white border border-slate-200 text-slate-400 z-10 shadow-3xs">
+                <svg class="w-2.5 h-2.5 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <button type="button" onclick="addTimeline()" 
+                      class="text-[12px] font-bold text-blue-600 hover:text-blue-700 transition-colors pl-1.5 cursor-pointer focus:outline-none">
+                Tambah destinasi kunjungan berikutnya...
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
+          <a href="/trip/my" class="inline-flex items-center justify-center h-10 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-xl px-5 text-[12px] font-semibold transition-colors">
+            Batal
+          </a>
+          <button type="submit" class="h-10 px-6 rounded-xl text-[12px] font-semibold transition-colors cursor-pointer shadow-sm outline-none text-white <%= isRejected ? 'bg-rose-500 hover:bg-rose-600' : 'bg-blue-600 hover:bg-blue-700' %>">
+            <%= isRejected ? "Publish Ulang Perjalanan" : "Simpan Perubahan" %>
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 </div>
 
-                <!-- MEET WITH -->
-                <div class="space-y-1.5">
+<script>
+  let timelineIndex = <%= trip.timeline ? trip.timeline.length : 0 %>;
+  let budgetItemIndex = <%= savedItems.length %>;
 
-                  <label class="text-[13px] font-semibold text-slate-700">
-                    Bertemu Dengan
-                  </label>
-
-                  <input type="text" name="meetWith" value="<%= trip.meetWith || '' %>"
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-
-                </div>
-
-                <!-- TIMELINE -->
-                <div class="space-y-2">
-
-                  <label class="text-[13px] font-semibold text-slate-700">
-                    Timeline Perjalanan
-                  </label>
-
-                  <div id="timelineBox" class="space-y-2">
-
-                    <% if (trip.timeline && trip.timeline.length) { %>
-
-                      <% trip.timeline.forEach((t, i)=> { %>
-
-                        <div class="flex gap-2 timeline-item">
-
-                          <input type="text" name="timeline[<%= i %>][address]" value="<%= t.address %>" required
-                            class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all" />
-
-                          <input type="hidden" name="timeline[<%= i %>][order]" value="<%= i + 1 %>" />
-
-                          <button type="button" onclick="removeTimeline(this)"
-                            class="px-3 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition">
-                            ✕
-                          </button>
-
-                        </div>
-
-                        <% }) %>
-
-                          <% } %>
-
-                  </div>
-
-                  <button type="button" onclick="addTimeline()" class="text-sm text-indigo-600 hover:text-indigo-700">
-                    + Tambah Timeline
-                  </button>
-
-                </div>
-
-                <!-- SUBMIT -->
-                <div class="pt-4 border-t border-slate-100">
-
-                  <button type="submit" class="
-              w-full
-              text-white
-              py-3
-              rounded-xl
-              text-sm
-              font-medium
-              transition-all
-
-              <%= isRejected
-                ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-slate-900 hover:bg-slate-800'
-              %>
-            ">
-                    <%= isRejected ? "Ajukan Ulang Pengajuan" : "Simpan Perubahan" %>
-                  </button>
-
-                </div>
-
-              </form>
-
-            </div>
-
-      </div>
-
-    </div>
-
-    <script>
-     let timelineIndex = <%= trip.timeline ? trip.timeline.length : 0 %>;
-  let budgetItemIndex = <%= savedItems.length %>; // Mulai melacak dari jumlah item yang ada saat ini
-
-  // 1. FUNGSI FORMAT CURRENCY (Menggunakan logika regex lama lu)
   function formatCurrency(input) {
     let value = input.value.replace(/\D/g, ""); 
-    
     let rawInput = input.closest('.col-span-5').querySelector('.budget-amount-raw');
-    rawInput.value = value; // Simpan angka bersih ke hidden input
+    rawInput.value = value; 
 
     if (!value) {
       input.value = "";
@@ -340,7 +287,6 @@
     calculateTotalBudget();
   }
 
-  // 2. FUNGSI HITUNG TOTAL ESTIMASI BUDGET
   function calculateTotalBudget() {
     let total = 0;
     document.querySelectorAll('.budget-amount-raw').forEach(input => {
@@ -349,30 +295,28 @@
     document.getElementById('budget-total-display').innerText = 'Rp ' + total.toLocaleString('id-ID');
   }
 
-  // 3. EVENT LISTENER: TOMBOL TAMBAH BARIS ITEM BUDGET BARU
   document.getElementById('add-budget-item').addEventListener('click', function() {
     const container = document.getElementById('budget-items-container');
-    
     const newItem = document.createElement('div');
-    newItem.className = 'budget-item bg-slate-50/50 border border-slate-200/60 rounded-xl p-3.5 space-y-2 relative group/item';
+    newItem.className = 'budget-item bg-slate-50/60 border border-slate-200/60 rounded-xl p-3.5 space-y-2 relative group/item shadow-2xs';
     newItem.innerHTML = `
       <div class="grid grid-cols-12 gap-2.5">
         <div class="col-span-7">
           <input type="text" name="budget[items][${budgetItemIndex}][title]" placeholder="Nama pengeluaran..." required
-            class="w-full bg-white border border-slate-200 rounded-lg text-[11.5px] px-3 py-2 text-slate-700 outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+            class="w-full h-9 bg-white border border-slate-200 rounded-lg text-[12px] font-medium px-3 text-slate-800 outline-none focus:border-slate-400 transition-colors shadow-2xs" />
         </div>
         <div class="col-span-5 pr-7">
           <input type="text" placeholder="Rp 0" oninput="formatCurrency(this)"
-            class="budget-amount-display w-full bg-white border border-slate-200 rounded-lg text-[11.5px] px-3 py-2 text-slate-700 text-right outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+            class="budget-amount-display w-full h-9 bg-white border border-slate-200 rounded-lg text-[12px] font-semibold px-3 text-slate-800 text-right outline-none focus:border-slate-400 transition-colors shadow-2xs tabular-nums" />
           <input type="hidden" name="budget[items][${budgetItemIndex}][allocatedAmount]" class="budget-amount-raw" value="0" />
         </div>
       </div>
       <div>
         <input type="text" name="budget[items][${budgetItemIndex}][description]" placeholder="Keterangan opsional..."
-          class="w-full bg-white border border-slate-200 rounded-lg text-[11px] px-3 py-1.5 text-slate-500 outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition-all" />
+          class="w-full h-8 bg-white border border-slate-200 rounded-lg text-[11px] font-medium px-3 text-slate-400 placeholder:text-slate-400/50 outline-none focus:border-slate-400 transition-colors shadow-2xs" />
       </div>
-      <button type="button" onclick="removeBudgetItem(this)" class="delete-budget-btn absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors">
-        <svg class="w-4 h-4 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button type="button" onclick="removeBudgetItem(this)" class="delete-budget-btn absolute top-3.5 right-3 text-slate-300 hover:text-rose-600 transition-colors cursor-pointer">
+        <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v1a3 3 0 003 3h10M9 7h6" />
         </svg>
       </button>
@@ -383,7 +327,6 @@
     toggleDeleteButtons();
   });
 
-  // 4. FUNGSI HAPUS BARIS
   function removeBudgetItem(button) {
     const itemRow = button.closest('.budget-item');
     itemRow.remove();
@@ -392,7 +335,6 @@
     toggleDeleteButtons();
   }
 
-  // 5. HIDDEN/SHOW TOMBOL HAPUS
   function toggleDeleteButtons() {
     const rows = document.querySelectorAll('.budget-item');
     rows.forEach(row => {
@@ -405,7 +347,6 @@
     });
   }
 
-  // 6. RE-INDEXING NAMESPACE INPUT SETELAH PROSES HAPUS ROW
   function reIndexItems() {
     const rows = document.querySelectorAll('.budget-item');
     budgetItemIndex = 0;
@@ -416,46 +357,83 @@
       budgetItemIndex = idx + 1;
     });
   }
-      // ADD TIMELINE
-      function addTimeline() {
 
-        const box = document.getElementById("timelineBox");
+  function addTimeline() {
+    const box = document.getElementById("timelineBox");
+    const div = document.createElement("div");
+    div.className = "relative flex gap-3 items-center timeline-item group animate-fadeIn";
 
-        const div = document.createElement("div");
-
-        div.className = "flex gap-2 timeline-item";
-
-        div.innerHTML = `
-      <input
-        type="text"
+    div.innerHTML = `
+      <div class="absolute -left-[22px] flex items-center justify-center w-2 h-2 rounded-full bg-slate-300 ring-4 ring-slate-50 z-10 group-hover:bg-slate-800 transition-all duration-200"></div>
+      
+      <input type="text"
         name="timeline[${timelineIndex}][address]"
-        placeholder="Alamat berikutnya"
+        placeholder="Alamat tujuan berikutnya..."
         required
-        class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-400 transition-all"
-      />
+        class="flex-1 bg-slate-50/60 border border-slate-200/70 rounded-xl px-4 py-2.5 text-[13px] font-medium text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-all focus:ring-0" />
 
-      <input
-        type="hidden"
+      <input type="hidden"
         name="timeline[${timelineIndex}][order]"
-        value="${timelineIndex + 1}"
-      />
+        value="${timelineIndex + 1}" />
 
-      <button
-        type="button"
+      <button type="button"
         onclick="removeTimeline(this)"
-        class="px-3 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition"
-      >
-        ✕
+        class="px-2.5 h-8.5 rounded-lg bg-slate-50 text-slate-400 border border-slate-200/40 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200/40 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-pointer shadow-2xs">
+        <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
       </button>
     `;
 
-        box.appendChild(div);
+    box.appendChild(div);
+    timelineIndex++;
+  }
 
-        timelineIndex++;
-      }
+  function removeTimeline(btn) {
+    btn.parentElement.remove();
+  }
 
-      // REMOVE
-      function removeTimeline(btn) {
-        btn.parentElement.remove();
-      }
-    </script>
+  function toggleDropdown() {
+    const menu = document.getElementById('dropdown-menu');
+    const arrow = document.getElementById('dropdown-arrow');
+
+    if (menu.classList.contains('hidden')) {
+      menu.classList.remove('hidden');
+      setTimeout(() => {
+        menu.classList.remove('opacity-0', 'scale-95');
+        menu.classList.add('opacity-100', 'scale-100');
+      }, 10);
+      arrow.classList.add('rotate-180');
+    } else {
+      closeDropdown();
+    }
+  }
+
+  function closeDropdown() {
+    const menu = document.getElementById('dropdown-menu');
+    const arrow = document.getElementById('dropdown-arrow');
+
+    menu.classList.remove('opacity-100', 'scale-100');
+    menu.classList.add('opacity-0', 'scale-95');
+    arrow.classList.remove('rotate-180');
+
+    setTimeout(() => {
+      menu.classList.add('hidden');
+    }, 150);
+  }
+
+  function selectOption(value, label) {
+    document.getElementById('purpose-value').value = value;
+    const labelEl = document.getElementById('dropdown-label');
+    labelEl.textContent = label;
+    labelEl.className = 'text-slate-800 font-medium';
+    closeDropdown();
+  }
+
+  window.addEventListener('click', function (e) {
+    const dropdown = document.getElementById('custom-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+      closeDropdown();
+    }
+  });
+</script>

@@ -1,172 +1,167 @@
 import mongoose from "mongoose";
-
+import User from "../../models/basic/User.model.js";
+import Employee from "../../models/employee/Employee.model.js";
 import Loan from "../../models/loan/Loan.model.js";
 import LoanApproval from "../../models/loan/LoanApproval.model.js";
 import LoanPayment from "../../models/loan/loanPayment.model.js";
 
-import Employee from "../../models/employee/Employee.model.js";
-import EmployeeSalary from "../../models/employee/EmployeeSalary.model.js";
-import User from "../../models/basic/User.model.js";
-import Role from "../../models/basic/Role.model.js";
-
-/**
- * CONFIG WORKFLOW
- */
-const WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
-
-/**
- * Helper: get role + user
- */
-async function getUserByRole(roleName) {
-  const role = await Role.findOne({ name: roleName });
-  if (!role) throw new Error(`Role ${roleName} tidak ditemukan`);
-
-  const user = await User.findOne({ roleId: role._id });
-  if (!user) throw new Error(`User dengan role ${roleName} tidak ditemukan`);
-
-  return user;
-}
-
-/**
- * MAIN SEED FUNCTION
- */
-export async function seedLoanSystem() {
+const seedLoansCustom = async () => {
   try {
-    console.log("🚀 Starting Loan Seeder...");
+    const targetUsernames = [
+      "fajarjaniko",
+      "adindarismayani",
+      "abdulaziz",
+      "meltisundari",
+      "basoherman",
+    ];
 
-    // =========================================================
-    // 1. AMBIL EMPLOYEE SAMPLE
-    // =========================================================
-    const employee = await Employee.findOne({});
-    if (!employee) throw new Error("Tidak ada employee di database");
+    // 1. Cari User berdasarkan Username target
+    const users = await User.find({
+      username: { $in: targetUsernames.map((name) => new RegExp(name, "i")) },
+    });
 
-    let salary = await EmployeeSalary.findOne({ employeeId: employee._id });
-
-    if (!salary) {
-      salary = await EmployeeSalary.create({
-        employeeId: employee._id,
-        basicSalary: 5000000,
-      });
+    if (!users.length) {
+      console.log("❌ Tidak ada user target yang ditemukan untuk seeding loan.");
+      return;
     }
 
-    const basicSalary = salary.basicSalary;
-
-    // =========================================================
-    // 2. HITUNG LOAN SAMPLE SESUAI RULE
-    // =========================================================
-    const amountRequested = basicSalary * 2; // aman (max 3x)
-    const tenorMonths = 6;
-    const monthlyDeduction = Math.ceil(amountRequested / tenorMonths);
-
-    const reason = "Dana pinjaman untuk kebutuhan renovasi rumah keluarga mendesak";
-
-    // =========================================================
-    // 3. CREATE LOAN
-    // =========================================================
-    const loan = await Loan.create({
-      employeeId: employee._id,
-      amountRequested,
-      tenorMonths,
-      monthlyDeduction,
-      reason,
-      status: "PENDING",
-    });
-
-    console.log("Loan created:", loan._id);
-
-    // =========================================================
-    // 4. CREATE APPROVAL CHAIN
-    // =========================================================
-    const approvals = [];
-
-    for (let i = 0; i < WORKFLOW.length; i++) {
-      const roleName = WORKFLOW[i];
-      const user = await getUserByRole(roleName);
-
-      approvals.push({
-        loanId: loan._id,
-        step: roleName,
-        approverId: i === 0 ? user._id : null,
-        status: i === 0 ? "PENDING" : "PENDING",
-      });
+    // 2. Ambil ID Employee terkait
+    const employees = await Employee.find({ userId: { $in: users.map((u) => u._id) } });
+    if (!employees.length) {
+      console.log("❌ Data Employee tidak ditemukan untuk user tersebut.");
+      return;
     }
 
-    await LoanApproval.insertMany(approvals);
-
-    console.log("Approval chain created");
-
-    // =========================================================
-    // 5. SIMULASI APPROVAL STEP 1 & 2 (OPTIONAL)
-    // =========================================================
-    const step1 = await LoanApproval.findOne({
-      loanId: loan._id,
-      step: "WAKIL_DIREKTUR",
+    console.log(`🧹 Membersihkan data Loan lama khusus untuk 5 pegawai target...`);
+    const employeeIds = employees.map((e) => e._id);
+    await Loan.deleteMany({ employeeId: { $in: employeeIds } });
+    await LoanApproval.deleteMany({
+      loanId: { $in: await Loan.find({ employeeId: { $in: employeeIds } }).distinct("_id") },
     });
+    await LoanPayment.deleteMany({ employeeId: { $in: employeeIds } });
 
-    step1.status = "APPROVED";
-    step1.approverId = (await getUserByRole("WAKIL_DIREKTUR"))._id;
-    step1.actionDate = new Date();
-    await step1.save();
+    const loanRecords = [];
+    const approvalRecords = [];
+    const paymentRecords = [];
 
-    const step2 = await LoanApproval.findOne({
-      loanId: loan._id,
-      step: "DIREKTUR_UTAMA",
-    });
+    // Definisikan waktu pencairan simulasi
+    const cairBulanMei = new Date(Date.UTC(2026, 4, 15)); // 15 Mei 2026
+    const cairBulanJuni = new Date(Date.UTC(2026, 5, 10)); // 10 Juni 2026
 
-    step2.status = "APPROVED";
-    step2.approverId = (await getUserByRole("DIREKTUR_UTAMA"))._id;
-    step2.actionDate = new Date();
-    await step2.save();
+    for (const emp of employees) {
+      const userObj = users.find((u) => u._id.toString() === emp.userId.toString());
+      const username = userObj ? userObj.username.toLowerCase() : "";
 
-    console.log("Step 1 & 2 approved");
+      // =========================================================================
+      // SKENARIO 1: SEMUA PEGAWAI MENCAIRKAN PINJAMAN DI BULAN MEI
+      // =========================================================================
+      const loanMeiId = new mongoose.Types.ObjectId();
+      const amountMei = 3000000; // Total pinjaman 3 Juta
+      const tenorMei = 3; // Tenor 3 bulan
+      const cicilanMei = 1000000; // 1 Juta per bulan
 
-    // =========================================================
-    // 6. FINAL APPROVAL (MANAGER KEUANGAN)
-    // =========================================================
-    const financeUser = await getUserByRole("MANAGER_KEUANGAN");
-
-    const financeApproval = await LoanApproval.findOne({
-      loanId: loan._id,
-      step: "MANAGER_KEUANGAN",
-    });
-
-    financeApproval.status = "APPROVED";
-    financeApproval.approverId = financeUser._id;
-    financeApproval.actionDate = new Date();
-    await financeApproval.save();
-
-    loan.status = "APPROVED_BY_MANAGEMENT";
-    await loan.save();
-
-    console.log("Final approval done");
-    // =========================================================
-    // 7. CREATE PAYMENT SCHEDULE
-    // =========================================================
-    const payments = [];
-
-    const startDate = new Date();
-
-    for (let i = 1; i <= tenorMonths; i++) {
-      const next = new Date(startDate.getFullYear(), startDate.getMonth() + i, 1);
-
-      const periodMonth = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}`;
-
-      payments.push({
-        loanId: loan._id,
-        employeeId: employee._id,
-        installmentNumber: i,
-        amount: monthlyDeduction,
-        periodMonth,
-        isPaid: false,
+      loanRecords.push({
+        _id: loanMeiId,
+        employeeId: emp._id,
+        amountRequested: amountMei,
+        tenorMonths: tenorMei,
+        monthlyDeduction: cicilanMei,
+        reason: "Pinjaman keperluan mendesak keluarga (Seeder Mei)",
+        status: "APPROVED",
+        disbursementDate: cairBulanMei,
+        paymentProof: "/uploads/files/bukti_transfer_mei.pdf",
       });
+
+      // Generate history approval lengkap untuk Manager Keuangan (Disbursed)
+      approvalRecords.push({
+        loanId: loanMeiId,
+        step: "MANAGER_KEUANGAN",
+        status: "APPROVED",
+        note: "Dana seeder Mei telah ditransfer.",
+        actionDate: cairBulanMei,
+      });
+
+      // Jadwal Angsuran Pinjaman Mei (Cair Mei, tagihan dimulai Juni, Juli, Agustus)
+      for (let i = 1; i <= tenorMei; i++) {
+        const nextDate = new Date(cairBulanMei.getFullYear(), cairBulanMei.getMonth() + i, 1);
+        const periodMonth = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, "0")}`;
+
+        paymentRecords.push({
+          loanId: loanMeiId,
+          employeeId: emp._id,
+          installmentNumber: i,
+          amount: cicilanMei,
+          periodMonth: periodMonth, // i=1 -> 2026-06, i=2 -> 2026-07, dst.
+          isPaid: false,
+        });
+      }
+
+      // =========================================================================
+      // SKENARIO 2: KHUSUS ADINDARISMAYANI ADA PINJAMAN KEDUA DI BULAN JUNI
+      // =========================================================================
+      if (username.includes("adindarismayani")) {
+        const loanJuniId = new mongoose.Types.ObjectId();
+        const amountJuni = 1500000; // Pinjaman kedua 1.5 Juta
+        const tenorJuni = 3; // Tenor 3 bulan
+        const cicilanJuni = 500000; // 500 Ribu per bulan
+
+        loanRecords.push({
+          _id: loanJuniId,
+          employeeId: emp._id,
+          amountRequested: amountJuni,
+          tenorMonths: tenorJuni,
+          monthlyDeduction: cicilanJuni,
+          reason: "Biaya tambahan perbaikan rumah (Seeder Juni)",
+          status: "APPROVED",
+          disbursementDate: cairBulanJuni,
+          paymentProof: "/uploads/files/bukti_transfer_juni.pdf",
+        });
+
+        approvalRecords.push({
+          loanId: loanJuniId,
+          step: "MANAGER_KEUANGAN",
+          status: "APPROVED",
+          note: "Dana seeder Juni telah ditransfer.",
+          actionDate: cairBulanJuni,
+        });
+
+        // Jadwal Angsuran Pinjaman Juni (Cair Juni, tagihan dimulai Juli, Agustus, September)
+        // KARENA REQUEST: 2 cicilan bayar di Juni, kita paksa angsuran ke-1 pinjaman ini jatuh di 2026-06
+        for (let i = 1; i <= tenorJuni; i++) {
+          // Normalnya i = bulan berjalan + i. Kita ubah agar index 1 langsung kena di bulan Juni (month + i - 1)
+          const nextDate = new Date(
+            cairBulanJuni.getFullYear(),
+            cairBulanJuni.getMonth() + i - 1,
+            1
+          );
+          const periodMonth = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, "0")}`;
+
+          paymentRecords.push({
+            loanId: loanJuniId,
+            employeeId: emp._id,
+            installmentNumber: i,
+            amount: cicilanJuni,
+            periodMonth: periodMonth, // i=1 -> 2026-06, i=2 -> 2026-07
+            isPaid: false,
+          });
+        }
+      }
     }
 
-    await LoanPayment.insertMany(payments);
+    // 3. Insert massal ke MongoDB
+    await Loan.insertMany(loanRecords);
+    await LoanApproval.insertMany(approvalRecords);
+    await LoanPayment.insertMany(paymentRecords);
 
-    console.log("ayment schedule created");
-
-    console.log("SEED COMPLETED SUCCESSFULLY");
-  } catch (err) {
-    console.error("Seeder Error:", err.message);
+    console.log(`\n================================================================`);
+    console.log(`🚀 [SUCCESS] Seeding data pinjaman kustom berhasil dijalankan!`);
+    console.log(`📝 Total Master Pinjaman : ${loanRecords.length} Data`);
+    console.log(`💳 Total Jadwal Angsuran  : ${paymentRecords.length} Baris Tagihan`);
+    console.log(`🎯 Adinda Rismayani sukses memiliki 2 cicilan aktif di periode 2026-06.`);
+    console.log(`================================================================\n`);
+  } catch (error) {
+    console.error("❌ Gagal menyuntikkan data seeder pinjaman:", error);
   }
-}
+};
+
+export default seedLoansCustom;

@@ -14,9 +14,6 @@ import employeeSalarySeeder from "./employeeSalary.seeder.js";
 import holidaySeeder from "./holidays.seeder.js";
 import leaveSeeder from "./leave.seeder.js";
 
-import assignmentSeeder from "./assignment.seeder.js";
-import announcementSeeder from "./announcement.seeder.js";
-import salesVisitSeeder from "./salesVisit.seeder.js";
 import completeLoanSeeder from "./completeLoan.seeder.js";
 import completePayrollHistorySeeder from "./completePayrollHistory.seeder.js";
 import attendanceSeeder from "./attendance.seeder.js";
@@ -47,9 +44,6 @@ const seeders = [
   completeLoanSeeder,
   overtimeSeeder,
 
-  assignmentSeeder,
-  announcementSeeder,
-  salesVisitSeeder,
   businessTripSeeder,
   expenseCategorySeeder,
   expenseSeeder,

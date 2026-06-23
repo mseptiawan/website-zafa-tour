@@ -1,45 +1,27 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
-import roleSeeder from "./role.seeder.js";
-import bidangSeeder from "./bidang.seeder.js";
-import unitSeeder from "./unit.seeder.js";
-import positionSeeder from "./position.seeder.js";
 import salaryComponentSeeder from "./salaryComponent.seeder.js";
 
-import userSeeder from "./user.seeder.js";
-import employeeSeeder from "./employee.seeder.js";
-import employeeSalarySeeder from "./employeeSalary.seeder.js";
-
-import holidaySeeder from "./holidays.seeder.js";
-
+import completeLoanSeeder from "./completeLoan.seeder.js";
+import completePayrollHistorySeeder from "./completePayrollHistory.seeder.js";
+import attendanceSeeder from "./attendance.seeder.js";
+import overtimeSeeder from "./overtime.seeder.js";
 import expenseCategorySeeder from "./expenseCategory.seeder.js";
-
-import kpiTemplateSeeder from "./kpiTemplate.seeder.js";
-import kpiTemplateDetailSeeder from "./kpiTemplateDetail.seeder.js";
-import unitKpiMappingSeeder from "./unitKpiMapping.seeder.js";
-
+import holidaysSeeder from "./holidays.seeder.js";
+import seedLeaveBalance from "./leaveBalance.seeder.js";
 dotenv.config();
 
-// Array ini sekarang hanya berisi seeder yang sudah di-import di atas
 const seeders = [
-  roleSeeder,
-  bidangSeeder,
-  unitSeeder,
-  positionSeeder,
+  // attendanceSeeder,
+  // completeLoanSeeder,
   salaryComponentSeeder,
+  // overtimeSeeder,
+  // holidaysSeeder,
+  // seedLeaveBalance,
 
-  userSeeder,
-  employeeSeeder,
-  employeeSalarySeeder,
-
-  holidaySeeder,
-
-  expenseCategorySeeder,
-
-  kpiTemplateSeeder,
-  kpiTemplateDetailSeeder,
-  unitKpiMappingSeeder,
+  // expenseCategorySeeder,
+  // completePayrollHistorySeeder,
 ];
 
 const runSeeder = async () => {

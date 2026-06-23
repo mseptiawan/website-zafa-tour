@@ -1,7 +1,7 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen bg-slate-50/60 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
-  <div class="max-w-6xl mx-auto">
+<div class=" min-h-screen md:ml-72 bg-slate-50/60 p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
+  <div class="max-w-none mx-auto">
 
     <% 
       const APPROVER_ROLES = ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"];
@@ -27,7 +27,7 @@
       
       <div class="lg:col-span-2 space-y-6">
         
-        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
+        <div class="bg-white border border-slate-200/60 rounded-2xl  overflow-hidden">
           
           <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
             <div class="flex items-center gap-4 min-w-0 flex-1">
@@ -102,7 +102,7 @@
               <div class="relative pl-5 space-y-4 before:absolute before:left-[4px] before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-200">
                 <% (trip.timeline || []).forEach((item)=> { %>
                   <div class="relative group flex items-start">
-                    <div class="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full border border-white bg-slate-300 group-hover:bg-slate-500 transition-colors shadow-sm ring-4 ring-white flex-shrink-0"></div>
+                    <div class="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full border border-white bg-slate-300 group-hover:bg-slate-500 transition-colors  ring-4 ring-white flex-shrink-0"></div>
                     <div class="text-[12px] font-medium text-slate-600 group-hover:text-slate-900 transition-colors leading-snug break-words max-w-full">
                       <%= item.address %>
                     </div>
@@ -141,7 +141,7 @@
 
 
         <% if (canApprove && !isPimpinanBlocked) { %>
-          <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
+          <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 ">
             <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
               <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-700">
                 <i class="fa-solid fa-check-double"></i>
@@ -160,7 +160,7 @@
                   </div>
                   <input type="text" name="note" id="approval-note-input"
                     placeholder="Wajib diisi jika Anda bermaksud menolak pengajuan ini..."
-                    class="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl pl-10 pr-4 py-2.5 text-[13px] text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 transition-all shadow-sm" />
+                    class="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl pl-10 pr-4 py-2.5 text-[13px] text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 transition-all " />
                 </div>
               </div>
 
@@ -171,7 +171,7 @@
                 </button>
 
                 <button type="button" onclick="submitWithAction('APPROVE')"
-                  class="cursor-pointer px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition active:scale-[0.98] whitespace-nowrap">
+                  class="cursor-pointer px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold  transition active:scale-[0.98] whitespace-nowrap">
                   Setujui Pengajuan
                 </button>
 
@@ -219,7 +219,7 @@
 
             <form method="POST" action="/trip/<%= trip._id %>/delegate" class="flex-shrink-0">
               <button type="submit"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-amber-50/50 text-amber-600 hover:text-amber-700 border border-amber-200 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all shadow-sm shadow-amber-50 active:scale-[0.98] cursor-pointer">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-amber-50/50 text-amber-600 hover:text-amber-700 border border-amber-200 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all   active:scale-[0.98] cursor-pointer">
                 <i class="fa-solid fa-shuffle text-[10px]"></i> Delegasikan ke Wakil Direktur
               </button>
             </form>
@@ -229,7 +229,7 @@
       </div>
 
       <div class="space-y-6">
-        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6">
+        <div class="bg-white border border-slate-200/60 rounded-2xl  p-6">
           <div class="mb-8">
             <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h2>
             <p class="text-[10px] text-slate-400 mt-0.5">Alur dan status persetujuan berkas dinas</p>

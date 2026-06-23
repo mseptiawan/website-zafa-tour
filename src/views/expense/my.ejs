@@ -10,31 +10,26 @@
         return { 
           label: 'Review Manager', 
           badge: 'bg-amber-50 text-amber-600 border border-amber-200/50', 
-          dot: 'bg-amber-500' 
         };
       case 'PENDING_FINANCE':
         return { 
           label: 'Proses Finance', 
           badge: 'bg-blue-50 text-blue-600 border border-blue-200/50', 
-          dot: 'bg-blue-500' 
         };
       case 'PAID':
         return { 
           label: 'Selesai & Lunas', 
           badge: 'bg-emerald-50 text-emerald-600 border border-emerald-200/50', 
-          dot: 'bg-emerald-500' 
         };
       case 'REJECTED':
         return { 
           label: 'Ditolak', 
           badge: 'bg-rose-50 text-rose-600 border border-rose-200/50', 
-          dot: 'bg-rose-500' 
         };
       default:
         return { 
           label: status, 
           badge: 'bg-slate-50 text-slate-600 border border-slate-200/50', 
-          dot: 'bg-slate-500' 
         };
     }
   };
@@ -63,7 +58,7 @@
             value: activeExpenses.length, 
             unit: 'Berkas', 
             icon: 'fa-solid fa-spinner', 
-            bgClass: 'bg-white border-slate-200/50 shadow-sm', 
+            bgClass: 'bg-white border-slate-200/50 ', 
             iconBoxClass: 'bg-blue-50 text-blue-600 border border-blue-200/50' 
           },
           { 
@@ -71,7 +66,7 @@
             value: historyExpenses.filter(e => e.status === 'PAID').length, 
             unit: 'Berkas', 
             icon: 'fa-solid fa-check-to-slot', 
-            bgClass: 'bg-white border border-slate-200/50 shadow-sm', 
+            bgClass: 'bg-white border border-slate-200/50 ', 
             iconBoxClass: 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' 
           },
           { 
@@ -79,7 +74,7 @@
             value: expenses.length, 
             unit: 'Berkas', 
             icon: 'fa-solid fa-wallet', 
-            bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800 shadow-sm', 
+            bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800 ', 
             labelClass: 'text-slate-300', 
             valueClass: 'text-white', 
             unitClass: 'text-slate-400',
@@ -89,12 +84,12 @@
       }) %>
     </div>
 
-    <div class="flex flex-col gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none shadow-sm md:shadow-none select-none">
+    <div class="flex flex-col gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none  md:shadow-none select-none">
       <div class="flex items-center justify-between gap-3 w-full md:hidden">
         <div>
           <h3 class="text-[15px] font-bold text-slate-800 tracking-tight">Daftar Pengajuan Klaim</h3>
         </div>
-        <a href="/expense/create" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-full shadow-sm shadow-blue-100 transition-all active:scale-95 cursor-pointer outline-none shrink-0 decoration-none">
+        <a href="/expense/create" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-full  shadow-blue-100 transition-all active:scale-95 cursor-pointer outline-none shrink-0 decoration-none">
           <i class="fa-solid fa-plus text-[9px] text-blue-100"></i>
           <span>Buat</span>
         </a>
@@ -110,7 +105,7 @@
 
     <div id="tab-content-active" class="tab-pane space-y-6 block opacity-100 transition-all duration-300 transform translate-y-0">
       
-      <div class="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden w-full border border-slate-200/50">
+      <div class="hidden md:block bg-white rounded-2xl  overflow-hidden w-full border border-slate-200/50">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -151,13 +146,13 @@
                   Rp <%= e.amount.toLocaleString('id-ID') %>
                 </td>
                 <td class="py-4 px-6 text-center select-none">
-                  <div class="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider <%= config.badge %> shadow-3xs">
+                  <div class="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wider <%= config.badge %> ">
                     <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
                     <span><%= config.label.toUpperCase() %></span>
                   </div>
                 </td>
                 <td class="py-4 px-6 text-center">
-                  <button type="button" class="openExpenseModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer shadow-3xs outline-none" data-title="<%= e.title %>" data-date="<%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>" data-amount="Rp <%= e.amount.toLocaleString('id-ID') %>" data-status="<%= config.label %>" data-badge-class="<%= config.badge %>" data-dot-class="<%= config.dot %>" data-description="<%= e.description || '-' %>" data-proof="<%= e.proofFile || '' %>">
+                  <button type="button" class="openExpenseModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer  outline-none" data-title="<%= e.title %>" data-date="<%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>" data-amount="Rp <%= e.amount.toLocaleString('id-ID') %>" data-status="<%= config.label %>" data-badge-class="<%= config.badge %>" data-dot-class="<%= config.dot %>" data-description="<%= e.description || '-' %>" data-proof="<%= e.proofFile || '' %>">
                     <i class="fa-solid fa-eye text-[11px]"></i>
                   </button>
                 </td>
@@ -171,13 +166,13 @@
 
       <div class="block md:hidden space-y-4 w-full">
         <% if (activeExpenses.length === 0) { %>
-        <div class="bg-white border border-slate-200/50 rounded-2xl py-12 text-center shadow-sm px-4">
+        <div class="bg-white border border-slate-200/50 rounded-2xl py-12 text-center  px-4">
           <p class="text-[12px] font-semibold text-slate-400">Tidak ada pengajuan aktif</p>
         </div>
         <% } else { %>
         <% activeExpenses.forEach(e => { %>
         <% const config = getStatusConfig(e.status); %>
-        <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5 shadow-sm space-y-4">
+        <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5  space-y-4">
           <div class="flex items-center justify-between gap-2">
             <div>
               <h3 class="text-[13px] font-bold text-slate-800 tracking-tight line-clamp-1"><%= e.title %></h3>
@@ -197,7 +192,7 @@
           </div>
 
           <div class="flex items-center justify-end gap-3 pt-0.5">
-  <button type="button" class="openExpenseModal h-8.5 px-4.5 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11.5px] font-bold rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer shadow-3xs" 
+  <button type="button" class="openExpenseModal h-8.5 px-4.5 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11.5px] font-bold rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer " 
     data-title="<%= e.title %>" 
     data-date="<%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>" 
     data-amount="Rp <%= e.amount.toLocaleString('id-ID') %>" 
@@ -218,7 +213,7 @@
 
     <div id="tab-content-history" class="tab-pane space-y-6 hidden opacity-0 transition-all duration-300 transform translate-y-2">
 
-      <div class="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden w-full border border-slate-200/50">
+      <div class="hidden md:block bg-white rounded-2xl  overflow-hidden w-full border border-slate-200/50">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -259,13 +254,13 @@
                   Rp <%= e.amount.toLocaleString('id-ID') %>
                 </td>
                 <td class="py-4 px-6 text-center select-none">
-                  <div class="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider <%= config.badge %> shadow-3xs">
+                  <div class="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider <%= config.badge %> ">
                     <span class="w-1.5 h-1.5 rounded-full <%= config.dot %> <%= e.status === 'PAID' ? 'animate-pulse' : '' %>"></span>
                     <span><%= config.label.toUpperCase() %></span>
                   </div>
                 </td>
                 <td class="py-4 px-6 text-center">
-                  <button type="button" class="openExpenseModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer shadow-3xs outline-none" data-title="<%= e.title %>" data-date="<%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>" data-amount="Rp <%= e.amount.toLocaleString('id-ID') %>" data-status="<%= config.label %>" data-badge-class="<%= config.badge %>" data-dot-class="<%= config.dot %>" data-description="<%= e.description || '-' %>" data-proof="<%= e.proofFile || '' %>" data-reason="<%= e.rejectionReason || '' %>" data-paidat="<%= e.paidAt ? new Date(e.paidAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '' %>">
+                  <button type="button" class="openExpenseModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer  outline-none" data-title="<%= e.title %>" data-date="<%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>" data-amount="Rp <%= e.amount.toLocaleString('id-ID') %>" data-status="<%= config.label %>" data-badge-class="<%= config.badge %>" data-dot-class="<%= config.dot %>" data-description="<%= e.description || '-' %>" data-proof="<%= e.proofFile || '' %>" data-reason="<%= e.rejectionReason || '' %>" data-paidat="<%= e.paidAt ? new Date(e.paidAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '' %>">
                     <i class="fa-solid fa-eye text-[11px]"></i>
                   </button>
                 </td>
@@ -279,13 +274,13 @@
 
       <div class="block md:hidden space-y-4 w-full">
         <% if (historyExpenses.length === 0) { %>
-        <div class="bg-white border border-slate-200/50 rounded-2xl py-12 text-center shadow-sm px-4">
+        <div class="bg-white border border-slate-200/50 rounded-2xl py-12 text-center  px-4">
           <p class="text-[12px] font-semibold text-slate-400">Belum ada riwayat dokumen</p>
         </div>
         <% } else { %>
         <% historyExpenses.forEach(e => { %>
         <% const config = getStatusConfig(e.status); %>
-        <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5 shadow-sm space-y-4">
+        <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5  space-y-4">
           <div class="flex items-center justify-between gap-2">
             <div>
               <h3 class="text-[13px] font-bold text-slate-800 tracking-tight line-clamp-1"><%= e.title %></h3>
@@ -312,7 +307,7 @@
               <span class="text-emerald-600 font-bold">✓ SELESAI DICAIRKAN</span>
               <% } %>
             </div>
-            <button type="button" class="openExpenseModal h-8.5 px-4.5 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11.5px] font-bold rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer shadow-3xs" data-title="<%= e.title %>" data-date="<%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>" data-amount="Rp <%= e.amount.toLocaleString('id-ID') %>" data-status="<%= config.label %>" data-badge-class="<%= config.badge %>" data-dot-class="<%= config.dot %>" data-description="<%= e.description || '-' %>" data-proof="<%= e.proofFile || '' %>" data-reason="<%= e.rejectionReason || '' %>" data-paidat="<%= e.paidAt ? new Date(e.paidAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '' %>">
+            <button type="button" class="openExpenseModal h-8.5 px-4.5 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11.5px] font-bold rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer " data-title="<%= e.title %>" data-date="<%= new Date(e.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>" data-amount="Rp <%= e.amount.toLocaleString('id-ID') %>" data-status="<%= config.label %>" data-badge-class="<%= config.badge %>" data-dot-class="<%= config.dot %>" data-description="<%= e.description || '-' %>" data-proof="<%= e.proofFile || '' %>" data-reason="<%= e.rejectionReason || '' %>" data-paidat="<%= e.paidAt ? new Date(e.paidAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '' %>">
               <span>DETAIL</span>
             </button>
           </div>
@@ -461,7 +456,7 @@
         const downloadContainer = document.getElementById("modalDownloadContainer");
         if (proof && proof !== "") {
           downloadContainer.innerHTML = `
-            <a href="/uploads/files/${proof}" target="_blank" download class="w-full h-9 bg-blue-500 hover:bg-blue-700 text-white text-[11.5px] font-bold tracking-wide uppercase rounded-xl transition-all active:scale-[0.99] shadow-3xs cursor-pointer flex items-center justify-center gap-2">
+            <a href="/uploads/files/${proof}" target="_blank" download class="w-full h-9 bg-blue-500 hover:bg-blue-700 text-white text-[11.5px] font-bold tracking-wide uppercase rounded-xl transition-all active:scale-[0.99]  cursor-pointer flex items-center justify-center gap-2">
               <i class="fa-solid fa-cloud-arrow-down text-xs"></i> UNDUH NOTA LAMPIRAN
             </a>`;
         } else {

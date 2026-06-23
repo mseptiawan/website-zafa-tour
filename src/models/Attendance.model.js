@@ -22,10 +22,10 @@ const attendanceSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
     status: {
       type: String,
       enum: ["HADIR", "TELAT", "ALPHA", "CUTI", "SAKIT", "IZIN"],
-      default: "ALPHA",
     },
 
     type: {

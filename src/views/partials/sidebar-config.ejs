@@ -47,7 +47,12 @@
           show: true,
           submenus: [
             { name: "Catat KPI", path: "/kpi/appraisal-list", show: !!perms.kpi_create },
-            { name: "Daftar KPI Pegawai", path: "/kpi/history-list", show: !!perms.kpi_list }
+            { name: "Daftar KPI Pegawai", path: "/kpi/history-list", show: !!perms.kpi_list },
+        { 
+              name: "Riwayat KPI Saya", 
+              path: "/kpi/my-history", 
+              show: role !== "WAKIL_DIREKTUR" && role !== "DIREKTUR_UTAMA"
+            }
           ]
         },
         {
@@ -146,7 +151,9 @@
           show: true,
           submenus: [
             { name: "Catat Kunjungan", path: "/sales/new", show: !!perms.sales_new },
-            { name: "Daftar Kunjungan", path: "/sales/my", show: !!perms.sales_my }
+            { name: "Daftar Kunjungan", path: "/sales/my", show: !!perms.sales_my },
+            { name: "Kunjungan Pegawai", path: "/sales/employee-visits", show: !!perms.sales_employee },
+
           ]
         },
         {
@@ -185,7 +192,7 @@
           id: "expense",
           name: "Pengajuan Klaim",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6v2m0 16v2m8-10h2M2 12H4" />`,
-          show: true,
+          show: role !== "DIREKTUR_UTAMA",
           submenus: [
             { name: "Set Kategori Klaim", path: "/expense-categories", show: !!perms.claim_category_manage },
             { name: "Buat Pengajuan", path: "/expense/create", show: !!perms.claim_new },

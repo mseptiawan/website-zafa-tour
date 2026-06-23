@@ -130,82 +130,92 @@
     </table>
 
     <table class="financial-container">
-      <tr>
-        <td class="financial-col">
-          <table class="table-component">
-            <thead>
-              <tr>
-                <th>Komponen Pendapatan</th>
-                <th style="width: 115px;" class="text-center border-left-black">Jumlah</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Upah Pokok</td>
-                <td class="text-right border-left-black">Rp <%= payroll.basicSalary.toLocaleString('id-ID') %></td>
-              </tr>
-              <% allowances.forEach(allow => { %>
-                <tr>
-                  <td><%= allow.componentName %></td>
-                  <td class="text-right border-left-black">Rp <%= allow.amount.toLocaleString('id-ID') %></td>
-                </tr>
-              <% }) %>
-              <% if (allowances.length < 2) { 
-                for(let i = allowances.length; i < 2; i++) { %>
-                <tr>
-                  <td>&nbsp;</td>
-                  <td class="border-left-black"></td>
-                </tr>
-              <% } } %>
-              <tr class="total-row">
-                <td>Total Pendapatan Gross</td>
-                <td class="text-right border-left-black">Rp <%= payroll.totalEarnings.toLocaleString('id-ID') %></td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
+  <tr>
+    <td class="financial-col">
+      <table class="table-component">
+        <thead>
+          <tr>
+            <th>Komponen Pendapatan</th>
+            <th style="width: 115px;" class="text-center border-left-black">Jumlah</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Upah Pokok</td>
+            <td class="text-right border-left-black">Rp <%= payroll.basicSalary.toLocaleString('id-ID') %></td>
+          </tr>
+          <% allowances.forEach(allow => { %>
+            <tr>
+              <td><%= allow.componentName %></td>
+              <td class="text-right border-left-black">Rp <%= allow.amount.toLocaleString('id-ID') %></td>
+            </tr>
+          <% }) %>
+          
+          <% if (allowances.length < 3) { 
+            for(let i = allowances.length; i < 3; i++) { %>
+            <tr>
+              <td>&nbsp;</td>
+              <td class="border-left-black"></td>
+            </tr>
+          <% } } %>
+          <tr class="total-row">
+            <td>Total Pendapatan Gross</td>
+            <td class="text-right border-left-black">Rp <%= payroll.totalEarnings.toLocaleString('id-ID') %></td>
+          </tr>
+        </tbody>
+      </table>
+    </td>
 
-        <td class="financial-spacer"></td>
+    <td class="financial-spacer"></td>
 
-        <td class="financial-col">
-          <table class="table-component">
-            <thead>
+    <td class="financial-col">
+      <table class="table-component">
+        <thead>
+          <tr>
+            <th>Komponen Potongan</th>
+            <th style="width: 115px;" class="text-center border-left-black">Jumlah</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% deductions.forEach(ded => { %>
+            <tr>
+              <td><%= ded.componentName %></td>
+              <td class="text-right border-left-black">Rp <%= ded.amount.toLocaleString('id-ID') %></td>
+            </tr>
+          <% }) %>
+          
+          <% let totalLoanAmount = 0; %>
+          <% if (payroll.loanDeduction && payroll.loanDeduction.length > 0) { %>
+            <% payroll.loanDeduction.forEach(loan => { %>
+              <% totalLoanAmount += loan.amount; %>
+            <% }) %>
+            <% if (totalLoanAmount > 0) { %>
               <tr>
-                <th>Komponen Potongan</th>
-                <th style="width: 115px;" class="text-center border-left-black">Jumlah</th>
+                <td>Cicilan Pinjaman</td>
+                <td class="text-right border-left-black">Rp <%= totalLoanAmount.toLocaleString('id-ID') %></td>
               </tr>
-            </thead>
-            <tbody>
-              <% deductions.forEach(ded => { %>
-                <tr>
-                  <td><%= ded.componentName %></td>
-                  <td class="text-right border-left-black">Rp <%= ded.amount.toLocaleString('id-ID') %></td>
-                </tr>
-              <% }) %>
-              <% if (payroll.loanDeduction && payroll.loanDeduction.amount > 0) { %>
-                <tr>
-                  <td>Cicilan Pinjaman</td>
-                  <td class="text-right border-left-black">Rp <%= payroll.loanDeduction.amount.toLocaleString('id-ID') %></td>
-                </tr>
-              <% } %>
-              <% 
-                let totalDedRows = deductions.length + (payroll.loanDeduction?.amount > 0 ? 1 : 0);
-                if (totalDedRows < 2) { 
-                  for(let i = totalDedRows; i < 2; i++) { %>
-                  <tr>
-                    <td>&nbsp;</td>
-                    <td class="border-left-black"></td>
-                  </tr>
-              <% } } %>
-              <tr class="total-row">
-                <td>Total Potongan Net</td>
-                <td class="text-right border-left-black">Rp <%= payroll.totalDeductions.toLocaleString('id-ID') %></td>
+            <% } %>
+          <% } %>
+          
+          <% 
+            let hasLoanRow = totalLoanAmount > 0 ? 1 : 0;
+            let totalDedRows = deductions.length + hasLoanRow;
+            if (totalDedRows < 4) { 
+              for(let i = totalDedRows; i < 4; i++) { %>
+              <tr>
+                <td>&nbsp;</td>
+                <td class="border-left-black"></td>
               </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
-    </table>
+          <% } } %>
+          <tr class="total-row">
+            <td>Total Potongan Net</td>
+            <td class="text-right border-left-black">Rp <%= payroll.totalDeductions.toLocaleString('id-ID') %></td>
+          </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</table>
 
     <table class="summary-bank-table">
       <tr>

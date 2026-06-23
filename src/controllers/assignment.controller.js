@@ -95,15 +95,17 @@ export const myAssignments = async (req, res, next) => {
     next(err);
   }
 };
-
+// Jalankan update pada fungsi index di assignment.controller.js
 export const index = async (req, res, next) => {
   try {
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const limit = Math.max(parseInt(req.query.limit) || 5, 1);
 
+    // Kirim data user yang sedang login ke service untuk di-filter jabatannya
     const result = await assignmentService.findAll({
       page,
       limit,
+      currentUser: req.session.user,
     });
 
     res.render("assignment/index", {
