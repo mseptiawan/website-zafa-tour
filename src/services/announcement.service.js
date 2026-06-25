@@ -20,9 +20,9 @@ const create = ({ body, userId, file }) => {
     title,
     content,
     category,
-    status,
     createdBy: userId,
     attachment: file?.filename || null,
+    publishDate: new Date(),
   });
 };
 
@@ -50,13 +50,4 @@ const getById = (id) => {
   return Announcement.findById(id).populate(POPULATE_CREATED_BY).lean();
 };
 
-// ─── PUBLISH ─────────────────────────────────────────────────────────────────
-const publish = (id) => {
-  return Announcement.findByIdAndUpdate(
-    id,
-    { status: "PUBLISHED", publishDate: new Date() },
-    { new: true }
-  );
-};
-
-export default { create, getAll, getById, publish };
+export default { create, getAll, getById };

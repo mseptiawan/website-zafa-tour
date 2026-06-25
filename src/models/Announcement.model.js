@@ -19,12 +19,6 @@ const announcementSchema = new mongoose.Schema(
       default: "LIGHT",
     },
 
-    status: {
-      type: String,
-      enum: ["DRAFT", "PUBLISHED"],
-      default: "PUBLISHED",
-    },
-
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -45,10 +39,8 @@ const announcementSchema = new mongoose.Schema(
 );
 
 // ─── INDEX ────────────────────────────────────────────────────────────────────
-// Optimasi query getAll (sort by createdAt, filter by status/category)
 announcementSchema.index({ createdAt: -1 });
-announcementSchema.index({ status: 1, createdAt: -1 });
-announcementSchema.index({ category: 1, status: 1 });
+announcementSchema.index({ category: 1, createdAt: -1 });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
 

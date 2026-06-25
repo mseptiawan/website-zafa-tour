@@ -84,13 +84,3 @@ export const show = async (req, res, next) => {
     next(err);
   }
 };
-
-// ─── PUBLISH ──────────────────────────────────────────────────────────────────
-export const publish = async (req, res, next) => {
-  try {
-    await announcementService.publish(req.params.id);
-    return res.redirect("/announcement");
-  } catch (err) {
-    next(err);
-  }
-};
