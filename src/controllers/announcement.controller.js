@@ -6,7 +6,7 @@ const RENDER_DEFAULTS = (req) => ({
 });
 
 // ─── NEW FORM ─────────────────────────────────────────────────────────────────
-export const newForm = (req, res) => {
+export const create = (req, res) => {
   console.log("ANNOUNCEMENT NEW HIT");
   res.render("announcement/create", {
     ...RENDER_DEFAULTS(req),
@@ -16,9 +16,9 @@ export const newForm = (req, res) => {
   });
 };
 
-// ─── CREATE ───────────────────────────────────────────────────────────────────
+// ─── STORE ───────────────────────────────────────────────────────────────────
 
-export const create = async (req, res, next) => {
+export const store = async (req, res, next) => {
   try {
     if (req.validationErrors) {
       return res.status(400).render("announcement/create", {
@@ -28,10 +28,16 @@ export const create = async (req, res, next) => {
         old: req.body,
       });
     }
+    const userRole = req.session.user.role;
+    const announcementData = { ...req.body };
+
+    if (userRole !== "DIREKTUR_UTAMA") {
+      announcementData.category = "LIGHT";
+    }
 
     await announcementService.create({
-      body: req.body,
-      userId: req.session.user._id,
+      body: announcementData,
+      userSession: req.session.user,
       file: req.file,
     });
 
@@ -51,7 +57,7 @@ export const index = async (req, res, next) => {
       limit: determinedLimit,
     });
 
-    const result = await announcementService.getAll({ page, limit, skip });
+    const result = await announcementService.getAll({ page, limit, skip, user: req.session.user });
 
     res.render("announcement/index", {
       ...RENDER_DEFAULTS(req),

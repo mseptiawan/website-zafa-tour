@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const announcementSchema = new mongoose.Schema(
   {
+    // ─── CONTENT ─────────────────────────────
     title: {
       type: String,
       required: true,
@@ -19,28 +20,42 @@ const announcementSchema = new mongoose.Schema(
       default: "LIGHT",
     },
 
+    // ─── AUTHOR ──────────────────────────────
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
+    authorName: {
+      type: String,
+      required: true,
+    },
+
+    authorAvatar: {
+      type: String,
+      default: null,
+    },
+
+    // ─── ATTACHMENT ──────────────────────────
     attachment: {
       type: String,
       default: null,
     },
 
+    // ─── PUBLISHING ──────────────────────────
     publishDate: {
       type: Date,
-      default: null,
+      default: Date.now,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-// ─── INDEX ────────────────────────────────────────────────────────────────────
+// ─── INDEX ──────────────────────────────────
 announcementSchema.index({ createdAt: -1 });
-announcementSchema.index({ category: 1, createdAt: -1 });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
 
