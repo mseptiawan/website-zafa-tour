@@ -49,7 +49,6 @@ const assignmentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index
 assignmentSchema.index({ createdAt: -1 });
 assignmentSchema.index({ employees: 1 });
 assignmentSchema.index({ createdBy: 1, createdAt: -1 });

@@ -6,7 +6,7 @@ import User from "../models/basic/User.model.js";
 
 import notificationService from "./notification.service.js";
 /**
- * Query builder internal untuk menyaring data dinas luar berdasarkan role user.
+ * Query builder internal untuk menyaring data penugasan berdasarkan role user.
  * @param {Object} currentUser - Objek user dari session
  * @returns {Object} Mongoose filter object
  */
@@ -61,7 +61,7 @@ export const findEmployees = async (excludeEmployeeId = null) => {
 };
 
 /**
- * Membuat data dinas luar baru sekaligus mengirimkan notifikasi push ke tim yang didelegasikan.
+ * Membuat data penugasan baru sekaligus mengirimkan notifikasi push ke tim yang didelegasikan.
  * @param {Object} params
  * @param {Object} params.body - Request body berisi payload form
  * @param {Object} [params.file] - Berkas lampiran multer
@@ -120,7 +120,7 @@ export const create = async ({ body, file, userId, creatorName }) => {
 };
 
 /**
- * Mengambil data dinas luar yang didelegasikan spesifik ke karyawan tertentu (Terpagination & Lean).
+ * Mengambil data penugasan yang didelegasikan spesifik ke karyawan tertentu (Terpagination & Lean).
  * @param {Object} params
  * @param {string} params.employeeId - ID Karyawan login aktif
  * @param {number|string} [params.page] - Posisi halaman saat ini
@@ -157,7 +157,7 @@ export const findMine = async ({ employeeId, page, limit }) => {
 };
 
 /**
- * Mengambil seluruh log data dinas luar internal perusahaan berdasarkan hak akses user (Terpagination & Lean).
+ * Mengambil seluruh log data penugasan internal perusahaan berdasarkan hak akses user (Terpagination & Lean).
  * @param {Object} params
  * @param {number|string} [params.page=1] - Posisi halaman saat ini
  * @param {number|string} [params.limit] - Jumlah limit item per halaman
@@ -187,7 +187,7 @@ export const findAll = async ({ page = 1, limit = PAGINATION.ASSIGNMENT_DEFAULT,
 };
 
 /**
- * Mencari satu detail dokumen dinas luar secara mendalam melalui ID dokumen (Lean).
+ * Mencari satu detail dokumen penugasan secara mendalam melalui ID dokumen (Lean).
  * @param {string} id - ID Object Data Assignment
  * @returns {Promise<Object|null>} Berkas penugasan utuh atau null
  */
@@ -199,10 +199,10 @@ export const findById = async (id) => {
         path: "createdBy",
         select: "username email",
         populate: {
-          path: "employeeData", // Mengambil virtual Employee dari model User
+          path: "employeeData",
           select: "fullName foto_profile",
         },
       },
     ])
-    .lean(); // Eksekusi lean di akhir aman di sini
+    .lean();
 };
