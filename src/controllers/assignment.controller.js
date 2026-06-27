@@ -1,91 +1,80 @@
-import { createAssignmentSchema } from "../validations/assignment.schema.js";
-import * as assignmentService from "../services/assignment.service.js";
+import {
+  findEmployees,
+  create as createAssignment,
+  findMine,
+  findAll,
+  findById,
+} from "../services/assignment.service.js";
 
-export const newForm = async (req, res, next) => {
+const RENDER_DEFAULTS = (req) => ({
+  user: req.session.user,
+});
+
+export const create = async (req, res, next) => {
   try {
     const currentEmployeeId = req.session.user?.employeeId;
-
-    const employees = await assignmentService.findEmployees(currentEmployeeId);
+    const employees = await findEmployees(currentEmployeeId);
     const today = new Date().toISOString().split("T")[0];
+
     res.render("assignment/create", {
+      ...RENDER_DEFAULTS(req),
       title: "Buat Penugasan",
       employees,
       today,
-      error: null,
+      errors: {},
       old: {},
+      activeMenu: "create-assignment",
     });
   } catch (err) {
     next(err);
   }
 };
-export const create = async (req, res, next) => {
+
+export const store = async (req, res, next) => {
   try {
-    const result = createAssignmentSchema.safeParse(req.body);
+    const currentEmployeeId = req.session.user?.employeeId;
 
-    if (!result.success) {
-      const fieldErrors = result.error.format();
+    if (req.validationErrors) {
+      const employees = await findEmployees(currentEmployeeId);
+      const today = new Date().toISOString().split("T")[0];
 
-      const employees = await assignmentService.findEmployees();
       return res.status(400).render("assignment/create", {
+        ...RENDER_DEFAULTS(req),
         title: "Buat Penugasan",
         employees,
-        errors: fieldErrors,
+        today,
+        errors: req.validationErrors,
         old: req.body,
+        activeMenu: "create-assignment",
       });
     }
 
-    await assignmentService.create({
-      body: result.data,
+    await createAssignment({
+      body: req.body,
       file: req.file,
       userId: req.session.user._id,
+      creatorName: req.session.user.fullName,
     });
 
-    return res.redirect("/assignment");
+    return res.redirect("/assignments");
   } catch (err) {
-    console.error("Database Error Terdeteksi:", err);
-
-    const employees = await assignmentService.findEmployees();
-
-    let customFieldsError = { _errors: [] };
-
-    if (err.message && err.message.includes("at least 10 character")) {
-      customFieldsError = {
-        _errors: [],
-        description: {
-          _errors: ["Deskripsi terlalu pendek, minimal harus berisi 10 karakter"],
-        },
-      };
-    } else {
-      return res.status(400).render("assignment/create", {
-        title: "Buat Penugasan",
-        employees,
-        errors: customFieldsError,
-        old: req.body,
-        today: new Date().toISOString().split("T")[0],
-      });
-    }
-
-    return res.status(400).render("assignment/create", {
-      title: "Buat Penugasan",
-      employees,
-      errors: fieldErrors,
-      old: req.body,
-      today: new Date().toISOString().split("T")[0],
-    });
+    next(err);
   }
 };
-export const myAssignments = async (req, res, next) => {
-  try {
-    const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.max(parseInt(req.query.limit) || 5, 1);
 
-    const { data, meta } = await assignmentService.findMine({
-      userId: req.session.user._id,
+export const my = async (req, res, next) => {
+  try {
+    const { page, limit } = req.query;
+    const employeeId = req.session.user?.employeeId;
+
+    const { data, meta } = await findMine({
+      employeeId,
       page,
       limit,
     });
 
     res.render("assignment/my", {
+      ...RENDER_DEFAULTS(req),
       title: "Penugasan Saya",
       assignments: data,
       pagination: meta,
@@ -95,23 +84,22 @@ export const myAssignments = async (req, res, next) => {
     next(err);
   }
 };
-// Jalankan update pada fungsi index di assignment.controller.js
+
 export const index = async (req, res, next) => {
   try {
-    const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.max(parseInt(req.query.limit) || 5, 1);
+    const { page, limit } = req.query;
 
-    // Kirim data user yang sedang login ke service untuk di-filter jabatannya
-    const result = await assignmentService.findAll({
+    const result = await findAll({
       page,
       limit,
       currentUser: req.session.user,
     });
 
     res.render("assignment/index", {
+      ...RENDER_DEFAULTS(req),
       title: "Semua Penugasan",
       assignments: result.assignments,
-      pagination: result.pagination,
+      pagination: result.meta,
       query: req.query,
     });
   } catch (err) {
@@ -121,9 +109,16 @@ export const index = async (req, res, next) => {
 
 export const show = async (req, res, next) => {
   try {
-    const assignment = await assignmentService.findById(req.params.id);
+    const assignment = await findById(req.params.id);
+
+    if (!assignment) {
+      const err = new Error("Penugasan tidak ditemukan");
+      err.statusCode = 404;
+      return next(err);
+    }
 
     res.render("assignment/show", {
+      ...RENDER_DEFAULTS(req),
       title: "Detail Penugasan",
       assignment,
     });

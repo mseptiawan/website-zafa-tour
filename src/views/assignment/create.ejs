@@ -5,38 +5,38 @@
 
     <%- include('../partials/page-header', {
       section: 'Area Kerja',
-      module: 'Assignment',
+      module: 'Dinas Luar',
       title: 'Buat Penugasan',
-      description: 'Tambahkan tugas atau penugasan resmi baru untuk Pegawai.'
+      description: 'Tambahkan tugas atau penugasan dinas luar baru untuk Pegawai.'
     }) %>
 
-    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8  overflow-hidden">
-      <form id="assignment-form" method="POST" enctype="multipart/form-data" class="space-y-5" action="/assignment/">
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
+      <form id="assignment-form" method="POST" enctype="multipart/form-data" class="space-y-5" action="/assignments/">
 
-        <% if (typeof errors !== 'undefined' && errors._errors && errors._errors.length > 0) { %>
+        <% if (typeof errors !== 'undefined' && errors && typeof errors === 'string') { %>
           <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium flex items-start gap-2.5">
             <svg class="w-4 h-4 shrink-0 mt-0.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span><%= errors._errors[0] %></span>
+            <span><%= errors %></span>
           </div>
         <% } %>
 
         <div class="space-y-2">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Penugasan <span class="text-rose-500">*</span></label>
-          <input type="text" name="title" required value="<%= typeof old !== 'undefined' && old.title ? old.title : '' %>" placeholder="Ketik judul dokumen penugasan..."
-            class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.title ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
-          <% if (typeof errors !== 'undefined' && errors.title) { %>
-            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.title._errors[0] %></p>
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Dinas Luar <span class="text-rose-500">*</span></label>
+          <input type="text" name="title" value="<%= typeof old !== 'undefined' && old.title ? old.title : '' %>" placeholder="Ketik judul dokumen penugasan..."
+            class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors?.title ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
+          <% if (typeof errors !== 'undefined' && errors?.title) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.title %></p>
           <% } %>
         </div>
 
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Deskripsi Detail <span class="text-rose-500">*</span></label>
-          <textarea name="description" required rows="4" placeholder="Tulis rincian deskripsi tugas secara jelas..."
-            class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.description ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= typeof old !== 'undefined' && old.description ? old.description : '' %></textarea>
-          <% if (typeof errors !== 'undefined' && errors.description) { %>
-            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.description._errors[0] %></p>
+          <textarea name="description" rows="4" placeholder="Tulis rincian deskripsi tugas secara jelas..."
+            class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors?.description ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= typeof old !== 'undefined' && old.description ? old.description : '' %></textarea>
+          <% if (typeof errors !== 'undefined' && errors?.description) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.description %></p>
           <% } %>
         </div>
 
@@ -54,48 +54,52 @@
                 if (old.type === 'LAINNYA') currentLabel = '📌 Lainnya';
               }
             %>
-            <input type="hidden" name="type" id="assignment-type-value" value="<%= currentType %>" required>
+            <input type="hidden" name="type" id="assignment-type-value" value="<%= currentType %>" >
             <button type="button" onclick="toggleTypeDropdown()"
-              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.type ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer">
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors?.type ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer">
               <span id="assignment-type-label" class="flex items-center gap-2"><%= currentLabel %></span>
               <svg id="assignment-type-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <div id="assignment-type-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl  p-1.5 space-y-0.5">
+            <div id="assignment-type-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl p-1.5 space-y-0.5">
               <button type="button" onclick="selectAssignmentType('UNDANGAN', '✉️ Undangan')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">✉️ Undangan</button>
               <button type="button" onclick="selectAssignmentType('INTERNAL', '📁 Internal')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">📁 Internal</button>
               <button type="button" onclick="selectAssignmentType('TRAINING', '🎓 Training')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">🎓 Training</button>
               <button type="button" onclick="selectAssignmentType('LAINNYA', '📌 Lainnya')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">📌 Lainnya</button>
             </div>
           </div>
-          <% if (typeof errors !== 'undefined' && errors.type) { %>
-            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.type._errors[0] %></p>
+          <% if (typeof errors !== 'undefined' && errors?.type) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.type %></p>
           <% } %>
         </div>
-
-        <div class="space-y-2">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Lokasi Tujuan / Tempat <span class="text-rose-500">*</span></label>
-          <input type="text" name="location" required value="<%= typeof old !== 'undefined' && old.location ? old.location : '' %>" placeholder="Contoh: Kantor Cabang Palembang"
-            class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
-        </div>
+<div class="space-y-2">
+  <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Lokasi Tujuan / Tempat <span class="text-rose-500">*</span></label>
+  
+  <input type="text" name="location" value="<%= typeof old !== 'undefined' && old.location ? old.location : '' %>" placeholder="Contoh: Kantor Cabang Palembang"
+    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors?.location ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
+  
+  <% if (typeof errors !== 'undefined' && errors?.location) { %>
+    <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.location %></p>
+  <% } %>
+</div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Mulai <span class="text-rose-500">*</span></label>
-            <input type="date" id="startDate" name="startDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.startDate ? old.startDate : '' %>"
-              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.startDate ? 'border-rose-400' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
-            <% if (typeof errors !== 'undefined' && errors.startDate) { %>
-              <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.startDate._errors[0] %></p>
+            <input type="date" id="startDate" name="startDate" min="<%= today %>" value="<%= typeof old !== 'undefined' && old.startDate ? old.startDate : '' %>"
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors?.startDate ? 'border-rose-400' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
+            <% if (typeof errors !== 'undefined' && errors?.startDate) { %>
+              <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.startDate %></p>
             <% } %>
           </div>
 
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Selesai <span class="text-rose-500">*</span></label>
-            <input type="date" id="endDate" name="endDate" required min="<%= today %>" value="<%= typeof old !== 'undefined' && old.endDate ? old.endDate : '' %>"
-              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.endDate ? 'border-rose-400' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
-            <% if (typeof errors !== 'undefined' && errors.endDate) { %>
-              <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.endDate._errors[0] %></p>
+            <input type="date" id="endDate" name="endDate" min="<%= today %>" value="<%= typeof old !== 'undefined' && old.endDate ? old.endDate : '' %>"
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors?.endDate ? 'border-rose-400' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
+            <% if (typeof errors !== 'undefined' && errors?.endDate) { %>
+              <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.endDate %></p>
             <% } %>
           </div>
         </div>
@@ -142,11 +146,11 @@
               </svg>
             </div>
             <input type="text" id="employee-search" placeholder="Cari nama staf atau Pegawai..."
-              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.employees ? 'border-rose-400' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl pl-9 pr-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
+              class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors?.employees ? 'border-rose-400' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl pl-9 pr-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
           </div>
 
-          <div id="employee-list" class="border <%= typeof errors !== 'undefined' && errors.employees ? 'border-rose-200 bg-rose-50/10' : 'border-slate-200/60 bg-slate-50/40' %> rounded-xl p-1.5 max-h-48 overflow-y-auto space-y-0.5">
-            <% employees.forEach(e=> { %>
+          <div id="employee-list" class="border <%= typeof errors !== 'undefined' && errors?.employees ? 'border-rose-200 bg-rose-50/10' : 'border-slate-200/60 bg-slate-50/40' %> rounded-xl p-1.5 max-h-48 overflow-y-auto space-y-0.5">
+            <% employees.forEach(e => { %>
               <% 
                 let isChecked = false;
                 if (typeof old !== 'undefined' && old.employees) {
@@ -163,14 +167,14 @@
           </div>
           
           <p id="employee-error-msg" class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5 hidden">Wajib memilih minimal satu Pegawai yang didelegasikan.</p>
-          <% if (typeof errors !== 'undefined' && errors.employees) { %>
-            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.employees._errors[0] %></p>
+          <% if (typeof errors !== 'undefined' && errors?.employees) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.employees %></p>
           <% } %>
           <p class="text-[11px] text-slate-400 font-normal pl-0.5 leading-normal">Cari nama di atas, lalu centang satu atau beberapa Pegawai yang akan didelegasikan.</p>
         </div>
 
         <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-2.5 select-none">
-          <a href="/assignment" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200/80 text-slate-600 h-9.5 px-4 text-[12px] font-medium rounded-xl transition-all decoration-none">Batal</a>
+          <a href="/assignments" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200/80 text-slate-600 h-9.5 px-4 text-[12px] font-medium rounded-xl transition-all decoration-none">Batal</a>
           <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white h-9.5 px-5 text-[12px] font-semibold rounded-xl transition-all border-none cursor-pointer">Kirim Penugasan</button>
         </div>
 
@@ -181,7 +185,6 @@
 </div>
 
 <script>
-  // Logika Backend & Validasi Tetap Aman 100%
   document.getElementById('assignment-form').addEventListener('submit', function(e) {
     const checkboxes = document.querySelectorAll('.employee-checkbox');
     const errorMsg = document.getElementById('employee-error-msg');

@@ -43,7 +43,7 @@ router.use("/daily-log", dailylog);
 router.use("/approvals", approvalRoutes);
 router.use("/finance", finance);
 router.use("/sales", salesRoutes);
-router.use("/assignment", assignmentRoutes);
+router.use("/assignments", assignmentRoutes);
 router.use("/announcement", announcementRoutes);
 router.use("/expense-categories", expenseCategoryRoutes);
 router.use("/expense", expenseRoutes);

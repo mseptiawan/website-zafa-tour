@@ -10,12 +10,10 @@ export const findEmployees = async (excludeEmployeeId = null) => {
     query._id = { $ne: excludeEmployeeId };
   }
 
-  return await Employee.find(query).sort({
-    fullName: 1,
-  });
+  return await Employee.find(query).sort({ fullName: 1 });
 };
 
-export const create = async ({ body, file, userId }) => {
+export const create = async ({ body, file, userId, creatorName }) => {
   let employeeIds = [];
   if (body.employees) {
     employeeIds = Array.isArray(body.employees) ? body.employees : [body.employees];
@@ -34,8 +32,7 @@ export const create = async ({ body, file, userId }) => {
   });
 
   try {
-    const creator = await Employee.findById(userId);
-    const creatorName = creator ? creator.name : "Pimpinan";
+    const senderName = creatorName || "Pimpinan";
 
     if (employeeIds.length > 0 && employeeIds[0]) {
       const notifPromises = employeeIds.map((empId) => {
@@ -43,7 +40,7 @@ export const create = async ({ body, file, userId }) => {
           userId: empId,
           type: "assignment",
           title: "Penugasan Baru",
-          text: `${creatorName} memberikan Anda tugas baru: "${body.title || "Tanpa Judul"}"`,
+          text: `${senderName} memberikan Anda tugas baru: "${body.title || "Tanpa Judul"}"`,
           module: "assignment",
           referenceId: assignment._id,
         });
@@ -58,101 +55,58 @@ export const create = async ({ body, file, userId }) => {
   return assignment;
 };
 
-export const findMine = async ({ userId, page, limit }) => {
-  const employee = await Employee.findOne({ userId });
-
-  if (!employee) {
-    return {
-      data: [],
-      meta: getPaginationMeta({
-        page: 1,
-        limit,
-        total: 0,
-      }),
-    };
+export const findMine = async ({ employeeId, page, limit }) => {
+  if (!employeeId) {
+    return { data: [], meta: getPaginationMeta({ page: 1, limit: 10, total: 0 }) };
   }
 
-  const {
-    skip,
-    limit: perPage,
-    page: currentPage,
-  } = getPagination({
-    page,
-    limit,
-  });
-
-  const filter = {
-    employees: employee._id,
-  };
-
+  const paginationArgs = getPagination({ page, limit });
+  const filter = { employees: employeeId };
   const total = await Assignment.countDocuments(filter);
 
-  const data = await Assignment.find(filter).sort({ createdAt: -1 }).skip(skip).limit(perPage);
+  const data = await Assignment.find(filter)
+    .populate("createdBy", "username email")
+    .sort({ createdAt: -1 })
+    .skip(paginationArgs.skip)
+    .limit(paginationArgs.limit);
 
   return {
     data,
     meta: getPaginationMeta({
-      page: currentPage,
-      limit: perPage,
+      page: paginationArgs.page,
+      limit: paginationArgs.limit,
       total,
     }),
   };
 };
-// Jalankan update pada fungsi findAll di assignment.service.js
-export const findAll = async ({ page = 1, limit = 7, currentUser }) => {
-  const {
-    skip,
-    limit: perPage,
-    page: currentPage,
-  } = getPagination({
-    page,
-    limit,
-  });
 
-  // Tentukan filter default kosong (untuk Wadir & Dirut bisa melihat semua secara default)
+export const findAll = async ({ page = 1, limit = 7, currentUser }) => {
+  const paginationArgs = getPagination({ page, limit });
   let filter = {};
   const role = currentUser?.role?.toUpperCase();
 
-  // Logika Aturan Bisnis Baru:
   if (["MANAGER_ADMINISTRASI", "MANAGER_HAJI_UMRAH", "MANAGER_KEUANGAN"].includes(role)) {
-    // Jika Manager Bidang, HANYA bisa melihat yang dibuat oleh dirinya sendiri
     filter = { createdBy: currentUser._id };
   }
-  // Jika Wadir atau Dirut, filter tetap kosong {} (artinya bisa melihat semua data buatan mereka + buatan para manager)
 
   const total = await Assignment.countDocuments(filter);
 
   const assignments = await Assignment.find(filter)
     .populate([{ path: "employees" }, { path: "createdBy" }])
     .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(perPage);
+    .skip(paginationArgs.skip)
+    .limit(paginationArgs.limit);
 
   return {
     assignments,
-    pagination: getPaginationMeta({
-      page: currentPage,
-      limit: perPage,
+    meta: getPaginationMeta({
+      page: paginationArgs.page,
+      limit: paginationArgs.limit,
       total,
     }),
   };
 };
 
 export const findById = async (id) => {
-  return await Assignment.findById(id).populate([
-    {
-      path: "employees",
-    },
-    {
-      path: "createdBy",
-    },
-  ]);
-};
-
-export default {
-  create,
-  findAll,
-  findById,
-  findMine,
-  findEmployees,
+  return await Assignment.findById(id).populate([{ path: "employees" }, { path: "createdBy" }]);
 };

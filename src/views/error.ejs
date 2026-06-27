@@ -1,34 +1,42 @@
-<%- layout('layouts/main', { title: 'Terjadi Kesalahan' }) %>
-
-<div class=" min-h-screen flex items-center justify-center p-6 antialiased">
-
-  <div class="max-w-md w-full relative">
-
-    <div class="absolute -top-12 ">
-      <a href="/dashboard" class="px-5 py-2 rounded-lg text-[13px] font-medium text-slate-400 hover:text-slate-800 transition-colors">
+<div class="flex min-h-screen items-center justify-center p-6 antialiased">
+  <div class="relative w-full max-w-md">
+    <div class="absolute -top-12">
+      <a
+        href="/dashboard"
+        class="rounded-lg px-5 py-2 text-[13px] font-medium text-slate-400 transition-colors hover:text-slate-800"
+      >
         ← Kembali
       </a>
     </div>
 
-    <div class="bg-white rounded-2xl p-8 text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-100">
-      <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-slate-50 mb-6">
-        <svg class="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    <div
+      class="rounded-2xl border border-slate-100 bg-white p-8 text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)]"
+    >
+      <div class="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-50">
+        <svg class="h-7 w-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
         </svg>
       </div>
 
-      <h1 class="text-lg font-semibold text-slate-800 mb-2">Sistem Tidak Merespons</h1>
-      <p class="text-xs text-slate-400 mb-8 max-w-xs mx-auto leading-relaxed">
-        Terjadi gangguan pada permintaan Anda. Mohon untuk memuat ulang atau kembali ke halaman utama.
+      <h1 class="mb-2 text-lg font-semibold text-slate-800">Sistem Tidak Merespons</h1>
+      <p class="mx-auto mb-8 max-w-xs text-xs leading-relaxed text-slate-400">
+        Terjadi gangguan pada permintaan Anda. Mohon untuk memuat ulang atau kembali ke halaman
+        utama.
       </p>
 
-      <div class="bg-slate-50 rounded-lg p-4 text-left border border-slate-100">
-        <span class="block text-[9px] font-bold text-slate-300 uppercase tracking-widest mb-1">Penyebab:</span>
-        <p class="text-[11px] font-mono text-slate-500 break-words leading-relaxed">
+      <div class="rounded-lg border border-slate-100 bg-slate-50 p-4 text-left">
+        <span class="mb-1 block text-[9px] font-bold tracking-widest text-slate-300 uppercase">
+          Penyebab:
+        </span>
+        <p class="font-mono text-[11px] leading-relaxed break-words text-slate-500">
           <%= typeof message !== 'undefined' ? message : 'No detailed logs found.' %>
         </p>
       </div>
     </div>
-
   </div>
 </div>
