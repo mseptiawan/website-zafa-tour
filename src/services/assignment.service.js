@@ -1,19 +1,77 @@
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
+import { ROLES, PAGINATION, FILE_UPLOAD, MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 import Assignment from "../models/Assignment.model.js";
 import Employee from "../models/employee/Employee.model.js";
-import * as notificationService from "./notification.service.js";
+import User from "../models/basic/User.model.js";
 
+import notificationService from "./notification.service.js";
+/**
+ * Query builder internal untuk menyaring data dinas luar berdasarkan role user.
+ * @param {Object} currentUser - Objek user dari session
+ * @returns {Object} Mongoose filter object
+ */
+const buildAssignmentFilter = (currentUser) => {
+  const filter = {};
+  const role = currentUser?.role?.toUpperCase();
+
+  const restrictedRoles = [
+    ROLES.MANAGER_ADMINISTRASI,
+    ROLES.MANAGER_HAJI_UMRAH,
+    ROLES.MANAGER_KEUANGAN,
+  ];
+
+  if (restrictedRoles.includes(role)) {
+    filter.createdBy = currentUser._id;
+  }
+  return filter;
+};
+
+/**
+ * Memvalidasi berkas/dokumen lampiran secara ketat sebelum diproses sistem.
+ * @param {Object} file - Express Multer File Object
+ * @throws {Error} Jika berkas melanggar limit ukuran atau tipe mime
+ */
+const validateUploadedFile = (file) => {
+  if (!file) return;
+
+  if (file.size > FILE_UPLOAD.MAX_SIZE) {
+    const err = new Error("Ukuran file lampiran terlalu besar. Maksimal berukuran 5MB.");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  if (!FILE_UPLOAD.ALLOWED_MIMETYPES.includes(file.mimetype)) {
+    const err = new Error("Format file tidak didukung. Unggah file gambar, PDF, atau Word.");
+    err.statusCode = 400;
+    throw err;
+  }
+};
+
+/**
+ * Mengambil semua daftar karyawan aktif untuk pilihan drop-down formulir (Optimal via .lean()).
+ * @param {string|null} [excludeEmployeeId=null] - ID Karyawan pembuat untuk dikecualikan
+ * @returns {Promise<Array<Object>>} Daftar karyawan murni (POJO)
+ */
 export const findEmployees = async (excludeEmployeeId = null) => {
   const query = {};
-
   if (excludeEmployeeId) {
     query._id = { $ne: excludeEmployeeId };
   }
-
-  return await Employee.find(query).sort({ fullName: 1 });
+  return await Employee.find(query).sort({ fullName: 1 }).lean();
 };
 
+/**
+ * Membuat data dinas luar baru sekaligus mengirimkan notifikasi push ke tim yang didelegasikan.
+ * @param {Object} params
+ * @param {Object} params.body - Request body berisi payload form
+ * @param {Object} [params.file] - Berkas lampiran multer
+ * @param {string} params.userId - ID User pembuat dokumen
+ * @param {string} params.creatorName - Nama lengkap user pembuat dokumen
+ * @returns {Promise<Object>} Instance data Assignment terbuat
+ */
 export const create = async ({ body, file, userId, creatorName }) => {
+  validateUploadedFile(file);
+
   let employeeIds = [];
   if (body.employees) {
     employeeIds = Array.isArray(body.employees) ? body.employees : [body.employees];
@@ -31,33 +89,50 @@ export const create = async ({ body, file, userId, creatorName }) => {
     attachment: file?.filename || null,
   });
 
-  try {
-    const senderName = creatorName || "Pimpinan";
+  if (employeeIds.length > 0 && employeeIds[0]) {
+    try {
+      const employeesData = await Employee.find({ _id: { $in: employeeIds } })
+        .select("userId")
+        .lean();
 
-    if (employeeIds.length > 0 && employeeIds[0]) {
-      const notifPromises = employeeIds.map((empId) => {
-        return notificationService.createNotification({
-          userId: empId,
-          type: "assignment",
+      const targetUserIds = employeesData.map((emp) => emp.userId).filter((id) => id != null);
+
+      if (targetUserIds.length > 0) {
+        await notificationService.createManyNotifications({
+          userIds: targetUserIds,
+          senderId: userId,
+          senderName: creatorName || "Pimpinan",
           title: "Penugasan Baru",
-          text: `${senderName} memberikan Anda tugas baru: "${body.title || "Tanpa Judul"}"`,
-          module: "assignment",
+          text: `Anda mendapatkan penugasan baru: "${body.title || "Tanpa Judul"}"`,
+          module: MODULES.ASSIGNMENT,
           referenceId: assignment._id,
+          actionUrl: `/assignments/${assignment._id}`,
+          type: "ASSIGNMENT",
+          category: NOTIF_CATEGORIES.INFO,
         });
-      });
-
-      await Promise.all(notifPromises);
+      }
+    } catch (notifError) {
+      console.error("ERROR DI DALAM BLOK NOTIFIKASI:", notifError.message);
     }
-  } catch (notifError) {
-    console.error("Notification Error on Assignment Creation:", notifError);
   }
 
   return assignment;
 };
 
+/**
+ * Mengambil data dinas luar yang didelegasikan spesifik ke karyawan tertentu (Terpagination & Lean).
+ * @param {Object} params
+ * @param {string} params.employeeId - ID Karyawan login aktif
+ * @param {number|string} [params.page] - Posisi halaman saat ini
+ * @param {number|string} [params.limit] - Limit data per halaman
+ * @returns {Promise<{data: Array<Object>, meta: Object}>} Objek standar pembawa data & metadata halaman
+ */
 export const findMine = async ({ employeeId, page, limit }) => {
   if (!employeeId) {
-    return { data: [], meta: getPaginationMeta({ page: 1, limit: 10, total: 0 }) };
+    return {
+      data: [],
+      meta: getPaginationMeta({ page: 1, limit: PAGINATION.DEFAULT_LIMIT, total: 0 }),
+    };
   }
 
   const paginationArgs = getPagination({ page, limit });
@@ -68,7 +143,8 @@ export const findMine = async ({ employeeId, page, limit }) => {
     .populate("createdBy", "username email")
     .sort({ createdAt: -1 })
     .skip(paginationArgs.skip)
-    .limit(paginationArgs.limit);
+    .limit(paginationArgs.limit)
+    .lean();
 
   return {
     data,
@@ -80,25 +156,28 @@ export const findMine = async ({ employeeId, page, limit }) => {
   };
 };
 
-export const findAll = async ({ page = 1, limit = 7, currentUser }) => {
+/**
+ * Mengambil seluruh log data dinas luar internal perusahaan berdasarkan hak akses user (Terpagination & Lean).
+ * @param {Object} params
+ * @param {number|string} [params.page=1] - Posisi halaman saat ini
+ * @param {number|string} [params.limit] - Jumlah limit item per halaman
+ * @param {Object} params.currentUser - Objek Sesi User login aktif
+ * @returns {Promise<{data: Array<Object>, meta: Object}>} Objek standar pembawa data & metadata halaman
+ */
+export const findAll = async ({ page = 1, limit = PAGINATION.ASSIGNMENT_DEFAULT, currentUser }) => {
   const paginationArgs = getPagination({ page, limit });
-  let filter = {};
-  const role = currentUser?.role?.toUpperCase();
-
-  if (["MANAGER_ADMINISTRASI", "MANAGER_HAJI_UMRAH", "MANAGER_KEUANGAN"].includes(role)) {
-    filter = { createdBy: currentUser._id };
-  }
-
+  const filter = buildAssignmentFilter(currentUser);
   const total = await Assignment.countDocuments(filter);
 
-  const assignments = await Assignment.find(filter)
+  const data = await Assignment.find(filter)
     .populate([{ path: "employees" }, { path: "createdBy" }])
     .sort({ createdAt: -1 })
     .skip(paginationArgs.skip)
-    .limit(paginationArgs.limit);
+    .limit(paginationArgs.limit)
+    .lean();
 
   return {
-    assignments,
+    data,
     meta: getPaginationMeta({
       page: paginationArgs.page,
       limit: paginationArgs.limit,
@@ -107,6 +186,23 @@ export const findAll = async ({ page = 1, limit = 7, currentUser }) => {
   };
 };
 
+/**
+ * Mencari satu detail dokumen dinas luar secara mendalam melalui ID dokumen (Lean).
+ * @param {string} id - ID Object Data Assignment
+ * @returns {Promise<Object|null>} Berkas penugasan utuh atau null
+ */
 export const findById = async (id) => {
-  return await Assignment.findById(id).populate([{ path: "employees" }, { path: "createdBy" }]);
+  return await Assignment.findById(id)
+    .populate([
+      { path: "employees" },
+      {
+        path: "createdBy",
+        select: "username email",
+        populate: {
+          path: "employeeData", // Mengambil virtual Employee dari model User
+          select: "fullName foto_profile",
+        },
+      },
+    ])
+    .lean(); // Eksekusi lean di akhir aman di sini
 };

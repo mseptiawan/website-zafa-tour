@@ -99,15 +99,12 @@ app.use("/", routes);
 // 6. ERROR HANDLERS (Selalu paling bawah)
 // ==========================================
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.originalUrl}`);
   const error = new Error("Halaman yang Anda cari tidak ditemukan (404)");
   error.status = 404;
   next(error);
 });
 
 app.use((err, req, res, next) => {
-  console.error("Error Handler Catch:", err);
-
   const status = err.status || 500;
 
   if (err.details) {

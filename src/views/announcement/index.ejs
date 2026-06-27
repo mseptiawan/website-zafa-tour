@@ -30,24 +30,7 @@
     </div>
     <% } %>
 
-    <% if (pagination.totalPages > 1) { %>
-    <div class="flex items-center justify-end mt-8 w-full border-t border-slate-200/60 pt-4">
-      <div class="flex items-center gap-5">
-        <a href="?page=<%= pagination.page - 1 %>" class="py-1 text-[11.5px] font-semibold transition-colors flex items-center gap-1 <%= pagination.hasPrev ? 'text-slate-500 hover:text-slate-900' : 'text-slate-300 pointer-events-none select-none' %>">
-          <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Prev
-        </a>
-        <a href="?page=<%= pagination.page + 1 %>" class="py-1 text-[11.5px] font-semibold transition-colors flex items-center gap-1 <%= pagination.hasNext ? 'text-slate-500 hover:text-slate-900' : 'text-slate-300 pointer-events-none select-none' %>">
-          Next
-          <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
-      </div>
-    </div>
-    <% } %>
+ <%- include('../partials/pagination-nav') %>
 
   </div>
 </div>

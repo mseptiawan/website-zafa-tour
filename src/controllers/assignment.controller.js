@@ -1,3 +1,5 @@
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData, getToday } from "../utils/renderHelper.js";
 import {
   findEmployees,
   create as createAssignment,
@@ -6,123 +8,113 @@ import {
   findById,
 } from "../services/assignment.service.js";
 
-const RENDER_DEFAULTS = (req) => ({
-  user: req.session.user,
-});
+// ─── METHOD 1: FORM CREATE  ─────────────────────
+export const create = asyncHandler(async (req, res) => {
+  const currentEmployeeId = req.session.user?.employeeId;
+  const employees = await findEmployees(currentEmployeeId);
 
-export const create = async (req, res, next) => {
-  try {
-    const currentEmployeeId = req.session.user?.employeeId;
-    const employees = await findEmployees(currentEmployeeId);
-    const today = new Date().toISOString().split("T")[0];
-
-    res.render("assignment/create", {
-      ...RENDER_DEFAULTS(req),
+  res.render("assignment/create", {
+    ...buildRenderData(req, {
       title: "Buat Penugasan",
       employees,
-      today,
-      errors: {},
-      old: {},
-      activeMenu: "create-assignment",
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+      today: getToday(),
+    }),
+  });
+});
 
-export const store = async (req, res, next) => {
-  try {
-    const currentEmployeeId = req.session.user?.employeeId;
+// ─── METHOD 2: STORE DATA  ───
+export const store = asyncHandler(async (req, res) => {
+  const currentEmployeeId = req.session.user?.employeeId;
 
-    if (req.validationErrors) {
-      const employees = await findEmployees(currentEmployeeId);
-      const today = new Date().toISOString().split("T")[0];
+  if (req.validationErrors) {
+    const employees = await findEmployees(currentEmployeeId);
 
-      return res.status(400).render("assignment/create", {
-        ...RENDER_DEFAULTS(req),
+    return res.status(400).render("assignment/create", {
+      ...buildRenderData(req, {
         title: "Buat Penugasan",
         employees,
-        today,
+        today: getToday(),
         errors: req.validationErrors,
         old: req.body,
-        activeMenu: "create-assignment",
-      });
-    }
-
-    await createAssignment({
-      body: req.body,
-      file: req.file,
-      userId: req.session.user._id,
-      creatorName: req.session.user.fullName,
+        error: ["Mohon periksa kembali form pengisian Anda."],
+      }),
     });
-
-    return res.redirect("/assignments");
-  } catch (err) {
-    next(err);
   }
-};
 
-export const my = async (req, res, next) => {
-  try {
-    const { page, limit } = req.query;
-    const employeeId = req.session.user?.employeeId;
+  await createAssignment({
+    body: req.body,
+    file: req.file,
+    userId: req.session.user._id,
+    creatorName: req.session.user.fullName,
+  });
 
-    const { data, meta } = await findMine({
-      employeeId,
-      page,
-      limit,
+  req.flash("success", "Penugasan berhasil diterbitkan!");
+
+  await new Promise((resolve, reject) => {
+    req.session.save((err) => {
+      if (err) return reject(err);
+      resolve();
     });
+  });
 
-    res.render("assignment/my", {
-      ...RENDER_DEFAULTS(req),
-      title: "Penugasan Saya",
-      assignments: data,
+  return res.redirect("/assignments");
+});
+
+// ─── METHOD 3: PENUGASAN SAYA  ────────
+export const my = asyncHandler(async (req, res) => {
+  const { page, limit } = req.query;
+  const employeeId = req.session.user?.employeeId;
+
+  const { data: assignments, meta } = await findMine({
+    employeeId,
+    page,
+    limit,
+  });
+
+  res.render("assignment/my", {
+    ...buildRenderData(req, {
+      title: "Penugasan ku",
+      assignments,
       pagination: meta,
       query: req.query,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+    }),
+  });
+});
 
-export const index = async (req, res, next) => {
-  try {
-    const { page, limit } = req.query;
+// ─── METHOD 4: INDEX ALL  ───
+export const index = asyncHandler(async (req, res) => {
+  const { page, limit } = req.query;
 
-    const result = await findAll({
-      page,
-      limit,
-      currentUser: req.session.user,
-    });
+  const { data: assignments, meta } = await findAll({
+    page,
+    limit,
+    currentUser: req.session.user,
+  });
 
-    res.render("assignment/index", {
-      ...RENDER_DEFAULTS(req),
+  res.render("assignment/index", {
+    ...buildRenderData(req, {
       title: "Semua Penugasan",
-      assignments: result.assignments,
-      pagination: result.meta,
+      assignments,
+      pagination: meta,
       query: req.query,
-    });
-  } catch (err) {
-    next(err);
+    }),
+  });
+});
+
+// ─── METHOD 5: SHOW DETAIL ────────
+export const show = asyncHandler(async (req, res) => {
+  const assignment = await findById(req.params.id);
+
+  if (!assignment) {
+    const err = new Error("Data penugasan tidak ditemukan");
+    err.statusCode = 404;
+    throw err;
   }
-};
 
-export const show = async (req, res, next) => {
-  try {
-    const assignment = await findById(req.params.id);
-
-    if (!assignment) {
-      const err = new Error("Penugasan tidak ditemukan");
-      err.statusCode = 404;
-      return next(err);
-    }
-
-    res.render("assignment/show", {
-      ...RENDER_DEFAULTS(req),
+  res.render("assignment/show", {
+    ...buildRenderData(req, {
       title: "Detail Penugasan",
       assignment,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+    }),
+  });
+});

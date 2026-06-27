@@ -1,7 +1,5 @@
 const authMiddleware = (req, res, next) => {
-  console.log("AUTH CHECK:", req.session.user);
   if (!req.session.user) {
-    console.log("SESSION KOSONG");
     return res.redirect("/");
   }
 

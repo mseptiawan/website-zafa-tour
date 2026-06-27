@@ -1166,8 +1166,6 @@ export const approveDelegation = async (req, res) => {
         ? requester.roleId.name.toString().trim().toUpperCase()
         : "";
 
-    console.log("DEBUG - BERHASIL MENDAPATKAN ROLE STRUKTURAL:", requesterRoleName);
-
     const { nextStep, nextApproverId } = await getNextApprover(requesterRoleName, "HANDOVER");
 
     if (nextApproverId) {
@@ -1421,8 +1419,6 @@ export const approveLeave = async (req, res) => {
         balance.remaining -= Number(leave.totalDays);
         await balance.save();
       }
-
-      console.log("DEBUG WORKFLOW - FINAL APPROVED");
     }
 
     return res.redirect("/leave/manage-requests");

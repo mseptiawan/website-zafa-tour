@@ -7,7 +7,6 @@ import Announcement from "../models/Announcement.model.js";
 
 export const index = async (req, res, next) => {
   try {
-    console.log("debug");
     const user = req.session.user;
     if (!user) {
       return res.redirect("/?error=SESSION_EXPIRED");
