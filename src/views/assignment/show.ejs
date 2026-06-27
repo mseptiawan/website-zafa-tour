@@ -3,30 +3,25 @@
 <div class="ml-0 md:ml-72 min-h-screen bg-slate-50 md:bg-[#FCFCFD] p-4 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
   <div class="w-full max-w-none mx-auto">
 
-    <a href="/assignment"
-      class="inline-flex items-center gap-1.5 text-[12px] font-bold text-slate-400 hover:text-slate-700 mb-5 transition-colors group decoration-none select-none">
-      <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-      </svg>
-      <span>Kembali ke Daftar</span>
-    </a>
-
+   
     <div class="bg-white border border-slate-200/60 rounded-2xl shadow-3xs overflow-hidden">
       
       <div class="px-6 py-5 border-b border-slate-100 flex items-start justify-between bg-white gap-6 select-none">
-        <div class="space-y-1">
-          <h1 class="text-xl font-bold text-slate-900 tracking-tight"><%= assignment.title %></h1>
-          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tipe: <span class="text-slate-600"><%= assignment.type %></span></p>
+        <div class="space-y-1.5 min-w-0">
+          <h1 class="text-xl font-bold text-slate-900 tracking-tight truncate"><%= assignment.title %></h1>
+          <div class="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span>Tipe: <span class="text-slate-600"><%= assignment.type %></span></span>
+          </div>
         </div>
         
         <div class="shrink-0 pt-0.5">
           <% if (new Date(assignment.endDate) >= new Date()) { %>
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100/50">
-              <span class="h-1 w-1 rounded-full bg-emerald-500"></span> Active
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Active
             </span>
           <% } else { %>
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-200/50">
-              <span class="h-1 w-1 rounded-full bg-slate-300"></span> Completed
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-200/50">
+              <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Completed
             </span>
           <% } %>
         </div>
@@ -34,24 +29,37 @@
 
       <div class="p-6 space-y-6">
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-b border-slate-100 pb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 border-b border-slate-100 pb-6">
           <div>
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Lokasi Tujuan</div>
-            <div class="text-[13px] font-bold text-slate-700"><%= assignment.location || '-' %></div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Diberikan Oleh</div>
+            <div class="text-[13px] font-semibold text-slate-700 flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
+              <i class="fa-solid fa-user-tie text-[11px] text-indigo-500"></i>
+              <span class="truncate"><%= assignment.createdBy?.employeeData?.fullName || assignment.createdBy?.username || 'Pimpinan / Admin' %></span>
+            </div>
           </div>
+          
           <div>
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Durasi Penugasan</div>
-            <div class="text-[13px] font-bold text-slate-700">
-              <%= new Date(assignment.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %> 
-              <span class="text-slate-300 font-normal mx-1">s/d</span> 
-              <%= new Date(assignment.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Lokasi Tujuan</div>
+            <div class="text-[13px] font-semibold text-slate-700 flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
+              <i class="fa-solid fa-location-dot text-[11px] text-slate-400"></i>
+              <span class="truncate"><%= assignment.location || '-' %></span>
+            </div>
+          </div>
+          
+          <div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Durasi Dinas Luar</div>
+            <div class="text-[13px] font-semibold text-slate-700 flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
+              <i class="fa-regular fa-calendar text-[11px] text-slate-400 mr-0.5"></i>
+              <span><%= new Date(assignment.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) %></span> 
+              <span class="text-slate-300 font-normal text-xs">s/d</span> 
+              <span><%= new Date(assignment.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %></span>
             </div>
           </div>
         </div>
 
         <div class="space-y-1.5">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Deskripsi Penugasan</div>
-          <p class="text-[13px] text-slate-600 leading-relaxed break-words whitespace-pre-line font-medium bg-slate-50/50 border border-slate-100 p-3.5 rounded-xl">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Deskripsi Dinas Luar</div>
+          <p class="text-[13px] text-slate-600 leading-relaxed break-words whitespace-pre-line font-medium bg-slate-50/40 border border-slate-200/40 p-4 rounded-xl">
             <%= assignment.description || 'Tidak ada deskripsi tambahan untuk penugasan ini.' %>
           </p>
         </div>
@@ -60,7 +68,7 @@
           <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Pegawai Ditugaskan</div>
           <div class="flex flex-wrap gap-2 select-none">
             <% assignment.employees.forEach(e => { %>
-              <span class="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg">
+              <span class="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200/50 text-slate-600 text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-colors hover:bg-slate-100/60">
                 <i class="fa-solid fa-user text-[9px] text-slate-400"></i> <%= e.fullName %>
               </span>
             <% }) %>
@@ -72,8 +80,8 @@
             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Surat Perintah Kerja (SPK)</div>
             <div class="flex items-center justify-between border border-slate-200/60 rounded-xl p-3 bg-white shadow-3xs select-none">
               <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-rose-500 shrink-0">
-                  <i class="fa-solid fa-file-pdf text-[13px]"></i>
+                <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-100/40 flex items-center justify-center text-rose-500 shrink-0">
+                  <i class="fa-solid fa-file-pdf text-[14px]"></i>
                 </div>
                 <div class="truncate">
                   <p class="text-[12px] font-bold text-slate-700 truncate">Lampiran_Penugasan.pdf</p>

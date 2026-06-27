@@ -1,0 +1,48 @@
+<div class="fixed inset-x-0 bottom-0 z-[105] flex items-center justify-around border-t border-white bg-white/70 backdrop-blur-lg px-2 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] md:hidden">
+  <a href="/dashboard" class="flex flex-1 flex-col items-center gap-1 text-slate-600 active:text-blue-600 transition-all hover:text-blue-600">
+    <i class="fa-solid fa-house text-lg"></i>
+    <span class="text-[9px] font-bold uppercase tracking-wide">Beranda</span>
+  </a>
+
+  <a href="/attendance/history" class="flex flex-1 flex-col items-center gap-1 active:text-blue-600 text-slate-600 transition-all hover:text-blue-600">
+    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+    <span class="text-[9px] font-bold uppercase tracking-wide">Absensi</span>
+  </a>
+
+  <div class="flex-1 flex justify-center relative -top-6">
+    <button type="button" onclick="toggleQuickMenuMobile()" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30 active:scale-90 transition-all duration-300">
+      <i id="quickMenuIconMobile" class="fa-solid fa-plus text-xl transition-transform duration-300"></i>
+    </button>
+  </div>
+
+  <a href="/leave/my-history" class="relative flex flex-1 flex-col items-center gap-1 text-slate-600 transition-all hover:text-blue-600 active:text-blue-600">
+    <i class="fa-solid fa-envelope-open-text text-lg"></i>
+    <span class="text-[9px] font-bold uppercase tracking-wide">Cuti</span>
+  </a>
+
+  <div class="relative flex flex-1 flex-col items-center gap-1 text-slate-600 active:text-blue-600">
+    <button type="button" id="accountMenuBtnMobile" onclick="toggleAccountMenuMobile()" class="flex flex-col items-center gap-1 hover:text-blue-600 focus:outline-none">
+      <div class="w-6 h-6 rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 transition-all">
+        <% if (typeof user !== 'undefined' && user.foto_profile) { %>
+        <img src="<%= user.foto_profile %>" alt="Profil" class="w-full h-full object-cover">
+        <% } else { %>
+        <span class="text-[10px] font-bold text-slate-600 uppercase"><%= typeof user !== 'undefined' ? user.username.charAt(0) : 'A' %></span>
+        <% } %>
+      </div>
+      <span class="text-[9px] font-bold uppercase tracking-wide">Akun</span>
+    </button>
+
+    <div id="accountDropdownMobile" class="hidden absolute bottom-16 right-2 w-44 bg-white/95 backdrop-blur-sm border border-slate-100 rounded-2xl shadow-2xl p-1.5 flex flex-col space-y-0.5 z-[1000]">
+      <a href="/employee/detail/<%= typeof user !== 'undefined' ? user?.employeeId : '' %>" class="px-3 py-2.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2">
+        <i class="fa-solid fa-user text-slate-400"></i> Lihat Informasi
+      </a>
+      <a href="/change-password" class="px-3 py-2.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2">
+        <i class="fa-solid fa-user-gear text-slate-400"></i> Ganti Password
+      </a>
+      <div class="border-t border-slate-100 my-1"></div>
+      <a href="/logout" onclick="localStorage.clear();" class="px-3 py-2.5 text-[11px] font-bold text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2">
+        <i class="fa-solid fa-right-from-bracket text-red-400"></i> Keluar
+      </a>
+    </div>
+  </div>
+</div>

@@ -1781,6 +1781,9 @@
   .border-green-100 {
     border-color: var(--color-green-100);
   }
+  .border-indigo-100 {
+    border-color: var(--color-indigo-100);
+  }
   .border-indigo-100\/20 {
     border-color: color-mix(in srgb, oklch(93% 0.034 272.788) 20%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -4792,6 +4795,16 @@
       }
     }
   }
+  .hover\:bg-slate-100\/60 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, oklch(96.8% 0.007 247.896) 60%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-slate-100) 60%, transparent);
+        }
+      }
+    }
+  }
   .hover\:bg-slate-100\/80 {
     &:hover {
       @media (hover: hover) {
@@ -6054,6 +6067,13 @@
   .md\:bg-white {
     @media (width >= 48rem) {
       background-color: var(--color-white);
+    }
+  }
+  .md\:md\:p-8 {
+    @media (width >= 48rem) {
+      @media (width >= 48rem) {
+        padding: calc(var(--spacing) * 8);
+      }
     }
   }
   .md\:p-0 {

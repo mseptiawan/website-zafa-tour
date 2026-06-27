@@ -1,0 +1,139 @@
+<script>
+  console.log("SUCCESS LOCAL:", <%- JSON.stringify(success) %>);
+  console.log("ERROR LOCAL:", <%- JSON.stringify(error) %>);
+</script>
+<script src="/js/custom-modal.js"></script>
+<script src="/js/sidebar-handler.js"></script>
+<script src="/js/notification-handler.js"></script>
+
+<script>
+  function openRiwayatMenuMobile() {
+    const menu = document.getElementById('riwayatMenuMobile');
+    menu.classList.remove('hidden');
+    setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10);
+  }
+
+  function toggleRiwayatMenuMobile() {
+    const menu = document.getElementById('riwayatMenuMobile');
+    menu.querySelector('.transform').classList.add('translate-y-full');
+    setTimeout(() => menu.classList.add('hidden'), 200);
+  }
+
+  function toggleQuickMenuMobile() {
+    const menu = document.getElementById('quickActionMenuMobile');
+    const icon = document.getElementById('quickMenuIconMobile');
+    document.getElementById('accountDropdownMobile').classList.add('hidden');
+    if (menu.classList.contains('hidden')) {
+      menu.classList.remove('hidden');
+      setTimeout(() => menu.querySelector('div').classList.remove('translate-y-10'), 10);
+      icon.classList.add('rotate-45');
+    } else {
+      menu.querySelector('div').classList.add('translate-y-10');
+      setTimeout(() => menu.classList.add('hidden'), 150);
+      icon.classList.remove('rotate-45');
+    }
+  }
+
+  function toggleAccountMenuMobile() {
+    const dropdown = document.getElementById('accountDropdownMobile');
+    if (dropdown) dropdown.classList.toggle('hidden');
+  }
+
+  document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('accountDropdownMobile');
+    const isClickInsideButton = e.target.closest('#accountMenuBtnMobile');
+    if (dropdown && !dropdown.contains(e.target) && !isClickInsideButton) {
+      dropdown.classList.add('hidden');
+    }
+  });
+
+  if (document.getElementById('liveClockMobile')) {
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('liveClockMobile').textContent = now.toLocaleTimeString('id-ID', { hour12: false });
+    }, 1000);
+  }
+
+  function triggerGlobalToast({ title = "Info", message = "", type = "success" }) {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+    const styles = {
+      success: { icon: "fa-circle-check", iconColor: "text-emerald-500", accentBorder: "border-l-emerald-500" },
+      error: { icon: "fa-circle-xmark", iconColor: "text-rose-500", accentBorder: "border-l-rose-500" }
+    };
+    const s = styles[type] || styles.success;
+    const toast = document.createElement("div");
+    toast.className = "w-[360px] rounded-xl border border-slate-200/60 border-l-4 " + s.accentBorder + " bg-white/95 shadow-md p-4 transform translate-x-20 opacity-0 transition-all duration-300 ease-out";
+    toast.innerHTML =
+      '<div class="flex items-start gap-3">' +
+      '<div class="flex-shrink-0 mt-0.5"><i class="fa-solid ' + s.icon + ' ' + s.iconColor + ' text-lg"></i></div>' +
+      '<div class="flex-1 min-w-0 text-left">' +
+      '<h4 class="text-[13px] font-bold text-slate-900 tracking-tight">' + title + '</h4>' +
+      '<p class="mt-0.5 text-xs font-medium text-slate-500 leading-relaxed break-words">' + message + '</p>' +
+      '</div>' +
+      '<button class="text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0 p-0.5 hover:bg-slate-100 rounded-lg"><i class="fa-solid fa-xmark text-xs"></i></button>' +
+      '</div>';
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.remove("translate-x-20", "opacity-0");
+      toast.classList.add("translate-x-0", "opacity-100");
+    }, 50);
+    const closeToast = () => {
+      toast.classList.remove("translate-x-0", "opacity-100");
+      toast.classList.add("translate-x-10", "opacity-0");
+      setTimeout(() => toast.remove(), 300);
+    };
+    toast.querySelector("button").addEventListener("click", closeToast);
+    setTimeout(closeToast, 4000);
+  }
+
+  function openExpenseMenuMobile() {
+    const menu = document.getElementById('expenseMenuMobile');
+    menu.classList.remove('hidden');
+    setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10);
+  }
+
+  function toggleExpenseMenuMobile() {
+    const menu = document.getElementById('expenseMenuMobile');
+    menu.querySelector('.transform').classList.add('translate-y-full');
+    setTimeout(() => menu.classList.add('hidden'), 200);
+  }
+
+  // Auto Flash Message Trigger Framework
+  document.addEventListener("DOMContentLoaded", () => {
+    const successMessage = <%- (typeof success !== 'undefined' && success && success.length) ? JSON.stringify(success[0]) : 'null' %>;
+    const errorMessage = <%- (typeof error !== 'undefined' && error && error.length) ? JSON.stringify(error[0]) : 'null' %>;
+
+    if (successMessage) triggerGlobalToast({ title: "Berhasil", message: successMessage, type: "success" });
+    if (errorMessage) triggerGlobalToast({ title: "Gagal", message: errorMessage, type: "error" });
+  });
+
+  function openLoanMenuMobile() { const menu = document.getElementById('loanMenuMobile'); menu.classList.remove('hidden'); setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10); }
+  function toggleLoanMenuMobile() { const menu = document.getElementById('loanMenuMobile'); menu.querySelector('.transform').classList.add('translate-y-full'); setTimeout(() => menu.classList.add('hidden'), 200); }
+  function openOvertimeMenuMobile() { const menu = document.getElementById('overtimeMenuMobile'); menu.classList.remove('hidden'); setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10); }
+  function toggleOvertimeMenuMobile() { const menu = document.getElementById('overtimeMenuMobile'); menu.querySelector('.transform').classList.add('translate-y-full'); setTimeout(() => menu.classList.add('hidden'), 200); }
+  function openLeaveMenuMobile() { const menu = document.getElementById('leaveMenuMobile'); menu.classList.remove('hidden'); setTimeout(() => menu.querySelector('.transform').classList.remove('translate-y-full'), 10); }
+  function toggleLeaveMenuMobile() { const menu = document.getElementById('leaveMenuMobile'); menu.querySelector('.transform').classList.add('translate-y-full'); setTimeout(() => menu.classList.add('hidden'), 200); }
+
+  function openPermitMenuMobile() {
+    const menu = document.getElementById('permitMenuMobile');
+    if (!menu) return;
+    menu.classList.remove('hidden');
+    setTimeout(() => {
+      menu.classList.add('opacity-100');
+      menu.querySelector('.transform').classList.remove('translate-y-full');
+    }, 10);
+  }
+  function togglePermitMenuMobile() {
+    const menu = document.getElementById('permitMenuMobile');
+    if (!menu) return;
+    const content = menu.querySelector('.transform');
+    if (!content.classList.contains('translate-y-full')) {
+      content.classList.add('translate-y-full');
+      menu.classList.remove('opacity-100');
+      setTimeout(() => menu.classList.add('hidden'), 200);
+    } else {
+      openPermitMenuMobile();
+    }
+  }
+</script>

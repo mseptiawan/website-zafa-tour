@@ -1,5 +1,5 @@
 import Announcement from "../models/Announcement.model.js";
-import { getPaginationMeta } from "../utils/pagination.js";
+import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 
 // ─── CREATE ──────────────────────────────────────────────────────────────────
 const create = ({ body, userSession, file }) => {
@@ -18,21 +18,31 @@ const create = ({ body, userSession, file }) => {
 };
 
 // ─── GET ALL ─────────────────────────────────────────────────────────────────
-const getAll = async ({ page, limit, skip }) => {
-  const [data, total] = await Promise.all([
-    Announcement.find()
+const getAll = async ({ page, isMobile }) => {
+  const determinedLimit = isMobile ? 5 : 9;
 
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(),
+  const {
+    page: currentPage,
+    limit,
+    skip,
+  } = getPagination({
+    page,
+    limit: determinedLimit,
+  });
+
+  const [data, total] = await Promise.all([
+    Announcement.find().sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
 
     Announcement.countDocuments(),
   ]);
 
   return {
     data,
-    meta: getPaginationMeta({ page, limit, total }),
+    meta: getPaginationMeta({
+      page: currentPage,
+      limit,
+      total,
+    }),
   };
 };
 

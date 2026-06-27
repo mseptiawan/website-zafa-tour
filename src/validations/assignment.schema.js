@@ -7,7 +7,7 @@ export const createAssignmentSchema = z
     type: z.enum(["UNDANGAN", "INTERNAL", "TRAINING", "LAINNYA"], {
       errorMap: () => ({ message: "Tipe penugasan tidak valid" }),
     }),
-    location: z.string().optional(),
+    location: z.string().min(1, "Lokasi tujuan / tempat wajib diisi"),
     startDate: z.string().min(1, "Tanggal mulai wajib diisi"),
     endDate: z.string().min(1, "Tanggal selesai wajib diisi"),
     employees: z.union([z.string().min(1), z.array(z.string()).min(1)], {

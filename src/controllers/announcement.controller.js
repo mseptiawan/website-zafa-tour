@@ -7,7 +7,6 @@ const RENDER_DEFAULTS = (req) => ({
 
 // ─── NEW FORM ─────────────────────────────────────────────────────────────────
 export const create = (req, res) => {
-  console.log("ANNOUNCEMENT NEW HIT");
   res.render("announcement/create", {
     ...RENDER_DEFAULTS(req),
     title: "Buat Pengumuman",
@@ -17,17 +16,21 @@ export const create = (req, res) => {
 };
 
 // ─── STORE ───────────────────────────────────────────────────────────────────
-
 export const store = async (req, res, next) => {
   try {
     if (req.validationErrors) {
+      req.flash("error", "Mohon periksa kembali form pengisian Anda.");
+
       return res.status(400).render("announcement/create", {
         ...RENDER_DEFAULTS(req),
         title: "Buat Pengumuman",
         errors: req.validationErrors,
         old: req.body,
+        success: req.flash("success"),
+        error: req.flash("error"),
       });
     }
+
     const userRole = req.session.user.role;
     const announcementData = { ...req.body };
 
@@ -41,8 +44,11 @@ export const store = async (req, res, next) => {
       file: req.file,
     });
 
-    return res.redirect("/announcement");
+    req.session.save((err) => {
+      return res.redirect("/announcement");
+    });
   } catch (err) {
+    req.flash("error", "Terjadi kesalahan saat menyimpan pengumuman.");
     next(err);
   }
 };
@@ -50,14 +56,10 @@ export const store = async (req, res, next) => {
 // ─── INDEX ────────────────────────────────────────────────────────────────────
 export const index = async (req, res, next) => {
   try {
-    const determinedLimit = req.useragent?.isMobile ? 5 : 9;
-
-    const { page, limit, skip } = getPagination({
+    const result = await announcementService.getAll({
       page: req.query.page,
-      limit: determinedLimit,
+      isMobile: req.useragent?.isMobile,
     });
-
-    const result = await announcementService.getAll({ page, limit, skip, user: req.session.user });
 
     res.render("announcement/index", {
       ...RENDER_DEFAULTS(req),
@@ -80,7 +82,6 @@ export const show = async (req, res, next) => {
       err.statusCode = 404;
       return next(err);
     }
-
     res.render("announcement/show", {
       ...RENDER_DEFAULTS(req),
       title: announcement.title,

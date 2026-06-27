@@ -2,47 +2,36 @@ import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
+import { validate } from "../middlewares/validate.v2.js";
+import { createAssignmentSchema } from "../validations/assignment.schema.js";
 
-import {
-  newForm,
-  create,
-  myAssignments,
-  index,
-  show,
-} from "../controllers/assignment.controller.js";
+import { index, create, store, my, show } from "../controllers/assignment.controller.js";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get(
-  "/",
-  roleMiddleware(
-    "DIREKTUR_UTAMA",
-    "MANAGER_ADMINISTRASI",
-    "MANAGER_HAJI_UMRAH",
-    "MANAGER_KEUANGAN",
-    "WAKIL_DIREKTUR"
-  ),
-  index
-);
+const ALLOWED_MANAGEMENT_ROLES = [
+  "DIREKTUR_UTAMA",
+  "WAKIL_DIREKTUR",
+  "MANAGER_ADMINISTRASI",
+  "MANAGER_HAJI_UMRAH",
+  "MANAGER_KEUANGAN",
+];
 
-router.get("/new", newForm);
+router.get("/", roleMiddleware(...ALLOWED_MANAGEMENT_ROLES), index);
+
+router.get("/new", roleMiddleware(...ALLOWED_MANAGEMENT_ROLES), create);
+
+router.get("/my", my);
 
 router.post(
   "/",
-  roleMiddleware([
-    "DIREKTUR_UTAMA",
-    "MANAGER_ADMINISTRASI",
-    "MANAGER_HAJI_UMRAH",
-    "MANAGER_KEUANGAN",
-    "WAKIL_DIREKTUR",
-  ]),
+  roleMiddleware(...ALLOWED_MANAGEMENT_ROLES),
   uploadFile.single("attachment"),
-  create
+  validate(createAssignmentSchema),
+  store
 );
-
-router.get("/my", myAssignments);
 
 router.get("/:id", show);
 

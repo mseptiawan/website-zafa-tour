@@ -1,0 +1,240 @@
+<% if (typeof title !== 'undefined' && title.toLowerCase().includes('dashboard')) { %>
+<div class="mb-6 block rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.015)] md:hidden">
+  <div class="flex items-center justify-between mb-5 px-1">
+    <div>
+      <h1 class="text-xl font-extrabold tracking-tight text-slate-900">Beranda</h1>
+      <p class="text-[10px] font-medium text-slate-400 mt-0.5">Halo, <%= typeof user !== 'undefined' ? user.fullName : 'Pegawai' %> 👋</p>
+    </div>
+    <div class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400">
+      <i class="fa-solid fa-sparkles text-xs text-amber-500"></i>
+    </div>
+  </div>
+
+  <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 rounded-3xl pt-8 pb-10 px-6 text-white shadow relative overflow-hidden mb-6 min-h-[160px] flex flex-col justify-between">
+    <div class="absolute -right-4 -top-10 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-indigo-500/20 rounded-full blur-xl pointer-events-none"></div>
+
+    <div class="flex justify-between items-start w-full relative z-10 select-none">
+      <div class="space-y-0.5">
+        <p class="text-[10px] font-bold text-blue-100 uppercase tracking-[0.15em] opacity-90">Status Kehadiran</p>
+        <% if (!already) { %>
+        <h2 class="text-3xl font-extrabold tracking-tight mt-1 bg-gradient-to-r from-white via-white to-blue-100 bg-clip-text text-transparent tabular-nums">-- : --</h2>
+        <% } else if (already && !hasCheckedOut) { %>
+        <h2 class="text-3xl font-extrabold tracking-tight mt-1 bg-gradient-to-r from-white via-white to-blue-100 bg-clip-text text-transparent tabular-nums"><%= checkInTimeStr %></h2>
+        <% } else { %>
+        <% const checkOutTimeStr = attendance && attendance.checkOut ? moment(attendance.checkOut).format("HH:mm") : "--:--"; %>
+        <h2 class="text-3xl font-extrabold tracking-tight mt-1 bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent tabular-nums"><%= checkOutTimeStr %></h2>
+        <% } %>
+      </div>
+
+      <% if (!already) { %>
+      <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-white text-slate-900 font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(255,255,255,0.15)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.25)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
+        <span class="relative flex h-2 w-2 shrink-0">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <i class="fa-solid fa-camera text-[13px] text-slate-500 group-hover/btn:text-slate-800 transition-colors"></i>
+        <span class="tracking-tight">Check In</span>
+      </a>
+      <% } else if (already && !hasCheckedOut) { %>
+      <a href="/attendance" class="group/btn relative inline-flex items-center gap-2 h-10 px-4 bg-amber-500 text-white font-bold text-xs rounded-xl shadow-[0_4px_12px_rgba(245,158,11,0.2)] transition-all duration-200 active:scale-95 outline-none overflow-hidden decoration-none shrink-0">
+        <span class="tracking-tight">Check Out</span>
+      </a>
+      <% } else { %>
+      <div class="inline-flex items-center gap-2 h-10 px-4 bg-white/10 border border-white/20 text-white/90 font-bold text-xs rounded-xl shrink-0 shadow-3xs">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-[13px]"></i>
+        <span class="tracking-tight">Selesai Kerja</span>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="w-full pt-4 relative z-10">
+      <div class="flex items-center gap-1.5 text-[11px] text-blue-100/80 font-semibold tracking-wide">
+        <i class="fa-regular fa-calendar-check text-xs text-blue-300"></i>
+        <span>Jam Kerja: 08:30 - 16:30 WIB</span>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="text-xs font-bold uppercase tracking-wider mb-6">Featured</h3>
+  <div class="grid grid-cols-4 gap-x-2 gap-y-6">
+    <button onclick="openLeaveMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.02)] transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-calendar-check text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Cuti</span>
+    </button>
+
+    <% 
+      const overtimeApproverRoles = ['MANAGER_ADMINISTRASI', 'MANAGER_KEUANGAN', 'MANAGER_HAJI_UMRAH', 'WAKIL_DIREKTUR'];
+      const canAccessOvertimeMenu = typeof user !== 'undefined' && overtimeApproverRoles.includes(user.role);
+    %>
+    <% if (canAccessOvertimeMenu) { %>
+    <button onclick="openOvertimeMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-purple-50/70 text-purple-600 border border-purple-100/20 shadow-[0_6px_16px_rgba(139,92,246,0.03)] transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-user-clock text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Lembur</span>
+    </button>
+    <% } else { %>
+    <a href="/overtime/my" class="group flex flex-col items-center gap-2 text-center">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-purple-50/70 text-purple-600 border border-purple-100/20 shadow-[0_6px_16px_rgba(139,92,246,0.03)] transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-user-clock text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Lembur</span>
+    </a>
+    <% } %>
+
+    <% if (typeof user !== 'undefined' && user?.role === 'WAKIL_DIREKTUR') { %>
+    <button type="button" onclick="openPermitMenuMobile()" class="group flex flex-col items-center gap-2 text-center w-full bg-transparent border-none p-0 cursor-pointer outline-none select-none">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
+        <i class="fa-solid fa-file-signature text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
+    </button>
+    <% } else { %>
+    <a href="/permit/history" class="group flex flex-col items-center gap-2 text-center select-none">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-indigo-50/70 text-indigo-600 border border-indigo-100/20 shadow-[0_6px_16px_rgba(79,70,229,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-indigo-100/50">
+        <i class="fa-solid fa-file-signature text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Izin</span>
+    </a>
+    <% } %>
+
+    <a href="/sales/my" class="group flex flex-col items-center gap-2 text-center">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-rose-50/70 text-rose-600 border border-rose-100/20 shadow-[0_6px_16px_rgba(244,63,94,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-rose-100/50">
+        <i class="fa-solid fa-map-pin text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Kunjungan Sales</span>
+    </a>
+
+    <% 
+      const reviewerRoles = ['MANAGER_ADMINISTRASI', 'MANAGER_KEUANGAN', 'MANAGER_HAJI_UMRAH', 'WAKIL_DIREKTUR', 'DIREKTUR_UTAMA'];
+      const targetPath = (typeof user !== 'undefined' && reviewerRoles.includes(user.role)) ? '/daily-log/review' : '/daily-log';
+    %>
+    <a href="<%= targetPath %>" class="group flex flex-col items-center gap-2 text-center">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-teal-50/70 text-teal-600 border border-teal-100/20 shadow-[0_6px_16px_rgba(20,184,166,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-teal-100/50">
+        <i class="fa-solid fa-pen-to-square text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Jurnal</span>
+    </a>
+
+    <a href="/payroll/my-slip" class="group flex flex-col items-center gap-2 text-center">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-orange-50/70 text-orange-600 border border-orange-100/20 shadow-[0_6px_16px_rgba(249,115,22,0.03)] transition-all duration-200 active:scale-95 group-hover:bg-orange-100/50">
+        <i class="fa-solid fa-receipt text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Slip Gaji</span>
+    </a>
+
+    <% const isManager = typeof user !== 'undefined' && ['MANAGER_ADMINISTRASI', 'MANAGER_HAJI_UMRAH', 'MANAGER_KEUANGAN', 'WAKIL_DIREKTUR'].includes(user.role); %>
+    <% if (isManager) { %>
+    <button onclick="openExpenseMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.02)] transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-file-invoice text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Klaim Beban</span>
+    </button>
+    <% } else { %>
+    <a href="/expense/my" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-cyan-50/70 text-cyan-600 border border-cyan-100/20 shadow-[0_6px_16px_rgba(6,182,212,0.02)] transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-file-invoice text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Klaim Beban</span>
+    </a>
+    <% } %>
+
+    <% 
+      const loanManagerRoles = ['MANAGER_ADMINISTRASI', 'MANAGER_HAJI_UMRAH', 'MANAGER_KEUANGAN'];
+      const direksiRoles = ['WAKIL_DIREKTUR', 'DIREKTUR_UTAMA'];
+      const canAccessLoanMenu = typeof user !== 'undefined' && [...loanManagerRoles, ...direksiRoles].includes(user.role);
+    %>
+    <% if (canAccessLoanMenu) { %>
+    <button onclick="openLoanMenuMobile()" class="group flex flex-col items-center gap-2 text-center focus:outline-none">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-violet-50/70 text-violet-600 border border-violet-100/20 shadow-[0_6px_16px_rgba(109,40,217,0.03)] transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-hand-holding-dollar text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Kasbon</span>
+    </button>
+    <% } else { %>
+    <a href="/loans/my" class="group flex flex-col items-center gap-2 text-center">
+      <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-violet-50/70 text-violet-600 border border-violet-100/20 shadow-[0_6px_16px_rgba(109,40,217,0.03)] transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-hand-holding-dollar text-base"></i>
+      </div>
+      <span class="text-[11px] font-medium text-slate-600 tracking-tight leading-none">Kasbon</span>
+    </a>
+    <% } %>
+  </div>
+
+  <div class="mt-10 px-1">
+    <h3 class="text-xs font-bold uppercase tracking-wider mb-6">Management Hub</h3>
+    <div class="grid grid-cols-4 gap-3">
+      <% if (user.role !== 'PEGAWAI') { %>
+      <a href="/employee/" class="group flex flex-col items-center gap-1.5 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white shadow-xs transition-all active:scale-95">
+          <i class="fa-solid fa-users text-sm"></i>
+        </div>
+        <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Data Pegawai</span>
+      </a>
+      <% } %>
+
+      <a href="/report/attendance" class="group flex flex-col items-center gap-1.5 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100/30 shadow-xs transition-all active:scale-95">
+          <i class="fa-solid fa-calendar-check text-sm"></i>
+        </div>
+        <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Absen</span>
+      </a>
+      <% if (user.role == 'WAKIL_DIREKTUR') { %>
+      <a href="/report/overview" class="group flex flex-col items-center gap-1.5 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100/30 shadow-xs transition-all active:scale-95">
+          <i class="fa-solid fa-chart-line text-sm"></i>
+        </div>
+        <span class="text-[10px] font-bold text-slate-700 tracking-tight leading-none">Lap. Lengkap</span>
+      </a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="mt-8 border-t border-slate-100 pt-6 pb-8">
+    <div class="flex items-center justify-between mb-5 border-b border-slate-100/80 pb-3">
+      <h3 class="text-[13px] font-semibold text-slate-700 tracking-tight">Pengumuman Terbaru</h3>
+      <div class="flex items-center gap-4">
+        <a href="/announcement/new" class="inline-flex items-center gap-1 text-[12px] font-medium text-slate-500 hover:text-blue-600 transition-colors">
+          <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          <span class="hidden sm:inline">Buat</span>
+        </a>
+        <a href="/announcement" class="text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors">Lihat Semua</a>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <% if (typeof latestAnnouncements !== 'undefined' && latestAnnouncements.length > 0) { %>
+        <% latestAnnouncements.slice(0, 2).forEach(ann => { %>
+          <a href="/announcement/<%= ann._id %>" class="flex items-center gap-4 p-4 rounded-2xl border border-slate-200/40 bg-slate-50/40 hover:bg-slate-50 transition w-full max-w-full overflow-hidden">
+            <% if (ann.category === 'OFFICIAL') { %>
+              <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100/40 flex items-center justify-center text-blue-600 shrink-0">
+                <i class="fa-solid fa-bullhorn text-sm"></i>
+              </div>
+            <% } else { %>
+              <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200/50 flex items-center justify-center text-slate-500 shrink-0">
+                <i class="fa-solid fa-leaf text-sm text-emerald-600"></i>
+              </div>
+            <% } %>
+            <div class="min-w-0 w-0 flex-1 space-y-0.5">
+              <p class="text-xs font-bold text-slate-800 truncate block tracking-tight"><%= ann.title %></p>
+              <p class="text-[11px] text-slate-400 font-normal line-clamp-1 leading-tight break-all"><%= ann.content %></p>
+              <p class="text-[10px] text-slate-400/80 font-medium tracking-wide pt-0.5 shrink-0">
+                <%= ann.category === 'OFFICIAL' ? 'Resmi' : 'Umum' %> •
+                <%= new Date(ann.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+              </p>
+            </div>
+          </a>
+        <% }) %>
+      <% } else { %>
+        <div class="p-5 text-center text-xs text-slate-400 bg-slate-50/50 rounded-2xl border border-slate-200/20">Belum ada pengumuman terbaru.</div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<% } %>
