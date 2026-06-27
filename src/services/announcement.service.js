@@ -2,10 +2,10 @@ import Announcement from "../models/Announcement.model.js";
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 
 // ─── CREATE ──────────────────────────────────────────────────────────────────
-const create = ({ body, userSession, file }) => {
+export const createAnnouncement = async ({ body, userSession, file }) => {
   const { title, content, category } = body;
 
-  return Announcement.create({
+  return await Announcement.create({
     title,
     content,
     category,
@@ -18,7 +18,7 @@ const create = ({ body, userSession, file }) => {
 };
 
 // ─── GET ALL ─────────────────────────────────────────────────────────────────
-const getAll = async ({ page, isMobile }) => {
+export const getAllAnnouncements = async ({ page, isMobile }) => {
   const determinedLimit = isMobile ? 5 : 9;
 
   const {
@@ -31,7 +31,16 @@ const getAll = async ({ page, isMobile }) => {
   });
 
   const [data, total] = await Promise.all([
-    Announcement.find().sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    Announcement.find()
+      .populate({
+        path: "createdBy",
+        select: "username",
+        populate: { path: "employeeData", select: "fullName foto_profile" },
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
 
     Announcement.countDocuments(),
   ]);
@@ -47,8 +56,12 @@ const getAll = async ({ page, isMobile }) => {
 };
 
 // ─── GET BY ID ───────────────────────────────────────────────────────────────
-const getById = (id) => {
-  return Announcement.findById(id).lean();
+export const getAnnouncementById = async (id) => {
+  return await Announcement.findById(id)
+    .populate({
+      path: "createdBy",
+      select: "username",
+      populate: { path: "employeeData", select: "fullName foto_profile" },
+    })
+    .lean();
 };
-
-export default { create, getAll, getById };
