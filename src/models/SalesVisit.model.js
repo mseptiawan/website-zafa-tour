@@ -2,9 +2,10 @@ import mongoose from "mongoose";
 
 const salesVisitSchema = new mongoose.Schema(
   {
-    userId: {
+    employeeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Employee",
+      required: true,
     },
 
     title: {
@@ -38,5 +39,20 @@ const salesVisitSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// ─── INDEXS────────────────────────────────────────
+
+/**
+ * 1. Compound Index untuk Fitur "Kunjungan Saya" & "Monitoring Tim"
+ * Sangat krusial karena query Anda selalu memfilter employeeId dan mengurutkan berdasarkan waktu terbaru.
+ * Nilai 1 (Ascending) untuk filter kesamaan, dan -1 (Descending) untuk arah sort.
+ */
+salesVisitSchema.index({ employeeId: 1, createdAt: -1 });
+
+/**
+ * 2. Single Field Index untuk visitTime (Opsional)
+ * Berguna jika ke depannya Anda membuat fitur filter laporan berdasarkan rentang tanggal kunjungan (Date Range).
+ */
+salesVisitSchema.index({ visitTime: -1 });
 
 export default mongoose.model("SalesVisit", salesVisitSchema);

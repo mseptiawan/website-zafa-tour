@@ -2,11 +2,8 @@
   
   <% if (typeof showEmployee !== 'undefined' && showEmployee) { %>
     <div class="flex items-center gap-2 pb-1.5 border-b border-slate-100/70 select-none">
-      <div class="w-6 h-6 rounded-md bg-blue-50 border border-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600 uppercase">
-        <%= visit.userId?.employeeData?.fullName ? visit.userId.employeeData.fullName.charAt(0) : (visit.userId?.fullName ? visit.userId.fullName.charAt(0) : '?') %>
-      </div>
       <span class="text-[11.5px] font-semibold text-slate-400">
-        Oleh Sales: <span class="text-blue-600 font-bold"><%= visit.userId?.employeeData?.fullName || visit.userId?.fullName || 'Anonim / User Seeder' %></span>
+        Oleh: <span class="text-blue-600 font-bold"><%= visit.employeeId?.fullName || 'Anonim' %></span>
       </span>
     </div>
   <% } %>
