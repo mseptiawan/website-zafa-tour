@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 
-const DailyLogSchema = new mongoose.Schema(
+const dailyActivitySchema = new mongoose.Schema(
   {
-    userId: {
+    employeeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Employee",
       required: true,
     },
-    tanggal: {
+
+    activityDate: {
       type: String,
       required: true,
     },
@@ -17,20 +18,25 @@ const DailyLogSchema = new mongoose.Schema(
       ref: "KpiTemplate",
       required: false,
     },
-    judul: {
+
+    title: {
       type: String,
       required: true,
+      trim: true,
     },
+
     status: {
       type: String,
       enum: ["Pending", "In Progress", "Completed", "Canceled"],
       default: "Pending",
     },
-    penjelasanHasil: {
+
+    resultDescription: {
       type: String,
       default: "",
     },
-    fileLampiran: {
+
+    attachmentFile: {
       type: String,
       default: "",
     },
@@ -38,6 +44,11 @@ const DailyLogSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-DailyLogSchema.index({ userId: 1, tanggal: 1 });
+/**
+ * PERBAIKAN INDEX:
+ * Diselaraskan dengan field 'employeeId' dan 'activityDate' yang kita pakai di atas.
+ * Urutan compound index diletakkan dari kesamaan (employeeId) baru ke pengurutan/tanggal.
+ */
+dailyActivitySchema.index({ employeeId: 1, activityDate: -1 });
 
-export default mongoose.model("DailyLog", DailyLogSchema);
+export default mongoose.model("DailyActivity", dailyActivitySchema);

@@ -13,7 +13,7 @@ import announcementRoutes from "./announcement.routes.js";
 import expenseCategoryRoutes from "./expenseCategory.routes.js";
 
 import expenseRoutes from "./expense.routes.js";
-import dailylog from "./dailylog.route.js";
+import dailyActivity from "./dailyActivity.route.js";
 import finance from "./finance.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
 import approvalRoutes from "./approval.routes.js";
@@ -39,7 +39,7 @@ router.use("/api/employee", apiEmployeeRoutes);
 router.use("/", organizationRoutes);
 router.use("/", kpiRoutes);
 router.use("/trip", tripRoutes);
-router.use("/daily-log", dailylog);
+router.use("/daily-activities", dailyActivity);
 router.use("/approvals", approvalRoutes);
 router.use("/finance", finance);
 router.use("/sales", salesRoutes);

@@ -157,13 +157,13 @@
           ]
         },
         {
-          id: "daily-log",
-          name: "Jurnal Harian",
+          id: "Aktivitas Harian",
+          name: "Aktivitas Harian",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />`,
           show: true,
           submenus: [
-            { name: "Lembar Kerja", path: "/daily-log", show: !!perms.daily_log_create },
-            { name: "Riwayat Jurnal", path: "/daily-log/review", show: role !== "PEGAWAI" }
+            { name: "Catat Aktivitas Harian", path: "/daily-activities", show: !!perms.daily_log_create },
+            { name: "Riwayat Aktivitas Pegawai", path: "/daily-activities/review", show: role !== "PEGAWAI" }
           ]
         }
       ]

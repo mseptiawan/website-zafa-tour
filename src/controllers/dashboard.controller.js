@@ -1,6 +1,6 @@
 import moment from "moment";
 import Attendance from "../models/Attendance.model.js";
-import DailyLog from "../models/DailyLog.model.js";
+import DailyLog from "../models/DailyActivity.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
 import Holiday from "../models/calender/Holiday.model.js";
 import Announcement from "../models/Announcement.model.js";
