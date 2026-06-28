@@ -7,39 +7,35 @@
         <%- include('../partials/page-header', { 
             section: 'Area Kerja', 
             module: 'Jurnal', 
-            title: 'Daily Activity Log', 
-            description: 'Kelola log aktivitas harian Anda dengan ringkas.' 
+            title: 'Daily Activity', 
+            description: 'Kelola aktivitas harian Anda dengan ringkas.' 
         }) %>
       </div>
 
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
         <div class="w-full sm:w-44">
-          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal Log</label>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal Aktivitas</label>
           <input type="date" id="log-date" 
-                 class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 transition shadow-3xs cursor-pointer" />
+                 class="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-slate-400 transition cursor-pointer" />
         </div>
       </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-4 select-none">
-      <div class="flex items-center gap-2 pl-0.5">
-        <span class="relative flex h-1.5 w-1.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-slate-900"></span>
-        </span>
-        <span id="date-status" class="text-[12px] font-semibold text-slate-600">Memuat lembar kerja...</span>
-      </div>
+   <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-4 select-none">
+  <div class="flex items-center gap-2 pl-0.5">
+    <span id="date-status" class="text-[12px] font-semibold text-slate-600">Memuat lembar kerja...</span>
+  </div>
 
-      <button type="button" id="btn-carry-over" onclick="executeCarryOver()" 
-              class="hidden h-[34px] px-3.5 inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 text-[11px] font-bold rounded-xl transition-all active:scale-[0.98] shadow-3xs cursor-pointer outline-none w-full sm:w-auto">
-        <i class="fa-solid fa-rotate text-[10px] text-slate-400"></i>
-        <span>Salin Tugas Pending</span>
-      </button>
-    </div>
+  <button type="button" id="btn-carry-over" onclick="executeCarryOver()" 
+          class="hidden h-[34px] px-3.5 inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 text-[11px] font-bold rounded-xl transition-all active:scale-[0.98]  cursor-pointer outline-none w-full sm:w-auto">
+    <i class="fa-solid fa-rotate text-[10px] text-slate-400"></i>
+    <span>Salin Tugas Pending</span>
+  </button>
+</div>
 
-    <div id="container-form-add" class="bg-white border border-slate-200/60 p-4 rounded-xl md:rounded-2xl shadow-3xs">
+    <div id="container-form-add" class="bg-white border border-slate-200/60 p-4 rounded-xl md:rounded-2xl ">
       <h2 class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-1.5 select-none">
-        <div class="flex items-center justify-center w-5 h-5 rounded-md bg-slate-50 border border-slate-200/60 text-slate-800 shadow-3xs">
+        <div class="flex items-center justify-center w-5 h-5 rounded-md bg-slate-50 border border-slate-200/60 text-slate-800 ">
           <i class="fa-solid fa-plus text-[9px]"></i>
         </div>
         Aktivitas Baru
@@ -49,13 +45,13 @@
         <div class="md:col-span-6">
           <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1 ml-0.5">Judul Aktivitas</label>
           <!-- Atribut name diganti menjadi title -->
-          <input type="text" id="add-title" name="title" placeholder="Contoh: Rekap data bulanan penjualan" required class="w-full h-9 md:h-10 bg-slate-50 border border-slate-200/80 rounded-xl px-3 text-[12px] md:text-[12.5px] font-semibold text-slate-800 placeholder-slate-400/70 outline-none focus:bg-white focus:border-slate-400 transition-colors shadow-3xs" />
+          <input type="text" id="add-title" name="title" placeholder="Contoh: Rekap data bulanan penjualan" required class="w-full h-9 md:h-10 placeholder:text-[11.5px]  bg-slate-50 border border-slate-200/80 rounded-xl px-3 text-[12px] md:text-[12.5px] font-semibold text-slate-800 placeholder-slate-400/70 outline-none focus:bg-white focus:border-slate-400 transition-colors " />
         </div>
 
         <div class="md:col-span-3">
           <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1 ml-0.5">Target KPI</label>
           <div class="relative">
-            <select id="add-kpiTemplateId" name="kpiTemplateId" required class="w-full h-9 md:h-10 bg-slate-50 border border-slate-200/80 rounded-xl pl-3 pr-8 text-[12px] md:text-[12.5px] font-semibold text-slate-700 outline-none focus:bg-white focus:border-slate-400 transition-colors appearance-none cursor-pointer shadow-3xs">
+            <select id="add-kpiTemplateId" name="kpiTemplateId" required class="w-full h-9 md:h-10 bg-slate-50 border border-slate-200/80 rounded-xl pl-3 pr-8 text-[12px] md:text-[12.5px] font-semibold text-slate-700 outline-none focus:bg-white focus:border-slate-400 transition-colors appearance-none cursor-pointer ">
               <% initialKpis.forEach(kpi => { %>
               <option value="<%= kpi._id %>"><%= kpi.indikator %></option>
               <% }) %>
@@ -70,7 +66,7 @@
         </div>
 
         <div class="md:col-span-3 w-full">
-          <button type="submit" class="w-full h-9 md:h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium text-[11px] md:text-[11.5px] rounded-xl transition-all active:scale-[0.99] flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer outline-none">
+          <button type="submit" class="w-full h-9 md:h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium text-[11px] md:text-[11.5px] rounded-xl transition-all active:scale-[0.99] flex items-center justify-center gap-1.5 cursor-pointer outline-none">
             <i class="fa-solid fa-floppy-disk text-[10px]"></i>
             Simpan Aktivitas
           </button>
@@ -78,7 +74,7 @@
       </form>
     </div>
 
-    <div class="bg-white border border-slate-200/60 rounded-xl md:rounded-2xl shadow-3xs overflow-hidden w-full">
+    <div class="bg-white border border-slate-200/60 rounded-xl md:rounded-2xl  overflow-hidden w-full">
       <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -97,7 +93,7 @@
       <div id="task-mobile-list" class="block md:hidden divide-y divide-slate-100"></div>
 
       <div id="empty-state" class="hidden py-14 text-center max-w-sm mx-auto px-4">
-        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/60 text-slate-400 mx-auto mb-2.5 shadow-3xs">
+        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/60 text-slate-400 mx-auto mb-2.5 ">
           <i class="fa-solid fa-list-check text-xs"></i>
         </div>
         <p class="text-[12px] font-semibold text-slate-700">Tidak ada aktivitas harian</p>
@@ -232,7 +228,7 @@
             </div>
             <div class="flex gap-2 justify-end">
               <button type="button" onclick="toggleExpandRow('${task._id}')" class="text-[12px] font-semibold text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl transition cursor-pointer active:scale-95">Tutup</button>
-              <button type="submit" class="text-[12px] font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-xl transition shadow-sm shadow-blue-100 cursor-pointer active:scale-95">Simpan</button>
+              <button type="submit" class="text-[12px] font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-xl transition  cursor-pointer active:scale-95">Simpan</button>
             </div>
           </div>
         `;
@@ -277,8 +273,8 @@
             </td>
           </tr>
           <tr class="expanded-form-row hidden bg-slate-50/40 transition-all" id="row-expand-${task._id}">
-            <td colspan="5" class="p-5 border-t border-slate-100 bg-slate-50/30 shadow-inner">
-              <form id="form-update-${task._id}" onsubmit="submitFormUpdate(event, '${task._id}')" enctype="multipart/form-data" class="max-w-2xl mx-auto space-y-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+            <td colspan="5" class="p-5 border-t border-slate-100 bg-slate-50/30 ">
+              <form id="form-update-${task._id}" onsubmit="submitFormUpdate(event, '${task._id}')" enctype="multipart/form-data" class="max-w-2xl mx-auto space-y-4 bg-white p-5 rounded-2xl border border-slate-200/80 ">
                 ${formInnerHTML}
               </form>
             </td>
