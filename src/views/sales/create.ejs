@@ -13,82 +13,13 @@
     <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
       <form action="/sales/" method="POST" enctype="multipart/form-data" class="space-y-5">
 
-        <% if (typeof errors !== 'undefined' && errors.global) { %>
+        <% if (typeof errors !== 'undefined' && errors?.global) { %>
         <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
           <%= errors.global %>
         </div>
         <% } %>
 
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Kunjungan</label>
-          <input type="text" name="title" value="<%= old?.title || '' %>" placeholder="Contoh: Mempererat kerjasama dengan mitra" 
-                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.title ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
-          <% if (typeof errors !== 'undefined' && errors.title) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.title %></p>
-          <% } %>
-        </div>
-
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alamat</label>
-          <input type="text" name="address" value="<%= old?.address || '' %>" placeholder="Alamat lengkap lokasi customer" 
-                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.address ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
-          <% if (typeof errors !== 'undefined' && errors.address) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.address %></p>
-          <% } %>
-        </div>
-
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Bertemu Dengan</label>
-          <input type="text" name="meetWith" value="<%= old?.meetWith || '' %>" placeholder="Nama PIC yang ditemui" 
-                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.meetWith ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
-          <% if (typeof errors !== 'undefined' && errors.meetWith) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.meetWith %></p>
-          <% } %>
-        </div>
-
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Hasil Kunjungan</label>
-          <textarea name="result" rows="6" placeholder="Jelaskan poin-poin penting hasil diskusi kunjungan di sini..." 
-                    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.result ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none resize-none transition-all leading-relaxed text-slate-800"><%= old?.result || '' %></textarea>
-          <% if (typeof errors !== 'undefined' && errors.result) { %>
-            <p class="text-[11px] font-medium text-rose-500 mt-1 pl-0.5"><%= errors.result %></p>
-          <% } %>
-        </div>
-
-        <div class="space-y-2 mb-2">
-          <label class="block text-[12px] font-semibold text-slate-700 tracking-wide">
-            Lampiran <span class="text-slate-400 font-normal">(Opsional)</span>
-          </label>
-          <div class="relative">
-            <input type="file" name="attachments" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
-            
-            <div id="dropzone-empty" class="w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center">
-              <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-              </svg>
-              <span class="text-[12px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
-              <span class="text-[11px] text-slate-400 mt-0.5">PNG, JPG, PDF, atau DOCX (maks 5MB)</span>
-            </div>
-
-            <div id="dropzone-filled" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
-              <div class="flex items-center gap-3 min-w-0 flex-1">
-                <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <div class="min-w-0 flex-1">
-                  <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">file.pdf</div>
-                  <div id="size-preview" class="text-[11px] text-slate-400 mt-0.5">0 KB</div>
-                </div>
-              </div>
-              <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto relative z-20">
-                <a id="view-file-btn" href="#" target="_blank" class="text-[11px] font-medium text-center text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">View</a>
-                <button type="button" onclick="document.getElementById('file-input').click()" class="text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">Ganti</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <%- include('./partials/sales-form-fields.ejs', { old: typeof old !== 'undefined' ? old : null, errors: typeof errors !== 'undefined' ? errors : {} }) %>
 
         <div class="pt-5 border-t border-slate-100 flex items-center justify-end">
           <button type="submit" class="w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-3xs active:scale-[0.98]">
@@ -102,14 +33,24 @@
 </div>
 
 <script>
+  let currentFileUrl = null;
+
   function handleFileSelect(input) {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
+      if (currentFileUrl) { URL.revokeObjectURL(currentFileUrl); }
+      currentFileUrl = URL.createObjectURL(file);
+      
       document.getElementById("name-preview").textContent = file.name;
       document.getElementById("size-preview").textContent = (file.size / 1024).toFixed(1) + " KB";
       document.getElementById("dropzone-empty").classList.add("hidden");
       document.getElementById("dropzone-filled").classList.remove("hidden");
-      document.getElementById("view-file-btn").href = URL.createObjectURL(file);
+      document.getElementById("view-file-btn").href = currentFileUrl;
     }
   }
+
+  // Bersihkan Alokasi Memori Objek URL saat berpindah halaman
+  window.addEventListener("beforeunload", () => {
+    if (currentFileUrl) { URL.revokeObjectURL(currentFileUrl); }
+  });
 </script>
