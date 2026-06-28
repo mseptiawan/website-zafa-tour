@@ -6,14 +6,18 @@ export const validate =
     const result = schema.safeParse(req[source]);
 
     if (!result.success) {
-      console.log("ZOD ERROR:", result.error.issues);
       req.validationErrors = formatZodError(result.error);
+
+      // Hindari req.body undefined
+      req.body ??= {};
+      req.params ??= {};
+      req.query ??= {};
 
       return next();
     }
 
-    req[source] = result.data;
     req.validationErrors = null;
+    req[source] = result.data;
 
     next();
   };

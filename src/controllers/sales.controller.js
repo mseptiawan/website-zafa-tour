@@ -1,266 +1,165 @@
-import { getPagination } from "../utils/pagination.js";
-import salesService from "../services/sales.service.js";
-import PDFDocument from "pdfkit";
-export const newForm = (req, res) => {
-  res.render("sales/create", {
-    title: "Catat Kunjungan",
-    error: null,
-    old: {},
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
+import {
+  createSalesVisit,
+  findMinePaged,
+  findById,
+  updateSalesVisit,
+  findMineRaw,
+  findAllPaged,
+  generateSalesVisitPdf,
+} from "../services/sales.service.js";
+
+/**
+ * Helper internal untuk mengamankan penyimpanan sesi Express menggunakan async/await
+ */
+const saveSession = (req) =>
+  new Promise((resolve, reject) => {
+    req.session.save((err) => (err ? reject(err) : resolve()));
   });
-};
-export const create = async (req, res) => {
-  try {
-    if (req.validationErrors) {
-      return res.status(400).render("sales/create", {
+
+// ─── METHOD 1: FORM CREATE ──────────────────────────────────────────
+export const create = asyncHandler(async (req, res) => {
+  res.render("sales/create", { ...buildRenderData(req, { title: "Catat Kunjungan" }) });
+});
+
+// ─── METHOD 2: STORE DATA ───────────────────────────────────────────
+export const store = asyncHandler(async (req, res) => {
+  if (req.validationErrors) {
+    return res.status(400).render("sales/create", {
+      ...buildRenderData(req, {
         title: "Catat Kunjungan",
         errors: req.validationErrors,
         validationErrors: req.validationErrors,
         old: req.body,
-      });
-    }
-
-    await salesService.create({
-      body: req.body,
-      file: req.file,
-      userId: req.session.user._id,
+        error: ["Mohon periksa kembali form pengisian Anda."],
+      }),
     });
+  }
 
+  try {
+    await createSalesVisit({ body: req.body, file: req.file, userId: req.session.user._id });
+    req.flash("success", "Data kunjungan sales berhasil dicatat!");
+    await saveSession(req);
     return res.redirect("/sales/my");
   } catch (err) {
     return res.status(400).render("sales/create", {
-      title: "Catat Kunjungan",
-      error: err.message,
-      old: req.body,
+      ...buildRenderData(req, { title: "Catat Kunjungan", error: [err.message], old: req.body }),
     });
   }
-};
-export const myVisits = async (req, res, next) => {
-  try {
-    const determinedLimit = req.useragent?.isMobile ? 5 : 7;
+});
 
-    const { page, limit, skip } = getPagination({
-      page: req.query.page,
-      limit: determinedLimit,
-    });
+// ─── METHOD 3: KUNJUNGAN SAYA ───────────────────────────────────────
+export const my = asyncHandler(async (req, res) => {
+  const determinedLimit = req.useragent?.isMobile ? 5 : 7;
 
-    const userId = req.session.user._id;
-    const result = await salesService.findMinePaged({ userId, page, limit, skip });
+  const { data: visits, meta } = await findMinePaged({
+    userId: req.session.user._id,
+    page: req.query.page,
+    limit: determinedLimit,
+  });
 
-    res.render("sales/my", {
+  res.render("sales/my", {
+    ...buildRenderData(req, {
       title: "Daftar Kunjungan Ku",
-      visits: result.data,
-      pagination: result.meta,
-      error: null,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-export const report = async (req, res, next) => {
-  try {
-    const visits = await salesService.findAll();
-
-    res.render("sales/report", {
-      title: "Laporan",
       visits,
-      user: req.session.user,
+      pagination: meta,
+      query: req.query,
+    }),
+  });
+});
+
+// ─── METHOD 4: FORM EDIT ────────────────────────────────────────────
+export const edit = asyncHandler(async (req, res) => {
+  const visit = await findById(req.params.id);
+  if (!visit)
+    throw Object.assign(new Error("Data kunjungan tidak ditemukan."), { statusCode: 404 });
+
+  const ownerId = String(visit.userId._id || visit.userId);
+  if (ownerId !== String(req.session.user._id)) {
+    throw Object.assign(new Error("Anda tidak diizinkan menyunting berkas dokumen ini."), {
+      statusCode: 403,
     });
-  } catch (err) {
-    next(err);
   }
-};
 
-export const edit = async (req, res, next) => {
-  try {
-    const visit = await salesService.findById(req.params.id);
-    if (!visit) {
-      return res.status(404).send("Data tidak ditemukan");
-    }
+  res.render("sales/edit", { ...buildRenderData(req, { title: "Edit Kunjungan", visit }) });
+});
 
-    const ownerId = String(visit.userId._id || visit.userId);
-    const sessionId = String(req.session.user._id);
+// ─── METHOD 5: UPDATE DATA ──────────────────────────────────────────
+export const update = asyncHandler(async (req, res, next) => {
+  const visitId = req.params.id;
 
-    if (ownerId !== sessionId) {
-      return res.status(403).send("Tidak diizinkan");
-    }
-
-    res.render("sales/edit", {
-      title: "Edit Kunjungan",
-      visit,
-      error: null,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const update = async (req, res, next) => {
-  try {
-    if (req.validationErrors) {
-      const visit = await salesService.findById(req.params.id);
-
-      const updatedData = Object.assign(visit, req.body);
-
-      return res.status(400).render("sales/edit", {
+  if (req.validationErrors) {
+    const visit = await findById(visitId);
+    return res.status(400).render("sales/edit", {
+      ...buildRenderData(req, {
         title: "Edit Kunjungan",
-        visit: updatedData,
+        visit: Object.assign(visit || {}, req.body),
         errors: req.validationErrors,
         validationErrors: req.validationErrors,
-        error: "Validasi gagal, silakan periksa inputan Anda.",
-      });
-    }
+        error: ["Validasi gagal, silakan periksa kembali inputan Anda."],
+      }),
+    });
+  }
 
-    await salesService.update({
-      id: req.params.id,
+  try {
+    await updateSalesVisit({
+      id: visitId,
       userId: req.session.user._id,
       body: req.body,
       file: req.file,
     });
-
+    req.flash("success", "Data catatan kunjungan berhasil diperbarui!");
+    await saveSession(req);
     return res.redirect("/sales/my");
   } catch (err) {
     try {
-      const visit = await salesService.findById(req.params.id);
+      const visit = await findById(visitId);
       return res.status(400).render("sales/edit", {
-        title: "Edit Kunjungan",
-        visit,
-        error: err.message,
+        ...buildRenderData(req, { title: "Edit Kunjungan", visit, error: [err.message] }),
       });
     } catch (innerErr) {
       next(err);
     }
   }
-};
-export const exportPdf = async (req, res, next) => {
-  try {
-    const visits = await salesService.findMine(req.session.user._id);
-    const user = req.session.user;
+});
 
-    const doc = new PDFDocument({ size: "A4", margin: 42 });
+// ─── METHOD 6: EXPORT DATA PDF ──────────────────────────────────────
+export const exportPdf = asyncHandler(async (req, res) => {
+  const user = req.session.user;
+  const visits = await findMineRaw(user._id);
+  const pdfBuffer = await generateSalesVisitPdf(user, visits);
 
-    const safeUsername = user.fullName || "Sales";
-    const filename = `Riwayat_Kunjungan_${safeUsername}_${Date.now()}.pdf`;
+  const safeUsername = (user.fullName || "Sales").replace(/\s+/g, "_");
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=Riwayat_Kunjungan_${safeUsername}_${Date.now()}.pdf`
+  );
+  return res.end(pdfBuffer);
+});
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+// ─── METHOD 7: MONITORING TIM ───────────────────────────────────────
+export const employeeVisits = asyncHandler(async (req, res) => {
+  const determinedLimit = req.useragent?.isMobile ? 5 : 7;
+  const { role, bidangId } = req.session.user;
+  const isWadirOrDirektur = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(role);
 
-    doc.pipe(res);
+  const { data: visits, meta } = await findAllPaged({
+    page: req.query.page,
+    limit: determinedLimit,
+    userBidangId: bidangId,
+    isWadirOrDirektur,
+  });
 
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(18)
-      .fillColor("#1e293b")
-      .text("LAPORAN RIWAYAT SALES VISIT", { align: "center" });
-    doc
-      .font("Helvetica")
-      .fontSize(10)
-      .fillColor("#64748b")
-      .text("Sistem Manajemen Kunjungan - Zafa Tour", { align: "center" });
-    doc.moveDown(1.5);
-
-    doc.font("Helvetica-Bold").fontSize(11).fillColor("#334155").text("Informasi Personel:");
-    doc
-      .font("Helvetica")
-      .fontSize(10)
-      .fillColor("#475569")
-      .text(`Nama Sales : ${user.fullName || "-"}`)
-      .text(`Email              : ${user.email || "-"}`)
-      .text(
-        `Tanggal Cetak : ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })} WIB`
-      );
-
-    doc.moveDown(1);
-    doc.strokeColor("#e2e8f0").lineWidth(1).moveTo(42, doc.y).lineTo(553, doc.y).stroke();
-    doc.moveDown(1.5);
-
-    if (visits.length === 0) {
-      doc
-        .font("Helvetica-Oblique")
-        .fontSize(11)
-        .fillColor("#94a3b8")
-        .text("Belum ada data riwayat kunjungan.", { align: "center" });
-    } else {
-      visits.forEach((v, index) => {
-        if (doc.y > 720) {
-          doc.addPage();
-        }
-
-        const visitDate = new Date(v.visitTime).toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        });
-
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(12)
-          .fillColor("#1e40af")
-          .text(`${index + 1}. ${v.title}`);
-
-        doc
-          .font("Helvetica")
-          .fontSize(9)
-          .fillColor("#64748b")
-          .text(`Waktu Kunjungan: ${visitDate}   |   Bertemu Dengan: ${v.meetWith}`);
-
-        doc
-          .font("Helvetica")
-          .fontSize(9)
-          .fillColor("#475569")
-          .text(`Lokasi / Alamat  : ${v.address}`);
-
-        if (v.result) {
-          doc.moveDown(0.4);
-          doc
-            .font("Helvetica-Bold")
-            .fontSize(9)
-            .fillColor("#334155")
-            .text("Hasil Kunjungan:", { continued: true });
-          doc.font("Helvetica").fontSize(9).fillColor("#475569").text(` ${v.result}`);
-        }
-
-        doc.moveDown(1);
-        doc.strokeColor("#f1f5f9").lineWidth(0.5).moveTo(42, doc.y).lineTo(553, doc.y).stroke();
-        doc.moveDown(1);
-      });
-    }
-
-    doc.end();
-  } catch (err) {
-    next(err);
-  }
-};
-export const employeeVisits = async (req, res, next) => {
-  try {
-    const determinedLimit = req.useragent?.isMobile ? 5 : 7;
-
-    const { page, limit, skip } = getPagination({
-      page: req.query.page,
-      limit: determinedLimit,
-    });
-
-    const userRoleName = req.session.user.role;
-    const userRoleId = req.session.user.roleId;
-
-    const isWadirOrDirektur = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(userRoleName);
-
-    const result = await salesService.findAllPaged({
-      page,
-      limit,
-      skip,
-      managerRoleId: userRoleId,
-      isWadirOrDirektur,
-    });
-
-    res.render("sales/employee-sales-visits", {
+  res.render("sales/employee-sales-visits", {
+    ...buildRenderData(req, {
       title: isWadirOrDirektur
         ? "Monitoring Semua Kunjungan Sales"
         : "Monitoring Kunjungan Bidang Anda",
-      visits: result.data,
-      pagination: result.meta,
-      error: null,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+      visits,
+      pagination: meta,
+      query: req.query,
+    }),
+  });
+});

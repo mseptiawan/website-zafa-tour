@@ -1,0 +1,82 @@
+<div class="bg-white border border-slate-200/60 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 shadow-3xs hover:border-slate-300/80 transition-all duration-150 md:bg-transparent md:border-none md:rounded-none md:p-5 md:shadow-none">
+  
+  <% if (typeof showEmployee !== 'undefined' && showEmployee) { %>
+    <div class="flex items-center gap-2 pb-1.5 border-b border-slate-100/70 select-none">
+      <div class="w-6 h-6 rounded-md bg-blue-50 border border-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600 uppercase">
+        <%= visit.userId?.employeeData?.fullName ? visit.userId.employeeData.fullName.charAt(0) : (visit.userId?.fullName ? visit.userId.fullName.charAt(0) : '?') %>
+      </div>
+      <span class="text-[11.5px] font-semibold text-slate-400">
+        Oleh Sales: <span class="text-blue-600 font-bold"><%= visit.userId?.employeeData?.fullName || visit.userId?.fullName || 'Anonim / User Seeder' %></span>
+      </span>
+    </div>
+  <% } %>
+
+  <div class="flex items-start justify-between gap-4">
+    <div class="min-w-0 flex-1 space-y-1.5">
+      <h2 class="text-[13.5px] sm:text-[14px] font-bold tracking-tight text-slate-800 break-words leading-snug">
+        <%= visit.title %>
+      </h2>
+      
+      <div class="flex items-start gap-1.5 text-slate-400">
+        <svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        </svg>
+        <p class="text-[12px] leading-relaxed text-slate-500 font-medium break-words">
+          <%= visit.address %>
+        </p>
+      </div>
+    </div>
+
+    <% if (typeof canEdit !== 'undefined' && canEdit) { %>
+      <div class="flex-shrink-0 pt-0.5">
+        <% const diffHours = (new Date() - new Date(visit.createdAt)) / (1000 * 60 * 60); %>
+        <% if (diffHours <= 24) { %>
+          <a href="/sales/<%= visit._id %>/edit" title="Ubah data kunjungan" class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/40 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-all shadow-3xs active:scale-95 decoration-none">
+            <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </a>
+        <% } else { %>
+          <div class="w-7 h-7 flex items-center justify-center text-slate-300" title="Akses edit telah terkunci (>24 jam)">
+            <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+
+  <% if (visit.result) { %>
+    <div class="bg-slate-50/70 border border-slate-200/40 p-3 rounded-xl">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Hasil Kunjungan</p>
+      <p class="text-[12px] text-slate-600 leading-relaxed break-words whitespace-pre-line"><%= visit.result %></p>
+    </div>
+  <% } %>
+
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3.5 border-t border-slate-100">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11.5px] font-semibold text-slate-400">
+      <div class="text-slate-500">
+        PIC Klien: <span class="text-slate-700 font-bold"><%= visit.meetWith %></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="h-1 w-1 rounded-full bg-slate-300 hidden sm:block"></span>
+        Waktu Kunjungan: <span class="text-slate-700 font-bold">
+          <%= new Date(visit.visitTime).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) %>
+        </span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 justify-end select-none">
+      <% if (visit.attachments && visit.attachments.length > 0 && visit.attachments[0]?.filename) { %>
+        <a href="/uploads/files/<%= visit.attachments[0].filename %>" target="_blank" class="inline-flex items-center gap-1.5 bg-blue-50/70 hover:bg-blue-100 text-blue-600 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-colors decoration-none border border-blue-100/40">
+          <svg class="w-3 h-3 stroke-[2.5] text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          </svg>
+          <span>Lihat Lampiran</span>
+        </a>
+      <% } %>
+    </div>
+  </div>
+
+</div>

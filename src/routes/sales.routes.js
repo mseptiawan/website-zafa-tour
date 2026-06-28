@@ -5,10 +5,9 @@ import { uploadFile } from "../middlewares/uploadFile.js";
 import { validate } from "../middlewares/validate.js";
 import { createSalesVisitSchema, updateSalesVisitSchema } from "../validations/sales.schema.js";
 import {
-  newForm,
   create,
-  myVisits,
-  report,
+  store,
+  my,
   edit,
   exportPdf,
   update,
@@ -20,25 +19,19 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // FORM + CREATE
-router.get("/new", newForm);
-router.post(
-  "/",
-  uploadFile.single("attachments"),
-  validate(createSalesVisitSchema, "body"),
-  create
-);
+router.get("/new", create);
+router.post("/", uploadFile.single("attachments"), validate(createSalesVisitSchema), store);
 
 // READ
-router.get("/my", myVisits);
+router.get("/my", my);
 router.get("/my/export-pdf", exportPdf);
 router.get("/employee-visits", employeeVisits);
-router.get("/:id/edit", authMiddleware, edit);
+router.get("/:id/edit", edit);
 
 router.post(
   "/:id/edit",
-  authMiddleware,
   uploadFile.single("attachments"),
-  validate(updateSalesVisitSchema, "body"),
+  validate(updateSalesVisitSchema),
   update
 );
 

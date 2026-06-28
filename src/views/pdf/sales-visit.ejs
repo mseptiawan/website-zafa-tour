@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Riwayat Sales Visit</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      color: #1e293b; background-color: #ffffff;
+      line-height: 1.5; font-size: 11px;
+    }
+    .main-content { padding: 20px 0; }
+    
+    /* Info Personel Box */
+    .info-box {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 25px;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .info-box td {
+      padding: 10px 15px;
+      vertical-align: top;
+    }
+    .info-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: #1a365d;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Tabel Kunjungan */
+    .table-visit {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .table-visit th {
+      background-color: #1a365d;
+      color: #ffffff;
+      font-weight: bold;
+      padding: 10px;
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      border: 1px solid #1a365d;
+    }
+    .table-visit td {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+      line-height: 1.4;
+    }
+    .table-visit tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    
+    .text-center { text-align: center; }
+    .font-bold { font-weight: bold; }
+    .text-muted { color: #64748b; font-size: 10px; }
+    
+    .result-box {
+      margin-top: 5px;
+      padding: 8px;
+      background-color: #f1f5f9;
+      border-left: 3px solid #3b82f6;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mengambil parsial kop surat bawaan sistem Zafa Tour -->
+  <%- include('../partials/pdf-header') %>
+
+  <div class="main-content">
+    
+    <!-- Judul Dokumen Cetak -->
+    <div style="text-align: center; margin-bottom: 25px;">
+      <h2 style="font-size: 16px; margin: 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">
+        Laporan Riwayat Kunjungan Sales
+      </h2>
+      <span class="text-muted">Sistem Manajemen Kunjungan — PT Zafa Mulia Mandiri</span>
+    </div>
+
+    <!-- Informasi Personel & Dokumen -->
+    <table class="info-box">
+      <tr>
+        <td style="width: 55%;">
+          <div class="info-title">Informasi Personel</div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="width: 100px; color: #64748b; padding: 3px 0;">Nama Lengkap</td>
+              <td style="width: 12px; padding: 3px 0;">:</td>
+              <td class="font-bold" style="padding: 3px 0;"><%= user.fullName || "-" %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b; padding: 3px 0;">Divisi / Bidang</td>
+              <td>:</td>
+              <td style="padding: 3px 0;"><%= user.bidangName || "-" %></td>
+            </tr>
+            <tr>
+              <td style="color: #64748b; padding: 3px 0;">Jabatan</td>
+              <td>:</td>
+              <td style="padding: 3px 0;"><%= user.positionName || "-" %></td>
+            </tr>
+          </table>
+        </td>
+        <td style="width: 45%; border-left: 1px solid #e2e8f0;">
+          <div class="info-title">Meta Laporan</div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="width: 110px; color: #64748b; padding: 3px 0;">Tanggal Cetak</td>
+              <td style="width: 12px; padding: 3px 0;">:</td>
+              <td style="padding: 3px 0;"><%= formattedDate %> WIB</td>
+            </tr>
+            <tr>
+              <td style="color: #64748b; padding: 3px 0;">Total Record</td>
+              <td>:</td>
+              <td class="font-bold" style="padding: 3px 0;"><%= visits.length %> Data Kunjungan</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Tabel Data Kunjungan Lapangan -->
+    <table class="table-visit">
+      <thead>
+        <tr>
+          <th style="width: 5%; text-align: center;">No</th>
+          <th style="width: 25%;">Waktu & Agenda</th>
+          <th style="width: 30%;">Instansi / Pihak Tujuan</th>
+          <th style="width: 40%;">Hasil & Catatan Kunjungan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (visits.length === 0) { %>
+          <tr>
+            <td colspan="4" class="text-center" style="padding: 25px; color: #94a3b8; font-style: italic;">
+              Belum ada data riwayat catatan kunjungan lapangan untuk personel ini.
+            </td>
+          </tr>
+        <% } else { %>
+          <% visits.forEach((v, index) => { %>
+            <tr>
+              <td class="text-center" style="font-weight: 600;"><%= index + 1 %></td>
+              <td>
+                <span class="font-bold" style="color: #0f172a;">
+                  <%= new Date(v.visitTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                </span>
+                <div class="text-muted" style="margin-top: 5px;">Agenda Perjalanan:</div>
+                <div style="font-weight: 600; color: #1e40af;"><%= v.title %></div>
+              </td>
+              <td>
+                <div style="margin-bottom: 4px;">
+                  <span class="text-muted">Bertemu :</span> <span class="font-bold" style="color: #334155;"><%= v.meetWith %></span>
+                </div>
+                <div style="margin-top: 2px;">
+                  <span class="text-muted">Lokasi / Alamat :</span><br>
+                  <span style="color: #475569;"><%= v.address %></span>
+                </div>
+              </td>
+              <td>
+                <% if (v.result) { %>
+                  <div class="result-box">
+                    <%= v.result %>
+                  </div>
+                <% } else { %>
+                  <span class="text-muted" style="font-style: italic;">Tidak ada catatan hasil yang diinputkan.</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+
+    <!-- Footer Otentikasi Dokumen Elektronik -->
+    <div style="border-bottom: 1px solid #cbd5e1; margin-top: 50px;"></div>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 9px; color: #64748b;">
+      <tr>
+        <td style="vertical-align: middle;">
+          <span style="font-family: 'Times New Roman', Times, serif; font-weight: bold; color: #1a365d; font-size: 12px; margin-right: 5px;">ZM</span>
+          <span>PT Zafa Mulia Mandiri — Dokumen ini sah dan diterbitkan secara elektronik melalui Sistem HRIS Zafa Tour.</span>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+</body>
+</html>
