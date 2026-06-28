@@ -10,9 +10,6 @@ import {
   generateSalesVisitPdf,
 } from "../services/sales.service.js";
 
-/**
- * Helper internal untuk mengamankan penyimpanan sesi Express menggunakan async/await
- */
 const saveSession = (req) =>
   new Promise((resolve, reject) => {
     req.session.save((err) => (err ? reject(err) : resolve()));
@@ -25,6 +22,8 @@ export const create = asyncHandler(async (req, res) => {
 
 // ─── METHOD 2: STORE DATA ───────────────────────────────────────────
 export const store = asyncHandler(async (req, res) => {
+  const { employeeId } = req.session.user;
+
   if (req.validationErrors) {
     return res.status(400).render("sales/create", {
       ...buildRenderData(req, {
@@ -38,7 +37,7 @@ export const store = asyncHandler(async (req, res) => {
   }
 
   try {
-    await createSalesVisit({ body: req.body, file: req.file, userId: req.session.user._id });
+    await createSalesVisit({ body: req.body, file: req.file, employeeId });
     req.flash("success", "Data kunjungan sales berhasil dicatat!");
     await saveSession(req);
     return res.redirect("/sales/my");
@@ -52,9 +51,10 @@ export const store = asyncHandler(async (req, res) => {
 // ─── METHOD 3: KUNJUNGAN SAYA ───────────────────────────────────────
 export const my = asyncHandler(async (req, res) => {
   const determinedLimit = req.useragent?.isMobile ? 5 : 7;
+  const { employeeId } = req.session.user;
 
   const { data: visits, meta } = await findMinePaged({
-    userId: req.session.user._id,
+    employeeId,
     page: req.query.page,
     limit: determinedLimit,
   });
@@ -71,12 +71,14 @@ export const my = asyncHandler(async (req, res) => {
 
 // ─── METHOD 4: FORM EDIT ────────────────────────────────────────────
 export const edit = asyncHandler(async (req, res) => {
+  const { employeeId } = req.session.user;
   const visit = await findById(req.params.id);
+
   if (!visit)
     throw Object.assign(new Error("Data kunjungan tidak ditemukan."), { statusCode: 404 });
 
-  const ownerId = String(visit.userId._id || visit.userId);
-  if (ownerId !== String(req.session.user._id)) {
+  const ownerId = String(visit.employeeId?._id || visit.employeeId);
+  if (ownerId !== String(employeeId)) {
     throw Object.assign(new Error("Anda tidak diizinkan menyunting berkas dokumen ini."), {
       statusCode: 403,
     });
@@ -88,6 +90,7 @@ export const edit = asyncHandler(async (req, res) => {
 // ─── METHOD 5: UPDATE DATA ──────────────────────────────────────────
 export const update = asyncHandler(async (req, res, next) => {
   const visitId = req.params.id;
+  const { employeeId } = req.session.user;
 
   if (req.validationErrors) {
     const visit = await findById(visitId);
@@ -105,7 +108,7 @@ export const update = asyncHandler(async (req, res, next) => {
   try {
     await updateSalesVisit({
       id: visitId,
-      userId: req.session.user._id,
+      employeeId,
       body: req.body,
       file: req.file,
     });
@@ -126,11 +129,12 @@ export const update = asyncHandler(async (req, res, next) => {
 
 // ─── METHOD 6: EXPORT DATA PDF ──────────────────────────────────────
 export const exportPdf = asyncHandler(async (req, res) => {
-  const user = req.session.user;
-  const visits = await findMineRaw(user._id);
-  const pdfBuffer = await generateSalesVisitPdf(user, visits);
+  const { employeeId } = req.session.user;
+  const visits = await findMineRaw(employeeId);
 
-  const safeUsername = (user.fullName || "Sales").replace(/\s+/g, "_");
+  const pdfBuffer = await generateSalesVisitPdf(req.session.user, visits);
+
+  const safeUsername = (req.session.user.fullName || "Sales").replace(/\s+/g, "_");
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
     "Content-Disposition",
@@ -143,6 +147,7 @@ export const exportPdf = asyncHandler(async (req, res) => {
 export const employeeVisits = asyncHandler(async (req, res) => {
   const determinedLimit = req.useragent?.isMobile ? 5 : 7;
   const { role, bidangId } = req.session.user;
+
   const isWadirOrDirektur = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(role);
 
   const { data: visits, meta } = await findAllPaged({
