@@ -4,7 +4,7 @@ export const renderManagePage = async (req, res) => {
   try {
     const components = await salaryComponentService.fetchAllComponents();
 
-    res.render("payroll/components", {
+    res.render("payroll/component", {
       title: "Kelola Komponen Gaji",
       user: req.user,
       components: components,

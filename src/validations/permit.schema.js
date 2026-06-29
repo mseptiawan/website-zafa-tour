@@ -1,9 +1,20 @@
 import { z } from "zod";
 
 export const createPermitSchema = z.object({
-  type: z.enum(["SAKIT", "PENDAMPINGAN_MELAHIRKAN", "MUSIBAH", "PENTING"], {
-    error_map: () => ({ message: "Jenis izin yang dipilih tidak valid." }),
-  }),
+  type: z.enum(
+    [
+      "SAKIT",
+      "PENDAMPINGAN_MELAHIRKAN",
+      "MUSIBAH",
+      "PENTING",
+      "KEPERLUAN_KELUARGA",
+      "KEPERLUAN_MENDESAK",
+      "LAINNYA",
+    ],
+    {
+      error_map: () => ({ message: "Jenis izin yang dipilih tidak valid." }),
+    }
+  ),
   date: z
     .string({ required_error: "Tanggal ketidakhadiran wajib diisi." })
     .refine((val) => !isNaN(Date.parse(val)), {

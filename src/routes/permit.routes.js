@@ -2,24 +2,30 @@ import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
-import { createPermitSchema } from "../validations/permit.schema.js";
 import { validate } from "../middlewares/validate.js";
-
+import { createPermitSchema } from "../validations/permit.schema.js";
 import {
-  newForm,
-  createPermit,
+  create,
+  store,
+  getHistoryPermits,
   getIncomingPermits,
   actionApproval,
-  getHistoryPermits,
 } from "../controllers/permit.controller.js";
 
 const router = express.Router();
 
+// Mewajibkan verifikasi token autentikasi login aktif untuk mengakses seluruh sub-rute
 router.use(authMiddleware);
 
-router.get("/new", newForm);
-router.post("/", uploadFile.single("document"), validate(createPermitSchema), createPermit);
+const ALLOWED_DIRECTORATE_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR"];
+
+// Aksesibilitas Sisi Karyawan (Pengaju Pemohon)
+router.get("/new", create);
+router.post("/", uploadFile.single("document"), validate(createPermitSchema), store);
 router.get("/history", getHistoryPermits);
-router.get("/incoming", getIncomingPermits);
-router.post("/approval/:id", actionApproval);
+
+// Aksesibilitas Sisi Atasan (Otorisasi Direksi)
+router.get("/incoming", roleMiddleware(...ALLOWED_DIRECTORATE_ROLES), getIncomingPermits);
+router.post("/approval/:id", roleMiddleware(...ALLOWED_DIRECTORATE_ROLES), actionApproval);
+
 export default router;
