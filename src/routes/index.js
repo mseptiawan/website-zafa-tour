@@ -2,7 +2,7 @@ import express from "express";
 
 import authRoutes from "./auth.routes.js";
 import leaveRoutes from "./leave.routes.js";
-import permitRoutes from "./permit.routes.js";
+import permit from "./permit.routes.js";
 import overtimeRoutes from "./overtime.routes.js";
 import attendanceRoutes from "./attendance.routes.js";
 import kpiRoutes from "./kpi.routes.js";
@@ -31,7 +31,7 @@ const router = express.Router();
 router.use("/", authRoutes);
 router.use("/", dashboardRoutes);
 router.use("/", leaveRoutes);
-router.use("/permit", permitRoutes);
+router.use("/permit", permit);
 router.use("/overtime", overtimeRoutes);
 router.use("/attendance", attendanceRoutes);
 router.use("/employee", webEmployeeRoutes);
