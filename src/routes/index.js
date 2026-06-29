@@ -15,7 +15,7 @@ import expenseCategoryRoutes from "./expenseCategory.routes.js";
 import expenseRoutes from "./expense.routes.js";
 import dailyActivity from "./dailyActivity.route.js";
 import finance from "./finance.routes.js";
-import dashboardRoutes from "./dashboard.routes.js";
+import dashboard from "./dashboard.routes.js";
 import approvalRoutes from "./approval.routes.js";
 import organization from "./organization.routes.js";
 import webEmployeeRoutes from "./web/employee.routes.js";
@@ -29,7 +29,7 @@ import reportRoutes from "./report.routes.js";
 const router = express.Router();
 
 router.use("/", authRoutes);
-router.use("/", dashboardRoutes);
+router.use("/dashboard", dashboard);
 router.use("/", leaveRoutes);
 router.use("/permit", permit);
 router.use("/overtime", overtimeRoutes);
