@@ -1,6 +1,6 @@
 import express from "express";
 
-import authRoutes from "./auth.routes.js";
+import auth from "./auth.routes.js";
 import leaveRoutes from "./leave.routes.js";
 import permit from "./permit.routes.js";
 import overtimeRoutes from "./overtime.routes.js";
@@ -28,7 +28,7 @@ import payrollRoutes from "./payroll.routes.js";
 import reportRoutes from "./report.routes.js";
 const router = express.Router();
 
-router.use("/", authRoutes);
+router.use("/", auth);
 router.use("/dashboard", dashboard);
 router.use("/", leaveRoutes);
 router.use("/permit", permit);

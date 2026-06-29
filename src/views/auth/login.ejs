@@ -57,13 +57,38 @@
           <p class="text-xs text-slate-400 font-medium mt-1.5">Enter valid user name & password to continue</p>
         </div>
 
-        <% if (typeof query !== 'undefined' && query?.error) { %>
-          <div class="w-full mb-4 p-3 px-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2.5 text-rose-800">
-            <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-rose-500"></i>
-            <span class="text-xs font-medium tracking-tight">Periksa kembali username atau password Anda.</span>
+        <% if (typeof errors !== 'undefined' && Object.keys(errors).length > 0) { %>
+          <div class="w-full mb-4 p-3 px-4 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-800">
+            <% Object.values(errors).forEach(err => { %>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-rose-500"></i>
+                <span class="text-xs font-medium tracking-tight"><%= err %></span>
+              </div>
+            <% }) %>
           </div>
         <% } %>
 
+        <% if (typeof error !== 'undefined' && error.length > 0) { %>
+          <div class="w-full mb-4 p-3 px-4 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-800">
+            <% error.forEach(msg => { %>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-rose-500"></i>
+                <span class="text-xs font-medium tracking-tight"><%= msg %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (typeof success !== 'undefined' && success.length > 0) { %>
+          <div class="w-full mb-4 p-3 px-4 bg-emerald-50 border border-emerald-100 rounded-xl flex flex-col gap-1 text-emerald-800">
+            <% success.forEach(msg => { %>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check-circle" class="w-4 h-4 shrink-0 text-emerald-500"></i>
+                <span class="text-xs font-medium tracking-tight"><%= msg %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
         <form action="/login" method="POST" class="w-full space-y-4">
           
           <div class="relative">
@@ -74,7 +99,8 @@
               type="text"
               name="identifier"
               required
-              placeholder="Username"
+              placeholder="Username atau Email"
+              value="<%= (typeof old !== 'undefined' && old?.identifier) ? old.identifier : '' %>"
               class="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400"
             />
           </div>
@@ -105,6 +131,7 @@
               <input 
                 type="checkbox" 
                 name="remember" 
+                <%= (typeof old !== 'undefined' && old?.remember) ? 'checked' : '' %>
                 class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 accent-blue-600 cursor-pointer"
               />
               <span>Ingat saya</span>
