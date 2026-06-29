@@ -25,7 +25,7 @@
 
     <div class="bg-white border border-slate-200 rounded-2xl  overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-[1000px]">
+        <table class="w-full text-sm min-w-[1000px]">PayrollPeriod.model
           <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
             <tr>
               <th class="text-left px-6 py-4">Kode & Nama Komponen</th>
@@ -178,8 +178,8 @@
       const statusLabel = comp.isActive ? "" : '<span class="text-[9px] font-bold text-slate-400 uppercase ml-2">(Diarsipkan)</span>';
       const category = normalizeCategory(comp.category);
       const type = normalizeType(comp.type);
-      const displayValue = comp.calculationType === 'PERCENTAGE' ? // <--- Ubah dari comp.calcType ke comp.calculationType
-  `${comp.defaultAmount}%` :                                 // <--- Sesuaikan dari comp.value ke comp.defaultAmount sesuai schema
+      const displayValue = comp.calculationType === 'PERCENTAGE' ? 
+  `${comp.defaultAmount}%` :                               
   `Rp ${Number(comp.defaultAmount).toLocaleString('id-ID')}`;
       const isEarning = category === "Pendapatan";
       const textClass = isEarning ? "text-emerald-600" : "text-rose-600";
@@ -237,8 +237,6 @@
     totalCounter.textContent = components.length;
   }
 
-  // Modal Management
- // Modal Management
   function openModal(mode, id = null) {
     compModal.classList.remove("hidden");
     compModal.classList.add("flex");
@@ -254,12 +252,10 @@
       document.getElementById("form-category").value = normalizeCategory(comp.category);
       document.getElementById("form-type").value = normalizeType(comp.type);
       
-      // 1. SET VALUE TIPE KALKULASI DARI DATABASE (Penyebab Bug)
       document.getElementById("form-calc-type").value = comp.calculationType || "FIXED_AMOUNT";
       
       document.getElementById("form-amount").value = comp.defaultAmount;
 
-      // 2. PAKSA UPDATE LABEL DAN SIMBOL (Rp / %) SESUAI TIPE KALKULASI YANG DI-EDIT
       updatePlaceholder();
     } else {
       document.getElementById("modal-title").textContent = "Tambah Komponen Gaji";
@@ -267,7 +263,6 @@
       document.getElementById("form-id").value = "";
       document.getElementById("form-code").disabled = false;
       
-      // Kembalikan placeholder ke kondisi default (Rupiah) saat tambah data baru
       updatePlaceholder();
     }
   }
@@ -277,7 +272,6 @@
     compModal.classList.remove("flex");
   }
 
-  // API Interactions
   async function saveComponent(e) {
     e.preventDefault();
     const id = document.getElementById("form-id").value;
@@ -372,6 +366,5 @@
   }
 
 
-  // Init
   renderTable();
 </script>

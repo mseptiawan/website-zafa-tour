@@ -3,20 +3,20 @@
 <div class=" min-h-screen ml-72 bg-slate-50/50 p-8 antialiased text-slate-900">
   <div class="mx-auto max-w-none space-y-6">
 
- <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/60 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.02)] mb-6">
-      
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/60 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.02)] mb-6">
+
       <div>
         <h1 class="text-base font-bold tracking-tight text-slate-900">Komponen Payroll</h1>
         <p class="text-[11px] text-slate-400 mt-0.5">Kelola kalkulasi gaji, tunjangan, dan potongan Pegawai aktif</p>
       </div>
-      
+
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-        
+
         <form id="form-tutup-buku" onsubmit="triggerTutupBuku(event)" class="flex items-center gap-3.5 bg-slate-50/50 border border-slate-200/80 p-1.5 pl-3.5 rounded-xl max-w-sm w-full sm:w-auto">
           <div class="text-[10px] text-slate-400 leading-tight hidden sm:block font-medium whitespace-nowrap">
             Kunci transaksi & update pinjaman <br />periode <span class="font-bold text-blue-600"><%= currentPeriod %></span>
           </div>
-          
+
           <button type="submit" class="bg-slate-950 hover:bg-slate-800 text-white font-bold text-[11px] h-8.5 px-3.5 rounded-xl  transition-all active:scale-[0.98] flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
             <i class="fa-solid fa-lock text-[9px] text-slate-400"></i> Tutup Buku
           </button>
@@ -26,7 +26,7 @@
           <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px] pointer-events-none"></i>
           <select id="filterPeriod" class="w-full bg-white border border-slate-200 text-[11px] font-bold text-slate-700 rounded-xl pl-8 pr-7 h-11 appearance-none cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all">
             <% availablePeriods.forEach(p => { %>
-              <option value="<%= p %>" <%= p === currentPeriod ? 'selected' : '' %>><%= p %></option>
+            <option value="<%= p %>" <%= p === currentPeriod ? 'selected' : '' %>><%= p %></option>
             <% }) %>
           </select>
           <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] pointer-events-none"></i>
@@ -36,7 +36,7 @@
 
     </div>
 
-   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       <div class="lg:col-span-3 bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
         <div class="p-3 bg-white border-b border-slate-100">
           <div class="relative">
@@ -75,7 +75,7 @@
         </div>
       </div>
 
-     <div class="lg:col-span-9 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-9 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div class="lg:col-span-7 space-y-6">
           <div class="bg-white border border-slate-200/50 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
@@ -100,7 +100,7 @@
 
               <div class="pt-4 border-t border-slate-100">
                 <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5">Tunjangan Dinamis</h3>
-                
+
                 <div id="allowanceWrapper" class="space-y-2 rounded-xl border border-transparent">
                   <div id="overtimeContainer" class="space-y-2"></div>
                   <div id="attendanceAllowanceContainer" class="space-y-2"></div>
@@ -153,7 +153,7 @@
             </h3>
             <div class="space-y-3.5 text-[12px]">
               <div class="flex justify-between items-center text-slate-600">
-                <span>Gaji Pokok</span> 
+                <span>Gaji Pokok</span>
                 <span id="previewBasic" class="font-medium text-slate-800 tracking-tight">Rp 0</span>
               </div>
               <div id="previewOvertimeRow" class="flex justify-between items-center text-blue-600 hidden">
@@ -162,21 +162,21 @@
               </div>
               <div class="flex flex-col gap-1.5">
                 <div class="flex justify-between items-center text-emerald-600">
-                  <span>Total Tunjangan</span> 
+                  <span>Total Tunjangan</span>
                   <span id="previewEarnings" class="font-medium tracking-tight">+Rp 0</span>
                 </div>
                 <div id="detailEarningsContainer" class="hidden pl-3 border-l-2 border-emerald-100 space-y-1.5 mt-0.5 w-full"></div>
               </div>
               <div class="flex flex-col gap-1.5">
                 <div class="flex justify-between items-center text-rose-500">
-                  <span>Total Potongan</span> 
+                  <span>Total Potongan</span>
                   <span id="previewDeductions" class="font-medium tracking-tight">-Rp 0</span>
                 </div>
                 <div id="detailDeductionsContainer" class="hidden pl-3 border-l-2 border-rose-100 space-y-1.5 mt-0.5 w-full"></div>
               </div>
               <div class="pt-4 mt-2 border-t border-slate-200/80">
                 <div class="flex justify-between items-end">
-                  <span class="font-medium text-slate-600 text-[13px]">Take Home Pay</span> 
+                  <span class="font-medium text-slate-600 text-[13px]">Take Home Pay</span>
                   <span id="previewNetPay" class="font-bold text-blue-600 text-[15px] tracking-tight">Rp 0</span>
                 </div>
               </div>
@@ -190,8 +190,15 @@
 </div>
 
 <script>
-  let overtimeSummary = { totalHours: 0, totalPay: 0 };
-  let attendanceSummary = { totalDays: 0, ratePerDay: 0, totalPay: 0 };
+  let overtimeSummary = {
+    totalHours: 0,
+    totalPay: 0
+  };
+  let attendanceSummary = {
+    totalDays: 0,
+    ratePerDay: 0,
+    totalPay: 0
+  };
   let isReadOnlyMode = false;
 
   function parseIDR(str) {
@@ -243,10 +250,10 @@
     try {
       const basicInput = document.getElementById('inputBasicSalary');
       const basic = basicInput ? parseIDR(basicInput.value) : 0;
-      
+
       let allowances = 0;
       let earningsDetailHTML = '';
-      
+
       document.querySelectorAll('.allowance-row').forEach(row => {
         const nameInput = row.querySelector('input[type="text"]');
         const amountInput = row.querySelector('.amount-input-allowance');
@@ -280,13 +287,13 @@
 
       let deductions = 0;
       let deductionsDetailHTML = '';
-      
+
       document.querySelectorAll('.deduction-row').forEach(row => {
         const nameInput = row.querySelector('input[type="text"]');
         const amountInput = row.querySelector('.amount-input-deduction');
         const container = row.querySelector('.w-32 relative');
         const unitSpan = container ? container.querySelector('span') : null;
-        
+
         if (nameInput && amountInput) {
           let inputVal = parseIDR(amountInput.value);
           let finalAmount = inputVal;
@@ -308,22 +315,22 @@
       });
 
       const netPay = (basic + allowances + overtime) - deductions;
-      
+
       if (document.getElementById('previewBasic')) document.getElementById('previewBasic').innerText = 'Rp ' + basic.toLocaleString('id-ID');
-      
+
       const earnDetailBox = document.getElementById('detailEarningsContainer');
       if (earnDetailBox) {
         earnDetailBox.innerHTML = earningsDetailHTML;
         earnDetailBox.classList.toggle('hidden', earningsDetailHTML === '');
       }
       if (document.getElementById('previewEarnings')) document.getElementById('previewEarnings').innerText = '+Rp ' + allowances.toLocaleString('id-ID');
-      
+
       const dedDetailBox = document.getElementById('detailDeductionsContainer');
       if (dedDetailBox) {
         dedDetailBox.innerHTML = deductionsDetailHTML;
         dedDetailBox.classList.toggle('hidden', deductionsDetailHTML === '');
       }
-      
+
       if (document.getElementById('previewDeductions')) document.getElementById('previewDeductions').innerText = '-Rp ' + deductions.toLocaleString('id-ID');
       if (document.getElementById('previewNetPay')) document.getElementById('previewNetPay').innerText = 'Rp ' + netPay.toLocaleString('id-ID');
     } catch (err) {}
@@ -334,9 +341,15 @@
     try {
       const res = await fetch(`/overtime/summary/${idParam}`);
       const data = await res.json();
-      overtimeSummary = { totalHours: Number(data.totalHours || 0), totalPay: Number(data.totalPay || 0) };
+      overtimeSummary = {
+        totalHours: Number(data.totalHours || 0),
+        totalPay: Number(data.totalPay || 0)
+      };
     } catch (err) {
-      overtimeSummary = { totalHours: 0, totalPay: 0 };
+      overtimeSummary = {
+        totalHours: 0,
+        totalPay: 0
+      };
     } finally {
       renderOvertimeComponent();
       calculatePayroll();
@@ -409,23 +422,23 @@
 
   // --- REVISI UTAMA FIX 404 & FIX RIBAUAN PERSEN DI HISTORY MODE ---
   function generateRowHTML(name, amount, isFixed, type) {
-  const colorClass = type === 'allowance' ? 'blue' : 'rose';
+    const colorClass = type === 'allowance' ? 'blue' : 'rose';
 
-  const isReadOnly = isFixed || isReadOnlyMode;
-  const readOnlyAttr = isReadOnly ? 'readonly' : '';
+    const isReadOnly = isFixed || isReadOnlyMode;
+    const readOnlyAttr = isReadOnly ? 'readonly' : '';
 
-  const trashButton = isReadOnly
-    ? `<div class="w-8 h-8"></div>`
-    : `<button type="button"
+    const trashButton = isReadOnly ?
+      `<div class="w-8 h-8"></div>` :
+      `<button type="button"
         onclick="this.parentElement.remove(); updateContainerBackgrounds(); calculatePayroll();"
         class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-${colorClass}-600 flex items-center justify-center transition-all text-xs">
         <i class="fa-solid fa-trash-can text-[11px]"></i>
       </button>`;
 
-  const numericAmount = parseFloat(amount || 0);
-  const formattedAmount = formatIDRValue(numericAmount);
+    const numericAmount = parseFloat(amount || 0);
+    const formattedAmount = formatIDRValue(numericAmount);
 
-  return `
+    return `
     <div class="flex items-center gap-2 ${type}-row animate-fadeIn">
 
       <input type="text"
@@ -451,12 +464,12 @@
 
     </div>
   `;
-}
+  }
 
   function addAllowanceField() {
     const select = document.getElementById('masterAllowanceSelect');
     if (!select || !select.value) return;
-    
+
     const selectedOption = select.options[select.selectedIndex];
     const componentName = select.value;
     const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
@@ -482,7 +495,7 @@
   function addDeductionField() {
     const select = document.getElementById('masterDeductionSelect');
     if (!select || !select.value) return;
-    
+
     const selectedOption = select.options[select.selectedIndex];
     const componentName = select.value;
     const defaultAmount = selectedOption.getAttribute('data-amount') || 0;
@@ -510,17 +523,17 @@
   function switchEmployee(el) {
     document.querySelectorAll('.employee-card').forEach(card => card.classList.remove('bg-blue-50/40'));
     el.classList.add('bg-blue-50/40');
-    
+
     const employeeId = el.getAttribute('data-id');
     const name = el.getAttribute('data-name');
     const nik = el.getAttribute('data-nik');
     const pos = el.getAttribute('data-pos');
-    
+
     sessionStorage.setItem('selectedEmployeeId', employeeId);
-    
+
     document.getElementById('empNameTitle').innerText = name;
     document.getElementById('empMetaTitle').innerText = 'NIK: ' + nik + ' • ' + pos;
-    
+
     fetchAndRenderPayrollData(employeeId);
   }
 
@@ -528,10 +541,17 @@
     const period = document.getElementById('filterPeriod').value;
     document.getElementById('labelPeriodSummary').innerText = period;
     const activeCard = document.querySelector(`.employee-card[data-id="${employeeId}"]`);
-    if(!activeCard) return;
+    if (!activeCard) return;
 
-    overtimeSummary = { totalHours: 0, totalPay: 0 };
-    attendanceSummary = { totalDays: 0, ratePerDay: 0, totalPay: 0 };
+    overtimeSummary = {
+      totalHours: 0,
+      totalPay: 0
+    };
+    attendanceSummary = {
+      totalDays: 0,
+      ratePerDay: 0,
+      totalPay: 0
+    };
 
     const allowanceContainer = document.getElementById('allowanceContainer');
     const deductionContainer = document.getElementById('deductionContainer');
@@ -573,19 +593,22 @@
           const arrAllow = data.allowances || [];
           arrAllow.forEach(item => {
             const cName = item.componentName || item.name;
-            if(cName.includes('Konsumsi') || cName.includes('Lembur')) return; 
+            if (cName.includes('Konsumsi') || cName.includes('Lembur')) return;
             allowanceContainer.insertAdjacentHTML('beforeend', generateRowHTML(cName, item.amount, true, 'allowance'));
           });
 
           const konsumsiItem = arrAllow.find(a => (a.componentName || a.name).includes('Konsumsi'));
-          if(konsumsiItem) {
-             attendanceSummary.totalDays = 1; 
-             attendanceAllowanceContainer.innerHTML = `<div class="flex items-center gap-2 allowance-row animate-fadeIn"><input type="text" value="${konsumsiItem.componentName || konsumsiItem.name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span><input type="text" value="${formatIDRValue(konsumsiItem.amount)}" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none" readonly></div><div class="w-8 h-8"></div></div>`;
+          if (konsumsiItem) {
+            attendanceSummary.totalDays = 1;
+            attendanceAllowanceContainer.innerHTML = `<div class="flex items-center gap-2 allowance-row animate-fadeIn"><input type="text" value="${konsumsiItem.componentName || konsumsiItem.name}" class="flex-1 bg-white border border-slate-200/60 rounded-lg px-2.5 py-1.5 text-[12px] text-slate-800 font-medium" readonly><div class="w-32 relative"><span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-400">Rp</span><input type="text" value="${formatIDRValue(konsumsiItem.amount)}" class="amount-input-allowance w-full bg-white border border-slate-200/60 rounded-lg pl-7 pr-2 py-1.5 text-[12px] font-bold text-slate-800 text-right focus:outline-none" readonly></div><div class="w-8 h-8"></div></div>`;
           }
 
-          if(data.overtime && data.overtime.amount > 0) {
-             overtimeSummary = { totalHours: data.overtime.hours, totalPay: data.overtime.amount };
-             renderOvertimeComponent();
+          if (data.overtime && data.overtime.amount > 0) {
+            overtimeSummary = {
+              totalHours: data.overtime.hours,
+              totalPay: data.overtime.amount
+            };
+            renderOvertimeComponent();
           }
 
           const arrDed = data.deductions || [];
@@ -596,18 +619,18 @@
           });
 
           if (data.loanDeduction && data.loanDeduction.length > 0) {
-  data.loanDeduction.forEach(loan => {
-    deductionContainer.insertAdjacentHTML(
-      'beforeend',
-      generateRowHTML(
-        'Cicilan Pinjaman',
-        loan.amount,
-        true,
-        'deduction'
-      )
-    );
-  });
-}
+            data.loanDeduction.forEach(loan => {
+              deductionContainer.insertAdjacentHTML(
+                'beforeend',
+                generateRowHTML(
+                  'Cicilan Pinjaman',
+                  loan.amount,
+                  true,
+                  'deduction'
+                )
+              );
+            });
+          }
 
           updateContainerBackgrounds();
           calculatePayroll();
@@ -628,19 +651,19 @@
             deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML(item.componentName, item.amount, false, 'deduction'));
           });
 
-         if (data.loanDeduction && data.loanDeduction.length > 0) {
-  data.loanDeduction.forEach(loan => {
-    deductionContainer.insertAdjacentHTML(
-      'beforeend',
-      generateRowHTML(
-        'Cicilan Pinjaman',
-        loan.amount,
-        true,
-        'deduction'
-      )
-    );
-  });
-}
+          if (data.loanDeduction && data.loanDeduction.length > 0) {
+            data.loanDeduction.forEach(loan => {
+              deductionContainer.insertAdjacentHTML(
+                'beforeend',
+                generateRowHTML(
+                  'Cicilan Pinjaman',
+                  loan.amount,
+                  true,
+                  'deduction'
+                )
+              );
+            });
+          }
 
           updateContainerBackgrounds();
           loadOvertime(employeeId);
@@ -650,59 +673,61 @@
   }
 
   async function triggerTutupBuku(event) {
-  event.preventDefault();
-  
-  const currentPeriod = document.getElementById('filterPeriod').value;
-  
-  // 1. Sesuaikan teks alert konfirmasi menjadi 5 pegawai target
-  if (!confirm(`Apakah Anda yakin ingin melakukan Tutup Buku periode ${currentPeriod} untuk 5 pegawai target? Data yang dikunci tidak dapat diubah kembali.`)) {
-    return;
-  }
+    event.preventDefault();
 
-  const allCards = document.querySelectorAll('.employee-card');
-  
-  // 2. TAMBAHKAN USERNAME BARU DI SINI 👈
-  const targetUsernames = ["fajarjaniko", "adindarismayani", "abdulaziz", "meltisundari", "basoherman"];
-  const matchedEmployeeIds = [];
+    const currentPeriod = document.getElementById('filterPeriod').value;
 
-  allCards.forEach(card => {
-    const nameText = card.querySelector('h4').innerText.toLowerCase().replace(/\s/g, "");
-    const empId = card.getAttribute('data-id');
-    
-    const isTarget = targetUsernames.some(target => nameText.includes(target));
-    if (isTarget && empId) {
-      matchedEmployeeIds.push(empId);
+    // 1. Sesuaikan teks alert konfirmasi menjadi 5 pegawai target
+    if (!confirm(`Apakah Anda yakin ingin melakukan Tutup Buku periode ${currentPeriod} untuk 5 pegawai target? Data yang dikunci tidak dapat diubah kembali.`)) {
+      return;
     }
-  });
 
-  if (matchedEmployeeIds.length === 0) {
-    alert("❌ Gagal memetakan ID Pegawai. Pastikan profil 5 pegawai target ada di database.");
-    return;
-  }
+    const allCards = document.querySelectorAll('.employee-card');
 
-  try {
-    const response = await fetch('/payroll/close-book', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        employeeIds: matchedEmployeeIds,
-        periodMonth: currentPeriod
-      })
+    // 2. TAMBAHKAN USERNAME BARU DI SINI 👈
+    const targetUsernames = ["fajarjaniko", "adindarismayani", "abdulaziz", "meltisundari", "basoherman"];
+    const matchedEmployeeIds = [];
+
+    allCards.forEach(card => {
+      const nameText = card.querySelector('h4').innerText.toLowerCase().replace(/\s/g, "");
+      const empId = card.getAttribute('data-id');
+
+      const isTarget = targetUsernames.some(target => nameText.includes(target));
+      if (isTarget && empId) {
+        matchedEmployeeIds.push(empId);
+      }
     });
 
-    const result = await response.json();
-    
-    if (result.success) {
-      alert(`🔒 Sukses! ${result.message}`);
-      window.location.reload();
-    } else {
-      alert(`❌ Gagal: ${result.message}`);
+    if (matchedEmployeeIds.length === 0) {
+      alert("❌ Gagal memetakan ID Pegawai. Pastikan profil 5 pegawai target ada di database.");
+      return;
     }
-  } catch (error) {
-    console.error(error);
-    alert("Terjadi kesalahan koneksi sistem.");
+
+    try {
+      const response = await fetch('/payroll/close-book', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          employeeIds: matchedEmployeeIds,
+          periodMonth: currentPeriod
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`🔒 Sukses! ${result.message}`);
+        window.location.reload();
+      } else {
+        alert(`❌ Gagal: ${result.message}`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan koneksi sistem.");
+    }
   }
-}
 
   function submitPayrollData() {
     const allCards = document.querySelectorAll('.employee-card');
@@ -711,17 +736,20 @@
       if (card.classList.contains('bg-blue-50/40')) activeCard = card;
     });
     if (!activeCard) return;
-    
+
     const employeeId = activeCard.getAttribute('data-id');
     const combinedComponents = [];
-    
+
     document.querySelectorAll('.allowance-row').forEach(row => {
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-allowance');
       if (nameInput && amountInput) {
         let nameValue = nameInput.value;
         if (nameValue.includes('Tunjangan Konsumsi')) nameValue = 'Tunjangan Konsumsi';
-        combinedComponents.push({ componentName: nameValue, amount: parseIDR(amountInput.value) || 0 });
+        combinedComponents.push({
+          componentName: nameValue,
+          amount: parseIDR(amountInput.value) || 0
+        });
       }
     });
 
@@ -729,14 +757,22 @@
       const nameInput = row.querySelector('input[type="text"]');
       const amountInput = row.querySelector('.amount-input-deduction');
       if (nameInput && amountInput) {
-        combinedComponents.push({ componentName: nameInput.value, amount: parseIDR(amountInput.value) || 0 });
+        combinedComponents.push({
+          componentName: nameInput.value,
+          amount: parseIDR(amountInput.value) || 0
+        });
       }
     });
 
     fetch('/payroll/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ employeeId, allowances: combinedComponents })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          employeeId,
+          allowances: combinedComponents
+        })
       })
       .then(res => res.json())
       .then(data => {
@@ -748,10 +784,10 @@
   }
 
   document.getElementById('filterPeriod').addEventListener('change', function() {
-      const activeCard = document.querySelector('.employee-card.bg-blue-50\\/40');
-      if (activeCard) {
-          fetchAndRenderPayrollData(activeCard.getAttribute('data-id'));
-      }
+    const activeCard = document.querySelector('.employee-card.bg-blue-50\\/40');
+    if (activeCard) {
+      fetchAndRenderPayrollData(activeCard.getAttribute('data-id'));
+    }
   });
 
   document.getElementById('searchEmployeeInput').addEventListener('input', function(e) {
@@ -772,7 +808,10 @@
     if (targetCard) {
       setTimeout(() => {
         targetCard.click();
-        targetCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        targetCard.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth'
+        });
       }, 100);
     } else {
       const firstCard = document.querySelector('.employee-card');

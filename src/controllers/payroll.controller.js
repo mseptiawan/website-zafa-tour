@@ -4,7 +4,6 @@ import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
 import { getAttendanceSummary } from "../services/attendanceSummary.service.js";
 import * as payrollService from "../services/payroll.service.js";
 import Payroll from "../models/payroll/Payroll.model.js";
-import { runPayroll } from "../services/payrollRun.service.js";
 import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
