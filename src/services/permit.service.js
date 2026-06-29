@@ -2,6 +2,8 @@ import Permit from "../models/Permit.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import User from "../models/basic/User.model.js";
 import Role from "../models/basic/Role.model.js";
+import fs from "fs";
+
 import notificationService from "./notification.service.js";
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
@@ -34,9 +36,13 @@ export const createPermit = async ({ body, file, currentUser }) => {
     document: documentPath,
   });
 
-  // Timbal balik notifikasi otomatis ke Wakil Direktur sebagai pintu pertama otorisasi
   try {
-    const targetRole = await Role.findOne({ name: "WAKIL_DIREKTUR" }).lean();
+    let targetRoleName = "WAKIL_DIREKTUR";
+    if (currentUser.role?.toUpperCase() === "WAKIL_DIREKTUR") {
+      targetRoleName = "DIREKTUR_UTAMA";
+    }
+
+    const targetRole = await Role.findOne({ name: targetRoleName }).lean();
     if (targetRole) {
       const reviewers = await User.find({ roleId: targetRole._id }).select("_id").lean();
       const reviewerUserIds = reviewers.map((rev) => rev._id);
@@ -98,23 +104,34 @@ export const findEmployeeHistory = async ({ employeeId, page }) => {
  * @param {number|string} params.page - Nomor halaman antrean aktif
  * @returns {Promise<{data: Array, meta: Object, summary: Object}>} Berkas izin masuk beserta metrik rangkumannya
  */
+/**
+ * Mengambil daftar antrean permohonan izin masuk yang menjadi wewenang approver berdasarkan kebijakan struktural (Terpaginasi).
+ */
 export const findIncomingPermits = async ({ currentUser, page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
   const userRoleName = currentUser.role?.toUpperCase();
 
   const wadirRole = await Role.findOne({ name: "WAKIL_DIREKTUR" }).lean();
-  const wadirEmployeeIds = wadirRole
-    ? await Employee.find({ roleId: wadirRole._id }).distinct("_id")
-    : [];
 
-  let query = { _id: null }; // Default aman jika bukan merupakan jajaran direksi
+  const wadirUsers = wadirRole ? await User.find({ roleId: wadirRole._id }).distinct("_id") : [];
+
+  const wadirEmployeeIds =
+    wadirUsers.length > 0
+      ? await Employee.find({ userId: { $in: wadirUsers } }).distinct("_id")
+      : [];
+
+  let query = { _id: null };
 
   if (userRoleName === "DIREKTUR_UTAMA") {
-    // Direktur Utama meninjau pengajuan khusus dari Wakil Direktur
-    query = { employeeId: { $in: wadirEmployeeIds, $ne: currentUser.employeeId } };
+    query = {
+      employeeId: { $in: wadirEmployeeIds, $ne: currentUser.employeeId },
+      status: "PENDING",
+    };
   } else if (userRoleName === "WAKIL_DIREKTUR") {
-    // Wakil Direktur mengelola seluruh perizinan staf di bawahnya (Kecuali direksi)
-    query = { employeeId: { $nin: wadirEmployeeIds, $ne: currentUser.employeeId } };
+    query = {
+      employeeId: { $nin: wadirEmployeeIds, $ne: currentUser.employeeId },
+      status: "PENDING",
+    };
   }
 
   const total = await Permit.countDocuments(query);
@@ -134,9 +151,10 @@ export const findIncomingPermits = async ({ currentUser, page }) => {
 
   const summary = {
     totalPermits: total,
-    approved: await Permit.countDocuments({ ...query, status: "APPROVED" }),
-    pending: await Permit.countDocuments({ ...query, status: "PENDING" }),
-    rejected: await Permit.countDocuments({ ...query, status: "REJECTED" }),
+    approved: await Permit.countDocuments({ employeeId: query.employeeId, status: "APPROVED" }),
+    pending: await Permit.countDocuments({ employeeId: query.employeeId, status: "PENDING" }),
+    rejected: await Permit.countDocuments({ employeeId: query.employeeId, status: "REJECTED" }),
+    cancelled: await Permit.countDocuments({ employeeId: query.employeeId, status: "CANCELLED" }),
   };
 
   return {
@@ -177,7 +195,6 @@ export const executeApproval = async ({ id, status, notesByApprover, currentUser
   const targetRoleName = permit.employeeId?.userId?.roleId?.name?.toUpperCase();
   const approverRoleName = currentUser.role?.toUpperCase();
 
-  // Memaksa kepatuhan gerbang birokrasi penandatanganan struktur internal perusahaan
   if (targetRoleName === "WAKIL_DIREKTUR") {
     if (approverRoleName !== "DIREKTUR_UTAMA") {
       const error = new Error(
@@ -204,12 +221,11 @@ export const executeApproval = async ({ id, status, notesByApprover, currentUser
 
   // Pengiriman balik notifikasi langsung ke akun personal pemohon
   try {
-    const statusEmoji = status === "APPROVED" ? "✅" : "❌";
     await notificationService.createNotification({
       userId: permit.employeeId.userId._id,
       senderId: currentUser._id,
       senderName: currentUser.fullName,
-      title: `Status Perizinan: ${status} ${statusEmoji}`,
+      title: `Status Perizinan: ${status}`,
       text: `Pengajuan izin Anda telah ${status === "APPROVED" ? "disetujui" : "ditolak"}. Catatan: "${notesByApprover || "-"}"`,
       module: MODULES.PERMIT || "PERMIT",
       referenceId: permit._id,
@@ -222,4 +238,152 @@ export const executeApproval = async ({ id, status, notesByApprover, currentUser
   }
 
   return permit;
+};
+/**
+ * @typedef {Object} EmployeeIdPopulated
+ * @property {string} _id - ID MongoDB milik dokumen pegawai.
+ * @property {string} fullName - Nama lengkap pegawai.
+ * @property {Object} [careerData] - Informasi karir pegawai.
+ * @property {Object} [careerData.bidangId] - Referensi dokumen bidang/divisi.
+ * @property {string} [careerData.bidangId.name] - Nama bidang/divisi kerja pegawai.
+ */
+
+/**
+ * @typedef {Object} PermitDocument
+ * @property {string} _id - ID unik dokumen izin.
+ * @property {string|EmployeeIdPopulated} employeeId - ID pegawai atau objek data pegawai yang di-populate.
+ * @property {'PENDING'|'APPROVED'|'REJECTED'|'CANCELLED'} status - Status pemrosesan berkas.
+ * @property {'SAKIT'|'PENDAMPINGAN_MELAHIRKAN'|'MUSIBAH'|'PENTING'|'KEPERLUAN_KELUARGA'|'KEPERLUAN_MENDESAK'|'LAINNYA'} type - Jenis izin yang diajukan.
+ * @property {string|Date} date - Tanggal izin yang diajukan.
+ * @property {string} reason - Deskripsi alasan pengajuan.
+ * @property {string} [document] - Path URL file lampiran dokumen pendukung.
+ * @property {string} [notesByApprover] - Catatan evaluasi dari atasan / peninjau.
+ */
+
+/**
+ * Mengambil satu data berkas izin untuk form edit dengan validasi kepemilikan dan status.
+ * * @async
+ * @function getPermitForEdit
+ * @param {Object} payload - Objek parameter fungsi.
+ * @param {string} payload.id - ID dokumen perizinan (`_id`) yang ingin dicari.
+ * @param {string} payload.employeeId - ID pegawai milik pemohon untuk memastikan validasi kepemilikan berkas.
+ * @returns {Promise<PermitDocument>} Mengembalikan objek dokumen izin dalam format POJO (Plain Old JavaScript Object) lewat `.lean()`.
+ * * @throws {Error} Melempar error dengan `statusCode = 404` jika berkas tidak ditemukan atau bukan milik pegawai tersebut.
+ * @throws {Error} Melempar error dengan `statusCode = 400` jika status berkas sudah diproses (`APPROVED`/`REJECTED`/`CANCELLED`).
+ */
+export const getPermitForEdit = async ({ id, employeeId }) => {
+  const permit = await Permit.findOne({ _id: id, employeeId }).lean();
+
+  if (!permit) {
+    const error = new Error("Data pengajuan perizinan tidak ditemukan.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (permit.status !== "PENDING") {
+    const error = new Error("Akses Ditolak: Berkas telah diproses dan tidak dapat diubah lagi.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return permit;
+};
+
+/**
+ * Memperbarui berkas dokumen perizinan dari sisi karyawan.
+ * Melakukan penggantian file fisik lama jika terdapat berkas upload baru yang dikirimkan.
+ * * @async
+ * @function updatePermit
+ * @param {Object} payload - Objek parameter fungsi.
+ * @param {string} payload.id - ID dokumen perizinan (`_id`) yang akan diubah.
+ * @param {Object} payload.body - Objek data formulir yang dikirim melalui `req.body`.
+ * @param {string} payload.body.type - Jenis tipe izin baru yang dipilih.
+ * @param {string|Date} payload.body.date - Tanggal izin baru yang diajukan.
+ * @param {string} payload.body.reason - Deskripsi alasan pembaruan pengajuan izin.
+ * @param {Object} [payload.file] - Objek file dokumen baru hasil unggahan `multer` (`req.file`).
+ * @param {string} payload.file.filename - Nama file baru yang tersimpan di storage server.
+ * @param {Object} payload.currentUser - Objek data user aktif yang sedang login (`req.session.user`).
+ * @param {string} payload.currentUser.employeeId - ID pegawai dari user untuk pengecekan kepemilikan.
+ * @returns {Promise<Object>} Mengembalikan dokumen Mongoose instance dari berkas izin yang diperbarui.
+ * * @throws {Error} Melempar error dengan `statusCode = 404` jika data pengajuan tidak ditemukan.
+ * @throws {Error} Melempar error dengan `statusCode = 400` jika dokumen perizinan telah dievaluasi oleh atasan.
+ * @throws {Error} Melempar error dengan `statusCode = 400` dan properti `field = 'document'` jika tipe izin diubah ke 'SAKIT' tanpa melampirkan berkas dokter.
+ */
+export const updatePermit = async ({ id, body, file, currentUser }) => {
+  const { type, date, reason } = body;
+
+  const permit = await Permit.findOne({ _id: id, employeeId: currentUser.employeeId });
+
+  if (!permit) {
+    const error = new Error("Data pengajuan perizinan tidak ditemukan.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (permit.status !== "PENDING") {
+    const error = new Error("Akses Ditolak: Berkas telah diproses oleh atasan.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (type === "SAKIT" && !file && !permit.document) {
+    const error = new Error("Izin sakit wajib menyertakan dokumen surat keterangan dokter.");
+    error.statusCode = 400;
+    error.field = "document";
+    throw error;
+  }
+
+  if (file) {
+    if (permit.document) {
+      const oldPath = `./public${permit.document}`;
+      if (fs.existsSync(oldPath)) {
+        try {
+          fs.unlinkSync(oldPath);
+        } catch (e) {
+          console.error("Gagal hapus file lama:", e);
+        }
+      }
+    }
+    permit.document = `/uploads/files/${file.filename}`;
+  }
+
+  permit.type = type;
+  permit.date = date;
+  permit.reason = reason;
+
+  await permit.save();
+  return permit;
+};
+
+/**
+ * Menghapus/menarik berkas dokumen perizinan dari sisi karyawan dengan mengubah statusnya menjadi `CANCELLED`.
+ * Dokumen tidak benar-benar dihapus (hard delete) dari database demi kebutuhan audit trail.
+ * * @async
+ * @function deletePermit
+ * @param {Object} payload - Objek parameter fungsi.
+ * @param {string} payload.id - ID dokumen perizinan (`_id`) yang akan dibatalkan.
+ * @param {string} payload.employeeId - ID pegawai dari pemohon untuk mencocokkan hak akses pembatalan berkas.
+ * @returns {Promise<boolean>} Mengembalikan nilai `true` jika proses pembatalan status berhasil dilakukan.
+ * * @throws {Error} Melempar error dengan `statusCode = 404` jika berkas tidak ditemukan.
+ * @throws {Error} Melempar error dengan `statusCode = 400` jika dokumen tidak berstatus `PENDING` (sudah diproses oleh pihak atasan).
+ */
+export const deletePermit = async ({ id, employeeId }) => {
+  const permit = await Permit.findOne({ _id: id, employeeId });
+
+  if (!permit) {
+    const error = new Error("Data pengajuan perizinan tidak ditemukan.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (permit.status !== "PENDING") {
+    const error = new Error("Akses Ditolak: Dokumen telah dikunci karena sudah diproses.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  permit.status = "CANCELLED";
+  await permit.save();
+
+  return true;
 };

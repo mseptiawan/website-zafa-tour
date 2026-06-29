@@ -417,6 +417,9 @@
   .top-8 {
     top: calc(var(--spacing) * 8);
   }
+  .top-full {
+    top: 100%;
+  }
   .-right-4 {
     right: calc(var(--spacing) * -4);
   }
@@ -425,6 +428,9 @@
   }
   .right-0 {
     right: calc(var(--spacing) * 0);
+  }
+  .right-1\/4 {
+    right: calc(1 / 4 * 100%);
   }
   .right-2 {
     right: calc(var(--spacing) * 2);
@@ -462,6 +468,9 @@
   .bottom-20 {
     bottom: calc(var(--spacing) * 20);
   }
+  .bottom-full {
+    bottom: 100%;
+  }
   .-left-10 {
     left: calc(var(--spacing) * -10);
   }
@@ -488,6 +497,9 @@
   }
   .left-0 {
     left: calc(var(--spacing) * 0);
+  }
+  .left-1\/2 {
+    left: calc(1 / 2 * 100%);
   }
   .left-2\.5 {
     left: calc(var(--spacing) * 2.5);
@@ -521,6 +533,9 @@
   }
   .z-\[110\] {
     z-index: 110;
+  }
+  .z-\[120\] {
+    z-index: 120;
   }
   .z-\[150\] {
     z-index: 150;
@@ -776,6 +791,9 @@
   }
   .aspect-video {
     aspect-ratio: var(--aspect-video);
+  }
+  .h-0 {
+    height: calc(var(--spacing) * 0);
   }
   .h-1 {
     height: calc(var(--spacing) * 1);
@@ -1071,6 +1089,9 @@
   .w-\[13\%\] {
     width: 13%;
   }
+  .w-\[14\%\] {
+    width: 14%;
+  }
   .w-\[15\%\] {
     width: 15%;
   }
@@ -1083,8 +1104,17 @@
   .w-\[20\%\] {
     width: 20%;
   }
+  .w-\[22\%\] {
+    width: 22%;
+  }
+  .w-\[24\%\] {
+    width: 24%;
+  }
   .w-\[25\%\] {
     width: 25%;
+  }
+  .w-\[26\%\] {
+    width: 26%;
   }
   .w-\[27\%\] {
     width: 27%;
@@ -1248,6 +1278,10 @@
   .origin-top-right {
     transform-origin: 100% 0;
   }
+  .-translate-x-1\/2 {
+    --tw-translate-x: calc(calc(1 / 2 * 100%) * -1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
   .-translate-x-full {
     --tw-translate-x: -100%;
     translate: var(--tw-translate-x) var(--tw-translate-y);
@@ -1317,6 +1351,9 @@
   }
   .animate-spin {
     animation: var(--animate-spin);
+  }
+  .cursor-help {
+    cursor: help;
   }
   .cursor-not-allowed {
     cursor: not-allowed;
@@ -1692,6 +1729,10 @@
     border-style: var(--tw-border-style);
     border-width: 4px;
   }
+  .border-x-4 {
+    border-inline-style: var(--tw-border-style);
+    border-inline-width: 4px;
+  }
   .border-y {
     border-block-style: var(--tw-border-style);
     border-block-width: 1px;
@@ -1699,6 +1740,10 @@
   .border-t {
     border-top-style: var(--tw-border-style);
     border-top-width: 1px;
+  }
+  .border-t-4 {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 4px;
   }
   .border-r {
     border-right-style: var(--tw-border-style);
@@ -2180,6 +2225,12 @@
   .border-slate-300 {
     border-color: var(--color-slate-300);
   }
+  .border-slate-300\/60 {
+    border-color: color-mix(in srgb, oklch(86.9% 0.022 252.894) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-slate-300) 60%, transparent);
+    }
+  }
   .border-slate-800 {
     border-color: var(--color-slate-800);
   }
@@ -2227,6 +2278,12 @@
     @supports (color: color-mix(in lab, red, red)) {
       border-color: color-mix(in oklab, var(--color-white) 40%, transparent);
     }
+  }
+  .border-x-transparent {
+    border-inline-color: transparent;
+  }
+  .border-t-slate-900 {
+    border-top-color: var(--color-slate-900);
   }
   .border-l-amber-500 {
     border-left-color: var(--color-amber-500);
@@ -2624,6 +2681,12 @@
       background-color: color-mix(in oklab, var(--color-slate-50) 70%, transparent);
     }
   }
+  .bg-slate-50\/75 {
+    background-color: color-mix(in srgb, oklch(98.4% 0.003 247.858) 75%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-50) 75%, transparent);
+    }
+  }
   .bg-slate-50\/80 {
     background-color: color-mix(in srgb, oklch(98.4% 0.003 247.858) 80%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -2685,6 +2748,12 @@
     background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 40%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-slate-900) 40%, transparent);
+    }
+  }
+  .bg-slate-900\/60 {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 60%, transparent);
     }
   }
   .bg-slate-900\/80 {
@@ -3686,6 +3755,12 @@
       color: color-mix(in oklab, var(--color-slate-400) 60%, transparent);
     }
   }
+  .text-slate-400\/70 {
+    color: color-mix(in srgb, oklch(70.4% 0.04 256.788) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-slate-400) 70%, transparent);
+    }
+  }
   .text-slate-400\/80 {
     color: color-mix(in srgb, oklch(70.4% 0.04 256.788) 80%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -3742,6 +3817,9 @@
   }
   .lowercase {
     text-transform: lowercase;
+  }
+  .normal-case {
+    text-transform: none;
   }
   .uppercase {
     text-transform: uppercase;
@@ -4302,6 +4380,13 @@
   .group-open\:rotate-180 {
     &:is(:where(.group):is([open], :popover-open, :open) *) {
       rotate: 180deg;
+    }
+  }
+  .group-hover\:block {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        display: block;
+      }
     }
   }
   .group-hover\:-translate-x-0\.5 {
@@ -5894,6 +5979,14 @@
       }
     }
   }
+  .focus\:ring-rose-500\/20 {
+    &:focus {
+      --tw-ring-color: color-mix(in srgb, oklch(64.5% 0.246 16.439) 20%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        --tw-ring-color: color-mix(in oklab, var(--color-rose-500) 20%, transparent);
+      }
+    }
+  }
   .focus\:ring-slate-100 {
     &:focus {
       --tw-ring-color: var(--color-slate-100);
@@ -6645,6 +6738,11 @@
   .md\:justify-between {
     @media (width >= 48rem) {
       justify-content: space-between;
+    }
+  }
+  .md\:justify-center {
+    @media (width >= 48rem) {
+      justify-content: center;
     }
   }
   .md\:justify-start {

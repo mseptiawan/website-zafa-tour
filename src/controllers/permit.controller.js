@@ -5,7 +5,7 @@ import fs from "fs";
 
 // Rendisi Form Pengajuan Izin Baru
 export const create = asyncHandler(async (req, res) => {
-  return res.render("permit/create", {
+  return res.render("permit/form", {
     ...buildRenderData(req, {
       title: "Pengajuan Izin",
       mode: "CREATE",
@@ -17,9 +17,9 @@ export const create = asyncHandler(async (req, res) => {
 export const store = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
     if (req.file) {
-      fs.unlinkSync(req.file.path); // Hapus file temporary yang diupload jika skema gagal tervalidasi
+      fs.unlinkSync(req.file.path);
     }
-    return res.status(400).render("permit/create", {
+    return res.status(400).render("permit/form", {
       ...buildRenderData(req, {
         title: "Pengajuan Izin",
         mode: "CREATE",
@@ -38,14 +38,13 @@ export const store = asyncHandler(async (req, res) => {
     });
 
     req.flash("success", "Permohonan perizinan berhasil diajukan ke atasan!");
-
     await new Promise((resolve) => req.session.save(resolve));
     return res.redirect("/permit/history");
   } catch (error) {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    return res.status(error.statusCode || 500).render("permit/create", {
+    return res.status(error.statusCode || 500).render("permit/form", {
       ...buildRenderData(req, {
         title: "Pengajuan Izin",
         mode: "CREATE",
@@ -74,6 +73,7 @@ export const getHistoryPermits = asyncHandler(async (req, res) => {
       pagination: meta,
       query: req.query,
       type: "history",
+      user: req.session.user,
     }),
   });
 });
@@ -99,6 +99,7 @@ export const getIncomingPermits = asyncHandler(async (req, res) => {
       query: req.query,
       currentRole: req.session.user.role,
       summary,
+      user: req.session.user, // <-- PERBAIKAN UTAMA: Wajib dipasok agar partial table bisa memvalidasi "Self-Approval"
     }),
   });
 });
@@ -123,4 +124,82 @@ export const actionApproval = asyncHandler(async (req, res) => {
 
   await new Promise((resolve) => req.session.save(resolve));
   return res.redirect("/permit/incoming");
+});
+
+// Rendisi Form Edit Izin (Hanya jika status PENDING)
+export const edit = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const employeeId = req.session.user.employeeId;
+
+  try {
+    const permit = await permitService.getPermitForEdit({ id, employeeId });
+    return res.render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Ubah Pengajuan Izin",
+        mode: "EDIT",
+        oldData: permit,
+      }),
+    });
+  } catch (error) {
+    req.flash("error", error.message);
+    await new Promise((resolve) => req.session.save(resolve));
+    return res.redirect("/permit/history");
+  }
+});
+
+// Memperbarui Data Pengajuan Izin ke Database
+export const update = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (req.validationErrors) {
+    if (req.file) fs.unlinkSync(req.file.path);
+    return res.status(400).render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Ubah Pengajuan Izin",
+        mode: "EDIT",
+        errors: req.validationErrors,
+        oldData: { ...req.body, _id: id },
+        error: ["Sila lengkapi semua isian wajib formulir."],
+      }),
+    });
+  }
+
+  try {
+    await permitService.updatePermit({
+      id,
+      body: req.body,
+      file: req.file,
+      currentUser: req.session.user,
+    });
+
+    req.flash("success", "Permohonan perizinan berhasil diperbarui!");
+    await new Promise((resolve) => req.session.save(resolve));
+    return res.redirect("/permit/history");
+  } catch (error) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    return res.status(error.statusCode || 500).render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Ubah Pengajuan Izin",
+        mode: "EDIT",
+        oldData: { ...req.body, _id: id },
+        error: [error.message],
+      }),
+    });
+  }
+});
+
+// Menarik / Menghapus Berkas Pengajuan Izin (Hanya jika status PENDING)
+export const destroy = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const employeeId = req.session.user.employeeId;
+
+  try {
+    await permitService.deletePermit({ id, employeeId });
+    req.flash("success", "Berkas permohonan izin berhasil ditarik kembali.");
+  } catch (error) {
+    req.flash("error", error.message || "Gagal menarik berkas perizinan.");
+  }
+
+  await new Promise((resolve) => req.session.save(resolve));
+  return res.redirect("/permit/history");
 });

@@ -10,6 +10,9 @@ import {
   getHistoryPermits,
   getIncomingPermits,
   actionApproval,
+  edit,
+  update,
+  destroy,
 } from "../controllers/permit.controller.js";
 
 const router = express.Router();
@@ -23,6 +26,11 @@ const ALLOWED_DIRECTORATE_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR"];
 router.get("/new", create);
 router.post("/", uploadFile.single("document"), validate(createPermitSchema), store);
 router.get("/history", getHistoryPermits);
+
+// Tambahkan rute Edit & Delete khusus Sisi Karyawan di bawah ini:
+router.get("/edit/:id", edit);
+router.post("/edit/:id", uploadFile.single("document"), validate(createPermitSchema), update);
+router.get("/delete/:id", destroy); // Menggunakan GET untuk mempermudah trigger tag <a> dari EJS Anda
 
 // Aksesibilitas Sisi Atasan (Otorisasi Direksi)
 router.get("/incoming", roleMiddleware(...ALLOWED_DIRECTORATE_ROLES), getIncomingPermits);
