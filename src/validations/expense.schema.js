@@ -6,6 +6,11 @@ const baseExpenseSchema = z.object({
     .min(5, "Judul terlalu pendek (minimal 5 karakter)")
     .max(150, "Judul terlalu panjang (maksimal 150 karakter)")
     .trim(),
+  description: z
+    .string()
+    .max(500, "Keterangan terlalu panjang (maksimal 500 karakter)")
+    .trim()
+    .optional(),
 
   category: z
     .string({ required_error: "Kategori beban wajib dipilih" })

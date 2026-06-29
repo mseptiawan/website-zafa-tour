@@ -1,0 +1,269 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<% 
+  // =========================================================================
+  // LOGIKA CONFIGURATION BADGE STATUS
+  // =========================================================================
+  const getStatusConfig = (status) => {
+    switch(status) {
+      case 'PENDING_MANAGER':
+        return { label: 'PENDING', badge: 'bg-amber-50 text-amber-600 border-amber-200/50', dot: 'bg-amber-500' };
+      case 'PENDING_FINANCE':
+        return { label: 'PENDING', badge: 'bg-blue-50 text-blue-600 border-blue-200/50', dot: 'bg-blue-500' };
+      case 'PAID':
+        return { label: 'APPROVED', badge: 'bg-emerald-50 text-emerald-600 border-emerald-200/50', dot: 'bg-emerald-500 animate-pulse' };
+      case 'REJECTED':
+        return { label: 'DITOLAK', badge: 'bg-rose-50 text-rose-600 border-rose-200/50', dot: 'bg-rose-500' };
+      default:
+        return { label: status, badge: 'bg-slate-50 text-slate-600 border-slate-200', dot: 'bg-slate-400' };
+    }
+  };
+
+  const config = getStatusConfig(expense.status);
+%>
+
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] sm:p-6 md:p-10 antialiased pb-24 md:pb-8">
+  <div class="w-full max-w-none mx-auto space-y-6">
+
+  
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full">
+
+      <div class="lg:col-span-2 space-y-6">
+
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400">
+                <i class="fa-solid fa-user text-lg"></i>
+              </div>
+              <div>
+                <h2 class="text-[15px] font-semibold text-slate-900 tracking-tight"><%= expense.employeeId?.fullName || 'Anonim Karyawan' %></h2>
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
+                  <%= expense.employeeId?.careerData?.bidangId?.name || 'DIVISI OPERASIONAL' %>
+                </p>
+              </div>
+            </div>
+
+            <div class="sm:text-right select-none">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider border <%= config.badge %>">
+                <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
+                <span><%= config.label %></span>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100 my-6">
+
+          <div class="grid grid-cols-2 gap-y-6 gap-x-4 text-xs">
+            <div>
+              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Total Klaim</p>
+              <p class="text-[16px] font-semibold text-slate-900 tabular-nums mt-1">Rp <%= expense.amount.toLocaleString('id-ID') %></p>
+            </div>
+            <div>
+              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Kategori Beban</p>
+              <div class="mt-1">
+                <span class="bg-slate-100 text-slate-700 text-[11px] px-2.5 py-1 rounded-md font-semibold inline-block uppercase">
+                  <%= expense.category?.name || 'Umum / COGS' %>
+                </span>
+              </div>
+            </div>
+            <div>
+              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Tanggal Pengajuan</p>
+              <p class="text-[13px] font-semibold text-slate-800 mt-1">
+                <%= new Date(expense.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+              </p>
+            </div>
+            <div>
+              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Tanggal Nota Transaksi</p>
+              <p class="text-[13px] font-semibold text-slate-800 mt-1">
+                <%= expense.expenseDate ? new Date(expense.expenseDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %>
+              </p>
+            </div>
+            <div class="col-span-2">
+              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Tanggal Pencairan Dana</p>
+              <p class="text-[13px] font-semibold  mt-1">
+                <%= expense.paidAt ? new Date(expense.paidAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + ' • ' + new Date(expense.paidAt).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : 'Belum Dicairkan' %>
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-5 border-t border-slate-50">
+            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2">Judul & Deskripsi Pengajuan</p>
+            <div class="bg-slate-50/60 border border-slate-200/30 rounded-xl p-4 text-[13px] text-slate-700 font-medium">
+              <div class="font-semibold text-slate-900 mb-1"><%= expense.title %></div>
+              <div class="text-slate-500 italic font-normal">"<%= expense.description || 'Tidak ada deskripsi tambahan dari pegawai.' %>"</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION LAMPIRAN: NOTA & BUKTI TRANSFER -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-6 space-y-4">
+          <h3 class="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">Berkas Validasi Lampiran</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 1. NOTA TRANSAKSI / SELF DECLARATION (DARI PEGAWAI) -->
+            <% if (expense.proofFile) { %>
+            <div class="p-4 bg-slate-50/50 border border-slate-200/60 rounded-xl flex flex-col justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
+                  <i class="fa-solid fa-file-invoice text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[12px] font-semibold text-slate-800 truncate">Nota Transaksi</p>
+                  <p class="text-[10px] text-slate-400 font-medium mt-0.5">Unggahan Pegawai</p>
+                </div>
+              </div>
+              <a href="/uploads/files/<%= expense.proofFile %>" target="_blank" class="w-full h-8 rounded-lg bg-white border border-slate-200  text-[11px] font-semibold inline-flex items-center justify-center transition-all hover:bg-slate-50 active:scale-95 cursor-pointer decoration-none">
+                LIHAT NOTA
+              </a>
+            </div>
+            <% } else if (expense.selfDeclaration) { %>
+            <div class="p-4 border border-slate-200/60 rounded-xl text-[11px] text-slate-700 flex flex-col items-start justify-start text-left min-h-[100px] w-full">
+              <span class="font-bold text-slate-900 mb-2 inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info shrink-0 text-slate-400"></i> Self Declaration (Tanpa Nota)
+              </span>
+
+              <p class="font-medium break-all whitespace-pre-wrap leading-relaxed w-full text-left m-0">
+                <span class="font-bold text-slate-900 inline">Alasan:</span> <%= expense.noReceiptReason || 'Tidak ada nota fisik.' %>
+              </p>
+            </div>
+            <% } else { %>
+            <div class="p-4 bg-slate-50/50 border border-slate-200/40 rounded-xl text-[11px] text-slate-400 italic flex items-center justify-center">
+              Nota tidak tersedia
+            </div>
+            <% } %>
+
+            <!-- 2. BUKTI TRANSFER (DARI FINANCE) -->
+            <div class="p-4 bg-slate-50/50 border border-slate-200/60 rounded-xl flex flex-col justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
+                  <i class="fa-solid fa-receipt text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[12px] font-semibold text-slate-800 truncate">Bukti Transfer Bank</p>
+                  <p class="text-[10px] text-slate-400 font-medium mt-0.5">Otorisasi Kas Keuangan</p>
+                </div>
+              </div>
+
+              <% if (expense.transferProofFile) { %>
+              <a href="/uploads/files/<%= expense.transferProofFile %>" target="_blank" class="w-full h-8 rounded-lg bg-white border border-slate-200 text-[11px] font-semibold inline-flex items-center justify-center transition-all hover:bg-slate-50 active:scale-95 cursor-pointer decoration-none">
+                LIHAT TRANSFER
+              </a>
+              <% } else { %>
+              <div class="px-2.5 py-2 bg-slate-100/80 border border-slate-200/50 rounded-lg text-[11px] text-slate-500 font-medium">
+                <% if (expense.status === 'PAID') { %>
+                <span class="text-amber-600 font-semibold"><i class="fa-solid fa-clock-half-way mr-1"></i> Lunas Tanpa Berkas</span>
+                <p class="text-[10px] text-slate-400 mt-0.5">Dana dicairkan sistem tanpa lampiran file.</p>
+                <% } else { %>
+                <span class="text-slate-400"><i class="fa-solid fa-ban mr-1"></i> Belum Ada Bukti</span>
+                <p class="text-[10px] text-slate-400 mt-0.5">Menunggu berkas pelunasan dari Finance.</p>
+                <% } %>
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="space-y-6">
+
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-6 space-y-4">
+          <div>
+            <h3 class="text-[12px] font-semibold text-slate-800 tracking-tight uppercase">Jejak Log Pemeriksaan</h3>
+            <p class="text-[11px] text-slate-400 font-medium mt-0.5">Alur dan status persetujuan berkas</p>
+          </div>
+
+          <div class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+
+            <% if (expense.logs && expense.logs.length > 0) { %>
+            <% expense.logs.forEach((log, index) => { %>
+            <div class="relative">
+              <span class="absolute -left-[23px] top-0.5 w-[16px] h-[16px] rounded-full text-[9px] font-semibold flex items-center justify-center ring-4 ring-white <%= log.status === 'APPROVED' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white' %>">
+                <%= index + 1 %>
+              </span>
+              <div>
+                <div class="flex items-center justify-between gap-2">
+                  <h4 class="text-[12px] font-semibold text-slate-800 uppercase tracking-tight"><%= log.role %></h4>
+                  <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded border <%= log.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100' %>"><%= log.status %></span>
+                </div>
+                <p class="text-[11px] text-slate-500 font-semibold mt-0.5"><%= log.user?.name %></p>
+                <p class="text-[10px] text-slate-400 mt-0.5"><%= new Date(log.createdAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) %> • <%= new Date(log.createdAt).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) %></p>
+
+                <% if (log.note) { %>
+                <div class="mt-2 bg-slate-50 p-2.5 rounded-lg text-[11px] text-slate-600 border border-slate-100 font-medium">
+                  "<%= log.note %>"
+                </div>
+                <% } %>
+              </div>
+            </div>
+            <% }) %>
+            <% } else { %>
+            <div class="relative">
+              <span class="absolute -left-[23px] top-0.5 w-[16px] h-[16px] rounded-full bg-amber-500 text-white text-[9px] font-semibold flex items-center justify-center ring-4 ring-white">1</span>
+              <div>
+                <div class="flex items-center justify-between gap-2">
+                  <h4 class="text-[12px] font-semibold text-slate-800 uppercase tracking-tight">Manager</h4>
+                  <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded border bg-amber-50 text-amber-600 border-amber-100">MENUNGGU</span>
+                </div>
+                <p class="text-[11px] text-slate-400 font-medium mt-0.5">Dalam Antrean Pemeriksaan Berkas</p>
+              </div>
+            </div>
+            <% } %>
+
+          </div>
+        </div>
+
+        <% if (expense.canApprove) { %>
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-6 space-y-4">
+          <div>
+            <h3 class="text-[12px] font-bold text-slate-800 tracking-tight uppercase">Evaluasi Pengajuan Klaim</h3>
+           
+          </div>
+
+          <% const isDisbursementMode = expense.status === 'PENDING_FINANCE' && user.role?.toUpperCase() === 'MANAGER_KEUANGAN'; %>
+
+          <form id="evaluationForm" action="/expense/<%= expense._id %>/approve" method="POST" enctype="<%= isDisbursementMode ? 'multipart/form-data' : 'application/x-www-form-urlencoded' %>" class="space-y-4 m-0">
+
+            <textarea name="note" rows="3" placeholder="Masukkan catatan keputusan pemeriksaan berkas di sini..." class="w-full text-xs font-medium border border-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-blue-500 placeholder:text-slate-400/80 resize-none bg-slate-50/30"></textarea>
+
+            <% if (isDisbursementMode) { %>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block">Upload Bukti Transfer Bank</label>
+              <input type="file" id="proofFileInput" name="proofFile" class="w-full text-xs font-medium border border-slate-200 rounded-xl p-2 focus:outline-none focus:border-blue-500 bg-slate-50/30">
+            </div>
+            <% } %>
+
+            <div class="grid grid-cols-2 gap-3 pt-1">
+              <button type="submit" formaction="/expense/<%= expense._id %>/reject" class="h-9 w-full rounded-xl border border-rose-200 hover:bg-rose-50 text-rose-600 text-xs font-bold transition-all active:scale-95 cursor-pointer">
+                Tolak
+              </button>
+
+              <button type="submit" <% if (isDisbursementMode) { %> onclick="return validateFinanceApproval()" <% } %> class="h-9 w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer">
+                <%= isDisbursementMode ? 'Setujui & Mark as Paid' : 'Setujui Berkas' %>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <% if (isDisbursementMode) { %>
+        <script>
+          function validateFinanceApproval() {
+            const fileInput = document.getElementById('proofFileInput');
+            if (!fileInput || fileInput.files.length === 0) {
+              alert('Gagal: Sebagai Finance, Anda wajib mengunggah file bukti transfer untuk mencairkan dana!');
+              return false;
+            }
+            return true;
+          }
+        </script>
+        <% } %>
+        <% } %>
+
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,8 +1,8 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="min-h-screen md:ml-72 bg-slate-50/50  sm:p-8 antialiased">
+<div class="min-h-screen md:ml-72 bg-slate-50/50 sm:p-8 antialiased">
   <div class="max-w-none mx-auto space-y-6 sm:space-y-8">
-
+    
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Finance', 
@@ -32,57 +32,58 @@
 
     <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300">
       
-      <div class="hidden lg:block bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+      <div class="hidden lg:block bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left border-collapse text-[13px]">
             <thead>
-              <tr class="bg-slate-50/70 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                <th class="px-6 py-4">Pegawai</th>
-                <th class="px-6 py-4">Detail Pengajuan</th>
-                <th class="px-6 py-4 text-center">Lampiran</th>
-                <th class="px-6 py-4">Status Otorisasi</th>
-                <th class="px-6 py-4 text-right">Nominal Tagihan</th>
-                <th class="px-6 py-4 text-center">Tindakan Pembayaran</th>
+              <tr class="bg-slate-50/70 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100 select-none">
+                <th class="px-6 py-4 w-48">Tgl Pengajuan</th>
+                <th class="px-6 py-4">Nama Pegawai</th>
+                <th class="px-6 py-4">Kategori</th>
+                <th class="px-6 py-4 text-right">Nominal Klaim</th>
+                <th class="px-6 py-4 text-center">Status</th>
+                <th class="px-6 py-4 text-center">Aksi</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+            <tbody class="divide-y divide-slate-100 text-slate-600 font-medium bg-white">
               <% if (activeExpenses.length === 0) { %>
-                <tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">Tidak ada klaim aktif yang memerlukan pencairan dana.</td></tr>
+                <tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">Tidak ada klaim aktif yang memerlukan tindakan keuangan.</td></tr>
               <% } else { %>
                 <% activeExpenses.forEach(e => { %>
-                  <tr class="hover:bg-slate-50/40 transition">
-                    <td class="px-6 py-4 font-bold text-slate-900"><%= e.employeeId?.fullName %></td>
-                    <td class="px-6 py-4 font-semibold text-slate-800"><%= e.title %></td>
-                    <td class="px-6 py-4 text-center">
-                      <% if (!e.proofFile) { %>
-                        <span class="text-[11px] text-slate-400 italic">Tanpa Nota</span>
+                  <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-6 py-4 text-slate-500 whitespace-nowrap tabular-nums">
+                      <%= new Date(e.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-slate-800">
+                      <%= e.employeeId?.fullName || 'Pegawai' %>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="bg-slate-100 text-slate-700 text-[12px] px-3 py-1 rounded-md font-semibold inline-block whitespace-nowrap">
+                        <%= e.category?.name || 'Kategori' %>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right font-bold text-slate-900 tabular-nums">
+                      Rp <%= e.amount.toLocaleString('id-ID') %>
+                    </td>
+                    <td class="px-6 py-4 text-center select-none">
+                      <% if (e.status === 'PENDING_FINANCE') { %>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide border text-blue-600 bg-blue-50/70 border-blue-200/50">
+                          <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                          <span>SIAP BAYAR</span>
+                        </div>
                       <% } else { %>
-                        <a href="/uploads/files/<%= e.proofFile %>" target="_blank" download class="group inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 hover:text-blue-600 transition-colors">
-                          <i class="fa-solid fa-arrow-down-to-bracket text-slate-400 group-hover:text-blue-600 transition-colors"></i>
-                          Unduh Nota
-                        </a>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide border text-slate-500 bg-slate-50/70 border-slate-200/50">
+                          <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                          <span>REVIEW MANAGER</span>
+                        </div>
                       <% } %>
                     </td>
                     <td class="px-6 py-4">
-                      <% if (e.status === 'PENDING_FINANCE') { %>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60"><i class="fa-solid fa-hourglass-half"></i> Siap Bayar</span>
-                      <% } else { %>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-medium bg-slate-100 text-slate-500 border border-slate-200/60"><i class="fa-solid fa-user-tie"></i> Review Manager</span>
-                      <% } %>
-                    </td>
-                    <td class="px-6 py-4 text-right font-bold text-slate-900 tabular-nums">Rp <%= e.amount.toLocaleString('id-ID') %></td>
-                    <td class="px-6 py-4 text-center">
-                      <% if (e.status === 'PENDING_FINANCE') { %>
-                        <form action="/expense/<%= e._id %>/pay" method="POST" enctype="multipart/form-data" class="flex items-center justify-center gap-2">
-                          <label for="tf-<%= e._id %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-[10px] font-medium rounded-lg cursor-pointer transition-colors group">
-                            <i class="fa-solid fa-paperclip text-slate-400 group-hover:text-slate-600 transition-colors"></i> <span id="lbl-<%= e._id %>">Bukti TF</span>
-                          </label>
-                          <input type="file" id="tf-<%= e._id %>" name="transferProof" onchange="document.getElementById('lbl-<%= e._id %>').innerText = 'File OK'; this.parentElement.querySelector('label').classList.replace('text-slate-600', 'text-emerald-600'); this.parentElement.querySelector('i').classList.replace('text-slate-400', 'text-emerald-600')" class="hidden" required />
-                          <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer"><i class="fa-solid fa-money-bill-transfer"></i> Lunasi</button>
-                        </form>
-                      <% } else { %>
-                        <span class="text-[10px] text-slate-400 italic">Menunggu Approval Atasan</span>
-                      <% } %>
+                      <div class="flex items-center justify-center">
+                        <a href="/expense/detail/<%= e._id %>" title="Periksa Berkas & Cairkan" class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 inline-flex items-center justify-center transition-all active:scale-[0.95] decoration-none">
+                          <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 <% }) %>
@@ -95,71 +96,33 @@
       <div class="lg:hidden space-y-4">
         <% if (activeExpenses.length === 0) { %>
           <div class="p-8 text-center text-slate-400 text-xs bg-white border border-dashed border-slate-200 rounded-2xl">
-            Tidak ada klaim aktif yang memerlukan pencairan dana.
+            Tidak ada klaim aktif yang memerlukan tindakan keuangan.
           </div>
         <% } else { %>
           <% activeExpenses.forEach(e => { %>
-            <div class="bg-white rounded-2xl border border-slate-200/70 p-4 shadow-xs space-y-4">
-              <div class="flex justify-between items-start gap-3">
+            <div class="bg-white rounded-2xl border border-slate-200/70 p-4 space-y-3.5">
+              <div class="flex justify-between items-start gap-2">
                 <div class="min-w-0">
-                  <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">Pegawai</span>
-                  <h3 class="font-bold text-slate-900 text-xs sm:text-sm truncate"><%= e.employeeId?.fullName %></h3>
+                  <h3 class="font-bold text-slate-900 text-xs sm:text-sm truncate"><%= e.employeeId?.fullName || 'Pegawai' %></h3>
+                  <p class="text-[11px] text-slate-400 font-medium mt-0.5">
+                    Diajukan: <%= new Date(e.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                  </p>
                 </div>
                 <div class="text-right shrink-0">
-                  <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">Nominal</span>
-                  <span class="font-bold text-slate-900 text-xs sm:text-sm tabular-nums">Rp <%= e.amount.toLocaleString('id-ID') %></span>
+                  <span class="font-bold text-slate-900 text-xs sm:text-sm tabular-nums block">Rp <%= e.amount.toLocaleString('id-ID') %></span>
+                  <span class="inline-flex px-1.5 py-0.5 rounded border bg-slate-50 text-slate-600 border-slate-200 text-[9px] font-bold mt-1 uppercase"><%= e.category?.name || 'Kategori' %></span>
                 </div>
               </div>
-
-              <div class="bg-slate-50/80 rounded-xl p-3 space-y-2.5 border border-slate-100 text-[11px]">
+              
+              <div class="flex items-center justify-between text-[11px] pt-2.5 border-t border-slate-100 text-slate-500 font-medium">
                 <div>
-                  <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">Detail Pengajuan</span>
-                  <p class="font-semibold text-slate-800 leading-normal"><%= e.title %></p>
+                  <% if (e.status === 'PENDING_FINANCE') { %>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600"><span class="w-1 h-1 rounded-full bg-blue-500"></span> Siap Bayar</span>
+                  <% } else { %>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500"><span class="w-1 h-1 rounded-full bg-slate-400"></span> Review Manager</span>
+                  <% } %>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200/40">
-                  <div>
-                    <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">Otorisasi</span>
-                    <div>
-                      <% if (e.status === 'PENDING_FINANCE') { %>
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Siap Bayar</span>
-                      <% } else { %>
-                        <span class="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Di-review</span>
-                      <% } %>
-                    </div>
-                  </div>
-                  <div>
-                    <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">Nota Lampiran</span>
-                    <div class="font-medium">
-                      <% if (!e.proofFile) { %>
-                        <span class="text-slate-400 italic">Tanpa Nota</span>
-                      <% } else { %>
-                        <a href="/uploads/files/<%= e.proofFile %>" target="_blank" download class="inline-flex items-center gap-1 text-blue-600 font-bold hover:underline">
-                          <i class="fa-solid fa-arrow-down-to-bracket"></i> Unduh
-                        </a>
-                      <% } %>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="pt-1">
-                <% if (e.status === 'PENDING_FINANCE') { %>
-                  <form action="/expense/<%= e._id %>/pay" method="POST" enctype="multipart/form-data" class="grid grid-cols-2 gap-2">
-                    <label for="tf-mob-<%= e._id %>" class="inline-flex items-center justify-center gap-1.5 py-2.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-xl cursor-pointer transition-colors group">
-                      <i class="fa-solid fa-paperclip text-slate-400 group-hover:text-slate-600"></i> <span id="lbl-mob-<%= e._id %>">Bukti TF</span>
-                    </label>
-                    <input type="file" id="tf-mob-<%= e._id %>" name="transferProof" onchange="document.getElementById('lbl-mob-<%= e._id %>').innerText = 'File OK'; this.parentElement.querySelector('label').classList.replace('text-slate-600', 'text-emerald-600'); this.parentElement.querySelector('i').classList.replace('text-slate-400', 'text-emerald-600')" class="hidden" required />
-                    
-                    <button type="submit" class="inline-flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-xs">
-                      <i class="fa-solid fa-money-bill-transfer"></i> Lunasi
-                    </button>
-                  </form>
-                <% } else { %>
-                  <div class="w-full text-center py-2 bg-slate-100 text-slate-400 rounded-xl text-[11px] font-medium italic">
-                    Menunggu Approval Atasan / Manager
-                  </div>
-                <% } %>
+                <a href="/expense/detail/<%= e._id %>" class="h-8 px-4 bg-slate-100 hover:bg-slate-200/70 text-slate-700 text-[11px] font-semibold border border-slate-200/60 rounded-lg flex items-center justify-center tracking-wide active:scale-95 transition-all decoration-none">TINJAU</a>
               </div>
             </div>
           <% }) %>
@@ -170,51 +133,57 @@
 
     <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300">
       
-      <div class="hidden lg:block bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+      <div class="hidden lg:block bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left border-collapse text-[13px]">
             <thead>
-              <tr class="bg-slate-50/70 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                <th class="px-6 py-4">Pegawai</th>
-                <th class="px-6 py-4">Detail Pengajuan</th>
-                <th class="px-6 py-4 text-center">Lampiran Klaim</th>
-                <th class="px-6 py-4 text-center">Bukti Transfer</th>
-                <th class="px-6 py-4 text-right">Nominal</th>
-                <th class="px-6 py-4">Status Akhir</th>
+              <tr class="bg-slate-50/70 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100 select-none">
+                <th class="px-6 py-4 w-48">Tgl Pengajuan</th>
+                <th class="px-6 py-4">Nama Pegawai</th>
+                <th class="px-6 py-4">Kategori</th>
+                <th class="px-6 py-4 text-right">Nominal Klaim</th>
+                <th class="px-6 py-4 text-center">Status Akhir</th>
+                <th class="px-6 py-4 text-center">Aksi</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+            <tbody class="divide-y divide-slate-100 text-slate-600 font-medium bg-white">
               <% if (historyExpenses.length === 0) { %>
                 <tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">Belum ada jejak rekam riwayat pencairan klaim.</td></tr>
               <% } else { %>
                 <% historyExpenses.forEach(e => { %>
-                  <tr class="hover:bg-slate-50/40 transition">
-                    <td class="px-6 py-4 font-bold text-slate-900"><%= e.employeeId?.fullName %></td>
-                    <td class="px-6 py-4 font-semibold text-slate-800"><%= e.title %></td>
-                    <td class="px-6 py-4 text-center">
-                      <% if (!e.proofFile) { %><span class="text-[11px] text-slate-400 italic">Tanpa Nota</span><% } else { %>
-                        <a href="/uploads/files/<%= e.proofFile %>" target="_blank" download class="group inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 hover:text-blue-600 transition-colors"><i class="fa-solid fa-arrow-down-to-bracket text-slate-400 group-hover:text-blue-600 transition-colors"></i> Unduh Nota</a>
-                      <% } %>
+                  <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-6 py-4 text-slate-500 whitespace-nowrap tabular-nums">
+                      <%= new Date(e.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                     </td>
-                    <td class="px-6 py-4 text-center">
-                      <% if (e.transferProofFile) { %>
-                        <a href="/uploads/files/<%= e.transferProofFile %>" target="_blank" download class="group inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 hover:text-emerald-700 transition-colors"><i class="fa-solid fa-receipt text-emerald-500"></i> Unduh Resi</a>
-                      <% } else { %>
-                        <span class="text-[11px] text-slate-400 italic">-</span>
-                      <% } %>
+                    <td class="px-6 py-4 font-semibold text-slate-800">
+                      <%= e.employeeId?.fullName %>
                     </td>
-                    <td class="px-6 py-4 text-right font-bold text-slate-900 tabular-nums">Rp <%= e.amount.toLocaleString('id-ID') %></td>
                     <td class="px-6 py-4">
+                      <span class="bg-slate-100 text-slate-700 text-[12px] px-3 py-1 rounded-md font-semibold inline-block whitespace-nowrap">
+                        <%= e.category?.name || 'Kategori' %>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right font-bold text-slate-900 tabular-nums">
+                      Rp <%= e.amount.toLocaleString('id-ID') %>
+                    </td>
+                    <td class="px-6 py-4 text-center select-none">
                       <% 
-                        const labels = { 'PAID': 'Selesai & Lunas', 'REJECTED': 'Ditolak' }; 
+                        const labels = { 'PAID': 'LUNAS & CAIR', 'REJECTED': 'REJECTED' }; 
                         const texts = { 'PAID': 'text-emerald-600', 'REJECTED': 'text-rose-600' };
                         const bgs = { 'PAID': 'bg-emerald-50/70', 'REJECTED': 'bg-rose-50/70' };
                         const borders = { 'PAID': 'border-emerald-200/50', 'REJECTED': 'border-rose-200/50' };
-                        const dots = { 'PAID': 'bg-emerald-500', 'REJECTED': 'bg-rose-500' };
+                        const dots = { 'PAID': 'bg-emerald-500 animate-pulse', 'REJECTED': 'bg-rose-500' };
                       %>
-                      <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide <%= texts[e.status] %> <%= bgs[e.status] %> <%= borders[e.status] %>">
-                        <span class="w-1.5 h-1.5 rounded-full <%= dots[e.status] %> <%= e.status === 'PAID' ? 'animate-pulse' : '' %>"></span>
+                      <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide border <%= texts[e.status] %> <%= bgs[e.status] %> <%= borders[e.status] %>">
+                        <span class="w-1.5 h-1.5 rounded-full <%= dots[e.status] %>"></span>
                         <span><%= labels[e.status] %></span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex items-center justify-center">
+                        <a href="/expense/detail/<%= e._id %>" title="Lihat Rekam Jejak" class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 inline-flex items-center justify-center transition-all active:scale-[0.95] decoration-none">
+                          <i class="fa-solid fa-eye text-[11px]"></i>
+                        </a>
                       </div>
                     </td>
                   </tr>
@@ -232,53 +201,35 @@
           </div>
         <% } else { %>
           <% historyExpenses.forEach(e => { %>
-            <div class="bg-white rounded-2xl border border-slate-200/70 p-4 shadow-xs space-y-3.5">
-              
+            <div class="bg-white rounded-2xl border border-slate-200/70 p-4 space-y-3.5">
               <div class="flex justify-between items-start gap-2">
                 <div class="min-w-0">
                   <h3 class="font-bold text-slate-900 text-xs sm:text-sm truncate"><%= e.employeeId?.fullName %></h3>
-                  <p class="text-[11px] text-slate-500 font-medium truncate mt-0.5"><%= e.title %></p>
+                  <p class="text-[11px] text-slate-400 font-medium mt-0.5">
+                    Diajukan: <%= new Date(e.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                  </p>
                 </div>
                 <div class="text-right shrink-0 flex flex-col items-end gap-1.5">
                   <span class="font-bold text-slate-900 text-xs sm:text-sm tabular-nums">Rp <%= e.amount.toLocaleString('id-ID') %></span>
                   
                   <% 
-                    const labels = { 'PAID': 'Lunas', 'REJECTED': 'Ditolak' }; 
+                    const labels = { 'PAID': 'Lunas', 'REJECTED': 'Rejected' }; 
                     const texts = { 'PAID': 'text-emerald-600', 'REJECTED': 'text-rose-600' };
                     const bgs = { 'PAID': 'bg-emerald-50/70', 'REJECTED': 'bg-rose-50/70' };
                     const borders = { 'PAID': 'border-emerald-200/50', 'REJECTED': 'border-rose-200/50' };
                     const dots = { 'PAID': 'bg-emerald-500', 'REJECTED': 'bg-rose-500' };
                   %>
-                  <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-bold tracking-wide <%= texts[e.status] %> <%= bgs[e.status] %> <%= borders[e.status] %>">
-                    <span class="w-1 h-1 rounded-full <%= dots[e.status] %> <%= e.status === 'PAID' ? 'animate-pulse' : '' %>"></span>
+                  <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border shrink-0 <%= texts[e.status] %> <%= bgs[e.status] %> <%= borders[e.status] %>">
+                    <span class="w-1 h-1 rounded-full <%= dots[e.status] %>"></span>
                     <span><%= labels[e.status] %></span>
                   </div>
                 </div>
               </div>
               
-              <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-slate-100 text-[11px] font-medium text-slate-500">
-                <div>
-                  <span class="text-[9px] uppercase tracking-wider text-slate-400 block mb-0.5">Nota Pengajuan</span>
-                  <% if (!e.proofFile) { %>
-                    <span class="italic text-slate-400 text-[10px]">Tanpa Nota</span>
-                  <% } else { %>
-                    <a href="/uploads/files/<%= e.proofFile %>" target="_blank" download class="inline-flex items-center gap-1 text-slate-700 hover:text-blue-600 font-bold">
-                      <i class="fa-solid fa-arrow-down-to-bracket text-slate-400"></i> Unduh Nota
-                    </a>
-                  <% } %>
-                </div>
-                <div class="border-l border-slate-100 pl-3">
-                  <span class="text-[9px] uppercase tracking-wider text-slate-400 block mb-0.5">Resi Pembayaran</span>
-                  <% if (e.transferProofFile) { %>
-                    <a href="/uploads/files/<%= e.transferProofFile %>" target="_blank" download class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-bold">
-                      <i class="fa-solid fa-receipt text-emerald-500"></i> Unduh Resi
-                    </a>
-                  <% } else { %>
-                    <span class="text-slate-400 italic">-</span>
-                  <% } %>
-                </div>
+              <div class="flex items-center justify-between text-[11px] pt-2.5 border-t border-slate-100 text-slate-500 font-medium">
+                <span><i class="fa-solid fa-box-archive text-slate-400 mr-1"></i> Arsip Selesai</span>
+                <a href="/expense/detail/<%= e._id %>" class="h-8 px-4 bg-slate-100 hover:bg-slate-200/70 text-slate-700 text-[11px] font-semibold border border-slate-200/60 rounded-lg flex items-center justify-center tracking-wide active:scale-95 transition-all decoration-none">LIHAT</a>
               </div>
-
             </div>
           <% }) %>
         <% } %>

@@ -1,244 +1,215 @@
-import ExpenseClaim from "../models/ExpenseClaim.model.js";
-import Employee from "../models/employee/Employee.model.js";
-import ExpenseCategory from "../models/ExpenseCategory.model.js";
-import { getPagination, getPaginationMeta } from "../utils/pagination.js";
-import Bidang from "../models/basic/Bidang.model.js";
-import EmployeeCareer from "../models/employee/EmployeeCareer.js";
-export const formExpense = async (req, res) => {
-  try {
-    const categories = await ExpenseCategory.find({ isActive: true }).sort({ name: 1 });
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
+import {
+  findActiveCategories,
+  createClaim,
+  findMyClaims,
+  findManagerApprovals,
+  rejectByManager,
+  processApproval,
+  findFinanceClaims,
+  processPayment,
+  findClaimById,
+} from "../services/expense.service.js";
 
-    res.render("expense/create", {
+// ─── METHOD 1: FORM CREATE VIEW ───────────────────
+export const create = asyncHandler(async (req, res) => {
+  const categories = await findActiveCategories();
+
+  res.render("expense/create", {
+    ...buildRenderData(req, {
       title: "Ajukan Klaim Beban",
       categories,
       errors: {},
       old: {},
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error loading expense form");
-  }
-};
-export const createExpense = async (req, res) => {
-  try {
-    const categories = await ExpenseCategory.find({ isActive: true }).sort({ name: 1 });
+    }),
+  });
+});
 
-    if (req.validationErrors) {
-      return res.status(400).render("expense/create", {
+// ─── METHOD 2: STORE DATA CLAIM ───────────────────
+export const store = asyncHandler(async (req, res) => {
+  const categories = await findActiveCategories();
+
+  if (req.validationErrors) {
+    return res.status(400).render("expense/create", {
+      ...buildRenderData(req, {
         title: "Ajukan Klaim Beban",
         categories,
         errors: req.validationErrors,
         old: req.body,
-      });
-    }
-
-    const { title, category, amount, expenseDate, noReceiptReason, selfDeclaration, noReceipt } =
-      req.body;
-
-    const user = req.session.user;
-    if (!user) return res.status(401).send("Unauthorized");
-
-    const employee = await Employee.findOne({ userId: user._id }).populate({
-      path: "careerData",
+      }),
     });
-    if (!employee) return res.status(404).send("Employee data tidak ditemukan");
-
-    const isNoReceipt = !!noReceipt;
-    const hasFile = !!req.file;
-
-    if (!isNoReceipt && !hasFile) {
-      return res.status(400).render("expense/create", {
-        title: "Ajukan Klaim Beban",
-        categories,
-        errors: { proofFile: "Upload bukti transaksi wajib jika nota tersedia." },
-        old: req.body,
-      });
-    }
-
-    const cleanAmount = Number(amount) || 0;
-
-    let status = "PENDING_FINANCE";
-    let approverRoleId = null;
-
-    const currentUserRole = user.role?.toUpperCase();
-
-    const isManagerRole = [
-      "MANAGER_KEUANGAN",
-      "MANAGER_ADMINISTRASI",
-      "MANAGER_HAJI_UMRAH",
-      "WAKIL_DIREKTUR",
-      "DIREKTUR_UTAMA",
-    ].includes(currentUserRole);
-
-    if (cleanAmount > 200000 && !isManagerRole) {
-      status = "PENDING_MANAGER";
-
-      const career = employee.careerData;
-      if (career && career.bidangId) {
-        const bidang = await Bidang.findById(career.bidangId);
-        if (bidang && bidang.managerRoleId) {
-          approverRoleId = bidang.managerRoleId;
-        }
-      }
-
-      if (!approverRoleId) {
-        return res
-          .status(400)
-          .send("Gagal: Bidang kerja atau Manager penanggung jawab tidak ditemukan.");
-      }
-    } else {
-      status = "PENDING_FINANCE";
-      approverRoleId = null;
-    }
-
-    await ExpenseClaim.create({
-      userId: user._id,
-      employeeId: employee._id,
-      title,
-      category,
-      amount: cleanAmount,
-      expenseDate,
-      noReceiptReason: isNoReceipt ? noReceiptReason : null,
-      selfDeclaration: isNoReceipt ? !!selfDeclaration : false,
-      status,
-      approverRoleId,
-      proofFile: hasFile ? req.file.filename : null,
-    });
-
-    return res.redirect("/expense/my");
-  } catch (err) {
-    console.error("CREATE EXPENSE ERROR:", err);
-    return res.status(500).send("Create expense error: " + err.message);
   }
-};
-export const myExpenses = async (req, res) => {
+
   try {
-    const { page } = req.query;
-    const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
+    await createClaim({
+      body: req.body,
+      file: req.file,
+      currentUser: req.session.user,
+    });
 
-    const totalExpenses = await ExpenseClaim.countDocuments({ userId: req.user._id });
-    const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
+    req.flash("success", "Klaim operasional beban berhasil diajukan!");
 
-    const expenses = await ExpenseClaim.find({ userId: req.user._id })
-      .populate("category")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    await new Promise((resolve) => req.session.save(resolve));
+    return res.redirect("/expense/my");
+  } catch (error) {
+    if (error.statusCode === 400 && error.field) {
+      return res.status(400).render("expense/create", {
+        ...buildRenderData(req, {
+          title: "Ajukan Klaim Beban",
+          categories,
+          errors: { [error.field]: error.message },
+          old: req.body,
+        }),
+      });
+    }
+    throw error;
+  }
+});
 
-    res.render("expense/my", {
+// ─── METHOD 3: PERSONAL HISTORY VIEW ──────────────
+export const my = asyncHandler(async (req, res) => {
+  const { page } = req.query;
+  const userId = req.session.user._id;
+
+  const { data: expenses, meta: pagination } = await findMyClaims({ userId, page });
+
+  res.render("expense/my", {
+    ...buildRenderData(req, {
       title: "Riwayat Klaim Beban",
       expenses,
       pagination,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading my expenses");
-  }
-};
-export const approvalManagerExpense = async (req, res) => {
-  try {
-    const { page } = req.query;
-    const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
+    }),
+  });
+});
 
-    const currentUserRoleId = req.session.user.roleId;
-    const currentUserId = req.session.user._id;
+// ─── METHOD 4: MANAGER ANTREAN VIEW ───────────────
+export const approvalPage = asyncHandler(async (req, res) => {
+  const { page } = req.query;
+  const { roleId, _id: userId } = req.session.user;
 
-    const query = {
-      $or: [
-        { status: "PENDING_MANAGER", approverRoleId: currentUserRoleId },
-        { managerApprovedBy: currentUserId },
-        { status: "REJECTED", managerApprovedBy: currentUserId },
-      ],
-    };
+  const { data: expenses, meta: pagination } = await findManagerApprovals({ roleId, userId, page });
 
-    const totalExpenses = await ExpenseClaim.countDocuments(query);
-    const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
-
-    const expenses = await ExpenseClaim.find(query)
-      .populate("employeeId")
-      .populate("category")
-      .sort({ updatedAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    res.render("expense/approval", {
+  res.render("expense/approval", {
+    ...buildRenderData(req, {
       title: "Approval Klaim Operasional",
       expenses,
       pagination,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading approval page");
-  }
-};
-export const approveManagerExpense = async (req, res) => {
+    }),
+  });
+});
+
+// ─── METHOD 5: ACTION APPROVE (KONDISIONAL MANAGER / FINANCE) ───
+export const approveClaim = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { note } = req.body;
+  const currentUser = req.session.user;
+
   try {
-    await ExpenseClaim.findByIdAndUpdate(req.params.id, {
-      status: "PENDING_FINANCE",
-      managerApprovedBy: req.session.user._id,
+    const expense = await findClaimById(id, currentUser);
+
+    const userRole = currentUser.role?.toUpperCase();
+
+    if (expense.status === "PENDING_FINANCE") {
+      if (userRole !== "MANAGER_KEUANGAN") {
+        req.flash("error", "Anda tidak memiliki akses finansial untuk mencairkan dana.");
+        return res.redirect(`/expense/detail/${id}`);
+      }
+    }
+
+    const { nextStatus } = await processApproval({
+      id,
+      userId: currentUser._id,
+      role: currentUser.role,
+      file: req.file,
+      note,
+      currentStatus: expense.status,
     });
 
-    res.redirect("/expense/approval/manager");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Approve manager error");
+    req.flash(
+      "success",
+      nextStatus === "PAID"
+        ? "Klaim berhasil dicairkan dan ditandai Lunas!"
+        : "Berkas berhasil disetujui dan diteruskan ke Bagian Keuangan."
+    );
+
+    await new Promise((resolve) => req.session.save(resolve));
+    return res.redirect(`/expense/detail/${id}`);
+  } catch (error) {
+    if (error.statusCode === 400 || error.message.includes("tidak ditemukan")) {
+      req.flash("error", error.message);
+      return res.redirect(req.header("Referer") || "/expense");
+    }
+    throw error;
   }
-};
+});
+export const rejectClaim = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { note } = req.body;
+  const currentUser = req.session.user;
 
-export const financeExpensePage = async (req, res) => {
-  try {
-    const { page } = req.query;
-    const { page: currentPage, limit, skip } = getPagination({ page, limit: 10 });
+  const roleType = currentUser.role?.toUpperCase() === "MANAGER_KEUANGAN" ? "FINANCE" : "MANAGER";
 
-    const financeQuery = { status: { $in: ["PENDING_FINANCE", "PAID"] } };
+  if (roleType === "FINANCE") {
+    await Expense.findByIdAndUpdate(id, { status: "REJECTED" });
+    await ExpenseLog.create({
+      expenseId: id,
+      userId: currentUser._id,
+      role: "FINANCE",
+      action: "REJECTED",
+      note,
+    });
+  } else {
+    await rejectByManager({ id, userId: currentUser._id, role: "MANAGER", note });
+  }
 
-    const totalExpenses = await ExpenseClaim.countDocuments(financeQuery);
-    const pagination = getPaginationMeta({ page: currentPage, limit, total: totalExpenses });
+  req.flash("error", "Permohonan klaim beban telah ditolak.");
+  await new Promise((resolve) => req.session.save(resolve));
 
-    const expenses = await ExpenseClaim.find(financeQuery)
-      .populate("employeeId")
-      .populate("category")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+  res.redirect(roleType === "FINANCE" ? "/expense/finance" : "/expense/approval/manager");
+});
 
-    res.render("expense/finance", {
+// ─── METHOD 7: FINANCE ANTREAN VIEW ───────────────
+export const financePage = asyncHandler(async (req, res) => {
+  const { page } = req.query;
+
+  const { data: expenses, meta: pagination } = await findFinanceClaims({ page });
+
+  res.render("expense/finance", {
+    ...buildRenderData(req, {
       title: "Manajemen Keuangan Klaim",
       expenses,
       pagination,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading finance page");
-  }
-};
-export const payExpense = async (req, res) => {
-  try {
-    const { id } = req.params;
+    }),
+  });
+});
 
-    await ExpenseClaim.findByIdAndUpdate(id, {
-      status: "PAID",
-      financeApprovedBy: req.session.user._id,
-      paidAt: new Date(),
-      transferProofFile: req.file ? req.file.filename : null,
-    });
+// ─── METHOD 8: FINANCE ACTION DISBURSE (KLIK TOMBOL BAYAR LANGSUNG) ───
+export const payClaim = asyncHandler(async (req, res) => {
+  await processPayment({
+    id: req.params.id,
+    userId: req.session.user._id,
+    file: req.file,
+    note: "Dana dicairkan oleh Finance",
+  });
 
-    res.redirect("/expense/finance");
-  } catch (err) {
-    console.log("Payment error:", err);
-    res.status(500).send("Payment error");
-  }
-};
-export const rejectManagerExpense = async (req, res) => {
-  try {
-    await ExpenseClaim.findByIdAndUpdate(req.params.id, {
-      status: "REJECTED",
-      managerApprovedBy: req.session.user._id,
-    });
+  req.flash("success", "Klaim beban berhasil dicairkan dan ditandai Lunas.");
+  await new Promise((resolve) => req.session.save(resolve));
 
-    res.redirect("/expense/approval/manager");
-  } catch (err) {
-    console.log("Reject manager error:", err);
-    res.status(500).send("Reject manager error");
-  }
-};
+  res.redirect("/expense/finance");
+});
+
+// ─── METHOD 9: SHOW DETAIL CLAIM ──────────────────
+export const show = asyncHandler(async (req, res) => {
+  const expenseId = req.params.id;
+  const currentUser = req.session.user;
+
+  const expense = await findClaimById(expenseId, currentUser);
+
+  res.render("expense/detail", {
+    ...buildRenderData(req, {
+      title: `Detail Klaim - ${expense.title}`,
+      expense,
+    }),
+  });
+});

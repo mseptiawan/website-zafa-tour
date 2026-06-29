@@ -45,26 +45,20 @@ class LoanService {
     if (!employeeId)
       throw new Error("Data Pegawai tidak ditemukan atau Anda tidak terdaftar sebagai pegawai");
 
-    // 1. Ambil data Gaji Pokok
     const salary = await EmployeeSalary.findOne({ employeeId: employeeId });
     const existingMonthlyCommitment = await getTotalMonthlyDeduction(employeeId);
     const basicSalary = salary ? salary.basicSalary : 0;
 
-    // Pastikan konversi ke tipe data Number untuk keamanan kalkulasi backend
     const amountRequested = Number(loanData.amountRequested) || 0;
     const tenorMonths = Number(loanData.tenorMonths) || 0;
     const { reason } = loanData;
 
-    // 2. Validasi Alasan
     if (!reason || reason.trim().length < 15) {
       throw new Error(
         "Alasan peminjaman terlalu pendek. Harap berikan penjelasan yang jelas (minimal 15 karakter)."
       );
     }
 
-    // =========================================================================
-    // ATURAN BARU 1: MAKSIMAL TOTAL PINJAMAN (3X GAJI POKOK)
-    // =========================================================================
     const maxLoan = basicSalary * 3;
     if (amountRequested > maxLoan) {
       throw new Error(
@@ -72,9 +66,6 @@ class LoanService {
       );
     }
 
-    // =========================================================================
-    // ATURAN 2: MAKSIMAL CICILAN BULANAN (30% GAJI POKOK) & TENOR (1-12 BULAN)
-    // =========================================================================
     if (tenorMonths < 1 || tenorMonths > 12) {
       throw new Error("Pengajuan ditolak. Tenor pinjaman harus di antara 1 sampai 12 bulan.");
     }
@@ -89,19 +80,15 @@ class LoanService {
         `Pengajuan ditolak. Total cicilan bulanan Anda saat ini (existing Rp ${existingMonthlyCommitment.toLocaleString("id-ID")} + pengajuan baru Rp ${monthlyDeduction.toLocaleString("id-ID")} = Rp ${totalMonthlyAfterLoan.toLocaleString("id-ID")}) melebihi batas 30% gaji (Rp ${maxDeduction.toLocaleString("id-ID")}).`
       );
     }
-    // =========================================================================
-
-    // 3. Buat Data Loan Baru
     const newLoan = await Loan.create({
       employeeId: employeeId,
       amountRequested,
       tenorMonths,
-      monthlyDeduction, // tersimpan rapi dengan pembulatan ke atas (Math.ceil)
+      monthlyDeduction,
       reason,
       status: "PENDING",
     });
 
-    // 4. Alur Approval Otomatis
     const initialStep = userRole === "WAKIL_DIREKTUR" ? "WAKIL_DIREKTUR" : null;
     const { nextStep, nextApproverId } = await this.getNextLoanApprover(initialStep);
 
@@ -237,9 +224,6 @@ class LoanService {
     const salary = await EmployeeSalary.findOne({ employeeId: employee._id });
     const basicSalary = salary ? salary.basicSalary : 0;
 
-    // =========================================================================
-    // Validasi Maksimal Total Pinjaman (3x Gaji Pokok)
-    // =========================================================================
     const maxLoan = basicSalary * 3;
     if (amountRequested > maxLoan) {
       throw new Error(
@@ -271,7 +255,7 @@ class LoanService {
 
     const loans = await Loan.find({
       _id: { $in: loanIds },
-      status: { $ne: "CANCELLED" }, // $ne = Not Equal
+      status: { $ne: "CANCELLED" },
     }).populate({
       path: "employeeId",
       select: "fullName",
@@ -309,9 +293,6 @@ class LoanService {
       throw new Error(`Anda tidak memiliki otoritas. Tahap saat ini: ${approval.step}`);
     }
 
-    // -------------------------------------------------------------------------
-    // DOUBLE GUARD VALIDATION
-    // -------------------------------------------------------------------------
     const loan = await Loan.findById(approval.loanId);
     if (!loan) throw new Error("Data pinjaman terkait tidak ditemukan.");
 
@@ -323,7 +304,6 @@ class LoanService {
         "Persetujuan dibatalkan sistem. Profil finansial pegawai saat ini sudah tidak memenuhi syarat limit loan."
       );
     }
-    // -------------------------------------------------------------------------
 
     approval.status = "APPROVED";
     approval.note = note || "";
