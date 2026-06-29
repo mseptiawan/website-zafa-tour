@@ -1,7 +1,7 @@
 const roleMiddleware = (...roles) => {
   return (req, res, next) => {
     if (!req.session.user) {
-      return res.redirect("/");
+      return res.redirect("/login");
     }
 
     let userRole = req.session.user.role;

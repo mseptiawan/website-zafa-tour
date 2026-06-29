@@ -1,10 +1,8 @@
 const authMiddleware = (req, res, next) => {
-  if (!req.session.user) {
-    return res.redirect("/");
-  }
+  const user = req.session.user;
 
-  if (!req.session.user._id && !req.session.user.id) {
-    return res.redirect("/");
+  if (!user || (!user._id && !user.id)) {
+    return res.redirect("/login");
   }
 
   next();

@@ -1,292 +1,188 @@
-import { redisClient } from "../config/redis.js";
-import transporter from "../config/mailer.js";
-import bcrypt from "bcrypt";
-import { sendEmail } from "../services/email.service.js";
-import User from "../models/basic/User.model.js";
-import crypto from "crypto";
-import { getPermissions } from "../services/permission.service.js";
-import Attendance from "../models/Attendance.model.js";
-import Employee from "../models/employee/Employee.model.js";
-import BusinessTrip from "../models/BusinessTrip.model.js";
-import Announcement from "../models/Announcement.model.js";
-export const showLogin = (req, res) => {
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
+import {
+  verifyAndBuildSession,
+  requestResetToken,
+  getEmailByToken,
+  resetPasswordWithToken,
+  updateInternalPassword,
+} from "../services/auth.service.js";
+
+// ─── GET: SHOW LOGIN PAGE ────────────────────────────────────────────
+export const showLogin = asyncHandler(async (req, res) => {
   if (req.session.user) {
     return res.redirect("/dashboard");
   }
-
   res.render("auth/login", {
-    query: req.query || {},
+    ...buildRenderData(req, { title: "Login HRIS" }),
   });
-};
-export const login = async (req, res) => {
+});
+
+// ─── POST: PROCESS LOGIN ─────────────────────────────────────────────
+export const login = asyncHandler(async (req, res) => {
+  if (req.validationErrors) {
+    return res.status(400).render("auth/login", {
+      ...buildRenderData(req, {
+        title: "Login HRIS",
+        errors: req.validationErrors,
+        old: req.body,
+      }),
+    });
+  }
+
   try {
     const { identifier, password, remember } = req.body;
-    const user = await User.findOne({
-      $or: [{ username: identifier }, { email: identifier }],
-    }).populate("roleId");
+    const sessionUserData = await verifyAndBuildSession(identifier, password);
 
-    if (!user) {
-      return res.redirect("/?error=USER_NOT_FOUND");
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.redirect("/?error=INVALID_PASSWORD");
-    }
-
-    const employee = await Employee.findOne({ userId: user._id }).populate({
-      path: "careerData",
-      populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
-    });
-
-    const roleName = user.roleId?.name?.toUpperCase();
-
-    const managerRoles = [
-      "MANAGER_KEUANGAN",
-      "MANAGER_ADMINISTRASI",
-      "MANAGER_HAJI_UMRAH",
-      "WAKIL_DIREKTUR",
-    ];
-    const isManager = managerRoles.includes(roleName);
-
-    const career = employee?.careerData || null;
-
-    const careerId = career?._id || null;
-    const bidangId = career?.bidangId?._id || null;
-    const bidangName = career?.bidangId?.name || null;
-    const unitId = career?.unitId?._id || null;
-    const unitName = career?.unitId?.name || null;
-    const positionId = career?.positionId?._id || null;
-    const positionName = career?.positionId?.name || null;
-    req.session.user = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-
-      employeeId: employee?._id,
-      employeeNumber: employee?.employeeIdNumber,
-
-      fullName: employee?.fullName,
-      foto_profile: employee?.foto_profile,
-      gender: employee?.jenis_kelamin,
-
-      role: roleName,
-      roleId: user.roleId?._id,
-      permissions: getPermissions(roleName),
-
-      isManager,
-
-      bidangId,
-      bidangName,
-
-      unitId,
-      unitName,
-
-      careerId,
-
-      positionId,
-      positionName,
-    };
+    req.session.user = sessionUserData;
 
     if (remember) {
-      req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000;
+      req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000; // 3 Hari
     }
 
-    req.session.save(() => {
-      res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
-      console.log("LOGIN SUCCESS -> /dashboard");
-      return res.redirect("/dashboard");
+    await new Promise((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) return reject(err);
+        resolve();
+      });
     });
-  } catch (err) {
-    console.error(err);
-    return res.redirect("/?error=SERVER_ERROR");
+
+    res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+    return res.redirect("/dashboard");
+  } catch (error) {
+    return res.status(error.statusCode || 500).render("auth/login", {
+      ...buildRenderData(req, {
+        title: "Login HRIS",
+        error: [error.message || "Terjadi kesalahan internal pada server."],
+        old: req.body,
+      }),
+    });
   }
-};
-export const logout = (req, res) => {
+});
+
+// ─── POST: PROCESS LOGOUT ────────────────────────────────────────────
+export const logout = asyncHandler(async (req, res) => {
   req.session.destroy((err) => {
-    if (err) console.error(err);
+    if (err) console.error("Session Destroy Error:", err);
     res.clearCookie("connect.sid");
-    return res.redirect("/");
+    return res.redirect("/login");
   });
-};
-export const showForgotPassword = (req, res) => {
+});
+
+// ─── GET: SHOW FORGOT PASSWORD PAGE ──────────────────────────────────
+export const showForgotPassword = asyncHandler(async (req, res) => {
   res.render("auth/forgot-password", {
-    query: req.query || {},
+    ...buildRenderData(req, { title: "Lupa Password" }),
   });
-};
+});
 
-export const resetPassword = async (req, res) => {
-  try {
-    const { password, confirmPassword } = req.body;
-
-    const email = req.session.resetEmail;
-
-    if (!email) {
-      return res.redirect("/forgot-password");
-    }
-
-    if (!password || password.length < 6) {
-      return res.redirect("/reset-password?error=WEAK_PASSWORD");
-    }
-
-    if (password !== confirmPassword) {
-      return res.redirect("/reset-password?error=PASSWORD_MISMATCH");
-    }
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.redirect("/forgot-password?error=EMAIL_NOT_FOUND");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.updateOne({ email }, { $set: { password: hashedPassword } });
-
-    req.session.resetEmail = null;
-
-    return res.redirect("/?success=PASSWORD_CHANGED");
-  } catch (err) {
-    console.log(err);
-    return res.redirect("/reset-password?error=SERVER_ERROR");
-  }
-};
-
-export const requestPasswordReset = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.redirect("/forgot-password?error=EMAIL_NOT_FOUND");
-    }
-
-    const token = crypto.randomBytes(32).toString("hex");
-    await redisClient.setEx(`reset:${token}`, 900, user.email);
-
-    const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
-
-    await sendEmail({
-      to: email,
-      subject: "Reset Password Akun HRIS",
-      html: `
-        <h2>Reset Password</h2>
-        <p>Klik tombol di bawah ini untuk mengatur ulang password Anda:</p>
-        <a href="${resetLink}" style="padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
-        <p>Link ini akan kedaluwarsa dalam 15 menit.</p>
-      `,
+// ─── POST: REQUEST PASSWORD RESET (SEND EMAIL) ───────────────────────
+export const requestPasswordReset = asyncHandler(async (req, res) => {
+  if (req.validationErrors) {
+    return res.status(400).render("auth/forgot-password", {
+      ...buildRenderData(req, {
+        title: "Lupa Password",
+        errors: req.validationErrors,
+        old: req.body,
+      }),
     });
-
-    return res.redirect("/forgot-password?success=EMAIL_SENT");
-  } catch (err) {
-    console.error(err);
-    return res.redirect("/forgot-password?error=SERVER_ERROR");
   }
-};
-export const showResetPasswordPage = async (req, res) => {
+
+  try {
+    await requestResetToken(req.body.email);
+    req.flash("success", "Link pemulihan kata sandi berhasil dikirim ke email Anda.");
+    return res.redirect("/forgot-password");
+  } catch (error) {
+    return res.status(error.statusCode || 500).render("auth/forgot-password", {
+      ...buildRenderData(req, {
+        title: "Lupa Password",
+        error: [error.message],
+        old: req.body,
+      }),
+    });
+  }
+});
+
+// ─── GET: SHOW RESET PASSWORD PAGE ───────────────────────────────────
+export const showResetPasswordPage = asyncHandler(async (req, res) => {
   const { token } = req.query;
+  if (!token) {
+    req.flash("error", "Akses ditolak. Token tidak ditemukan.");
+    return res.redirect("/forgot-password");
+  }
 
-  if (!token) return res.redirect("/forgot-password");
-
-  const redisKey = `reset:${token}`;
-  const email = await redisClient.get(redisKey);
-
-  console.log("Mencari token di Redis dengan key:", redisKey);
-  console.log("Hasil ditemukan:", email);
-
+  const email = await getEmailByToken(token);
   if (!email) {
-    return res.send(`Token tidak ditemukan di database. Token: ${token}`);
+    return res.status(400).send("Token tidak valid atau telah kedaluwarsa dari database.");
   }
 
-  res.render("auth/reset-password", { token, query: req.query || {} });
-};
+  res.render("auth/reset-password", {
+    ...buildRenderData(req, { title: "Atur Ulang Password", token }),
+  });
+});
 
-export const handleResetPassword = async (req, res) => {
-  try {
-    const { token, password, confirmPassword } = req.body;
+// ─── POST: HANDLE RESET PASSWORD ACTION ──────────────────────────────
+export const handleResetPassword = asyncHandler(async (req, res) => {
+  const token = req.body.token || req.query.token;
 
-    if (!token) {
-      return res.redirect("/forgot-password");
-    }
-
-    if (password !== confirmPassword) {
-      return res.redirect(`/reset-password?token=${token}&error=PASSWORD_MISMATCH`);
-    }
-
-    const email = await redisClient.get(`reset:${token}`);
-
-    if (!email) {
-      return res.redirect("/forgot-password?error=TOKEN_EXPIRED");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await User.updateOne({ email }, { $set: { password: hashedPassword } });
-
-    await redisClient.del(`reset:${token}`);
-
-    return res.redirect("/?success=PASSWORD_CHANGED");
-  } catch (err) {
-    console.log(err);
-    return res.redirect("/reset-password?error=SERVER_ERROR");
-  }
-};
-
-// ==========================================
-// SHOW CHANGE PASSWORD PAGE (RENDER VIEW)
-// ==========================================
-export const showChangePassword = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/");
-    }
-
-    res.render("auth/change-password", {
-      user: req.session.user,
-      query: req.query || {},
+  if (req.validationErrors) {
+    return res.status(400).render("auth/reset-password", {
+      ...buildRenderData(req, {
+        title: "Atur Ulang Password",
+        errors: req.validationErrors,
+        token,
+      }),
     });
-  } catch (err) {
-    console.error("Error showing change password page:", err);
-    return res.redirect("/dashboard?error=SERVER_ERROR");
   }
-};
 
-// ==========================================
-// HANDLE CHANGE PASSWORD (POST ACTION)
-// ==========================================
-export const changePassword = async (req, res) => {
   try {
-    const { currentPassword, password, confirmPassword } = req.body;
-    const userId = req.session.user?._id;
-
-    if (!userId) {
-      return res.redirect("/");
-    }
-
-    if (!password || password.length < 6) {
-      return res.redirect("/change-password?error=WEAK_PASSWORD");
-    }
-
-    if (password !== confirmPassword) {
-      return res.redirect("/change-password?error=PASSWORD_MISMATCH");
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.redirect("/?error=USER_NOT_FOUND");
-    }
-
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      return res.redirect("/change-password?error=WRONG_CURRENT_PASSWORD");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.updateOne({ _id: userId }, { $set: { password: hashedPassword } });
-
-    return res.redirect("/change-password?success=PASSWORD_CHANGED");
-  } catch (err) {
-    console.error("Error handling change password:", err);
-    return res.redirect("/change-password?error=SERVER_ERROR");
+    await resetPasswordWithToken(token, req.body.password);
+    req.flash("success", "Password Anda berhasil diperbarui. Silakan login.");
+    return res.redirect("/login");
+  } catch (error) {
+    return res.status(error.statusCode || 500).render("auth/reset-password", {
+      ...buildRenderData(req, {
+        title: "Atur Ulang Password",
+        error: [error.message],
+        token,
+      }),
+    });
   }
-};
+});
+
+// ─── GET: SHOW INTERNAL CHANGE PASSWORD PAGE ─────────────────────────
+export const showChangePassword = asyncHandler(async (req, res) => {
+  res.render("auth/change-password", {
+    ...buildRenderData(req, { title: "Ubah Password", user: req.session.user }),
+  });
+});
+
+// ─── POST: HANDLE INTERNAL CHANGE PASSWORD ───────────────────────────
+export const changePassword = asyncHandler(async (req, res) => {
+  if (req.validationErrors) {
+    return res.status(400).render("auth/change-password", {
+      ...buildRenderData(req, {
+        title: "Ubah Password",
+        errors: req.validationErrors,
+        user: req.session.user,
+      }),
+    });
+  }
+
+  try {
+    const userId = req.session.user._id;
+    const { currentPassword, password } = req.body;
+
+    await updateInternalPassword(userId, currentPassword, password);
+    req.flash("success", "Kata sandi Anda berhasil diubah!");
+    return res.redirect("/change-password");
+  } catch (error) {
+    return res.status(error.statusCode || 500).render("auth/change-password", {
+      ...buildRenderData(req, {
+        title: "Ubah Password",
+        error: [error.message],
+        user: req.session.user,
+      }),
+    });
+  }
+});
