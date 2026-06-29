@@ -1,0 +1,27 @@
+<div id="form-panel-jabatan" class="hidden space-y-4">
+  <div>
+    <h3 class="mb-1 text-[13px] font-bold">Tambah Jabatan Baru</h3>
+    <p class="text-[11px] text-slate-400">Menentukan kriteria karier pegawai di sistem.</p>
+  </div>
+  <form onsubmit="handleCreateJabatan(event)" class="space-y-3">
+    <input
+      type="text"
+      id="input-jabatan-name"
+      placeholder="Contoh: Senior Engineer, Supervisor..."
+      required
+      class="w-full rounded-xl border border-slate-200/60 bg-slate-50 px-3.5 py-2.5 text-[12.5px] font-medium transition outline-none focus:border-slate-400 focus:bg-white"
+    />
+    <input
+      type="text"
+      id="input-jabatan-keterangan"
+      placeholder="Keterangan singkat posisi (Opsional)..."
+      class="w-full rounded-xl border border-slate-200/60 bg-slate-50 px-3.5 py-2.5 text-[12.5px] font-medium transition outline-none focus:border-slate-400 focus:bg-white"
+    />
+    <button
+      type="submit"
+      class="w-full cursor-pointer rounded-xl bg-blue-600 py-2.5 text-[12.5px] font-medium text-white transition hover:bg-blue-700"
+    >
+      Simpan
+    </button>
+  </form>
+</div>

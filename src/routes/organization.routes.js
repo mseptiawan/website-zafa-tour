@@ -11,21 +11,22 @@ import {
   updatePosition,
   deletePosition,
 } from "../controllers/organization.controller.js";
+import { validate } from "../middlewares/validate.js";
+import { bidangSchema, unitSchema, positionSchema } from "../validations/organization.schema.js";
 
 const router = express.Router();
 
-router.get("/organization-structure", getWorkspace);
+router.get("/", getWorkspace);
 
-router.post("/api/bidang", createBidang);
-router.put("/api/bidang/:id", updateBidang);
-router.delete("/api/bidang/:id", deleteBidang);
+router.post("/bidang", validate(bidangSchema), createBidang);
+router.put("/bidang/:id", validate(bidangSchema), updateBidang);
+router.delete("/bidang/:id", deleteBidang);
 
-router.post("/api/unit", createUnit);
-router.put("/api/unit/:id", updateUnit);
-router.delete("/api/unit/:id", deleteUnit);
+router.post("/unit", validate(unitSchema), createUnit);
+router.put("/unit/:id", validate(unitSchema), updateUnit);
+router.delete("/unit/:id", deleteUnit);
 
-router.post("/api/position", createPosition);
-router.put("/api/position/:id", updatePosition);
-router.delete("/api/position/:id", deletePosition);
-
+router.post("/position", validate(positionSchema), createPosition);
+router.put("/position/:id", validate(positionSchema), updatePosition);
+router.delete("/position/:id", deletePosition);
 export default router;

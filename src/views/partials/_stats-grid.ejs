@@ -1,6 +1,6 @@
 <% 
   const totalItems = items.length;
-  let desktopGridCols = 'lg:grid-cols-3'; // default fallback
+  let desktopGridCols = 'lg:grid-cols-3';
   
   if (totalItems === 4) {
     desktopGridCols = 'lg:grid-cols-4';
@@ -19,7 +19,7 @@
           <%= item.label %>
         </span>
         
-        <span class="text-base sm:text-lg md:text-2xl font-semibold <%= item.valueClass || 'text-slate-900' %> tracking-tight tabular-nums block truncate">
+        <span id="<%= item.valueId || '' %>" class="text-base sm:text-lg md:text-2xl font-semibold <%= item.valueClass || 'text-slate-900' %> tracking-tight tabular-nums block truncate">
           <%= (typeof item.value !== 'undefined' && item.value !== null) ? item.value : 0 %> 
           <% if (item.unit) { %>
             <span class="text-[9px] sm:text-[10px] md:text-xs font-medium <%= item.unitClass || 'text-slate-500' %> inline-block ml-0.5"><%= item.unit %></span>

@@ -5,203 +5,76 @@
   <div class="w-full max-w-none mx-auto">
 
     <div class="mb-6 border-b border-slate-200/60 pb-5">
-  <%- include('../partials/page-header', {
-    section: 'Area Kerja',
-    module: 'Struktur Organisasi',
-    title: 'Struktur Organisasi',
-    description: 'Kelola master data Bidang, Sub-Unit Kerja, dan Tingkatan Jabatan secara efisien dalam satu halaman.'
-  }) %>
+      <%- include('../partials/page-header', {
+        section: 'Area Kerja',
+        module: 'Unit & Jabatan',
+        title: 'Unit & Jabatan',
+        description: 'Kelola master data Bidang, Sub-Unit Kerja, dan Jabatan secara efisien dalam satu halaman.'
+      }) %>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-    
-    <div class="bg-white border border-slate-200/60 p-5 rounded-2xl   flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Bidang Induk</span>
-        <div class="flex items-baseline gap-2">
-          <span id="stat-total-bidang" class="text-2xl font-black text-slate-900 tabular-nums">0</span>
-          <span class="text-[11px] text-slate-500 font-medium">Divisi Utama</span>
-        </div>
+    <div class="w-full">
+        <%- include('../partials/_stats-grid', {
+          items: [
+            {
+              label: 'Total Bidang Induk',
+              value: '0',
+              valueId: 'stat-total-bidang', 
+              unit: 'Bidang',
+              icon: 'fa-solid fa-sitemap',
+              bgClass: 'bg-white border-slate-200/60',
+              iconBoxClass: 'bg-blue-50 text-blue-600 border border-blue-100',
+              labelClass: 'text-slate-400' 
+            },
+            {
+              label: 'Total Sub-Unit Kerja',
+              value: '0',
+              valueId: 'stat-total-unit', 
+              unit: 'Tersebar',
+              icon: 'fa-solid fa-cubes',
+              bgClass: 'bg-white border-slate-200/60',
+              iconBoxClass: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
+              labelClass: 'text-slate-400'
+            },
+          {
+              label: 'Jabatan',
+              value: '0',
+              valueId: 'stat-total-jabatan',
+              unit: 'Level Karier',
+              icon: 'fa-solid fa-briefcase',
+              bgClass: 'bg-white border-slate-200/60', 
+              labelClass: 'text-slate-400',
+              valueClass: 'text-slate-900',
+              unitClass: 'text-slate-500',
+              iconBoxClass: 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
+            }
+          ]
+        }) %>
       </div>
-      <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-        </svg>
+   <div class="mb-5 mt-10">
+        <%- include('../partials/_tab-nav', {
+          tabs: [
+            { id: 'bidang', label: 'Bidang Induk' },
+            { id: 'unit', label: 'Sub-Unit Kerja' },
+            { id: 'jabatan', label: 'Jabatan' }
+          ]
+        }) %>
       </div>
-    </div>
 
-    <div class="bg-white border border-slate-200/60 p-5 rounded-2xl   flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Sub-Unit Kerja</span>
-        <div class="flex items-baseline gap-2">
-          <span id="stat-total-unit" class="text-2xl font-black text-slate-900 tabular-nums">0</span>
-          <span id="stat-subtext-unit" class="text-[11px] text-slate-500 truncate max-w-[130px] font-medium">Tersebar di bidang</span>
-        </div>
-      </div>
-      <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v.25c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-.25zM2.25 16.625c0-.621.504-1.125 1.125-1.125h6c.621 0 1.125.504 1.125 1.125v.25c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-.25zM11.625 11.875c0-.621.504-1.125 1.125-1.125h9c.621 0 1.125.504 1.125 1.125v.25c0 .621-.504 1.125-1.125 1.125h-9a1.125 1.125 0 01-1.125-1.125v-.25z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 6.125a1.125 1.125 0 10-2.25 0 1.125 1.125 0 002.25 0zM18.375 15.625a1.125 1.125 0 10-2.25 0 1.125 1.125 0 002.25 0zM6.875 11.375a1.125 1.125 0 10-2.25 0 1.125 1.125 0 002.25 0z" />
-        </svg>
-      </div>
-    </div>
-
-    <div class="bg-white border border-slate-200/60 p-5 rounded-2xl   flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Tingkatan Jabatan</span>
-        <div class="flex items-baseline gap-2">
-          <span id="stat-total-jabatan" class="text-2xl font-black text-slate-900 tabular-nums">0</span>
-          <span class="text-[11px] text-slate-500 font-medium">Level Karier</span>
-        </div>
-      </div>
-      <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-        </svg>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="mb-5 bg-white rounded-2xl border border-slate-200/60 p-1.5   inline-flex items-center gap-1">
-    
-    <!-- Tab Aktif (Slate-900) -->
-    <button type="button" 
-      onclick="switchMasterTab('bidang')" 
-      id="nav-bidang" 
-      class="tab-btn px-5 py-2.5 text-[11px] font-bold bg-slate-900 text-white   rounded-xl transition-all duration-300 outline-none flex items-center gap-2 whitespace-nowrap">
-      Bidang Induk
-      <span id="badge-count-bidang" class="px-1.5 py-0.5 text-[9px] bg-white/10 text-white rounded-md tabular-nums">0</span>
-    </button>
-
-    <!-- Tab Inactive (Slate-600) -->
-    <button type="button" 
-      onclick="switchMasterTab('unit')" 
-      id="nav-unit" 
-      class="tab-btn px-5 py-2.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all duration-300 outline-none flex items-center gap-2 whitespace-nowrap">
-      Sub-Unit Kerja
-      <span id="badge-count-unit" class="px-1.5 py-0.5 text-[9px] bg-slate-100 text-slate-500 rounded-md tabular-nums">0</span>
-    </button>
-
-    <button type="button" 
-      onclick="switchMasterTab('jabatan')" 
-      id="nav-jabatan" 
-      class="tab-btn px-5 py-2.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all duration-300 outline-none flex items-center gap-2 whitespace-nowrap">
-      Level Jabatan
-      <span id="badge-count-jabatan" class="px-1.5 py-0.5 text-[9px] bg-slate-100 text-slate-500 rounded-md tabular-nums">0</span>
-    </button>
-
-</div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-    <div class="lg:col-span-5">
-      <div class="bg-white border border-slate-200/60 p-5 rounded-xl  ">
-
-        <div id="form-panel-bidang" class="block space-y-4">
-          <div>
-            <h3 class="text-[13px] font-bold text-slate-800 mb-1">Tambah Bidang Baru</h3>
-            <p class="text-[11px] text-slate-400">Membuat departemen atau divisi induk utama perusahaan.</p>
-          </div>
-          <form onsubmit="handleCreateBidang(event)" class="space-y-3">
-            <input type="text" id="input-bidang-name" placeholder="Contoh: Operasional, IT, HRD..." required class="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium outline-none focus:bg-white focus:border-slate-400 transition" />
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-[12.5px] py-2.5 rounded-xl transition cursor-pointer">
-              Simpan Bidang
-            </button>
-          </form>
-        </div>
-
-        <div id="form-panel-unit" class="hidden space-y-4">
-          <div>
-            <h3 class="text-[13px] font-bold  mb-1">Tambah Sub-Unit Kerja</h3>
-            <p class="text-[11px] text-slate-400">Membuat sub-bagian yang menginduk pada bidang tertentu.</p>
-          </div>
-          <form onsubmit="handleCreateUnit(event)" class="space-y-3">
-            <div class="relative">
-              <select id="input-unit-bidangId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 outline-none appearance-none cursor-pointer focus:bg-white focus:border-slate-400 transition">
-              </select>
-              <div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
-                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
-              </div>
-            </div>
-            <input type="text" id="input-unit-name" placeholder="Contoh: Mobile Dev, Front Office..." required class="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium outline-none focus:bg-white focus:border-slate-400 transition" />
-            <textarea id="input-unit-desc" rows="2" placeholder="Deskripsi singkat tugas unit kerja..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[12.5px] font-medium outline-none resize-none focus:bg-white focus:border-slate-400 transition"></textarea>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-[12.5px] py-2.5 rounded-xl transition cursor-pointer shadow-xs">
-              Simpan Sub-Unit
-            </button>
-          </form>
-        </div>
-
-        <div id="form-panel-jabatan" class="hidden space-y-4">
-          <div>
-            <h3 class="text-[13px] font-bold  mb-1">Tambah Jabatan Baru</h3>
-            <p class="text-[11px] text-slate-400">Menentukan kriteria tingkatan karier pegawai di sistem.</p>
-          </div>
-          <form onsubmit="handleCreateJabatan(event)" class="space-y-3">
-            <input type="text" id="input-jabatan-name" placeholder="Contoh: Senior Engineer, Supervisor..." required class="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium outline-none focus:bg-white focus:border-slate-400 transition" />
-            <input type="text" id="input-jabatan-keterangan" placeholder="Keterangan singkat posisi (Opsional)..." class="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium outline-none focus:bg-white focus:border-slate-400 transition" />
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-[12.5px] py-2.5 rounded-xl transition cursor-pointer">
-              Simpan Jabatan
-            </button>
-          </form>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="lg:col-span-7">
-      <div class="bg-white border border-slate-200/60 rounded-xl   overflow-hidden">
-
-        <div id="table-panel-bidang" class="block">
-          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
-            <h3 class="text-[13px] font-bold text-slate-800">Daftar Bidang Utama</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="py-3 px-5">Nama Divisi/Bidang</th>
-                  <th class="py-3 px-5 w-16 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="render-list-bidang" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
-            </table>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <div class="lg:col-span-5">
+          <div class="bg-white border border-slate-200/60 p-5 rounded-xl">
+            <%- include('./partials/form-bidang') %>
+            <%- include('./partials/form-unit') %>
+            <%- include('./partials/form-jabatan') %>
           </div>
         </div>
 
-        <div id="table-panel-unit" class="hidden">
-          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
-            <h3 class="text-[13px] font-bold text-slate-800">Daftar Sub-Unit Kerja</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="py-3 px-5">Unit Kerja</th>
-                  <th class="py-3 px-5">Bidang Induk</th>
-                  <th class="py-3 px-5 w-16 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="render-list-unit" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="table-panel-jabatan" class="hidden">
-          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
-            <h3 class="text-[13px] font-bold text-slate-800">Daftar Tingkatan Level Jabatan</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold border-b border-slate-100">
-                  <th class="py-3 px-5">Tingkatan Jabatan</th>
-                  <th class="py-3 px-5 w-16 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="render-list-jabatan" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
-            </table>
+        <div class="lg:col-span-7">
+          <div class="bg-white border border-slate-200/60 rounded-xl overflow-hidden">
+            <%- include('./partials/table-bidang') %>
+            <%- include('./partials/table-unit') %>
+            <%- include('./partials/table-jabatan') %>
           </div>
         </div>
 
@@ -211,337 +84,15 @@
   </div>
 </div>
 
-  </div>
-</div>
 <script>
-  let listBidang = <%- JSON.stringify(listBidang) %>;
-  let listUnit = <%- JSON.stringify(listUnit) %>;
-  let listJabatan = <%- JSON.stringify(listPosition) %>; 
-
-  document.addEventListener("DOMContentLoaded", () => {
-    refreshWorkspace();
-    const savedTab = localStorage.getItem('activeOrgTab') || 'bidang';
-    switchMasterTab(savedTab);
-  });
-
-  function refreshWorkspace() {
-    renderBidangTable();
-    renderUnitTable();
-    renderJabatanTable();
-    populateBidangSelect();
-    updateTabBadges();
-    calculateStats(); // Jalankan kalkulasi statistik real-time
-  }
-
-  function updateTabBadges() {
-    document.getElementById('badge-count-bidang').innerText = listBidang.length;
-    document.getElementById('badge-count-unit').innerText = listUnit.length;
-    document.getElementById('badge-count-jabatan').innerText = listJabatan.length;
-  }
-
-  // ================= STATISTIK ENGINE =================
-  function calculateStats() {
-    document.getElementById('stat-total-bidang').innerText = listBidang.length;
-    document.getElementById('stat-total-unit').innerText = listUnit.length;
-    document.getElementById('stat-total-jabatan').innerText = listJabatan.length;
-
-    // Tambah subtext analitik dinamis untuk Sub-Unit Kerja
-    const subtextUnitEl = document.getElementById('stat-subtext-unit');
-    if (listBidang.length > 0) {
-      subtextUnitEl.innerText = `Tersebar di ${listBidang.length} Bidang`;
-    } else {
-      subtextUnitEl.innerText = "Belum ada bidang induk";
-    }
-  }
-
-  function switchMasterTab(activeTab) {
-    localStorage.setItem('activeOrgTab', activeTab);
-
-    const tabs = ['bidang', 'unit', 'jabatan'];
-    tabs.forEach(tab => {
-      const formPanel = document.getElementById(`form-panel-${tab}`);
-      const tablePanel = document.getElementById(`table-panel-${tab}`);
-      const navBtn = document.getElementById(`nav-${tab}`);
-      const badge = document.getElementById(`badge-count-${tab}`);
-
-      if (tab === activeTab) {
-        formPanel?.classList.remove('hidden');
-        tablePanel?.classList.remove('hidden');
-        
-        if (navBtn) {
-          navBtn.className = "tab-btn px-5 py-2.5 text-xs font-bold bg-slate-900 text-white shadow-xs rounded-xl transition-all duration-200 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap";
-        }
-        if (badge) {
-          badge.className = "ml-1 px-1.5 py-0.5 text-[10px] bg-white/20 text-white rounded-md tabular-nums font-bold";
-        }
-      } else {
-        formPanel?.classList.add('hidden');
-        tablePanel?.classList.add('hidden');
-        
-        if (navBtn) {
-          navBtn.className = "tab-btn px-5 py-2.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all duration-200 outline-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap";
-        }
-        if (badge) {
-          badge.className = "ml-1 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold";
-        }
-      }
-    });
-  }
-
-  function populateBidangSelect() {
-    const selectEl = document.getElementById('input-unit-bidangId');
-    if (!selectEl) return;
-    let markup = '<option value="" disabled selected>-- Pilih Bidang Induk --</option>';
-    listBidang.forEach(b => {
-      markup += `<option value="${b._id}">${b.name}</option>`;
-    });
-    selectEl.innerHTML = markup;
-  }
-
-  // ================= DATA RENDERING ENGINE =================
-  function renderBidangTable() {
-    const container = document.getElementById('render-list-bidang');
-    container.innerHTML = "";
-    if (listBidang.length === 0) {
-      container.innerHTML = `<tr><td colspan="2" class="p-5 text-center text-slate-400 italic">Kosong</td></tr>`;
-      return;
-    }
-    listBidang.forEach(item => {
-      container.insertAdjacentHTML('beforeend', `
-        <tr class="hover:bg-slate-50/50 transition duration-150"><td class="py-3.5 px-5 font-medium text-slate-900">${item.name}</td>
-        <td class="py-3.5 px-5 text-center"><button onclick="toggleExpandRow('bidang', '${item._id}')" id="arrow-bidang-${item._id}" class="text-slate-400 hover:text-slate-700 w-7 h-7 inline-flex items-center justify-center border border-transparent hover:border-slate-200 rounded-lg transition cursor-pointer"><svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg></button></td></tr>
-        <tr class="hidden bg-slate-50/50" id="row-bidang-expand-${item._id}"><td colspan="2" class="p-4"><form onsubmit="handleUpdateBidang(event, '${item._id}')" class="bg-white p-4 border border-slate-200 rounded-xl space-y-3"><input type="text" name="name" value="${item.name}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-[12.5px]" required /><div class="flex justify-between"><button type="button" onclick="handleDeleteBidang('${item._id}')" class="text-rose-500 font-medium text-[11px]">Hapus</button><div><button type="button" onclick="toggleExpandRow('bidang', '${item._id}')" class="text-slate-500 text-[11.5px] mr-2">Batal</button><button type="submit" class="bg-blue-600 text-white text-[11.5px] px-4 py-1.5 rounded-lg">Simpan</button></div></div></form></td></tr>`);
-    });
-  }
-
-  function renderUnitTable() {
-    const container = document.getElementById('render-list-unit');
-    container.innerHTML = "";
-    if (listUnit.length === 0) {
-      container.innerHTML = `<tr><td colspan="3" class="p-5 text-center text-slate-400 italic">Kosong</td></tr>`;
-      return;
-    }
-    listUnit.forEach(item => {
-      const pName = item.bidangId?.name || 'Unknown';
-      container.insertAdjacentHTML('beforeend', `
-        <tr class="hover:bg-slate-50/50 transition duration-150"><td class="py-3.5 px-5"><div class="flex flex-col"><span class="font-medium text-slate-900">${item.name}</span><span class="text-[11px] text-slate-400 font-medium mt-0.5">${item.description || ''}</span></div></td><td class="py-3.5 px-5 text-slate-500 font-medium">${pName}</td>
-        <td class="py-3.5 px-5 text-center"><button onclick="toggleExpandRow('unit', '${item._id}')" id="arrow-unit-${item._id}" class="text-slate-400 hover:text-slate-700 w-7 h-7 inline-flex items-center justify-center border border-transparent hover:border-slate-200 rounded-lg transition cursor-pointer"><svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg></button></td></tr>
-        <tr class="hidden bg-slate-50/50" id="row-unit-expand-${item._id}"><td colspan="3" class="p-4"><form onsubmit="handleUpdateUnit(event, '${item._id}')" class="bg-white p-4 border border-slate-200 rounded-xl space-y-3"><input type="text" name="name" value="${item.name}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-[12.5px]" required /><input type="text" name="description" value="${item.description || ''}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-[12.5px]" /><div class="flex justify-between"><button type="button" onclick="handleDeleteUnit('${item._id}')" class="text-rose-500 font-medium text-[11px]">Hapus</button><div><button type="button" onclick="toggleExpandRow('unit', '${item._id}')" class="text-slate-500 text-[11.5px] mr-2">Batal</button><button type="submit" class="bg-indigo-600 text-white text-[11.5px] px-4 py-1.5 rounded-lg">Simpan</button></div></div></form></td></tr>`);
-    });
-  }
-
-  function renderJabatanTable() {
-    const container = document.getElementById('render-list-jabatan');
-    container.innerHTML = "";
-    if (listJabatan.length === 0) {
-      container.innerHTML = `<tr><td colspan="2" class="p-5 text-center text-slate-400 italic">Kosong</td></tr>`;
-      return;
-    }
-    listJabatan.forEach(item => {
-      container.insertAdjacentHTML('beforeend', `
-        <tr class="hover:bg-slate-50/50 transition duration-150"><td class="py-3.5 px-5"><div class="flex flex-col"><span class="font-medium text-slate-900">${item.name}</span><span class="text-[11px] text-slate-400 font-medium mt-0.5">${item.description || ''}</span></div></td>
-        <td class="py-3.5 px-5 text-center"><button onclick="toggleExpandRow('jabatan', '${item._id}')" id="arrow-jabatan-${item._id}" class="text-slate-400 hover:text-slate-700 w-7 h-7 inline-flex items-center justify-center border border-transparent hover:border-slate-200 rounded-lg transition cursor-pointer"><svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg></button></td></tr>
-        <tr class="hidden bg-slate-50/50" id="row-jabatan-expand-${item._id}"><td colspan="2" class="p-4"><form onsubmit="handleUpdateJabatan(event, '${item._id}')" class="bg-white p-4 border border-slate-200 rounded-xl space-y-3"><input type="text" name="name" value="${item.name}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-[12.5px]" required /><input type="text" name="description" value="${item.description || ''}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-[12.5px]" /><div class="flex justify-between"><button type="button" onclick="handleDeleteJabatan('${item._id}')" class="text-rose-500 font-medium text-[11px]">Hapus</button><div><button type="button" onclick="toggleExpandRow('jabatan', '${item._id}')" class="text-slate-500 text-[11.5px] mr-2">Batal</button><button type="submit" class="bg-emerald-600 text-white text-[11.5px] px-4 py-1.5 rounded-lg">Simpan</button></div></div></form></td></tr>`);
-    });
-  }
-
-  // ================= AJAX CRUD LOGIC IMPLEMENTATION =================
-  async function handleCreateBidang(event) {
-    event.preventDefault();
-    const input = document.getElementById('input-bidang-name');
-    try {
-      const res = await fetch('/api/bidang', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: input.value })
-      });
-      const data = await res.json();
-      if (data.success) {
-        listBidang.unshift(data.data);
-        input.value = "";
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleUpdateBidang(event, id) {
-    event.preventDefault();
-    const name = new FormData(event.target).get('name');
-    try {
-      const res = await fetch(`/api/bidang/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-      });
-      const data = await res.json();
-      if (data.success) {
-        const idx = listBidang.findIndex(b => b._id === id);
-        listBidang[idx].name = name;
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleDeleteBidang(id) {
-    if (!confirm("Hapus bidang ini?")) return;
-    try {
-      const res = await fetch(`/api/bidang/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        listBidang = listBidang.filter(b => b._id !== id);
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleCreateUnit(event) {
-    event.preventDefault();
-    const bId = document.getElementById('input-unit-bidangId').value;
-    const n = document.getElementById('input-unit-name');
-    const d = document.getElementById('input-unit-desc');
-    try {
-      const res = await fetch('/api/unit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bidangId: bId, name: n.value, description: d.value })
-      });
-      const data = await res.json();
-      if (data.success) {
-        listUnit.unshift(data.data);
-        n.value = "";
-        d.value = "";
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleUpdateUnit(event, id) {
-    event.preventDefault();
-    const f = new FormData(event.target);
-    const name = f.get('name');
-    const description = f.get('description');
-    try {
-      const res = await fetch(`/api/unit/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description })
-      });
-      const data = await res.json();
-      if (data.success) {
-        const idx = listUnit.findIndex(u => u._id === id);
-        listUnit[idx].name = name;
-        listUnit[idx].description = description;
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleDeleteUnit(id) {
-    if (!confirm("Hapus unit ini?")) return;
-    try {
-      const res = await fetch(`/api/unit/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        listUnit = listUnit.filter(u => u._id !== id);
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleCreateJabatan(event) {
-    event.preventDefault();
-    const n = document.getElementById('input-jabatan-name');
-    const k = document.getElementById('input-jabatan-keterangan');
-    try {
-      const res = await fetch('/api/position', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: n.value, description: k.value })
-      });
-      const data = await res.json();
-      if (data.success) {
-        listJabatan.unshift(data.data);
-        n.value = "";
-        k.value = "";
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleUpdateJabatan(event, id) {
-    event.preventDefault();
-    const f = new FormData(event.target);
-    const name = f.get('name');
-    const description = f.get('description');
-    try {
-      const res = await fetch(`/api/position/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description })
-      });
-      const data = await res.json();
-      if (data.success) {
-        const idx = listJabatan.findIndex(j => j._id === id);
-        listJabatan[idx].name = name;
-        listJabatan[idx].description = description;
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function handleDeleteJabatan(id) {
-    if (!confirm("Hapus jabatan ini?")) return;
-    try {
-      const res = await fetch(`/api/position/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        listJabatan = listJabatan.filter(j => j._id !== id);
-        refreshWorkspace();
-      } else {
-        alert(data.message);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  function toggleExpandRow(type, id) {
-    const el = document.getElementById(`row-${type}-expand-${id}`);
-    const svg = document.getElementById(`arrow-${type}-${id}`).querySelector('svg');
-    const isHidden = el.classList.contains('hidden');
-    el.classList.toggle('hidden', !isHidden);
-    svg.classList.toggle('rotate-180', isHidden);
-  }
+  window.listBidang = <%- JSON.stringify(listBidang) %>;
+  window.listUnit = <%- JSON.stringify(listUnit) %>;
+  window.listJabatan = <%- JSON.stringify(listPosition) %>; 
+  
+  window.flashMessage = {
+    success: '<%= (typeof success !== "undefined" && success.length > 0) ? success[0] : "" %>',
+    error: '<%= (typeof error !== "undefined" && error.length > 0) ? error[0] : "" %>'
+  };
 </script>
+
+<script src="/js/organization.js"></script>
