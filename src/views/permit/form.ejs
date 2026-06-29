@@ -91,7 +91,7 @@
 
         <div class="space-y-2 mb-5">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alasan Pengajuan</label>
-          <textarea name="reason" rows="4" required placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." 
+          <textarea name="reason" rows="4"  placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." 
                     class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.reason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= typeof oldData !== 'undefined' && oldData.reason ? oldData.reason : '' %></textarea>
           <% if (typeof errors !== 'undefined' && errors.reason) { %>
             <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.reason %></p>
@@ -177,7 +177,6 @@
     const optionalMark = document.getElementById('optional-mark');
     const dropzoneFilled = document.getElementById('dropzone-filled');
 
-    // Jika tipe SAKIT dan belum memiliki file di database, set required true
     if (value === 'SAKIT') {
       if (dropzoneFilled.classList.contains('hidden')) {
         fileUpload.required = true;
@@ -211,7 +210,6 @@
       document.getElementById("dropzone-filled").classList.remove("hidden");
       document.getElementById("view-file-btn").href = URL.createObjectURL(file);
     } else {
-      // Jika kosong dan tidak ada file database lama, tampilkan dropzone kosong
       <% if (typeof oldData === 'undefined' || !oldData.document) { %>
         document.getElementById("dropzone-empty").classList.remove("hidden");
         document.getElementById("dropzone-filled").classList.add("hidden");
@@ -219,7 +217,6 @@
     }
   }
 
-  // Pengaturan batasan penanggalan
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0'); 

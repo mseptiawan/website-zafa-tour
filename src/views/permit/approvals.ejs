@@ -1,7 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
 <%
-  // Helper lokal untuk menghindari error jika _table.ejs membutuhkannya secara eksplisit
   const typeLabels = {
     'SAKIT': 'Izin Sakit',
     'PENDAMPINGAN_MELAHIRKAN': 'Mendampingi Istri Melahirkan',
@@ -17,7 +16,7 @@
 
     <div class="border border-slate-200/60 md:border-none md:shadow-none">
       <%- include('../partials/page-header', {
-        section: 'Area Kerja',
+        // section: 'Area Kerja',
         module: 'Kehadiran',
         title: 'Otorisasi Perizinan',
         description: 'Tinjau, otorisasi, dan kelola dokumen perizinan operasional halangan kerja masuk dari staf.'
@@ -121,7 +120,6 @@
 </div>
 
 <script>
-  // Mengintegrasikan fungsi pembuka modal reject dari partial _table
   function openRejectModal(permitId) {
     const modal = document.getElementById('rejectModal');
     document.getElementById('rejectForm').action = `/permit/approval/${permitId}`;

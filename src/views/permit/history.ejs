@@ -7,12 +7,10 @@
   const activePermits = permits.filter(p => p.status === 'PENDING');
   const approvedPermits = permits.filter(p => p.status === 'APPROVED');
   const rejectedPermits = permits.filter(p => p.status === 'REJECTED');
-  const cancelledPermits = permits.filter(p => p.status === 'CANCELLED'); // <-- Tambahkan baris ini
+  const cancelledPermits = permits.filter(p => p.status === 'CANCELLED'); // 
 
-  // Gabungkan seluruh berkas non-pending ke dalam riwayat selesai
   const historyPermits = [...approvedPermits, ...rejectedPermits, ...cancelledPermits]; 
 
-  // Mengambil data user dari buildRenderData secara aman
   const currentUserData = (typeof user !== 'undefined') ? user : ((typeof currentUser !== 'undefined') ? currentUser : null);
   const isApprover = currentUserData && ['WAKIL_DIREKTUR', 'DIREKTUR_UTAMA'].includes(currentUserData.role);
 

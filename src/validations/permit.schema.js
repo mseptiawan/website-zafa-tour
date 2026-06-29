@@ -1,19 +1,23 @@
 import { z } from "zod";
 
 export const createPermitSchema = z.object({
-  type: z.enum(
-    [
-      "SAKIT",
-      "PENDAMPINGAN_MELAHIRKAN",
-      "MUSIBAH",
-      "PENTING",
-      "KEPERLUAN_KELUARGA",
-      "KEPERLUAN_MENDESAK",
-      "LAINNYA",
-    ],
-    {
-      error_map: () => ({ message: "Jenis izin yang dipilih tidak valid." }),
-    }
+  type: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(
+      [
+        "SAKIT",
+        "PENDAMPINGAN_MELAHIRKAN",
+        "MUSIBAH",
+        "PENTING",
+        "KEPERLUAN_KELUARGA",
+        "KEPERLUAN_MENDESAK",
+        "LAINNYA",
+      ],
+      {
+        invalid_type_error: "Jenis izin yang dipilih tidak valid.",
+        required_error: "Jenis izin wajib dipilih.",
+      }
+    )
   ),
   date: z
     .string({ required_error: "Tanggal ketidakhadiran wajib diisi." })

@@ -1,6 +1,15 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData } from "../utils/renderHelper.js";
-import * as permitService from "../services/permit.service.js";
+import {
+  createPermit,
+  findEmployeeHistory,
+  findIncomingPermits,
+  executeApproval,
+  getPermitForEdit,
+  updatePermit,
+  deletePermit,
+} from "../services/permit.service.js";
+
 import fs from "fs";
 
 // Rendisi Form Pengajuan Izin Baru
@@ -31,7 +40,7 @@ export const store = asyncHandler(async (req, res) => {
   }
 
   try {
-    await permitService.createPermit({
+    await createPermit({
       body: req.body,
       file: req.file,
       currentUser: req.session.user,
@@ -61,7 +70,7 @@ export const getHistoryPermits = asyncHandler(async (req, res) => {
   const { page } = req.query;
   const employeeId = req.session.user.employeeId;
 
-  const { data: permits, meta } = await permitService.findEmployeeHistory({
+  const { data: permits, meta } = await findEmployeeHistory({
     employeeId,
     page,
   });
@@ -86,7 +95,7 @@ export const getIncomingPermits = asyncHandler(async (req, res) => {
     data: permits,
     meta,
     summary,
-  } = await permitService.findIncomingPermits({
+  } = await findIncomingPermits({
     currentUser: req.session.user,
     page,
   });
@@ -99,7 +108,7 @@ export const getIncomingPermits = asyncHandler(async (req, res) => {
       query: req.query,
       currentRole: req.session.user.role,
       summary,
-      user: req.session.user, // <-- PERBAIKAN UTAMA: Wajib dipasok agar partial table bisa memvalidasi "Self-Approval"
+      user: req.session.user,
     }),
   });
 });
@@ -110,7 +119,7 @@ export const actionApproval = asyncHandler(async (req, res) => {
   const { status, notesByApprover } = req.body;
 
   try {
-    await permitService.executeApproval({
+    await executeApproval({
       id,
       status,
       notesByApprover,
@@ -132,7 +141,7 @@ export const edit = asyncHandler(async (req, res) => {
   const employeeId = req.session.user.employeeId;
 
   try {
-    const permit = await permitService.getPermitForEdit({ id, employeeId });
+    const permit = await getPermitForEdit({ id, employeeId });
     return res.render("permit/form", {
       ...buildRenderData(req, {
         title: "Ubah Pengajuan Izin",
@@ -165,7 +174,7 @@ export const update = asyncHandler(async (req, res) => {
   }
 
   try {
-    await permitService.updatePermit({
+    await updatePermit({
       id,
       body: req.body,
       file: req.file,
@@ -194,7 +203,7 @@ export const destroy = asyncHandler(async (req, res) => {
   const employeeId = req.session.user.employeeId;
 
   try {
-    await permitService.deletePermit({ id, employeeId });
+    await deletePermit({ id, employeeId });
     req.flash("success", "Berkas permohonan izin berhasil ditarik kembali.");
   } catch (error) {
     req.flash("error", error.message || "Gagal menarik berkas perizinan.");
