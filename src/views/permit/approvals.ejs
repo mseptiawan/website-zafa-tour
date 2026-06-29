@@ -1,122 +1,157 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="min-h-screen bg-slate-50/50 md:ml-72 md:p-8 antialiased selection:bg-blue-50 selection:text-blue-600">
-  <!-- Wrapper dengan margin yang lebih fleksibel untuk mobile -->
-  <div class="max-w-none mx-auto space-y-6 md:space-y-8">
+<%
+  const typeLabels = {
+    'SAKIT': 'Izin Sakit',
+    'PENDAMPINGAN_MELAHIRKAN': 'Mendampingi Istri Melahirkan',
+    'MUSIBAH': 'Terkena Musibah',
+    'PENTING': 'Keperluan Mendesak',
+    'KEPERLUAN_KELUARGA': 'Keperluan Keluarga',
+    'LAINNYA': 'Lainnya'
+  };
+%>
 
-    <!-- Header Page -->
-    <%- include('../partials/page-header', {
-      section: 'Area Kerja',
-      module: 'Kehadiran',
-      title: 'Riwayat & Status Izin',
-      description: 'Pantau status, otorisasi, dan riwayat dokumentasi perizinan operasional kerja pegawai.'
-    }) %>
+<div class="min-h-screen bg-slate-50/50 md:ml-72 p-4 sm:p-6 md:p-10 antialiased selection:bg-blue-50 selection:text-blue-600 pb-24 md:pb-8">
+  <div class="max-w-none mx-auto space-y-5 md:space-y-8">
 
-    <!-- Stats Grid: Dibuat grid-cols-1 di mobile, 2 di tablet, 4 di desktop -->
-   <div class="w-full">
-  <%- include('../partials/_stats-grid', {
-    items: [
-      { 
-        label: 'Total Pengajuan', 
-        value: summary.totalPermits, 
-        unit: 'Berkas', 
-        icon: 'fa-solid fa-folder-open', 
-        bgClass: 'bg-white border border-slate-200/50 shadow-sm', 
-        iconBoxClass: 'bg-slate-50 text-slate-600 border border-slate-100' 
-      },
-      { 
-        label: 'Disetujui Wadir', 
-        value: summary.approved, 
-        unit: 'Berkas', 
-        icon: 'fa-solid fa-circle-check', 
-        bgClass: 'bg-white border border-slate-200/50 shadow-sm', 
-        iconBoxClass: 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' 
-      },
-      { 
-        label: 'Pending Approval', 
-        value: summary.pending, 
-        unit: 'Berkas', 
-        icon: 'fa-solid fa-hourglass-half', 
-        bgClass: 'bg-white border border-slate-200/50 shadow-sm', 
-        iconBoxClass: 'bg-amber-50 text-amber-600 border border-amber-200/50' 
-      },
-      { 
-        label: 'Ditolak', 
-        value: summary.rejected, 
-        unit: 'Berkas', 
-        icon: 'fa-solid fa-circle-xmark', 
-        bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 shadow-sm', 
-        valueClass: 'text-white', 
-        labelClass: 'text-slate-300',
-        unitClass: 'text-slate-400',
-        iconBoxClass: 'bg-white/10 text-white border border-white/10' 
-      }
-    ]
-  }) %>
+    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+      <%- include('../partials/page-header', {
+        // section: 'Area Kerja',
+        module: 'Kehadiran',
+        title: 'Otorisasi Perizinan',
+        description: 'Tinjau, otorisasi, dan kelola dokumen perizinan operasional halangan kerja masuk dari staf.'
+      }) %>
+    </div>
+
+    <div class="w-full">
+      <%- include('../partials/_stats-grid', {
+        gridClass: 'grid-cols-2 lg:grid-cols-4',
+        items: [
+          { 
+            label: 'Total Pengajuan', 
+            value: summary.totalPermits, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-folder-open', 
+            labelClass: '!font-medium text-slate-400', 
+            valueClass: '!font-medium text-slate-800', 
+            iconBoxClass: 'bg-slate-50 text-slate-400 border border-slate-200/50' 
+          },
+          { 
+            label: 'Pending Approval', 
+            value: summary.pending, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-hourglass-half', 
+            labelClass: '!font-medium text-amber-600', 
+            valueClass: '!font-medium text-amber-700', 
+            iconBoxClass: 'bg-amber-50 text-amber-500 border border-amber-200/50' 
+          },
+          { 
+            label: 'Disetujui', 
+            value: summary.approved, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-check', 
+            labelClass: '!font-medium text-emerald-600', 
+            valueClass: '!font-medium text-emerald-700', 
+            iconBoxClass: 'bg-emerald-50 text-emerald-500 border border-emerald-200/50' 
+          },
+          { 
+            label: 'Ditolak', 
+            value: summary.rejected, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-xmark', 
+            labelClass: '!font-medium text-rose-600', 
+            valueClass: '!font-medium text-rose-700', 
+            iconBoxClass: 'bg-rose-50 text-rose-500 border border-rose-200/50' 
+          }
+        ]
+      }) %>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none select-none">
+      <div class="flex items-center justify-between gap-3 w-full md:hidden">
+        <h3 class="text-[14px] font-medium text-slate-800 tracking-tight">Daftar Berkas Masuk</h3>
+      </div>
+      
+      <div class="w-full">
+        <%- include('../partials/_tab-nav', {
+          tabs: [
+            { id: 'active', label: `Permintaan Masuk (${permits.filter(p => p.status === 'PENDING').length})`, isActive: true },
+            { id: 'history', label: `Arsip Keputusan (${permits.filter(p => p.status !== 'PENDING').length})`, isActive: false }
+          ]
+        }) %>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
+        <%- include('partials/_table', { permits: permits.filter(p => p.status === 'PENDING'), type: 'active', isApprovalPage: true, typeLabels }) %>
+      </div>
+
+      <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
+        <%- include('partials/_table', { permits: permits.filter(p => p.status !== 'PENDING'), type: 'history', isApprovalPage: true, typeLabels }) %>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-    <!-- Tab Navigation -->
-    <%- include('../partials/_tab-nav', {
-      tabs: [
-        { id: 'active', label: `Permintaan Masuk (${permits.filter(p => p.status === 'PENDING').length})` },
-        { id: 'history', label: `Arsip Keputusan (${permits.filter(p => p.status !== 'PENDING').length})` }
-      ]
-    }) %>
-
-   <div class="relative">
-  <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300">
-    <%- include('partials/_table', { permits: permits.filter(p => p.status === 'PENDING'), type: 'active', isApprovalPage: true }) %>
-  </div>
-
-  <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300">
-    <%- include('partials/_table', { permits: permits.filter(p => p.status !== 'PENDING'), type: 'history', isApprovalPage: true }) %>
-  </div>
-</div>
-
-  </div>
-
-  <div id="approvalModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all">
-      <form id="approvalForm" action="" method="POST">
-        <input type="hidden" name="status" id="status">
-
-        <div class="p-6">
-          <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Konfirmasi</h3>
-          <p class="text-sm text-slate-500 mt-2">Apakah Anda yakin ingin <span id="actionLabel"></span> pengajuan ini?</p>
-
-          <div class="mt-6">
-            <textarea name="notesByApprover" placeholder="Tambahkan catatan (opsional)" class="w-full text-sm border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-          </div>
+<div id="rejectModal" class="fixed inset-0 z-[120] hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full border border-slate-100 shadow-2xl overflow-hidden transform scale-95 transition-all duration-200">
+    <div class="p-5 space-y-4">
+      <div class="flex items-center gap-2.5 text-rose-600">
+        <div class="w-7 h-7 rounded-lg bg-rose-50 flex items-center justify-center text-xs"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3 class="text-sm font-bold text-slate-800">Tolak Permohonan Izin</h3>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">Masukkan alasan penolakan berkas agar pegawai dapat mengetahui feedback evaluasi.</p>
+      
+      <form id="rejectForm" method="POST" class="space-y-4">
+        <input type="hidden" name="status" value="REJECTED">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Catatan Penolakan</label>
+          <textarea name="notesByApprover" required rows="3" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all" placeholder="Tulis catatan penolakan di sini..."></textarea>
         </div>
-
-        <div class="p-4 bg-slate-50 flex gap-2">
-          <button type="button" onclick="closeApprovalModal()" class="flex-1 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg">Batal</button>
-          <button type="submit" class="flex-1 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Ya, Proses</button>
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" onclick="closeRejectModal()" class="h-8.5 px-3.5 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl hover:bg-slate-50 cursor-pointer">Batal</button>
+          <button type="submit" class="h-8.5 px-4 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer">Konfirmasi</button>
         </div>
       </form>
     </div>
   </div>
-
-
 </div>
 
-
-
 <script>
-  function openApprovalModal(id, status) {
-    // 1. Update action form dengan ID yang benar: /permit/approval/:id
-    const form = document.getElementById('approvalForm');
-    form.action = '/permit/approval/' + id;
-
-    // 2. Update status dan label
-    document.getElementById('status').value = status;
-    document.getElementById('actionLabel').innerText = status === 'APPROVED' ? 'MENYETUJUI' : 'MENOLAK';
-
-    // 3. Tampilkan modal
-    document.getElementById('approvalModal').classList.remove('hidden');
+  function openRejectModal(permitId) {
+    const modal = document.getElementById('rejectModal');
+    document.getElementById('rejectForm').action = `/permit/approval/${permitId}`;
+    modal.classList.remove('hidden');
   }
 
-  function closeApprovalModal() {
-    document.getElementById('approvalModal').classList.add('hidden');
+  function closeRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+  }
+
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.add('hidden');
+      pane.classList.remove('block', 'opacity-100', 'translate-y-0');
+    });
+
+    const activeContent = document.getElementById(`tab-content-${tabName}`);
+    if (activeContent) {
+      activeContent.classList.remove('hidden');
+      activeContent.classList.add('block');
+      setTimeout(() => { activeContent.classList.add('opacity-100', 'translate-y-0'); }, 10);
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+      btn.classList.add('font-medium', 'text-slate-500');
+    });
+
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (activeBtn) {
+      activeBtn.classList.remove('font-medium', 'text-slate-500');
+      activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+    }
   }
 </script>

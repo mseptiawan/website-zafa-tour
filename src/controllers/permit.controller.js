@@ -1,203 +1,214 @@
-import User from "../models/basic/User.model.js";
-import Permit from "../models/Permit.model.js";
-import Role from "../models/basic/Role.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
+import {
+  createPermit,
+  findEmployeeHistory,
+  findIncomingPermits,
+  executeApproval,
+  getPermitForEdit,
+  updatePermit,
+  deletePermit,
+} from "../services/permit.service.js";
+
 import fs from "fs";
-export const newForm = async (req, res) => {
-  try {
-    res.render("permit/create", {
+
+// Rendisi Form Pengajuan Izin Baru
+export const create = asyncHandler(async (req, res) => {
+  return res.render("permit/form", {
+    ...buildRenderData(req, {
       title: "Pengajuan Izin",
       mode: "CREATE",
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+    }),
+  });
+});
 
-export const createPermit = async (req, res) => {
-  try {
-    if (req.validationErrors) {
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).render("permit/create", {
-        title: "Pengajuan Izin & Cuti",
-        errors: req.validationErrors,
-        oldData: req.body,
-      });
-    }
-
-    const { type, date, reason } = req.body;
-
-    if (type === "SAKIT" && !req.file) {
-      return res.status(400).render("permit/create", {
-        title: "Pengajuan Izin & Cuti",
-        errors: { document: "Izin sakit wajib menyertakan dokumen surat dokter." },
-        oldData: req.body,
-      });
-    }
-
-    const documentPath = req.file ? `/uploads/files/${req.file.filename}` : null;
-    const newPermit = new Permit({
-      user: req.user._id,
-      type,
-      date,
-      reason,
-      document: documentPath,
-    });
-
-    await newPermit.save();
-    res.redirect("/permit/history");
-  } catch (error) {
+// Menyimpan Pengajuan Izin Baru ke Database
+export const store = asyncHandler(async (req, res) => {
+  if (req.validationErrors) {
     if (req.file) {
       fs.unlinkSync(req.file.path);
     }
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(400).render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Pengajuan Izin",
+        mode: "CREATE",
+        errors: req.validationErrors,
+        oldData: req.body,
+        error: ["Sila lengkapi semua isian wajib formulir."],
+      }),
+    });
   }
-};
 
-export const getHistoryPermits = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    await createPermit({
+      body: req.body,
+      file: req.file,
+      currentUser: req.session.user,
+    });
 
-    const permits = await Permit.find({ user: userId })
-      .populate({
-        path: "user",
-        select: "name roleId",
-        populate: {
-          path: "employeeData",
-          select: "fullName careerData",
-          populate: {
-            path: "careerData",
-            populate: {
-              path: "bidangId",
-              select: "name",
-            },
-          },
-        },
-      })
-      .sort({ createdAt: -1 });
+    req.flash("success", "Permohonan perizinan berhasil diajukan ke atasan!");
+    await new Promise((resolve) => req.session.save(resolve));
+    return res.redirect("/permit/history");
+  } catch (error) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    return res.status(error.statusCode || 500).render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Pengajuan Izin",
+        mode: "CREATE",
+        errors: error.field ? { [error.field]: error.message } : {},
+        oldData: req.body,
+        error: [error.message],
+      }),
+    });
+  }
+});
 
-    res.render("permit/history", {
+// Menampilkan Riwayat Pengajuan Izin Pribadi (Karyawan)
+export const getHistoryPermits = asyncHandler(async (req, res) => {
+  const { page } = req.query;
+  const employeeId = req.session.user.employeeId;
+
+  const { data: permits, meta } = await findEmployeeHistory({
+    employeeId,
+    page,
+  });
+
+  return res.render("permit/history", {
+    ...buildRenderData(req, {
       title: "Riwayat Pengajuan Izin",
       permits,
+      pagination: meta,
+      query: req.query,
       type: "history",
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-export const getIncomingPermits = async (req, res) => {
-  try {
-    const userRoleName = req.session.user.role;
-    const currentUserId = req.session.user._id;
+      user: req.session.user,
+    }),
+  });
+});
 
-    const wadirRole = await Role.findOne({ name: "WAKIL_DIREKTUR" });
-    const dirutRole = await Role.findOne({ name: "DIREKTUR_UTAMA" });
+// Menampilkan Antrean Berkas Izin Masuk (Direksi/Atasan)
+export const getIncomingPermits = asyncHandler(async (req, res) => {
+  const { page } = req.query;
 
-    const wadirUserIds = wadirRole
-      ? await User.find({ roleId: wadirRole._id }).distinct("_id")
-      : [];
-    const dirutUserIds = dirutRole
-      ? await User.find({ roleId: dirutRole._id }).distinct("_id")
-      : [];
+  const {
+    data: permits,
+    meta,
+    summary,
+  } = await findIncomingPermits({
+    currentUser: req.session.user,
+    page,
+  });
 
-    let query = {};
-
-    if (userRoleName === "DIREKTUR_UTAMA") {
-      query = {
-        user: { $in: wadirUserIds, $ne: currentUserId },
-      };
-    } else if (userRoleName === "WAKIL_DIREKTUR") {
-      query = {
-        user: {
-          $nin: [...wadirUserIds, ...dirutUserIds],
-          $ne: currentUserId,
-        },
-      };
-    } else {
-      query = { _id: null };
-    }
-
-    const permits = await Permit.find(query)
-      .populate({
-        path: "user",
-        select: "name role",
-        populate: {
-          path: "employeeData",
-          select: "fullName",
-          populate: {
-            path: "careerData",
-            select: "bidangId",
-            populate: {
-              path: "bidangId",
-              select: "name",
-            },
-          },
-        },
-      })
-      .sort({ createdAt: -1 });
-
-    const totalPermits = await Permit.countDocuments(query);
-    const approved = await Permit.countDocuments({ ...query, status: "APPROVED" });
-    const pending = await Permit.countDocuments({ ...query, status: "PENDING" });
-    const rejected = await Permit.countDocuments({ ...query, status: "REJECTED" });
-
-    res.render("permit/approvals", {
+  return res.render("permit/approvals", {
+    ...buildRenderData(req, {
       title: "Otorisasi Perizinan",
       permits,
-      currentRole: userRoleName,
-      summary: { totalPermits, approved, pending, rejected },
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-export const actionApproval = async (req, res) => {
+      pagination: meta,
+      query: req.query,
+      currentRole: req.session.user.role,
+      summary,
+      user: req.session.user,
+    }),
+  });
+});
+
+// Memproses Aksi Persetujuan / Penolakan Berkas Permohonan Izin Karyawan
+export const actionApproval = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status, notesByApprover } = req.body;
+
   try {
-    const { id } = req.params;
-    const { status, notesByApprover } = req.body;
-
-    const approverRoleName = req.session.user.role;
-
-    if (!["APPROVED", "REJECTED"].includes(status)) {
-      return res.status(400).json({ success: false, message: "Status tidak valid" });
-    }
-
-    const permit = await Permit.findById(id).populate({
-      path: "user",
-      populate: { path: "roleId" },
+    await executeApproval({
+      id,
+      status,
+      notesByApprover,
+      currentUser: req.session.user,
     });
 
-    if (!permit) {
-      return res.status(404).json({ success: false, message: "Data pengajuan tidak ditemukan" });
-    }
-
-    const targetUserRoleName = permit.user.roleId.name;
-
-    if (targetUserRoleName === "WAKIL_DIREKTUR") {
-      if (approverRoleName !== "DIREKTUR_UTAMA") {
-        return res.status(403).json({
-          success: false,
-          message: "Hanya Direktur Utama yang berhak memproses perizinan Wakil Direktur.",
-        });
-      }
-    } else {
-      if (approverRoleName !== "WAKIL_DIREKTUR") {
-        return res.status(403).json({
-          success: false,
-          message: "Hanya Wakil Direktur yang berhak memproses perizinan karyawan.",
-        });
-      }
-    }
-
-    permit.status = status;
-    permit.approvedBy = req.session.user._id;
-    permit.approvalDate = new Date();
-    permit.notesByApprover = notesByApprover || null;
-
-    await permit.save();
-    res.redirect("/permit/incoming");
+    req.flash("success", `Berkas perizinan berhasil diperbarui menjadi ${status}!`);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    req.flash("error", error.message || "Gagal mengeksekusi keputusan otorisasi.");
   }
-};
+
+  await new Promise((resolve) => req.session.save(resolve));
+  return res.redirect("/permit/incoming");
+});
+
+// Rendisi Form Edit Izin (Hanya jika status PENDING)
+export const edit = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const employeeId = req.session.user.employeeId;
+
+  try {
+    const permit = await getPermitForEdit({ id, employeeId });
+    return res.render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Ubah Pengajuan Izin",
+        mode: "EDIT",
+        oldData: permit,
+      }),
+    });
+  } catch (error) {
+    req.flash("error", error.message);
+    await new Promise((resolve) => req.session.save(resolve));
+    return res.redirect("/permit/history");
+  }
+});
+
+// Memperbarui Data Pengajuan Izin ke Database
+export const update = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (req.validationErrors) {
+    if (req.file) fs.unlinkSync(req.file.path);
+    return res.status(400).render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Ubah Pengajuan Izin",
+        mode: "EDIT",
+        errors: req.validationErrors,
+        oldData: { ...req.body, _id: id },
+        error: ["Sila lengkapi semua isian wajib formulir."],
+      }),
+    });
+  }
+
+  try {
+    await updatePermit({
+      id,
+      body: req.body,
+      file: req.file,
+      currentUser: req.session.user,
+    });
+
+    req.flash("success", "Permohonan perizinan berhasil diperbarui!");
+    await new Promise((resolve) => req.session.save(resolve));
+    return res.redirect("/permit/history");
+  } catch (error) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    return res.status(error.statusCode || 500).render("permit/form", {
+      ...buildRenderData(req, {
+        title: "Ubah Pengajuan Izin",
+        mode: "EDIT",
+        oldData: { ...req.body, _id: id },
+        error: [error.message],
+      }),
+    });
+  }
+});
+
+// Menarik / Menghapus Berkas Pengajuan Izin (Hanya jika status PENDING)
+export const destroy = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const employeeId = req.session.user.employeeId;
+
+  try {
+    await deletePermit({ id, employeeId });
+    req.flash("success", "Berkas permohonan izin berhasil ditarik kembali.");
+  } catch (error) {
+    req.flash("error", error.message || "Gagal menarik berkas perizinan.");
+  }
+
+  await new Promise((resolve) => req.session.save(resolve));
+  return res.redirect("/permit/history");
+});

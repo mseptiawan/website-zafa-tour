@@ -1,20 +1,29 @@
 <%- layout('layouts/main', { title }) %>
 
-<!-- 1. GLOBAL ISLAND CANVAS LAYER -->
+<% 
+  const permitId = (typeof oldData !== 'undefined' && oldData._id) ? oldData._id : '';
+  
+  let formattedDate = '';
+  if (typeof oldData !== 'undefined' && oldData.date) {
+    const d = new Date(oldData.date);
+    if (!isNaN(d.getTime())) {
+      formattedDate = d.toISOString().split('T')[0];
+    }
+  }
+%>
+
 <div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:bg-[#FCFCFD] py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
   <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
-    <!-- 2. REUSABLE PAGE HEADER COMPONENT -->
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Perizinan', 
-        title: 'Pengajuan Izin & Cuti', 
-        description: 'Form permohonan izin absensi atau cuti pegawai.' 
+        title: typeof mode !== 'undefined' && mode === 'EDIT' ? 'Ubah Pengajuan Izin' : 'Pengajuan Izin', 
+        description: typeof mode !== 'undefined' && mode === 'EDIT' ? 'Form pembaruan data permohonan izin pegawai.' : 'Form permohonan izin pegawai.' 
     }) %>
 
-    <!-- 3. MAIN CARD WRAPPER (Anti-Lancip di Mobile, Premium di Desktop) -->
     <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
-      <form action="/permit" method="POST" enctype="multipart/form-data" class="space-y-5">
+      <form action="<%= typeof mode !== 'undefined' && mode === 'EDIT' ? '/permit/edit/' + permitId : '/permit' %>" method="POST" enctype="multipart/form-data" class="space-y-5">
 
         <% if (typeof errors !== 'undefined' && errors?.global) { %>
         <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
@@ -22,16 +31,22 @@
         </div>
         <% } %>
 
-        <!-- Row: Jenis Izin / Cuti Dropdown -->
         <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jenis Izin / Cuti</label>
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jenis Izin</label>
           <div class="relative w-full" id="custom-dropdown">
             <input type="hidden" name="type" id="leave-type-value" value="<%= typeof oldData !== 'undefined' && oldData.type ? oldData.type : '' %>" required>
 
             <button type="button" onclick="toggleDropdown()" 
                     class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.type ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-0 transition-all">
               <span id="dropdown-label" class="<%= typeof oldData !== 'undefined' && oldData.type ? 'text-slate-800' : 'text-slate-400/60 text-[12px]' %>">
-                <%= typeof oldData !== 'undefined' && oldData.type ? (oldData.type === 'SAKIT' ? 'Izin Sakit (Dengan Surat Dokter)' : oldData.type === 'PENDAMPINGAN_MELAHIRKAN' ? 'Izin Mendampingi Istri Melahirkan' : oldData.type === 'MUSIBAH' ? 'Izin Terkena Musibah / Kemalangan' : 'Izin Keperluan Mendesak / Hal Penting') : 'Pilih jenis permohonan izin...' %>
+                <%= typeof oldData !== 'undefined' && oldData.type ? 
+                    (oldData.type === 'SAKIT' ? 'Izin Sakit' : 
+                     oldData.type === 'PENDAMPINGAN_MELAHIRKAN' ? 'Izin Mendampingi Istri Melahirkan' : 
+                     oldData.type === 'MUSIBAH' ? 'Izin Terkena Musibah / Kemalangan' : 
+                     oldData.type === 'KEPERLUAN_KELUARGA' ? 'Izin Keperluan Keluarga' : 
+                     oldData.type === 'KEPERLUAN_MENDESAK' ? 'Izin Keperluan Mendesak' : 
+                     oldData.type === 'LAINNYA' ? 'Izin Lainnya' : 'Izin Keperluan Mendesak / Hal Penting') 
+                    : 'Pilih jenis permohonan izin...' %>
               </span>
               <svg id="dropdown-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -39,17 +54,23 @@
             </button>
 
             <div id="dropdown-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-lg p-1.5 space-y-0.5">
-              <button type="button" onclick="selectOption('SAKIT', 'Izin Sakit (Dengan Surat Dokter)')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
-                <span>Izin Sakit (Dengan Surat Dokter)</span>
+              <button type="button" onclick="selectOption('SAKIT', 'Izin Sakit')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Izin Sakit</span>
               </button>
               <button type="button" onclick="selectOption('PENDAMPINGAN_MELAHIRKAN', 'Izin Mendampingi Istri Melahirkan')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Mendampingi Istri Melahirkan</span>
               </button>
               <button type="button" onclick="selectOption('MUSIBAH', 'Izin Terkena Musibah / Kemalangan')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
-                <span>Izin Terkena Musibah / Kemalangan</span>
+                <span>Izin Terkena Musibah</span>
               </button>
-              <button type="button" onclick="selectOption('PENTING', 'Izin Keperluan Mendesak / Hal Penting')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
-                <span>Izin Keperluan Mendesak / Hal Penting</span>
+              <button type="button" onclick="selectOption('KEPERLUAN_KELUARGA', 'Izin Keperluan Keluarga')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Izin Keperluan Keluarga</span>
+              </button>
+              <button type="button" onclick="selectOption('KEPERLUAN_MENDESAK', 'Izin Keperluan Mendesak')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Izin Keperluan Mendesak</span>
+              </button>
+              <button type="button" onclick="selectOption('LAINNYA', 'Izin Lainnya')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
+                <span>Lainnya</span>
               </button>
             </div>
           </div>
@@ -58,10 +79,9 @@
           <% } %>
         </div>
 
-        <!-- Row: Tanggal Ketidakhadiran -->
         <div class="space-y-2 mb-5">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Ketidakhadiran</label>
-          <input type="date" id="permitDate" name="date" value="<%= typeof oldData !== 'undefined' && oldData.date ? oldData.date : '' %>" required 
+          <input type="date" id="permitDate" name="date" value="<%= formattedDate %>" required 
                  class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.date ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all" />
           <p class="text-[10.5px] text-slate-400/80 font-medium pl-0.5">Sifatnya insidental, pilih hari ini saat halangan terjadi.</p>
           <% if (typeof errors !== 'undefined' && errors.date) { %>
@@ -69,17 +89,15 @@
           <% } %>
         </div>
 
-        <!-- Row: Alasan Pengajuan -->
         <div class="space-y-2 mb-5">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alasan Pengajuan</label>
-          <textarea name="reason" rows="4" required placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." 
+          <textarea name="reason" rows="4"  placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." 
                     class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.reason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= typeof oldData !== 'undefined' && oldData.reason ? oldData.reason : '' %></textarea>
           <% if (typeof errors !== 'undefined' && errors.reason) { %>
             <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.reason %></p>
           <% } %>
         </div>
 
-        <!-- Row: Dokumen Pendukung Dropzone -->
         <div class="space-y-2 mb-2">
           <label class="block text-[12px] font-semibold text-slate-700 tracking-wide">
             Dokumen Pendukung 
@@ -89,7 +107,9 @@
           <div class="relative">
             <input type="file" name="document" id="file-upload" accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateFileName(this)" />
             
-            <div id="dropzone-empty" class="w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center">
+            <% const hasDocument = (typeof oldData !== 'undefined' && oldData.document); %>
+
+            <div id="dropzone-empty" class="w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center <%= hasDocument ? 'hidden' : '' %>">
               <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
               </svg>
@@ -97,7 +117,7 @@
               <span class="text-[11px] text-slate-400 mt-0.5">PDF, JPG, JPEG, atau PNG (Maks. 2MB)</span>
             </div>
 
-            <div id="dropzone-filled" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
+            <div id="dropzone-filled" class="<%= hasDocument ? '' : 'hidden' %> flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
               <div class="flex items-center gap-3 min-w-0 flex-1">
                 <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,12 +125,16 @@
                   </svg>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">file.pdf</div>
-                  <div id="size-preview" class="text-[11px] text-slate-400 mt-0.5">0 KB</div>
+                  <div id="name-preview" class="text-[12px] font-semibold text-slate-700 truncate">
+                    <%= hasDocument ? oldData.document.split('/').pop() : 'file.pdf' %>
+                  </div>
+                  <div id="size-preview" class="text-[11px] text-slate-400 mt-0.5">
+                    <%= hasDocument ? 'Berkas Tersimpan' : '0 KB' %>
+                  </div>
                 </div>
               </div>
               <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto relative z-20">
-                <a id="view-file-btn" href="#" target="_blank" class="text-[11px] font-medium text-center text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">View</a>
+                <a id="view-file-btn" href="<%= hasDocument ? oldData.document : '#' %>" target="_blank" class="text-[11px] font-medium text-center text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">View</a>
                 <button type="button" onclick="document.getElementById('file-upload').click()" class="text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-3 py-1.5 rounded-lg flex-1 sm:flex-initial transition-colors">Ganti</button>
               </div>
             </div>
@@ -120,13 +144,12 @@
           <% } %>
         </div>
 
-        <!-- 4. ACTION BUTTONS FOOTER -->
         <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
-          <a href="/permit" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
+          <a href="/permit/history" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
             Batal
           </a>
           <button type="submit" class="w-auto text-center bg-blue-600 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
-            <%= typeof mode !== 'undefined' ? (mode === 'CREATE' ? 'Ajukan Izin' : 'Simpan Perubahan') : 'Ajukan Izin' %>
+            <%= typeof mode !== 'undefined' && mode === 'EDIT' ? 'Simpan Perubahan' : 'Ajukan Izin' %>
           </button>
         </div>
 
@@ -152,9 +175,12 @@
     const fileUpload = document.getElementById('file-upload');
     const requiredMark = document.getElementById('required-mark');
     const optionalMark = document.getElementById('optional-mark');
+    const dropzoneFilled = document.getElementById('dropzone-filled');
 
     if (value === 'SAKIT') {
-      fileUpload.required = true;
+      if (dropzoneFilled.classList.contains('hidden')) {
+        fileUpload.required = true;
+      }
       requiredMark.classList.remove('hidden');
       optionalMark.classList.add('hidden');
     } else {
@@ -166,7 +192,6 @@
     toggleDropdown();
   }
 
-  // Tutup dropdown otomatis jika user ngeklik luar area menu
   document.addEventListener('click', function(e) {
     const dropdown = document.getElementById('custom-dropdown');
     const menu = document.getElementById('dropdown-menu');
@@ -185,12 +210,13 @@
       document.getElementById("dropzone-filled").classList.remove("hidden");
       document.getElementById("view-file-btn").href = URL.createObjectURL(file);
     } else {
-      document.getElementById("dropzone-empty").classList.remove("hidden");
-      document.getElementById("dropzone-filled").classList.add("hidden");
+      <% if (typeof oldData === 'undefined' || !oldData.document) { %>
+        document.getElementById("dropzone-empty").classList.remove("hidden");
+        document.getElementById("dropzone-filled").classList.add("hidden");
+      <% } %>
     }
   }
 
-  // Set minimum dan maksimum range tanggal pengajuan
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0'); 
@@ -208,9 +234,11 @@
   permitDateInput.min = formattedToday;
   permitDateInput.max = formattedTomorrow;
 
-  if (!permitDateInput.value) {
-    permitDateInput.value = formattedToday;
-  }
+  <% if (typeof mode === 'undefined' || mode !== 'EDIT') { %>
+    if (!permitDateInput.value) {
+      permitDateInput.value = formattedToday;
+    }
+  <% } %>
 
   document.addEventListener('DOMContentLoaded', function() {
     const currentValue = document.getElementById('leave-type-value').value;
@@ -218,8 +246,12 @@
       const fileUpload = document.getElementById('file-upload');
       const requiredMark = document.getElementById('required-mark');
       const optionalMark = document.getElementById('optional-mark');
+      const hasDoc = <%= hasDocument %>;
+      
       if (currentValue === 'SAKIT') {
-        fileUpload.required = true;
+        if (!hasDoc) {
+          fileUpload.required = true;
+        }
         requiredMark.classList.remove('hidden');
         optionalMark.classList.add('hidden');
       }

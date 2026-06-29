@@ -3,9 +3,9 @@ import {
   renderPayrollPage,
   saveEmployeeAllowances,
   getEmployeeAttendanceSummary,
-  calculateEmployeePayroll,
-  closePayrollForSpecificEmployees,
-  getMySlipPage,
+  calculatePayroll,
+  closePayrollForEmployees,
+  renderMySlipPage,
 } from "../controllers/payroll.controller.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -14,10 +14,10 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.get("/manage", renderPayrollPage);
-router.get("/finance", renderPayrollPage);
 router.post("/save", saveEmployeeAllowances);
 router.get("/attendance-summary/:employeeId", getEmployeeAttendanceSummary);
-router.get("/calculate/:employeeId", calculateEmployeePayroll);
-router.post("/close-book", closePayrollForSpecificEmployees);
-router.get("/my-slip", getMySlipPage);
+router.get("/calculate/:employeeId", calculatePayroll);
+router.post("/close-book", closePayrollForEmployees);
+router.get("/my-slip", renderMySlipPage);
+
 export default router;

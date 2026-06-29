@@ -4,7 +4,6 @@ import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
 import { getAttendanceSummary } from "../services/attendanceSummary.service.js";
 import * as payrollService from "../services/payroll.service.js";
 import Payroll from "../models/payroll/Payroll.model.js";
-import { runPayroll } from "../services/payrollRun.service.js";
 import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
@@ -27,7 +26,6 @@ export const renderPayrollPage = async (req, res) => {
     periodsSet.add(currentMonthRaw);
 
     const availablePeriods = Array.from(periodsSet).sort((a, b) => b.localeCompare(a));
-    // const availablePeriods = ["2026-05", "2026-06", "2026-07"];
     res.render("payroll/index", {
       title: "Manajemen Payroll",
       user: req.user,
@@ -43,7 +41,7 @@ export const renderPayrollPage = async (req, res) => {
   }
 };
 
-export const calculateEmployeePayroll = async (req, res) => {
+export const calculatePayroll = async (req, res) => {
   try {
     const { employeeId } = req.params;
     const period = req.query.period;
@@ -243,7 +241,7 @@ export const getEmployeeAttendanceSummary = async (req, res) => {
   }
 };
 
-export const closePayrollForSpecificEmployees = async (req, res) => {
+export const closePayrollForEmployees = async (req, res) => {
   try {
     const { employeeIds, periodMonth } = req.body;
 
@@ -365,7 +363,7 @@ export const closePayrollForSpecificEmployees = async (req, res) => {
   }
 };
 
-export const getMySlipPage = async (req, res, next) => {
+export const renderMySlipPage = async (req, res, next) => {
   try {
     const employee = await Employee.findOne({ userId: req.user._id })
       .populate({

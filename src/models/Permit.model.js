@@ -2,14 +2,22 @@ import mongoose from "mongoose";
 
 const permitSchema = new mongoose.Schema(
   {
-    user: {
+    employeeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Employee",
       required: true,
     },
     type: {
       type: String,
-      enum: ["SAKIT", "PENDAMPINGAN_MELAHIRKAN", "MUSIBAH", "PENTING"],
+      enum: [
+        "SAKIT",
+        "PENDAMPINGAN_MELAHIRKAN",
+        "MUSIBAH",
+        "PENTING",
+        "KEPERLUAN_KELUARGA",
+        "KEPERLUAN_MENDESAK",
+        "LAINNYA",
+      ],
       required: true,
     },
     date: {
@@ -20,8 +28,6 @@ const permitSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: 5,
-      maxlength: 500,
     },
     document: {
       type: String,
@@ -29,12 +35,12 @@ const permitSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED"],
+      enum: ["PENDING", "APPROVED", "REJECTED", "CANCELLED"],
       default: "PENDING",
     },
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Employee",
       default: null,
     },
     approvalDate: {
@@ -44,11 +50,14 @@ const permitSchema = new mongoose.Schema(
     notesByApprover: {
       type: String,
       default: null,
+      trim: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model("Permit", permitSchema);
+permitSchema.index({ employeeId: 1, createdAt: -1 });
+permitSchema.index({ status: 1, createdAt: -1 });
+
+const Permit = mongoose.model("Permit", permitSchema);
+export default Permit;

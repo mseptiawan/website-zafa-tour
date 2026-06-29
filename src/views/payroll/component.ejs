@@ -1,0 +1,151 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="min-h-screen ml-72 bg-slate-50/50 p-8 antialiased text-slate-900">
+  <div class="mx-auto max-w-none space-y-6">
+
+    <%- include('../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Finance', 
+        title: 'Master Komponen Gaji', 
+        description: 'Kelola parameter pendapatan dan potongan payroll Pegawai secara terpusat.' 
+    }) %>
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.01)] border border-slate-200">
+      <div>
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Komponen Aktif</p>
+        <h3 class="text-xl font-bold text-slate-800 mt-1 block tabular-nums" id="total-komponen">0</h3>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openModal('add')" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold px-5 py-3 rounded-xl transition active:scale-[0.98]">
+          <i class="fa-solid fa-plus text-[10px]"></i>
+          <span>Tambah Komponen</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[1000px]">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="text-left px-6 py-4">Kode & Nama Komponen</th>
+              <th class="text-left px-6 py-4">Kategori</th>
+              <th class="text-left px-6 py-4">Sifat / Tipe</th>
+              <th class="text-right px-6 py-4">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="component-table-body" class="divide-y divide-slate-100">
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="component-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-[110] transition-all">
+  <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden border border-slate-100 transform transition-all">
+    <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <h3 id="modal-title" class="text-[14px] font-bold text-slate-900">Tambah Komponen Gaji</h3>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form id="component-form" onsubmit="saveComponent(event)">
+      <input type="hidden" id="form-id">
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Kode Komponen</label>
+          <input type="text" id="form-code" required placeholder="Contoh: GAPOK, TJ-TRAN" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] font-semibold text-slate-800 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all disabled:opacity-50">
+          <p id="error-form-code" class="mt-1 hidden text-[11px] font-medium text-red-500"></p>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Nama Komponen</label>
+          <input type="text" id="form-name" required placeholder="Contoh: Gaji Pokok" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+          <p id="error-form-name" class="mt-1 hidden text-[11px] font-medium text-red-500"></p>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Kategori</label>
+          <select id="form-category" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+            <option value="Pendapatan">Pendapatan (Penerimaan)</option>
+            <option value="Potongan">Potongan (Pengurangan)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Sifat</label>
+          <select id="form-type" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+            <option value="Tetap">Tetap (Tiap Bulan Sama)</option>
+            <option value="Tidak Tetap">Tidak Tetap (Variabel/Input Manual)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Tipe Kalkulasi</label>
+          <select id="form-calc-type" onchange="updatePlaceholder()" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+            <option value="FIXED_AMOUNT">Nominal Tetap (Rp)</option>
+            <option value="PERCENTAGE">Persentase (%)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1" id="label-value">Nilai Nominal</label>
+          <div class="relative">
+            <input type="number" id="form-amount" required placeholder="0" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all pr-8">
+            <span id="unit-symbol" class="absolute right-3 top-2.5 text-[12px] text-slate-400 font-bold">Rp</span>
+          </div>
+          <p id="error-form-defaultAmount" class="mt-1 hidden text-[11px] font-medium text-red-500"></p>
+        </div>
+      </div>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
+        <button type="button" onclick="closeModal()" class="px-3.5 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-600 hover:bg-slate-50 text-[12px] font-medium transition-all cursor-pointer">Batal</button>
+        <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[12px] font-semibold transition-all cursor-pointer">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="doc-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition-all">
+  <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden border border-slate-100 transform transition-all">
+    <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <h3 class="text-[14px] font-bold text-slate-900">Buat Dokumen Komponen Gaji</h3>
+      <button onclick="closeDocModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form id="doc-form" onsubmit="generateDocument(event)">
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Judul / Nama Dokumen</label>
+          <input type="text" required placeholder="Contoh: SK Komponen Gaji 2026" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Format Dokumen</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="border border-slate-200 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-all">
+              <input type="radio" name="doc-format" value="pdf" checked class="text-blue-600 focus:ring-blue-500/20">
+              <span class="text-[12px] font-medium text-slate-700"><i class="fa-solid fa-file-pdf text-rose-500 mr-1"></i> PDF File</span>
+            </label>
+            <label class="border border-slate-200 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-all">
+              <input type="radio" name="doc-format" value="xlsx" class="text-blue-600 focus:ring-blue-500/20">
+              <span class="text-[12px] font-medium text-slate-700"><i class="fa-solid fa-file-excel text-emerald-600 mr-1"></i> Excel Spreadsheet</span>
+            </label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catatan Tambahan</label>
+          <textarea rows="3" placeholder="Tambahkan keterangan regulasi atau memo internal jika diperlukan..." class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all resize-none"></textarea>
+        </div>
+      </div>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
+        <button type="button" onclick="closeDocModal()" class="px-3.5 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-600 hover:bg-slate-50 text-[12px] font-medium transition-all cursor-pointer">Batal</button>
+        <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[12px] font-semibold transition-all cursor-pointer">Generate</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  window.__INITIAL_COMPONENTS__ = <%- JSON.stringify(components || []) %>;
+</script>
+
+<script src="/js/component.js"></script>
