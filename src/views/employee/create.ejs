@@ -1,89 +1,84 @@
 <%- layout('layouts/main', { title: "Tambah Pegawai" }) %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  p-4 sm:p-6 md:p-10 antialiased pb-24 md:pb-8 text-slate-800">
-  <div class="w-full max-w-5xl mx-auto space-y-6">
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-3xl mx-auto mt-4 md:mt-0 space-y-6">
 
     <%- include('../partials/page-header', {
       section: 'Area Kerja',
-      module: 'Tambah Pegawai',
+      module: 'SDM',
       title: 'Daftarkan Pegawai Baru',
       description: 'Langkah awal pembuatan akun kredensial dan penempatan posisi kerja staf baru.'
     }) %>
-
-    <% if (typeof error !== 'undefined' && error && error !== 'null' && error !== null) { %>
-      <div class="border-l-2 border-rose-500 bg-rose-50/50 text-rose-700 px-4 py-3 rounded-r-md text-xs mb-4 font-medium">
-        <%= error %>
-      </div>
-    <% } %>
+    
 
     <div id="units-data" data-json="<%= JSON.stringify(units) %>" class="hidden"></div>
 
-    <div class="bg-white p-5 md:p-8 rounded-2xl border border-slate-200  ">
-      <form action="/api/employee/create" method="POST" class="space-y-8">
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
+      <form action="/employee/create" method="POST" class="space-y-6">
         <% const formErrors = typeof errors !== 'undefined' ? errors : {} %>
         <% const oldData = typeof old !== 'undefined' ? old : {} %>
 
         <div class="space-y-4">
           <div class="pb-2 border-b border-slate-100">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">1</span>
+            <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 select-none">
+              <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-50 text-slate-500 border border-slate-200/60 text-[10px] font-bold">1</span>
               Identitas Pribadi & Kredensial
             </h3>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Lengkap <span class="text-rose-500">*</span></label>
-              <input name="fullName" type="text" placeholder="Nama sesuai KTP" value="<%= oldData.fullName || '' %>" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.fullName ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>"/>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Nama Lengkap <span class="text-rose-500">*</span></label>
+              <input name="fullName" type="text" placeholder="Nama sesuai KTP" value="<%= oldData.fullName || '' %>" required class="w-full bg-slate-50/60 border <%= formErrors.fullName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
               <% if (formErrors.fullName) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.fullName %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.fullName %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nomor KTP (NIK) <span class="text-rose-500">*</span></label>
-              <input name="nomor_ktp" type="text" maxlength="16" placeholder="16 digit NIK" value="<%= oldData.nomor_ktp || '' %>" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.nomor_ktp ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>"/>
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Nomor KTP (NIK) <span class="text-rose-500">*</span></label>
+              <input name="nomor_ktp" type="text" maxlength="16" placeholder="16 digit NIK" value="<%= oldData.nomor_ktp || '' %>" required class="w-full bg-slate-50/60 border <%= formErrors.nomor_ktp ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
               <% if (formErrors.nomor_ktp) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.nomor_ktp %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.nomor_ktp %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email Utama Aplikasi <span class="text-rose-500">*</span></label>
-              <input name="email" type="email" placeholder="nama@zafamulia.com" value="<%= oldData.email || '' %>" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.email ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>"/>
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Email Utama Aplikasi <span class="text-rose-500">*</span></label>
+              <input name="email" type="email" placeholder="nama@zafamulia.com" value="<%= oldData.email || '' %>" required class="w-full bg-slate-50/60 border <%= formErrors.email ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
               <% if (formErrors.email) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.email %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.email %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hak Akses Sistem (Role) <span class="text-rose-500">*</span></label>
-              <select name="roleId" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.roleId ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Hak Akses Sistem (Role) <span class="text-rose-500">*</span></label>
+              <select name="roleId" required class="w-full bg-slate-50/60 border <%= formErrors.roleId ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 cursor-pointer">
                 <option value="" disabled <%= !oldData.roleId ? 'selected' : '' %>>Pilih Hak Akses</option>
                 <% roles.forEach(r => { %>
                   <option value="<%= r._id %>" <%= String(oldData.roleId) === String(r._id) ? 'selected' : '' %>><%= r.name %></option>
                 <% }) %>
               </select>
               <% if (formErrors.roleId) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.roleId %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.roleId %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Jenis Kelamin <span class="text-rose-500">*</span></label>
-              <select name="jenis_kelamin" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.jenis_kelamin ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jenis Kelamin <span class="text-rose-500">*</span></label>
+              <select name="jenis_kelamin" required class="w-full bg-slate-50/60 border <%= formErrors.jenis_kelamin ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 cursor-pointer">
                 <option value="" disabled <%= !oldData.jenis_kelamin ? 'selected' : '' %>>Pilih Jenis Kelamin</option>
                 <option value="Laki-Laki" <%= oldData.jenis_kelamin === 'Laki-Laki' ? 'selected' : '' %>>Laki-Laki</option>
                 <option value="Perempuan" <%= oldData.jenis_kelamin === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
               </select>
               <% if (formErrors.jenis_kelamin) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.jenis_kelamin %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.jenis_kelamin %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Agama <span class="text-rose-500">*</span></label>
-              <select name="agama" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.agama ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Agama <span class="text-rose-500">*</span></label>
+              <select name="agama" required class="w-full bg-slate-50/60 border <%= formErrors.agama ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 cursor-pointer">
                 <option value="" disabled <%= !oldData.agama ? 'selected' : '' %>>Pilih Agama</option>
                 <option value="Islam" <%= oldData.agama === 'Islam' ? 'selected' : '' %>>Islam</option>
                 <option value="Kristen" <%= oldData.agama === 'Kristen' ? 'selected' : '' %>>Kristen</option>
@@ -92,7 +87,7 @@
                 <option value="Buddha" <%= oldData.agama === 'Buddha' ? 'selected' : '' %>>Buddha</option>
               </select>
               <% if (formErrors.agama) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.agama %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.agama %></p>
               <% } %>
             </div>
           </div>
@@ -100,52 +95,52 @@
 
         <div class="space-y-4 pt-2">
           <div class="pb-2 border-b border-slate-100">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">2</span>
+            <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 select-none">
+              <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-50 text-slate-500 border border-slate-200/60 text-[10px] font-bold">2</span>
               Struktur Penempatan & Karir
             </h3>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Jabatan Struktural <span class="text-rose-500">*</span></label>
-              <select name="positionId" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.positionId ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jabatan Struktural <span class="text-rose-500">*</span></label>
+              <select name="positionId" required class="w-full bg-slate-50/60 border <%= formErrors.positionId ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 cursor-pointer">
                 <option value="" disabled <%= !oldData.positionId ? 'selected' : '' %>>Pilih Jabatan</option>
                 <% positions.forEach(p => { %>
                   <option value="<%= p._id %>" <%= String(oldData.positionId) === String(p._id) ? 'selected' : '' %>><%= p.name %></option>
                 <% }) %>
               </select>
               <% if (formErrors.positionId) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.positionId %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.positionId %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Bidang Kerja <span class="text-rose-500">*</span></label>
-              <select id="select-bidang" name="bidangId" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.bidangId ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Bidang Kerja <span class="text-rose-500">*</span></label>
+              <select id="select-bidang" name="bidangId" required class="w-full bg-slate-50/60 border <%= formErrors.bidangId ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 cursor-pointer">
                 <option value="" disabled <%= !oldData.bidangId ? 'selected' : '' %>>Pilih Bidang Kerja</option>
                 <% bidang.forEach(b => { %>
                   <option value="<%= b._id %>" <%= String(oldData.bidangId) === String(b._id) ? 'selected' : '' %>><%= b.name %></option>
                 <% }) %>
               </select>
               <% if (formErrors.bidangId) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.bidangId %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.bidangId %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Unit Kantor Penempatan <span class="text-rose-500">*</span></label>
-              <select id="select-unit" name="unitId" required data-old="<%= oldData.unitId || '' %>" class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.unitId ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Unit Kantor Penempatan <span class="text-rose-500">*</span></label>
+              <select id="select-unit" name="unitId" required data-old="<%= oldData.unitId || '' %>" class="w-full bg-slate-50/60 border <%= formErrors.unitId ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 cursor-pointer">
                 <option value="" disabled selected>Pilih Bidang Kerja Terlebih Dahulu</option>
               </select>
               <% if (formErrors.unitId) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.unitId %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.unitId %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Status Kepegawaian Awal <span class="text-rose-500">*</span></label>
-              <select id="select-status" name="status_pegawai" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.status_pegawai ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>">
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Status Kepegawaian Awal <span class="text-rose-500">*</span></label>
+              <select id="select-status" name="status_pegawai" required class="w-full bg-slate-50/60 border <%= formErrors.status_pegawai ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 cursor-pointer">
                 <option value="" disabled <%= !oldData.status_pegawai ? 'selected' : '' %>>Pilih Status</option>
                 <option value="Pegawai Tetap" <%= oldData.status_pegawai === 'Pegawai Tetap' ? 'selected' : '' %>>Pegawai Tetap</option>
                 <option value="Pegawai Kontrak" <%= oldData.status_pegawai === 'Pegawai Kontrak' ? 'selected' : '' %>>Pegawai Kontrak</option>
@@ -153,35 +148,33 @@
                 <option value="Pensiun" <%= oldData.status_pegawai === 'Pensiun' ? 'selected' : '' %>>Pensiun</option>
               </select>
               <% if (formErrors.status_pegawai) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.status_pegawai %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.status_pegawai %></p>
               <% } %>
             </div>
 
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Mulai Bergabung <span class="text-rose-500">*</span></label>
-              <input type="date" name="tanggal_mulai_bergabung" value="<%= oldData.tanggal_mulai_bergabung || '' %>" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.tanggal_mulai_bergabung ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>"/>
+            <div class="space-y-2">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Mulai Bergabung <span class="text-rose-500">*</span></label>
+              <input type="date" name="tanggal_mulai_bergabung" value="<%= oldData.tanggal_mulai_bergabung || '' %>" required class="w-full bg-slate-50/60 border <%= formErrors.tanggal_mulai_bergabung ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
               <% if (formErrors.tanggal_mulai_bergabung) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.tanggal_mulai_bergabung %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.tanggal_mulai_bergabung %></p>
               <% } %>
             </div>
 
-            <div id="wrapper-kontrak" class="space-y-1.5 hidden">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Berakhir Kontrak / Magang <span class="text-rose-500">*</span></label>
-              <input type="date" id="input-tanggal-kontrak" name="tanggal_berakhir_kontrak" value="<%= oldData.tanggal_berakhir_kontrak || '' %>" class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none <%= formErrors.tanggal_berakhir_kontrak ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200' %>"/>
+            <div id="wrapper-kontrak" class="space-y-2 hidden">
+              <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Berakhir Kontrak / Magang <span class="text-rose-500">*</span></label>
+              <input type="date" id="input-tanggal-kontrak" name="tanggal_berakhir_kontrak" value="<%= oldData.tanggal_berakhir_kontrak || '' %>" class="w-full bg-slate-50/60 border <%= formErrors.tanggal_berakhir_kontrak ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
               <% if (formErrors.tanggal_berakhir_kontrak) { %>
-                <p class="text-[11px] font-medium text-rose-500 mt-1"><%= formErrors.tanggal_berakhir_kontrak %></p>
+                <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= formErrors.tanggal_berakhir_kontrak %></p>
               <% } %>
             </div>
           </div>
         </div>
 
-        <div class="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-6 border-t border-slate-100">
-          <a href="/employee" 
-             class="w-full sm:w-auto text-center text-xs font-medium text-slate-500 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 hover:text-slate-700 transition-colors">
+        <div class="pt-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end items-center gap-3">
+          <a href="/employee" class="w-full sm:w-auto text-center border border-slate-200 text-slate-600 px-5 py-2.5 rounded-xl text-[12px] font-semibold hover:bg-slate-50 transition-colors active:scale-98">
             Batal
           </a>
-          <button type="submit" 
-                  class="w-full sm:w-auto text-xs font-medium text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 active:bg-blue-700 transition-colors tracking-wide  ">
+          <button type="submit" class="w-full sm:w-auto text-center bg-blue-500 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors hover:bg-blue-600 active:scale-98">
             Simpan Pegawai
           </button>
         </div>
@@ -190,58 +183,4 @@
   </div>
 </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const bidangSelect = document.getElementById("select-bidang");
-    const unitSelect = document.getElementById("select-unit");
-    const statusSelect = document.getElementById("select-status");
-    const kontrakWrapper = document.getElementById("wrapper-kontrak");
-    const kontrakInput = document.getElementById("input-tanggal-kontrak");
-    
-    const unitsData = JSON.parse(document.getElementById("units-data").dataset.json || '[]');
-
-    const filterUnits = (bidangId, selectedUnitId = "") => {
-      unitSelect.innerHTML = '<option value="" disabled selected>Pilih Unit Kantor</option>';
-      if (!bidangId) return;
-
-      const filtered = unitsData.filter(unit => String(unit.bidangId) === String(bidangId));
-      filtered.forEach(unit => {
-        const option = document.createElement("option");
-        option.value = unit._id;
-        option.textContent = unit.name;
-        if (String(unit._id) === String(selectedUnitId)) {
-          option.selected = true;
-        }
-        unitSelect.appendChild(option);
-      });
-    };
-
-    bidangSelect.addEventListener("change", (e) => {
-      filterUnits(e.target.value);
-    });
-
-    const toggleKontrakField = (status) => {
-      if (status === "Pegawai Kontrak" || status === "Magang / Intern") {
-        kontrakWrapper.classList.remove("hidden");
-        kontrakInput.setAttribute("required", "required");
-      } else {
-        kontrakWrapper.classList.add("hidden");
-        kontrakInput.removeAttribute("required");
-        kontrakInput.value = "";
-      }
-    };
-
-    statusSelect.addEventListener("change", (e) => {
-      toggleKontrakField(e.target.value);
-    });
-
-    if (bidangSelect.value) {
-      const oldUnitId = unitSelect.getAttribute("data-old");
-      filterUnits(bidangSelect.value, oldUnitId);
-    }
-    
-    if (statusSelect.value) {
-      toggleKontrakField(statusSelect.value);
-    }
-  });
-</script>
+<script src="/js/add-employee.js" defer></script>

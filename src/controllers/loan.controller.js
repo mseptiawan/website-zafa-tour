@@ -1,177 +1,152 @@
-import Loan from "../models/loan/Loan.model.js";
-import LoanApproval from "../models/loan/LoanApproval.model.js";
-import loanService from "../services/loan.service.js";
-import AppError from "../utils/AppError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
+import * as loanService from "../services/loan.service.js";
 
-export const newForm = async (req, res, next) => {
-  try {
-    const employeeData = await loanService.getEmployeeForForm(req.user._id);
-    res.render("loans/new", {
+export const newForm = asyncHandler(async (req, res) => {
+  const employeeData = await loanService.getEmployeeForForm(req.session.user._id);
+  res.render("loans/new", {
+    ...buildRenderData(req, {
       title: "Form Pengajuan Pinjaman",
       employee: employeeData,
-      salary: employeeData.basicSalary,
-      error: null,
-      old: null,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      salary: employeeData.financialData?.basicSalary || 0,
+      errorMessage: null,
+    }),
+  });
+});
 
-export const create = async (req, res, next) => {
+export const create = asyncHandler(async (req, res) => {
+  const employeeId = req.session.user?.employeeId;
+  const userRole = (req.session.user?.role || "").toString().trim().toUpperCase();
+
   try {
-    const employeeId = req.session.user?.employeeId;
-    const userRole = (req.session.user?.role || "").toString().trim().toUpperCase();
-
     await loanService.createLoan(employeeId, req.body, userRole);
-
-    res.redirect("/loans/my");
+    req.flash("success", "Pengajuan pinjaman Anda berhasil didaftarkan ke sistem.");
+    return res.redirect("/loans/my");
   } catch (error) {
-    try {
-      const userId = req.session.user?._id;
-
-      const employeeData = await loanService.getEmployeeForForm(userId);
-
-      return res.render("loans/new", {
+    const employeeData = await loanService.getEmployeeForForm(req.session.user._id);
+    return res.render("loans/new", {
+      ...buildRenderData(req, {
         title: "Pengajuan Pinjaman",
         employee: employeeData,
-        salary: employeeData.basicSalary || 0,
+        salary: employeeData.financialData?.basicSalary || 0,
         formData: req.body,
         errorMessage: error.message,
-      });
-    } catch (innerError) {
-      next(new AppError(error.message, 400));
-    }
+      }),
+    });
   }
-};
-export const myLoans = async (req, res, next) => {
-  try {
-    const { loans, summary } = await loanService.getEmployeeLoanHistory(req.user._id);
-    res.render("loans/my", {
+});
+
+export const myLoans = asyncHandler(async (req, res) => {
+  const { loans, summary } = await loanService.getEmployeeLoanHistory(req.session.user._id);
+  res.render("loans/my", {
+    ...buildRenderData(req, {
       title: "Riwayat Pinjaman",
       loans,
       summary,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+    }),
+  });
+});
 
-export const getDetail = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { loan, approvals, payments } = await loanService.getLoanDetailData(id);
-    res.render("loans/detail", {
+export const getDetail = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { loan, approvals, payments } = await loanService.getLoanDetailData(id);
+  res.render("loans/detail", {
+    ...buildRenderData(req, {
       title: "Detail Pengajuan Pinjaman",
       loan,
       approvals,
       payments,
       user: req.session.user,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+    }),
+  });
+});
 
-export const edit = async (req, res, next) => {
-  try {
-    const { loan, basicSalary } = await loanService.getLoanForEdit(req.params.id, req.user._id);
-
-    res.render("loans/new", {
+export const edit = asyncHandler(async (req, res) => {
+  const { loan, basicSalary } = await loanService.getLoanForEdit(
+    req.params.id,
+    req.session.user._id
+  );
+  res.render("loans/new", {
+    ...buildRenderData(req, {
       title: "Edit Pengajuan Pinjaman",
-      loan: loan,
+      loan,
       formData: loan,
       salary: basicSalary,
       errorMessage: null,
-    });
-  } catch (error) {
-    next(new AppError(error.message || "Data tidak ditemukan", 404));
-  }
-};
+    }),
+  });
+});
 
-export const update = async (req, res, next) => {
+export const update = asyncHandler(async (req, res) => {
   try {
-    await loanService.updateLoan(req.params.id, req.user._id, req.body);
-    res.redirect("/loans/my");
+    await loanService.updateLoan(req.params.id, req.session.user._id, req.body);
+    req.flash("success", "Pengajuan pinjaman berhasil diperbarui.");
+    return res.redirect("/loans/my");
   } catch (error) {
-    next(new AppError(error.message, 400));
+    req.flash("error", error.message);
+    return res.redirect("back");
   }
-};
+});
 
-export const cancel = async (req, res, next) => {
+export const cancel = asyncHandler(async (req, res) => {
   try {
-    await loanService.cancelLoan(req.params.id, req.user._id);
-    res.redirect("/loans/my");
+    await loanService.cancelLoan(req.params.id, req.session.user._id);
+    req.flash("success", "Pengajuan pinjaman berhasil dibatalkan.");
   } catch (error) {
-    next(new AppError(error.message, 400));
+    req.flash("error", error.message);
   }
-};
+  return res.redirect("/loans/my");
+});
 
-export const getManageLoanPage = async (req, res, next) => {
-  try {
-    const sessionUser = req.session.user;
-    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
-    const data = await loanService.getLoanManagementData(sessionUser);
-    res.render("loans/approval", {
+export const getManageLoanPage = asyncHandler(async (req, res) => {
+  const data = await loanService.getLoanManagementData(req.session.user);
+  res.render("loans/approval", {
+    ...buildRenderData(req, {
       title: "Pusat Kelola Pinjaman",
-      user: sessionUser,
+      user: req.session.user,
       activeLoans: data.activeLoans,
       historyLoans: data.historyLoans,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+    }),
+  });
+});
 
-export const approveLoan = async (req, res, next) => {
+export const approveLoan = asyncHandler(async (req, res) => {
   try {
-    const { note } = req.body;
-    const sessionUser = req.session.user;
-    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
-    const { id } = req.params;
-    await loanService.processApproval(id, sessionUser, note, req.file);
-    return res.redirect("/loans/approval");
+    await loanService.processApproval(req.params.id, req.session.user, req.body.note);
+    req.flash("success", "Dokumen pinjaman berhasil disetujui.");
   } catch (error) {
-    next(new AppError(error.message, 400));
+    req.flash("error", error.message);
   }
-};
+  return res.redirect("/loans/approval");
+});
 
-export const rejectLoan = async (req, res, next) => {
+export const rejectLoan = asyncHandler(async (req, res) => {
   try {
-    const { note } = req.body;
-    const sessionUser = req.session.user;
-    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
-    const { id } = req.params;
-    await loanService.processReject(id, sessionUser, note);
-    return res.redirect("/loans/approval");
+    await loanService.processReject(req.params.id, req.session.user, req.body.note);
+    req.flash("error", "Pengajuan pinjaman ditolak.");
   } catch (error) {
-    next(new AppError(error.message, 400));
+    req.flash("error", error.message);
   }
-};
+  return res.redirect("/loans/approval");
+});
 
-export const getFinanceCenterPage = async (req, res, next) => {
-  try {
-    const sessionUser = req.session.user;
-    const data = await loanService.getLoanManagementData(sessionUser);
-    res.render("loans/approval", {
+export const getFinanceCenterPage = asyncHandler(async (req, res) => {
+  const data = await loanService.getLoanManagementData(req.session.user);
+  res.render("loans/approval", {
+    ...buildRenderData(req, {
       title: "Pusat Pencairan Dana",
       activeLoans: data.activeLoans,
       historyLoans: data.historyLoans,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+    }),
+  });
+});
 
-export const disburseLoan = async (req, res, next) => {
+export const disburseLoan = asyncHandler(async (req, res) => {
   try {
-    const sessionUser = req.session.user;
-    if (!sessionUser) throw new AppError("Sesi Anda telah berakhir.", 401);
-    const { note } = req.body;
-    const { id } = req.params;
-    await loanService.processDisbursement(id, sessionUser, note, req.file);
-    return res.redirect("/loans/disbursement");
+    await loanService.processDisbursement(req.params.id, req.session.user, req.body.note, req.file);
+    req.flash("success", "Dana tunai pinjaman berhasil dicairkan ke rekening karyawan.");
   } catch (error) {
-    next(new AppError(error.message, 400));
+    req.flash("error", error.message);
   }
-};
+  return res.redirect("/loans/disbursement");
+});

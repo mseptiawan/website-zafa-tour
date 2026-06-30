@@ -138,31 +138,19 @@ export const updateFinancialSchema = z.object({
 });
 
 const familyMemberSchema = z.object({
-  nama: z.string({ required_error: "Nama wajib diisi" }).min(2, "Nama minimal 2 karakter").trim(),
+  nama: z.string().min(1, "Nama harus diisi"),
+  hubungan: z.enum(["Suami", "Istri", "Anak", "Orang Tua", "Saudara Kandung"]),
+  nik: z.string().optional().nullable().default("-"),
+  pekerjaan: z.string().optional().nullable().default("-"),
 
-  hubungan: z.enum(["Suami", "Istri", "Anak", "Orang Tua", "Saudara Kandung"], {
-    required_error: "Hubungan keluarga wajib dipilih",
-    invalid_type_error: "Pilihan hubungan keluarga tidak valid",
-  }),
-
-  nik: z
-    .string({ required_error: "NIK wajib diisi" })
-    .length(16, "NIK harus tepat 16 digit")
-    .regex(/^\d+$/, "NIK harus berupa angka")
-    .trim(),
-
-  pekerjaan: z
-    .string()
-    .trim()
-    .transform((val) => (val === "" ? null : val))
-    .nullable()
-    .optional(),
+  jenis_kelamin: z.enum(["Laki-laki", "Perempuan"]).optional().nullable(),
+  tanggal_lahir: z.string().optional().nullable(),
+  status_tanggungan: z.union([z.string(), z.boolean()]).optional().default(false),
 });
 
 export const updateFamilySchema = z.object({
   anggota_keluarga: z.array(familyMemberSchema).optional().default([]),
 });
-
 export const updateContactSchema = z.object({
   nomor_telp: z
     .string({ required_error: "Nomor telepon pegawai wajib diisi" })
@@ -212,7 +200,7 @@ export const updateDocumentSchema = z.object({
     .refine(
       (val) => {
         if (!val) return true;
-        return /^[A-Z0-9]{7,9}$/i.test(val); // Pola umum nomor paspor Alfanumerik 7-9 karakter
+        return /^[A-Z0-9]{7,9}$/i.test(val);
       },
       { message: "Format Nomor Paspor tidak valid" }
     ),

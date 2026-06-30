@@ -20,35 +20,32 @@ import {
 
 const router = express.Router();
 
+// Proteksi Global: Sesi login aktif diwajibkan
 router.use(authMiddleware);
 
+// --- Akses Fitur Karyawan Mandiri ---
 router.get("/new", newForm);
 router.post("/", create);
-
 router.get("/my", myLoans);
 router.get("/detail/:id", getDetail);
 router.get("/edit/:id", edit);
 router.post("/update/:id", update);
 router.post("/cancel/:id", cancel);
-router.get("/approval", roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]), getManageLoanPage);
 
+// --- Akses Manajemen Utama (Approval Direksi) ---
+router.get("/approval", roleMiddleware("WAKIL_DIREKTUR", "DIREKTUR_UTAMA"), getManageLoanPage);
 router.post(
   "/approval/approve/:id",
-  roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]),
+  roleMiddleware("WAKIL_DIREKTUR", "DIREKTUR_UTAMA"),
   approveLoan
 );
+router.post("/approval/reject/:id", roleMiddleware("WAKIL_DIREKTUR", "DIREKTUR_UTAMA"), rejectLoan);
 
-router.post(
-  "/approval/reject/:id",
-  roleMiddleware(["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"]),
-  rejectLoan
-);
-
-router.get("/disbursement", roleMiddleware(["MANAGER_KEUANGAN"]), getFinanceCenterPage);
-
+// --- Akses Finance & Kasir Perusahaan (Pencairan Dana) ---
+router.get("/disbursement", roleMiddleware("MANAGER_KEUANGAN"), getFinanceCenterPage);
 router.post(
   "/approval/disburse/:id",
-  roleMiddleware(["MANAGER_KEUANGAN"]),
+  roleMiddleware("MANAGER_KEUANGAN"),
   uploadFile.single("paymentProof"),
   disburseLoan
 );
