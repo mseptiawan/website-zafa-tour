@@ -13,13 +13,14 @@ export const newForm = asyncHandler(async (req, res) => {
     }),
   });
 });
-
 export const create = asyncHandler(async (req, res) => {
   const employeeId = req.session.user?.employeeId;
   const userRole = (req.session.user?.role || "").toString().trim().toUpperCase();
+  const creatorName = req.session.user?.fullName || "Karyawan";
 
   try {
-    await loanService.createLoan(employeeId, req.body, userRole);
+    await loanService.createLoan(employeeId, req.body, userRole, creatorName);
+
     req.flash("success", "Pengajuan pinjaman Anda berhasil didaftarkan ke sistem.");
     return res.redirect("/loans/my");
   } catch (error) {
@@ -35,7 +36,6 @@ export const create = asyncHandler(async (req, res) => {
     });
   }
 });
-
 export const myLoans = asyncHandler(async (req, res) => {
   const { loans, summary } = await loanService.getEmployeeLoanHistory(req.session.user._id);
   res.render("loans/my", {

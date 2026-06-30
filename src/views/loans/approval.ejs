@@ -77,7 +77,6 @@
 
 <script>
   function switchTab(tabName) {
-    // Visibilitas & Animasi Pane Konten
     document.querySelectorAll('.tab-pane').forEach(pane => {
       pane.classList.add('hidden');
       pane.classList.remove('block', 'opacity-100', 'translate-y-0');
@@ -92,13 +91,11 @@
       }, 10);
     }
 
-    // Reset Semua Tombol Tab ke Gaya Dasar
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
       btn.classList.add('font-medium', 'text-slate-500');
     });
 
-    // Terapkan Gaya Aktif pada Tab Terpilih
     const activeBtn = document.getElementById(`tab-btn-${tabName}`);
     if (activeBtn) {
       activeBtn.classList.remove('font-medium', 'text-slate-500');

@@ -32,7 +32,7 @@ router.get("/edit/:id", edit);
 router.post("/update/:id", update);
 router.post("/cancel/:id", cancel);
 
-// --- Akses Manajemen Utama (Approval Direksi) ---
+// --- Akses Manajemen Utama
 router.get("/approval", roleMiddleware("WAKIL_DIREKTUR", "DIREKTUR_UTAMA"), getManageLoanPage);
 router.post(
   "/approval/approve/:id",

@@ -5,8 +5,10 @@ import LoanPayment from "../models/loan/loanPayment.model.js";
 import User from "../models/basic/User.model.js";
 import Role from "../models/basic/Role.model.js";
 import { getTotalMonthlyDeduction } from "../helpers/loan.helper.js";
-
+import { getPayrollPeriod } from "../utils/payrollPeriod.js";
 const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
+import notificationService from "./notification.service.js";
+import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 
 /**
  * Menentukan tahapan approval berikutnya berdasarkan alur kerja perusahaan.
@@ -38,15 +40,14 @@ export const getEmployeeForForm = async (userId) => {
   const employee = await Employee.findOne({ userId }).lean();
   if (!employee) throw new Error("Data Karyawan tidak ditemukan di sistem.");
 
-  // Menyematkan nilai default property basicSalary agar kompatibel dengan EJS View
   employee.basicSalary = employee.financialData?.basicSalary || 0;
   return employee;
 };
 
 /**
- * Membuat pengajuan pinjaman baru dengan validasi rasio cicilan 30% gaji.
+ * Membuat pengajuan pinjaman baru dengan validasi rasio cicilan 30% gaji sekaligus mengirim notifikasi ke approver.
  */
-export const createLoan = async (employeeId, loanData, userRole = "") => {
+export const createLoan = async (employeeId, loanData, userRole = "", creatorName = "Karyawan") => {
   if (!employeeId) {
     throw new Error("Profil karyawan tidak valid atau Anda tidak terdaftar sebagai pegawai.");
   }
@@ -104,6 +105,29 @@ export const createLoan = async (employeeId, loanData, userRole = "") => {
     approverId: nextApproverId,
     status: "PENDING",
   });
+
+  // ─── INTEGRASI NOTIFIKASI REALTIME UNTUK APPROVER ─────────────────────────
+  if (nextApproverId) {
+    try {
+      await notificationService.createManyNotifications({
+        userIds: [nextApproverId],
+        senderId: employee.userId,
+        senderName: creatorName,
+        title: "Pengajuan Pinjaman Baru",
+        text: `${creatorName} mengajukan pinjaman baru sebesar Rp ${amountRequested.toLocaleString("id-ID")}`,
+        module: MODULES?.FINANCE || "Finance",
+        referenceId: newLoan._id,
+        actionUrl: `/loans/approval`,
+        type: "EXPENSE",
+        category: NOTIF_CATEGORIES?.INFO || "INFO",
+      });
+    } catch (notifError) {
+      console.error(
+        "⚠️ [Notification Error] Gagal mengirim notifikasi pinjaman:",
+        notifError.message
+      );
+    }
+  }
 
   return newLoan;
 };
@@ -284,7 +308,6 @@ export const getLoanManagementData = async (user) => {
 
   return { activeLoans, historyLoans };
 };
-
 export const processApproval = async (approvalId, sessionUser, note) => {
   const approval = await LoanApproval.findOne({ _id: approvalId, status: "PENDING" });
   if (!approval) throw new Error("Antrean tidak ditemukan atau sudah diproses sebelumnya.");
@@ -306,8 +329,9 @@ export const processApproval = async (approvalId, sessionUser, note) => {
     );
   }
 
+  const cleanNote = note ? note.trim() : "";
   approval.status = "APPROVED";
-  approval.note = note || "";
+  approval.note = cleanNote || "Disetujui oleh manajemen.";
   approval.approverId = sessionUser._id;
   approval.actionDate = new Date();
   await approval.save();
@@ -320,9 +344,49 @@ export const processApproval = async (approvalId, sessionUser, note) => {
       step: nextStep,
       approverId: nextApproverId,
       status: "PENDING",
+      note: "",
     });
+
+    if (nextApproverId) {
+      try {
+        const targetUrl =
+          nextStep === "MANAGER_KEUANGAN" ? "/loans/disbursement" : "/loans/approval";
+
+        await notificationService.createManyNotifications({
+          userIds: [nextApproverId],
+          senderId: sessionUser._id,
+          senderName: sessionUser.fullName,
+          title: "Persetujuan Pinjaman",
+          text: `Berkas pinjaman ${employee.fullName} diteruskan ke Anda oleh ${userRole.replace(/_/g, " ")}.`,
+          module: MODULES.LOAN,
+          referenceId: loan._id,
+          actionUrl: targetUrl,
+          type: "EXPENSE",
+          category: NOTIF_CATEGORIES.INFO,
+        });
+      } catch (err) {
+        console.error("Gagal mengirim notifikasi kelanjutan approval:", err.message);
+      }
+    }
   } else {
     await Loan.findByIdAndUpdate(approval.loanId, { status: "APPROVED" });
+
+    try {
+      await notificationService.createManyNotifications({
+        userIds: [employee.userId],
+        senderId: sessionUser._id,
+        senderName: sessionUser.fullName,
+        title: "Pinjaman Disetujui",
+        text: `Pengajuan pinjaman Anda telah disetujui penuh oleh Direksi. Menunggu pencairan dana oleh Keuangan.`,
+        module: MODULES.LOAN,
+        referenceId: loan._id,
+        actionUrl: "/loans/my",
+        type: "EXPENSE",
+        category: NOTIF_CATEGORIES.SUCCESS,
+      });
+    } catch (err) {
+      console.error("Gagal mengirim notifikasi final approval ke karyawan:", err.message);
+    }
   }
   return true;
 };
@@ -336,13 +400,35 @@ export const processReject = async (approvalId, sessionUser, note) => {
     throw new Error("Anda tidak memiliki otoritas pada tahapan penolakan ini.");
   }
 
+  const cleanNote = note ? note.trim() : "";
   approval.status = "REJECTED";
-  approval.note = note || "Ditolak oleh manajemen";
+  approval.note = cleanNote || "Ditolak oleh manajemen.";
   approval.approverId = sessionUser._id;
   approval.actionDate = new Date();
   await approval.save();
 
-  await Loan.findByIdAndUpdate(approval.loanId, { status: "REJECTED" });
+  const loan = await Loan.findByIdAndUpdate(approval.loanId, { status: "REJECTED" });
+
+  const employee = await Employee.findById(loan.employeeId).lean();
+  if (employee && employee.userId) {
+    try {
+      await notificationService.createManyNotifications({
+        userIds: [employee.userId],
+        senderId: sessionUser._id,
+        senderName: sessionUser.fullName,
+        title: "Pinjaman Ditolak",
+        text: `Pengajuan pinjaman Anda ditolak oleh ${userRole.replace(/_/g, " ")}. Catatan: ${approval.note}`,
+        module: MODULES.LOAN,
+        referenceId: loan._id,
+        actionUrl: "/loans/my",
+        type: "EXPENSE",
+        category: NOTIF_CATEGORIES.DANGER,
+      });
+    } catch (err) {
+      console.error("Gagal mengirim notifikasi penolakan ke karyawan:", err.message);
+    }
+  }
+
   return true;
 };
 
@@ -356,8 +442,9 @@ export const processDisbursement = async (approvalId, sessionUser, note, file) =
   });
   if (!approval) throw new Error("Antrean transaksi pencairan kas tidak valid.");
 
+  const cleanNote = note ? note.trim() : "";
   approval.status = "APPROVED";
-  approval.note = note || "Dana pinjaman telah ditransfer via Finance Center.";
+  approval.note = cleanNote || "Dana pinjaman telah ditransfer via Finance Center.";
   approval.approverId = sessionUser._id;
   approval.actionDate = new Date();
   await approval.save();
@@ -371,26 +458,48 @@ export const processDisbursement = async (approvalId, sessionUser, note, file) =
   await loan.save();
 
   const paymentRecords = [];
-  const startMonth = new Date();
+  const initialPeriod = getPayrollPeriod(loan.disbursementDate);
+  const [startYear, startMonthStr] = initialPeriod.id.split("-").map(Number);
+  const baseMonthIndex = startMonthStr - 1;
 
   for (let i = 1; i <= loan.tenorMonths; i++) {
-    const nextDate = new Date(startMonth.getFullYear(), startMonth.getMonth() + i, 1);
-    const periodMonth = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, "0")}`;
+    const nextDate = new Date(Date.UTC(startYear, baseMonthIndex + (i - 1), 1));
+    const currentPeriod = getPayrollPeriod(nextDate);
 
     paymentRecords.push({
       loanId: loan._id,
       employeeId: loan.employeeId,
       installmentNumber: i,
       amount: loan.monthlyDeduction,
-      periodMonth: periodMonth,
+      periodMonth: currentPeriod.id,
       isPaid: false,
     });
   }
 
   await LoanPayment.insertMany(paymentRecords);
+
+  const employee = await Employee.findById(loan.employeeId).lean();
+  if (employee && employee.userId) {
+    try {
+      await notificationService.createManyNotifications({
+        userIds: [employee.userId],
+        senderId: sessionUser._id,
+        senderName: sessionUser.fullName,
+        title: "Dana Pinjaman Dicairkan",
+        text: `Dana pinjaman sebesar Rp ${loan.amountRequested.toLocaleString("id-ID")} telah ditransfer ke rekening Anda.`,
+        module: MODULES.LOAN,
+        referenceId: loan._id,
+        actionUrl: "/loans/my",
+        type: "EXPENSE",
+        category: NOTIF_CATEGORIES.SUCCESS,
+      });
+    } catch (err) {
+      console.error("Gagal mengirim notifikasi pencairan dana:", err.message);
+    }
+  }
+
   return true;
 };
-
 export const cancelLoan = async (loanId, userId) => {
   const loan = await Loan.findById(loanId);
   if (!loan) throw new Error("Data pengajuan tidak ditemukan.");

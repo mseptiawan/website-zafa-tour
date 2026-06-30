@@ -102,3 +102,19 @@
   <% } %>
 </div>
 <% } %>
+
+
+<% if (activeApproval && (user.role || '').toUpperCase() !== 'MANAGER_KEUANGAN') { %>
+<script>
+  function appendNoteBeforeSubmit(formElement) {
+    const textSource = document.getElementById('evaluation-note');
+    
+    const hiddenField = formElement.querySelector('.hidden-note-field');
+    
+    if (textSource && hiddenField) {
+      hiddenField.value = textSource.value.trim();
+    }
+  }
+</script>
+<% } %>
+

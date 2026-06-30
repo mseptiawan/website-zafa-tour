@@ -324,7 +324,6 @@
 
 <script>
   function switchTab(tabName) {
-    // 1. Sinkronisasi Visibilitas & Animasi Pane Konten
     document.querySelectorAll('.tab-pane').forEach(pane => {
       pane.classList.add('hidden');
       pane.classList.remove('block', 'opacity-100', 'translate-y-0');
@@ -339,20 +338,14 @@
       }, 10);
     }
 
-    // 2. Reset Semua Tombol Tab ke Gaya Dasar (State Non-Aktif)
     document.querySelectorAll('.tab-btn').forEach(btn => {
-      // Hapus semua kemungkinan kelas aktif bawaan partial
       btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
-      // Kembalikan ke gaya standar track abu-abu
       btn.classList.add('font-medium', 'text-slate-500');
     });
 
-    // 3. Terapkan Gaya Aktif Mutlak pada Tab yang Dipilih
     const activeBtn = document.getElementById(`tab-btn-${tabName}`);
     if (activeBtn) {
-      // Hapus kelas non-aktifnya terlebih dahulu
       activeBtn.classList.remove('font-medium', 'text-slate-500');
-      // Suntikkan kelas aktif yang identik dengan render server awal
       activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
     }
   }

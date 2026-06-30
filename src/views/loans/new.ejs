@@ -1,7 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
 <% 
-  // Ambil data gaji pokok pegawai
   const gajiPokok = typeof salary !== 'undefined' ? salary : 0; 
   const maxLoanLimit = gajiPokok * 3;
   const maxInstallmentLimit = gajiPokok * 0.3;
