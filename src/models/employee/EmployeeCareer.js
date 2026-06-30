@@ -6,11 +6,12 @@ const employeeCareerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
       required: true,
+      unique: true,
     },
     status_pegawai: {
       type: String,
       enum: ["Pegawai Tetap", "Pegawai Kontrak", "Magang / Intern", "Pensiun"],
-      required: false,
+      required: true,
     },
     tanggal_mulai_bergabung: {
       type: Date,

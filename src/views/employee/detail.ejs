@@ -21,7 +21,7 @@
 
     <% const currentStatus = employee.userId?.status || 'Active'; %>
     <% if (currentStatus === 'Inactive') { %>
-    <div class="border border-rose-100 bg-rose-50/40 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 shadow-xs">
+    <div class="border border-rose-100 bg-rose-50/40 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 ">
       <div>
         <h2 class="text-xs sm:text-sm font-bold text-rose-900">Berkas Pegawai Dinonaktifkan (Arsip PHK)</h2>
         <p class="text-[11px] sm:text-[12px] text-rose-700/90 mt-0.5">
@@ -40,40 +40,40 @@
 
       <div class="lg:col-span-2 space-y-5">
 
-        <div class="bg-white border border-slate-200/50 rounded-xl shadow-xs overflow-hidden">
+        <div class="bg-white border border-slate-200/50 rounded-xl  overflow-hidden">
           <div class="p-4 sm:px-6 sm:py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between bg-white gap-3">
             <div class="flex items-center gap-3 min-w-0">
               <div class="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0 group/avatar">
   
-  <div class="w-full h-full rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-500 overflow-hidden relative">
-    <% if (employee.foto_profile) { %>
-      <img id="avatar-preview" src="<%= employee.foto_profile %>" alt="Foto Profil" class="w-full h-full object-cover">
-    <% } else { %>
-      <i id="avatar-icon" class="fa-solid fa-user-tie text-base sm:text-lg"></i>
-    <% } %>
+                <div class="w-full h-full rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-500 overflow-hidden relative">
+                  <% if (employee.foto_profile) { %>
+                    <img id="avatar-preview" src="<%= employee.foto_profile %>" alt="Foto Profil" class="w-full h-full object-cover">
+                  <% } else { %>
+                    <i id="avatar-icon" class="fa-solid fa-user-tie text-base sm:text-lg"></i>
+                  <% } %>
 
-    <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || String(employee._id) === String(user.employeeId)) { %>
-      <label for="avatar-input" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer text-white text-[9px]">
-        <i class="fa-solid fa-camera text-[10px]"></i>
-      </label>
-    <% } %>
-  </div>
+                  <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || String(employee._id) === String(user.employeeId)) { %>
+                    <label for="avatar-input" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer text-white text-[9px]">
+                      <i class="fa-solid fa-camera text-[10px]"></i>
+                    </label>
+                  <% } %>
+                </div>
 
-  <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || String(employee._id) === String(user.employeeId)) { %>
-    <label for="avatar-input" class="absolute bottom-0 right-0 w-4 h-4 sm:w-4.5 sm:h-4.5 bg-blue-600 text-white rounded-full flex items-center justify-center border border-white shadow-xs cursor-pointer z-20 transition-all group-hover/avatar:scale-90 group-hover/avatar:bg-slate-700">
-      <i class="fa-solid fa-pen text-[7px] sm:text-[8px]"></i>
-    </label>
-    <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="uploadFotoProfil('<%= employee._id %>')">
-  <% } %>
-
-</div>
+                <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || String(employee._id) === String(user.employeeId)) { %>
+  <label for="avatar-input" class="absolute bottom-0 right-0 w-4 h-4 sm:w-4.5 sm:h-4.5 bg-blue-600 text-white rounded-full flex items-center justify-center border border-white  cursor-pointer z-20 transition-all group-hover/avatar:scale-90 group-hover/avatar:bg-slate-700">
+    <i class="fa-solid fa-pen text-[7px] sm:text-[8px]"></i>
+  </label>
+  
+  <input type="file" id="avatar-input" accept="image/*" data-employee-id="<%= employee._id %>" class="hidden">
+<% } %>
+              </div>
               
               <div class="min-w-0">
                 <h1 class="text-xs sm:text-[14px] font-bold text-slate-900 tracking-tight leading-tight mb-1 truncate">
                   <%= employee.fullName %>
                 </h1>
                 <p class="text-[10px] text-slate-400 mb-1 leading-none">
-                  NIP: <span class="text-slate-800 font-medium"><%= employee.employeeIdNumber %></span>
+                  Kode: <span class="text-slate-800 font-medium"><%= employee.employeeIdNumber %></span>
                 </p>
                 
                 <div class="flex flex-col sm:flex-row sm:items-center gap-x-2 gap-y-0.5 text-[10px] mt-1.5 text-slate-500">
@@ -109,29 +109,33 @@
                   <%= employee.careerData?.unitId?.name || '-' %>
                 </div>
               </div>
-              <div class="col-span-2 sm:col-span-1">
-                <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Status Kontrak Kerja</div>
-                <div class="text-[11px] sm:text-xs text-slate-900 font-semibold">
-                  <%= employee.careerData?.status_pegawai || '-' %>
-                </div>
-              </div>
-              <div>
-                <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Mulai Bergabung</div>
-                <div class="text-[11px] sm:text-xs text-slate-900 font-medium">
-                  <%= employee.careerData?.tanggal_mulai_bergabung ? new Date(employee.careerData.tanggal_mulai_bergabung).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
-                </div>
-              </div>
-              <div>
-                <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Berakhir Kontrak</div>
-                <div class="text-[11px] sm:text-xs font-semibold truncate <%= employee.careerData?.tanggal_berakhir_kontrak ? 'text-rose-600' : 'text-slate-900' %>">
-                  <%= employee.careerData?.tanggal_berakhir_kontrak ? new Date(employee.careerData.tanggal_berakhir_kontrak).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Permanen / Tetap' %>
-                </div>
-              </div>
+             <div class="col-span-2 sm:col-span-1">
+  <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Status Kontrak Kerja</div>
+  <div class="text-[11px] sm:text-xs text-slate-900 font-semibold">
+    <%= employee.careerData?.status_pegawai || '-' %>
+  </div>
+</div>
+
+<div>
+  <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Mulai Bergabung</div>
+  <div class="text-[11px] sm:text-xs text-slate-900 font-medium">
+    <%= employee.careerData?.tanggal_mulai_bergabung ? new Date(employee.careerData.tanggal_mulai_bergabung).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
+  </div>
+</div>
+
+<div>
+  <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Berakhir Kontrak</div>
+  <!-- 💡 Warna dinamis: rose-600 kalau ada tanggalnya, slate-400 kalau kosong -->
+  <div class="text-[11px] sm:text-xs font-semibold truncate <%= employee.careerData?.tanggal_berakhir_kontrak ? 'text-rose-600' : 'text-slate-400 font-normal' %>">
+    <%= employee.careerData?.tanggal_berakhir_kontrak ? new Date(employee.careerData.tanggal_berakhir_kontrak).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
+  </div>
+</div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white border border-slate-200/50 rounded-xl shadow-xs overflow-hidden">
+        <!-- PARAMETER FINANSIAL & REKENING -->
+        <div class="bg-white border border-slate-200/50 rounded-xl  overflow-hidden">
           <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 bg-white flex items-center gap-2.5">
             <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/20">
               <i class="fa-solid fa-money-check-dollar text-[11px]"></i>
@@ -144,7 +148,7 @@
               <div class="col-span-2 sm:col-span-1">
                 <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Gaji Pokok (Basic Salary)</div>
                 <div class="text-sm sm:text-base text-slate-900 font-bold tracking-tight tabular-nums">
-                  Rp <%= (employee.salaryDetail?.basicSalary || 0).toLocaleString('id-ID') %>
+                  Rp <%= (employee.financialData?.basicSalary || 0).toLocaleString('id-ID') %>
                 </div>
               </div>
               <div class="col-span-2 sm:col-span-1">
@@ -176,54 +180,62 @@
           </div>
         </div>
 
-        <div class="bg-white border border-slate-200/50 rounded-xl shadow-xs overflow-hidden">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 bg-white flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/20">
-              <i class="fa-solid fa-graduation-cap text-[11px]"></i>
-            </div>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-800">Riwayat Pendidikan Terakhir</h3>
-          </div>
+        <div class="bg-white border border-slate-200/50 rounded-xl  overflow-hidden">
+  <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 bg-white flex items-center gap-2.5">
+    <div class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/20">
+      <i class="fa-solid fa-graduation-cap text-[11px]"></i>
+    </div>
+    <h3 class="text-xs sm:text-sm font-bold text-slate-800">Riwayat Pendidikan Terakhir</h3>
+  </div>
 
-          <div class="p-4 sm:p-6">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Jenjang / Gelar</div>
-                <div class="text-[11px] sm:text-xs text-slate-900 font-semibold">
-                  <%= employee.educationData?.pendidikan_terakhir || '-' %>
-                </div>
-              </div>
-              <div>
-                <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Tahun Lulus</div>
-                <div class="text-[11px] sm:text-xs text-slate-900 font-medium">
-                  <%= employee.educationData?.tahun_kelulusan || '-' %>
-                </div>
-              </div>
-              <div class="col-span-2">
-                <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Nama Instansi / Universitas</div>
-                <div class="text-[11px] sm:text-xs text-slate-900 font-semibold truncate">
-                  <%= employee.educationData?.institusi_pendidikan || '-' %>
-                </div>
-              </div>
-
-              <% if (employee.educationData?.file_ijazah) { %>
-              <div class="col-span-2 pt-1">
-                <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-1.5">Berkas Ijazah Digital</div>
-                <div class="flex items-center justify-between border border-slate-200/60 rounded-xl p-2.5 bg-slate-50/50 w-full max-w-md gap-2">
-                  <div class="flex items-center gap-2 min-w-0">
-                    <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-rose-500 shrink-0">
-                      <i class="fa-solid fa-file-pdf text-xs"></i>
-                    </div>
-                    <span class="text-[11px] font-medium text-slate-700 truncate block">Salinan_Ijazah_Terakhir.pdf</span>
-                  </div>
-                  <a href="<%= employee.educationData.file_ijazah %>" target="_blank" class="text-[9px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-lg tracking-wider shrink-0">VIEW</a>
-                </div>
-              </div>
-              <% } %>
-            </div>
-          </div>
+  <div class="p-4 sm:p-6">
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Jenjang / Gelar</div>
+        <div class="text-[11px] sm:text-xs text-slate-900 font-semibold">
+          <%= employee.educationData?.pendidikan_terakhir || '-' %>
         </div>
+      </div>
+      
+      <div>
+        <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Tahun Lulus</div>
+        <div class="text-[11px] sm:text-xs text-slate-900 font-medium">
+          <%= employee.educationData?.tahun_kelulusan || '-' %>
+        </div>
+      </div>
 
-        <div class="bg-white border border-slate-200/50 rounded-xl shadow-xs overflow-hidden">
+      <div class="col-span-2">
+        <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Nama Instansi / Universitas</div>
+        <div class="text-[11px] sm:text-xs text-slate-900 font-semibold truncate">
+          <%= employee.educationData?.institusi_pendidikan || '-' %>
+        </div>
+      </div>
+
+      <div class="col-span-2">
+        <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Jurusan / Program Studi</div>
+        <div class="text-[11px] sm:text-xs text-slate-900 font-semibold truncate">
+          <%= employee.educationData?.jurusan || '-' %>
+        </div>
+      </div>
+
+      <% if (employee.educationData?.file_ijazah) { %>
+      <div class="col-span-2 pt-1">
+        <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-1.5">Berkas Ijazah Digital</div>
+        <div class="flex items-center justify-between border border-slate-200/60 rounded-xl p-2.5 bg-slate-50/50 w-full max-w-md gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-rose-500 shrink-0">
+              <i class="fa-solid fa-file-pdf text-xs"></i>
+            </div>
+            <span class="text-[11px] font-medium text-slate-700 truncate block">Salinan_Ijazah_Terakhir.pdf</span>
+          </div>
+          <a href="<%= employee.educationData.file_ijazah %>" target="_blank" class="text-[9px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-lg tracking-wider shrink-0">VIEW</a>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+        <div class="bg-white border border-slate-200/50 rounded-xl  overflow-hidden">
           <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 bg-white flex items-center gap-2.5">
             <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/20">
               <i class="fa-solid fa-folder-open text-[11px]"></i>
@@ -303,7 +315,7 @@
       <div class="space-y-5">
 
         <% if (user && (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR' || (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()))) { %>
-        <div class="bg-white border border-slate-200/50 rounded-xl p-4 shadow-xs">
+        <div class="bg-white border border-slate-200/50 rounded-xl p-4 ">
           <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <i class="fa-solid fa-sliders text-[11px]"></i>
@@ -317,8 +329,8 @@
           <% if (user.role === 'WAKIL_DIREKTUR' || user.role === 'HR') { %>
           <p class="text-[10px] text-slate-500 leading-normal mb-3">Anda memegang otoritas penuh HR untuk memodifikasi berkas ini.</p>
           <div class="flex flex-col gap-1.5">
-            <a href="/employee/edit/<%= employee._id %>" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-xl shadow-xs text-center decoration-none">
-              <i class="fa-solid fa-user-pen text-[10px]"></i> Edit Pegawai (Full HR)
+            <a href="/employee/edit/<%= employee._id %>" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-xl  text-center decoration-none">
+              <i class="fa-solid fa-user-pen text-[10px]"></i> Edit Data
             </a>
             <a href="/employee/change-password/<%= employee._id %>" class="hidden w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 text-slate-600 text-[11px] font-bold rounded-xl text-center decoration-none">
               <i class="fa-solid fa-key text-[10px] text-slate-400"></i> Reset Password
@@ -328,8 +340,8 @@
           <% } else if (user.employeeId && String(employee._id).trim() === String(user.employeeId).trim()) { %>
           <p class="text-[10px] text-slate-500 leading-normal mb-3">Anda diizinkan mengedit nomor kontak, alamat, berkas ijazah, atau sertifikat mandiri.</p>
           <div class="flex flex-col gap-1.5">
-            <a href="/employee/my-profile/edit" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-xl shadow-xs text-center decoration-none">
-              <i class="fa-solid fa-user-pen text-[10px]"></i> Edit Profil Mandiri
+            <a href="/employee/my-profile/edit" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-xl  text-center decoration-none">
+              <i class="fa-solid fa-user-pen text-[10px]"></i> Edit Data
             </a>
             <a href="/change-password" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 text-slate-600 text-[11px] font-bold rounded-xl text-center decoration-none">
               <i class="fa-solid fa-key text-[10px] text-slate-400"></i> Ganti Password Akun
@@ -339,74 +351,119 @@
         </div>
         <% } %>
 
-        <div class="bg-white border border-slate-200/50 rounded-xl p-4 shadow-xs">
-          <div class="mb-4">
-            <h2 class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Biodata Personal & Kontak</h2>
-            <p class="text-[10px] text-slate-400 mt-0.5">Informasi kependudukan eksternal</p>
-          </div>
+       <div class="bg-white border border-slate-200/50 rounded-xl p-4 shadow-xs">
+  <div class="mb-4">
+    <h2 class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Biodata Personal & Kontak</h2>
+    <p class="text-[10px] text-slate-400 mt-0.5">Informasi kependudukan eksternal</p>
+  </div>
 
-          <div class="relative pl-5 space-y-4 before:absolute before:left-[9px] before:top-1.5 before:bottom-1.5 before:w-[1.5px] before:bg-slate-100">
+  <div class="relative pl-5 space-y-4 before:absolute before:left-[9px] before:top-1.5 before:bottom-1.5 before:w-[1.5px] before:bg-slate-100">
 
-            <div class="relative">
-              <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
-              <div class="flex flex-col text-[11px]">
-                <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Tempat, Tanggal Lahir</span>
-                <span class="text-slate-800 font-semibold"><%= employee.tempat_lahir || '-' %>, <%= employee.tanggal_lahir ? new Date(employee.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %></span>
-              </div>
-            </div>
+    <div class="relative">
+      <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
+      <div class="flex flex-col text-[11px]">
+        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Tempat, Tanggal Lahir</span>
+        <span class="text-slate-800 font-semibold"><%= employee.tempat_lahir || '-' %>, <%= employee.tanggal_lahir ? new Date(employee.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %></span>
+      </div>
+    </div>
 
-            <div class="relative">
-              <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
-              <div class="flex flex-col text-[11px]">
-                <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Agama & Pernikahan</span>
-                <span class="text-slate-700 font-semibold"><%= employee.agama %> <span class="text-slate-200">|</span> <%= employee.status_pernikahan || 'Lajang' %></span>
-              </div>
-            </div>
-
-            <div class="relative">
-              <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
-              <div class="flex flex-col text-[11px]">
-                <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Nomor Handphone Aktif</span>
-                <span class="text-slate-800 font-bold font-mono tracking-tight"><%= employee.contactData?.nomor_telp || '-' %></span>
-              </div>
-            </div>
-
-            <div class="relative">
-              <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
-              <div class="flex flex-col text-[11px]">
-                <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Kontak Darurat (Emergency)</span>
-                <span class="text-slate-800 font-semibold"><%= employee.contactData?.nama_kontak_darurat || '-' %> (<%= employee.contactData?.hubungan_kontak_darurat || '-' %>)</span>
-                <span class="text-slate-500 font-mono text-[10px] mt-0.5"><%= employee.contactData?.nomor_kontak_darurat || '-' %></span>
-              </div>
-            </div>
-
-            <div class="relative">
-              <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
-              <div class="flex flex-col text-[11px]">
-                <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Alamat Sesuai KTP</span>
-                <p class="text-slate-600 leading-relaxed italic text-[10px] bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl mt-1 font-medium break-words">
-                  "<%= employee.contactData?.alamat || 'Tidak ada info alamat' %>"
-                </p>
-              </div>
-            </div>
-
-          </div>
+   <div class="relative">
+      <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
+      <div class="flex flex-col text-[11px]">
+        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Identitas Kependudukan</span>
+        
+        <!-- Jenis Kelamin & Gol Darah -->
+        <span class="text-slate-800 font-semibold mb-0.5">
+          <%= employee.jenis_kelamin || '-' %> <span class="text-slate-300 mx-1">|</span> Gol: <%= employee.golongan_darah || '-' %>
+        </span>
+        
+        <!-- Nomor KTP -->
+        <div class="flex items-center gap-1.5 mt-0.5">
+          <span class="text-[9px] text-slate-400">NIK/KTP:</span>
+          <span class="text-slate-700 font-mono font-bold tracking-tight"><%= employee.nomor_ktp || '-' %></span>
         </div>
+      </div>
+    </div>
 
-        <% if (employee.familyData && employee.familyData.anggota_keluarga && employee.familyData.anggota_keluarga.length > 0) { %>
-        <div class="bg-white border border-slate-200/50 rounded-xl p-4 shadow-xs">
-          <div class="mb-3">
-            <h2 class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Tanggungan / Keluarga</h2>
-            <p class="text-[10px] text-slate-400 mt-0.5">Daftar keluarga terdaftar sistem</p>
+    <div class="relative">
+      <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
+      <div class="flex flex-col text-[11px]">
+        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Agama & Pernikahan</span>
+        <span class="text-slate-700 font-semibold"><%= employee.agama %> <span class="text-slate-200">|</span> <%= employee.status_pernikahan || 'Lajang' %></span>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
+      <div class="flex flex-col text-[11px]">
+        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Kontak (HP & Email)</span>
+        <span class="text-slate-800 font-bold font-mono tracking-tight"><%= employee.contactData?.nomor_telp || '-' %></span>
+        <span class="text-slate-500 font-medium"><%= employee.userId?.email || '-' %></span>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
+      <div class="flex flex-col text-[11px]">
+        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Kontak Darurat (Emergency)</span>
+        <span class="text-slate-800 font-semibold"><%= employee.contactData?.nama_kontak_darurat || '-' %> (<%= employee.contactData?.hubungan_kontak_darurat || '-' %>)</span>
+        <span class="text-slate-500 font-mono text-[10px] mt-0.5"><%= employee.contactData?.nomor_kontak_darurat || '-' %></span>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="absolute -left-[20.5px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs bg-slate-400"></div>
+      <div class="flex flex-col text-[11px]">
+        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Alamat Sesuai KTP</span>
+        <p class="text-slate-600 leading-relaxed italic text-[10px] bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl mt-1 font-medium break-words">
+          "<%= employee.contactData?.alamat || 'Tidak ada info alamat' %>"
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+      <% if (employee.familyData && employee.familyData.length > 0) { %>
+        <div class="bg-white border border-slate-200/50 rounded-xl p-4 ">
+          <div class="mb-4">
+            <h2 class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Daftar Anggota Keluarga</h2>
+            <p class="text-[10px] text-slate-400 mt-0.5">Informasi tanggungan keluarga inti</p>
           </div>
-          <div class="space-y-2">
-            <% employee.familyData.anggota_keluarga.forEach(fam => { %>
-            <div class="p-2.5 bg-slate-50/50 border border-slate-200/40 rounded-xl text-[11px]">
-              <div class="flex items-center justify-between mb-0.5 gap-2">
-                <span class="text-slate-800 font-bold truncate"><%= fam.nama %></span>
-                <span class="text-[8px] px-1.5 py-0.2 bg-white rounded border border-slate-200 uppercase text-slate-500 font-bold shrink-0"><%= fam.hubungan %></span>
+          
+          <div class="space-y-3">
+            <% employee.familyData.forEach(fam => { %>
+            <div class="p-3 bg-slate-50 border border-slate-200/60 rounded-xl space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold text-slate-800"><%= fam.nama %></span>
+                <span class="text-[9px] px-1.5 py-0.5 bg-white rounded border border-slate-200 text-slate-500 font-bold uppercase"><%= fam.hubungan %></span>
               </div>
-              <p class="text-[9px] text-slate-400 font-mono">NIK: <%= fam.nik || '-' %></p>
+              
+              <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px]">
+                <div>
+                  <span class="text-slate-400">NIK:</span>
+                  <span class="text-slate-700 font-mono"><%= fam.nik || '-' %></span>
+                </div>
+                <div>
+                  <span class="text-slate-400">Gender:</span>
+                  <span class="text-slate-700"><%= fam.jenis_kelamin || '-' %></span>
+                </div>
+                <div class="col-span-2">
+                  <span class="text-slate-400">Tgl Lahir:</span>
+                  <span class="text-slate-700">
+                    <%= fam.tanggal_lahir ? new Date(fam.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-' %>
+                  </span>
+                </div>
+                <div class="col-span-2">
+                  <span class="text-slate-400">Pekerjaan:</span>
+                  <span class="text-slate-700 font-medium"><%= fam.pekerjaan || '-' %></span>
+                </div>
+                <div class="col-span-2 pt-1 mt-1 border-t border-slate-200/50 flex justify-between">
+                  <span class="text-slate-400">Status Tanggungan:</span>
+                  <span class="font-bold <%= fam.status_tanggungan ? 'text-emerald-600' : 'text-slate-400' %>">
+                    <%= fam.status_tanggungan ? 'TANGGUNGAN AKTIF' : 'TIDAK' %>
+                  </span>
+                </div>
+              </div>
             </div>
             <% }) %>
           </div>
@@ -420,56 +477,6 @@
   </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  async function uploadFotoProfil(employeeId) {
-    const fileInput = document.getElementById('avatar-input');
-    const file = fileInput.files[0];
-
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      Swal.fire({ icon: 'error', title: 'Gagal', text: 'Ukuran file maksimal adalah 2MB!' });
-      fileInput.value = '';
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('foto_profile', file);
-
-    Swal.fire({
-      title: 'Mengupload...',
-      text: 'Mohon tunggu sebentar.',
-      allowOutsideClick: false,
-      didOpen: () => { Swal.showLoading(); }
-    });
-
-    try {
-      const response = await fetch(`/api/employee/upload-avatar/${employeeId}`, {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Foto profil berhasil diperbarui!', timer: 1500, showConfirmButton: false });
-
-        const previewImg = document.getElementById('avatar-preview');
-        if (previewImg) {
-          previewImg.src = result.imageUrl;
-        } else {
-          const container = document.getElementById('avatar-icon').parentElement;
-          container.innerHTML = `<img id="avatar-preview" src="${result.imageUrl}" alt="Foto Profil" class="w-full h-full object-cover">` + container.innerHTML;
-          const oldIcon = document.getElementById('avatar-icon');
-          if(oldIcon) oldIcon.remove();
-        }
-      } else {
-        Swal.fire({ icon: 'error', title: 'Gagal', text: result.message || 'Gagal mengupload gambar.' });
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
-    }
-  }
-</script>
+<script src="/js/detail-employee.js" defer></script>

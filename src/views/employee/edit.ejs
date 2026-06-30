@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title: isMandiri ? "Edit Profil Mandiri" : "Edit Data Pegawai" }) %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  p-4 sm:p-6 md:p-10 antialiased pb-24 md:pb-8 text-slate-800">
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 p-4 sm:p-6 md:p-10 antialiased pb-24 md:pb-8 text-slate-800">
   <div class="w-full max-w-none mx-auto space-y-6">
 
     <%- include('../partials/page-header', {
@@ -10,7 +10,7 @@
       description: isMandiri ? 'Perbarui informasi kontak, alamat, dokumen sertifikasi, dan anggota keluarga Anda.' : 'Kelola berkas personal, struktur kedinasan, kontak darurat, serta informasi payroll pegawai.'
     }) %>
 
-    <div id="units-data" data-json="<%= JSON.stringify(units || []) %>" class="hidden"></div>
+    <div id="units-data" data-json="<%= JSON.stringify(units || []) %>" data-employee-id="<%= employee._id %>" class="hidden"></div>
 
     <div id="global-error" class="border-l-2 border-rose-500 bg-rose-50/50 text-rose-700 px-4 py-3 rounded-r-md text-xs font-medium hidden"></div>
 
@@ -33,12 +33,18 @@
       </nav>
     </div>
 
-    <div class="bg-white p-5 md:p-8 rounded-2xl border border-slate-200  ">
+    <div class="bg-white p-5 md:p-8 rounded-2xl border border-slate-200">
 
       <% if (!isMandiri) { %>
       <div id="content-pribadi" class="tab-content space-y-6">
         <form id="form-pribadi" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email Akun (Sistem)</label>
+              <input type="email" value="<%= employee.userId?.email || 'Tidak terhubung ke akun' %>" readonly class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-500 border border-slate-200 rounded-xl bg-slate-100 cursor-not-allowed outline-hidden" />
+              <p class="text-[9px] text-slate-400">Email tidak dapat diubah melalui profil personal.</p>
+            </div>
             <div class="space-y-1.5">
               <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama Lengkap <span class="text-rose-500">*</span></label>
               <input name="fullName" type="text" value="<%= employee.fullName %>" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border border-slate-200 rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden" />
@@ -90,7 +96,7 @@
             </div>
           </div>
           <div class="flex justify-end pt-4">
-            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors  ">Perbarui Data Pribadi</button>
+            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">Perbarui Data Pribadi</button>
           </div>
         </form>
       </div>
@@ -101,9 +107,17 @@
             <div class="space-y-1.5">
               <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Jabatan Struktural <span class="text-rose-500">*</span></label>
               <select name="positionId" required class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border border-slate-200 rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden appearance-none">
+                <option value="" disabled>Pilih Jabatan</option>
+
                 <% (positions || []).forEach(p => { %>
-                <option value="<%= p._id %>" <%= String(employee.careerData?.positionId) === String(p._id) ? 'selected' : '' %>><%= p.name %></option>
+                <% 
+        const employeePositionId = employee.careerData?.positionId?._id || employee.careerData?.positionId; 
+      %>
+                <option value="<%= p._id %>" <%= String(employeePositionId) === String(p._id) ? 'selected' : '' %>>
+                  <%= p.name %>
+                </option>
                 <% }) %>
+
               </select>
             </div>
             <div class="space-y-1.5">
@@ -154,7 +168,7 @@
             </div>
           </div>
           <div class="flex justify-end pt-4">
-            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors  ">Perbarui Struktur & Karir</button>
+            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">Perbarui Struktur & Karir</button>
           </div>
         </form>
       </div>
@@ -185,7 +199,7 @@
             </div>
           </div>
           <div class="flex justify-end pt-4">
-            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors  ">Perbarui Kontak</button>
+            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">Perbarui Kontak</button>
           </div>
         </form>
       </div>
@@ -260,7 +274,7 @@
           </div>
 
           <div class="flex justify-end pt-4">
-            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors  ">Unggah & Simpan Dokumen</button>
+            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">Unggah & Simpan Dokumen</button>
           </div>
         </form>
       </div>
@@ -283,6 +297,10 @@
               <input name="institusi_pendidikan" type="text" value="<%= employee.educationData?.institusi_pendidikan || '' %>" class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border border-slate-200 rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden" />
             </div>
             <div class="space-y-1.5">
+              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Jurusan / Program Studi</label>
+              <input name="jurusan" type="text" value="<%= employee.educationData?.jurusan || '' %>" placeholder="Misal: Sistem Informasi, Akuntansi" class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border border-slate-200 rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden" />
+            </div>
+            <div class="space-y-1.5">
               <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tahun Kelulusan</label>
               <input name="tahun_kelulusan" type="number" value="<%= employee.educationData?.tahun_kelulusan || '' %>" class="w-full px-[14px] py-2.5 text-sm font-medium text-slate-900 border border-slate-200 rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden" />
             </div>
@@ -298,7 +316,7 @@
             </div>
           </div>
           <div class="flex justify-end pt-4">
-            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors  ">Perbarui Akademis</button>
+            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">Perbarui Akademis</button>
           </div>
         </form>
       </div>
@@ -310,28 +328,68 @@
             <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Daftar Anggota Keluarga Inti</h4>
             <button type="button" id="btn-add-family" class="text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-all">+ Tambah Baris</button>
           </div>
+
           <div id="family-container" class="space-y-4">
-            <% if (employee.familyData && employee.familyData.anggota_keluarga && employee.familyData.anggota_keluarga.length > 0) { %>
-            <% employee.familyData.anggota_keluarga.forEach((member, index) => { %>
-            <div class="family-row grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl relative border border-slate-100">
-              <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Nama</label><input type="text" name="anggota_keluarga[<%= index %>][nama]" value="<%= member.nama %>" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden" /></div>
+            <% if (employee.familyData && employee.familyData.length > 0) { %>
+            <% employee.familyData.forEach((member, index) => { %>
+            <div class="family-row grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 bg-slate-50 p-4 rounded-xl relative border border-slate-100">
+
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 font-bold uppercase">Nama</label>
+                <input type="text" name="anggota_keluarga[<%= index %>][nama]" value="<%= member.nama %>" class="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden" required />
+              </div>
+
               <div class="space-y-1">
                 <label class="text-[10px] text-slate-400 font-bold uppercase">Hubungan</label>
-                <select name="anggota_keluarga[<%= index %>][hubungan]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden appearance-none">
+                <select name="anggota_keluarga[<%= index %>][hubungan]" class="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden appearance-none" required>
+                  <option value="" disabled>Pilih</option>
                   <% ['Suami', 'Istri', 'Anak', 'Orang Tua', 'Saudara Kandung'].forEach(h => { %>
                   <option value="<%= h %>" <%= member.hubungan === h ? 'selected' : '' %>><%= h %></option>
                   <% }) %>
                 </select>
               </div>
-              <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">NIK</label><input type="text" maxlength="16" name="anggota_keluarga[<%= index %>][nik]" value="<%= member.nik %>" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden" /></div>
-              <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Pekerjaan</label><input type="text" name="anggota_keluarga[<%= index %>][pekerjaan]" value="<%= member.pekerjaan || '' %>" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden" /></div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 font-bold uppercase">NIK</label>
+                <input type="text" maxlength="16" name="anggota_keluarga[<%= index %>][nik]" value="<%= member.nik %>" class="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 font-bold uppercase">Jenis Kelamin</label>
+                <select name="anggota_keluarga[<%= index %>][jenis_kelamin]" class="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden appearance-none">
+                  <option value="">-</option>
+                  <% ['Laki-laki', 'Perempuan'].forEach(jk => { %>
+                  <option value="<%= jk %>" <%= member.jenis_kelamin === jk ? 'selected' : '' %>><%= jk %></option>
+                  <% }) %>
+                </select>
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 font-bold uppercase">Tgl Lahir</label>
+                <input type="date" name="anggota_keluarga[<%= index %>][tanggal_lahir]" value="<%= member.tanggal_lahir ? new Date(member.tanggal_lahir).toISOString().split('T')[0] : '' %>" class="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 font-bold uppercase">Pekerjaan</label>
+                <input type="text" name="anggota_keluarga[<%= index %>][pekerjaan]" value="<%= member.pekerjaan || '' %>" class="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 font-bold uppercase">Tanggungan?</label>
+                <select name="anggota_keluarga[<%= index %>][status_tanggungan]" class="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden appearance-none">
+                  <option value="false" <%= member.status_tanggungan === false ? 'selected' : '' %>>Tidak</option>
+                  <option value="true" <%= member.status_tanggungan === true ? 'selected' : '' %>>Ya</option>
+                </select>
+              </div>
+
               <button type="button" class="btn-remove-family absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-lg font-bold">×</button>
             </div>
             <% }) %>
             <% } %>
           </div>
+
           <div class="flex justify-end pt-4">
-            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors  ">Simpan Anggota Keluarga</button>
+            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">Simpan Anggota Keluarga</button>
           </div>
         </form>
       </div>
@@ -374,7 +432,7 @@
             <% if (!isMandiri) { %>
             <div class="space-y-1.5">
               <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Gaji Pokok (Rp) <span class="text-rose-500">*</span></label>
-              <input name="basicSalary" type="number" min="0" required placeholder="Contoh: 5000000" value="<%= employee.salaryDetail?.basicSalary || 0 %>" class="w-full px-[14px] py-2.5 text-sm font-semibold text-slate-900 border border-slate-200 rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden" />
+              <input name="basicSalary" type="number" min="0" required placeholder="Contoh: 5000000" value="<%= employee.financialData?.basicSalary || 0 %>" class="w-full px-[14px] py-2.5 text-sm font-semibold text-slate-900 border border-slate-200 rounded-xl bg-slate-50/70 focus:bg-white focus:border-slate-500 focus:ring-3 focus:ring-slate-500/10 transition-all duration-200 outline-hidden" />
             </div>
             <div class="space-y-1.5">
               <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Overtime Rate (per jam)</label>
@@ -383,7 +441,7 @@
             <% } %>
           </div>
           <div class="flex justify-end pt-4">
-            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors  ">Perbarui Data Finansial</button>
+            <button type="submit" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider text-white bg-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">Perbarui Data Finansial</button>
           </div>
         </form>
       </div>
@@ -391,208 +449,4 @@
   </div>
 </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const employeeId = "<%= employee._id %>";
-    const tabs = document.querySelectorAll(".tab-btn");
-    const contents = document.querySelectorAll(".tab-content");
-    const globalError = document.getElementById("global-error");
-
-    // --- INTERAKSI GANTI TAB ---
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        const target = tab.dataset.tab;
-        tabs.forEach(t => {
-          t.classList.remove("border-blue-600", "text-blue-600", "font-bold");
-          t.classList.add("border-transparent", "text-slate-500");
-        });
-        tab.classList.remove("border-transparent", "text-slate-500");
-        tab.classList.add("border-blue-600", "text-blue-600", "font-bold");
-        contents.forEach(c => {
-          if (c) {
-            c.id === `content-${target}` ? c.classList.remove("hidden") : c.classList.add("hidden");
-          }
-        });
-      });
-    });
-
-    // --- DEPENDENSI BIDANG VS UNIT ---
-    const bidangSelect = document.getElementById("select-bidang");
-    const unitSelect = document.getElementById("select-unit");
-    const unitsDataEl = document.getElementById("units-data");
-
-    if (bidangSelect && unitSelect && unitsDataEl) {
-      const unitsData = JSON.parse(unitsDataEl.dataset.json || '[]');
-
-      const filterUnits = (bidangId, selectedUnitId = "") => {
-        const hasSelected = selectedUnitId ? true : false;
-        unitSelect.innerHTML = `<option value="" disabled ${!hasSelected ? 'selected' : ''}>Pilih Unit Kantor</option>`;
-
-        if (!bidangId) return;
-
-        const filtered = unitsData.filter(u => String(u.bidangId) === String(bidangId));
-
-        filtered.forEach(u => {
-          const opt = document.createElement("option");
-          opt.value = u._id;
-          opt.textContent = u.name;
-
-          if (String(u._id) === String(selectedUnitId)) {
-            opt.selected = true;
-          }
-          unitSelect.appendChild(opt);
-        });
-      };
-
-      bidangSelect.addEventListener("change", (e) => filterUnits(e.target.value));
-
-      const selectedBidangOption = bidangSelect.querySelector('option[selected]');
-      const activeBidangId = selectedBidangOption ? selectedBidangOption.value : bidangSelect.value;
-      const activeUnitId = unitSelect.getAttribute("data-old");
-
-      if (activeBidangId) {
-        filterUnits(activeBidangId, activeUnitId);
-      }
-    }
-
-    // --- KONDISIONAL KONTRAK & MAGANG ---
-    const statusSelect = document.getElementById("select-status");
-    const kontrakWrapper = document.getElementById("wrapper-kontrak");
-    const kontrakInput = document.getElementById("input-tanggal-kontrak");
-
-    if (statusSelect && kontrakWrapper && kontrakInput) {
-      const toggleKontrak = (val) => {
-        if (val === "Pegawai Kontrak" || val === "Magang / Intern") {
-          kontrakWrapper.classList.remove("hidden");
-          kontrakInput.setAttribute("required", "required");
-        } else {
-          kontrakWrapper.classList.add("hidden");
-          kontrakInput.removeAttribute("required");
-          kontrakInput.value = "";
-        }
-      };
-      statusSelect.addEventListener("change", (e) => toggleKontrak(e.target.value));
-      if (statusSelect.value) toggleKontrak(statusSelect.value);
-    }
-
-    // --- REPEATER FORM KELUARGA ---
-    const familyContainer = document.getElementById("family-container");
-    if (familyContainer) {
-      document.getElementById("btn-add-family").addEventListener("click", () => {
-        const idx = familyContainer.querySelectorAll(".family-row").length;
-        const html = `
-        <div class="family-row grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl relative border border-slate-100">
-          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Nama</label><input type="text" name="anggota_keluarga[${idx}][nama]" required class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-slate-400 font-bold uppercase">Hubungan</label>
-            <select name="anggota_keluarga[${idx}][hubungan]" required class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden appearance-none">
-              <option value="Suami">Suami</option><option value="Istri">Istri</option><option value="Anak">Anak</option><option value="Orang Tua">Orang Tua</option><option value="Saudara Kandung">Saudara Kandung</option>
-            </select>
-          </div>
-          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">NIK</label><input type="text" maxlength="16" name="anggota_keluarga[${idx}][nik]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-          <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Pekerjaan</label><input type="text" name="anggota_keluarga[${idx}][pekerjaan]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-          <button type="button" class="btn-remove-family absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-lg font-bold">×</button>
-        </div>`;
-        familyContainer.insertAdjacentHTML('beforeend', html);
-      });
-      familyContainer.addEventListener("click", (e) => {
-        if (e.target.classList.contains("btn-remove-family")) e.target.closest(".family-row").remove();
-      });
-    }
-
-    // --- REPEATER FORM SERTIFIKAT ---
-    const certContainer = document.getElementById("cert-container");
-    if (certContainer) {
-      document.getElementById("btn-add-cert").addEventListener("click", () => {
-        const idx = certContainer.querySelectorAll(".cert-row").length;
-        const html = `
-      <div class="cert-row grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl relative border border-slate-100">
-        <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Nama Sertifikat</label><input type="text" name="sertifikat_kompetensi[${idx}][nama_sertifikat]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-        <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Penerbit / Lembaga</label><input type="text" name="sertifikat_kompetensi[${idx}][penerbit]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-        <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Nomor Sertifikat</label><input type="text" name="sertifikat_kompetensi[${idx}][nomor_sertifikat]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-        <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Tanggal Terbit</label><input type="date" name="sertifikat_kompetensi[${idx}][tanggal_terbit]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-        <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Tanggal Kadaluarsa</label><input type="date" name="sertifikat_kompetensi[${idx}][tanggal_kadaluarsa]" class="w-full px-[14px] py-2 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-        <div class="space-y-1"><label class="text-[10px] text-slate-400 font-bold uppercase">Upload File Sertifikat</label><input type="file" name="file_sertifikat_${idx}" class="w-full px-[14px] py-1.5 text-xs font-medium border border-slate-200 rounded-xl bg-white outline-hidden"/></div>
-        <button type="button" class="btn-remove-cert absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-lg font-bold">×</button>
-      </div>`;
-        certContainer.insertAdjacentHTML('beforeend', html);
-      });
-      certContainer.addEventListener("click", (e) => {
-        if (e.target.classList.contains("btn-remove-cert")) e.target.closest(".cert-row").remove();
-      });
-    }
-
-    // --- INTERSEPTOR AJAX FETCH API PER-FORM ---
-    const interceptForm = (formId, endpoint) => {
-      const form = document.getElementById(formId);
-      if (!form) return;
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        if (globalError) globalError.classList.add("hidden");
-
-        let bodyData;
-        let headers = {};
-
-        if (form.querySelector('input[type="file"]')) {
-          bodyData = new FormData(form);
-        } else {
-          const formData = new FormData(form);
-          const obj = {};
-
-          formData.forEach((value, key) => {
-            if (key.includes('[')) {
-              const parts = key.split(/\[|\]/).filter(p => p !== '');
-              if (parts.length === 3) {
-                const [arrName, idx, prop] = parts;
-                if (!obj[arrName]) obj[arrName] = [];
-                if (!obj[arrName][idx]) obj[arrName][idx] = {};
-                obj[arrName][idx][prop] = value;
-              } else if (parts.length === 2) {
-                const [arrName, innerKey] = parts;
-                if (isNaN(innerKey)) {
-                  if (!obj[arrName]) obj[arrName] = {};
-                  obj[arrName][innerKey] = value;
-                } else {
-                  if (!obj[arrName]) obj[arrName] = [];
-                  obj[arrName][innerKey] = value;
-                }
-              }
-            } else {
-              obj[key] = value;
-            }
-          });
-          bodyData = JSON.stringify(obj);
-          headers["Content-Type"] = "application/json";
-        }
-
-        try {
-          const res = await fetch(`/api/employee/${employeeId}/${endpoint}`, {
-            method: "PUT",
-            headers: headers,
-            body: bodyData
-          });
-          const result = await res.json();
-
-          if (result.success) {
-            triggerGlobalToast({ title: "Berhasil", message: result.message || "Data berhasil diperbarui.", type: "success" });
-            setTimeout(() => { window.location.reload(); }, 1500);
-          } else {
-            triggerGlobalToast({ title: "Gagal", message: result.message || "Gagal memproses pembaruan data.", type: "error" });
-          }
-        } catch (err) {
-          console.error("Fetch Error:", err);
-          triggerGlobalToast({ title: "Koneksi Terganggu", message: "Tidak dapat terhubung ke server.", type: "error" });
-        }
-      });
-    };
-
-    interceptForm("form-pribadi", "pribadi");
-    interceptForm("form-karir", "karir");
-    interceptForm("form-kontak", "kontak");
-    interceptForm("form-dokumen", "dokumen");
-    interceptForm("form-pendidikan", "pendidikan");
-    interceptForm("form-keluarga", "keluarga");
-    interceptForm("form-finansial", "finansial");
-  });
-</script>
+<script src="/js/edit-employee.js" defer></script>

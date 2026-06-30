@@ -1,381 +1,179 @@
-import { Overtime } from "../models/Overtime.model.js";
-import { createOvertimeService } from "../services/overtime.service.js";
-import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
-import Bidang from "../models/basic/Bidang.model.js";
-import EmployeeCareer from "../models/employee/EmployeeCareer.js";
-import Employee from "../models/employee/Employee.model.js";
-import EmployeeFinancial from "../models/employee/EmployeeFinancial.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
 import { getPayrollPeriod } from "../utils/payrollPeriod.js";
+import { Overtime } from "../models/Overtime.model.js";
+import Employee from "../models/employee/Employee.model.js";
+import {
+  createOvertime,
+  findMineOvertime,
+  findManagerApprovalList,
+} from "../services/overtime.service.js";
+import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 
-export const showApplyOvertime = (req, res) => {
-  const today = new Date();
-
-  const backLimit = new Date();
-  backLimit.setDate(today.getDate() - 7);
-
-  const period = getPayrollPeriod(today);
-
-  const minAllowed = new Date(Math.max(backLimit.getTime(), period.start.getTime()));
-
-  const formatDate = (d) => d.toISOString().split("T")[0];
-  console.log("DATE LIMIT:", {
-    min: formatDate(minAllowed),
-    max: formatDate(today),
-  });
-  return res.render("overtime/new", {
-    title: "Catat Lembur",
-    errors: {},
-    old: {},
-
-    dateLimit: {
-      min: formatDate(minAllowed),
-      max: formatDate(today),
-    },
-  });
-};
-
-export const applyOvertime = async (req, res) => {
+export const create = asyncHandler(async (req, res) => {
   const today = new Date();
   const backLimit = new Date();
   backLimit.setDate(today.getDate() - 7);
   const period = getPayrollPeriod(today);
   const minAllowed = new Date(Math.max(backLimit.getTime(), period.start.getTime()));
+
   const formatDate = (d) => d.toISOString().split("T")[0];
 
-  const currentDateLimit = {
-    min: formatDate(minAllowed),
-    max: formatDate(today),
-  };
+  res.render("overtime/new", {
+    ...buildRenderData(req, {
+      title: "Catat Lembur",
+      dateLimit: { min: formatDate(minAllowed), max: formatDate(today) },
+    }),
+  });
+});
 
-  try {
-    if (req.validationErrors) {
-      return res.render("overtime/new", {
+export const store = asyncHandler(async (req, res) => {
+  if (req.validationErrors) {
+    const today = new Date();
+    const backLimit = new Date();
+    backLimit.setDate(today.getDate() - 7);
+    const period = getPayrollPeriod(today);
+    const minAllowed = new Date(Math.max(backLimit.getTime(), period.start.getTime()));
+    const formatDate = (d) => d.toISOString().split("T")[0];
+
+    return res.status(400).render("overtime/new", {
+      ...buildRenderData(req, {
         title: "Catat Lembur",
         errors: req.validationErrors,
         old: req.body,
-        dateLimit: currentDateLimit,
-      });
-    }
-
-    await createOvertimeService({
-      user: req.session.user,
-      body: req.body,
-      file: req.file,
-    });
-
-    return res.redirect("/overtime/my");
-  } catch (err) {
-    console.log(err);
-
-    return res.render("overtime/new", {
-      title: "Catat Lembur",
-      errors: {
-        general: err.message,
-      },
-      old: req.body,
-      dateLimit: currentDateLimit,
+        dateLimit: { min: formatDate(minAllowed), max: formatDate(today) },
+      }),
     });
   }
-};
 
-export const myOvertime = async (req, res) => {
-  try {
-    const userId = req.session.user._id;
+  await createOvertime({ user: req.session.user, body: req.body, file: req.file });
+  req.flash("success", "Pengajuan lembur berhasil dikirim!");
+  return res.redirect("/overtime/my");
+});
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = 10;
-    const skip = (page - 1) * limit;
+export const my = asyncHandler(async (req, res) => {
+  const { page, limit } = req.query;
+  const { data: overtimes, meta } = await findMineOvertime({
+    userId: req.session.user._id,
+    page,
+    limit,
+  });
 
-    const totalData = await Overtime.countDocuments({ userId });
-
-    const totalPages = Math.ceil(totalData / limit);
-
-    const overtimes = await Overtime.find({ userId })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    return res.render("overtime/my-overtime", {
+  res.render("overtime/my-overtime", {
+    ...buildRenderData(req, {
       title: "Riwayat Lembur",
       overtimes,
-      pagination: {
-        page,
-        totalPages,
-        totalData,
-        hasPrev: page > 1,
-        hasNext: page < totalPages,
-      },
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err.message);
-  }
-};
-
-export const approvalOvertimePage = async (req, res) => {
-  try {
-    const user = req.session.user;
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = 10;
-    const skip = (page - 1) * limit;
-
-    const { search, status, sort, tab = "active" } = req.query;
-
-    const userRole = user.role;
-
-    const baseFilter = {
-      userId: { $ne: user._id },
-      requiredManagerRole: userRole,
-    };
-
-    if (search) {
-      baseFilter.employeeName = { $regex: search, $options: "i" };
-    }
-
-    const sortOption = sort === "asc" ? { createdAt: 1 } : { createdAt: -1 };
-
-    const activeFilter = {
-      ...baseFilter,
-      status: "SUBMITTED",
-    };
-
-    const historyFilter = {
-      ...baseFilter,
-      status: { $in: ["APPROVED", "REJECTED"] },
-    };
-
-    const [totalActive, totalHistory, activeOvertimes, historyOvertimes] = await Promise.all([
-      Overtime.countDocuments(activeFilter),
-      Overtime.countDocuments(historyFilter),
-
-      Overtime.find(activeFilter)
-        .populate("userId")
-        .sort(sortOption)
-        .skip(tab === "active" ? skip : 0)
-        .limit(tab === "active" ? limit : 10),
-
-      Overtime.find(historyFilter)
-        .populate("userId")
-        .sort(sortOption)
-        .skip(tab === "history" ? skip : 0)
-        .limit(tab === "history" ? limit : 10),
-    ]);
-
-    return res.render("overtime/approval", {
-      title: "Pusat Approval Lembur",
-      activeOvertimes,
-      historyOvertimes,
-      activeQuery: tab === "active" ? req.query : {},
-      historyQuery: tab === "history" ? req.query : {},
-
-      activePagination: {
-        page: tab === "active" ? page : 1,
-        totalPages: Math.ceil(totalActive / limit) || 1,
-        totalData: totalActive,
-        hasPrev: page > 1,
-        hasNext: page < Math.ceil(totalActive / limit),
-      },
-
-      historyPagination: {
-        page: tab === "history" ? page : 1,
-        totalPages: Math.ceil(totalHistory / limit) || 1,
-        totalData: totalHistory,
-        hasPrev: page > 1,
-        hasNext: page < Math.ceil(totalHistory / limit),
-      },
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err.message);
-  }
-};
-
-export const approveManagerOvertime = async (req, res) => {
-  try {
-    const overtime = await Overtime.findById(req.params.id);
-
-    if (!overtime) {
-      return res.status(404).send("Data tidak ditemukan");
-    }
-
-    const { note } = req.body;
-    const userRole = req.session.user.role;
-
-    if (userRole !== overtime.requiredManagerRole) {
-      return res.status(403).send("Anda tidak berhak approve lembur ini");
-    }
-
-    const financial = await EmployeeFinancial.findOne({
-      employee_id: overtime.employeeId,
-    });
-
-    if (!financial) {
-      return res.status(400).send("Data financial pegawai tidak ditemukan");
-    }
-
-    overtime.overtimeRateSnapshot = financial.overtimeRate || 0;
-    overtime.multiplierSnapshot = 1.5;
-
-    overtime.status = "APPROVED";
-    overtime.payrollStatus = "PENDING";
-
-    overtime.approvedBy = req.session.user._id;
-    overtime.approvedAt = new Date();
-
-    overtime.approvalHistory.push({
-      action: "APPROVED",
-      by: req.session.user._id,
-      role: userRole,
-      note: note?.trim() || null,
-      at: new Date(),
-    });
-
-    await overtime.save();
-
-    return res.redirect("/overtime/approval");
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err.message);
-  }
-};
-export const rejectOvertime = async (req, res) => {
-  try {
-    const overtime = await Overtime.findById(req.params.id);
-
-    if (!overtime) {
-      return res.status(404).send("Data tidak ditemukan");
-    }
-
-    const { note } = req.body;
-
-    const userRole = req.session.user.role;
-
-    if (userRole !== overtime.requiredManagerRole) {
-      return res.status(403).send("Anda tidak berhak reject lembur ini");
-    }
-
-    overtime.status = "REJECTED";
-    overtime.payrollStatus = "LOCKED";
-
-    overtime.approvedBy = req.session.user._id;
-    overtime.approvedAt = new Date();
-
-    overtime.approvalHistory.push({
-      action: "REJECTED",
-      by: req.session.user._id,
-      role: userRole,
-      note: note?.trim() || null,
-      at: new Date(),
-    });
-
-    await overtime.save();
-
-    return res.redirect("/overtime/approval");
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err.message);
-  }
-};
-export const approvalOvertimeHistory = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const { search, status, sort } = req.query;
-
-    const filter = {
-      userId: { $exists: true },
-      status: { $in: ["APPROVED", "REJECTED"] },
-    };
-
-    if (search) {
-      filter.employeeName = { $regex: search, $options: "i" };
-    }
-
-    if (status) {
-      filter.status = status;
-    }
-
-    const sortOption = sort === "asc" ? { createdAt: 1 } : { createdAt: -1 };
-
-    const totalData = await Overtime.countDocuments(filter);
-
-    const overtimes = await Overtime.find(filter).sort(sortOption).skip(skip).limit(limit);
-
-    return res.render("overtime/approval-history", {
-      title: "Riwayat Approval Lembur",
-      overtimes,
+      pagination: meta,
       query: req.query,
-      pagination: {
-        page,
-        limit,
-        totalData,
-        totalPages: Math.ceil(totalData / limit),
-        hasPrev: page > 1,
-        hasNext: page < Math.ceil(totalData / limit),
-      },
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err.message);
+    }),
+  });
+});
+
+export const approvalOvertimePage = asyncHandler(async (req, res) => {
+  const tab = req.query.tab || "active";
+  const { active, history } = await findManagerApprovalList({
+    user: req.session.user,
+    query: req.query,
+  });
+
+  res.render("overtime/approval", {
+    ...buildRenderData(req, {
+      title: "Pusat Approval Lembur",
+      activeOvertimes: active.data,
+      historyOvertimes: history.data,
+      activePagination: active.meta,
+      historyPagination: history.meta,
+      tab,
+      query: req.query,
+    }),
+  });
+});
+
+export const approveManagerOvertime = asyncHandler(async (req, res) => {
+  const overtime = await Overtime.findById(req.params.id);
+  if (!overtime) return res.status(404).send("Data tidak ditemukan");
+
+  const userRole = req.session.user.role;
+  if (userRole !== overtime.requiredManagerRole) {
+    return res.status(403).send("Anda tidak berhak approve lembur ini");
   }
-};
-export const getOvertimeDetail = async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    const overtime = await Overtime.findById(id).populate("approvalHistory.by");
+  // Membaca langsung dari model Employee terpadu
+  const employeeData = await Employee.findById(overtime.employeeId).lean();
+  if (!employeeData) return res.status(404).send("Data karyawan tidak ditemukan");
 
-    if (!overtime) {
-      return res.status(404).send("Data pengajuan lembur tidak ditemukan");
-    }
+  overtime.overtimeRateSnapshot = employeeData.financialData?.overtimeRate || 0;
+  overtime.multiplierSnapshot = 1.5;
+  overtime.status = "APPROVED";
+  overtime.payrollStatus = "PENDING";
+  overtime.approvedBy = req.session.user._id;
+  overtime.approvedAt = new Date();
 
-    const employee = await Employee.findOne({ userId: overtime.userId }).populate({
-      path: "careerData",
-      populate: [{ path: "bidangId" }, { path: "unitId" }],
-    });
+  overtime.approvalHistory.push({
+    action: "APPROVED",
+    by: req.session.user._id,
+    role: userRole,
+    note: req.body.note?.trim() || null,
+    at: new Date(),
+  });
 
-    const user = req.session.user;
+  await overtime.save();
+  req.flash("success", "Pengajuan lembur berhasil disetujui!");
+  return res.redirect("/overtime/approval");
+});
 
-    return res.render("overtime/detail", {
+export const rejectOvertime = asyncHandler(async (req, res) => {
+  const overtime = await Overtime.findById(req.params.id);
+  if (!overtime) return res.status(404).send("Data tidak ditemukan");
+
+  const userRole = req.session.user.role;
+  if (userRole !== overtime.requiredManagerRole) {
+    return res.status(403).send("Anda tidak berhak reject lembur ini");
+  }
+
+  overtime.status = "REJECTED";
+  overtime.payrollStatus = "LOCKED";
+  overtime.approvedBy = req.session.user._id;
+  overtime.approvedAt = new Date();
+
+  overtime.approvalHistory.push({
+    action: "REJECTED",
+    by: req.session.user._id,
+    role: userRole,
+    note: req.body.note?.trim() || null,
+    at: new Date(),
+  });
+
+  await overtime.save();
+  req.flash("error", "Pengajuan lembur telah ditolak.");
+  return res.redirect("/overtime/approval");
+});
+
+export const getOvertimeDetail = asyncHandler(async (req, res) => {
+  const overtime = await Overtime.findById(req.params.id).populate("approvalHistory.by");
+  if (!overtime) return res.status(404).send("Data tidak ditemukan");
+
+  const employee = await Employee.findOne({ userId: overtime.userId }).populate({
+    path: "careerData",
+    populate: [{ path: "bidangId" }, { path: "unitId" }],
+  });
+
+  res.render("overtime/detail", {
+    ...buildRenderData(req, {
       title: "Detail Aktivitas Lembur",
       overtime,
       employee,
-      user,
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send(err.message);
-  }
-};
-export const getPayrollOvertimeSummary = async (req, res) => {
-  try {
-    console.log("=== CONTROLLER OVERTIME PAYROLL START ===");
-    // Menangkap employeeId dari parameter URL route
-    const { employeeId } = req.params;
-    console.log("Target Employee ID:", employeeId);
+    }),
+  });
+});
 
-    // Memanggil service dengan passing employeeId
-    const result = await getOvertimeSummary(employeeId);
-    console.log("SERVICE RESULT FINAL:", result);
+export const getPayrollOvertimeSummary = asyncHandler(async (req, res) => {
+  const { employeeId } = req.params;
+  const result = await getOvertimeSummary(employeeId);
 
-    return res.status(200).json({
-      success: true,
-      totalHours: result?.totalHours || 0,
-      totalPay: result?.totalPay || 0,
-    });
-  } catch (error) {
-    console.error("Error di getPayrollOvertimeSummary Controller:", error);
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-      totalHours: 0,
-      totalPay: 0,
-    });
-  }
-};
-const canApproveOvertime = (userRole, requiredRole) => {
-  return userRole === requiredRole;
-};
+  return res.status(200).json({
+    success: true,
+    totalHours: result?.totalHours || 0,
+    totalPay: result?.totalPay || 0,
+  });
+});

@@ -1,135 +1,115 @@
 import { createEmployeeSchema } from "../validations/employee.schema.js";
-import { updateEmployeeSchema } from "../validations/employeeUpdate.schema.js";
-import { EmployeeService } from "../services/employee.service.js";
-import AppError from "../utils/AppError.js";
-import { successResponse } from "../utils/response.js";
-import Role from "../models/basic/Role.model.js";
+import * as EmployeeService from "../services/employee.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
 import { sendNewEmployeeEmail } from "../utils/emailHelper.js";
+import Employee from "../models/employee/Employee.model.js";
 import Position from "../models/basic/Position.model.js";
 import Unit from "../models/basic/Unit.model.js";
 import Bidang from "../models/basic/Bidang.model.js";
-import Employee from "../models/employee/Employee.model.js";
-import path from "path";
+import Role from "../models/basic/Role.model.js";
 
-export const getAllEmployeesWeb = async (req, res, next) => {
-  try {
-    const employees = await EmployeeService.findAllEmployees();
-    res.render("employee/index", {
-      title: "Data Pegawai",
-      employees,
-      error: null,
-      old: null,
+const handleControllerError = (err, res) => {
+  if (err.code === 11000) {
+    return res.status(400).json({
+      success: false,
+      message: "NIK, Email, atau berkas unik tersebut sudah terdaftar di sistem.",
     });
-  } catch (err) {
-    next(err);
   }
+  return res.status(500).json({
+    success: false,
+    message: err.message || "Terjadi kesalahan internal server.",
+  });
 };
 
-export const formEmployeeWeb = async (req, res, next) => {
-  try {
-    const currentUserRole = req.session.user.role;
-    const { positions, units, bidang, roles } = await EmployeeService.getFormData(currentUserRole);
+export const getAllEmployeesWeb = asyncHandler(async (req, res) => {
+  const employees = await EmployeeService.findAllEmployees(req.session.user);
+  res.render("employee/index", {
+    ...buildRenderData(req, {
+      title: "Data Pegawai",
+      employees,
+    }),
+  });
+});
 
-    res.render("employee/create", {
+export const formEmployeeWeb = asyncHandler(async (req, res) => {
+  const currentUserRole = req.session.user.role;
+  const { positions, units, bidang, roles } = await EmployeeService.getFormData(currentUserRole);
+
+  res.render("employee/create", {
+    ...buildRenderData(req, {
       title: "Tambah Pegawai",
-      error: null,
       positions,
       units,
       bidang,
       roles,
-    });
-  } catch (err) {
-    next(err);
+    }),
+  });
+});
+
+export const editEmployeeWeb = asyncHandler(async (req, res) => {
+  const [employee, references] = await Promise.all([
+    EmployeeService.findEmployeeById(req.params.id),
+    EmployeeService.getReferenceData(),
+  ]);
+
+  if (!employee) {
+    req.flash("error", "Pegawai tidak ditemukan.");
+    return res.status(404).render("errors/404", { message: "Pegawai tidak ditemukan" });
   }
-};
 
-export const editEmployeeWeb = async (req, res, next) => {
-  try {
-    const [employee, references] = await Promise.all([
-      EmployeeService.findEmployeeById(req.params.id),
-      EmployeeService.getReferenceData(),
-    ]);
-
-    if (!employee)
-      return res.status(404).render("errors/404", { message: "Pegawai tidak ditemukan" });
-
-    res.render("employee/edit", {
+  res.render("employee/edit", {
+    ...buildRenderData(req, {
       title: "Edit Data Pegawai",
       isMandiri: false,
-      error: null,
-      errors: {},
-      old: null,
       employee,
       positions: references.positions,
       units: references.units,
       bidang: references.bidangs,
       roles: references.roles,
-    });
-  } catch (err) {
-    next(err);
+    }),
+  });
+});
+
+export const editProfileMandiriWeb = asyncHandler(async (req, res) => {
+  const employeeId = req.session.user.employeeId;
+  const employee = await EmployeeService.findEmployeeById(employeeId);
+
+  if (!employee) {
+    return res.status(404).render("errors/404", { message: "Pegawai tidak ditemukan" });
   }
-};
 
-export const editProfileMandiriWeb = async (req, res, next) => {
-  try {
-    const employeeId = req.session.user.employeeId;
-
-    const employee = await EmployeeService.findEmployeeById(employeeId);
-    if (!employee)
-      return res.status(404).render("errors/404", { message: "Pegawai tidak ditemukan" });
-
-    res.render("employee/edit", {
+  res.render("employee/edit", {
+    ...buildRenderData(req, {
       title: "Edit Profil Mandiri",
       employee,
       isMandiri: true,
-      error: null,
-      errors: {},
-      old: null,
       positions: [],
       units: [],
       bidang: [],
       roles: [],
+    }),
+  });
+});
+
+export const getEmployeeDetailWeb = asyncHandler(async (req, res) => {
+  const employee = await EmployeeService.findEmployeeById(req.params.id);
+
+  if (!employee) {
+    return res.status(404).render("errors/404", {
+      message: "Data informasi pegawai tidak ditemukan atau sudah dihapus.",
     });
-  } catch (err) {
-    next(err);
   }
-};
 
-export const getEmployeeDetailWeb = async (req, res, next) => {
-  try {
-    const employee = await EmployeeService.findEmployeeById(req.params.id);
-
-    if (!employee) {
-      return res.status(404).render("errors/404", {
-        message: "Data informasi pegawai tidak ditemukan atau sudah dihapus.",
-      });
-    }
-    console.log("=== BENTUK DATA SALARY ===");
-    console.log(employee.salaryDetail);
-    res.render("employee/detail", {
+  res.render("employee/detail", {
+    ...buildRenderData(req, {
       title: "Profil Detail Pegawai",
       employee,
-      user: req.user,
-      error: null,
-      user: req.session?.user || req.user,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-const handleControllerError = (err, res) => {
-  if (err.code === 11000) {
-    return res.status(400).json({
-      success: false,
-      message: "NIK atau berkas unik tersebut sudah terdaftar di sistem.",
-    });
-  }
-  return res
-    .status(500)
-    .json({ success: false, message: err.message || "Terjadi kesalahan internal server." });
-};
+    }),
+  });
+});
 
-export const updatePribadiApi = async (req, res) => {
+export const updatePribadiApi = asyncHandler(async (req, res) => {
   try {
     const data = await EmployeeService.updatePribadi(req.params.id, req.body);
     return res
@@ -138,9 +118,9 @@ export const updatePribadiApi = async (req, res) => {
   } catch (err) {
     return handleControllerError(err, res);
   }
-};
+});
 
-export const updateKarirApi = async (req, res) => {
+export const updateKarirApi = asyncHandler(async (req, res) => {
   try {
     const data = await EmployeeService.updateKarir(req.params.id, req.body);
     return res
@@ -149,26 +129,20 @@ export const updateKarirApi = async (req, res) => {
   } catch (err) {
     return handleControllerError(err, res);
   }
-};
+});
 
-export const updateKontakApi = async (req, res) => {
+export const updateKontakApi = asyncHandler(async (req, res) => {
   try {
     const data = await EmployeeService.updateKontak(req.params.id, req.body);
-    return res.status(200).json({
-      success: true,
-      message: "Data Kontak Darurat & Alamat diperbarui.",
-      data,
-    });
+    return res
+      .status(200)
+      .json({ success: true, message: "Data Kontak Darurat & Alamat diperbarui.", data });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: err.message || "Gagal memperbarui data kontak.",
-    });
+    return handleControllerError(err, res);
   }
-};
-export const updateDokumenApi = async (req, res) => {
-  console.log("BODY:", req.body);
-  console.log("FILES:", req.files);
+});
+
+export const updateDokumenApi = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
     const bodyData = { ...req.body };
@@ -181,14 +155,10 @@ export const updateDokumenApi = async (req, res) => {
     if (req.files && req.files.length > 0) {
       req.files.forEach((file) => {
         const fileUrl = `/uploads/files/${file.filename}`;
-
-        if (file.fieldname === "file_ktp") {
-          fileKtpPath = fileUrl;
-        } else if (file.fieldname === "file_kk") {
-          fileKkPath = fileUrl;
-        } else if (file.fieldname === "file_skck") {
-          fileSkckPath = fileUrl;
-        } else if (file.fieldname.startsWith("file_sertifikat_")) {
+        if (file.fieldname === "file_ktp") fileKtpPath = fileUrl;
+        else if (file.fieldname === "file_kk") fileKkPath = fileUrl;
+        else if (file.fieldname === "file_skck") fileSkckPath = fileUrl;
+        else if (file.fieldname.startsWith("file_sertifikat_")) {
           const index = file.fieldname.split("_")[2];
           certFilesMap[index] = fileUrl;
         }
@@ -196,7 +166,6 @@ export const updateDokumenApi = async (req, res) => {
     }
 
     const rawSertifikat = bodyData.sertifikat_kompetensi || [];
-
     const formattedSertifikat = rawSertifikat.map((cert, idx) => ({
       nama_sertifikat: cert.nama_sertifikat || "",
       penerbit: cert.penerbit || "",
@@ -215,39 +184,28 @@ export const updateDokumenApi = async (req, res) => {
     };
 
     const updatedDoc = await EmployeeService.updateDokumen(id, payload);
-
     return res.status(200).json({
       success: true,
       message: "Seluruh berkas legalitas dan sertifikat kompetensi berhasil diperbarui.",
       data: updatedDoc,
     });
   } catch (err) {
-    console.error(err);
-
-    return res.status(500).json({
-      success: false,
-      message: err.message || "Gagal memperbarui tab dokumen.",
-    });
+    return handleControllerError(err, res);
   }
-};
+});
 
-export const updatePendidikanApi = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
-
+export const updatePendidikanApi = asyncHandler(async (req, res) => {
   try {
     const data = await EmployeeService.updatePendidikan(req.params.id, req.body, req.file);
-
-    return res.status(200).json({
-      success: true,
-      message: "Data Pendidikan Terakhir berhasil disimpan.",
-      data,
-    });
+    return res
+      .status(200)
+      .json({ success: true, message: "Data Pendidikan Terakhir berhasil disimpan.", data });
   } catch (err) {
     return handleControllerError(err, res);
   }
-};
-export const updateKeluargaApi = async (req, res) => {
+});
+
+export const updateKeluargaApi = asyncHandler(async (req, res) => {
   try {
     const data = await EmployeeService.updateKeluarga(req.params.id, req.body);
     return res
@@ -256,34 +214,31 @@ export const updateKeluargaApi = async (req, res) => {
   } catch (err) {
     return handleControllerError(err, res);
   }
-};
-export const updateFinansialApi = async (req, res) => {
+});
+
+export const updateFinansialApi = asyncHandler(async (req, res) => {
   try {
     const payload = { ...req.body };
     const userRole = req.session.user.role;
-    console.log("=== CCTV 1: req.body DARI FORM ===", req.body);
+
     if (userRole !== "HR" && userRole !== "WAKIL_DIREKTUR") {
       delete payload.basicSalary;
       delete payload.overtimeRate;
-      delete payload.effectiveDate;
     }
 
-    const data = await EmployeeService.updateFinansial(req.params.id, req.body);
-
+    const data = await EmployeeService.updateFinansial(req.params.id, payload);
     return res
       .status(200)
       .json({ success: true, message: "Data Finansial & Akun Payroll berhasil disimpan.", data });
   } catch (err) {
     return handleControllerError(err, res);
   }
-};
+});
 
-export const createEmployeeApi = async (req, res, next) => {
+export const createEmployeeApi = asyncHandler(async (req, res) => {
   try {
     const validatedBody = createEmployeeSchema.parse(req.body);
-
     const { newEmployee, plainPassword } = await EmployeeService.createNewEmployee(validatedBody);
-
     const username = validatedBody.fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
     try {
@@ -293,41 +248,37 @@ export const createEmployeeApi = async (req, res, next) => {
         username,
         plainPassword
       );
-      console.log("Email kredensial berhasil dikirim ke:", validatedBody.email);
     } catch (emailErr) {
       console.error("Gagal mengirim email kredensial:", emailErr);
     }
 
+    req.flash("success", `Pegawai baru bernama ${validatedBody.fullName} berhasil ditambahkan!`);
     return res.redirect("/employee");
   } catch (err) {
+    // Penanganan fallback resource form ketika terjadi error registrasi
     let positions = [],
       units = [],
       bidang = [],
       roles = [];
-    try {
-      const currentUserRole = req.session?.user?.role;
-      let roleQuery = {};
-      if (currentUserRole !== "DIREKTUR_UTAMA") {
-        roleQuery = { name: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] } };
-      }
-
-      [positions, units, bidang, roles] = await Promise.all([
-        Position.find({ name: { $in: ["General Manager", "Pegawai", "Manager"] } }),
-        Unit.find().lean(),
-        Bidang.find().lean(),
-        Role.find(roleQuery),
-      ]);
-    } catch (dbErr) {
-      console.error("Gagal memuat ulang database resource:", dbErr);
+    const currentUserRole = req.session?.user?.role;
+    let roleQuery = {};
+    if (currentUserRole !== "DIREKTUR_UTAMA") {
+      roleQuery = { name: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] } };
     }
+
+    [positions, units, bidang, roles] = await Promise.all([
+      Position.find({ name: { $in: ["General Manager", "Pegawai", "Manager"] } }).lean(),
+      Unit.find().lean(),
+      Bidang.find().lean(),
+      Role.find(roleQuery).lean(),
+    ]);
 
     let mappedErrors = {};
     let globalError = null;
 
     if (err.name === "ZodError") {
       err.errors.forEach((e) => {
-        const fieldName = e.path[0];
-        mappedErrors[fieldName] = e.message;
+        mappedErrors[e.path[0]] = e.message;
       });
     } else if (err.code === 11000) {
       const field = Object.keys(err.keyValue)[0];
@@ -337,61 +288,50 @@ export const createEmployeeApi = async (req, res, next) => {
     }
 
     return res.render("employee/create", {
-      title: "Tambah Pegawai",
-      error: globalError,
-      errors: mappedErrors,
-      old: req.body,
-      positions,
-      units,
-      bidang,
-      roles,
+      ...buildRenderData(req, {
+        title: "Tambah Pegawai",
+        error: globalError,
+        errors: mappedErrors,
+        old: req.body,
+        positions,
+        units,
+        bidang,
+        roles,
+      }),
     });
   }
-};
+});
 
-export const ajukanPHKApi = async (req, res, next) => {
-  try {
-    if (!req.file) return next(new AppError("Dokumen PHK wajib diunggah", 400));
-    await EmployeeService.createTermination(req.body, req.file.path);
-
-    return res.redirect("/employee");
-  } catch (err) {
-    next(err);
+export const ajukanPHKApi = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    req.flash("error", "Dokumen bukti keputusan PHK wajib diunggah.");
+    return res.redirect("back");
   }
-};
-export const uploadAvatarWeb = async (req, res) => {
-  try {
-    const employeeId = req.params.id;
+  await EmployeeService.createTermination(req.body, req.file.path);
+  req.flash("success", "Pengajuan Surat PHK berhasil diterbitkan dan menunggu persetujuan.");
+  return res.redirect("/employee");
+});
 
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "Tidak ada file diunggah" });
-    }
-
-    const imageUrl = `/uploads/files/${req.file.filename}`;
-
-    const updated = await Employee.findByIdAndUpdate(
-      employeeId,
-      { foto_profile: imageUrl },
-      { new: true }
-    );
-
-    if (!updated) {
-      return res.status(404).json({ success: false, message: "Pegawai tidak ditemukan" });
-    }
-
-    if (req.session && req.session.user) {
-      req.session.user.foto_profile = imageUrl;
-
-      req.session.save((err) => {
-        if (err) {
-          console.error("Gagal menyimpan sesi:", err);
-        }
-      });
-    }
-
-    return res.status(200).json({ success: true, imageUrl });
-  } catch (err) {
-    console.error("ERROR UPLOAD:", err);
-    return res.status(500).json({ success: false, message: err.message });
+export const uploadAvatarWeb = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: "Tidak ada file diunggah" });
   }
-};
+
+  const imageUrl = `/uploads/files/${req.file.filename}`;
+  const updated = await Employee.findByIdAndUpdate(
+    req.params.id,
+    { foto_profile: imageUrl },
+    { new: true }
+  );
+
+  if (!updated) {
+    return res.status(404).json({ success: false, message: "Pegawai tidak ditemukan" });
+  }
+
+  if (req.session?.user) {
+    req.session.user.foto_profile = imageUrl;
+    await new Promise((resolve) => req.session.save(() => resolve()));
+  }
+
+  return res.status(200).json({ success: true, imageUrl });
+});
