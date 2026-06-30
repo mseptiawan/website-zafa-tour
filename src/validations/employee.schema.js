@@ -144,8 +144,8 @@ const familyMemberSchema = z.object({
   pekerjaan: z.string().optional().nullable().default("-"),
 
   jenis_kelamin: z.enum(["Laki-laki", "Perempuan"]).optional().nullable(),
-  tanggal_lahir: z.string().optional().nullable(), // Diterima sebagai string HTML date dulu ("YYYY-MM-DD")
-  status_tanggungan: z.union([z.string(), z.boolean()]).optional().default(false), // Bisa terima string 'true'/'false' atau boolean asli
+  tanggal_lahir: z.string().optional().nullable(),
+  status_tanggungan: z.union([z.string(), z.boolean()]).optional().default(false),
 });
 
 export const updateFamilySchema = z.object({
@@ -200,7 +200,7 @@ export const updateDocumentSchema = z.object({
     .refine(
       (val) => {
         if (!val) return true;
-        return /^[A-Z0-9]{7,9}$/i.test(val); // Pola umum nomor paspor Alfanumerik 7-9 karakter
+        return /^[A-Z0-9]{7,9}$/i.test(val);
       },
       { message: "Format Nomor Paspor tidak valid" }
     ),

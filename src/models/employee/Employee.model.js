@@ -123,18 +123,11 @@ employeeSchema.virtual("terminationHistory", {
   justOne: false,
 });
 
-employeeSchema.virtual("salaryDetail", {
-  ref: "EmployeeSalary",
-  localField: "_id",
-  foreignField: "employeeId",
-  justOne: true,
-});
-
-employeeSchema.virtual("careerHistory", {
-  ref: "CareerHistory",
+employeeSchema.virtual("careerData", {
+  ref: "EmployeeCareer",
   localField: "_id",
   foreignField: "employee_id",
-  justOne: false, // Diubah ke false agar bisa menampung list mutasi/riwayat kerja
+  justOne: false,
 });
 
 employeeSchema.virtual("documentData", {

@@ -255,7 +255,6 @@ export const createEmployeeApi = asyncHandler(async (req, res) => {
     req.flash("success", `Pegawai baru bernama ${validatedBody.fullName} berhasil ditambahkan!`);
     return res.redirect("/employee");
   } catch (err) {
-    // Penanganan fallback resource form ketika terjadi error registrasi
     let positions = [],
       units = [],
       bidang = [],

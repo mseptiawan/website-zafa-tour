@@ -50,7 +50,6 @@ export const findAllEmployees = async (currentUser) => {
     .populate("approvedBy", "username")
     .lean();
 
-  // Ambil data karir secara terpisah untuk digabungkan (Lebih cepat & aman daripada deep virtual populate)
   const employeeIds = employeesData.map((e) => e._id);
   const careers = await EmployeeCareer.find({ employee_id: { $in: employeeIds } })
     .populate("bidangId unitId positionId")
@@ -73,7 +72,6 @@ export const findAllEmployees = async (currentUser) => {
       };
     }
 
-    // Dipasang ke careerData agar tidak merusak view EJS lama
     emp.careerData = careerInfo || null;
     return emp;
   });
@@ -121,7 +119,6 @@ export const createNewEmployee = async (data) => {
       roleId: data.roleId,
     });
 
-    // Embed data default langsung saat create awal
     createdEmployee = await Employee.create({
       userId: createdUser._id,
       employeeIdNumber: data.nomor_ktp,
@@ -173,13 +170,11 @@ export const findEmployeeById = async (id) => {
   const employee = await Employee.findById(id).populate("userId").lean();
   if (!employee) return null;
 
-  // Tarik data relasi eksternal
   const [career, document] = await Promise.all([
     EmployeeCareer.findOne({ employee_id: id }).populate("positionId unitId bidangId").lean(),
     EmployeeDocument.findOne({ employee_id: id }).lean(),
   ]);
 
-  // Pasang ke objek utama agar struktur property tetap kompatibel dengan EJS dan Virtuals lama
   employee.careerData = career || null;
   employee.documentData = document || null;
 
@@ -326,14 +321,13 @@ export const updateKeluarga = async (id, data) => {
     tanggal_lahir: m.tanggal_lahir ? new Date(m.tanggal_lahir) : null,
     jenis_kelamin: m.jenis_kelamin || null,
     pekerjaan: m.pekerjaan || "-",
-    // Konversi string dari form select menjadi Boolean asli murni
     status_tanggungan: m.status_tanggungan === "true" || m.status_tanggungan === true,
   }));
 
   return await Employee.findByIdAndUpdate(
     id,
     { $set: { familyData: formattedFamily } },
-    { new: true, runValidators: true } // runValidators memastikan aturan enum bekerja saat update
+    { new: true, runValidators: true }
   );
 };
 
@@ -350,7 +344,6 @@ export const updateFinansial = async (id, data) => {
     "financialData.overtimeRate": data.overtimeRate ?? 0,
   };
 
-  // Jika payload membawa basicSalary (dari HR/Wadir), masukkan juga ke dalam financialData
   if (data.basicSalary !== undefined) {
     updateData["financialData.basicSalary"] = data.basicSalary ?? 0;
   }

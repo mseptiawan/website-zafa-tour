@@ -9,12 +9,7 @@
       title: 'Daftarkan Pegawai Baru',
       description: 'Langkah awal pembuatan akun kredensial dan penempatan posisi kerja staf baru.'
     }) %>
-
-    <% if (typeof error !== 'undefined' && error && error !== 'null' && error !== null) { %>
-      <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
-        <%= error %>
-      </div>
-    <% } %>
+    
 
     <div id="units-data" data-json="<%= JSON.stringify(units) %>" class="hidden"></div>
 

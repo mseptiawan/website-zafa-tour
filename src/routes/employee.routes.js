@@ -54,7 +54,7 @@ router.get("/my-profile/edit", editProfileMandiriWeb);
 // 2. ROUTE PROSES DATA / ACTION FORM (POST & PUT)
 // ==========================================
 
-// Create Karyawan Baru (Hanya HR/Direksi)
+// Create Karyawan Baru (Hanya HR)
 router.post(
   "/create",
   roleMiddleware(...HR_MANAGEMENT_ROLES),
@@ -65,7 +65,7 @@ router.post(
   createEmployeeApi
 );
 
-// Pengajuan PHK (Hanya HR/Direksi)
+// Pengajuan PHK (Hanya HR)
 router.post(
   "/phk",
   roleMiddleware(...HR_MANAGEMENT_ROLES),
