@@ -1,7 +1,9 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class=" min-h-screen ml-72 bg-slate-50/50 p-8 antialiased text-slate-900">
-  <div class="mx-auto max-w-none space-y-6">
+<div id="categories-data" data-json="<%= JSON.stringify(categories || []) %>" class="hidden"></div>
+
+<div class="min-h-screen ml-0 md:ml-72 bg-slate-50/50 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-none mx-auto mt-4 md:mt-0 space-y-6">
 
     <%- include('../../partials/page-header', { 
         section: 'Area Kerja', 
@@ -10,35 +12,32 @@
         description: 'Kelola master data kategori klaim beban/reimbursement pegawai secara terpusat.' 
     }) %>
 
-    <!-- Statistik Singkat & Tombol Tambah -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.01)] border border-slate-200">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 md:border-slate-200/80">
       <div>
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Kategori Aktif</p>
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider select-none">Total Kategori Aktif</p>
         <h3 class="text-xl font-bold text-slate-800 mt-1 block tabular-nums" id="total-kategori">0</h3>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="openModal('add')" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold px-5 py-3 rounded-xl transition active:scale-[0.98] cursor-pointer">
+        <button id="btn-add-category" class="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-semibold px-5 py-2.5 rounded-xl transition-all active:scale-98 cursor-pointer">
           <i class="fa-solid fa-plus text-[10px]"></i>
           <span>Tambah Kategori</span>
         </button>
       </div>
     </div>
 
-    <!-- Tabel Data Kategori -->
-    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm min-w-[800px]">
-          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+          <thead class="bg-slate-50/70 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
             <tr>
-              <th class="text-left px-6 py-4">Nama Kategori</th>
-              <th class="text-left px-6 py-4">Keterangan / Deskripsi</th>
-              <th class="text-left px-6 py-4">Status</th>
-              <th class="text-right px-6 py-4">Aksi</th>
+              <th class="text-left px-6 py-4 font-bold">Nama Kategori</th>
+              <th class="text-left px-6 py-4 font-bold">Keterangan / Deskripsi</th>
+              <th class="text-left px-6 py-4 font-bold">Status</th>
+              <th class="text-right px-6 py-4 font-bold">Aksi</th>
             </tr>
           </thead>
-          <tbody id="category-table-body" class="divide-y divide-slate-100">
-            <!-- Data di-render via JavaScript di bawah -->
-          </tbody>
+          <tbody id="category-table-body" class="divide-y divide-slate-100 text-[13px]">
+            </tbody>
         </table>
       </div>
     </div>
@@ -46,186 +45,33 @@
   </div>
 </div>
 
-<!-- Modal Form CRUD (Tambah / Edit) -->
-<div id="category-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-[110] transition-all">
-  <div class="bg-white rounded-2xl  w-full max-w-md overflow-hidden border border-slate-100 transform transition-all">
+<div id="category-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs hidden items-center justify-center p-4 z-[110] transition-all">
+  <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden border border-slate-200/60 shadow-lg transform transition-all">
     <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-      <h3 id="modal-title" class="text-[14px] font-bold text-slate-900">Tambah Kategori Pengeluaran</h3>
-      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+      <h3 id="modal-title" class="text-[13px] font-bold text-slate-800 uppercase tracking-wide">Tambah Kategori Pengeluaran</h3>
+      <button id="btn-close-modal-x" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
-    <form id="category-form" onsubmit="saveCategory(event)">
+    <form id="category-form">
       <input type="hidden" id="form-id">
       <div class="p-5 space-y-4">
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Nama Kategori</label>
-          <input type="text" id="form-name" required placeholder="Contoh: Operasional & ATK" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Nama Kategori</label>
+          <input type="text" id="form-name" required placeholder="Contoh: Operasional & ATK" class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
         </div>
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Deskripsi / Catatan</label>
-          <textarea id="form-description" rows="3" placeholder="Deskripsi singkat cakupan biaya kategori ini..." class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all resize-none"></textarea>
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Deskripsi / Catatan</label>
+          <textarea id="form-description" rows="4" placeholder="Deskripsi singkat cakupan biaya kategori ini..." class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none resize-none transition-all text-slate-800 leading-relaxed"></textarea>
         </div>
       </div>
-      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
-        <button type="button" onclick="closeModal()" class="px-3.5 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-600 hover:bg-slate-50 text-[12px] font-medium transition-all cursor-pointer">Batal</button>
-        <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[12px] font-semibold transition-all cursor-pointer">Simpan</button>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end gap-2.5">
+        <button type="button" id="btn-close-modal-cancel" class="border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-[12px] font-semibold hover:bg-slate-50 transition-colors cursor-pointer">Batal</button>
+        <button type="submit" class="bg-blue-500 text-white px-5 py-2 rounded-xl text-[12px] font-semibold transition-colors hover:bg-blue-600 cursor-pointer">Simpan</button>
       </div>
     </form>
   </div>
 </div>
 
-<script>
-  // Parsing data categories dari Backend controller
-  let categories = <%- JSON.stringify(categories || []) %>;
-
-  const tableBody = document.getElementById("category-table-body");
-  const totalCounter = document.getElementById("total-kategori");
-  const categoryModal = document.getElementById("category-modal");
-
-  function renderTable() {
-    tableBody.innerHTML = "";
-    let activeCount = 0;
-
-    if (!categories.length) {
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="4" class="text-center py-12 text-slate-400">
-            Belum ada data kategori pengeluaran
-          </td>
-        </tr>`;
-      totalCounter.textContent = "0";
-      return;
-    }
-
-    categories.forEach((cat) => {
-      if(cat.isActive) activeCount++;
-
-      const rowOpacity = cat.isActive ? "" : "opacity-60 bg-slate-50";
-      const statusText = cat.isActive ? "Aktif" : "Non-Aktif";
-      const textClass = cat.isActive ? "text-emerald-600" : "text-slate-500";
-      const bgClass = cat.isActive ? "bg-emerald-50/70" : "bg-slate-100";
-      const borderClass = cat.isActive ? "border-emerald-200/50" : "border-slate-200";
-      const dotClass = cat.isActive ? "bg-emerald-500" : "bg-slate-400";
-
-      const tr = document.createElement("tr");
-      tr.className = `hover:bg-slate-50/50 transition ${rowOpacity}`;
-      tr.innerHTML = `
-        <td class="px-6 py-4 font-semibold text-slate-800">
-          ${cat.name}
-        </td>
-        <td class="px-6 py-4 text-slate-500 text-xs max-w-sm truncate">
-          ${cat.description || '<span class="text-slate-300 italic">Tidak ada deskripsi</span>'}
-        </td>
-        <td class="px-6 py-4">
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide ${textClass} ${bgClass} ${borderClass}">
-            <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
-            <span>${statusText}</span>
-          </div>
-        </td>
-        <td class="px-6 py-4">
-          <div class="flex items-center justify-end gap-2">
-            ${cat.isActive ? `
-              <!-- Tombol Edit -->
-              <button onclick="openModal('edit', '${cat._id}')" 
-                class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-400 text-white hover:bg-amber-500 transition active:scale-[0.95] cursor-pointer ">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4h3m2.586 2.586a2 2 0 010 2.828l-8.5 8.5L5 18l.086-3.086 8.5-8.5a2 2 0 012.828 0z" />
-                </svg>
-              </button>
-              <!-- Tombol Matikan (Soft Delete) -->
-              <button onclick="toggleStatus('${cat._id}', false)" 
-                class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition active:scale-[0.95] cursor-pointer" title="Nonaktifkan Kategori">
-                <i class="fa-solid fa-eye-slash text-xs"></i>
-              </button>
-            ` : `
-              <!-- Tombol Aktifkan Kembali -->
-              <button onclick="toggleStatus('${cat._id}', true)" 
-                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 text-[11px] font-bold transition active:scale-[0.95] cursor-pointer">
-                <i class="fa-solid fa-rotate-left mr-1.5 text-[10px]"></i> Aktifkan
-              </button>
-            `}
-          </div>
-        </td>`;
-      tableBody.appendChild(tr);
-    });
-
-    totalCounter.textContent = activeCount;
-  }
-
-  // Modal Management
-  function openModal(mode, id = null) {
-    categoryModal.classList.remove("hidden");
-    categoryModal.classList.add("flex");
-
-    if (mode === "edit") {
-      document.getElementById("modal-title").textContent = "Edit Kategori Pengeluaran";
-      const cat = categories.find((c) => c._id === id);
-
-      document.getElementById("form-id").value = cat._id;
-      document.getElementById("form-name").value = cat.name;
-      document.getElementById("form-description").value = cat.description || "";
-    } else {
-      document.getElementById("modal-title").textContent = "Tambah Kategori Pengeluaran";
-      document.getElementById("category-form").reset();
-      document.getElementById("form-id").value = "";
-    }
-  }
-
-  function closeModal() {
-    categoryModal.classList.add("hidden");
-    categoryModal.classList.remove("flex");
-  }
-
-  // API Form Submit
-  async function saveCategory(e) {
-    e.preventDefault();
-    const id = document.getElementById("form-id").value;
-    const payload = {
-      name: document.getElementById("form-name").value,
-      description: document.getElementById("form-description").value
-    };
-
-    try {
-      const url = id ? `/expense-categories/${id}` : "/expense-categories";
-      const method = id ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-      if (!result.success) throw new Error(result.message);
-      location.reload();
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-
-  // Soft Delete / Archive Toggle Status Function
-  async function toggleStatus(id, shouldActivate) {
-    const message = shouldActivate 
-      ? "Apakah Anda yakin ingin mengaktifkan kategori ini kembali?" 
-      : "Apakah Anda yakin ingin menonaktifkan kategori ini?";
-      
-    if (!confirm(message)) return;
-
-    try {
-      const response = await fetch(`/expense-categories/toggle-status/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: shouldActivate })
-      });
-
-      const result = await response.json();
-      if (!result.success) throw new Error(result.message);
-      location.reload();
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-
-  // Initialization
-  renderTable();
-</script>
+<script src="/js/expense-category.js" defer></script>

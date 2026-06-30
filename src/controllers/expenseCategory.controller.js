@@ -1,62 +1,95 @@
-import ExpenseCategory from "../models/ExpenseCategory.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { buildRenderData } from "../utils/renderHelper.js";
+import {
+  findAllCategories,
+  checkDuplicateName,
+  createCategory,
+  updateCategory,
+  updateCategoryStatus,
+} from "../services/expenseCategory.service.js";
 
-// 1. Render Halaman Utama Admin (View EJS)
-export const renderCategoryPage = async (req, res) => {
-  try {
-    const categories = await ExpenseCategory.find().sort({ name: 1 });
-    res.render("expense/expense-category/index", {
+/**
+ * ─── METHOD 1: RENDER INDEX PAGE ─────────────────────────────────────────────
+ */
+export const index = asyncHandler(async (req, res) => {
+  const categories = await findAllCategories();
+
+  res.render("expense/expense-category/index", {
+    ...buildRenderData(req, {
       title: "Kelola Kategori Pengeluaran",
       categories,
+    }),
+  });
+});
+
+/**
+ * ─── METHOD 2: STORE NEW CATEGORY (API) ──────────────────────────────────────
+ */
+export const store = asyncHandler(async (req, res) => {
+  // Jika Anda menggunakan req.validationErrors dari middleware validate.v2
+  if (req.validationErrors) {
+    const categories = await findAllCategories();
+    return res.status(400).render("expense/expense-category/index", {
+      ...buildRenderData(req, {
+        title: "Kelola Kategori Pengeluaran",
+        categories,
+        errors: req.validationErrors,
+        old: req.body,
+        error: ["Mohon periksa kembali form pengisian Anda."],
+      }),
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading expense categories page");
   }
-};
 
-// 2. API: Tambah Kategori Baru
-export const createCategory = async (req, res) => {
-  try {
-    const { name, description } = req.body;
+  const { name, description } = req.body;
 
-    const existing = await ExpenseCategory.findOne({ name: name.trim() });
-    if (existing) {
-      return res.status(400).json({ success: false, message: "Kategori sudah terdaftar" });
-    }
-
-    await ExpenseCategory.create({ name: name.trim(), description });
-    return res.json({ success: true, message: "Kategori berhasil ditambahkan" });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-// 3. API: Update Kategori
-export const updateCategory = async (req, res) => {
-  try {
-    const { name, description } = req.body;
-
-    await ExpenseCategory.findByIdAndUpdate(req.params.id, {
-      name: name.trim(),
-      description,
+  // Cek duplikasi via service
+  const isDuplicate = await checkDuplicateName(name);
+  if (isDuplicate) {
+    return res.status(400).json({
+      success: false,
+      message: "Kategori sudah terdaftar",
     });
-    return res.json({ success: true, message: "Kategori berhasil diperbarui" });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
   }
-};
 
-// 4. API: Toggle Status Aktif / Non-Aktif (Soft Delete)
-export const toggleCategoryStatus = async (req, res) => {
-  try {
-    const { isActive } = req.body;
+  await createCategory({ name, description });
 
-    await ExpenseCategory.findByIdAndUpdate(req.params.id, { isActive });
-    return res.json({
-      success: true,
-      message: `Kategori berhasil di-${isActive ? "aktifkan" : "nonaktifkan"}`,
-    });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
-  }
-};
+  req.flash("success", "Kategori pengeluaran berhasil ditambahkan!");
+  return res.json({
+    success: true,
+    message: "Kategori berhasil ditambahkan",
+  });
+});
+
+/**
+ * ─── METHOD 3: UPDATE CATEGORY (API) ─────────────────────────────────────────
+ */
+export const update = asyncHandler(async (req, res) => {
+  const { name, description } = req.body;
+  const { id } = req.params;
+
+  await updateCategory(id, { name, description });
+
+  req.flash("success", "Kategori pengeluaran berhasil diperbarui!");
+  return res.json({
+    success: true,
+    message: "Kategori berhasil diperbarui",
+  });
+});
+
+/**
+ * ─── METHOD 4: TOGGLE STATUS (API) ───────────────────────────────────────────
+ */
+export const toggleStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { isActive } = req.body;
+
+  await updateCategoryStatus(id, isActive);
+
+  const statusText = isActive ? "diaktifkan" : "dinonaktifkan";
+  req.flash("success", `Kategori berhasil di-${statusText}!`);
+
+  return res.json({
+    success: true,
+    message: `Kategori berhasil di-${statusText}`,
+  });
+});
