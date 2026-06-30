@@ -39,10 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  /**
+   * Mengambil data notifikasi dari backend
+   */
   async function fetchNotifications() {
     try {
-      // Menggunakan /api/notifications sesuai mounting router-mu
-      const response = await fetch("/api/notifications");
+      const response = await fetch("/notifications");
       const resData = await response.json();
       if (resData.success) {
         renderNotifications(resData.notifications, resData.unreadCount);
@@ -67,13 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!notifications || notifications.length === 0) {
       notifContainer.innerHTML = `
-      <div class="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi baru.</div>
-    `;
+        <div class="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi baru.</div>
+      `;
       return;
     }
 
-    // 1. Definisikan mapping style untuk setiap tipe modul secara dinamis
-    // 1. Definisikan mapping warna dan Icon SVG untuk setiap tipe modul
     const moduleStyles = {
       ASSIGNMENT: {
         bg: "bg-indigo-50 text-indigo-600 border border-indigo-100",
@@ -95,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
         bg: "bg-rose-50 text-rose-600 border border-rose-100",
         icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
       },
-
       DEFAULT: {
         bg: "bg-slate-50 text-slate-600 border border-slate-100",
         icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 16a1 1 0 1 1 1-1 1 1 0 0 1-1 1zm1-5.16V14a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1 1.5 1.5 0 1 0-1.5-1.5 1 1 0 0 1-2 0A3.5 3.5 0 1 1 13 12.84z"></path></svg>`,
@@ -113,37 +112,36 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentStyle = moduleStyles[item.type] || moduleStyles.DEFAULT;
 
       htmlContent += `
-    <a href="${targetUrl}" class="p-3.5 flex gap-3 items-start transition-colors block ${rowBackground}" data-id="${item._id}">
-      <div class="shrink-0 mt-0.5">
-        <div class="w-7 h-7 rounded-full ${currentStyle.bg} flex items-center justify-center">
-          ${currentStyle.icon}
-        </div>
-      </div>
-      <div class="min-w-0 flex-1 text-[11px]">
-        <p class="text-slate-600 font-medium leading-normal">
-          <span class="font-semibold text-slate-900">${item.title}</span>: ${item.text}
-        </p>
-        <div class="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400 font-medium">
-          <span>Baru saja</span>
-          <span>•</span>
-          <span class="text-slate-500 font-semibold capitalize">${item.module || "System"}</span>
-        </div>
-      </div>
-    </a>
-  `;
+        <a href="${targetUrl}" class="p-3.5 flex gap-3 items-start transition-colors block ${rowBackground}" data-id="${item._id}">
+          <div class="shrink-0 mt-0.5">
+            <div class="w-7 h-7 rounded-full ${currentStyle.bg} flex items-center justify-center">
+              ${currentStyle.icon}
+            </div>
+          </div>
+          <div class="min-w-0 flex-1 text-[11px]">
+            <p class="text-slate-600 font-medium leading-normal">
+              <span class="font-semibold text-slate-900">${item.title}</span>: ${item.text}
+            </p>
+            <div class="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400 font-medium">
+              <span>Baru saja</span>
+              <span>•</span>
+              <span class="text-slate-500 font-semibold capitalize">${item.module || "System"}</span>
+            </div>
+          </div>
+        </a>
+      `;
     });
 
     notifContainer.innerHTML = htmlContent;
   }
 
-  // Event Klik Mark-As-Read Tunggal via /api prefix
   notifContainer.addEventListener("click", async (e) => {
     const targetLink = e.target.closest("a[data-id]");
     if (!targetLink) return;
 
     const notifId = targetLink.getAttribute("data-id");
     try {
-      await fetch(`/api/notifications/${notifId}/read`, { method: "PATCH" });
+      await fetch(`/notifications/${notifId}/read`, { method: "PATCH" });
     } catch (error) {
       console.error("Gagal menandai notifikasi terbaca:", error);
     }
@@ -151,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   markAllReadBtn.addEventListener("click", async () => {
     try {
-      await fetch("/api/notifications/mark-all-read", { method: "POST" });
+      await fetch("/notifications/mark-all-read", { method: "POST" });
       fetchNotifications();
     } catch (error) {
       console.error("Gagal memperbarui status baca:", error);

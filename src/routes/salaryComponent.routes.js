@@ -12,6 +12,8 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
+router.get("/manage", renderManagePage);
+
 router.post("/", createComponent);
 
 router.put("/:id", updateComponent);

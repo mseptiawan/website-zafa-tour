@@ -160,7 +160,7 @@ async function saveComponent(e) {
   };
 
   try {
-    const url = id ? `/api/components/${id}` : "/api/components";
+    const url = id ? `/components/${id}` : "/components";
     const method = id ? "PUT" : "POST";
 
     const response = await fetch(url, {
@@ -207,7 +207,7 @@ async function deleteComponent(id) {
   if (!confirm("Apakah Anda yakin ingin mengarsipkan komponen ini?")) return;
 
   try {
-    const response = await fetch(`/api/components/${id}`, { method: "PATCH" });
+    const response = await fetch(`/components/${id}`, { method: "PATCH" });
     const result = await response.json();
     if (!result.success) throw new Error(result.message);
     location.reload();
@@ -220,7 +220,7 @@ async function restoreComponent(id) {
   if (!confirm("Apakah Anda yakin ingin mengaktifkan kembali komponen ini?")) return;
 
   try {
-    const response = await fetch(`/api/components/restore/${id}`, { method: "PATCH" });
+    const response = await fetch(`/components/restore/${id}`, { method: "PATCH" });
     const result = await response.json();
     if (!result.success) throw new Error(result.message);
     location.reload();

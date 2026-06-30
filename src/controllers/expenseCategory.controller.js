@@ -26,7 +26,6 @@ export const index = asyncHandler(async (req, res) => {
  * ─── METHOD 2: STORE NEW CATEGORY (API) ──────────────────────────────────────
  */
 export const store = asyncHandler(async (req, res) => {
-  // Jika Anda menggunakan req.validationErrors dari middleware validate.v2
   if (req.validationErrors) {
     const categories = await findAllCategories();
     return res.status(400).render("expense/expense-category/index", {
@@ -42,7 +41,6 @@ export const store = asyncHandler(async (req, res) => {
 
   const { name, description } = req.body;
 
-  // Cek duplikasi via service
   const isDuplicate = await checkDuplicateName(name);
   if (isDuplicate) {
     return res.status(400).json({

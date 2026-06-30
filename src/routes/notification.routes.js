@@ -3,7 +3,8 @@ import * as notificationController from "../controllers/notification.controller.
 
 const router = express.Router();
 
-router.get("/notifications", notificationController.getNotifications);
-router.post("/notifications/mark-all-read", notificationController.markAllRead);
-router.patch("/notifications/:id/read", notificationController.markSingleRead);
+router.get("/", notificationController.getNotifications);
+router.post("/mark-all-read", notificationController.markAllRead);
+router.patch("/:id/read", notificationController.markSingleRead);
+
 export default router;
