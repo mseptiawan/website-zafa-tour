@@ -65,6 +65,29 @@
             { name: "Penugasan Masuk", path: "/assignments/my", show: !!perms.assignment_my },
             { name: "Semua Penugasan", path: "/assignments/", show: !!perms.assignment_all }
           ]
+        },
+      {
+          id: "rewardPunishment",
+          name: "Reward & Punishment",
+          icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M11 5.5a2.5 2.5 0 115 0v1h-5v-1zm5 4v1H8v-1h8zM4 10H3a2 2 0 00-2 2v6a2 2 0 002 2h18a2 2 0 002-2v-6a2 2 0 00-2-2h-1M9 14l2 2 4-4" />`,
+          show: ["PEGAWAI", "MANAGER_ADMINISTRASI", "MANAGER_KEUANGAN", "MANAGER_HAJI_UMRAH", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(role),
+          submenus: [
+           { 
+              name: role !== "WAKIL_DIREKTUR" ? "Riwayat Log Saya" : "Riwayat Log Pegawai", 
+              path: role !== "WAKIL_DIREKTUR" ? "/reward-punishment/my-logs" : "/reward-punishment", 
+              show: true 
+            },
+            { 
+              name: "Catat Log Baru", 
+              path: "/reward-punishment/new", 
+              show: role === "WAKIL_DIREKTUR" 
+            },
+            { 
+              name: "Kelola Jenis Master", 
+              path: "/reward-punishment/types", 
+              show: role === "WAKIL_DIREKTUR" 
+            }
+          ]
         }
       ]
     },
@@ -230,8 +253,19 @@
             { name: "Laporan Absensi", path: "/report/attendance", show: true },
             { name: "Laporan Pengeluaran Gaji", path: "/report/payroll", show: true }
           ]
+        },
+        {
+          id: "system-setting",
+          name: "Pengaturan Sistem",
+          icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />`,
+          // Hanya tampil untuk role yang diizinkan di backend router kamu
+          show: ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI"].includes(role),
+          submenus: [
+            { name: "Konfigurasi Kantor", path: "/company-settings", show: true }
+          ]
         }
       ]
     }
+    
   ];
 %>

@@ -1,4 +1,4 @@
-# Human Resource Information System (HRIS)
+# Human Resource Information System
 
 A web-based Human Resource Information System designed to manage core HR operations such as attendance, leave management, overtime, and business trip workflows with a structured approval system.
 

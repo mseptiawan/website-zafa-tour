@@ -14,7 +14,7 @@ export const showLogin = asyncHandler(async (req, res) => {
     return res.redirect("/dashboard");
   }
   res.render("auth/login", {
-    ...buildRenderData(req, { title: "Login HRIS" }),
+    ...buildRenderData(req, { title: "Login" }),
   });
 });
 
@@ -23,7 +23,7 @@ export const login = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
     return res.status(400).render("auth/login", {
       ...buildRenderData(req, {
-        title: "Login HRIS",
+        title: "Login",
         errors: req.validationErrors,
         old: req.body,
       }),
@@ -52,7 +52,7 @@ export const login = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(error.statusCode || 500).render("auth/login", {
       ...buildRenderData(req, {
-        title: "Login HRIS",
+        title: "Login",
         error: [error.message || "Terjadi kesalahan internal pada server."],
         old: req.body,
       }),

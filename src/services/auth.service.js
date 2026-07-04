@@ -56,7 +56,7 @@ export const verifyAndBuildSession = async (identifier, password) => {
     email: user.email,
     employeeId: employee?._id || null,
     employeeNumber: employee?.employeeIdNumber || null,
-    fullName: employee?.fullName || "User HRIS",
+    fullName: employee?.fullName || "User",
     foto_profile: employee?.foto_profile || null,
     gender: employee?.jenis_kelamin || null,
     role: roleName,
@@ -95,7 +95,7 @@ export const requestResetToken = async (email) => {
 
   await sendEmail({
     to: email,
-    subject: "Reset Password Akun HRIS",
+    subject: "Reset Password Akun",
     html: `
       <h2>Reset Password</h2>
       <p>Klik tombol di bawah ini untuk mengatur ulang password Anda:</p>
