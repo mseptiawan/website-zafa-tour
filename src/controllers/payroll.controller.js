@@ -279,6 +279,8 @@ export const closePayrollForEmployees = asyncHandler(async (req, res) => {
 
     totalDeductions += totalLoanDeduction;
 
+    // ─── PERUBAHAN UTAMA DI SINI ──────────────────────────────────────
+    // Status langsung ditembak "PAID" dan langsung mencatat "paidAt"
     const finalPayroll = await Payroll.findOneAndUpdate(
       { employeeId: empId, periodMonth: periodMonth },
       {
@@ -291,10 +293,13 @@ export const closePayrollForEmployees = asyncHandler(async (req, res) => {
         totalEarnings,
         totalDeductions,
         netTakeHomePay: totalEarnings - totalDeductions,
-        status: "CLOSED",
+        status: "PAID", // Menggantikan "CLOSED" agar langsung lunas
+        paidAt: new Date(), // Langsung set waktu pembayaran sekarang
+        mutationFile: "/uploads/files/default-receipt.pdf", // Mengisi fallback bukti transfer otomatis
       },
       { upsert: true, new: true }
     );
+    // ──────────────────────────────────────────────────────────────────
 
     // Otomatis mengubah status tagihan pinjaman karyawan menjadi lunas terpotong payroll
     await LoanPayment.updateMany(
@@ -303,11 +308,15 @@ export const closePayrollForEmployees = asyncHandler(async (req, res) => {
     );
 
     processedResults.push(finalPayroll);
+
+    // 💡 TIPS: Di baris ini, kamu bisa langsung panggil service / fungsi
+    // pengiriman email/notifikasi slip gaji ke pegawai, misalnya:
+    // await sendSalarySlipToEmail(empId, finalPayroll);
   }
 
   return res.status(200).json({
     success: true,
-    message: `Proses tutup buku payroll periode ${periodMonth} berhasil dieksekusi secara masal!`,
+    message: `Proses tutup buku dan pencairan payroll periode ${periodMonth} berhasil dieksekusi massal. Slip gaji siap dikirim!`,
     data: processedResults,
   });
 });

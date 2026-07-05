@@ -89,12 +89,12 @@
               <td><%= employee.employeeIdNumber %></td>
             </tr>
             <tr>
-              <td style="color: #64748b;">Bagian</td>
+              <td style="color: #64748b;">Bidang</td>
               <td>:</td>
               <td><%= employee.careerData?.bidangId?.name || '-' %></td>
             </tr>
             <tr>
-              <td style="color: #64748b;">Job Title</td>
+              <td style="color: #64748b;">Jabatan</td>
               <td>:</td>
               <td><%= employee.careerData?.positionId?.name || '-' %></td>
             </tr>
@@ -103,7 +103,7 @@
         <td style="width: 50%;">
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
-              <td style="width: 120px; color: #64748b;">Golongan / Unit</td>
+              <td style="width: 120px; color: #64748b;"> Unit</td>
               <td style="width: 12px;">:</td>
               <td><%= employee.careerData?.unitId?.name || '-' %></td>
             </tr>
