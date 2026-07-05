@@ -211,7 +211,6 @@ export const getApprovalTripsService = async (user) => {
     baseFilter.currentStep = "DIREKTUR_UTAMA";
     console.log("FILTER (DIREKTUR):", baseFilter);
 
-    // TAMBAHKAN .populate("userId", "username") DI SINI
     const trips = await BusinessTrip.find(baseFilter).populate("userId", "username");
     console.log("RESULT:", trips.length);
     return trips;
@@ -231,7 +230,6 @@ export const getApprovalTripsService = async (user) => {
     ];
     console.log("FILTER (WAKIL DIREKTUR):", baseFilter);
 
-    // TAMBAHKAN .populate("userId", "username") DI SINI
     const trips = await BusinessTrip.find(baseFilter).populate("userId", "username");
     console.log("RESULT:", trips.length);
     return trips;
@@ -245,7 +243,7 @@ export const getApprovalTripsService = async (user) => {
   const employee = await Employee.findOne({ userId: user._id });
 
   if (!employee) {
-    console.log("❌ employee NOT FOUND");
+    console.log(" employee NOT FOUND");
     return [];
   }
 
@@ -254,15 +252,14 @@ export const getApprovalTripsService = async (user) => {
   });
 
   if (!career) {
-    console.log("❌ career NOT FOUND"); // Perbaikan: hapus panggilan bidang di sini
+    console.log(" career NOT FOUND"); 
     return [];
   }
 
-  // Deklarasi bidang dilakukan di sini
   const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
 
   if (!bidang?.managerRoleId) {
-    console.log("❌ managerRole NOT FOUND");
+    console.log(" managerRole NOT FOUND");
     return [];
   }
 
@@ -270,7 +267,6 @@ export const getApprovalTripsService = async (user) => {
 
   console.log("FILTER (MANAGER):", baseFilter);
 
-  // Ambil data plus lakukan populate userId agar nama pengaju muncul di EJS
   const trips = await BusinessTrip.find(baseFilter).populate("userId", "username");
 
   console.log("RESULT:", trips.length);

@@ -105,7 +105,6 @@ export const buildPayroll = async ({ employeeId, date, overtime }) => {
   const employee = await Employee.findById(employeeId).lean();
   const allowances = await EmployeeAllowance.find({ employeeId }).populate("componentId").lean();
 
-  // Mengambil nominal basicSalary dari sub-dokumen financialData terpadu
   const basicSalary = employee?.financialData?.basicSalary || 0;
 
   const earning = allowances

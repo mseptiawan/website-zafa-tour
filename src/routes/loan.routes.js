@@ -20,7 +20,6 @@ import {
 
 const router = express.Router();
 
-// Proteksi Global: Sesi login aktif diwajibkan
 router.use(authMiddleware);
 
 // --- Akses Fitur Karyawan Mandiri ---

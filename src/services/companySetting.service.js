@@ -17,7 +17,6 @@ export const getSettings = async () => {
 export const updateSettings = async (payload) => {
   const { name, entryTimeLimit, gracePeriodMinutes, locations } = payload;
 
-  // Pastikan struktur array lokasi terformat dengan benar
   let formattedLocations = [];
   if (locations && Array.isArray(locations)) {
     formattedLocations = locations.map((loc) => ({
@@ -29,7 +28,7 @@ export const updateSettings = async (payload) => {
   }
 
   return await CompanySetting.findOneAndUpdate(
-    {}, // Filter kosong karena hanya ada 1 document global
+    {},
     {
       $set: {
         name,

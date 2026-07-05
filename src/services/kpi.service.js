@@ -135,13 +135,9 @@ export const getKpiHistoryDetail = async (employeeId, periode) => {
 };
 export const getKpiHistoryByEmployee = async (employeeId) => {
   try {
-    // Ubah string ID dari session menjadi ObjectId Mongoose yang valid
-
     const targetId = mongoose.Types.ObjectId.isValid(employeeId)
       ? new mongoose.Types.ObjectId(employeeId)
       : employeeId;
-
-    // Lakukan query menggunakan targetId yang sudah bersih
 
     return await Kpi.find({ employeeId: targetId })
 

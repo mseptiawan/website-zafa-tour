@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.emit("join-room", currentUserId);
 
     socket.on("new-notification", (notif) => {
-      console.log("🔔 Live Notifikasi Masuk:", notif);
+      console.log(" Live Notifikasi Masuk:", notif);
       fetchNotifications();
     });
   }

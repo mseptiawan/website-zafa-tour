@@ -122,10 +122,7 @@ export const createLoan = async (employeeId, loanData, userRole = "", creatorNam
         category: NOTIF_CATEGORIES?.INFO || "INFO",
       });
     } catch (notifError) {
-      console.error(
-        "⚠️ [Notification Error] Gagal mengirim notifikasi pinjaman:",
-        notifError.message
-      );
+      console.error("[Notification Error] Gagal mengirim notifikasi pinjaman:", notifError.message);
     }
   }
 

@@ -76,7 +76,7 @@ export const destroy = asyncHandler(async (req, res) => {
 // =========================================================================
 
 export const indexType = asyncHandler(async (req, res) => {
-  const types = await rpService.findMasterTypes(); // Mengambil semua tipe (Aktif & Non-Aktif)
+  const types = await rpService.findMasterTypes();
 
   res.render("rewardPunishment/type/index", {
     ...buildRenderData(req, {

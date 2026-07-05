@@ -53,7 +53,7 @@ export const createOvertimeSchema = z
     // DATE VALIDATION (FIXED)
     // =========================
 
-    const workDate = data.date; // YYYY-MM-DD (string aman)
+    const workDate = data.date;
     const today = new Date().toISOString().split("T")[0];
 
     // tidak boleh future date

@@ -39,17 +39,14 @@ export const deleteLogById = async (id) => {
 // ─── MASTER TYPES SERVICES (NEW MANAGEMENT) ───
 // =========================================================================
 
-// Mengambil semua tanpa pengecualian status (Untuk halaman kelola master)
 export const findMasterTypes = async () => {
   return await RewardPunishmentType.find().sort({ category: 1, name: 1 }).lean();
 };
 
-// Mengambil HANYA yang aktif (Untuk dropdown pilihan di form create log baru)
 export const findActiveMasterTypes = async () => {
   return await RewardPunishmentType.find({ isActive: true }).sort({ category: 1, name: 1 }).lean();
 };
 
-// Validasi Duplikasi Nama dalam satu kategori yang sama
 export const checkDuplicateTypeName = async (name, category) => {
   if (!name || !category) return false;
   const existing = await RewardPunishmentType.findOne({
@@ -66,7 +63,7 @@ export const createType = async ({ category, name, description, financialImpact 
     name: name.trim(),
     description,
     financialImpact: Number(financialImpact) || 0,
-    isActive: true, // Nilai default saat dibuat pertama kali
+    isActive: true,
   });
 };
 

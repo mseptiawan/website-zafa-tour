@@ -15,7 +15,6 @@ const router = express.Router();
 // Role dengan hak otorisasi manajemen payroll perusahaan
 const PAYROLL_MANAGEMENT_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR", "HR"];
 
-// Semua rute di bawah ini wajib memiliki sesi login aktif
 router.use(authMiddleware);
 
 // --- Hak Akses Manajemen Keuangan & HR ---

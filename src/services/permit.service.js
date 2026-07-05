@@ -219,7 +219,6 @@ export const executeApproval = async ({ id, status, notesByApprover, currentUser
   permit.notesByApprover = notesByApprover || null;
   await permit.save();
 
-  // Pengiriman balik notifikasi langsung ke akun personal pemohon
   try {
     await notificationService.createNotification({
       userId: permit.employeeId.userId._id,

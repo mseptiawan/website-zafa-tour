@@ -90,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-add-family").addEventListener("click", () => {
       const idx = familyContainer.querySelectorAll(".family-row").length;
 
-      // 💡 Template HTML disesuaikan lengkap dengan 7 field dan responsivitas grid
       const html = `
     <div class="family-row grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 bg-slate-50 p-4 rounded-xl relative border border-slate-100">
       
@@ -149,13 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
       familyContainer.insertAdjacentHTML("beforeend", html);
     });
 
-    // Event delegation untuk hapus baris
     familyContainer.addEventListener("click", (e) => {
       if (e.target.classList.contains("btn-remove-family")) {
         e.target.closest(".family-row").remove();
 
-        // 💡 Opsional Tambahan: Re-index nama attribute setelah baris dihapus
-        // Biar urutan indeks [0], [1], [2] di backend ga berantakan/patah akibat baris tengah dihapus
         familyContainer.querySelectorAll(".family-row").forEach((row, newIdx) => {
           row.querySelectorAll("input, select").forEach((input) => {
             const nameAttr = input.getAttribute("name");
