@@ -3,7 +3,7 @@ import { buildRenderData, getToday } from "../utils/renderHelper.js";
 import * as rpService from "../services/rewardPunishment.service.js";
 
 // =========================================================================
-// ─── TRANSACTIONAL LOGS METHOD (EXISTING) ───
+// ─── TRANSACTIONAL LOGS METHOD (UPDATED) ───
 // =========================================================================
 
 export const index = asyncHandler(async (req, res) => {
@@ -18,7 +18,6 @@ export const index = asyncHandler(async (req, res) => {
 
 export const create = asyncHandler(async (req, res) => {
   const employees = await rpService.findAvailableEmployees();
-  // Hanya tampilkan master type yang statusnya AKTIF saat pembuatan log baru
   const types = await rpService.findActiveMasterTypes();
 
   res.render("rewardPunishment/create", {
@@ -31,6 +30,7 @@ export const create = asyncHandler(async (req, res) => {
   });
 });
 
+// SESUAIKAN: Menangkap file attachment dan meneruskannya ke service
 export const store = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
     const employees = await rpService.findAvailableEmployees();
@@ -49,9 +49,18 @@ export const store = asyncHandler(async (req, res) => {
     });
   }
 
+  // Jika operator mematikan toggle 'hasFinancialImpact', pastikan amount dipaksa jadi 0
+  if (!req.body.hasFinancialImpact) {
+    req.body.amount = 0;
+  }
+
+  // Ambil path file dari Multer jika ada file yang diupload
+  const attachmentPath = req.file ? req.file.path : "";
+
   await rpService.createLog({
     body: req.body,
     userId: req.session.user._id,
+    attachmentPath: attachmentPath, // Kirim berkas lampiran
   });
 
   req.flash("success", "Data Reward/Punishment berhasil dicatat!");
@@ -72,7 +81,7 @@ export const destroy = asyncHandler(async (req, res) => {
 });
 
 // =========================================================================
-// ─── MASTER TYPES METHOD (NEW MANAGEMENT) ───
+// ─── MASTER TYPES METHOD (AS IS) ───
 // =========================================================================
 
 export const indexType = asyncHandler(async (req, res) => {

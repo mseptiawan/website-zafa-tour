@@ -1,63 +1,240 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 sm:p-6 md:p-10 antialiased pb-24 text-slate-800">
-  <div class="w-full max-w-2xl mx-auto space-y-6">
-    
-    <div class="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-xs">
-      <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
-        <a href="/reward-punishment" class="w-8 h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600"><i class="fa-solid fa-arrow-left text-xs"></i></a>
-        <div>
-          <h2 class="text-base font-bold text-slate-900">Formulir Pencatatan Baru</h2>
-          <p class="text-xs text-slate-400">Terbitkan lembar sanksi kedisiplinan atau penghargaan pegawai.</p>
-        </div>
-      </div>
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
-      <form action="/reward-punishment" method="POST" class="space-y-5">
-        
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Pilih Pegawai</label>
-          <select name="employeeId" required class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-blue-500">
-            <option value="" disabled selected>-- Pilih Personel --</option>
-            <% employees.forEach(emp => { %>
-              <option value="<%= emp._id %>" <%= (typeof old !== 'undefined' && old.employeeId == emp._id.toString()) ? 'selected' : '' %>><%= emp.fullName %></option>
-            <% }) %>
-          </select>
-        </div>
+    <%- include('../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Kepegawaian', 
+        title: 'Formulir Catatan Reward & Punishment', 
+        description: 'Terbitkan berkas formal penghargaan atau sanksi kedisiplinan serta kelola dampak finansialnya.' 
+    }) %>
 
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Jenis Reward / Punishment</label>
-          <select name="typeId" required class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-blue-500">
-            <option value="" disabled selected>-- Pilih Jenis SK Master --</option>
-            <% types.forEach(t => { %>
-              <option value="<%= t._id %>" <%= (typeof old !== 'undefined' && old.typeId == t._id.toString()) ? 'selected' : '' %>>
-                [<%= t.category %>] <%= t.name %> (<%= t.financialImpact >= 0 ? '+' : '' %><%= t.financialImpact %>)
-              </option>
-            <% }) %>
-          </select>
-        </div>
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
+      <form action="/reward-punishment" method="POST" enctype="multipart/form-data" class="space-y-5">
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nomor Surat Keputusan (SK)</label>
-            <input type="text" name="skNumber" value="<%= typeof old !== 'undefined' ? old.skNumber : '' %>" placeholder="Contoh: SK/REWARD/2026/001" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-blue-500">
+        <% if (typeof errors !== 'undefined' && errors?.global) { %>
+        <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
+          <%= errors.global %>
+        </div>
+        <% } %>
+
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Pilih Pegawai</label>
+          <div class="relative w-full">
+            <select name="employeeId" class="w-full bg-slate-50/60 border <%= errors?.employeeId ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer appearance-none font-medium">
+              <option value="" disabled <%= !old?.employeeId ? 'selected' : '' %>>-- Pilih Personel --</option>
+              <% employees.forEach(emp => { %>
+                <option value="<%= emp._id %>" <%= old?.employeeId === String(emp._id) ? 'selected' : '' %>><%= emp.fullName %></option>
+              <% }) %>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
+              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+            </div>
           </div>
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Tanggal Berlaku</label>
-            <input type="date" name="dateIssued" value="<%= typeof old !== 'undefined' ? old.dateIssued : today %>" required class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-blue-500">
+          <% if (errors?.employeeId) { %>
+          <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.employeeId %></p>
+          <% } %>
+        </div>
+
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jenis SK Master</label>
+          <div class="relative w-full">
+            <select name="typeId" class="w-full bg-slate-50/60 border <%= errors?.typeId ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer appearance-none font-medium">
+              <option value="" disabled <%= !old?.typeId ? 'selected' : '' %>>-- Pilih Regulasi --</option>
+              <% types.forEach(t => { %>
+                <option value="<%= t._id %>" <%= old?.typeId === String(t._id) ? 'selected' : '' %>>[<%= t.category %>] <%= t.name %></option>
+              <% }) %>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
+              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+            </div>
+          </div>
+          <% if (errors?.typeId) { %>
+          <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.typeId %></p>
+          <% } %>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 p-4 bg-slate-50/60 border border-slate-200/50 rounded-2xl mb-5 select-none items-center">
+          <div class="flex flex-col">
+            <span class="text-[12px] font-bold text-slate-700 tracking-wide">Dampak Finansial</span>
+            <span class="text-[11px] text-slate-400 font-medium mt-0.5">Apakah kasus ini memengaruhi slip gaji/upah?</span>
+          </div>
+          <div class="flex items-center justify-start sm:justify-end gap-3">
+            <span id="toggleLabel" class="text-[11.5px] font-bold text-slate-400 uppercase tracking-wider min-w-[70px] text-right">Tidak Ada</span>
+            
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="hasFinancialImpact" name="hasFinancialImpact" class="sr-only peer" onchange="toggleFinancialSection()" <%= (typeof old !== 'undefined' && Number(old?.amount) > 0) ? 'checked' : '' %>>
+              <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-0 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
         </div>
 
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Deskripsi / Alasan</label>
-          <textarea name="reason" required rows="4" placeholder="Tuliskan justifikasi detail mengenai dikeluarkannya dokumen ini..." class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-blue-500"><%= typeof old !== 'undefined' ? old.reason : '' %></textarea>
+        <div id="financialAmountSection" class="space-y-2 mb-5 hidden transition-all duration-300">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Nominal Dampak Finansial</label>
+          <div class="relative flex items-center w-full">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none select-none">
+              <span class="text-slate-400 font-semibold text-[13px]">Rp</span>
+            </div>
+            <input type="text" id="nominalInput" placeholder="0" class="w-full bg-slate-50/60 border <%= errors?.amount ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl pl-10 pr-4 py-2.5 text-[13.5px] font-bold text-slate-800 outline-none focus:bg-white transition-all tabular-nums" />
+            <input type="hidden" name="amount" id="amountReal" value="<%= old?.amount || '0' %>" />
+          </div>
+          <% if (errors?.amount) { %>
+          <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.amount %></p>
+          <% } %>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <a href="/reward-punishment" class="h-10 px-4 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl hover:bg-slate-50 flex items-center justify-center">Batal</a>
-          <button type="submit" class="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer">Simpan Log Catatan</button>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+          <div class="space-y-2">
+            <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Nomor SK Resmi</label>
+            <input type="text" name="skNumber" value="<%= old?.skNumber || '' %>" placeholder="SK/REWARD/2026/001"
+              class="w-full bg-slate-50/60 border <%= errors?.skNumber ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none transition-all text-slate-800 font-medium" />
+            <% if (errors?.skNumber) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.skNumber %></p>
+            <% } %>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Terbit SK</label>
+            <input type="date" name="dateIssued" value="<%= old?.dateIssued || today %>"
+              class="w-full bg-slate-50/60 border <%= errors?.dateIssued ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white transition-all cursor-pointer font-medium" />
+            <% if (errors?.dateIssued) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.dateIssued %></p>
+            <% } %>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Efektif</label>
+            <input type="date" name="effectiveDate" value="<%= old?.effectiveDate || '' %>"
+              class="w-full bg-slate-50/60 border <%= errors?.effectiveDate ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white transition-all cursor-pointer font-medium" />
+            <% if (errors?.effectiveDate) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.effectiveDate %></p>
+            <% } %>
+          </div>
         </div>
+
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alasan / Justifikasi Kasus</label>
+          <textarea name="reason" rows="4" placeholder="Tuliskan justifikasi kronologi detail mengenai diterbitkannya dokumen log ini..." class="w-full bg-slate-50/60 border <%= errors?.reason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all leading-relaxed text-slate-800 font-medium"><%= old?.reason || '' %></textarea>
+          <% if (errors?.reason) { %>
+          <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.reason %></p>
+          <% } %>
+        </div>
+
+        <div class="space-y-4 pt-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 select-none">
+            <h3 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Berkas Lampiran SK</h3>
+          </div>
+
+          <div id="fileSection">
+            <div id="dropzone-empty" class="relative w-full border border-dashed rounded-xl p-6 bg-slate-50/20 hover:bg-slate-50/60 <%= errors?.attachment ? 'border-rose-400' : 'border-slate-200/80' %> transition-all flex flex-col items-center justify-center text-center cursor-pointer">
+              <input type="file" name="attachment" id="file-input" accept="image/*,application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(this)" />
+              <svg class="w-5 h-5 text-slate-400 mb-2 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+              <span class="text-[12.5px] font-semibold text-slate-700">Pilih Berkas SK atau Tarik ke Sini</span>
+              <p class="text-[11px] font-medium text-slate-400/80 mt-0.5">Mendukung format Gambar atau PDF (Maksimal 5MB)</p>
+              <% if (errors?.attachment) { %>
+                <span class="text-rose-500 text-[11px] font-semibold mt-1.5 block"><%= errors.attachment %></span>
+              <% } %>
+            </div>
+
+            <div id="dropzone-filled" class="hidden flex items-center justify-between border border-slate-200/80 rounded-xl px-4 py-3 bg-slate-50/30">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-8 h-8 rounded-lg bg-white border border-slate-200/60 flex items-center justify-center text-slate-400 shrink-0">
+                  <i class="fa-solid fa-file-pdf text-xs text-rose-500"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-[12.5px] font-semibold text-slate-700 truncate" id="name-preview">file.pdf</p>
+                  <p class="text-[11px] text-slate-400 font-medium leading-none mt-0.5">Dokumen SK siap diunggah</p>
+                </div>
+              </div>
+              <button type="button" onclick="resetFile()" class="h-7 text-[11px] font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-2.5 rounded-lg transition-colors cursor-pointer ml-4 shrink-0">Ganti</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-2.5">
+          <a href="/reward-punishment" class="w-auto text-center bg-white hover:bg-slate-50 text-slate-600 px-5 py-2.5 rounded-xl text-[12px] font-semibold border border-slate-200 transition-colors">
+            Batal
+          </a>
+          <button type="submit" class="w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors cursor-pointer">
+            Simpan Catatan
+          </button>
+        </div>
+
       </form>
     </div>
-
   </div>
 </div>
+
+<script>
+  // Logika Visibilitas Kolom Finansial via Toggle Switch
+  function toggleFinancialSection() {
+    const toggleCheckbox = document.getElementById("hasFinancialImpact");
+    const amountSection = document.getElementById("financialAmountSection");
+    const toggleLabel = document.getElementById("toggleLabel");
+    const nominalInput = document.getElementById("nominalInput");
+    const amountReal = document.getElementById("amountReal");
+
+    if (toggleCheckbox.checked) {
+      amountSection.classList.remove("hidden");
+      toggleLabel.textContent = "Ada";
+      toggleLabel.className = "text-[11.5px] font-bold text-blue-600 uppercase tracking-wider min-w-[70px] text-right";
+      
+      // Fokus ke input jika baru di-ON-kan dan nilainya 0
+      if(amountReal.value === "0" || amountReal.value === "") {
+        nominalInput.value = "";
+        amountReal.value = "0";
+      }
+    } else {
+      amountSection.classList.add("hidden");
+      toggleLabel.textContent = "Tidak Ada";
+      toggleLabel.className = "text-[11.5px] font-bold text-slate-400 uppercase tracking-wider min-w-[70px] text-right";
+      
+      // Reset nilai ke nol jika dimatikan
+      nominalInput.value = "";
+      amountReal.value = "0";
+    }
+  }
+
+  function handleFileSelect(input) {
+    if (input.files.length > 0) {
+      let fileName = input.files[0].name;
+      if(fileName.length > 30) fileName = fileName.substring(0, 25) + '...';
+      document.getElementById("name-preview").textContent = fileName;
+      document.getElementById("dropzone-empty").classList.add("hidden");
+      document.getElementById("dropzone-filled").classList.remove("hidden");
+    }
+  }
+
+  function resetFile() {
+    document.getElementById("file-input").value = "";
+    document.getElementById("dropzone-empty").classList.remove("hidden");
+    document.getElementById("dropzone-filled").classList.add("hidden");
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Jalankan pengecekan toggle pertama kali saat halaman selesai dimuat (untuk retensi old value)
+    toggleFinancialSection();
+
+    const nominalInput = document.getElementById("nominalInput");
+    const amountReal = document.getElementById("amountReal");
+
+    if (nominalInput && amountReal) {
+      if (amountReal.value && amountReal.value !== "0") {
+        nominalInput.value = formatRupiah(amountReal.value);
+      }
+
+      nominalInput.addEventListener("input", function () {
+        let value = this.value.replace(/[^0-9]/g, "");
+        amountReal.value = value || "0";
+        this.value = value ? formatRupiah(value) : "";
+      });
+    }
+
+    function formatRupiah(angka) {
+      return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+  });
+</script>

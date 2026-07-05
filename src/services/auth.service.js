@@ -25,7 +25,11 @@ export const verifyAndBuildSession = async (identifier, password) => {
     err.statusCode = 404;
     throw err;
   }
-
+  if (user.status === "Inactive") {
+    const err = new Error("Akun Anda telah dinonaktifkan karena pemutusan hubungan kerja (PHK).");
+    err.statusCode = 403;
+    throw err;
+  }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     const err = new Error("Password yang Anda masukkan salah.");

@@ -3,7 +3,7 @@ import RewardPunishmentType from "../models/rewardPunishment/RewardPunishmentTyp
 import Employee from "../models/employee/Employee.model.js";
 
 // =========================================================================
-// ─── LOG TRANSACTION SERVICES (EXISTING) ───
+// ─── LOG TRANSACTION SERVICES (UPDATED) ───
 // =========================================================================
 
 export const findAllLogs = async () => {
@@ -19,14 +19,22 @@ export const findAvailableEmployees = async () => {
   return await Employee.find({}, "_id fullName").sort({ fullName: 1 }).lean();
 };
 
-export const createLog = async ({ body, userId }) => {
-  const { employeeId, typeId, reason, skNumber, dateIssued } = body;
+// SESUAIKAN: Menambahkan field baru agar tersimpan ke model EmployeeLog
+export const createLog = async ({ body, userId, attachmentPath }) => {
+  const { employeeId, typeId, reason, skNumber, dateIssued, effectiveDate, amount } = body;
+
   return await EmployeeLog.create({
     employeeId,
     typeId,
     reason,
     skNumber,
     dateIssued: new Date(dateIssued),
+    // Simpan effectiveDate jika diisi, jika kosong set null sesuai default skema
+    effectiveDate: effectiveDate ? new Date(effectiveDate) : null,
+    // Simpan nominal finansial (otomatis dikonversi ke Number)
+    amount: Number(amount) || 0,
+    // Jalur string penyimpanan berkas/file upload
+    attachment: attachmentPath || "",
     createdBy: userId,
   });
 };
@@ -36,7 +44,7 @@ export const deleteLogById = async (id) => {
 };
 
 // =========================================================================
-// ─── MASTER TYPES SERVICES (NEW MANAGEMENT) ───
+// ─── MASTER TYPES SERVICES (AS IS) ───
 // =========================================================================
 
 export const findMasterTypes = async () => {
@@ -56,7 +64,6 @@ export const checkDuplicateTypeName = async (name, category) => {
   return !!existing;
 };
 
-// Tambah Data Baru
 export const createType = async ({ category, name, description, financialImpact }) => {
   return await RewardPunishmentType.create({
     category,
@@ -67,7 +74,6 @@ export const createType = async ({ category, name, description, financialImpact 
   });
 };
 
-// Update Data Terpilih
 export const updateTypeById = async (id, { category, name, description, financialImpact }) => {
   return await RewardPunishmentType.findByIdAndUpdate(
     id,
@@ -76,7 +82,6 @@ export const updateTypeById = async (id, { category, name, description, financia
   ).lean();
 };
 
-// Mengubah status aktif/nonaktif (Soft Delete)
 export const updateTypeStatus = async (id, isActive) => {
   return await RewardPunishmentType.findByIdAndUpdate(id, { isActive }, { new: true }).lean();
 };

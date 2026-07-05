@@ -1,13 +1,13 @@
 import express from "express";
 import * as rpController from "../controllers/rewardPunishment.controller.js";
+import { uploadFile } from "../middlewares/uploadFile.js";
 
 const router = express.Router();
 
 // ─── TRANSACTIONAL LOGS ───
 router.get("/", rpController.index);
 router.get("/new", rpController.create);
-router.post("/", rpController.store);
-router.get("/delete/:id", rpController.destroy);
+router.post("/", uploadFile.single("attachment"), rpController.store);
 
 router.get("/my-logs", rpController.myLog);
 

@@ -52,7 +52,7 @@
     <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
       <%- include('partials/_overtime-table', { 
         overtimes: activeOvertimes, 
-        query: activeQuery, 
+  query: query,
         pagination: activePagination, 
         type: 'active' 
       }) %>
@@ -61,7 +61,7 @@
     <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
       <%- include('partials/_overtime-table', { 
         overtimes: historyOvertimes, 
-        query: historyQuery, 
+      query: query,
         pagination: historyPagination, 
         type: 'history' 
       }) %>

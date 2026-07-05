@@ -15,8 +15,7 @@
           show: true,
           submenus: [
             { name: "Data Pegawai", path: "/employee", show: !!perms.employee_list },
-            { name: "Tambah Pegawai", path: "/employee/create", show: !!perms.employee_add },
-            { name: "Persetujuan PHK", path: "/approvals/pending", show: !!perms.phk }
+            { name: "Tambah Pegawai", path: "/employee/create", show: !!perms.employee_add }
           ]
         },
         {
@@ -36,7 +35,12 @@
           submenus: [
             { name: "Buat Pengajuan", path: "/loans/new", show: !!perms.loan_new },
             { name: "Riwayat Pengajuan", path: "/loans/my", show: !!perms.loan_my },
-            { name: "Persetujuan Pinjaman", path: "/loans/approval", show: !!perms.loan_manage_center },
+         {
+      name: "Persetujuan Pinjaman",
+      path: "/loans/approval",
+      show: !!perms.loan_manage_center && user.role !== "DIREKTUR_UTAMA"
+    },
+
             { name: "Penyaluran Dana", path: "/loans/disbursement", show: !!perms.loan_disbursement }
           ]
         },
@@ -48,11 +52,7 @@
           submenus: [
             { name: "Catat KPI", path: "/kpi/appraisal-list", show: !!perms.kpi_create },
             { name: "Daftar KPI Pegawai", path: "/kpi/history-list", show: !!perms.kpi_list },
-        { 
-              name: "Riwayat KPI Saya", 
-              path: "/kpi/my-history", 
-              show: role !== "WAKIL_DIREKTUR" && role !== "DIREKTUR_UTAMA"
-            }
+            { name: "Riwayat KPI Saya", path: "/kpi/my-history", show: !!perms.kpi_history }
           ]
         },
         {
@@ -66,26 +66,56 @@
             { name: "Semua Penugasan", path: "/assignments/", show: !!perms.assignment_all }
           ]
         },
-      {
+          {
+          id: "approval",
+          name: "Persetujuan",
+          icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
+          show: !!perms.phk,
+          submenus: [
+            { name: "Persetujuan PHK", path: "/terminations/pending", show: !!perms.phk },
+{
+      name: "Persetujuan Pinjaman",
+      path: "/loans/approval",
+      show: !!perms.loan_manage_center && user.role === "DIREKTUR_UTAMA"
+    },{
+  name: "Persetujuan Cuti",
+  path: "/leave/manage-requests",
+  show: !!perms.leave_manage && user.role === "DIREKTUR_UTAMA"
+},
+{
+  name: "Persetujuan Izin",
+  path: "/permit/incoming",
+  show: !!perms.permit_approval && user.role === "DIREKTUR_UTAMA"
+},
+{
+  name: "Persetujuan Dinas",
+  path: "/trip/approval",
+  show: !!perms.trip_approval && user.role === "DIREKTUR_UTAMA"
+}
+
+
+          ]
+        },
+        {
           id: "rewardPunishment",
           name: "Reward & Punishment",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M11 5.5a2.5 2.5 0 115 0v1h-5v-1zm5 4v1H8v-1h8zM4 10H3a2 2 0 00-2 2v6a2 2 0 002 2h18a2 2 0 002-2v-6a2 2 0 00-2-2h-1M9 14l2 2 4-4" />`,
-          show: ["PEGAWAI", "MANAGER_ADMINISTRASI", "MANAGER_KEUANGAN", "MANAGER_HAJI_UMRAH", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"].includes(role),
+          show: true,
           submenus: [
-           { 
+            { 
               name: role !== "WAKIL_DIREKTUR" ? "Riwayat Log Saya" : "Riwayat Log Pegawai", 
               path: role !== "WAKIL_DIREKTUR" ? "/reward-punishment/my-logs" : "/reward-punishment", 
-              show: true 
+              show:  !!perms.reward_punishment_view 
             },
             { 
               name: "Catat Log Baru", 
               path: "/reward-punishment/new", 
-              show: role === "WAKIL_DIREKTUR" 
+              show: !!perms.reward_punishment_new 
             },
             { 
               name: "Kelola Jenis Master", 
               path: "/reward-punishment/types", 
-              show: role === "WAKIL_DIREKTUR" 
+              show: !!perms.reward_punishment_manage 
             }
           ]
         }
@@ -104,7 +134,7 @@
             { name: "Buat Pengajuan", path: "/leave/apply", show: !!perms.leave_new },
             { name: "Riwayat Pengajuan", path: "/leave/my-history", show: !!perms.leave_my },
             { name: "Permintaan Delegasi", path: "/leave/my-delegations", show: !!perms.leave_delegation },
-            { name: "Manajemen Cuti", path: "/leave/manage-requests", show: !!perms.leave_manage }
+            { name: "Manajemen Cuti", path: "/leave/manage-requests",show: !!perms.leave_manage && user.role !== "DIREKTUR_UTAMA" }
           ]
         },
         {
@@ -115,18 +145,10 @@
           submenus: [
             { name: "Buat Pengajuan", path: "/permit/new", show: !!perms.permit_new },
             { name: "Riwayat Pengajuan", path: "/permit/history", show: !!perms.permit_my },
-            { name: "Persetujuan Izin", path: "/permit/incoming", show: !!perms.permit_approval }
+            { name: "Persetujuan Izin", path: "/permit/incoming",show: !!perms.permit_approval && user.role !== "DIREKTUR_UTAMA"}
           ]
         },
-        {
-          id: "approval",
-          name: "Persetujuan",
-          icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
-          show: !!perms.phk,
-          submenus: [
-            { name: "Persetujuan PHK", path: "/approvals/pending", show: !!perms.phk }
-          ]
-        },
+      
         {
           id: "overtime",
           name: "Lembur",
@@ -156,9 +178,7 @@
           submenus: [
             { name: "Buat Pengajuan", path: "/trip/new", show: !!perms.trip_new },
             { name: "Riwayat Pengajuan", path: "/trip/my", show: !!perms.trip_my },
-            { name: "Persetujuan Dinas", path: "/trip/approval", show: !!perms.trip_approval },
-            { name: "Verifikasi Finance", path: "/finance", show: !!perms.trip_verify },
-            { name: "Riwayat Verifikasi", path: "/finance/history", show: !!perms.trip_history }
+            { name: "Persetujuan Dinas", path: "/trip/approval", show: !!perms.trip_approval && user.role !== "DIREKTUR_UTAMA" },
           ]
         }
       ]
@@ -175,8 +195,7 @@
           submenus: [
             { name: "Catat Kunjungan", path: "/sales/new", show: !!perms.sales_new },
             { name: "Daftar Kunjungan", path: "/sales/my", show: !!perms.sales_my },
-            { name: "Kunjungan Pegawai", path: "/sales/employee-visits", show: !!perms.sales_employee },
-
+            { name: "Kunjungan Pegawai", path: "/sales/employee-visits", show: !!perms.sales_employee }
           ]
         },
         {
@@ -186,7 +205,7 @@
           show: true,
           submenus: [
             { name: "Catat Aktivitas Harian", path: "/daily-activities", show: !!perms.daily_log_create },
-            { name: "Riwayat Aktivitas Pegawai", path: "/daily-activities/review", show: role !== "PEGAWAI" }
+            { name: "Riwayat Aktivitas Pegawai", path: "/daily-activities/review", show: !!perms.daily_log_review }
           ]
         }
       ]
@@ -226,14 +245,13 @@
         },
         {
           id: "payroll",
-          name: role === "PEGAWAI" ? "Penggajian" : "Manajemen Payroll",
+          name: role !== "WAKIL_DIREKTUR" ? "Penggajian" : "Manajemen Payroll",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />`,
           show: true,
           submenus: [
             { name: "Slip Gaji Saya", path: "/payroll/my-slip", show: !!perms.payroll_view },
             { name: "Proses Hitung Gaji", path: "/payroll/manage", show: !!perms.payroll_manage },
-            { name: "Kelola Komponen Gaji", path: "/components/manage", show: !!perms.payroll_component_manage },
-            { name: "Verifikasi & Pembayaran", path: "/finance/payroll", show: role === "MANAGER_KEUANGAN" }
+            { name: "Kelola Komponen Gaji", path: "/components/manage", show: !!perms.payroll_component_manage }
           ]
         }
       ]
@@ -248,24 +266,22 @@
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h6v6m-7 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-2-2h-4L7 5H4a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
           show: true,
           submenus: [
-            { name: "Laporan Data Pegawai", path: "/report/employees", show: true },
-            { name: "Laporan Lembur", path: "/report/overtime", show: true },
-            { name: "Laporan Absensi", path: "/report/attendance", show: true },
-            { name: "Laporan Pengeluaran Gaji", path: "/report/payroll", show: true }
+            { name: "Laporan Data Pegawai", path: "/report/employees", show: !!perms.report_employees },
+            { name: "Laporan Lembur", path: "/report/overtime", show: !!perms.report_overtime },
+            { name: "Laporan Absensi", path: "/report/attendance", show: !!perms.report_attendance },
+            { name: "Laporan Pengeluaran Gaji", path: "/report/payroll", show: !!perms.report_payroll }
           ]
         },
         {
           id: "system-setting",
           name: "Pengaturan Sistem",
           icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />`,
-          // Hanya tampil untuk role yang diizinkan di backend router kamu
-          show: ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR", "MANAGER_ADMINISTRASI"].includes(role),
+          show: true,
           submenus: [
-            { name: "Konfigurasi Kantor", path: "/company-settings", show: true }
+            { name: "Konfigurasi Kantor", path: "/company-settings", show: !!perms.company_settings }
           ]
         }
       ]
     }
-    
   ];
 %>

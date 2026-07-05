@@ -11,15 +11,15 @@ import {
 
 const router = express.Router();
 
-router.get("/kpi/appraisal-list", roleMiddleware(["WAKIL_DIREKTUR"]), getAppraisalList);
-router.get("/kpi/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"]), getAppraisalForm);
-router.post("/kpi/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"]), submitAppraisal);
+router.get("/appraisal-list", roleMiddleware(["WAKIL_DIREKTUR"]), getAppraisalList);
+router.get("/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"]), getAppraisalForm);
+router.post("/appraisal-form/:employeeId", roleMiddleware(["WAKIL_DIREKTUR"]), submitAppraisal);
 
-router.get("/kpi/history-list", getHistoryList);
+router.get("/history-list", getHistoryList);
 
-router.get("/kpi/history-detail/:employeeId/:periode", getHistoryDetail);
+router.get("/history-detail/:employeeId/:periode", getHistoryDetail);
 
-router.get("/kpi/my-history", roleMiddleware(["PEGAWAI"]), getMyKpiHistory);
+router.get("/my-history", getMyKpiHistory);
 
-router.get("/kpi/history-detail/:employeeId/:periode", getHistoryDetail);
+router.get("/history-detail/:employeeId/:periode", getHistoryDetail);
 export default router;

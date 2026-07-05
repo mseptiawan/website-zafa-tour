@@ -24,7 +24,7 @@
          KOLOM KIRI (7/16) - OPERASIONAL UTAMA
          ========================================================================= -->
     <div class="lg:col-span-7 flex flex-col gap-6">
-      
+      <% if (user.role !== "DIREKTUR_UTAMA") { %>
       <!-- 1. BOKS PRESENSI HARI INI -->
       <div class="bg-white rounded-2xl border border-slate-100   overflow-hidden flex flex-col justify-between">
         <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
@@ -91,7 +91,8 @@
           </div>
         </div>
       </div>
-
+    <% } %>
+    <% if (user.role !== "DIREKTUR_UTAMA") { %>
       <!-- 2. BOKS LOG KERJA (TINGGI DISESUAIKAN BIAR SEIMBANG) -->
       <div class="bg-white rounded-2xl border border-slate-100   overflow-hidden flex flex-col min-h-[350px]">
         <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
@@ -128,7 +129,7 @@
           </a>
         </div>
       </div>
-
+<% } %>
     </div>
 
     <!-- =========================================================================

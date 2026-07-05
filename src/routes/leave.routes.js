@@ -29,35 +29,35 @@ import {
 
 const router = express.Router();
 
-router.get("/leave/apply", authMiddleware, showApplyLeave);
-router.post("/leave/apply", authMiddleware, uploadFile.single("attachments"), applyLeave);
-router.get("/leave/my-history", authMiddleware, myLeave);
-router.get("/leave/detail/:id", authMiddleware, getLeaveDetail);
-router.get("/leave/edit/:id", authMiddleware, editLeave);
-router.post("/leave/update/:id", authMiddleware, uploadFile.single("attachments"), updateLeave);
-router.post("/leave/cancel-pending/:id", authMiddleware, cancelPendingLeave);
-router.post("/leave/request-cancel/:id", authMiddleware, requestCancelApprovedLeave);
-router.get("/leave/resubmit/:id", authMiddleware, showResubmitLeave);
+router.get("/apply", authMiddleware, showApplyLeave);
+router.post("/apply", authMiddleware, uploadFile.single("attachments"), applyLeave);
+router.get("/my-history", authMiddleware, myLeave);
+router.get("/detail/:id", authMiddleware, getLeaveDetail);
+router.get("/edit/:id", authMiddleware, editLeave);
+router.post("/update/:id", authMiddleware, uploadFile.single("attachments"), updateLeave);
+router.post("/cancel-pending/:id", authMiddleware, cancelPendingLeave);
+router.post("/request-cancel/:id", authMiddleware, requestCancelApprovedLeave);
+router.get("/resubmit/:id", authMiddleware, showResubmitLeave);
 
-router.get("/leave/my-delegations", authMiddleware, myDelegations);
-router.post("/leave/delegation/approve/:id", authMiddleware, approveDelegation);
-router.post("/leave/delegation/reject/:id", authMiddleware, rejectDelegation);
+router.get("/my-delegations", authMiddleware, myDelegations);
+router.post("/delegation/approve/:id", authMiddleware, approveDelegation);
+router.post("/delegation/reject/:id", authMiddleware, rejectDelegation);
 
-router.get("/leave/manage-requests", authMiddleware, getManageLeavePage);
+router.get("/manage-requests", authMiddleware, getManageLeavePage);
 
-router.get("/api/leave/calculate-days", authMiddleware, calculateLeaveDays);
+router.get("/api/calculate-days", authMiddleware, calculateLeaveDays);
 
-router.get("/leave/manage-calendar", getHolidaysPage);
+router.get("/manage-calendar", getHolidaysPage);
 
-router.post("/leave/manage-calendar/create", createHoliday);
+router.post("/manage-calendar/create", createHoliday);
 
-router.patch("/leave/manage-calendar/toggle/:id", toggleHolidayStatus);
+router.patch("/manage-calendar/toggle/:id", toggleHolidayStatus);
 
-router.post("/leave/manage-calendar/update/:id", updateHoliday);
-router.post("/leave/manage-requests/generate-balances", generateOrResetLeaveBalance);
+router.post("/manage-calendar/update/:id", updateHoliday);
+router.post("/manage-requests/generate-balances", generateOrResetLeaveBalance);
 
-router.post("/leave/approval/approve/:id", authMiddleware, approveLeave);
+router.post("/approval/approve/:id", authMiddleware, approveLeave);
 
-router.post("/leave/approval/reject/:id", authMiddleware, rejectLeave);
+router.post("/approval/reject/:id", authMiddleware, rejectLeave);
 
 export default router;

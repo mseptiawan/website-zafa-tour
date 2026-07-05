@@ -85,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
        <td class="px-6 py-4 text-slate-500 text-xs max-w-sm whitespace-normal break-words leading-relaxed text-justify">
   ${descContent}
 </td>
-        <td class="px-6 py-4 text-right font-bold tabular-nums ${impactClass}">${item.financialImpact >= 0 ? "+" : ""}${formattedImpact}</td>
         <td class="px-6 py-4">
           <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide ${statusTextClass}">
             <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
