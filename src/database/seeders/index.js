@@ -4,17 +4,17 @@ import mongoose from "mongoose";
 import salaryComponentSeeder from "./salaryComponent.seeder.js";
 
 import completeLoanSeeder from "./completeLoan.seeder.js";
-import completePayrollHistorySeeder from "./completePayrollHistory.seeder.js";
 import attendanceSeeder from "./attendance.seeder.js";
 import overtimeSeeder from "./overtime.seeder.js";
-import expenseCategorySeeder from "./expenseCategory.seeder.js";
 import holidaysSeeder from "./holidays.seeder.js";
 import seedLeaveBalance from "./leaveBalance.seeder.js";
+
 dotenv.config();
 
 const seeders = [
-  // attendanceSeeder,
+  attendanceSeeder,
   completeLoanSeeder,
+  overtimeSeeder,
   // salaryComponentSeeder,
   // overtimeSeeder,
   // holidaysSeeder,
