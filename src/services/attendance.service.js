@@ -6,7 +6,6 @@ import CompanySetting from "../models/CompanySetting.model.js";
 import User from "../models/basic/User.model.js";
 import AppError from "../utils/AppError.js";
 import { uploadAndCompressToR2 } from "../utils/r2Service.js";
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
 const getTodayRange = () => {
   const start = new Date();
@@ -39,13 +38,6 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
-// ─── Service Functions ───────────────────────────────────────────────────────
-
-/**
- * Ambil data absensi hari ini milik user.
- * @param {string} userId
- * @returns {Object|null} attendance document
- */
 export const getTodayAttendance = async (userId) => {
   const { start, end } = getTodayRange();
   return Attendance.findOne({
@@ -54,13 +46,6 @@ export const getTodayAttendance = async (userId) => {
   });
 };
 
-/**
- * Proses check-in user.
- * @param {string} userId
- * @param {Object} body   – { lat, lng, accuracy, note }
- * @param {Object|null} file – multer file object
- * @returns {Object} attendance document baru
- */
 export const processCheckIn = async (userId, body, file) => {
   const { start, end } = getTodayRange();
 
@@ -77,14 +62,26 @@ export const processCheckIn = async (userId, body, file) => {
   let company = await CompanySetting.findOne();
   if (!company) company = await CompanySetting.create({});
 
-  const distance = haversineDistance(company.lat, company.lng, lat, lng);
-  const type = distance <= company.radiusMeter ? "KANTOR" : "LUAR KANTOR";
-  const locationLabel = type === "KANTOR" ? `Absen di ${company.name}` : await getAddress(lat, lng);
+  let matchedLocation = null;
+
+  if (company.locations && company.locations.length > 0) {
+    for (const loc of company.locations) {
+      const distance = haversineDistance(loc.lat, loc.lng, lat, lng);
+      if (distance <= loc.radiusMeter) {
+        matchedLocation = loc;
+        break;
+      }
+    }
+  }
+
+  const type = matchedLocation ? matchedLocation.locationName : "LUAR KANTOR";
+  const locationLabel = matchedLocation
+    ? `Absen di ${matchedLocation.locationName}`
+    : await getAddress(lat, lng);
 
   const photoUrl = file ? await uploadAndCompressToR2(file, "checkin") : null;
 
   const now = new Date();
-
   const [hour, minute] = company.entryTimeLimit.split(":").map(Number);
 
   const timeLimit = new Date();
@@ -99,6 +96,7 @@ export const processCheckIn = async (userId, body, file) => {
     status = "TELAT";
     lateDuration = Math.ceil((now - graceLimit) / 60000);
   }
+
   return Attendance.create({
     userId,
     checkIn: now,
@@ -120,13 +118,6 @@ export const processCheckIn = async (userId, body, file) => {
   });
 };
 
-/**
- * Proses check-out user.
- * @param {string} userId
- * @param {Object} body   – { lat, lng }
- * @param {Object|null} file – multer file object
- * @returns {Object} attendance document yang diperbarui
- */
 export const processCheckOut = async (userId, body, file) => {
   const { start, end } = getTodayRange();
 
@@ -158,23 +149,10 @@ export const processCheckOut = async (userId, body, file) => {
   await attendance.save();
   return attendance;
 };
-/**
- * Ambil riwayat absensi.
- * @param {Object} sessionUser – data user dari req.session.user
- * @param {Object} query       – { startDate, endDate, view }
- * @returns {{ listAttendance, analytics, isAdmin, isPersonalView, filters }}
- */
 
-/**
- * Ambil riwayat absensi dengan Sistem Otomatis Cut-off Perusahaan (Tanggal 27 - 26)
- * @param {Object} sessionUser – data user dari req.session.user
- * @param {Object} query       – { startDate, endDate, view }
- * @returns {{ listAttendance, analytics, isAdmin, isPersonalView, filters }}
- */
 export const getAttendanceHistory = async (sessionUser, query) => {
   const { startDate, endDate, view } = query;
 
-  // Sesuaikan kecocokan role admin Anda di backend
   const ADMIN_ROLES = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI", "HRD", "ADMIN"];
   const isAdmin = ADMIN_ROLES.includes(sessionUser.role);
   const isPersonalView = isAdmin && view === "personal";
@@ -190,32 +168,28 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     end.setHours(23, 59, 59, 999);
   } else {
     const period = getPayrollPeriod();
-
     start = period.start;
     end = period.end;
   }
 
-  // Query dasar MongoDB (Mencocokkan field checkIn dengan rentang waktu Date)
   const matchQuery = {
     checkIn: { $gte: start, $lte: end },
     ...(isAdmin && !isPersonalView ? {} : { userId: new mongoose.Types.ObjectId(sessionUser._id) }),
   };
 
-  // Ambil list kehadiran utama dari database
   let listAttendance = await Attendance.find(matchQuery)
     .populate("userId", "username")
     .sort({ checkIn: -1 });
 
   listAttendance = listAttendance.map((doc) => doc.toObject());
 
-  // Injeksi data User yang tidak melakukan absensi (BELUM ABSEN / MANGKIR)
   if (isAdmin && !isPersonalView) {
     const attendedInPeriod = await Attendance.find({
       checkIn: { $gte: start, $lte: end },
     }).distinct("userId");
 
     const missingUsers = await User.find({
-      role: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] }, // Filter management agar tidak masuk daftar alpa
+      role: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] },
       _id: { $nin: attendedInPeriod },
     }).select("username");
 
@@ -234,7 +208,6 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     listAttendance = [...missingAttendanceData, ...listAttendance];
   }
 
-  // Map Nama Karyawan dari Koleksi Employee ke Objek Output
   const employees = await Employee.find({}).select("userId fullName");
   const employeeMap = new Map();
   employees.forEach((emp) => {
@@ -249,7 +222,6 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     return { ...item, fullName };
   });
 
-  // Perhitungan Agregasi untuk Analytics Summary Card di Atas
   const summary = await Attendance.aggregate([
     { $match: matchQuery },
     {
@@ -291,35 +263,28 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     },
   ]);
 
-  // Kembalikan objek data yang siap dibaca oleh berkas EJS Anda
   return {
     listAttendance,
     analytics: summary[0] || { totalLateMinutes: 0, totalLateDays: 0, totalHadir: 0 },
     isAdmin,
     isPersonalView,
     filters: {
-      // Mengonversi kembali format objek Date ke string YYYY-MM-DD untuk isi value di form HTML input
       startDate: start.toISOString().split("T")[0],
       endDate: end.toISOString().split("T")[0],
     },
   };
 };
-/**
- * Perbarui lokasi & konfigurasi kantor.
- * @param {Object} body – { lat, lng, radiusMeter, entryTimeLimit, name }
- * @returns {Object} config yang diperbarui
- */
+
 export const updateCompanyConfig = async (body) => {
-  const { lat, lng, radiusMeter, entryTimeLimit, name } = body;
+  const { entryTimeLimit, gracePeriodMinutes, name, locations } = body;
 
   let config = await CompanySetting.findOne();
   if (!config) config = new CompanySetting();
 
-  if (lat) config.lat = parseFloat(lat);
-  if (lng) config.lng = parseFloat(lng);
-  if (radiusMeter) config.radiusMeter = parseInt(radiusMeter);
   if (entryTimeLimit) config.entryTimeLimit = entryTimeLimit;
+  if (gracePeriodMinutes !== undefined) config.gracePeriodMinutes = parseInt(gracePeriodMinutes);
   if (name) config.name = name;
+  if (locations && Array.isArray(locations)) config.locations = locations;
 
   await config.save();
   return config;

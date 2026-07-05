@@ -30,7 +30,6 @@ const attendanceSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["KANTOR", "LUAR KANTOR"],
       default: "KANTOR",
     },
 
@@ -64,9 +63,7 @@ const attendanceSchema = new mongoose.Schema(
 );
 
 attendanceSchema.index({ userId: 1, checkIn: -1 }, { name: "idx_userId_checkIn" });
-
 attendanceSchema.index({ checkIn: -1, userId: 1 }, { name: "idx_checkIn_userId" });
-
 attendanceSchema.index({ status: 1, checkIn: -1 }, { name: "idx_status_checkIn" });
 
 export default mongoose.model("Attendance", attendanceSchema);

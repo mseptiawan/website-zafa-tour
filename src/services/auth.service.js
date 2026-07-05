@@ -42,7 +42,7 @@ export const verifyAndBuildSession = async (identifier, password) => {
       path: "careerData",
       populate: [{ path: "bidangId" }, { path: "unitId" }, { path: "positionId" }],
     })
-    .lean();
+    .lean({ virtuals: true });
 
   const roleName = user.roleId?.name?.toUpperCase() || "";
   const managerRoles = [
@@ -52,7 +52,9 @@ export const verifyAndBuildSession = async (identifier, password) => {
     "WAKIL_DIREKTUR",
   ];
   const isManager = managerRoles.includes(roleName);
-  const career = employee?.careerData || null;
+
+  const career =
+    employee?.careerData && employee.careerData.length > 0 ? employee.careerData[0] : null;
 
   return {
     _id: user._id,
@@ -74,6 +76,8 @@ export const verifyAndBuildSession = async (identifier, password) => {
     careerId: career?._id || null,
     positionId: career?.positionId?._id || null,
     positionName: career?.positionId?.name || null,
+    status_pegawai: career?.status_pegawai || null,
+    tanggal_mulai_bergabung: career?.tanggal_mulai_bergabung || null,
   };
 };
 

@@ -1,8 +1,24 @@
 <%
-  const safeUser = user || {};
+const safeUser = user || {};
   const perms = safeUser.permissions || {};
   const role = safeUser.role || "";
+  const statusPegawai = safeUser.status_pegawai || "";
+  const tglBergabung = safeUser.tanggal_mulai_bergabung ? new Date(safeUser.tanggal_mulai_bergabung) : null;
+  
+  // Ambil unitName dari sesi
+  const unitName = safeUser.unitName || "";
 
+  let isKontrakLebihSatuTahun = false;
+  if (statusPegawai === "Pegawai Kontrak" && tglBergabung) {
+    const satuTahunLalu = new Date();
+    satuTahunLalu.setFullYear(satuTahunLalu.getFullYear() - 1);
+    isKontrakLebihSatuTahun = tglBergabung <= satuTahunLalu;
+  }
+
+  const isEligibleForLeave = statusPegawai === "Pegawai Tetap" || isKontrakLebihSatuTahun;
+  
+  // Gunakan pencocokan huruf besar semua (.toUpperCase()) pada kedua sisi agar aman
+  const isMarketing = unitName.toUpperCase().includes("MARKETING DAN KEMITRAAN");
   locals.sidebarSections = [
     {
       title: "Manajemen Pegawai",
@@ -124,19 +140,35 @@
     {
       title: "Absensi & Izin",
       show: true,
-      menus: [
-        {
-          id: "leave",
-          name: "Cuti",
-          icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
-          show: true,
-          submenus: [
-            { name: "Buat Pengajuan", path: "/leave/apply", show: !!perms.leave_new },
-            { name: "Riwayat Pengajuan", path: "/leave/my-history", show: !!perms.leave_my },
-            { name: "Permintaan Delegasi", path: "/leave/my-delegations", show: !!perms.leave_delegation },
-            { name: "Manajemen Cuti", path: "/leave/manage-requests",show: !!perms.leave_manage && user.role !== "DIREKTUR_UTAMA" }
-          ]
-        },
+menus: [
+      {
+        id: "leave",
+        name: "Cuti",
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
+        show: isEligibleForLeave || !!perms.leave_manage,
+        submenus: [
+          { 
+            name: "Buat Pengajuan", 
+            path: "/leave/apply", 
+            show: !!perms.leave_new && isEligibleForLeave 
+          },
+          { 
+            name: "Riwayat Pengajuan", 
+            path: "/leave/my-history", 
+            show: !!perms.leave_my && isEligibleForLeave 
+          },
+          { 
+            name: "Permintaan Delegasi", 
+            path: "/leave/my-delegations", 
+            show: !!perms.leave_delegation && isEligibleForLeave 
+          },
+          { 
+            name: "Manajemen Cuti", 
+            path: "/leave/manage-requests",
+            show: !!perms.leave_manage && user.role !== "DIREKTUR_UTAMA" 
+          }
+        ]
+      },
         {
           id: "permit",
           name: "Izin",
@@ -187,17 +219,29 @@
       title: "Aktivitas Lapangan",
       show: role !== "DIREKTUR_UTAMA",
       menus: [
-        {
-          id: "sales",
-          name: "Kunjungan Sales",
-          icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />`,
-          show: true,
-          submenus: [
-            { name: "Catat Kunjungan", path: "/sales/new", show: !!perms.sales_new },
-            { name: "Daftar Kunjungan", path: "/sales/my", show: !!perms.sales_my },
-            { name: "Kunjungan Pegawai", path: "/sales/employee-visits", show: !!perms.sales_employee }
-          ]
-        },
+{
+        id: "sales",
+        name: "Kunjungan Sales",
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />`,
+        show: isMarketing && (!!perms.sales_new || !!perms.sales_my || !!perms.sales_employee),
+        submenus: [
+          { 
+            name: "Catat Kunjungan", 
+            path: "/sales/new", 
+            show: isMarketing && !!perms.sales_new 
+          },
+          { 
+            name: "Daftar Kunjungan", 
+            path: "/sales/my", 
+            show: isMarketing && !!perms.sales_my 
+          },
+          { 
+            name: "Kunjungan Pegawai", 
+            path: "/sales/employee-visits", 
+            show: isMarketing && !!perms.sales_employee 
+          }
+        ]
+      },
         {
           id: "Aktivitas Harian",
           name: "Aktivitas Harian",

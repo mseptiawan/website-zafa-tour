@@ -32,6 +32,10 @@ const employeeCareerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Position",
     },
+    penempatan: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,
