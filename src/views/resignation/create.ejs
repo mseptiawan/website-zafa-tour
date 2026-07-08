@@ -1,0 +1,81 @@
+<%- layout('layouts/main', { title }) %>
+
+<% 
+  let formattedEffectiveDate = '';
+  if (typeof old !== 'undefined' && old.effective_date) {
+    const d = new Date(old.effective_date);
+    if (!isNaN(d.getTime())) {
+      formattedEffectiveDate = d.toISOString().split('T')[0];
+    }
+  }
+%>
+
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
+
+    <%- include('../partials/page-header', { 
+        section: 'Area Kerja', 
+        module: 'Pengunduran Diri', 
+        title: 'Pengajuan Resign', 
+        description: 'Form formulir permohonan pengunduran diri resmi pegawai.' 
+    }) %>
+
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
+      <form action="/resignation" method="POST" class="space-y-5">
+
+        <% if (typeof errors !== 'undefined' && errors?.global) { %>
+        <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
+          <%= errors.global %>
+        </div>
+        <% } %>
+
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Efektif Keluar</label>
+          <input type="date" id="effectiveDate" name="effective_date" value="<%= formattedEffectiveDate %>" required 
+                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.effective_date ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all" />
+          <p class="text-[10.5px] text-slate-400/80 font-medium pl-0.5">Sesuai aturan perusahaan, tanggal efektif harus lebih besar dari hari ini.</p>
+          <% if (typeof errors !== 'undefined' && errors.effective_date) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.effective_date %></p>
+          <% } %>
+        </div>
+
+        <div class="space-y-2 mb-5">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alasan Pengunduran Diri</label>
+          <textarea name="reason" rows="6" placeholder="Berikan alasan detail atau keterangan mengapa Anda mengajukan pengunduran diri..." 
+                    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.reason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= typeof old !== 'undefined' && old.reason ? old.reason : '' %></textarea>
+          <% if (typeof errors !== 'undefined' && errors.reason) { %>
+            <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.reason %></p>
+          <% } %>
+        </div>
+
+        <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
+          <a href="/resignation/my" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
+            Batal
+          </a>
+          <button type="submit" class="w-auto text-center bg-blue-600 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
+            Ajukan Resign
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const today = new Date();
+  tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const yyyy = tomorrow.getFullYear();
+  const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+  const dd = String(tomorrow.getDate()).padStart(2, '0');
+  const minDate = `${yyyy}-${mm}-${dd}`;
+
+  const effectiveDateInput = document.getElementById('effectiveDate');
+  effectiveDateInput.min = minDate;
+
+  if (!effectiveDateInput.value) {
+    effectiveDateInput.value = minDate;
+  }
+</script>

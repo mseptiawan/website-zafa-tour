@@ -21,5 +21,4 @@ router.get("/history-detail/:employeeId/:periode", getHistoryDetail);
 
 router.get("/my-history", getMyKpiHistory);
 
-router.get("/history-detail/:employeeId/:periode", getHistoryDetail);
 export default router;

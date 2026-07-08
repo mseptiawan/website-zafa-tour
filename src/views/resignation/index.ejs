@@ -1,0 +1,335 @@
+<%- layout('layouts/main', { title }) %>
+
+<% 
+  const loginRole = (typeof user !== 'undefined' && user.role) ? user.role : ((typeof currentUser !== 'undefined' && currentUser.role) ? currentUser.role : '');
+
+  const activeResignations = resignations.filter(r => {
+    if (loginRole === 'WAKIL_DIREKTUR') return r.status === 'PENDING_WADIR';
+    if (loginRole === 'DIREKTUR_UTAMA') return r.status === 'PENDING_DIRUT';
+    return false;
+  });
+
+  const historyResignations = resignations.filter(r => {
+    if (loginRole === 'WAKIL_DIREKTUR') {
+      return ['PENDING_DIRUT', 'REJECTED_WADIR'].includes(r.status);
+    }
+    if (loginRole === 'DIREKTUR_UTAMA') {
+      return ['APPROVED', 'REJECTED_DIRUT'].includes(r.status);
+    }
+    return false;
+  });
+%>
+
+<div class="min-h-screen bg-slate-50/50 md:ml-72 p-4 sm:p-6 md:p-10 antialiased selection:bg-blue-50 selection:text-blue-600 pb-24 md:pb-8">
+  <div class="max-w-none mx-auto space-y-5 md:space-y-8">
+
+    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+      <%- include('../partials/page-header', {
+        module: 'Kehadiran',
+        title: 'Otorisasi Pengunduran Diri',
+        description: 'Tinjau, evaluasi, dan kelola dokumen berkas pengunduran diri (resign) resmi masuk dari staf.'
+      }) %>
+    </div>
+
+    <div class="w-full">
+      <%- include('../partials/_stats-grid', {
+        gridClass: 'grid-cols-2 lg:grid-cols-4',
+        items: [
+          { 
+            label: 'Total Pengajuan', 
+            value: summary.totalResignations, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-folder-open', 
+            labelClass: '!font-medium text-slate-400', 
+            valueClass: '!font-medium text-slate-800', 
+            iconBoxClass: 'bg-slate-50 text-slate-400 border border-slate-200/50' 
+          },
+          { 
+            label: 'Pending Approval', 
+            value: summary.pending, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-hourglass-half', 
+            labelClass: '!font-medium text-amber-600', 
+            valueClass: '!font-medium text-amber-700', 
+            iconBoxClass: 'bg-amber-50 text-amber-500 border border-amber-200/50' 
+          },
+          { 
+            label: 'Disetujui Final', 
+            value: summary.approved, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-check', 
+            labelClass: '!font-medium text-emerald-600', 
+            valueClass: '!font-medium text-emerald-700', 
+            iconBoxClass: 'bg-emerald-50 text-emerald-500 border border-emerald-200/50' 
+          },
+          { 
+            label: 'Ditolak Masing-masing', 
+            value: summary.rejected, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-xmark', 
+            labelClass: '!font-medium text-rose-600', 
+            valueClass: '!font-medium text-rose-700', 
+            iconBoxClass: 'bg-rose-50 text-rose-500 border border-rose-200/50' 
+          }
+        ]
+      }) %>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none select-none">
+      <div class="w-full">
+        <%- include('../partials/_tab-nav', {
+          tabs: [
+            { 
+              id: 'active', 
+              label: `Permintaan Masuk (${activeResignations.length})`, 
+              isActive: true 
+            },
+            { 
+              id: 'history', 
+              label: `Arsip Keputusan Selesai (${historyResignations.length})`, 
+              isActive: false 
+            }
+          ]
+        }) %>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0">
+        <%- include('partials/_table', { 
+          resignations: activeResignations, 
+          type: 'active'
+        }) %>
+      </div>
+
+      <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
+        <%- include('partials/_table', { 
+          resignations: historyResignations, 
+          type: 'history'
+        }) %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="rejectModal" class="fixed inset-0 z-[120] hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full border border-slate-100 shadow-2xl overflow-hidden transform scale-95 transition-all duration-200">
+    <div class="p-5 space-y-4">
+      <div class="flex items-center gap-2.5 text-rose-600">
+        <div class="w-7 h-7 rounded-lg bg-rose-50 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-sm font-bold text-slate-800">Tolak Permohonan Resign</h3>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Masukkan alasan penolakan berkas evaluasi pengunduran diri ini secara jelas agar staf bersangkutan menerima notifikasi alasan penolakan sistem.
+      </p>
+      
+      <form id="rejectForm" method="POST" class="space-y-4">
+        <input type="hidden" name="action" value="REJECT">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Catatan Evaluasi Penolakan</label>
+          <textarea name="note" required rows="3" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all" placeholder="Tulis rincian atau alasan penolakan manajemen pimpinan..."></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" onclick="closeRejectModal()" class="h-8.5 px-3.5 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl hover:bg-slate-50 cursor-pointer">Batal</button>
+          <button type="submit" class="h-8.5 px-4 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer">Konfirmasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="approveFinalModal" class="fixed inset-0 z-[120] hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full border border-slate-100 shadow-2xl overflow-hidden transform scale-95 transition-all duration-200">
+    <div class="p-5 space-y-4">
+      <div class="flex items-center gap-2.5 text-emerald-600">
+        <div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-file-signature"></i>
+        </div>
+        <h3 class="text-sm font-bold text-slate-800">Persetujuan Final & Penerbitan SK</h3>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Anda akan menyetujui permohonan resign ini secara final. Silakan unggah dokumen Surat Keputusan (SK) resmi pengunduran diri staf untuk diarsip ke dalam sistem.
+      </p>
+      
+      <form id="approveFinalForm" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <input type="hidden" name="action" value="APPROVE">
+        
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Dokumen SK Resmi (PDF, Max 2MB)</label>
+          <input type="file" name="attachment" required accept=".pdf" class="w-full text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 file:cursor-pointer">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Catatan/Memo Direksi (Opsional)</label>
+          <textarea name="note" rows="2" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" placeholder="Tulis catatan atau memo tambahan jika ada..."></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" onclick="closeApproveFinalModal()" class="h-8.5 px-3.5 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl hover:bg-slate-50 cursor-pointer">Batal</button>
+          <button type="submit" class="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer">Setujui & Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="resignationDetailModal" class="fixed inset-0 z-[120] hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-lg w-full border border-slate-100 shadow-2xl overflow-hidden transform scale-95 transition-all duration-200">
+    <div class="p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2 text-blue-600">
+          <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-circle-info"></i>
+          </div>
+          <h3 class="text-sm font-bold text-slate-800">Rincian Informasi Lembar Resign</h3>
+        </div>
+        <button type="button" onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 text-xs">
+        <div>
+          <span class="block text-[10px] font-bold uppercase text-slate-400">Nama Pegawai</span>
+          <span id="detailName" class="font-bold text-slate-700 block mt-0.5">-</span>
+        </div>
+        <div>
+          <span class="block text-[10px] font-bold uppercase text-slate-400">Bidang / Divisi</span>
+          <span id="detailBidang" class="font-medium text-slate-600 block mt-0.5">-</span>
+        </div>
+        <div>
+          <span class="block text-[10px] font-bold uppercase text-slate-400">Tanggal Pengajuan</span>
+          <span id="detailSubDate" class="font-medium text-slate-600 block mt-0.5">-</span>
+        </div>
+        <div>
+          <span class="block text-[10px] font-bold uppercase text-slate-400">Tanggal Efektif Keluar</span>
+          <span id="detailEffDate" class="font-bold text-slate-700 block mt-0.5">-</span>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 pt-3">
+        <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Alasan Pengunduran Diri</span>
+        <p id="detailReason" class="text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-xl p-3 leading-relaxed font-normal whitespace-pre-line">-</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 border-t border-slate-100 pt-3">
+        <div>
+          <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Memo Wakil Direktur</span>
+          <p id="detailWadirNote" class="text-[11px] text-slate-500 italic bg-slate-50/60 p-2.5 rounded-lg border border-slate-100 font-normal">-</p>
+        </div>
+        <div>
+          <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Memo Direktur Utama</span>
+          <p id="detailDirutNote" class="text-[11px] text-slate-500 italic bg-slate-50/60 p-2.5 rounded-lg border border-slate-100 font-normal">-</p>
+        </div>
+      </div>
+
+      <div id="detailAttachmentContainer" class="border-t border-slate-100 pt-3 hidden">
+        <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1.5">Dokumen SK Lampiran</span>
+        <a id="detailAttachmentLink" href="#" target="_blank" class="inline-flex items-center gap-2 px-3 url-btn py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-lg text-[11px] hover:bg-emerald-100 transition-colors">
+          <i class="fa-solid fa-file-pdf"></i> Lihat Dokumen SK Resmi
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.open-detail-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('detailName').textContent = btn.dataset.name;
+        document.getElementById('detailBidang').textContent = btn.dataset.bidang;
+        document.getElementById('detailSubDate').textContent = btn.dataset.subdate;
+        document.getElementById('detailEffDate').textContent = btn.dataset.effdate;
+        document.getElementById('detailReason').textContent = btn.dataset.reason;
+        
+        document.getElementById('detailWadirNote').textContent = btn.dataset.wadirnote || 'Tidak ada catatan';
+        document.getElementById('detailDirutNote').textContent = btn.dataset.dirutnote || 'Tidak ada catatan';
+
+        const container = document.getElementById('detailAttachmentContainer');
+        const link = document.getElementById('detailAttachmentLink');
+     if (btn.dataset.attachment) {
+    const rawPath = btn.dataset.attachment;
+    
+    // LOGIKA PEMBERSIHAN PATH:
+    // Kita cari posisi folder 'uploads' dan ambil sisanya
+    let fileName = rawPath;
+    if (rawPath.includes('uploads/files/')) {
+        fileName = rawPath.split('uploads/files/').pop();
+    } else {
+        // Jika tidak ada pattern folder, ambil nama file paling belakang
+        fileName = rawPath.split(/[\\/]/).pop();
+    }
+    
+    // Sekarang link pasti rapi: /uploads/files/nama-file.pdf
+    link.href = '/uploads/files/' + fileName;
+    
+    container.classList.remove('hidden');
+} else {
+    container.classList.add('hidden');
+}
+
+        document.getElementById('resignationDetailModal').classList.remove('hidden');
+      });
+    });
+  });
+
+  function closeDetailModal() {
+    document.getElementById('resignationDetailModal').classList.add('hidden');
+  }
+
+  function openRejectModal(resignationId, currentRole) {
+    const modal = document.getElementById('rejectModal');
+    const form = document.getElementById('rejectForm');
+    
+    if (currentRole === 'DIREKTUR_UTAMA') {
+      form.action = `/resignation/approval-final/${resignationId}`;
+    } else {
+      form.action = `/resignation/approval-wadir/${resignationId}`;
+    }
+    modal.classList.remove('hidden');
+  }
+
+  function closeRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+  }
+
+  function openApproveFinalModal(resignationId) {
+    const modal = document.getElementById('approveFinalModal');
+    const form = document.getElementById('approveFinalForm');
+    form.action = `/resignation/approval-final/${resignationId}`;
+    modal.classList.remove('hidden');
+  }
+
+  function closeApproveFinalModal() {
+    document.getElementById('approveFinalModal').classList.add('hidden');
+  }
+
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.add('hidden');
+      pane.classList.remove('block', 'opacity-100', 'translate-y-0');
+    });
+
+    const activeContent = document.getElementById(`tab-content-${tabName}`);
+    if (activeContent) {
+      activeContent.classList.remove('hidden');
+      activeContent.classList.add('block');
+      setTimeout(() => { activeContent.classList.add('opacity-100', 'translate-y-0'); }, 10);
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+      btn.classList.add('font-medium', 'text-slate-500');
+    });
+
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (activeBtn) {
+      activeBtn.classList.remove('font-medium', 'text-slate-500');
+      activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+    }
+  }
+</script>

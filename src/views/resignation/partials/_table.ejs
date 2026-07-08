@@ -1,0 +1,106 @@
+<% 
+  const currentApproverRole = (typeof user !== 'undefined' && user.role) ? user.role : ((typeof currentUser !== 'undefined' && currentUser.role) ? currentUser.role : '');
+%>
+
+<div class="bg-white rounded-2xl border border-slate-200/50 shadow-xs overflow-hidden w-full">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-[13px] table-fixed">
+      <thead>
+        <tr class="bg-slate-50/70 border-b border-slate-200/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider select-none">
+          <th class="py-4 px-6 w-[25%]">Pegawai & Bidang</th>
+          <th class="py-4 px-6 w-[15%]">Tgl Pengajuan</th>
+          <th class="py-4 px-6 w-[15%]">Efektif Keluar</th>
+          <th class="py-4 px-6 w-[25%]">Alasan Keluar</th>
+          <th class="py-4 px-6 w-[12%] text-center">Status</th>
+          <th class="py-4 px-6 w-[13%] text-right">Otorisasi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 bg-white font-medium text-slate-600">
+        <% if (resignations.length === 0) { %>
+          <tr>
+            <td colspan="6" class="py-12 text-center text-slate-400 font-medium">Belum ada berkas pengunduran diri.</td>
+          </tr>
+        <% } else { %>
+          <% resignations.forEach(resign => { %>
+            <% 
+              const employeeName = resign.employee_id ? resign.employee_id.fullName : 'Staf Internal';
+              const bidangName = resign.employee_id?.careerData?.bidangId?.name || 'Staf Umum';
+              const wadirNote = resign.approvals?.wadir?.note || '';
+              const dirutNote = resign.approvals?.dirut?.note || '';
+            %>
+            <tr class="hover:bg-slate-50/40 transition-colors">
+              <td class="py-4 px-6">
+                <span class="font-bold text-slate-800 block truncate"><%= employeeName %></span>
+                <span class="text-[10.5px] text-slate-400 font-medium block mt-0.5">🏢 <%= bidangName %></span>
+              </td>
+              <td class="py-4 px-6 text-slate-500 tabular-nums">
+                <%= new Date(resign.submission_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+              </td>
+              <td class="py-4 px-6 font-semibold text-slate-700 tabular-nums">
+                <%= new Date(resign.effective_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+              </td>
+              <td class="py-4 px-6">
+  <p class="w-full text-slate-500 pr-2 font-normal whitespace-normal break-words line-clamp-3" title="<%= resign.reason %>">
+    <%= resign.reason %>
+  </p>
+</td>
+              <td class="py-4 px-6 text-center">
+                <% if (resign.status === 'PENDING_WADIR') { %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold border bg-amber-50 text-amber-600 border-amber-200/50">PENDING WADIR</span>
+                <% } else if (resign.status === 'PENDING_DIRUT') { %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold border bg-orange-50 text-orange-600 border-orange-200/50">PENDING DIRUT</span>
+                <% } else if (resign.status === 'APPROVED') { %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-200/50">APPROVED</span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold border bg-rose-50 text-rose-600 border-rose-200/50">REJECTED</span>
+                <% } %>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <div class="inline-flex items-center gap-1.5">
+                  
+                  <button type="button" 
+                          class="open-detail-btn w-7 h-7 rounded-lg border border-slate-200 text-slate-600 bg-white inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-slate-50 cursor-pointer"
+                          title="Periksa Lembar Detail"
+                          data-name="<%= employeeName %>"
+                          data-bidang="<%= bidangName %>"
+                          data-subdate="<%= new Date(resign.submission_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+                          data-effdate="<%= new Date(resign.effective_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+                          data-status="<%= resign.status %>"
+                          data-reason="<%= resign.reason %>"
+                          data-wadirnote="<%= wadirNote %>"
+                          data-dirutnote="<%= dirutNote %>"
+                          data-attachment="<%= resign.attachment || '' %>">
+                    <i class="fa-solid fa-eye text-[10px]"></i>
+                  </button>
+
+                  <% if (type === 'active') { %>
+                    <% if (currentApproverRole === 'DIREKTUR_UTAMA') { %>
+                      <button type="button" 
+                              onclick="openApproveFinalModal('<%= resign._id %>')" 
+                              title="Setujui & Unggah SK Resmi" 
+                              class="w-7 h-7 rounded-lg border border-emerald-200 text-emerald-600 bg-emerald-50/50 inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-emerald-600 hover:text-white cursor-pointer">
+                        <i class="fa-solid fa-cloud-arrow-up text-[10px]"></i>
+                      </button>
+                    <% } else { %>
+                      <form method="POST" action="/resignation/approval-wadir/<%= resign._id %>" class="inline">
+                        <input type="hidden" name="action" value="APPROVE">
+                        <button type="submit" title="Setujui Berkas" class="w-7 h-7 rounded-lg border border-emerald-200 text-emerald-600 bg-emerald-50/50 inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-emerald-600 hover:text-white cursor-pointer">
+                          <i class="fa-solid fa-check text-[10px]"></i>
+                        </button>
+                      </form>
+                    <% } %>
+
+                    <button type="button" onclick="openRejectModal('<%= resign._id %>', '<%= currentApproverRole %>')" title="Batalkan/Tolak Berkas" class="w-7 h-7 rounded-lg border border-rose-200 text-rose-600 bg-rose-50/50 inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-rose-600 hover:text-white cursor-pointer">
+                      <i class="fa-solid fa-xmark text-[10px]"></i>
+                    </button>
+                  <% } %>
+
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>

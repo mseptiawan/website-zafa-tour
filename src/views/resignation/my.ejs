@@ -1,0 +1,411 @@
+<%- layout('layouts/main', { title }) %>
+
+<% 
+  // =========================================================================
+  // LOGIKA FILTERING DATA & STATISTIK RESIGNATION
+  // =========================================================================
+  const activeResignations = resignations.filter(r => ['PENDING_WADIR', 'PENDING_DIRUT'].includes(r.status));
+  const approvedResignations = resignations.filter(r => r.status === 'APPROVED');
+  const rejectedResignations = resignations.filter(r => ['REJECTED_WADIR', 'REJECTED_DIRUT'].includes(r.status));
+
+  const historyResignations = [...approvedResignations, ...rejectedResignations]; 
+
+  const currentUserData = (typeof user !== 'undefined') ? user : ((typeof currentUser !== 'undefined') ? currentUser : null);
+  const isApprover = currentUserData && ['WAKIL_DIREKTUR', 'DIREKTUR_UTAMA'].includes(currentUserData.role);
+
+  function getStatusConfig(status) {
+    switch(status) {
+      case 'PENDING_WADIR': return { label: 'Pending Wadir', badge: 'bg-amber-50 text-amber-600 border-amber-200/50', dot: 'bg-amber-500' };
+      case 'PENDING_DIRUT': return { label: 'Pending Dirut', badge: 'bg-orange-50 text-orange-600 border-orange-200/50', dot: 'bg-orange-500' };
+      case 'APPROVED': return { label: 'Approved', badge: 'bg-emerald-50 text-emerald-600 border-emerald-200/50', dot: 'bg-emerald-500' };
+      case 'REJECTED_WADIR': return { label: 'Rejected Wadir', badge: 'bg-rose-50 text-rose-600 border-rose-200/50', dot: 'bg-rose-500' };
+      case 'REJECTED_DIRUT': return { label: 'Rejected Dirut', badge: 'bg-red-50 text-red-600 border-red-200/50', dot: 'bg-red-500' };
+      default: return { label: status, badge: 'bg-slate-50 text-slate-600 border-slate-200/50', dot: 'bg-slate-500' };
+    }
+  }
+%>
+
+<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 sm:p-6 md:p-10 antialiased pb-24 md:pb-8 text-slate-800">
+  <div class="w-full max-w-none mx-auto space-y-5 md:space-y-8">
+
+    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+      <%- include('../partials/page-header', {
+        section: 'Area Kerja',
+        module: 'Pengunduran Diri',
+        title: isApprover ? 'Otorisasi Resign Karyawan' : 'Riwayat Pengunduran Diri',
+        description: isApprover ? 'Tinjau dan kelola dokumen permohonan resign masuk dari staf.' : 'Pantau status permohonan pengunduran diri resmi Anda secara berkala.'
+      }) %>
+    </div>
+
+    <div class="w-full">
+      <%- include('../partials/_stats-grid', {
+        gridClass: 'grid-cols-2 lg:grid-cols-4', 
+        items: [
+          { 
+            label: 'Total Pengajuan', 
+            value: resignations.length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-folder-open', 
+            labelClass: '!font-medium text-slate-400', 
+            valueClass: '!font-medium text-slate-800', 
+            iconBoxClass: 'bg-slate-50 text-slate-400 border border-slate-200/50' 
+          },
+          { 
+            label: 'Menunggu', 
+            value: activeResignations.length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-hourglass-half', 
+            labelClass: '!font-medium text-amber-600', 
+            valueClass: '!font-medium text-amber-700', 
+            iconBoxClass: 'bg-amber-50 text-amber-500 border border-amber-200/50' 
+          },
+          { 
+            label: 'Disetujui Final', 
+            value: approvedResignations.length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-check', 
+            labelClass: '!font-medium text-emerald-600', 
+            valueClass: '!font-medium text-emerald-700', 
+            iconBoxClass: 'bg-emerald-50 text-emerald-500 border border-emerald-200/50' 
+          },
+          { 
+            label: 'Ditolak', 
+            value: rejectedResignations.length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-xmark', 
+            labelClass: '!font-medium text-rose-600', 
+            valueClass: '!font-medium text-rose-700', 
+            iconBoxClass: 'bg-rose-50 text-rose-500 border border-rose-200/50' 
+          }
+        ]
+      }) %>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none select-none">
+      <div class="flex items-center justify-between gap-3 w-full md:hidden">
+        <h3 class="text-[14px] font-medium text-slate-800 tracking-tight">Daftar Berkas</h3>
+        <% if (!isApprover) { %>
+          <a href="/resignation/create" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 text-white text-[11px] font-medium rounded-full transition-all active:scale-95 outline-none cursor-pointer">
+            <i class="fa-solid fa-plus text-[9px]"></i>
+            <span>Ajukan</span>
+          </a>
+        <% } %>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+        <div class="flex-1">
+          <%- include('../partials/_tab-nav', {
+            tabs: [
+              { 
+                id: 'active', 
+                label: `Menunggu Otorisasi (${activeResignations.length})`,
+                isActive: true 
+              },
+              { 
+                id: 'history', 
+                label: `Riwayat Selesai (${historyResignations.length})`,
+                isActive: false 
+              }
+            ]
+          }) %>
+        </div>
+        <% if (!isApprover) { %>
+          <a href="/resignation/create" class="hidden md:inline-flex items-center justify-center gap-2 h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-semibold rounded-xl transition-all active:scale-98 cursor-pointer shadow-sm">
+            <i class="fa-solid fa-plus text-[10px]"></i>
+            <span>Ajukan Resign Baru</span>
+          </a>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="hidden md:block bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50 shadow-2xs">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-[13px] table-fixed">
+          <thead>
+            <tr class="bg-slate-50/70 border-b border-slate-200/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider select-none">
+              <th class="py-4 px-6 w-[15%]">Tgl Pengajuan</th>
+              <th class="py-4 px-6 w-[15%]">Efektif Keluar</th>
+              <% if (isApprover) { %>
+                <th class="py-4 px-6 w-[25%]">Pegawai & Bidang</th>
+              <% } %>
+              <th class="py-4 px-6 w-[<%= isApprover ? '23%' : '48%' %>]">Alasan Keluar</th>
+              <th class="py-4 px-6 w-[12%] text-center">Status</th>
+              <th class="py-4 px-6 w-[10%] text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 bg-white font-medium text-slate-600">
+            <% ['active', 'history'].forEach(tabType => { %>
+              <% const targetData = tabType === 'active' ? activeResignations : historyResignations; %>
+              <% if (targetData.length === 0) { %>
+                <tr class="tab-pane-<%= tabType %> <%= tabType === 'history' ? 'hidden' : '' %>">
+                  <td colspan="<%= isApprover ? 6 : 5 %>" class="py-12 text-center text-slate-400 font-medium">Belum ada berkas pengunduran diri di data ini.</td>
+                </tr>
+              <% } else { %>
+                <% targetData.forEach(resign => { %>
+                  <% 
+                    const config = getStatusConfig(resign.status); 
+                    const employeeName = resign.employee_id ? resign.employee_id.fullName : 'Staf Internal';
+                    const bidangName = resign.employee_id?.careerData?.bidangId?.name || 'Staf Umum';
+                    const wadirNote = resign.approvals?.wadir?.note || '';
+                    const dirutNote = resign.approvals?.dirut?.note || '';
+                  %>
+                  <tr class="tab-pane-<%= tabType %> <%= tabType === 'history' ? 'hidden' : '' %> hover:bg-slate-50/40 transition-colors">
+                    <td class="py-4 px-6 text-slate-500 tabular-nums">
+                      <%= new Date(resign.submission_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+                    </td>
+                    <td class="py-4 px-6 font-semibold text-slate-700 tabular-nums">
+                      <%= new Date(resign.effective_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+                    </td>
+                    <% if (isApprover) { %>
+                      <td class="py-4 px-6">
+                        <span class="font-bold text-slate-800 block truncate"><%= employeeName %></span>
+                        <span class="text-[10.5px] text-slate-400 font-medium block mt-0.5">🏢 <%= bidangName %></span>
+                      </td>
+                    <% } %>
+                    <td class="py-4 px-6">
+                      <p class="w-full whitespace-normal break-words text-slate-500 pr-2 font-normal truncate-2-lines" title="<%= resign.reason %>"><%= resign.reason %></p>
+                    </td>
+                    <td class="py-4 px-6 text-center select-none">
+                      <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold border tracking-wide uppercase <%= config.badge %>">
+                        <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
+                        <span><%= config.label.toUpperCase() %></span>
+                      </div>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                     <button type="button" 
+        class="open-detail-btn w-8 h-8 rounded-lg border border-slate-200 text-slate-600 inline-flex items-center justify-center bg-white transition-all active:scale-[0.95] hover:bg-slate-50 cursor-pointer"
+        title="Periksa Lembar Detail"
+        data-name="<%= employeeName %>"
+        data-bidang="<%= bidangName %>"
+        data-subdate="<%= new Date(resign.submission_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+        data-effdate="<%= new Date(resign.effective_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+        data-status="<%= config.label.toUpperCase() %>"
+        data-reason="<%= resign.reason %>"
+        data-wadirnote="<%= wadirNote %>"
+        data-dirutnote="<%= dirutNote %>"
+        data-attachment="<%= resign.attachment || '' %>">
+  <i class="fa-solid fa-eye text-[11px]"></i>
+</button>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="block md:hidden space-y-3.5 w-full">
+      <% ['active', 'history'].forEach(tabType => { %>
+        <% const targetData = tabType === 'active' ? activeResignations : historyResignations; %>
+        <% if (targetData.length === 0) { %>
+          <div class="tab-pane-<%= tabType %>-mb <%= tabType === 'history' ? 'hidden' : '' %> bg-white border border-slate-200/60 rounded-2xl py-10 text-center px-4">
+            <p class="text-[12px] font-medium text-slate-400">Tidak ada data pengunduran diri</p>
+          </div>
+        <% } else { %>
+          <% targetData.forEach(resign => { %>
+            <% 
+              const config = getStatusConfig(resign.status); 
+              const employeeName = resign.employee_id ? resign.employee_id.fullName : 'Staf Internal';
+              const bidangName = resign.employee_id?.careerData?.bidangId?.name || 'Staf Umum';
+              const wadirNote = resign.approvals?.wadir?.note || '';
+              const dirutNote = resign.approvals?.dirut?.note || '';
+            %>
+            <div class="tab-pane-<%= tabType %>-mb <%= tabType === 'history' ? 'hidden' : '' %> bg-white border border-slate-200/60 rounded-2xl p-4 space-y-3.5 shadow-2xs">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="text-[13px] font-bold text-slate-800 tracking-tight">
+                    <%= isApprover ? employeeName : 'Rencana Keluar: ' + new Date(resign.effective_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+                  </h4>
+                  <p class="text-[11px] text-slate-400 font-medium mt-0.5">
+                    📅 Pengajuan: <%= new Date(resign.submission_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+                    <% if (isApprover) { %> | 🏢 <%= bidangName %> <% } %>
+                  </p>
+                </div>
+                <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold tracking-wider border shrink-0 uppercase <%= config.badge %>">
+                  <span><%= config.label %></span>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/30 text-xs">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Alasan Resign</p>
+                <p class="text-slate-600 font-normal leading-relaxed truncate-2-lines"><%= resign.reason %></p>
+              </div>
+
+              <div class="flex items-center justify-end pt-0.5">
+             <button type="button" 
+        class="open-detail-btn w-8 h-8 rounded-lg border border-slate-200 text-slate-600 inline-flex items-center justify-center bg-white transition-all active:scale-[0.95] hover:bg-slate-50 cursor-pointer"
+        title="Periksa Lembar Detail"
+        data-name="<%= employeeName %>"
+        data-bidang="<%= bidangName %>"
+        data-subdate="<%= new Date(resign.submission_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+        data-effdate="<%= new Date(resign.effective_date).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+        data-status="<%= config.label.toUpperCase() %>"
+        data-reason="<%= resign.reason %>"
+        data-wadirnote="<%= wadirNote %>"
+        data-dirutnote="<%= dirutNote %>"
+        data-attachment="<%= resign.attachment || '' %>">
+  <i class="fa-solid fa-eye text-[11px]"></i>
+</button>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      <% }) %>
+    </div>
+
+  </div>
+</div>
+
+<div id="detailModal" class="fixed inset-0 z-[150] hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-lg w-full border border-slate-100 shadow-2xl overflow-hidden transform scale-95 transition-all duration-200 max-h-[90vh] flex flex-col">
+    
+    <div class="p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2.5 text-blue-600">
+        <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-xs"><i class="fa-solid fa-file-invoice"></i></div>
+        <h3 class="text-sm font-bold text-slate-800">Lembar Informasi Dokumen</h3>
+      </div>
+      <button onclick="closeDetailModal()" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-50 text-slate-400 transition-colors cursor-pointer">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+    
+    <div class="p-5 space-y-4 overflow-y-auto flex-1 text-[12.5px] leading-relaxed">
+      
+      <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/40">
+        <div>
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nama Pegawai</span>
+          <span id="modal-name" class="font-bold text-slate-800">-</span>
+        </div>
+        <div>
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Divisi / Bidang</span>
+          <span id="modal-bidang" class="font-medium text-slate-600">-</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Tgl Pengajuan</span>
+          <span id="modal-submission" class="font-semibold text-slate-700">-</span>
+        </div>
+        <div>
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Efektif Keluar</span>
+          <span id="modal-effective" class="font-bold text-blue-600">-</span>
+        </div>
+        <div>
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Status Sistem</span>
+          <span id="modal-status" class="inline-block font-bold text-slate-700 mt-0.5">-</span>
+        </div>
+      </div>
+
+      <hr class="border-slate-100">
+
+      <div>
+        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Alasan Pengunduran Diri</span>
+        <div class="p-3 bg-slate-50 border border-slate-200/50 rounded-xl font-normal text-slate-600 whitespace-pre-line" id="modal-reason">-</div>
+      </div>
+
+      <div id="modal-attachment-box" class="hidden">
+        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Dokumen Surat Keputusan Resmi (SK)</span>
+        <a id="modal-attachment-link" href="#" target="_blank" class="w-full border border-blue-200 rounded-xl p-3 bg-blue-50/40 hover:bg-blue-50 text-blue-600 flex items-center justify-between transition-colors font-semibold">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-file-pdf text-base"></i>
+            <span>Buka SK Surat Keputusan Resign.pdf</span>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
+
+      <div class="space-y-3 pt-1">
+        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Evaluasi Memo Pimpinan</span>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="p-3 border border-slate-100 rounded-xl bg-slate-50/50">
+            <span class="block font-bold text-slate-700 text-[11px] mb-0.5">Wakil Direktur:</span>
+            <p id="modal-note-wadir" class="text-slate-500 font-normal italic">Tidak ada catatan</p>
+          </div>
+          <div class="p-3 border border-slate-100 rounded-xl bg-slate-50/50">
+            <span class="block font-bold text-slate-700 text-[11px] mb-0.5">Direktur Utama:</span>
+            <p id="modal-note-dirut" class="text-slate-500 font-normal italic">Tidak ada catatan</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end shrink-0">
+      <button type="button" onclick="closeDetailModal()" class="h-9 px-4 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-100 cursor-pointer transition-colors shadow-2xs">Tutup Lembar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pasang event listener untuk menangkap klik pada semua tombol detail
+document.addEventListener('click', function (e) {
+  // Cari apakah yang diklik adalah tombol detail atau ikon di dalamnya
+  const btn = e.target.closest('.open-detail-btn');
+  if (!btn) return;
+
+  // Ambil semua data dari attributes HTML secara aman tanpa takut broken string
+  const name = btn.getAttribute('data-name');
+  const bidang = btn.getAttribute('data-bidang');
+  const subDate = btn.getAttribute('data-subdate');
+  const effDate = btn.getAttribute('data-effdate');
+  const status = btn.getAttribute('data-status');
+  const reason = btn.getAttribute('data-reason');
+  const wadirNote = btn.getAttribute('data-wadirnote') || '';
+  const dirutNote = btn.getAttribute('data-dirutnote') || '';
+  const attachment = btn.getAttribute('data-attachment');
+
+  // Isi data ke elemen Modal
+  document.getElementById('modal-name').textContent = name;
+  document.getElementById('modal-bidang').textContent = bidang;
+  document.getElementById('modal-submission').textContent = subDate;
+  document.getElementById('modal-effective').textContent = effDate;
+  document.getElementById('modal-status').textContent = status;
+  document.getElementById('modal-reason').textContent = reason;
+
+  // Manajemen Catatan / Evaluasi Notes pimpinan
+  document.getElementById('modal-note-wadir').textContent = wadirNote.trim() ? `"${wadirNote}"` : 'Tidak memberikan catatan.';
+  document.getElementById('modal-note-wadir').classList.toggle('text-slate-700', !!wadirNote.trim());
+  
+  document.getElementById('modal-note-dirut').textContent = dirutNote.trim() ? `"${dirutNote}"` : 'Tidak memberikan catatan.';
+  document.getElementById('modal-note-dirut').classList.toggle('text-slate-700', !!dirutNote.trim());
+
+  // Manajemen Lampiran Dokumen
+  const attachBox = document.getElementById('modal-attachment-box');
+  if (attachment && attachment.trim() !== '') {
+    document.getElementById('modal-attachment-link').href = attachment;
+    attachBox.classList.remove('hidden');
+  } else {
+    attachBox.classList.add('hidden');
+  }
+
+  // Tampilkan Modal
+  document.getElementById('detailModal').classList.remove('hidden');
+});
+
+function closeDetailModal() {
+  document.getElementById('detailModal').classList.add('hidden');
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-pane-active, .tab-pane-history').forEach(pane => pane.classList.add('hidden'));
+  document.querySelectorAll(`.tab-pane-${tabName}`).forEach(pane => pane.classList.remove('hidden'));
+
+  document.querySelectorAll('.tab-pane-active-mb, .tab-pane-history-mb').forEach(pane => pane.classList.add('hidden'));
+  document.querySelectorAll(`.tab-pane-${tabName}-mb`).forEach(pane => pane.classList.remove('hidden'));
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+    btn.classList.add('font-medium', 'text-slate-500');
+  });
+
+  const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+  if (activeBtn) {
+    activeBtn.classList.remove('font-medium', 'text-slate-500');
+    activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+  }
+}
+</script>

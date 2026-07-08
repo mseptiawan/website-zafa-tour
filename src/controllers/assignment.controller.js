@@ -1,17 +1,19 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData, getToday } from "../utils/renderHelper.js";
+
 import {
-  findEmployees,
-  create as createAssignment,
-  findMine,
-  findAll,
-  findById,
+  getEmployeesForAssignment,
+  createAssignment as createAssignmentService, 
+  getAssignmentsByEmployeeId,
+  getAllAssignments as getAllAssignmentsService,
+  getAssignmentById as getAssignmentByIdService,
 } from "../services/assignment.service.js";
 
-// ─── METHOD 1: FORM CREATE  ─────────────────────
-export const create = asyncHandler(async (req, res) => {
+// ─── METHOD 1: RENDER FORM CREATE ─────────────────────
+export const renderCreateForm = asyncHandler(async (req, res) => {
   const currentEmployeeId = req.session.user?.employeeId;
-  const employees = await findEmployees(currentEmployeeId);
+  
+  const employees = await getEmployeesForAssignment(currentEmployeeId);
 
   res.render("assignment/create", {
     ...buildRenderData(req, {
@@ -22,12 +24,12 @@ export const create = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── METHOD 2: STORE DATA  ───
-export const store = asyncHandler(async (req, res) => {
+// ─── METHOD 2: STORE / CREATE DATA ───
+export const createAssignment = asyncHandler(async (req, res) => {
   const currentEmployeeId = req.session.user?.employeeId;
 
   if (req.validationErrors) {
-    const employees = await findEmployees(currentEmployeeId);
+    const employees = await getEmployeesForAssignment(currentEmployeeId);
 
     return res.status(400).render("assignment/create", {
       ...buildRenderData(req, {
@@ -41,7 +43,7 @@ export const store = asyncHandler(async (req, res) => {
     });
   }
 
-  await createAssignment({
+  await createAssignmentService({
     body: req.body,
     file: req.file,
     userId: req.session.user._id,
@@ -60,12 +62,12 @@ export const store = asyncHandler(async (req, res) => {
   return res.redirect("/assignments");
 });
 
-// ─── METHOD 3: PENUGASAN SAYA  ────────
-export const my = asyncHandler(async (req, res) => {
+// ─── METHOD 3: GET PENUGASAN SAYA ────────
+export const getMyAssignments = asyncHandler(async (req, res) => {
   const { page, limit } = req.query;
   const employeeId = req.session.user?.employeeId;
 
-  const { data: assignments, meta } = await findMine({
+  const { data: assignments, meta } = await getAssignmentsByEmployeeId({
     employeeId,
     page,
     limit,
@@ -73,7 +75,7 @@ export const my = asyncHandler(async (req, res) => {
 
   res.render("assignment/my", {
     ...buildRenderData(req, {
-      title: "Penugasan ku",
+      title: "Penugasan Saya", 
       assignments,
       pagination: meta,
       query: req.query,
@@ -81,11 +83,11 @@ export const my = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── METHOD 4: INDEX ALL  ───
-export const index = asyncHandler(async (req, res) => {
+// ─── METHOD 4: GET INDEX ALL ───
+export const getAllAssignments = asyncHandler(async (req, res) => {
   const { page, limit } = req.query;
 
-  const { data: assignments, meta } = await findAll({
+  const { data: assignments, meta } = await getAllAssignmentsService({
     page,
     limit,
     currentUser: req.session.user,
@@ -101,9 +103,10 @@ export const index = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── METHOD 5: SHOW DETAIL ────────
-export const show = asyncHandler(async (req, res) => {
-  const assignment = await findById(req.params.id);
+// ─── METHOD 5: GET SHOW DETAIL ────────
+// ─── METHOD 5: GET SHOW DETAIL ────────
+export const getAssignmentById = asyncHandler(async (req, res) => {
+  const assignment = await getAssignmentByIdService(req.params.id);
 
   if (!assignment) {
     const err = new Error("Data penugasan tidak ditemukan");
@@ -111,10 +114,19 @@ export const show = asyncHandler(async (req, res) => {
     throw err;
   }
 
+  // Deteksi halaman asal. Jika tidak ada (misal ketik URL langsung), default ke '/assignments'
+  const referrer = req.get('Referer') || '';
+  let backLink = '/assignments';
+
+  if (referrer.includes('/assignments/me')) {
+    backLink = '/assignments/me';
+  }
+
   res.render("assignment/show", {
     ...buildRenderData(req, {
       title: "Detail Penugasan",
       assignment,
+      backLink, // <-- Kirim variabel ini ke EJS
     }),
   });
 });

@@ -136,6 +136,11 @@ employeeSchema.virtual("documentData", {
   foreignField: "employee_id",
   justOne: true,
 });
-
+employeeSchema.virtual("resignationHistory", {
+  ref: "Resignation",
+  localField: "_id",
+  foreignField: "employee_id",
+  justOne: false,
+});
 const Employee = mongoose.model("Employee", employeeSchema);
 export default Employee;

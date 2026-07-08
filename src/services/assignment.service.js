@@ -5,10 +5,10 @@ import Employee from "../models/employee/Employee.model.js";
 import User from "../models/basic/User.model.js";
 
 import notificationService from "./notification.service.js";
+
 /**
  * Query builder internal untuk menyaring data penugasan berdasarkan role user.
- * @param {Object} currentUser - Objek user dari session
- * @returns {Object} Mongoose filter object
+ * (Fungsi internal/private tetap menggunakan nama camelCase singkat)
  */
 const buildAssignmentFilter = (currentUser) => {
   const filter = {};
@@ -28,8 +28,6 @@ const buildAssignmentFilter = (currentUser) => {
 
 /**
  * Memvalidasi berkas/dokumen lampiran secara ketat sebelum diproses sistem.
- * @param {Object} file - Express Multer File Object
- * @throws {Error} Jika berkas melanggar limit ukuran atau tipe mime
  */
 const validateUploadedFile = (file) => {
   if (!file) return;
@@ -52,7 +50,7 @@ const validateUploadedFile = (file) => {
  * @param {string|null} [excludeEmployeeId=null] - ID Karyawan pembuat untuk dikecualikan
  * @returns {Promise<Array<Object>>} Daftar karyawan murni (POJO)
  */
-export const findEmployees = async (excludeEmployeeId = null) => {
+export const getEmployeesForAssignment = async (excludeEmployeeId = null) => {
   const query = {};
   if (excludeEmployeeId) {
     query._id = { $ne: excludeEmployeeId };
@@ -69,7 +67,7 @@ export const findEmployees = async (excludeEmployeeId = null) => {
  * @param {string} params.creatorName - Nama lengkap user pembuat dokumen
  * @returns {Promise<Object>} Instance data Assignment terbuat
  */
-export const create = async ({ body, file, userId, creatorName }) => {
+export const createAssignment = async ({ body, file, userId, creatorName }) => {
   validateUploadedFile(file);
 
   let employeeIds = [];
@@ -127,7 +125,7 @@ export const create = async ({ body, file, userId, creatorName }) => {
  * @param {number|string} [params.limit] - Limit data per halaman
  * @returns {Promise<{data: Array<Object>, meta: Object}>} Objek standar pembawa data & metadata halaman
  */
-export const findMine = async ({ employeeId, page, limit }) => {
+export const getAssignmentsByEmployeeId = async ({ employeeId, page, limit }) => {
   if (!employeeId) {
     return {
       data: [],
@@ -164,7 +162,7 @@ export const findMine = async ({ employeeId, page, limit }) => {
  * @param {Object} params.currentUser - Objek Sesi User login aktif
  * @returns {Promise<{data: Array<Object>, meta: Object}>} Objek standar pembawa data & metadata halaman
  */
-export const findAll = async ({ page = 1, limit = PAGINATION.ASSIGNMENT_DEFAULT, currentUser }) => {
+export const getAllAssignments = async ({ page = 1, limit = PAGINATION.ASSIGNMENT_DEFAULT, currentUser }) => {
   const paginationArgs = getPagination({ page, limit });
   const filter = buildAssignmentFilter(currentUser);
   const total = await Assignment.countDocuments(filter);
@@ -191,7 +189,7 @@ export const findAll = async ({ page = 1, limit = PAGINATION.ASSIGNMENT_DEFAULT,
  * @param {string} id - ID Object Data Assignment
  * @returns {Promise<Object|null>} Berkas penugasan utuh atau null
  */
-export const findById = async (id) => {
+export const getAssignmentById = async (id) => {
   return await Assignment.findById(id)
     .populate([
       { path: "employees" },

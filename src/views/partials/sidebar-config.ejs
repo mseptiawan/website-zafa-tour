@@ -78,7 +78,7 @@ const safeUser = user || {};
           show: true,
           submenus: [
             { name: "Buat Penugasan", path: "/assignments/new", show: !!perms.assignment_new },
-            { name: "Penugasan Masuk", path: "/assignments/my", show: !!perms.assignment_my },
+            { name: "Penugasan Masuk", path: "/assignments/me", show: !!perms.assignment_my },
             { name: "Semua Penugasan", path: "/assignments/", show: !!perms.assignment_all }
           ]
         },
@@ -212,9 +212,38 @@ menus: [
             { name: "Riwayat Pengajuan", path: "/trip/my", show: !!perms.trip_my },
             { name: "Persetujuan Dinas", path: "/trip/approval", show: !!perms.trip_approval && user.role !== "DIREKTUR_UTAMA" },
           ]
-        }
+        },
+     {
+  id: "resignation",
+  name: "Pengunduran Diri",
+  icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />`,
+  show: true, 
+  submenus: [
+    { 
+      name: "Ajukan Resign", 
+      path: "/resignation/new", 
+      show: !!perms.resignation_new
+    },
+    { 
+      name: "Riwayat Resign", 
+      path: "/resignation/my", 
+      show: !!perms.resignation_my
+    },
+    { 
+      name: "Persetujuan Resign", 
+      path: "/resignation", 
+      show: !!perms.resignation_approval_wadir && user.role === "WAKIL_DIREKTUR" 
+    },
+    {
+      name: "Persetujuan Resign",
+      path: "/resignation",
+      show: !!perms.resignation_approval_dirut && user.role === "DIREKTUR_UTAMA"
+    }
+  ]
+},
       ]
     },
+    
     {
       title: "Aktivitas Lapangan",
       show: role !== "DIREKTUR_UTAMA",

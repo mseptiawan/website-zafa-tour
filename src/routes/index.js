@@ -17,6 +17,7 @@ import finance from "./finance.routes.js";
 import dashboard from "./dashboard.routes.js";
 import termination from "./termination.routes.js";
 import organization from "./organization.routes.js";
+import resignation from "./resignation.route.js"
 import employee from "./employee.routes.js";
 import loan from "./loan.routes.js";
 import rewardPunishment from "./rewardPunishment.route.js";
@@ -38,6 +39,7 @@ router.use("/organization", organization);
 router.use("/kpi", kpi);
 router.use("/trip", tripRoutes);
 router.use("/daily-activities", dailyActivity);
+router.use("/resignation", resignation);
 router.use("/terminations", termination);
 router.use("/finance", finance);
 router.use("/sales", sales);
