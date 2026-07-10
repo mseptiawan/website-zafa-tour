@@ -1,6 +1,6 @@
-# Sistem Informasi Kepegawaian (SIK)
+# Sistem Informasi Kepegawaian (SIMPEG)
 
-Sistem Informasi Kepegawaian (SIK) merupakan aplikasi berbasis web yang dirancang untuk membantu digitalisasi proses administrasi kepegawaian di perusahaan. Sistem ini mengelola berbagai proses operasional seperti manajemen data pegawai, kehadiran, cuti, lembur, hingga dinas luar melalui mekanisme persetujuan bertingkat (_multi-level approval_).
+Sistem Informasi Kepegawaian (SIMPEG) merupakan aplikasi berbasis web yang dirancang untuk membantu digitalisasi proses administrasi kepegawaian di perusahaan. Sistem ini mengelola berbagai proses operasional seperti manajemen data pegawai, kehadiran, cuti, lembur, hingga dinas luar melalui mekanisme persetujuan bertingkat (_multi-level approval_).
 
 Proyek ini dikembangkan sebagai bagian dari tugas akhir dan berfokus pada penerapan arsitektur backend yang modular, workflow approval, serta manajemen data menggunakan MongoDB dan Redis.
 
