@@ -1,0 +1,247 @@
+<%- layout('layouts/main', { title }) %>
+
+<% 
+  const gajiPokok = typeof salary !== 'undefined' ? salary : 0; 
+  const maxLoanLimit = gajiPokok * 3;
+  const maxInstallmentLimit = gajiPokok * 0.3;
+%>
+
+<div>
+  <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0 space-y-5">
+
+    <%- include('../partials/page-header', {
+      section: 'Area Kerja',
+      module: 'Finance',
+      title: (typeof loan !== 'undefined' && loan) ? 'Ubah Pengajuan Pinjaman' : 'Pengajuan Pinjaman',
+      description: (typeof loan !== 'undefined' && loan) ? 'Update data permohonan pinjaman internal Anda.' : 'Ajukan pinjaman internal atau modal kerja Anda di sini.'
+    }) %>
+
+    <details class="group bg-slate-50 border border-slate-200/60 rounded-xl transition-all select-none">
+      <summary class="p-3.5 text-[12px] font-semibold text-slate-700 cursor-pointer list-none flex items-center justify-between outline-none">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Lihat Batas & Ketentuan Pinjaman</span>
+        </div>
+        <svg class="w-3.5 h-3.5 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <div class="px-3.5 pb-4 pt-1 border-t border-slate-200/40 grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] text-slate-600 font-medium">
+        <div class="bg-white p-2.5 rounded-lg border border-slate-100">
+          <p class="text-slate-400 font-semibold text-[10px] tracking-wide mb-0.5">Maksimum Pinjaman (3x Gaji)</p>
+          <p class="text-[13px] font-bold text-slate-800 tabular-nums">Rp <%= String(maxLoanLimit).replace(/\B(?=(\d{3})+(?!\d))/g, ".") %></p>
+        </div>
+        <div class="bg-white p-2.5 rounded-lg border border-slate-100">
+          <p class="text-slate-400 font-semibold text-[10px] tracking-wide mb-0.5">Maksimum Cicilan (30% Gaji)</p>
+          <p class="text-[13px] font-bold text-slate-800 tabular-nums">Rp <%= String(maxInstallmentLimit).replace(/\B(?=(\d{3})+(?!\d))/g, ".") %></p>
+        </div>
+      </div>
+    </details>
+
+    <% 
+      const activeError = (typeof errorMessage !== 'undefined' && errorMessage) ? errorMessage : ((typeof error !== 'undefined' && error) ? error : '');
+      const isSalaryError = activeError && (activeError.includes('Cicilan bulanan') || activeError.includes('maksimal 30%') || activeError.includes('Maksimum pinjaman'));
+    %>
+
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
+      <form id="loanForm" action="<%= typeof loan !== 'undefined' && loan ? '/loans/update/' + loan._id : '/loans' %>" method="POST" class="space-y-5">
+
+  <!-- GRID 2 KOLOM UNTUK INPUT PENDEK (DESKTOP) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    
+    <!-- Jumlah Pinjaman -->
+    <div class="space-y-2">
+      <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">
+        Jumlah Pinjaman <span class="text-slate-400 font-medium text-[11px]">(IDR)</span>
+      </label>
+      <% 
+        let amountValue = '';
+        if (typeof loan !== 'undefined' && loan) {
+          amountValue = loan.amountRequested || '';
+        } else if (typeof formData !== 'undefined' && formData) {
+          amountValue = formData.amountRequested || '';
+        } else if (typeof old !== 'undefined' && old) {
+          amountValue = old.amount || '';
+        }
+
+        const formatRupiahInitial = (angka) => {
+          if (!angka) return '';
+          return String(angka).replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        };
+      %>
+      <input type="text" id="inputRupiah" required value="<%= formatRupiahInitial(amountValue) %>" placeholder="Contoh: 5.000.000" 
+             class="w-full bg-slate-50/60 border <%= isSalaryError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
+      <input type="hidden" name="amountRequested" id="amountRequestedHidden" value="<%= amountValue %>" />
+      
+      <% if (isSalaryError) { %>
+        <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5">Batas pengajuan terlampaui. Cek kembali rincian ketentuan.</p>
+      <% } %>
+    </div>
+
+    <!-- Tenor Pinjaman -->
+    <div class="space-y-2">
+      <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">
+        Tenor Pinjaman <span class="text-slate-400 font-medium text-[11px]">(Bulan)</span>
+      </label>
+      <%
+        let currentTenor = '';
+        if (typeof loan !== 'undefined' && loan) {
+          currentTenor = Number(loan.tenorMonths) || '';
+        } else if (typeof formData !== 'undefined' && formData) {
+          currentTenor = Number(formData.tenorMonths) || '';
+        } else if (typeof old !== 'undefined' && old) {
+          currentTenor = Number(old.tenor) || '';
+        }
+      %>
+      <div class="relative w-full">
+        <select name="tenorMonths" id="selectTenor" required 
+                class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer appearance-none font-medium">
+          <option value="" disabled <%= !currentTenor ? 'selected' : '' %>>Pilih tenor (maks. 12 bulan)...</option>
+          <% for(let i = 1; i <= 12; i++) { %>
+            <option value="<%= i %>" <%= currentTenor === i ? 'selected' : '' %>><%= i %> Bulan</option>
+          <% } %>
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Boks Error Server (Jika ada error umum di luar batas gaji) -->
+  <% if (activeError && String(activeError).trim() !== '' && !isSalaryError) { %>
+    <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[12px] border border-rose-100 font-medium leading-relaxed">
+      <%= activeError %>
+    </div>
+  <% } %>
+
+  <!-- Preview Simulasi (Lebar Penuh) -->
+  <div id="calcPreview" class="hidden p-4 bg-slate-50 border border-slate-200/60 rounded-xl space-y-2 transition-all">
+    <div class="flex justify-between items-center">
+      <div>
+        <span class="text-[12px] font-semibold text-slate-700 block">Estimasi Potong Gaji</span>
+        <span class="text-[11px] text-slate-400">Nilai cicilan flat per bulan</span>
+      </div>
+      <span id="previewCicilan" class="text-lg font-bold text-blue-600 tracking-tight tabular-nums">Rp 0</span>
+    </div>
+    <div id="warningMsg" class="hidden text-[11px] text-rose-600 font-medium pt-2 border-t border-slate-200/40 flex flex-col gap-0.5 leading-relaxed">
+    </div>
+  </div>
+
+  <!-- Alasan Peminjaman (Lebar Penuh) -->
+  <div class="space-y-2">
+    <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Alasan Peminjaman</label>
+    <% 
+      let reasonValue = '';
+      if (typeof loan !== 'undefined' && loan) {
+        reasonValue = loan.reason || '';
+      } else if (typeof formData !== 'undefined' && formData) {
+        reasonValue = formData.reason || '';
+      } else if (typeof old !== 'undefined' && old) {
+        reasonValue = old.reason || '';
+      }
+    %>
+    <textarea name="reason" rows="4" maxlength="500" required placeholder="Jelaskan tujuan dan alasan pengajuan pinjaman secara detail di sini..." 
+              class="w-full bg-slate-50/60 border border-slate-200/70 focus:border-slate-400 rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= reasonValue %></textarea>
+  </div>
+
+  <!-- Tombol Aksi (Sejajar Kanan) -->
+  <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+    <a href="/loans/me" class="text-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-colors decoration-none">
+      Batal
+    </a>
+    <button type="submit" id="btnSubmit" class="text-center bg-blue-600 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
+      <%= typeof loan !== 'undefined' && loan ? 'Simpan Perubahan' : 'Ajukan Pinjaman' %>
+    </button>
+  </div>
+
+</form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const GAJI_POKOK = Number("<%= gajiPokok %>");
+  const MAX_LOAN = Number("<%= maxLoanLimit %>");
+  const MAX_INSTALLMENT = Number("<%= maxInstallmentLimit %>");
+
+  const inputRupiah = document.getElementById('inputRupiah');
+  const hiddenInput = document.getElementById('amountRequestedHidden');
+  const selectTenor = document.getElementById('selectTenor');
+  const btnSubmit = document.getElementById('btnSubmit');
+
+  const calcPreview = document.getElementById('calcPreview');
+  const previewCicilan = document.getElementById('previewCicilan');
+  const warningMsg = document.getElementById('warningMsg');
+
+  const formatNumberWithDots = (value) => {
+    let clean = value.replace(/\D/g, '');
+    return clean.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  function hitungSimulasi() {
+    const nominal = Number(hiddenInput.value) || 0;
+    const tenor = Number(selectTenor.value) || 0;
+
+    if (nominal > 0 || tenor > 0) {
+      calcPreview.classList.remove('hidden');
+    } else {
+      calcPreview.classList.add('hidden');
+    }
+
+    let cicilanPerBulan = 0;
+    if (nominal > 0 && tenor > 0) {
+      cicilanPerBulan = Math.ceil(nominal / tenor);
+      previewCicilan.innerText = "Rp " + formatNumberWithDots(String(cicilanPerBulan));
+    } else {
+      previewCicilan.innerText = "Rp 0";
+    }
+
+    let isError = false;
+    let pesanError = "";
+
+    if (nominal > MAX_LOAN) {
+      isError = true;
+      pesanError = `• Total pinjaman melebihi batas 3 kali gaji pokok (Maks: Rp ${formatNumberWithDots(String(MAX_LOAN))})`;
+    }
+
+    if (cicilanPerBulan > MAX_INSTALLMENT) {
+      isError = true;
+      pesanError += (pesanError ? '<br>' : '') + `• Cicilan bulanan (Rp ${formatNumberWithDots(String(cicilanPerBulan))}) melebihi batas 30% gaji (Maks: Rp ${formatNumberWithDots(String(MAX_INSTALLMENT))})`;
+    }
+
+    if (isError && nominal > 0 && tenor > 0) {
+      warningMsg.innerHTML = pesanError;
+      warningMsg.classList.remove('hidden');
+      btnSubmit.disabled = true;
+      btnSubmit.classList.add('opacity-40', 'cursor-not-allowed');
+      btnSubmit.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+      btnSubmit.classList.add('bg-slate-400');
+    } else {
+      warningMsg.classList.add('hidden');
+      btnSubmit.disabled = false;
+      btnSubmit.classList.remove('opacity-40', 'cursor-not-allowed', 'bg-slate-400');
+      btnSubmit.classList.add('bg-blue-500');
+    }
+  }
+
+  inputRupiah.addEventListener('input', function(e) {
+    const formatted = formatNumberWithDots(this.value);
+    this.value = formatted;
+    hiddenInput.value = formatted.replace(/\./g, '');
+    hitungSimulasi();
+  });
+
+  selectTenor.addEventListener('change', function() {
+    hitungSimulasi();
+  });
+
+  if (hiddenInput.value || selectTenor.value) {
+    hitungSimulasi();
+  }
+</script>

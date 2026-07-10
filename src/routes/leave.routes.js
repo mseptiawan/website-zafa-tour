@@ -29,9 +29,9 @@ import {
 
 const router = express.Router();
 
-router.get("/apply", authMiddleware, showApplyLeave);
-router.post("/apply", authMiddleware, uploadFile.single("attachments"), applyLeave);
-router.get("/my-history", authMiddleware, myLeave);
+router.get("/new", authMiddleware, showApplyLeave);
+router.post("/", authMiddleware, uploadFile.single("attachments"), applyLeave);
+router.get("/me", authMiddleware, myLeave);
 router.get("/detail/:id", authMiddleware, getLeaveDetail);
 router.get("/edit/:id", authMiddleware, editLeave);
 router.post("/update/:id", authMiddleware, uploadFile.single("attachments"), updateLeave);

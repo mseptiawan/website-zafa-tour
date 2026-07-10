@@ -6,10 +6,10 @@ import {
   findAllPending,
   findById,
   processWadirApproval,
-  processFinalApproval
+  processFinalApproval,
 } from "../services/resignation.service.js";
 
-export const create = asyncHandler(async (req, res) => {
+export const renderResignationForm = asyncHandler(async (req, res) => {
   res.render("resignation/create", {
     ...buildRenderData(req, {
       title: "Ajukan Pengunduran Diri",
@@ -17,7 +17,7 @@ export const create = asyncHandler(async (req, res) => {
   });
 });
 
-export const store = asyncHandler(async (req, res) => {
+export const storeResignation = asyncHandler(async (req, res) => {
   const currentEmployeeId = req.session.user?.employeeId;
 
   if (req.validationErrors) {
@@ -58,7 +58,7 @@ export const store = asyncHandler(async (req, res) => {
   return res.redirect("/resignation/my");
 });
 
-export const my = asyncHandler(async (req, res) => {
+export const getMyResignations = asyncHandler(async (req, res) => {
   const { page, limit } = req.query;
   const employeeId = req.session.user?.employeeId;
 
@@ -68,7 +68,7 @@ export const my = asyncHandler(async (req, res) => {
     limit,
   });
 
-  res.render("resignation/my", {
+  res.render("resignation/history", {
     ...buildRenderData(req, {
       title: "Riwayat Resign Saya",
       resignations,
@@ -77,7 +77,7 @@ export const my = asyncHandler(async (req, res) => {
     }),
   });
 });
-export const index = asyncHandler(async (req, res) => {
+export const renderResignationIndex = asyncHandler(async (req, res) => {
   const { page, limit } = req.query;
 
   const { data: resignations, meta } = await findAllPending({
@@ -88,9 +88,13 @@ export const index = asyncHandler(async (req, res) => {
 
   // Hitung summary global secara dinamis dari array atau buat konstan statis untuk pelaporan
   const totalResignations = resignations.length;
-  const pending = resignations.filter(r => ["PENDING_WADIR", "PENDING_DIRUT"].includes(r.status)).length;
-  const approved = resignations.filter(r => r.status === "APPROVED").length;
-  const rejected = resignations.filter(r => ["REJECTED_WADIR", "REJECTED_DIRUT"].includes(r.status)).length;
+  const pending = resignations.filter((r) =>
+    ["PENDING_WADIR", "PENDING_DIRUT"].includes(r.status)
+  ).length;
+  const approved = resignations.filter((r) => r.status === "APPROVED").length;
+  const rejected = resignations.filter((r) =>
+    ["REJECTED_WADIR", "REJECTED_DIRUT"].includes(r.status)
+  ).length;
 
   res.render("resignation/index", {
     ...buildRenderData(req, {
@@ -102,24 +106,8 @@ export const index = asyncHandler(async (req, res) => {
         totalResignations,
         pending,
         approved,
-        rejected
-      }
-    }),
-  });
-});
-export const show = asyncHandler(async (req, res) => {
-  const resignation = await findById(req.params.id);
-
-  if (!resignation) {
-    const err = new Error("Data pengunduran diri tidak ditemukan");
-    err.statusCode = 404;
-    throw err;
-  }
-
-  res.render("resignation/show", {
-    ...buildRenderData(req, {
-      title: "Detail Pengunduran Diri",
-      resignation,
+        rejected,
+      },
     }),
   });
 });

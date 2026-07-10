@@ -147,7 +147,7 @@ export const myTrips = async (req, res) => {
       total,
     });
 
-    res.render("trip/user/my", {
+    res.render("trip/user/history", {
       title: "Perjalanan Saya",
       trips,
       pagination,
@@ -173,7 +173,7 @@ export const show = async (req, res) => {
       });
     }
 
-    res.render("trip/user/show", {
+    res.render("trip/user/detail", {
       title: "Detail Perjalanan Dinas",
       trip,
     });

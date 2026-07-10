@@ -9,7 +9,7 @@ import {
 
 // ─── Page: Form Absensi ──────────────────────────────────────────────────────
 
-export const index = async (req, res, next) => {
+export const renderAttendancePage = async (req, res, next) => {
   try {
     const user = req.user;
 
@@ -66,7 +66,7 @@ export const checkOut = async (req, res, next) => {
 
 // ─── Page: Riwayat Absensi ───────────────────────────────────────────────────
 
-export const attendanceHistory = async (req, res, next) => {
+export const renderHistoryPage = async (req, res, next) => {
   try {
     const user = req.user;
 

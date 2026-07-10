@@ -1,7 +1,7 @@
 import Payroll from "../models/payroll/Payroll.model.js";
 import { Overtime } from "../models/Overtime.model.js";
 import Employee from "../models/employee/Employee.model.js";
-import { attendanceHistory } from "./attendance.controller.js";
+import { renderHistoryPage } from "./attendance.controller.js";
 
 // === IMPOR SERVICES PUPPETEER ===
 import {
@@ -76,7 +76,7 @@ export const renderAttendanceReportPage = async (req, res, next) => {
       if (err) console.error("Log internal next attendance:", err);
     };
 
-    await attendanceHistory(mockReq, mockRes, mockNext);
+    await renderHistoryPage(mockReq, mockRes, mockNext);
   } catch (error) {
     console.error("Gagal merender laporan absensi:", error);
     return res.status(500).send("Terjadi masalah saat memuat laporan absensi.");
@@ -366,7 +366,7 @@ export const downloadAttendancePdfReport = async (req, res, next) => {
       if (err) console.error(" Log internal next download attendance PDF:", err);
     };
 
-    await attendanceHistory(mockReq, mockRes, mockNext);
+    await renderHistoryPage(mockReq, mockRes, mockNext);
   } catch (error) {
     console.error("Gagal memproses unduhan PDF absensi:", error);
     return res.status(500).send("Terjadi masalah saat mencetak laporan absensi.");

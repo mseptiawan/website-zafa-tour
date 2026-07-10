@@ -11,7 +11,7 @@
   };
 %>
 
-<div class="min-h-screen bg-slate-50/50 md:ml-72 p-4 sm:p-6 md:p-10 antialiased selection:bg-blue-50 selection:text-blue-600 pb-24 md:pb-8">
+<div >
   <div class="max-w-none mx-auto space-y-5 md:space-y-8">
 
     <div class="border border-slate-200/60 md:border-none md:shadow-none">
@@ -76,7 +76,7 @@
         <%- include('../partials/_tab-nav', {
           tabs: [
             { id: 'active', label: `Permintaan Masuk (${permits.filter(p => p.status === 'PENDING').length})`, isActive: true },
-            { id: 'history', label: `Arsip Keputusan (${permits.filter(p => p.status !== 'PENDING').length})`, isActive: false }
+            { id: 'history', label: `Riwayat Permohonan (${permits.filter(p => p.status !== 'PENDING').length})`, isActive: false }
           ]
         }) %>
       </div>

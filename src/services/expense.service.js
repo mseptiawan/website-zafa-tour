@@ -9,11 +9,11 @@ import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 import notificationService from "./notification.service.js";
 
-export const findActiveCategories = async () => {
+export const findActiveCategoriesService = async () => {
   return await ExpenseCategory.find({ isActive: true }).sort({ name: 1 }).lean();
 };
 
-export const createClaim = async ({ body, file, currentUser }) => {
+export const createExpenseService = async ({ body, file, currentUser }) => {
   const {
     title,
     description,
@@ -98,8 +98,8 @@ export const createClaim = async ({ body, file, currentUser }) => {
           userIds: managerUserIds,
           senderId: currentUser._id,
           senderName: employee.fullName,
-          title: "Persetujuan Klaim Baru",
-          text: `${employee.fullName} mengajukan klaim "${title}" sebesar Rp ${formattedAmount}.`,
+          title: "Persetujuan Reimbursement Baru",
+          text: `${employee.fullName} mengajukan reimbursement "${title}" sebesar Rp ${formattedAmount}.`,
           module: "EXPENSE",
           referenceId: expense._id,
           actionUrl: `/expense/detail/${expense._id}`,
@@ -119,8 +119,8 @@ export const createClaim = async ({ body, file, currentUser }) => {
             userIds: financeUserIds,
             senderId: currentUser._id,
             senderName: employee.fullName,
-            title: "Antrean Klaim Finansial",
-            text: `Klaim operasional baru "${title}" Rp ${formattedAmount} menunggu pencairan dana.`,
+            title: "Antrean Reimbursement Finansial",
+            text: `Reimbursement operasional baru "${title}" Rp ${formattedAmount} menunggu pencairan dana.`,
             module: "EXPENSE",
             referenceId: expense._id,
             actionUrl: `/expense/detail/${expense._id}`,
@@ -137,7 +137,7 @@ export const createClaim = async ({ body, file, currentUser }) => {
   return expense;
 };
 
-export const findMyClaims = async ({ userId, page }) => {
+export const findMyExpenseService = async ({ userId, page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
   const filter = { userId };
 
@@ -155,7 +155,7 @@ export const findMyClaims = async ({ userId, page }) => {
   };
 };
 
-export const findManagerApprovals = async ({ roleId, userId, page }) => {
+export const findManagerApprovalsService = async ({ roleId, userId, page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
 
   const handledLogs = await ExpenseLog.find({ userId }).select("expenseId").lean();
@@ -183,7 +183,7 @@ export const findManagerApprovals = async ({ roleId, userId, page }) => {
   };
 };
 
-export const processApproval = async ({ id, userId, role, file, note, currentStatus }) => {
+export const processApprovalService = async ({ id, userId, role, file, note, currentStatus }) => {
   let nextStatus = currentStatus;
   let transferProofFile = null;
   let paidAt = null;
@@ -219,7 +219,9 @@ export const processApproval = async ({ id, userId, role, file, note, currentSta
     action: "APPROVED",
     note:
       note ||
-      (nextStatus === "PAID" ? "Klaim dicairkan oleh Finance" : "Disetujui oleh Manager Bidang"),
+      (nextStatus === "PAID"
+        ? "Reimbursement dicairkan oleh Finance"
+        : "Disetujui oleh Manager Bidang"),
   });
 
   try {
@@ -238,7 +240,7 @@ export const processApproval = async ({ id, userId, role, file, note, currentSta
             senderId: userId,
             senderName: "Manager Bidang",
             title: "Tagihan Siap Dicairkan",
-            text: `Klaim "${expense.title}" Rp ${formattedAmount} disetujui Manager & diteruskan ke Keuangan.`,
+            text: `Reimbursement "${expense.title}" Rp ${formattedAmount} disetujui Manager & diteruskan ke Keuangan.`,
             module: "EXPENSE",
             referenceId: expense._id,
             actionUrl: `/expense/detail/${expense._id}`,
@@ -252,8 +254,8 @@ export const processApproval = async ({ id, userId, role, file, note, currentSta
         userId: expense.userId,
         senderId: userId,
         senderName: "Manager Bidang",
-        title: "Klaim Disetujui Manager",
-        text: `Klaim "${expense.title}" telah disetujui dan kini berada dalam antrean Bagian Keuangan.`,
+        title: "Reimbursement Disetujui Manager",
+        text: `Reimbursement "${expense.title}" telah disetujui dan kini berada dalam antrean Bagian Keuangan.`,
         module: "EXPENSE",
         referenceId: expense._id,
         actionUrl: `/expense/detail/${expense._id}`,
@@ -265,8 +267,8 @@ export const processApproval = async ({ id, userId, role, file, note, currentSta
         userId: expense.userId,
         senderId: userId,
         senderName: "Bagian Keuangan",
-        title: "Dana Klaim Dicairkan",
-        text: `Klaim "${expense.title}" senilai Rp ${formattedAmount} telah ditransfer dan Lunas.`,
+        title: "Dana Reimbursement Dicairkan",
+        text: `Reimbursement "${expense.title}" senilai Rp ${formattedAmount} telah ditransfer dan Lunas.`,
         module: "EXPENSE",
         referenceId: expense._id,
         actionUrl: `/expense/detail/${expense._id}`,
@@ -281,7 +283,7 @@ export const processApproval = async ({ id, userId, role, file, note, currentSta
   return { expense, nextStatus };
 };
 
-export const rejectByManager = async ({ id, userId, role, note }) => {
+export const rejectByManagerService = async ({ id, userId, role, note }) => {
   const expense = await Expense.findByIdAndUpdate(
     id,
     {
@@ -303,7 +305,7 @@ export const rejectByManager = async ({ id, userId, role, note }) => {
       userId: expense.userId,
       senderId: userId,
       senderName: "Manager Bidang",
-      title: "Klaim Beban Ditolak ",
+      title: "Reimbursement Ditolak ",
       text: `Pengajuan "${expense.title}" ditolak. Alasan: "${note || "Tidak ada catatan"}"`,
       module: "EXPENSE",
       referenceId: expense._id,
@@ -318,7 +320,7 @@ export const rejectByManager = async ({ id, userId, role, note }) => {
   return expense;
 };
 
-export const findFinanceClaims = async ({ page }) => {
+export const findFinanceExpenseService = async ({ page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
   const filter = { status: { $in: ["PENDING_FINANCE", "PAID"] } };
 
@@ -337,7 +339,7 @@ export const findFinanceClaims = async ({ page }) => {
   };
 };
 
-export const processPayment = async ({ id, userId, file, note }) => {
+export const processPaymentService = async ({ id, userId, file, note }) => {
   const expense = await Expense.findByIdAndUpdate(
     id,
     {
@@ -353,7 +355,7 @@ export const processPayment = async ({ id, userId, file, note }) => {
     userId,
     role: "FINANCE",
     action: "APPROVED",
-    note: note || "Klaim dicairkan oleh Finance",
+    note: note || "Reimbursement dicairkan oleh Finance",
   });
 
   try {
@@ -362,8 +364,8 @@ export const processPayment = async ({ id, userId, file, note }) => {
       userId: expense.userId,
       senderId: userId,
       senderName: "Finance",
-      title: "Dana Klaim Berhasil Dicairkan 🎉",
-      text: `Hore! Dana untuk klaim "${expense.title}" senilai Rp ${formattedAmount} telah dikirim oleh tim keuangan.`,
+      title: "Dana Reimbursement Berhasil Dicairkan 🎉",
+      text: `Hore! Dana untuk reimbursement "${expense.title}" senilai Rp ${formattedAmount} telah dikirim oleh tim keuangan.`,
       module: "EXPENSE",
       referenceId: expense._id,
       actionUrl: `/expense/detail/${expense._id}`,
@@ -377,7 +379,7 @@ export const processPayment = async ({ id, userId, file, note }) => {
   return expense;
 };
 
-export const findClaimById = async (id, currentUser) => {
+export const findExpenseByIdService = async (id, currentUser) => {
   const expense = await Expense.findById(id)
     .populate({
       path: "employeeId",
@@ -390,7 +392,7 @@ export const findClaimById = async (id, currentUser) => {
     .lean();
 
   if (!expense) {
-    throw new Error("Data pengajuan klaim beban tidak ditemukan atau telah dihapus.");
+    throw new Error("Data pengajuan reimbursement tidak ditemukan atau telah dihapus.");
   }
 
   const rawLogs = await ExpenseLog.find({ expenseId: id })

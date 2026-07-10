@@ -3,10 +3,10 @@ import { uploadPhoto } from "../middlewares/uploadPhoto.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import injectUser from "../middlewares/injectUser.js";
 import {
-  index,
+  renderAttendancePage,
   checkIn,
   checkOut,
-  attendanceHistory,
+  renderHistoryPage,
   updateCompanyLocation,
 } from "../controllers/attendance.controller.js";
 
@@ -16,8 +16,8 @@ router.use(authMiddleware);
 
 router.use(injectUser);
 
-router.get("/", index);
-router.get("/history", attendanceHistory);
+router.get("/", renderAttendancePage);
+router.get("/history", renderHistoryPage);
 
 router.post("/checkin", uploadPhoto.single("photo"), checkIn);
 router.post("/checkout", uploadPhoto.single("photo"), checkOut);

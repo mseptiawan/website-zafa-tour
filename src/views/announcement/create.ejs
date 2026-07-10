@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+<div class="overflow-hidden">
   <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
     <%- include('../partials/page-header', { 
@@ -19,16 +19,17 @@
         </div>
         <% } %>
 
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Pengumuman</label>
-          <input type="text" name="title" placeholder="Ketik judul di sini..." value="<%= old?.title || '' %>" class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.title) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800" />
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Judul Pengumuman</label>
+          <input type="text" name="title" placeholder="Ketik judul di sini..." value="<%= old?.title || '' %>" 
+                 class="w-full bg-slate-50/50 border <%= (typeof errors !== 'undefined' && errors?.title) ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/5' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/5' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-4 outline-none transition-all text-slate-800" />
           <% if (typeof errors !== 'undefined' && errors?.title) { %>
           <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.title %></p>
           <% } %>
         </div>
 
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Kategori</label>
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Kategori</label>
           <div class="relative w-full" id="category-dropdown">
             <% 
               let currentCatValue = old?.category || 'LIGHT';
@@ -38,20 +39,21 @@
               }
             %>
             <input type="hidden" name="category" id="category-value" value="<%= currentCatValue %>">
-            <button type="button" onclick="toggleCategoryDropdown()" class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.category) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-0 transition-all">
-              <span id="category-label" class="flex items-center gap-2">
+            <button type="button" onclick="toggleCategoryDropdown()" 
+                    class="w-full bg-slate-50/50 border <%= (typeof errors !== 'undefined' && errors?.category) ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/5' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/5' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 transition-all">
+              <span id="category-label" class="flex items-center gap-2 font-medium">
                 <%= currentCatLabel %>
               </span>
               <svg id="category-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <div id="category-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-lg p-1.5 space-y-0.5">
-              <button type="button" onclick="selectCategory('LIGHT', '🍃 Pengumuman Ringan')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">
+            <div id="category-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
+              <button type="button" onclick="selectCategory('LIGHT', '🍃 Pengumuman Ringan')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2 transition-colors">
                 <span>🍃</span> Pengumuman Ringan
               </button>
               <% if (user.role === "DIREKTUR_UTAMA") { %>
-              <button type="button" onclick="selectCategory('OFFICIAL', '⚖️ Pengumuman Resmi')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2">
+              <button type="button" onclick="selectCategory('OFFICIAL', '⚖️ Pengumuman Resmi')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center gap-2 transition-colors">
                 <span>⚖️</span> Pengumuman Resmi
               </button>
               <% } %>
@@ -62,18 +64,27 @@
           <% } %>
         </div>
 
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Isi Pengumuman</label>
-          <textarea name="content" rows="6" placeholder="Tulis detail informasi di sini..." class="w-full bg-slate-50/60 border <%= (typeof errors !== 'undefined' && errors?.content) ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= old?.content || '' %></textarea>
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Isi Pengumuman</label>
+          <textarea name="content" rows="6" placeholder="Tulis detail informasi di sini..." 
+                    class="w-full bg-slate-50/50 border <%= (typeof errors !== 'undefined' && errors?.content) ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/5' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/5' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-4 leading-relaxed text-slate-800"><%= old?.content || '' %></textarea>
           <% if (typeof errors !== 'undefined' && errors?.content) { %>
           <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.content %></p>
           <% } %>
         </div>
+<%- include('../partials/form/file-uploads', { 
+    inputId: 'announcement-attachment',
+    inputName: 'attachment',
+    label: 'Dokumen Lampiran',
+    required: false,
+    accept: '.pdf,.jpg,.jpeg,.png',
+    maxText: 'PDF, JPG, PNG (Maks. 5MB)',
+    error: (typeof errors !== 'undefined' && errors?.attachment) ? errors.attachment : null,
+    oldFile: (typeof old?.attachment !== 'undefined') ? old.attachment : null
+}) %>
 
-        <%- include('./partials/file-dropzone', { labelName: 'Lampiran', inputName: 'attachment' }) %>
-
-        <div class="pt-5 border-t border-slate-100 flex items-center justify-end">
-          <button type="submit" class="w-auto text-center bg-blue-500 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
+          <button type="submit" class="w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs">
             Publish
           </button>
         </div>
@@ -83,4 +94,5 @@
   </div>
 </div>
 
-  <script src="/js/announcement-form.js"></script>
+<script src="/js/announcement-form.js"></script>
+<script src="/js/file-upload.js"></script>

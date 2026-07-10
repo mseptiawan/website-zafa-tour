@@ -1,13 +1,14 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData } from "../utils/renderHelper.js";
+
 import {
-  createAnnouncement,
-  getAllAnnouncements,
-  getAnnouncementById,
+  createAnnouncementService,
+  getAllAnnouncementsService,
+  getAnnouncementByIdService,
 } from "../services/announcement.service.js";
 
-// ─── NEW FORM ─────────────────────────────────────────────────────────────────
-export const create = asyncHandler(async (req, res) => {
+// ─── METHOD 1: RENDER FORM CREATE ─────────────────────────────────────────────
+export const renderCreateAnnouncementForm = asyncHandler(async (req, res) => {
   res.render("announcement/create", {
     ...buildRenderData(req, {
       title: "Buat Pengumuman",
@@ -17,8 +18,8 @@ export const create = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── STORE ───────────────────────────────────────────────────────────────────
-export const store = asyncHandler(async (req, res) => {
+// ─── METHOD 2: STORE / CREATE DATA ───────────────────────────────────────────
+export const createAnnouncement = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
     req.flash("error", "Mohon periksa kembali form pengisian Anda.");
 
@@ -38,18 +39,19 @@ export const store = asyncHandler(async (req, res) => {
     announcementData.category = "LIGHT";
   }
 
-  await createAnnouncement({
+  await createAnnouncementService({
     body: announcementData,
     userSession: req.session.user,
     file: req.file,
   });
+
   req.flash("success", "Pengumuman berhasil diterbitkan!");
   return res.redirect("/announcement");
 });
 
-// ─── INDEX ────────────────────────────────────────────────────────────────────
-export const index = asyncHandler(async (req, res) => {
-  const result = await getAllAnnouncements({
+// ─── METHOD 3: GET INDEX ALL ──────────────────────────────────────────────────
+export const getAllAnnouncements = asyncHandler(async (req, res) => {
+  const result = await getAllAnnouncementsService({
     page: req.query.page,
     isMobile: req.useragent?.isMobile,
   });
@@ -63,9 +65,9 @@ export const index = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── SHOW ─────────────────────────────────────────────────────────────────────
-export const show = asyncHandler(async (req, res) => {
-  const announcement = await getAnnouncementById(req.params.id);
+// ─── METHOD 4: GET SHOW DETAIL ────────────────────────────────────────────────
+export const getAnnouncementById = asyncHandler(async (req, res) => {
+  const announcement = await getAnnouncementByIdService(req.params.id);
 
   if (!announcement) {
     const err = new Error("Pengumuman tidak ditemukan");

@@ -16,7 +16,7 @@ import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
  * @param {Object} params.currentUser - Objek session user aktif
  * @returns {Promise<Object>} Instance data Permit terbuat
  */
-export const createPermit = async ({ body, file, currentUser }) => {
+export const createPermitService = async ({ body, file, currentUser }) => {
   const { type, date, reason } = body;
 
   if (type === "SAKIT" && !file) {
@@ -76,7 +76,7 @@ export const createPermit = async ({ body, file, currentUser }) => {
  * @param {number|string} params.page - Halaman aktif saat ini
  * @returns {Promise<{data: Array, meta: Object}>} Log riwayat perizinan terpaginasi
  */
-export const findEmployeeHistory = async ({ employeeId, page }) => {
+export const findEmployeeHistoryService = async ({ employeeId, page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
   const filter = { employeeId };
 
@@ -107,7 +107,7 @@ export const findEmployeeHistory = async ({ employeeId, page }) => {
 /**
  * Mengambil daftar antrean permohonan izin masuk yang menjadi wewenang approver berdasarkan kebijakan struktural (Terpaginasi).
  */
-export const findIncomingPermits = async ({ currentUser, page }) => {
+export const findIncomingPermitsService = async ({ currentUser, page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
   const userRoleName = currentUser.role?.toUpperCase();
 
@@ -173,7 +173,7 @@ export const findIncomingPermits = async ({ currentUser, page }) => {
  * @param {Object} params.currentUser - Profil atasan peninjau keputusan
  * @returns {Promise<Object>} Dokumen hasil eksekusi pembaruan perizinan
  */
-export const executeApproval = async ({ id, status, notesByApprover, currentUser }) => {
+export const executeApprovalService = async ({ id, status, notesByApprover, currentUser }) => {
   if (!["APPROVED", "REJECTED"].includes(status)) {
     const error = new Error("Aksi keputusan status otorisasi tidak valid.");
     error.statusCode = 400;
@@ -270,7 +270,7 @@ export const executeApproval = async ({ id, status, notesByApprover, currentUser
  * * @throws {Error} Melempar error dengan `statusCode = 404` jika berkas tidak ditemukan atau bukan milik pegawai tersebut.
  * @throws {Error} Melempar error dengan `statusCode = 400` jika status berkas sudah diproses (`APPROVED`/`REJECTED`/`CANCELLED`).
  */
-export const getPermitForEdit = async ({ id, employeeId }) => {
+export const getPermitForEditService = async ({ id, employeeId }) => {
   const permit = await Permit.findOne({ _id: id, employeeId }).lean();
 
   if (!permit) {
@@ -308,7 +308,7 @@ export const getPermitForEdit = async ({ id, employeeId }) => {
  * @throws {Error} Melempar error dengan `statusCode = 400` jika dokumen perizinan telah dievaluasi oleh atasan.
  * @throws {Error} Melempar error dengan `statusCode = 400` dan properti `field = 'document'` jika tipe izin diubah ke 'SAKIT' tanpa melampirkan berkas dokter.
  */
-export const updatePermit = async ({ id, body, file, currentUser }) => {
+export const updatePermitService = async ({ id, body, file, currentUser }) => {
   const { type, date, reason } = body;
 
   const permit = await Permit.findOne({ _id: id, employeeId: currentUser.employeeId });
@@ -358,7 +358,7 @@ export const updatePermit = async ({ id, body, file, currentUser }) => {
  * Menghapus/menarik berkas dokumen perizinan dari sisi karyawan dengan mengubah statusnya menjadi `CANCELLED`.
  * Dokumen tidak benar-benar dihapus (hard delete) dari database demi kebutuhan audit trail.
  * * @async
- * @function deletePermit
+ * @function cancelPermitService
  * @param {Object} payload - Objek parameter fungsi.
  * @param {string} payload.id - ID dokumen perizinan (`_id`) yang akan dibatalkan.
  * @param {string} payload.employeeId - ID pegawai dari pemohon untuk mencocokkan hak akses pembatalan berkas.
@@ -366,7 +366,7 @@ export const updatePermit = async ({ id, body, file, currentUser }) => {
  * * @throws {Error} Melempar error dengan `statusCode = 404` jika berkas tidak ditemukan.
  * @throws {Error} Melempar error dengan `statusCode = 400` jika dokumen tidak berstatus `PENDING` (sudah diproses oleh pihak atasan).
  */
-export const deletePermit = async ({ id, employeeId }) => {
+export const cancelPermitService = async ({ id, employeeId }) => {
   const permit = await Permit.findOne({ _id: id, employeeId });
 
   if (!permit) {

@@ -6,15 +6,15 @@ import { validate } from "../middlewares/validate.js";
 import { createExpenseSchema } from "../validations/expense.schema.js";
 
 import {
-  create,
-  store,
-  my,
-  show,
-  approvalPage,
-  approveClaim,
-  rejectClaim,
-  financePage,
-  payClaim,
+  renderCreateExpenseForm,
+  storeExpense,
+  getMyExpenses,
+  showExpense,
+  getExpenseApprovalPage,
+  approveExpense,
+  rejectExpense,
+  getExpenseFinancePage,
+  payExpense,
 } from "../controllers/expense.controller.js";
 
 const router = express.Router();
@@ -28,29 +28,29 @@ const ALLOWED_MANAGEMENT_ROLES = [
   "MANAGER_HAJI_UMRAH",
 ];
 
-router.get("/create", create);
-router.post("/create", uploadFile.single("proofFile"), validate(createExpenseSchema), store);
-router.get("/my", my);
-router.get("/detail/:id", show);
+router.get("/new", renderCreateExpenseForm);
+router.post("/", uploadFile.single("proofFile"), validate(createExpenseSchema), storeExpense);
+router.get("/me", getMyExpenses);
+router.get("/detail/:id", showExpense);
 
-router.get("/approval/manager", roleMiddleware(ALLOWED_MANAGEMENT_ROLES), approvalPage);
+router.get("/approval/manager", roleMiddleware(ALLOWED_MANAGEMENT_ROLES), getExpenseApprovalPage);
 
 router.post(
   "/:id/approve",
   roleMiddleware(ALLOWED_MANAGEMENT_ROLES),
   uploadFile.single("proofFile"),
-  approveClaim
+  approveExpense
 );
 
-router.post("/:id/reject", roleMiddleware(ALLOWED_MANAGEMENT_ROLES), rejectClaim);
+router.post("/:id/reject", roleMiddleware(ALLOWED_MANAGEMENT_ROLES), rejectExpense);
 
-router.get("/finance", roleMiddleware(["MANAGER_KEUANGAN"]), financePage);
+router.get("/finance", roleMiddleware(["MANAGER_KEUANGAN"]), getExpenseFinancePage);
 
 router.post(
   "/:id/pay",
   roleMiddleware(["MANAGER_KEUANGAN"]),
   uploadFile.single("transferProof"),
-  payClaim
+  payExpense
 );
 
 export default router;

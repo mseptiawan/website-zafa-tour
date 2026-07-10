@@ -1,1 +1,36 @@
-{}
+{
+  // ─── PENGATURAN UTAMA AUTO FORMAT ──────────────────────────────
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": false,
+
+  // ─── FORMATTER UTAMA (PRETTIER) ────────────────────────────────
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // ─── KONFIGURASI KHUSUS BAHASA (LANGUAGES) ─────────────────────
+
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+
+  // 👇 1. MATIKAN AUTO-FORMAT KHUSUS UNTUK FILE EJS
+  "[ejs]": {
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.defaultFormatter": null // Menghapus formatter bawaan agar tidak merusak sintaks
+  },
+
+  // 👇 2. ASSIGNMENT UTAMA AGAR EXTENSION MEMBACA FILE .EJS DENGAN BENAR
+  "files.associations": {
+    "*.ejs": "html"
+  },
+
+  "prettier.singleQuote": false,
+  "prettier.trailingComma": "es5",
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "prettier.semi": true
+}

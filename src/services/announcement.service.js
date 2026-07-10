@@ -1,8 +1,8 @@
 import Announcement from "../models/Announcement.model.js";
 import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 
-// ─── CREATE ──────────────────────────────────────────────────────────────────
-export const createAnnouncement = async ({ body, userSession, file }) => {
+// ─── SERVICE: CREATE DATA ────────────────────────────────────────────────────
+export const createAnnouncementService = async ({ body, userSession, file }) => {
   const { title, content, category } = body;
 
   return await Announcement.create({
@@ -17,8 +17,8 @@ export const createAnnouncement = async ({ body, userSession, file }) => {
   });
 };
 
-// ─── GET ALL ─────────────────────────────────────────────────────────────────
-export const getAllAnnouncements = async ({ page, isMobile }) => {
+// ─── SERVICE: GET ALL (PAGINATED) ────────────────────────────────────────────
+export const getAllAnnouncementsService = async ({ page, isMobile }) => {
   const determinedLimit = isMobile ? 5 : 9;
 
   const {
@@ -55,8 +55,8 @@ export const getAllAnnouncements = async ({ page, isMobile }) => {
   };
 };
 
-// ─── GET BY ID ───────────────────────────────────────────────────────────────
-export const getAnnouncementById = async (id) => {
+// ─── SERVICE: GET BY ID ──────────────────────────────────────────────────────
+export const getAnnouncementByIdService = async (id) => {
   return await Announcement.findById(id)
     .populate({
       path: "createdBy",

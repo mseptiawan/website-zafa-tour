@@ -43,15 +43,15 @@
   const historyExpenses = expenses.filter(e => e.status === 'PAID' || e.status === 'REJECTED');
 %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  sm:p-6 md:p-10 antialiased pb-40 md:pb-8">
+<div  >
   <div class="w-full max-w-none mx-auto space-y-5 md:space-y-6">
 
     <div class="hidden md:block">
       <%- include('../partials/page-header', { 
           section: 'Area Kerja', 
-          module: 'Finance', 
-          title: 'Riwayat Klaim Beban', 
-          description: 'Pantau status persetujuan berkas dan rekam jejak pencairan dana reimbursement Anda.' 
+          module: 'Reimbursement', 
+          title: 'Riwayat Reimbursement', 
+          description: 'Pantau status persetujuan reimbursement dan rekam jejak pencairan dana reimbursement Anda.' 
       }) %>
     </div>
 
@@ -92,7 +92,7 @@
     <div class="flex flex-col gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/60 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none select-none">
       <div class="flex items-center justify-between gap-3 w-full md:hidden">
         <div>
-          <h3 class="text-[14px] font-bold text-slate-900 tracking-tight">Daftar Pengajuan Klaim</h3>
+          <h3 class="text-[14px] font-bold text-slate-900 tracking-tight">Daftar Pengajuan Reimbursement</h3>
         </div>
         <a href="/expense/create" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-full transition-all active:scale-95 cursor-pointer decoration-none">
           <i class="fa-solid fa-plus text-[9px] text-blue-100"></i>
@@ -103,7 +103,7 @@
       <%- include('../partials/_tab-nav', {
         tabs: [
           { id: 'active', label: `Dalam Proses (${activeExpenses.length})` },
-          { id: 'history', label: `Riwayat Pengajuan (${historyExpenses.length})` }
+          { id: 'history', label: `Riwayat (${historyExpenses.length})` }
         ]
       }) %>
     </div>
@@ -117,7 +117,7 @@
               <tr>
                 <th class="py-4 px-6 w-56">Tanggal Pengajuan</th>
                 <th class="py-4 px-6 w-32">Kategori</th>
-                <th class="py-4 px-6 text-right w-56">Nominal Klaim</th>
+                <th class="py-4 px-6 text-right w-56">Nominal</th>
                 <th class="py-4 px-6 text-center w-40">Status</th>
                 <th class="py-4 px-6 text-center w-24">Aksi</th>
               </tr>
@@ -126,7 +126,7 @@
               <% if (activeExpenses.length === 0) { %>
               <tr>
                 <td colspan="5" class="text-center py-12 text-slate-400 font-medium">
-                  Tidak ada pengajuan klaim yang sedang diproses.
+                  Tidak ada pengajuan reimbursement yang sedang diproses.
                 </td>
               </tr>
               <% } else { %>
@@ -188,7 +188,7 @@
 
           <div class="bg-slate-50/60 rounded-xl px-4 py-3 border border-slate-200/40 flex items-center justify-between">
             <div>
-              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Nominal Klaim</p>
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Nominal</p>
               <p class="text-[14px] font-bold text-slate-900 tabular-nums mt-0.5">Rp <%= e.amount.toLocaleString('id-ID') %></p>
             </div>
 
@@ -211,7 +211,7 @@
               <tr>
                 <th class="py-4 px-6 w-56">Tanggal Pengajuan</th>
                 <th class="py-4 px-6 w-32">Kategori</th>
-                <th class="py-4 px-6 text-right w-56">Nominal Klaim</th>
+                <th class="py-4 px-6 text-right w-56">Nominal</th>
                 <th class="py-4 px-6 text-center w-40">Status Akhir</th>
                 <th class="py-4 px-6 text-center w-24">Aksi</th>
               </tr>

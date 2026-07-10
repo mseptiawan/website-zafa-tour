@@ -2,7 +2,7 @@
 
 <div id="types-data" data-json="<%= JSON.stringify(types || []) %>" class="hidden"></div>
 
-<div class="min-h-screen ml-0 md:ml-72 bg-slate-50/50 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+<div class=" overflow-hidden">
   <div class="w-full max-w-none mx-auto mt-4 md:mt-0 space-y-6">
 
     <%- include('../../partials/page-header', { 
@@ -12,15 +12,12 @@
         description: 'Kelola standarisasi jenis penghargaan (reward) dan sanksi sanksi (punishment) pegawai secara terpusat.' 
     }) %>
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 md:border-slate-200/80">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4  p-4  border-b border-slate-200/60 md:border-slate-200/80">
       <div>
         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider select-none">Total Regulasi Aktif</p>
         <h3 class="text-xl font-bold text-slate-800 mt-1 block tabular-nums" id="total-aktif-counter">0</h3>
       </div>
       <div class="flex items-center gap-2">
-        <a href="/reward-punishment" class="border border-slate-200 text-slate-600 text-[12px] font-semibold px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-1.5">
-          <i class="fa-solid fa-arrow-left text-[10px]"></i> Log Transaksi
-        </a>
         <button id="btn-add-type" class="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-semibold px-5 py-2.5 rounded-xl transition-all active:scale-98 cursor-pointer">
           <i class="fa-solid fa-plus text-[10px]"></i>
           <span>Tambah Jenis Baru</span>
@@ -50,7 +47,7 @@
 </div>
 
 <div id="type-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs hidden items-center justify-center p-4 z-[110] transition-all">
-  <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden border border-slate-200/60 shadow-lg transform transition-all">
+  <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden border border-slate-200/60  transform transition-all">
     <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
       <h3 id="modal-title" class="text-[13px] font-bold text-slate-800 uppercase tracking-wide">Tambah Jenis Aturan</h3>
       <button id="btn-close-modal-x" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer">

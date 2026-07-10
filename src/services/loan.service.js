@@ -6,14 +6,21 @@ import User from "../models/basic/User.model.js";
 import Role from "../models/basic/Role.model.js";
 import { getTotalMonthlyDeduction } from "../helpers/loan.helper.js";
 import { getPayrollPeriod } from "../utils/payrollPeriod.js";
-const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
 import notificationService from "./notification.service.js";
 import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 
 /**
- * Menentukan tahapan approval berikutnya berdasarkan alur kerja perusahaan.
+ * Alur kerja persetujuan pinjaman perusahaan berdasarkan urutan hierarki peran.
+ * @type {string[]}
  */
-export const getNextLoanApprover = async (currentStep) => {
+const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
+
+/**
+ * Menentukan tahapan approval berikutnya berdasarkan alur kerja perusahaan.
+ * * @param {string|null} currentStep - Tahapan persetujuan saat ini (misal: "WAKIL_DIREKTUR"). Jika null, akan memulai dari awal alur kerja.
+ * @returns {Promise<{nextStep: string|null, nextApproverId: string|null}>} Objek berisi tahapan berikutnya dan ID pengguna yang berwenang menyetujui.
+ */
+export const getNextLoanApproverService = async (currentStep) => {
   if (!currentStep) {
     const roleDoc = await Role.findOne({ name: "WAKIL_DIREKTUR" });
     if (!roleDoc) return { nextStep: "WAKIL_DIREKTUR", nextApproverId: null };
@@ -35,8 +42,11 @@ export const getNextLoanApprover = async (currentStep) => {
 
 /**
  * Mengambil profil data pegawai beserta informasi gaji finansial terpadu.
+ * * @param {string} userId - ID Pengguna (User ID) dari pegawai terkait.
+ * @returns {Promise<Object>} Data profil karyawan objek biasa (lean object).
+ * @throws {Error} Jika data karyawan tidak ditemukan di dalam sistem database.
  */
-export const getEmployeeForForm = async (userId) => {
+export const getEmployeeForFormService = async (userId) => {
   const employee = await Employee.findOne({ userId }).lean();
   if (!employee) throw new Error("Data Karyawan tidak ditemukan di sistem.");
 
@@ -46,8 +56,22 @@ export const getEmployeeForForm = async (userId) => {
 
 /**
  * Membuat pengajuan pinjaman baru dengan validasi rasio cicilan 30% gaji sekaligus mengirim notifikasi ke approver.
+ * * @param {string} employeeId - ID Dokumen Karyawan yang mengajukan pinjaman.
+ * @param {Object} loanData - Objek data pengajuan pinjaman dari formulir.
+ * @param {number|string} loanData.amountRequested - Jumlah nominal dana pinjaman yang diajukan.
+ * @param {number|string} loanData.tenorMonths - Durasi masa angsuran pinjaman dalam hitungan bulan.
+ * @param {string} loanData.reason - Alasan rasional pengajuan pinjaman (minimal 15 karakter).
+ * @param {string} [userRole=""] - Nama peran dari pembuat dokumen saat ini.
+ * @param {string} [creatorName="Karyawan"] - Nama lengkap pembuat pengajuan untuk keperluan pengiriman notifikasi.
+ * @returns {Promise<Object>} Dokumen pinjaman baru yang berhasil disimpan ke database.
+ * @throws {Error} Jika parameter tidak valid, melanggar batas nominal, tenor salah, atau melebihi batas 30% gaji pokok.
  */
-export const createLoan = async (employeeId, loanData, userRole = "", creatorName = "Karyawan") => {
+export const storeLoanService = async (
+  employeeId,
+  loanData,
+  userRole = "",
+  creatorName = "Karyawan"
+) => {
   if (!employeeId) {
     throw new Error("Profil karyawan tidak valid atau Anda tidak terdaftar sebagai pegawai.");
   }
@@ -97,7 +121,7 @@ export const createLoan = async (employeeId, loanData, userRole = "", creatorNam
   });
 
   const initialStep = userRole === "WAKIL_DIREKTUR" ? "WAKIL_DIREKTUR" : null;
-  const { nextStep, nextApproverId } = await getNextLoanApprover(initialStep);
+  const { nextStep, nextApproverId } = await getNextLoanApproverService(initialStep);
 
   await LoanApproval.create({
     loanId: newLoan._id,
@@ -131,8 +155,11 @@ export const createLoan = async (employeeId, loanData, userRole = "", creatorNam
 
 /**
  * Mengambil informasi riwayat limit kredit & sisa plafon pinjaman pribadi karyawan.
+ * * @param {string} userId - ID Pengguna (User ID) dari pegawai terkait.
+ * @returns {Promise<{loans: Object[], summary: {limit: number, maxLoan: number, activeLoan: number, installmentThisMonth: number, remainingDebt: number}}>} Data kumpulan riwayat pinjaman beserta ringkasan kalkulasi sisa plafon utang.
+ * @throws {Error} Jika data profil pegawai tidak terdaftar di database.
  */
-export const getEmployeeLoanHistory = async (userId) => {
+export const getEmployeeLoanHistoryService = async (userId) => {
   const employee = await Employee.findOne({ userId }).lean();
   if (!employee) throw new Error("Data pegawai tidak ditemukan.");
 
@@ -170,9 +197,12 @@ export const getEmployeeLoanHistory = async (userId) => {
 };
 
 /**
- * Mendapatkan detail rincian pinjaman, alur persetujuan, dan jadwal angsuran.
+ * Mendapatkan detail rincian data pinjaman induk, alur log persetujuan, dan jadwal angsuran pembayaran bulanan.
+ * * @param {string} loanId - ID Dokumen induk pinjaman yang ingin dicari.
+ * @returns {Promise<{loan: Object, approvals: Object[], payments: Object[]}>} Gabungan objek berisikan detail pinjaman, riwayat verifikasi approval, dan tabel angsuran.
+ * @throws {Error} Jika berkas pengajuan pinjaman utama tidak ditemukan.
  */
-export const getLoanDetailData = async (loanId) => {
+export const getLoanDetailDataService = async (loanId) => {
   const loan = await Loan.findById(loanId)
     .populate({
       path: "employeeId",
@@ -199,7 +229,14 @@ export const getLoanDetailData = async (loanId) => {
   return { loan, approvals, payments };
 };
 
-export const getLoanForEdit = async (loanId, userId) => {
+/**
+ * Mengambil data pinjaman khusus untuk kebutuhan halaman penyuntingan (edit form) sebelum diproses manajemen.
+ * * @param {string} loanId - ID Dokumen pinjaman yang hendak diubah.
+ * @param {string} userId - ID Pengguna (User ID) yang memiliki dokumen pinjaman tersebut.
+ * @returns {Promise<{loan: Object, basicSalary: number}>} Objek pinjaman beserta nilai nominal komponen gaji pokok.
+ * @throws {Error} Jika pegawai tidak valid, pengajuan tidak ditemukan, status bukan PENDING, atau sudah diverifikasi oleh Manajemen Inti.
+ */
+export const getLoanForEditService = async (loanId, userId) => {
   const employee = await Employee.findOne({ userId }).lean();
   if (!employee) throw new Error("Data pegawai tidak ditemukan.");
 
@@ -219,7 +256,18 @@ export const getLoanForEdit = async (loanId, userId) => {
   return { loan, basicSalary };
 };
 
-export const updateLoan = async (loanId, userId, updateData) => {
+/**
+ * Memperbarui (update) data isi dokumen aplikasi pinjaman yang masih berstatus tunda (PENDING).
+ * * @param {string} loanId - ID Dokumen pinjaman yang ingin dimodifikasi nilainya.
+ * @param {string} userId - ID Pengguna (User ID) dari pegawai pemohon.
+ * @param {Object} updateData - Kumpulan payload berisi perubahan data dari form revisi.
+ * @param {number|string} updateData.amountRequested - Jumlah perubahan pagu kredit pinjaman baru.
+ * @param {number|string} updateData.tenorMonths - Jumlah perubahan tenor angsuran bulanan.
+ * @param {string} updateData.reason - Revisi keterangan argumen permohonan pinjaman (minimal 15 karakter).
+ * @returns {Promise<Object>} Berkas dokumen pinjaman termutakhir yang telah disimpan.
+ * @throws {Error} Jika validasi alasan kependekan, salah masa tenor, melewati plafon 3x lipat gaji pokok, atau melampaui rasio batas aman 30%.
+ */
+export const updateLoanService = async (loanId, userId, updateData) => {
   const amountRequested = Number(updateData.amountRequested) || 0;
   const tenorMonths = Number(updateData.tenorMonths) || 0;
   const reason = updateData.reason?.trim();
@@ -269,7 +317,13 @@ export const updateLoan = async (loanId, userId, updateData) => {
   return await loan.save();
 };
 
-export const getLoanManagementData = async (user) => {
+/**
+ * Mengambil kompilasi data administrasi pinjaman untuk panel manajemen (Manajer Keuangan, Direksi, dll).
+ * * @param {Object} user - Objek entitas user pelaksana yang sedang login dari session.
+ * @param {string} user.role - Nama peran akses otorisasi user (misal: "DIREKTUR_UTAMA").
+ * @returns {Promise<{activeLoans: Object[], historyLoans: Object[]}>} Kumpulan array yang dipisah menjadi antrean aktif dan rekam jejak riwayat masa lampau.
+ */
+export const getLoanManagementDataService = async (user) => {
   const roleName = (user.role || "").toString().trim().toUpperCase();
 
   const approvals = await LoanApproval.find({ step: roleName }).sort({ createdAt: -1 }).lean();
@@ -305,7 +359,19 @@ export const getLoanManagementData = async (user) => {
 
   return { activeLoans, historyLoans };
 };
-export const processApproval = async (approvalId, sessionUser, note) => {
+
+/**
+ * Memproses aksi persetujuan (Approval) berkas pinjaman ke tahapan alur verifikasi selanjutnya.
+ * * @param {string} approvalId - ID Antrean dokumen persetujuan (LoanApproval ID).
+ * @param {Object} sessionUser - Objek data user peninjau yang mengeksekusi aksi dari session.
+ * @param {string} sessionUser._id - ID Dokumen User peninjau.
+ * @param {string} sessionUser.role - Judul otoritas peran user aktif.
+ * @param {string} sessionUser.fullName - Nama terang peninjau untuk lampiran pelaporan.
+ * @param {string} [note] - Catatan tambahan pertimbangan persetujuan dari jajaran direksi.
+ * @returns {Promise<boolean>} Nilai true apabila seluruh rangkaian mutasi data dan pembuatan status sukses terlaksana.
+ * @throws {Error} Jika antrean tidak valid, user melanggar hak otorisasi step, atau kondisi riwayat profil finansial pemohon mendadak berubah di luar batas aman.
+ */
+export const processApprovalService = async (approvalId, sessionUser, note) => {
   const approval = await LoanApproval.findOne({ _id: approvalId, status: "PENDING" });
   if (!approval) throw new Error("Antrean tidak ditemukan atau sudah diproses sebelumnya.");
 
@@ -333,7 +399,7 @@ export const processApproval = async (approvalId, sessionUser, note) => {
   approval.actionDate = new Date();
   await approval.save();
 
-  const { nextStep, nextApproverId } = await getNextLoanApprover(approval.step);
+  const { nextStep, nextApproverId } = await getNextLoanApproverService(approval.step);
 
   if (nextStep) {
     await LoanApproval.create({
@@ -377,7 +443,7 @@ export const processApproval = async (approvalId, sessionUser, note) => {
         text: `Pengajuan pinjaman Anda telah disetujui penuh oleh Direksi. Menunggu pencairan dana oleh Keuangan.`,
         module: MODULES.LOAN,
         referenceId: loan._id,
-        actionUrl: "/loans/my",
+        actionUrl: "/loans/me",
         type: "EXPENSE",
         category: NOTIF_CATEGORIES.SUCCESS,
       });
@@ -388,7 +454,18 @@ export const processApproval = async (approvalId, sessionUser, note) => {
   return true;
 };
 
-export const processReject = async (approvalId, sessionUser, note) => {
+/**
+ * Menolak (Reject) berkas aplikasi pengajuan pinjaman karyawan dan menghentikan seluruh workflow berjalan.
+ * * @param {string} approvalId - ID Antrean dokumen persetujuan (LoanApproval ID).
+ * @param {Object} sessionUser - Objek data user pengambil keputusan penolakan.
+ * @param {string} sessionUser._id - ID User pengambil keputusan.
+ * @param {string} sessionUser.role - Peran jabatan user aktif.
+ * @param {string} sessionUser.fullName - Nama lengkap pengambil keputusan.
+ * @param {string} [note] - Pesan berisi alasan penolakan berkas dari manajemen.
+ * @returns {Promise<boolean>} Nilai true jika seluruh siklus penolakan dan pembatalan status pinjaman utama tuntas.
+ * @throws {Error} Apabila entitas antrean nihil atau user melanggar batas hak otorisasi tahapan kerja.
+ */
+export const processRejectService = async (approvalId, sessionUser, note) => {
   const approval = await LoanApproval.findOne({ _id: approvalId, status: "PENDING" });
   if (!approval) throw new Error("Berkas antrean tidak ditemukan.");
 
@@ -417,7 +494,7 @@ export const processReject = async (approvalId, sessionUser, note) => {
         text: `Pengajuan pinjaman Anda ditolak oleh ${userRole.replace(/_/g, " ")}. Catatan: ${approval.note}`,
         module: MODULES.LOAN,
         referenceId: loan._id,
-        actionUrl: "/loans/my",
+        actionUrl: "/loans/me",
         type: "EXPENSE",
         category: NOTIF_CATEGORIES.DANGER,
       });
@@ -429,7 +506,19 @@ export const processReject = async (approvalId, sessionUser, note) => {
   return true;
 };
 
-export const processDisbursement = async (approvalId, sessionUser, note, file) => {
+/**
+ * Memproses pencairan dana kas (Disbursement) pinjaman oleh Manajer Keuangan, sekaligus mengunggah bukti transfer bank dan menginisiasi skema tabel cicilan tenor otomatis.
+ * * @param {string} approvalId - ID Antrean peninjauan transaksi (LoanApproval ID).
+ * @param {Object} sessionUser - Objek pengguna kas keuangan yang berwenang melayani transaksi.
+ * @param {string} sessionUser._id - ID User kasir/manajer keuangan penanggung jawab.
+ * @param {string} sessionUser.fullName - Nama lengkap pengelola keuangan.
+ * @param {string} [note] - Catatan tambahan operasional pencairan dana dari divisi akuntansi.
+ * @param {Object} file - Objek file berkas bukti transfer perbankan yang diunggah dari middleware (Express/Multer).
+ * @param {string} file.filename - Nama berkas fisik penunjang bukti pencairan dana di penyimpanan server.
+ * @returns {Promise<boolean>} Nilai true bila seluruh proses mutasi pencairan kas dan penyisipan data angsuran massal sukses disimpan.
+ * @throws {Error} Bila berkas lampiran bukti transfer bank kosong atau ID antrean kas tidak valid.
+ */
+export const processDisbursementService = async (approvalId, sessionUser, note, file) => {
   if (!file) throw new Error("Dokumen Bukti Transfer Bank (Pencairan) wajib dilampirkan.");
 
   const approval = await LoanApproval.findOne({
@@ -486,7 +575,7 @@ export const processDisbursement = async (approvalId, sessionUser, note, file) =
         text: `Dana pinjaman sebesar Rp ${loan.amountRequested.toLocaleString("id-ID")} telah ditransfer ke rekening Anda.`,
         module: MODULES.LOAN,
         referenceId: loan._id,
-        actionUrl: "/loans/my",
+        actionUrl: "/loans/me",
         type: "EXPENSE",
         category: NOTIF_CATEGORIES.SUCCESS,
       });
@@ -497,7 +586,15 @@ export const processDisbursement = async (approvalId, sessionUser, note, file) =
 
   return true;
 };
-export const cancelLoan = async (loanId, userId) => {
+
+/**
+ * Membatalkan aplikasi permohonan pinjaman mandiri secara sepihak oleh karyawan pemohon sebelum disetujui penuh / masuk kas keuangan.
+ * * @param {string} loanId - ID Dokumen pinjaman yang hendak dibatalkan.
+ * @param {string} userId - ID Pengguna (User ID) dari karyawan pemilik dokumen pinjaman.
+ * @returns {Promise<Object>} Berkas pinjaman induk yang diubah statusnya menjadi CANCELLED.
+ * @throws {Error} Jika dokumen nihil, user tidak punya hak kepemilikan dokumen, pinjaman terlanjur berstatus APPROVED, atau sudah berstatus REJECTED/CANCELLED sebelumnya.
+ */
+export const cancelLoanService = async (loanId, userId) => {
   const loan = await Loan.findById(loanId);
   if (!loan) throw new Error("Data pengajuan tidak ditemukan.");
 

@@ -42,7 +42,7 @@
     <!-- 4. MAIN FORM SHEET CONTAINER -->
     <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
 
-      <% let formAction="/leave/apply" ; if (mode==='EDIT' ) formAction="/leave/update/" + leave._id; if (mode==='RESUBMIT' ) formAction="/leave/apply" ; %>
+      <% let formAction="/leave" ; if (mode==='EDIT' ) formAction="/leave/update/" + leave._id; if (mode==='RESUBMIT' ) formAction="/leave/apply" ; %>
 
       <form action="<%= formAction %>" method="POST" enctype="multipart/form-data" class="space-y-5">
 

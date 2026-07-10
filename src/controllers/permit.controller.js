@@ -1,20 +1,20 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData } from "../utils/renderHelper.js";
 import {
-  createPermit,
-  findEmployeeHistory,
-  findIncomingPermits,
-  executeApproval,
-  getPermitForEdit,
-  updatePermit,
-  deletePermit,
+  createPermitService,
+  updatePermitService,
+  cancelPermitService,
+  findEmployeeHistoryService,
+  findIncomingPermitsService,
+  executeApprovalService,
+  getPermitForEditService,
 } from "../services/permit.service.js";
 
 import fs from "fs";
 
 // Rendisi Form Pengajuan Izin Baru
-export const create = asyncHandler(async (req, res) => {
-  return res.render("permit/form", {
+export const renderCreatePermitForm = asyncHandler(async (req, res) => {
+  return res.render("permit/create", {
     ...buildRenderData(req, {
       title: "Pengajuan Izin",
       mode: "CREATE",
@@ -23,12 +23,12 @@ export const create = asyncHandler(async (req, res) => {
 });
 
 // Menyimpan Pengajuan Izin Baru ke Database
-export const store = asyncHandler(async (req, res) => {
+export const storePermit = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
     if (req.file) {
       fs.unlinkSync(req.file.path);
     }
-    return res.status(400).render("permit/form", {
+    return res.status(400).render("permit/create", {
       ...buildRenderData(req, {
         title: "Pengajuan Izin",
         mode: "CREATE",
@@ -40,7 +40,7 @@ export const store = asyncHandler(async (req, res) => {
   }
 
   try {
-    await createPermit({
+    await createPermitService({
       body: req.body,
       file: req.file,
       currentUser: req.session.user,
@@ -48,12 +48,12 @@ export const store = asyncHandler(async (req, res) => {
 
     req.flash("success", "Permohonan perizinan berhasil diajukan ke atasan!");
     await new Promise((resolve) => req.session.save(resolve));
-    return res.redirect("/permit/history");
+    return res.redirect("/permit/me");
   } catch (error) {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    return res.status(error.statusCode || 500).render("permit/form", {
+    return res.status(error.statusCode || 500).render("permit/create", {
       ...buildRenderData(req, {
         title: "Pengajuan Izin",
         mode: "CREATE",
@@ -70,7 +70,7 @@ export const getHistoryPermits = asyncHandler(async (req, res) => {
   const { page } = req.query;
   const employeeId = req.session.user.employeeId;
 
-  const { data: permits, meta } = await findEmployeeHistory({
+  const { data: permits, meta } = await findEmployeeHistoryService({
     employeeId,
     page,
   });
@@ -95,7 +95,7 @@ export const getIncomingPermits = asyncHandler(async (req, res) => {
     data: permits,
     meta,
     summary,
-  } = await findIncomingPermits({
+  } = await findIncomingPermitsService({
     currentUser: req.session.user,
     page,
   });
@@ -119,7 +119,7 @@ export const actionApproval = asyncHandler(async (req, res) => {
   const { status, notesByApprover } = req.body;
 
   try {
-    await executeApproval({
+    await executeApprovalService({
       id,
       status,
       notesByApprover,
@@ -136,13 +136,13 @@ export const actionApproval = asyncHandler(async (req, res) => {
 });
 
 // Rendisi Form Edit Izin (Hanya jika status PENDING)
-export const edit = asyncHandler(async (req, res) => {
+export const editPermit = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const employeeId = req.session.user.employeeId;
 
   try {
-    const permit = await getPermitForEdit({ id, employeeId });
-    return res.render("permit/form", {
+    const permit = await getPermitForEditService({ id, employeeId });
+    return res.render("permit/create", {
       ...buildRenderData(req, {
         title: "Ubah Pengajuan Izin",
         mode: "EDIT",
@@ -152,17 +152,17 @@ export const edit = asyncHandler(async (req, res) => {
   } catch (error) {
     req.flash("error", error.message);
     await new Promise((resolve) => req.session.save(resolve));
-    return res.redirect("/permit/history");
+    return res.redirect("/permit/me");
   }
 });
 
 // Memperbarui Data Pengajuan Izin ke Database
-export const update = asyncHandler(async (req, res) => {
+export const updatePermit = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   if (req.validationErrors) {
     if (req.file) fs.unlinkSync(req.file.path);
-    return res.status(400).render("permit/form", {
+    return res.status(400).render("permit/create", {
       ...buildRenderData(req, {
         title: "Ubah Pengajuan Izin",
         mode: "EDIT",
@@ -174,7 +174,7 @@ export const update = asyncHandler(async (req, res) => {
   }
 
   try {
-    await updatePermit({
+    await updatePermitService({
       id,
       body: req.body,
       file: req.file,
@@ -183,10 +183,10 @@ export const update = asyncHandler(async (req, res) => {
 
     req.flash("success", "Permohonan perizinan berhasil diperbarui!");
     await new Promise((resolve) => req.session.save(resolve));
-    return res.redirect("/permit/history");
+    return res.redirect("/permit/me");
   } catch (error) {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    return res.status(error.statusCode || 500).render("permit/form", {
+    return res.status(error.statusCode || 500).render("permit/create", {
       ...buildRenderData(req, {
         title: "Ubah Pengajuan Izin",
         mode: "EDIT",
@@ -197,18 +197,17 @@ export const update = asyncHandler(async (req, res) => {
   }
 });
 
-// Menarik / Menghapus Berkas Pengajuan Izin (Hanya jika status PENDING)
-export const destroy = asyncHandler(async (req, res) => {
+export const cancelPermit = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const employeeId = req.session.user.employeeId;
 
   try {
-    await deletePermit({ id, employeeId });
+    await cancelPermitService({ id, employeeId });
     req.flash("success", "Berkas permohonan izin berhasil ditarik kembali.");
   } catch (error) {
     req.flash("error", error.message || "Gagal menarik berkas perizinan.");
   }
 
   await new Promise((resolve) => req.session.save(resolve));
-  return res.redirect("/permit/history");
+  return res.redirect("/permit/me");
 });

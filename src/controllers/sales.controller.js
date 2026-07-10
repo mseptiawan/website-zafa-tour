@@ -59,7 +59,7 @@ export const my = asyncHandler(async (req, res) => {
     limit: determinedLimit,
   });
 
-  res.render("sales/my", {
+  res.render("sales/history", {
     ...buildRenderData(req, {
       title: "Daftar Kunjungan Ku",
       visits,

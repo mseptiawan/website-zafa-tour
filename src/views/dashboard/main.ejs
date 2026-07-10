@@ -1,65 +1,68 @@
 <%- layout('layouts/main') -%>
 
-<div class="hidden md:block ml-0 md:ml-72 min-h-screen bg-slate-50/50      p-4 md:p-8 antialiased text-slate-900 pb-24 md:pb-8 relative z-10">
+<!-- FIX: Menggunakan md:ml-16 xl:ml-72 (atau xl:ml-64) agar sinkron dengan perubahan lebar posisi sidebar -->
+<div class="  relative z-10">
+  
   <!-- HEADER DASHBOARD -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
     <div>
-      <h1 class="text-2xl font-semibold tracking-tight text-slate-950">Zafa Tour, Melayani Dengan Hati</h1>
-      <p class="text-sm text-slate-500 mt-0.5">
+      <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-950">Zafa Tour, Melayani Dengan Hati</h1>
+      <p class="text-sm text-slate-500 mt-0.5 flex flex-wrap items-center gap-1.5">
         Hai, <span class="font-semibold text-slate-900"><%= user.fullName || user.username %></span> 
-        <span class="text-[11px] bg-slate-200/80 px-2 py-0.5 rounded-md text-slate-700 ml-1 font-semibold tracking-wide uppercase">Peran: <%= user.role.replace(/_/g, ' ') %></span>
+        <span class="text-[10px] md:text-[11px] bg-slate-200/80 px-2 py-0.5 rounded-md text-slate-700 font-semibold tracking-wide uppercase">Peran: <%= user.role.replace(/_/g, ' ') %></span>
       </p>
     </div>
-    <div class="flex items-center gap-3">
-      <span class="inline-flex items-center gap-2 bg-blue-600 px-4 py-2 text-xs font-semibold text-white rounded-xl   shadow-blue-600/10 uppercase tracking-wider">
-        <i class="fa-solid fa-calendar-day text-sm"></i> Tahun Buku: <%= new Date().getFullYear() %>
-      </span>
-    </div>
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+  <!-- Perubahan: bg-slate-900 text-slate-100 -->
+  <span class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-900 text-slate-100 px-4 py-2 text-xs font-semibold rounded-xl uppercase tracking-wider">
+    <i class="fa-solid fa-calendar-day text-sm text-slate-400"></i> Tahun Buku: <%= new Date().getFullYear() %>
+  </span>
+</div>
   </div>
 
-  <!-- MAIN GRID 3 BLOCK (KIRI 7, TENGAH 5, KANAN 4) - PERSIS LAYOUT AWAL LU -->
+  <!-- MAIN GRID 3 BLOCK (RESPONSIVE: 1 KOLOM DI HP, 16 KOLOM DI LAPTOP) -->
   <div class="grid grid-cols-1 lg:grid-cols-16 gap-6 items-stretch">
     
     <!-- =========================================================================
          KOLOM KIRI (7/16) - OPERASIONAL UTAMA
          ========================================================================= -->
-    <div class="lg:col-span-7 flex flex-col gap-6">
+    <div class="grid-cols-1 lg:col-span-7 flex flex-col gap-6">
       <% if (user.role !== "DIREKTUR_UTAMA") { %>
       <!-- 1. BOKS PRESENSI HARI INI -->
-      <div class="bg-white rounded-2xl border border-slate-100   overflow-hidden flex flex-col justify-between">
-        <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+      <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col justify-between">
+        <div class="px-5 py-4 border-b border-slate-100 flex flex-row justify-between items-center bg-white gap-2">
           <h5 class="text-xs font-semibold tracking-wide text-slate-900 uppercase flex items-center gap-2">
             <i class="fa-solid fa-user-clock text-slate-400"></i> Presensi Hari Ini
           </h5>
-          <span class="text-[11px] font-semibold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+          <span class="text-[11px] font-semibold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 whitespace-nowrap">
             <%= new Date().toLocaleDateString('id-ID', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) %>
           </span>
         </div>
         <div class="p-5 flex-1 flex items-center">
           <div class="flex flex-col sm:flex-row gap-6 items-center w-full">
-            <div class="text-center sm:text-left sm:border-r sm:border-slate-100 sm:pr-6 flex flex-col justify-center items-center sm:items-start shrink-0">
+            <div class="text-center sm:text-left sm:border-r sm:border-slate-100 sm:pr-6 flex flex-col justify-center items-center sm:items-start shrink-0 w-full sm:w-auto">
               <h2 class="text-3xl font-semibold tracking-tight text-slate-950 mb-0.5">
                 <%= attendance && attendance.checkIn ? new Date(attendance.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '00:00' %>
                 <span class="text-sm font-medium text-slate-400">WIB</span>
               </h2>
               <p class="text-[11px] text-slate-400 font-medium mb-4">Batas Masuk Kantor Zafa Tour</p>
               
-              <div class="flex gap-2.5 w-full">
+              <div class="flex gap-2.5 w-full justify-center sm:justify-start">
                 <% if (!already) { %>
-                  <form action="/attendance" method="GET" class="m-0 p-0 w-1/2">
-                    <button type="submit" class="w-full justify-center inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-3.5 py-2.5 rounded-xl   transition-all active:scale-95 cursor-pointer">
+                  <form action="/attendance" method="GET" class="m-0 p-0 w-1/2 sm:w-auto">
+                    <button type="submit" class="w-full justify-center inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer whitespace-nowrap">
                       <i class="fa-solid fa-sign-in-alt"></i> In
                     </button>
                   </form>
-                  <button class="w-1/2 justify-center inline-flex items-center gap-2 bg-slate-100 text-slate-400 font-semibold text-xs px-3.5 py-2.5 rounded-xl cursor-not-allowed" disabled>
+                  <button class="w-1/2 sm:w-auto justify-center inline-flex items-center gap-2 bg-slate-100 text-slate-400 font-semibold text-xs px-4 py-2.5 rounded-xl cursor-not-allowed whitespace-nowrap" disabled>
                     <i class="fa-solid fa-sign-out-alt"></i> Out
                   </button>
                 <% } else if (already && !hasCheckedOut) { %>
-                  <button class="w-1/2 justify-center inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 border border-emerald-100 font-semibold text-xs px-3.5 py-2.5 rounded-xl cursor-not-allowed" disabled>
+                  <button class="w-1/2 sm:w-auto justify-center inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 border border-emerald-100 font-semibold text-xs px-4 py-2.5 rounded-xl cursor-not-allowed whitespace-nowrap" disabled>
                     <i class="fa-solid fa-check"></i> In
                   </button>
-                  <form action="/attendance" method="GET" class="m-0 p-0 w-1/2">
-                    <button type="submit" class="w-full justify-center inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-semibold text-xs px-3.5 py-2.5 rounded-xl   transition-all active:scale-95 cursor-pointer">
+                  <form action="/attendance" method="GET" class="m-0 p-0 w-1/2 sm:w-auto">
+                    <button type="submit" class="w-full justify-center inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer whitespace-nowrap">
                       <i class="fa-solid fa-sign-out-alt"></i> Out
                     </button>
                   </form>
@@ -71,35 +74,46 @@
               </div>
             </div>
             
-            <div class="w-full">
-              <p class="text-center text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Rekap Kehadiran Bulan Ini</p>
-              <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="bg-emerald-50/40 p-2.5 rounded-xl border border-emerald-100/30">
-                  <span class="block text-lg font-semibold text-emerald-600"><%= rekapAbsen.hadir %></span>
-                  <small class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Hadir</small>
-                </div>
-                <div class="bg-amber-50/40 p-2.5 rounded-xl border border-amber-100/30">
-                  <span class="block text-lg font-semibold text-amber-600"><%= rekapAbsen.telat %></span>
-                  <small class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Telat</small>
-                </div>
-                <div class="bg-rose-50/40 p-2.5 rounded-xl border border-rose-100/30">
-                  <span class="block text-lg font-semibold text-rose-600"><%= rekapAbsen.alpa %></span>
-                  <small class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Alpa</small>
-                </div>
-              </div>
-            </div>
+          <div class="w-full mt-4 sm:mt-0"> <!-- Ditambahkan margin top sedikit agar rapi saat mode responsive -->
+  <p class="text-center text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Rekap Kehadiran Bulan Ini</p>
+  
+  <!-- FIX: Menggunakan grid-cols-3 dasar, berubah jadi 1 kolom di tablet (md:grid-cols-1), dan balik 3 kolom di komputer (xl:grid-cols-3) -->
+  <div class="grid grid-cols-3 md:grid-cols-1 xl:grid-cols-3 gap-2 text-center">
+    
+    <!-- CARD HADIR -->
+    <!-- Di tablet (md), layout diubah jadi flex kesamping agar hemat ruang dan teks tidak patah -->
+    <div class="bg-emerald-50/40 p-2.5 rounded-xl border border-emerald-100/30 flex flex-col md:flex-row xl:flex-col items-center justify-center md:gap-2">
+      <span class="block text-lg font-semibold text-emerald-600"><%= rekapAbsen.hadir %></span>
+      <small class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Hadir</small>
+    </div>
+    
+    <!-- CARD TELAT -->
+    <div class="bg-amber-50/40 p-2.5 rounded-xl border border-amber-100/30 flex flex-col md:flex-row xl:flex-col items-center justify-center md:gap-2">
+      <span class="block text-lg font-semibold text-amber-600"><%= rekapAbsen.telat %></span>
+      <small class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Telat</small>
+    </div>
+    
+    <!-- CARD ALPA -->
+    <div class="bg-rose-50/40 p-2.5 rounded-xl border border-rose-100/30 flex flex-col md:flex-row xl:flex-col items-center justify-center md:gap-2">
+      <span class="block text-lg font-semibold text-rose-600"><%= rekapAbsen.alpa %></span>
+      <small class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Alpa</small>
+    </div>
+    
+  </div>
+</div>
           </div>
         </div>
       </div>
-    <% } %>
-    <% if (user.role !== "DIREKTUR_UTAMA") { %>
-      <!-- 2. BOKS LOG KERJA (TINGGI DISESUAIKAN BIAR SEIMBANG) -->
-      <div class="bg-white rounded-2xl border border-slate-100   overflow-hidden flex flex-col min-h-[350px]">
-        <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+      <% } %>
+
+      <% if (user.role !== "DIREKTUR_UTAMA") { %>
+      <!-- 2. BOKS LOG KERJA -->
+      <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col min-h-[350px]">
+        <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white gap-2">
           <h5 class="text-xs font-semibold tracking-wider text-slate-900 uppercase flex items-center gap-2">
             <i class="fa-solid fa-list-check text-indigo-600"></i> Log Kerja & Aktivitas Harian
           </h5>
-          <button onclick="triggerCarryOver()" class="text-[10px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg border border-indigo-100/50 transition-colors cursor-pointer">
+          <button onclick="triggerCarryOver()" class="text-[10px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg border border-indigo-100/50 transition-colors cursor-pointer whitespace-nowrap">
             <i class="fa-solid fa-arrows-spin mr-1"></i> Carry Over
           </button>
         </div>
@@ -129,18 +143,16 @@
           </a>
         </div>
       </div>
-<% } %>
+      <% } %>
     </div>
 
     <!-- =========================================================================
          KOLOM TENGAH (5/16) - FINANSIAL & DINAS LUAR
          ========================================================================= -->
-    <div class="lg:col-span-5 flex flex-col gap-6">
+    <div class="grid-cols-1 lg:col-span-5 flex flex-col gap-6">
       
-    
-
-      <!-- 4. ANGGARAN DINAS LUAR ANDA (TINGGI DISESUAIKAN) -->
-      <div class="bg-white rounded-2xl border border-slate-100   overflow-hidden flex flex-col min-h-[160px] justify-between">
+      <!-- 4. ANGGARAN DINAS LUAR ANDA -->
+      <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col min-h-[160px] justify-between">
         <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
           <h5 class="text-xs font-semibold tracking-wider text-slate-900 uppercase flex items-center gap-2">
             <i class="fa-solid fa-plane-departure text-indigo-500"></i> Anggaran Dinas Luar Anda
@@ -170,7 +182,7 @@
       </div>
 
       <!-- 5. INFO KALENDER LIBUR -->
-      <div class="bg-white rounded-2xl border border-slate-100   p-4.5">
+      <div class="bg-white rounded-2xl border border-slate-100 p-4.5">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center shrink-0 border border-rose-100/50">
             <i class="fa-solid fa-umbrella-beach text-xs"></i>
@@ -194,10 +206,10 @@
     <!-- =========================================================================
          KOLOM KANAN (4/16) - MAKLUMAT & PENGUMUMAN PERUSAHAAN
          ========================================================================= -->
-    <div class="lg:col-span-4 flex flex-col gap-6">
+    <div class="grid-cols-1 lg:col-span-4 flex flex-col gap-6">
       
-      <!-- 6. PENGUMUMAN PERUSAHAAN (DIBIKIN TINGGI DAN COMPACT BIAR SEIMBANG SAMA KIRI) -->
-      <div class="bg-white rounded-2xl border border-slate-100   overflow-hidden flex flex-col min-h-[460px]">
+      <!-- 6. PENGUMUMAN PERUSAHAAN -->
+      <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col min-h-[460px]">
         <div class="px-4 py-3.5 border-b border-slate-100 bg-white">
           <h5 class="text-xs font-semibold tracking-wider text-slate-900 uppercase flex items-center gap-2">
             <i class="fa-solid fa-bullhorn text-amber-500"></i> Pengumuman Perusahaan
@@ -238,7 +250,6 @@
 </div>
 
 <script>
-  // Fungsi Toggle Masking Slip Gaji (Buka/Tutup Mata)
   function toggleSalaryMask(btn) {
     const salarySpan = document.getElementById('salaryAmount');
     const isMasked = salarySpan.innerText.includes('•••••••');
@@ -259,6 +270,10 @@
   function handleClockIn() {
     console.log("Memicu pengambilan koordinat geofencing kantor...");
   }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    console.log("Dashboard siap.");
+  });
 
   function triggerCarryOver() {
     console.log("Memicu fungsi carryOverTasks dari controller harian...");

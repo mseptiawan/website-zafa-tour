@@ -50,7 +50,7 @@ const validateUploadedFile = (file) => {
  * @param {string|null} [excludeEmployeeId=null] - ID Karyawan pembuat untuk dikecualikan
  * @returns {Promise<Array<Object>>} Daftar karyawan murni (POJO)
  */
-export const getEmployeesForAssignment = async (excludeEmployeeId = null) => {
+export const getEmployeesForAssignmentService = async (excludeEmployeeId = null) => {
   const query = {};
   if (excludeEmployeeId) {
     query._id = { $ne: excludeEmployeeId };
@@ -67,7 +67,7 @@ export const getEmployeesForAssignment = async (excludeEmployeeId = null) => {
  * @param {string} params.creatorName - Nama lengkap user pembuat dokumen
  * @returns {Promise<Object>} Instance data Assignment terbuat
  */
-export const createAssignment = async ({ body, file, userId, creatorName }) => {
+export const createAssignmentService = async ({ body, file, userId, creatorName }) => {
   validateUploadedFile(file);
 
   let employeeIds = [];
@@ -125,7 +125,7 @@ export const createAssignment = async ({ body, file, userId, creatorName }) => {
  * @param {number|string} [params.limit] - Limit data per halaman
  * @returns {Promise<{data: Array<Object>, meta: Object}>} Objek standar pembawa data & metadata halaman
  */
-export const getAssignmentsByEmployeeId = async ({ employeeId, page, limit }) => {
+export const getAssignmentsByEmployeeIdService = async ({ employeeId, page, limit }) => {
   if (!employeeId) {
     return {
       data: [],
@@ -162,7 +162,11 @@ export const getAssignmentsByEmployeeId = async ({ employeeId, page, limit }) =>
  * @param {Object} params.currentUser - Objek Sesi User login aktif
  * @returns {Promise<{data: Array<Object>, meta: Object}>} Objek standar pembawa data & metadata halaman
  */
-export const getAllAssignments = async ({ page = 1, limit = PAGINATION.ASSIGNMENT_DEFAULT, currentUser }) => {
+export const getAllAssignmentsService = async ({
+  page = 1,
+  limit = PAGINATION.ASSIGNMENT_DEFAULT,
+  currentUser,
+}) => {
   const paginationArgs = getPagination({ page, limit });
   const filter = buildAssignmentFilter(currentUser);
   const total = await Assignment.countDocuments(filter);
@@ -189,7 +193,7 @@ export const getAllAssignments = async ({ page = 1, limit = PAGINATION.ASSIGNMEN
  * @param {string} id - ID Object Data Assignment
  * @returns {Promise<Object|null>} Berkas penugasan utuh atau null
  */
-export const getAssignmentById = async (id) => {
+export const getAssignmentByIdService = async (id) => {
   return await Assignment.findById(id)
     .populate([
       { path: "employees" },

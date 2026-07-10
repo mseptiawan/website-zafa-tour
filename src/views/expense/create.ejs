@@ -1,17 +1,17 @@
-<%- layout('layouts/main', { title: 'Ajukan Klaim Beban' }) %>
+<%- layout('layouts/main', { title: 'Ajukan Reimbursement' }) %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+<div >
   <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
-        module: 'Finance', 
-        title: 'Formulir Klaim Pengeluaran', 
+        module: 'Reimbursement', 
+        title: 'Formulir Reimbursement', 
         description: 'Catat pengeluaran operasional Anda dan lampirkan bukti transaksi yang valid.' 
     }) %>
 
     <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl p-4 sm:p-5 md:p-8 overflow-hidden">
-      <form action="/expense/create" method="POST" enctype="multipart/form-data" class="space-y-5">
+      <form action="/expense" method="POST" enctype="multipart/form-data" class="space-y-5">
 
         <% if (typeof errors !== 'undefined' && errors?.global) { %>
         <div class="p-3.5 rounded-xl bg-rose-50 text-rose-600 text-[13px] border border-rose-100 font-medium">
@@ -21,8 +21,7 @@
 
         <div class="space-y-2 mb-5">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Judul Pengeluaran</label>
-          <input type="text" name="title" value="<%= old?.title || '' %>" placeholder="Contoh: Pembelian Tinta Printer & Kertas HVS"
-            class="w-full bg-slate-50/60 border <%= errors?.title ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
+          <input type="text" name="title" value="<%= old?.title || '' %>" placeholder="Contoh: Pembelian Tinta Printer & Kertas HVS" class="w-full bg-slate-50/60 border <%= errors?.title ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white focus:ring-0 outline-none transition-all text-slate-800 font-medium" />
           <% if (errors?.title) { %>
           <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.title %></p>
           <% } %>
@@ -35,22 +34,23 @@
               <select name="category" class="w-full bg-slate-50/60 border <%= errors?.category ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer appearance-none font-medium">
                 <option value="" disabled <%= !old?.category ? 'selected' : '' %>>-- Pilih Kategori --</option>
                 <% categories.forEach(cat => { %>
-                  <option value="<%= cat._id %>" <%= old?.category === String(cat._id) ? 'selected' : '' %>><%= cat.name %></option>
+                <option value="<%= cat._id %>" <%= old?.category === String(cat._id) ? 'selected' : '' %>><%= cat.name %></option>
                 <% }) %>
               </select>
               <div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
-                <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
               </div>
             </div>
             <% if (errors?.category) { %>
             <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.category %></p>
             <% } %>
           </div>
-          
+
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Nota</label>
-            <input type="date" id="expenseDate" name="expenseDate" value="<%= old?.expenseDate || '' %>"
-              class="w-full bg-slate-50/60 border <%= errors?.expenseDate ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer font-medium" />
+            <input type="date" id="expenseDate" name="expenseDate" value="<%= old?.expenseDate || '' %>" class="w-full bg-slate-50/60 border <%= errors?.expenseDate ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all cursor-pointer font-medium" />
             <% if (errors?.expenseDate) { %>
             <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.expenseDate %></p>
             <% } %>
@@ -97,7 +97,7 @@
               <span class="text-[12.5px] font-semibold text-slate-700">Pilih Berkas atau Tarik File Ke Sini</span>
               <p class="text-[11px] font-medium text-slate-400/80 mt-0.5">Mendukung format JPG, PNG, atau PDF (Maksimal 5MB)</p>
               <% if (errors?.proofFile) { %>
-                <span class="text-rose-500 text-[11px] font-semibold mt-1.5 block"><%= errors.proofFile %></span>
+              <span class="text-rose-500 text-[11px] font-semibold mt-1.5 block"><%= errors.proofFile %></span>
               <% } %>
             </div>
 
@@ -118,10 +118,9 @@
           <div id="extraSections" class="<%= old?.noReceipt ? '' : 'hidden' %> space-y-4">
             <div class="space-y-2">
               <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alasan Ketiadaan Nota</label>
-              <textarea id="reasonInput" name="noReceiptReason" rows="2" placeholder="Jelaskan secara singkat kenapa nota tidak tersedia..."
-                class="w-full bg-slate-50/60 border <%= errors?.noReceiptReason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800 font-medium"><%= old?.noReceiptReason || '' %></textarea>
+              <textarea id="reasonInput" name="noReceiptReason" rows="2" placeholder="Jelaskan secara singkat kenapa nota tidak tersedia..." class="w-full bg-slate-50/60 border <%= errors?.noReceiptReason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800 font-medium"><%= old?.noReceiptReason || '' %></textarea>
               <% if (errors?.noReceiptReason) { %>
-                <p class="text-rose-500 text-[11px] font-semibold mt-1 pl-0.5"><%= errors.noReceiptReason %></p>
+              <p class="text-rose-500 text-[11px] font-semibold mt-1 pl-0.5"><%= errors.noReceiptReason %></p>
               <% } %>
             </div>
 
@@ -131,7 +130,7 @@
                 <p class="text-[12px] font-semibold text-slate-800">Pernyataan Tanggung Jawab Mutlak</p>
                 <p class="text-[11px] text-slate-400/90 font-medium mt-1 leading-relaxed">Saya menyatakan bahwa pengeluaran ini benar dilakukan untuk kepentingan operasional perusahaan, dan saya bersedia mempertanggungjawabkannya apabila terdapat kekeliruan di kemudian hari.</p>
                 <% if (errors?.selfDeclaration) { %>
-                  <p class="text-rose-500 text-[11px] font-semibold mt-1.5 pl-0.5"><%= errors.selfDeclaration %></p>
+                <p class="text-rose-500 text-[11px] font-semibold mt-1.5 pl-0.5"><%= errors.selfDeclaration %></p>
                 <% } %>
               </div>
             </label>
@@ -161,7 +160,7 @@
 
     if (isChecked) {
       fileSection.classList.add("hidden");
-      fileInput.value = ""; 
+      fileInput.value = "";
       extraSections.classList.remove("hidden");
     } else {
       fileSection.classList.remove("hidden");
@@ -172,7 +171,7 @@
   function handleFileSelect(input) {
     if (input.files.length > 0) {
       let fileName = input.files[0].name;
-      if(fileName.length > 30) fileName = fileName.substring(0, 25) + '...';
+      if (fileName.length > 30) fileName = fileName.substring(0, 25) + '...';
       document.getElementById("name-preview").textContent = fileName;
       document.getElementById("dropzone-empty").classList.add("hidden");
       document.getElementById("dropzone-filled").classList.remove("hidden");
@@ -203,7 +202,7 @@
         nominalInput.value = formatRupiah(amountReal.value);
       }
 
-      nominalInput.addEventListener("input", function () {
+      nominalInput.addEventListener("input", function() {
         let value = this.value.replace(/[^0-9]/g, "");
         amountReal.value = value;
         this.value = value ? formatRupiah(value) : "";

@@ -20,20 +20,20 @@
   </style>
 </head>
 
-<body class="bg-[#f1f5f9] md:bg-[#f8fafc] min-h-screen flex antialiased items-center justify-center md:items-stretch md:justify-start">
+<body class="bg-slate-100 md:bg-white min-h-screen antialiased text-slate-800 flex flex-col justify-center md:block">
 
-  <div class="w-full flex flex-col md:flex-row min-h-screen">
+  <div class="w-full max-w-[1440px] mx-auto min-h-screen flex flex-col md:flex-row bg-slate-100 md:bg-white overflow-hidden">
 
-    <div class="w-full md:w-[45%] lg:w-[40%] p-6 sm:p-12 md:p-16 flex flex-col justify-between z-10 my-auto md:my-0 bg-transparent md:bg-white min-h-screen md:min-h-0">
+    <div class="w-full md:w-[45%] lg:w-[40%] p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-center md:justify-between min-h-screen md:min-h-screen bg-transparent md:bg-white z-10 box-border">
       
-      <div class="hidden md:flex items-center gap-2.5">
+      <div class="hidden md:flex items-center gap-2.5 mb-6 md:mb-0">
         <span class="text-slate-900 font-extrabold tracking-tight text-base">Zafa Tour</span>
       </div>
 
-      <div class="w-full max-w-md mx-auto my-auto bg-white md:bg-transparent rounded-[32px] md:rounded-none p-8 sm:p-10 md:p-0 shadow-xl shadow-slate-200/50 md:shadow-none flex flex-col items-center md:items-stretch">
+      <div class="w-full max-w-md mx-auto bg-white md:bg-transparent border border-slate-200/60 md:border-transparent rounded-3xl md:rounded-none p-6 sm:p-10 md:p-0 shadow-xl shadow-slate-200/40 md:shadow-none flex flex-col items-center md:items-stretch my-auto md:my-0">
         
-        <div class="w-full flex justify-center mb-6">
-          <svg class="w-44 h-auto" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div class="w-full flex justify-center mb-5 md:mb-6">
+          <svg class="w-32 sm:w-36 md:w-40 h-auto" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="115" y="108" width="14" height="32" rx="3" fill="#1e293b" />
             <rect x="136" y="92" width="14" height="48" rx="3" fill="#1e293b" />
             <path d="M102 126 C 118 112, 128 98, 146 94" stroke="#1e293b" stroke-width="2" stroke-linecap="round" />
@@ -52,15 +52,15 @@
           </svg>
         </div>
 
-        <div class="text-center w-full mb-6">
-          <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Sign In</h1>
-          <p class="text-xs text-slate-400 font-medium mt-1.5">Enter valid user name & password to continue</p>
+        <div class="text-center md:text-left w-full mb-5">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Sign In</h1>
+          <p class="text-xs sm:text-[13px] text-slate-400 font-medium mt-1">Enter valid user name & password to continue</p>
         </div>
 
         <% if (typeof errors !== 'undefined' && Object.keys(errors).length > 0) { %>
-          <div class="w-full mb-4 p-3 px-4 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-800">
+          <div class="w-full mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-800">
             <% Object.values(errors).forEach(err => { %>
-              <div class="flex items-center gap-2.5">
+              <div class="flex items-center gap-2">
                 <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-rose-500"></i>
                 <span class="text-xs font-medium tracking-tight"><%= err %></span>
               </div>
@@ -68,28 +68,7 @@
           </div>
         <% } %>
 
-        <% if (typeof error !== 'undefined' && error.length > 0) { %>
-          <div class="w-full mb-4 p-3 px-4 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-800">
-            <% error.forEach(msg => { %>
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-rose-500"></i>
-                <span class="text-xs font-medium tracking-tight"><%= msg %></span>
-              </div>
-            <% }) %>
-          </div>
-        <% } %>
-
-        <% if (typeof success !== 'undefined' && success.length > 0) { %>
-          <div class="w-full mb-4 p-3 px-4 bg-emerald-50 border border-emerald-100 rounded-xl flex flex-col gap-1 text-emerald-800">
-            <% success.forEach(msg => { %>
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="check-circle" class="w-4 h-4 shrink-0 text-emerald-500"></i>
-                <span class="text-xs font-medium tracking-tight"><%= msg %></span>
-              </div>
-            <% }) %>
-          </div>
-        <% } %>
-        <form action="/login" method="POST" class="w-full space-y-4">
+        <form action="/login" method="POST" class="w-full space-y-3.5">
           
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
@@ -101,7 +80,7 @@
               required
               placeholder="Username atau Email"
               value="<%= (typeof old !== 'undefined' && old?.identifier) ? old.identifier : '' %>"
-              class="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400"
+              class="w-full pl-11 pr-4 py-3 bg-slate-50 md:bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 placeholder:text-slate-400 text-slate-800"
             />
           </div>
 
@@ -115,12 +94,12 @@
               name="password"
               required
               placeholder="Password"
-              class="w-full pl-11 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400"
+              class="w-full pl-11 pr-12 py-3 bg-slate-50 md:bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 placeholder:text-slate-400 text-slate-800"
             />
             <button 
               type="button" 
               id="toggleIcon"
-              class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
+              class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition outline-none cursor-pointer"
             >
               <i data-lucide="eye" class="w-4 h-4"></i>
             </button>
@@ -136,12 +115,12 @@
               />
               <span>Ingat saya</span>
             </label>
-            <a href="/forgot-password" class="font-semibold text-blue-600 hover:text-blue-700 transition">Forget password</a>
+            <a href="/forgot-password" class="font-semibold text-blue-600 hover:text-blue-700 transition">Forgot password?</a>
           </div>
 
           <button 
             type="submit"
-            class="w-full py-3.5 bg-[#2563eb] text-white font-semibold text-sm rounded-xl hover:bg-blue-700 active:scale-[0.99] transition-all duration-150 shadow-md shadow-blue-500/10 cursor-pointer flex items-center justify-center gap-2 mt-2"
+            class="w-full py-3 bg-blue-600 text-white font-semibold text-sm rounded-xl hover:bg-blue-700 active:scale-[0.99] transition-all duration-150 shadow-md shadow-blue-500/10 cursor-pointer flex items-center justify-center gap-2 pt-2"
           >
             <span>Masuk</span>
           </button>
@@ -149,45 +128,40 @@
         </form>
       </div>
 
-      <p class="text-center md:text-left text-xs text-slate-400 font-medium px-0.5 mt-auto md:mt-0 pt-4 w-full">
+      <p class="text-center md:text-left text-xs text-slate-400 font-medium px-0.5 mt-6 md:mt-0 pt-4 w-full">
         &copy; 2026 Zafa Tour. All rights reserved.
       </p>
     </div>
 
-    <div class="hidden md:block relative flex-1 bg-slate-900 overflow-hidden border-l border-slate-200/40">
-      
+    <div class="hidden md:block relative flex-1 min-h-screen bg-slate-900 overflow-hidden border-l border-slate-200/10">
       <img 
         src="https://skvindia.com/wp-content/uploads/2024/09/Types-of-modern-office-interior-design-banner.webp" 
         alt="Zafa Tour Workspace" 
-        class="absolute inset-0 w-full h-full object-cover opacity-45 filter brightness-95 contrast-105"
+        class="absolute inset-0 w-full h-full object-cover opacity-40 filter brightness-95 contrast-105"
       />
-
       <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-950/30"></div>
 
-      <div class="absolute top-8 right-8 z-10 p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg max-w-[140px]">
-        <img src="/images/logo.png" alt="Zafa Tour" class="w-full h-auto object-contain filter brightness-0 invert opacity-90"/>
+      <div class="absolute top-8 right-8 z-10 p-3 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg max-w-[140px]">
+        <img src="/images/logo.png" alt="Zafa Tour" class="w-full h-auto object-contain filter brightness-0 invert opacity-80"/>
       </div>
 
-      <div class="absolute bottom-16 left-16 right-16 z-10 max-w-lg space-y-4">
+      <div class="absolute bottom-16 left-12 right-12 lg:left-16 lg:right-16 z-10 max-w-xl space-y-4">
         <div class="space-y-2">
-          <h2 class="text-3xl font-black text-white leading-tight tracking-tight">
+          <h2 class="text-2xl lg:text-3xl font-black text-white leading-tight tracking-tight">
             Sistem Informasi <br />Kepegawaian Terintegrasi.
           </h2>
-          <p class="text-[13px] text-slate-300 font-medium leading-relaxed max-w-sm">
+          <p class="text-[13px] text-slate-300 font-medium leading-relaxed max-w-md opacity-90">
             Akses seluruh data operasional, kehadiran, birokrasi cuti, dan manajemen administrasi internal PT Zafa Mulia Mandiri dalam satu dasbor kendali terpusat.
           </p>
         </div>
       </div>
-
     </div>
 
   </div>
 
   <script>
     lucide.createIcons({
-      attrs: {
-        'stroke-width': 2.2
-      }
+      attrs: { 'stroke-width': 2.2 }
     });
 
     const passwordInput = document.getElementById('passwordInput');
@@ -196,16 +170,10 @@
     toggleIcon.addEventListener('click', () => {
       const isPassword = passwordInput.type === 'password';
       passwordInput.type = isPassword ? 'text' : 'password';
-
       toggleIcon.innerHTML = isPassword 
         ? '<i data-lucide="eye-off" class="w-4 h-4"></i>' 
         : '<i data-lucide="eye" class="w-4 h-4"></i>';
-      
-      lucide.createIcons({
-        attrs: {
-          'stroke-width': 2.2
-        }
-      });
+      lucide.createIcons({ attrs: { 'stroke-width': 2.2 } });
     });
   </script>
 

@@ -1,11 +1,10 @@
 <%- layout('layouts/main', { title }) %>
 
 <% 
-  // Ambil objek dari variabel aman yang baru dikirim oleh controller
   const currentSetting = typeof companySetting !== 'undefined' ? companySetting : null;
 %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+<div >
   <div class="w-full max-w-none mx-auto mt-4 md:mt-0 space-y-6">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 select-none border-b border-slate-100">
@@ -14,7 +13,7 @@
             section: 'Pengaturan', 
             module: 'Sistem', 
             title: 'Company Setting', 
-            description: 'Konfigurasi parameter global perusahaan, toleransi waktu absensi, dan geo-radius lokasi kantor.' 
+            description: 'Konfigurasi parameter global perusahaan, toleransi waktu absensi, dan tentukan radius lokasi kantor.' 
         }) %>
       </div>
     </div>
@@ -29,7 +28,7 @@
     <form id="form-company-setting" onsubmit="submitSettingForm(event)" class="space-y-6">
       
       <div class="bg-white border border-slate-200/80 p-5 md:p-6 rounded-2xl space-y-4">
-        <h2 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 select-none">
+        <h2 class="text-[10px] font-medium text-slate-400 uppercase tracking-wider flex items-center gap-2 select-none">
           <div class="flex items-center justify-center w-5.5 h-5.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
             <i class="fa-solid fa-building text-[10px]"></i>
           </div>
@@ -38,19 +37,19 @@
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
           <div class="md:col-span-6">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nama Perusahaan / Instansi</label>
+            <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nama Perusahaan / Instansi</label>
             <input type="text" id="setting-name" name="name" required value="<%= currentSetting?.name || '' %>"
                    class="w-full h-10 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-[12.5px] font-semibold text-slate-800 outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition" />
           </div>
 
           <div class="md:col-span-3">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Batas Jam Masuk (HH:mm)</label>
+            <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Batas Jam Masuk (HH:mm)</label>
             <input type="text" id="setting-entryTimeLimit" name="entryTimeLimit" placeholder="Contoh: 08:00" required value="<%= currentSetting?.entryTimeLimit || '08:00' %>"
                    class="w-full h-10 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-[12.5px] font-semibold text-slate-800 text-center outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition" />
           </div>
 
           <div class="md:col-span-3">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Toleransi Terlambat (Menit)</label>
+            <label class="block text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Toleransi Terlambat (Menit)</label>
             <input type="number" id="setting-gracePeriodMinutes" name="gracePeriodMinutes" min="0" required value="<%= currentSetting?.gracePeriodMinutes ?? 0 %>"
                    class="w-full h-10 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-[12.5px] font-semibold text-slate-800 text-center outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition" />
           </div>
@@ -59,20 +58,20 @@
 
       <div class="bg-white border border-slate-200/80 p-5 md:p-6 rounded-2xl space-y-4">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3 select-none">
-          <h2 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <h2 class="text-[10px] font-medium text-slate-400 uppercase tracking-wider flex items-center gap-2">
             <div class="flex items-center justify-center w-5.5 h-5.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
               <i class="fa-solid fa-map-location-dot text-[10px]"></i>
             </div>
             Daftar Lokasi Kantor Terdaftar
           </h2>
           <button type="button" onclick="addNewLocationRow()" 
-                  class="h-[28px] px-3 inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/60 text-[10.5px] font-bold rounded-lg transition active:scale-95 cursor-pointer">
+                  class="h-[28px] px-3 inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/60 text-[10.5px] font-medium rounded-lg transition active:scale-95 cursor-pointer">
             <i class="fa-solid fa-plus text-[9px]"></i> Tambah Lokasi
           </button>
         </div>
 
         <div class="w-full">
-          <div class="hidden md:grid grid-cols-12 gap-4 bg-slate-50/70 border-b border-slate-200 py-2.5 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none rounded-t-xl">
+          <div class="hidden md:grid grid-cols-12 gap-4 bg-slate-50/70 border-b border-slate-200 py-2.5 px-3 text-[10px] font-medium text-slate-400 uppercase tracking-wider select-none rounded-t-xl">
             <div class="col-span-5">Nama Lokasi Kantor</div>
             <div class="col-span-2">Latitude</div>
             <div class="col-span-2">Longitude</div>
@@ -85,13 +84,13 @@
         </div>
 
         <div id="location-empty-state" class="hidden py-8 text-center max-w-xs mx-auto select-none">
-          <p class="text-[12px] font-bold text-slate-500">Belum ada kantor yang ditambahkan</p>
+          <p class="text-[12px] font-medium text-slate-500">Belum ada kantor yang ditambahkan</p>
           <p class="text-[11px] text-slate-400 mt-0.5">Wajib memiliki minimal 1 lokasi operasional.</p>
         </div>
       </div>
 
       <div class="flex items-center justify-end gap-3 pt-2">
-        <button type="submit" id="btn-submit-setting" class="h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[12px] rounded-xl transition-all active:scale-[0.99] flex items-center gap-2 cursor-pointer outline-none">
+        <button type="submit" id="btn-submit-setting" class="h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium text-[12px] rounded-xl transition-all active:scale-[0.99] flex items-center gap-2 cursor-pointer outline-none">
           <i class="fa-solid fa-floppy-disk text-[11px]"></i>
           Simpan
         </button>
@@ -102,10 +101,8 @@
 </div>
 
 <script>
-  // Mengambil state data awal dari database lewat controller (.lean())
   let allocatedLocations = <%- currentSetting && currentSetting.locations ? JSON.stringify(currentSetting.locations) : '[]' %>;
 
-  // Fungsi Render Tunggal: Handle tampilan desktop sekaligus mobile dalam satu silsilah elemen DOM
   function renderLocations() {
     const container = document.getElementById('location-responsive-container');
     const emptyState = document.getElementById('location-empty-state');
@@ -123,36 +120,36 @@
         <div class="py-4 md:py-3 grid grid-cols-12 gap-3 md:gap-4 items-center transition-colors hover:bg-slate-50/20">
           
           <div class="col-span-12 flex items-center justify-between md:hidden select-none mb-0.5">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lokasi #${index + 1}</span>
+            <span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Lokasi #${index + 1}</span>
           </div>
 
           <div class="col-span-12 md:col-span-5">
-            <label class="block md:hidden text-[9.5px] font-bold text-slate-400 mb-1">Nama Lokasi Kantor</label>
+            <label class="block md:hidden text-[9.5px] font-medium text-slate-400 mb-1">Nama Lokasi Kantor</label>
             <input type="text" value="${loc.locationName || ''}" oninput="updateLocalData(${index}, 'locationName', this.value)" placeholder="Misal: Kantor Pusat Palembang" required
                    class="w-full h-9 bg-slate-50 border border-slate-200 rounded-lg px-3 text-[12px] font-semibold text-slate-800 outline-none focus:bg-white focus:border-blue-500 transition" />
           </div>
 
           <div class="col-span-6 md:col-span-2">
-            <label class="block md:hidden text-[9.5px] font-bold text-slate-400 mb-1">Latitude</label>
+            <label class="block md:hidden text-[9.5px] font-medium text-slate-400 mb-1">Latitude</label>
             <input type="number" step="any" value="${loc.lat || ''}" oninput="updateLocalData(${index}, 'lat', this.value)" placeholder="-2.9876" required
                    class="w-full h-9 bg-slate-50 border border-slate-200 rounded-lg px-3 text-[12px] font-semibold text-slate-700 outline-none focus:bg-white focus:border-blue-500 transition" />
           </div>
 
           <div class="col-span-6 md:col-span-2">
-            <label class="block md:hidden text-[9.5px] font-bold text-slate-400 mb-1">Longitude</label>
+            <label class="block md:hidden text-[9.5px] font-medium text-slate-400 mb-1">Longitude</label>
             <input type="number" step="any" value="${loc.lng || ''}" oninput="updateLocalData(${index}, 'lng', this.value)" placeholder="104.7654" required
                    class="w-full h-9 bg-slate-50 border border-slate-200 rounded-lg px-3 text-[12px] font-semibold text-slate-700 outline-none focus:bg-white focus:border-blue-500 transition" />
           </div>
 
           <div class="col-span-12 md:col-span-2">
-            <label class="block md:hidden text-[9.5px] font-bold text-slate-400 mb-1">Geofence Radius (Meter)</label>
+            <label class="block md:hidden text-[9.5px] font-medium text-slate-400 mb-1">Geofence Radius (Meter)</label>
             <input type="number" value="${loc.radiusMeter || 500}" oninput="updateLocalData(${index}, 'radiusMeter', this.value)" placeholder="500" min="10" required
                    class="w-full h-9 bg-slate-50 border border-slate-200 rounded-lg px-3 text-[12px] font-semibold text-slate-700 text-center outline-none focus:bg-white focus:border-blue-500 transition" />
           </div>
 
           <div class="col-span-12 md:col-span-1 flex justify-end md:justify-center pt-1 md:pt-0">
             <button type="button" onclick="removeLocationRow(${index})" 
-                    class="w-full md:w-8 h-8 inline-flex items-center justify-center gap-2 md:gap-0 text-slate-400 hover:text-rose-600 bg-slate-50 md:bg-transparent border border-slate-200/60 md:border-transparent hover:bg-rose-50 hover:border-rose-100 rounded-lg text-[11.5px] font-bold md:font-normal py-2 md:py-0 transition cursor-pointer">
+                    class="w-full md:w-8 h-8 inline-flex items-center justify-center gap-2 md:gap-0 text-slate-400 hover:text-rose-600 bg-slate-50 md:bg-transparent border border-slate-200/60 md:border-transparent hover:bg-rose-50 hover:border-rose-100 rounded-lg text-[11.5px] font-medium md:font-normal py-2 md:py-0 transition cursor-pointer">
               <i class="fa-solid fa-trash-can text-[11px]"></i>
               <span class="md:hidden">Hapus Lokasi</span>
             </button>
@@ -179,14 +176,12 @@
     renderLocations();
   }
 
-  // Ikat state secara aman langsung ke memori array saat diketik oleh user
   function updateLocalData(index, field, value) {
     if (allocatedLocations[index]) {
       allocatedLocations[index][field] = value;
     }
   }
 
-  // Eksekusi Submit Form menggunakan data mutakhir di dalam array
   async function submitSettingForm(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -195,7 +190,6 @@
     btnSubmit.disabled = true;
     btnSubmit.classList.add('opacity-70', 'cursor-not-allowed');
 
-    // Bersihkan data array dan lakukan casting tipe data angka sebelum dikirim ke backend
     const cleanLocations = allocatedLocations
       .filter(loc => loc.locationName && loc.locationName.trim() !== "")
       .map(loc => ({
@@ -212,7 +206,6 @@
       locations: cleanLocations
     };
 
-    console.log("🔥 PAYLOAD FINAL RESPONSIVE SIAP KIRIM:", JSON.stringify(payload, null, 2));
 
     try {
       const response = await fetch('/company-settings', {
@@ -247,6 +240,5 @@
     }
   }
 
-  // Muat data tabel saat halaman pertama kali terbuka
   window.onload = renderLocations;
 </script>

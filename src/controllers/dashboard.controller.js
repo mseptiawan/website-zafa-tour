@@ -5,7 +5,7 @@ import BusinessTrip from "../models/BusinessTrip.model.js";
 import Holiday from "../models/calender/Holiday.model.js";
 import Announcement from "../models/Announcement.model.js";
 
-export const index = async (req, res, next) => {
+export const renderDashboardPage = async (req, res, next) => {
   try {
     const user = req.session.user;
     if (!user) {

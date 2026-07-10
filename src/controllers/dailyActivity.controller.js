@@ -15,7 +15,7 @@ import {
 } from "../services/dailyActivity.service.js";
 
 // ─── METHOD 1: MAIN EJS VIEW (INDEX) ─────────────────────────────────
-export const index = asyncHandler(async (req, res) => {
+export const renderDailyActivityPage = asyncHandler(async (req, res) => {
   const { employeeId } = req.session.user;
   const today = moment().format("YYYY-MM-DD");
 
@@ -54,7 +54,7 @@ export const getActivities = asyncHandler(async (req, res) => {
 });
 
 // ─── METHOD 3: AJAX STORE DATA ───────────────────────────────────────
-export const store = asyncHandler(async (req, res) => {
+export const createDailyActivity = asyncHandler(async (req, res) => {
   const { employeeId } = req.session.user;
   const { activityDate, title, kpiTemplateId } = req.body;
 
@@ -73,7 +73,7 @@ export const store = asyncHandler(async (req, res) => {
 });
 
 // ─── METHOD 4: AJAX UPDATE DATA ──────────────────────────────────────
-export const update = asyncHandler(async (req, res) => {
+export const updateDailyActivity = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { employeeId } = req.session.user;
 

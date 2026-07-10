@@ -1,13 +1,25 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData, getToday } from "../utils/renderHelper.js";
-import * as rpService from "../services/rewardPunishment.service.js";
+import {
+  findAllLogs,
+  findAvailableEmployees,
+  findActiveMasterTypes,
+  createLog,
+  deleteLogById,
+  findMasterTypes,
+  checkDuplicateTypeName,
+  createType,
+  updateTypeById,
+  updateTypeStatus,
+  findEmployeeLogs,
+} from "../services/rewardPunishment.service.js";
 
 // =========================================================================
-// ─── TRANSACTIONAL LOGS METHOD (UPDATED) ───
+// ─── TRANSACTIONAL LOGS METHOD ───
 // =========================================================================
 
-export const index = asyncHandler(async (req, res) => {
-  const logs = await rpService.findAllLogs();
+export const renderRewardPunishmentIndexPage = asyncHandler(async (req, res) => {
+  const logs = await findAllLogs();
   res.render("rewardPunishment/index", {
     ...buildRenderData(req, {
       title: "Reward & Punishment",
@@ -16,9 +28,9 @@ export const index = asyncHandler(async (req, res) => {
   });
 });
 
-export const create = asyncHandler(async (req, res) => {
-  const employees = await rpService.findAvailableEmployees();
-  const types = await rpService.findActiveMasterTypes();
+export const renderCreateRewardPunishmentForm = asyncHandler(async (req, res) => {
+  const employees = await findAvailableEmployees();
+  const types = await findActiveMasterTypes();
 
   res.render("rewardPunishment/create", {
     ...buildRenderData(req, {
@@ -30,11 +42,10 @@ export const create = asyncHandler(async (req, res) => {
   });
 });
 
-// SESUAIKAN: Menangkap file attachment dan meneruskannya ke service
-export const store = asyncHandler(async (req, res) => {
+export const storeRewardPunishmentLog = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
-    const employees = await rpService.findAvailableEmployees();
-    const types = await rpService.findActiveMasterTypes();
+    const employees = await findAvailableEmployees();
+    const types = await findActiveMasterTypes();
 
     return res.status(400).render("rewardPunishment/create", {
       ...buildRenderData(req, {
@@ -49,18 +60,16 @@ export const store = asyncHandler(async (req, res) => {
     });
   }
 
-  // Jika operator mematikan toggle 'hasFinancialImpact', pastikan amount dipaksa jadi 0
   if (!req.body.hasFinancialImpact) {
     req.body.amount = 0;
   }
 
-  // Ambil path file dari Multer jika ada file yang diupload
   const attachmentPath = req.file ? req.file.path : "";
 
-  await rpService.createLog({
+  await createLog({
     body: req.body,
     userId: req.session.user._id,
-    attachmentPath: attachmentPath, // Kirim berkas lampiran
+    attachmentPath: attachmentPath,
   });
 
   req.flash("success", "Data Reward/Punishment berhasil dicatat!");
@@ -74,18 +83,36 @@ export const store = asyncHandler(async (req, res) => {
   return res.redirect("/reward-punishment");
 });
 
-export const destroy = asyncHandler(async (req, res) => {
-  await rpService.deleteLogById(req.params.id);
+export const deleteRewardPunishmentLog = asyncHandler(async (req, res) => {
+  await deleteLogById(req.params.id);
   req.flash("success", "Catatan berhasil dihapus.");
   return res.redirect("/reward-punishment");
 });
 
+export const renderEmployeeRewardPunishmentLogPage = asyncHandler(async (req, res) => {
+  const employeeId = req.session.user.employeeId;
+
+  if (!employeeId) {
+    req.flash("error", "Data pegawai tidak ditemukan.");
+    return res.redirect("/");
+  }
+
+  const logs = await findEmployeeLogs(employeeId);
+
+  res.render("rewardPunishment/history", {
+    ...buildRenderData(req, {
+      title: "Reward & Punishment Saya",
+      logs,
+    }),
+  });
+});
+
 // =========================================================================
-// ─── MASTER TYPES METHOD (AS IS) ───
+// ─── MASTER TYPES METHOD ───
 // =========================================================================
 
-export const indexType = asyncHandler(async (req, res) => {
-  const types = await rpService.findMasterTypes();
+export const renderMasterTypeIndexPage = asyncHandler(async (req, res) => {
+  const types = await findMasterTypes();
 
   res.render("rewardPunishment/type/index", {
     ...buildRenderData(req, {
@@ -95,9 +122,9 @@ export const indexType = asyncHandler(async (req, res) => {
   });
 });
 
-export const storeType = asyncHandler(async (req, res) => {
+export const storeMasterType = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
-    const types = await rpService.findMasterTypes();
+    const types = await findMasterTypes();
     return res.status(400).render("rewardPunishment/type/index", {
       ...buildRenderData(req, {
         title: "Master Jenis Reward & Punishment",
@@ -111,7 +138,7 @@ export const storeType = asyncHandler(async (req, res) => {
 
   const { category, name, description, financialImpact } = req.body;
 
-  const isDuplicate = await rpService.checkDuplicateTypeName(name, category);
+  const isDuplicate = await checkDuplicateTypeName(name, category);
   if (isDuplicate) {
     return res.status(400).json({
       success: false,
@@ -119,7 +146,7 @@ export const storeType = asyncHandler(async (req, res) => {
     });
   }
 
-  await rpService.createType({ category, name, description, financialImpact });
+  await createType({ category, name, description, financialImpact });
 
   req.flash("success", "Jenis master berhasil ditambahkan!");
   return res.json({
@@ -128,11 +155,11 @@ export const storeType = asyncHandler(async (req, res) => {
   });
 });
 
-export const updateType = asyncHandler(async (req, res) => {
+export const updateMasterType = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { category, name, description, financialImpact } = req.body;
 
-  await rpService.updateTypeById(id, { category, name, description, financialImpact });
+  await updateTypeById(id, { category, name, description, financialImpact });
 
   req.flash("success", "Jenis master berhasil diperbarui!");
   return res.json({
@@ -141,11 +168,11 @@ export const updateType = asyncHandler(async (req, res) => {
   });
 });
 
-export const toggleStatusType = asyncHandler(async (req, res) => {
+export const toggleMasterTypeStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { isActive } = req.body;
 
-  await rpService.updateTypeStatus(id, isActive);
+  await updateTypeStatus(id, isActive);
 
   const statusText = isActive ? "diaktifkan" : "dinonaktifkan";
   req.flash("success", `Jenis master berhasil di-${statusText}!`);
@@ -153,23 +180,5 @@ export const toggleStatusType = asyncHandler(async (req, res) => {
   return res.json({
     success: true,
     message: `Jenis master berhasil di-${statusText}`,
-  });
-});
-
-export const myLog = asyncHandler(async (req, res) => {
-  const employeeId = req.session.user.employeeId;
-
-  if (!employeeId) {
-    req.flash("error", "Data pegawai tidak ditemukan.");
-    return res.redirect("/");
-  }
-
-  const logs = await rpService.findEmployeeLogs(employeeId);
-
-  res.render("rewardPunishment/my-log", {
-    ...buildRenderData(req, {
-      title: "Reward & Punishment Saya",
-      logs,
-    }),
   });
 });

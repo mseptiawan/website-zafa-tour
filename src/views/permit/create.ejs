@@ -12,7 +12,7 @@
   }
 %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50 py-5 md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+<div class="overflow-hidden">
   <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
     <%- include('../partials/page-header', { 
@@ -31,14 +31,15 @@
         </div>
         <% } %>
 
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Jenis Izin</label>
+        <!-- Row: Jenis Izin -->
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Jenis Izin</label>
           <div class="relative w-full" id="custom-dropdown">
             <input type="hidden" name="type" id="leave-type-value" value="<%= typeof oldData !== 'undefined' && oldData.type ? oldData.type : '' %>" required>
 
             <button type="button" onclick="toggleDropdown()" 
-                    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.type ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-0 transition-all">
-              <span id="dropdown-label" class="<%= typeof oldData !== 'undefined' && oldData.type ? 'text-slate-800' : 'text-slate-400/60 text-[12px]' %>">
+                    class="w-full bg-slate-50/50 border <%= typeof errors !== 'undefined' && errors.type ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/5' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/5' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 text-left flex items-center justify-between outline-none focus:bg-white focus:ring-4 transition-all">
+              <span id="dropdown-label" class="<%= typeof oldData !== 'undefined' && oldData.type ? 'text-slate-800 font-medium' : 'text-slate-400/70 text-[12px]' %>">
                 <%= typeof oldData !== 'undefined' && oldData.type ? 
                     (oldData.type === 'SAKIT' ? 'Izin Sakit' : 
                      oldData.type === 'PENDAMPINGAN_MELAHIRKAN' ? 'Izin Mendampingi Istri Melahirkan' : 
@@ -49,11 +50,11 @@
                     : 'Pilih jenis permohonan izin...' %>
               </span>
               <svg id="dropdown-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
-            <div id="dropdown-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-lg p-1.5 space-y-0.5">
+            <div id="dropdown-menu" class="hidden absolute z-30 w-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-0.5">
               <button type="button" onclick="selectOption('SAKIT', 'Izin Sakit')" class="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 rounded-lg flex items-center justify-between group transition-colors">
                 <span>Izin Sakit</span>
               </button>
@@ -79,26 +80,29 @@
           <% } %>
         </div>
 
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Tanggal Ketidakhadiran</label>
+        <!-- Row: Tanggal Ketidakhadiran -->
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Tanggal Ketidakhadiran</label>
           <input type="date" id="permitDate" name="date" value="<%= formattedDate %>" required 
-                 class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.date ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 outline-none focus:bg-white focus:ring-0 transition-all" />
+                 class="w-full bg-slate-50/50 border <%= typeof errors !== 'undefined' && errors.date ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/5' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/5' %> rounded-xl px-4 py-2.5 text-[13px] text-slate-800 font-medium outline-none focus:bg-white focus:ring-4 transition-all" />
           <p class="text-[10.5px] text-slate-400/80 font-medium pl-0.5">Sifatnya insidental, pilih hari ini saat halangan terjadi.</p>
           <% if (typeof errors !== 'undefined' && errors.date) { %>
             <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.date %></p>
           <% } %>
         </div>
 
-        <div class="space-y-2 mb-5">
-          <label class="text-[12px] font-semibold text-slate-700 tracking-wide">Alasan Pengajuan</label>
-          <textarea name="reason" rows="4"  placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." 
-                    class="w-full bg-slate-50/60 border <%= typeof errors !== 'undefined' && errors.reason ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200/70 focus:border-slate-400' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/60 focus:bg-white outline-none resize-none transition-all focus:ring-0 leading-relaxed text-slate-800"><%= typeof oldData !== 'undefined' && oldData.reason ? oldData.reason : '' %></textarea>
+        <!-- Row: Alasan Pengajuan -->
+        <div class="space-y-2">
+          <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Alasan Pengajuan</label>
+          <textarea name="reason" rows="4" placeholder="Berikan alasan detail atau keterangan permohonan izin Anda di sini..." 
+                    class="w-full bg-slate-50/50 border <%= typeof errors !== 'undefined' && errors.reason ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/5' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/5' %> rounded-xl px-4 py-2.5 text-[13px] placeholder:text-[11.5px] placeholder:text-slate-400/70 focus:bg-white outline-none resize-none transition-all focus:ring-4 leading-relaxed text-slate-800"><%= typeof oldData !== 'undefined' && oldData.reason ? oldData.reason : '' %></textarea>
           <% if (typeof errors !== 'undefined' && errors.reason) { %>
             <p class="text-[11px] font-medium text-rose-600 mt-1 pl-0.5"><%= errors.reason %></p>
           <% } %>
         </div>
 
-        <div class="space-y-2 mb-2">
+        <!-- Row: Dokumen Pendukung Dropzone -->
+        <div class="space-y-2">
           <label class="block text-[12px] font-semibold text-slate-700 tracking-wide">
             Dokumen Pendukung 
             <span id="required-mark" class="text-rose-500 hidden">*</span>
@@ -111,7 +115,7 @@
 
             <div id="dropzone-empty" class="w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center <%= hasDocument ? 'hidden' : '' %>">
               <svg class="w-4 h-4 text-slate-400 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
               </svg>
               <span class="text-[12px] font-medium text-slate-600">Pilih Berkas atau Drop File Disini</span>
               <span class="text-[11px] text-slate-400 mt-0.5">PDF, JPG, JPEG, atau PNG (Maks. 2MB)</span>
@@ -120,7 +124,7 @@
             <div id="dropzone-filled" class="<%= hasDocument ? '' : 'hidden' %> flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200 rounded-xl p-3.5 bg-white shadow-xs">
               <div class="flex items-center gap-3 min-w-0 flex-1">
                 <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
@@ -144,11 +148,12 @@
           <% } %>
         </div>
 
-        <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
-          <a href="/permit/history" class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
+        <!-- ACTION BUTTONS FOOTER -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+          <a href="/permit/history" class="px-5 py-2.5 rounded-xl text-[12px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all select-none">
             Batal
           </a>
-          <button type="submit" class="w-auto text-center bg-blue-600 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors">
+          <button type="submit" class="w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs">
             <%= typeof mode !== 'undefined' && mode === 'EDIT' ? 'Simpan Perubahan' : 'Ajukan Izin' %>
           </button>
         </div>
@@ -158,6 +163,7 @@
   </div>
 </div>
 
+<!-- SCRIPTS HANDLERS -->
 <script>
   function toggleDropdown() {
     const menu = document.getElementById('dropdown-menu');
@@ -170,7 +176,7 @@
     const labelEl = document.getElementById('dropdown-label');
     labelEl.textContent = label;
     labelEl.classList.remove('text-slate-400/60', 'text-[12px]');
-    labelEl.classList.add('text-slate-800');
+    labelEl.classList.add('text-slate-800', 'font-medium');
     
     const fileUpload = document.getElementById('file-upload');
     const requiredMark = document.getElementById('required-mark');

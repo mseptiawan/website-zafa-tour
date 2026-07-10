@@ -10,7 +10,7 @@ import {
 } from "../services/overtime.service.js";
 import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 
-export const create = asyncHandler(async (req, res) => {
+export const renderCreateOvertimeForm = asyncHandler(async (req, res) => {
   const today = new Date();
   const backLimit = new Date();
   backLimit.setDate(today.getDate() - 7);
@@ -19,7 +19,7 @@ export const create = asyncHandler(async (req, res) => {
 
   const formatDate = (d) => d.toISOString().split("T")[0];
 
-  res.render("overtime/new", {
+  res.render("overtime/create", {
     ...buildRenderData(req, {
       title: "Catat Lembur",
       dateLimit: { min: formatDate(minAllowed), max: formatDate(today) },
@@ -27,7 +27,7 @@ export const create = asyncHandler(async (req, res) => {
   });
 });
 
-export const store = asyncHandler(async (req, res) => {
+export const storeOvertime = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
     const today = new Date();
     const backLimit = new Date();
@@ -51,7 +51,7 @@ export const store = asyncHandler(async (req, res) => {
   return res.redirect("/overtime/my");
 });
 
-export const my = asyncHandler(async (req, res) => {
+export const getMyOvertime = asyncHandler(async (req, res) => {
   const { page, limit } = req.query;
   const { data: overtimes, meta } = await findMineOvertime({
     userId: req.session.user._id,
@@ -59,7 +59,7 @@ export const my = asyncHandler(async (req, res) => {
     limit,
   });
 
-  res.render("overtime/my-overtime", {
+  res.render("overtime/history", {
     ...buildRenderData(req, {
       title: "Riwayat Lembur",
       overtimes,
@@ -76,7 +76,7 @@ export const approvalOvertimePage = asyncHandler(async (req, res) => {
     query: req.query,
   });
 
-  res.render("overtime/approval", {
+  res.render("overtime/approvals", {
     ...buildRenderData(req, {
       title: "Pusat Approval Lembur",
       activeOvertimes: active.data,

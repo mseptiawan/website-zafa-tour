@@ -1,24 +1,24 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData } from "../utils/renderHelper.js";
 import {
-  findActiveCategories,
-  createClaim,
-  findMyClaims,
-  findManagerApprovals,
-  rejectByManager,
-  processApproval,
-  findFinanceClaims,
-  processPayment,
-  findClaimById,
+  findActiveCategoriesService,
+  createExpenseService,
+  findMyExpenseService,
+  findManagerApprovalsService,
+  rejectByManagerService,
+  processApprovalService,
+  findFinanceExpenseService,
+  processPaymentService,
+  findExpenseByIdService,
 } from "../services/expense.service.js";
 
 // ─── METHOD 1: FORM CREATE VIEW ───────────────────
-export const create = asyncHandler(async (req, res) => {
-  const categories = await findActiveCategories();
+export const renderCreateExpenseForm = asyncHandler(async (req, res) => {
+  const categories = await findActiveCategoriesService();
 
   res.render("expense/create", {
     ...buildRenderData(req, {
-      title: "Ajukan Klaim Beban",
+      title: "Ajukan Reimbursement",
       categories,
       errors: {},
       old: {},
@@ -27,13 +27,13 @@ export const create = asyncHandler(async (req, res) => {
 });
 
 // ─── METHOD 2: STORE DATA CLAIM ───────────────────
-export const store = asyncHandler(async (req, res) => {
-  const categories = await findActiveCategories();
+export const storeExpense = asyncHandler(async (req, res) => {
+  const categories = await findActiveCategoriesService();
 
   if (req.validationErrors) {
     return res.status(400).render("expense/create", {
       ...buildRenderData(req, {
-        title: "Ajukan Klaim Beban",
+        title: "Ajukan Reimbursement",
         categories,
         errors: req.validationErrors,
         old: req.body,
@@ -42,21 +42,21 @@ export const store = asyncHandler(async (req, res) => {
   }
 
   try {
-    await createClaim({
+    await createExpenseService({
       body: req.body,
       file: req.file,
       currentUser: req.session.user,
     });
 
-    req.flash("success", "Klaim operasional beban berhasil diajukan!");
+    req.flash("success", "Reimbursement berhasil diajukan!");
 
     await new Promise((resolve) => req.session.save(resolve));
-    return res.redirect("/expense/my");
+    return res.redirect("/expense/me");
   } catch (error) {
     if (error.statusCode === 400 && error.field) {
       return res.status(400).render("expense/create", {
         ...buildRenderData(req, {
-          title: "Ajukan Klaim Beban",
+          title: "Ajukan Reimbursement",
           categories,
           errors: { [error.field]: error.message },
           old: req.body,
@@ -68,15 +68,15 @@ export const store = asyncHandler(async (req, res) => {
 });
 
 // ─── METHOD 3: PERSONAL HISTORY VIEW ──────────────
-export const my = asyncHandler(async (req, res) => {
+export const getMyExpenses = asyncHandler(async (req, res) => {
   const { page } = req.query;
   const userId = req.session.user._id;
 
-  const { data: expenses, meta: pagination } = await findMyClaims({ userId, page });
+  const { data: expenses, meta: pagination } = await findMyExpenseService({ userId, page });
 
-  res.render("expense/my", {
+  res.render("expense/history", {
     ...buildRenderData(req, {
-      title: "Riwayat Klaim Beban",
+      title: "Riwayat Reimbursement",
       expenses,
       pagination,
     }),
@@ -84,15 +84,19 @@ export const my = asyncHandler(async (req, res) => {
 });
 
 // ─── METHOD 4: MANAGER ANTREAN VIEW ───────────────
-export const approvalPage = asyncHandler(async (req, res) => {
+export const getExpenseApprovalPage = asyncHandler(async (req, res) => {
   const { page } = req.query;
   const { roleId, _id: userId } = req.session.user;
 
-  const { data: expenses, meta: pagination } = await findManagerApprovals({ roleId, userId, page });
+  const { data: expenses, meta: pagination } = await findManagerApprovalsService({
+    roleId,
+    userId,
+    page,
+  });
 
-  res.render("expense/approval", {
+  res.render("expense/approvals", {
     ...buildRenderData(req, {
-      title: "Approval Klaim Operasional",
+      title: "Persetujuan Reimbursement",
       expenses,
       pagination,
     }),
@@ -100,13 +104,13 @@ export const approvalPage = asyncHandler(async (req, res) => {
 });
 
 // ─── METHOD 5: ACTION APPROVE (KONDISIONAL MANAGER / FINANCE) ───
-export const approveClaim = asyncHandler(async (req, res) => {
+export const approveExpense = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { note } = req.body;
   const currentUser = req.session.user;
 
   try {
-    const expense = await findClaimById(id, currentUser);
+    const expense = await findExpenseByIdService(id, currentUser);
 
     const userRole = currentUser.role?.toUpperCase();
 
@@ -117,7 +121,7 @@ export const approveClaim = asyncHandler(async (req, res) => {
       }
     }
 
-    const { nextStatus } = await processApproval({
+    const { nextStatus } = await processApprovalService({
       id,
       userId: currentUser._id,
       role: currentUser.role,
@@ -129,7 +133,7 @@ export const approveClaim = asyncHandler(async (req, res) => {
     req.flash(
       "success",
       nextStatus === "PAID"
-        ? "Klaim berhasil dicairkan dan ditandai Lunas!"
+        ? "Reimbursement berhasil dicairkan dan ditandai Lunas!"
         : "Berkas berhasil disetujui dan diteruskan ke Bagian Keuangan."
     );
 
@@ -143,7 +147,7 @@ export const approveClaim = asyncHandler(async (req, res) => {
     throw error;
   }
 });
-export const rejectClaim = asyncHandler(async (req, res) => {
+export const rejectExpense = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { note } = req.body;
   const currentUser = req.session.user;
@@ -160,24 +164,24 @@ export const rejectClaim = asyncHandler(async (req, res) => {
       note,
     });
   } else {
-    await rejectByManager({ id, userId: currentUser._id, role: "MANAGER", note });
+    await rejectByManagerService({ id, userId: currentUser._id, role: "MANAGER", note });
   }
 
-  req.flash("error", "Permohonan klaim beban telah ditolak.");
+  req.flash("error", "Permohonan reimbursement telah ditolak.");
   await new Promise((resolve) => req.session.save(resolve));
 
   res.redirect(roleType === "FINANCE" ? "/expense/finance" : "/expense/approval/manager");
 });
 
 // ─── METHOD 7: FINANCE ANTREAN VIEW ───────────────
-export const financePage = asyncHandler(async (req, res) => {
+export const getExpenseFinancePage = asyncHandler(async (req, res) => {
   const { page } = req.query;
 
-  const { data: expenses, meta: pagination } = await findFinanceClaims({ page });
+  const { data: expenses, meta: pagination } = await findFinanceExpenseService({ page });
 
   res.render("expense/finance", {
     ...buildRenderData(req, {
-      title: "Manajemen Keuangan Klaim",
+      title: "Persetujuan Reimbursement",
       expenses,
       pagination,
     }),
@@ -185,30 +189,30 @@ export const financePage = asyncHandler(async (req, res) => {
 });
 
 // ─── METHOD 8: FINANCE ACTION DISBURSE (KLIK TOMBOL BAYAR LANGSUNG) ───
-export const payClaim = asyncHandler(async (req, res) => {
-  await processPayment({
+export const payExpense = asyncHandler(async (req, res) => {
+  await processPaymentService({
     id: req.params.id,
     userId: req.session.user._id,
     file: req.file,
     note: "Dana dicairkan oleh Finance",
   });
 
-  req.flash("success", "Klaim beban berhasil dicairkan dan ditandai Lunas.");
+  req.flash("success", "Reimbursement berhasil dicairkan dan ditandai Lunas.");
   await new Promise((resolve) => req.session.save(resolve));
 
   res.redirect("/expense/finance");
 });
 
 // ─── METHOD 9: SHOW DETAIL CLAIM ──────────────────
-export const show = asyncHandler(async (req, res) => {
+export const showExpense = asyncHandler(async (req, res) => {
   const expenseId = req.params.id;
   const currentUser = req.session.user;
 
-  const expense = await findClaimById(expenseId, currentUser);
+  const expense = await findExpenseByIdService(expenseId, currentUser);
 
   res.render("expense/detail", {
     ...buildRenderData(req, {
-      title: `Detail Klaim - ${expense.title}`,
+      title: `Detail Reimbursement - ${expense.title}`,
       expense,
     }),
   });

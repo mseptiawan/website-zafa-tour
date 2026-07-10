@@ -22,7 +22,7 @@
   const config = getStatusConfig(expense.status);
 %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  sm:p-6 md:p-10 antialiased pb-24 md:pb-8">
+<div >
   <div class="w-full max-w-none mx-auto space-y-6">
 
   
@@ -57,7 +57,7 @@
 
           <div class="grid grid-cols-2 gap-y-6 gap-x-4 text-xs">
             <div>
-              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Total Klaim</p>
+              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Total Reimbursement</p>
               <p class="text-[16px] font-semibold text-slate-900 tabular-nums mt-1">Rp <%= expense.amount.toLocaleString('id-ID') %></p>
             </div>
             <div>
@@ -219,7 +219,7 @@
         <% if (expense.canApprove) { %>
         <div class="bg-white border border-slate-200/60 rounded-2xl p-6 space-y-4">
           <div>
-            <h3 class="text-[12px] font-bold text-slate-800 tracking-tight uppercase">Evaluasi Pengajuan Klaim</h3>
+            <h3 class="text-[12px] font-bold text-slate-800 tracking-tight uppercase">Evaluasi Pengajuan Reimbursement</h3>
            
           </div>
 

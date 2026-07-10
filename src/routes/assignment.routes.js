@@ -5,13 +5,12 @@ import { uploadFile } from "../middlewares/uploadFile.js";
 import { validate } from "../middlewares/validate.v2.js";
 import { createAssignmentSchema } from "../validations/assignment.schema.js";
 
-
-import { 
-  getAllAssignments, 
-  renderCreateForm, 
-  createAssignment, 
-  getMyAssignments, 
-  getAssignmentById 
+import {
+  getAllAssignments,
+  renderCreateAssignmentForm,
+  storeAssignment,
+  getMyAssignments,
+  getAssignmentById,
 } from "../controllers/assignment.controller.js";
 
 const router = express.Router();
@@ -28,16 +27,16 @@ const ALLOWED_MANAGEMENT_ROLES = [
 
 router.get("/", roleMiddleware(...ALLOWED_MANAGEMENT_ROLES), getAllAssignments);
 
-router.get("/new", roleMiddleware(...ALLOWED_MANAGEMENT_ROLES), renderCreateForm);
+router.get("/new", roleMiddleware(...ALLOWED_MANAGEMENT_ROLES), renderCreateAssignmentForm);
 
-router.get("/me", getMyAssignments); 
+router.get("/me", getMyAssignments);
 
 router.post(
   "/",
   roleMiddleware(...ALLOWED_MANAGEMENT_ROLES),
   uploadFile.single("attachment"),
   validate(createAssignmentSchema),
-  createAssignment
+  storeAssignment
 );
 
 router.get("/:id", getAssignmentById);

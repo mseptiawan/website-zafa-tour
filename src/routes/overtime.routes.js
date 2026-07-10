@@ -5,9 +5,9 @@ import { uploadFile } from "../middlewares/uploadFile.js";
 import { validate } from "../middlewares/validate.js";
 import { createOvertimeSchema } from "../validations/overtime.schema.js";
 import {
-  create,
-  store,
-  my,
+  renderCreateOvertimeForm,
+  storeOvertime,
+  getMyOvertime,
   getPayrollOvertimeSummary,
   approvalOvertimePage,
   approveManagerOvertime,
@@ -29,9 +29,9 @@ const APPROVAL_ROLES = [
 router.use(authMiddleware);
 
 // Rute khusus Karyawan (Pengajuan & Riwayat Mandiri)
-router.get("/new", create);
-router.post("/", uploadFile.single("proofFile"), validate(createOvertimeSchema), store);
-router.get("/my", my);
+router.get("/new", renderCreateOvertimeForm);
+router.post("/", uploadFile.single("proofFile"), validate(createOvertimeSchema), storeOvertime);
+router.get("/my", getMyOvertime);
 
 // Rute Manajemen & Persetujuan (Approval)
 router.get("/approval", roleMiddleware(...APPROVAL_ROLES), approvalOvertimePage);

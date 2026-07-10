@@ -22,7 +22,7 @@
   };
 %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  sm:p-6 md:p-10 antialiased pb-24 md:pb-8 selection:bg-blue-50 selection:text-blue-600">
+<div>
   <div class="w-full max-w-none mx-auto space-y-5 md:space-y-8">
 
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border border-slate-200/60 p-4 rounded-2xl bg-white md:bg-transparent md:border-none md:p-0">
@@ -36,12 +36,12 @@
       </div>
 
       <div class="flex shrink-0 items-center w-full lg:w-auto hidden md:block">
-        <form id="form-sync-saldo" action="/leave/manage-requests/generate-balances" method="POST" onsubmit="triggerSyncLeaveModal(event)" class="flex items-center justify-between sm:justify-start gap-4 bg-slate-50 border border-slate-200/60 md:bg-white p-2.5 pl-4 rounded-2xl shadow-2xs w-full max-w-none lg:max-w-sm">
+        <form id="form-sync-saldo" action="/leave/manage-requests/generate-balances" method="POST" onsubmit="triggerSyncLeaveModal(event)" class="flex items-center justify-between sm:justify-start gap-4 bg-slate-50 border border-slate-200/60 md:bg-white p-2.5 pl-4 rounded-2xl w-full max-w-none lg:max-w-sm">
           <input type="hidden" name="year" value="<%= selectedYear %>">
           <div class="text-[11px] text-slate-500 leading-tight hidden sm:block font-medium whitespace-nowrap">
             Reset & sesuaikan jatah (12 hari) <br /> untuk tahun <%= selectedYear %>
           </div>
-          <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-[12px] h-9 px-4 rounded-xl shadow-xs transition-all active:scale-[0.98] flex items-center gap-2 whitespace-nowrap cursor-pointer w-full sm:w-auto justify-center">
+          <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-[12px] h-9 px-4 rounded-xl  transition-all active:scale-[0.98] flex items-center gap-2 whitespace-nowrap cursor-pointer w-full sm:w-auto justify-center">
             <i class="fa-solid fa-rotate text-[10px] text-slate-300"></i> Sync Saldo <%= selectedYear %>
           </button>
         </form>
@@ -55,7 +55,7 @@
           { 
             label: 'Menunggu Review', 
             value: activeLeaves.filter(l => l.status !== 'CANCELLATION_PENDING').length, 
-            unit: ' Permohonan', 
+            unit: ' Berkas', 
             icon: 'fa-solid fa-hourglass-half', 
             labelClass: '!font-medium text-blue-600', 
             valueClass: '!font-medium text-blue-800', 
@@ -63,7 +63,7 @@
             wrapperClass: 'hover:border-blue-500/40 transition duration-200'
           },
           { 
-            label: 'Klaim Pembatalan', 
+            label: 'Pembatalan', 
             value: activeLeaves.filter(l => l.status === 'CANCELLATION_PENDING').length, 
             unit: ' Berkas', 
             icon: 'fa-solid fa-ban', 
@@ -113,10 +113,8 @@
 
     <div id="tab-content-active" class="tab-pane block opacity-100 transition-all duration-300 transform translate-y-0 space-y-4">
       
-      <div class="hidden md:block bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50 shadow-2xs">
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <h3 class="text-xs font-bold text-slate-800 tracking-wide uppercase">Menunggu Review Anda</h3>
-        </div>
+      <div class="hidden md:block bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50 ">
+       
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-[13px]">
             <thead>
@@ -167,7 +165,7 @@
                     <td class="py-4 px-6 text-center font-bold text-blue-600 tabular-nums"><%= leave.totalDays %> Hari</td>
                     <td class="py-4 px-6">
                       <div class="flex items-center justify-center">
-                        <a href="/leave/detail/<%= leave._id %>" title="Periksa Berkas" class="inline-flex h-8 px-3.5 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-600 shadow-2xs transition-all group-hover:border-blue-500 group-hover:text-blue-600 active:scale-[0.97]">
+                        <a href="/leave/detail/<%= leave._id %>" title="Periksa Berkas" class="inline-flex h-8 px-3.5 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-600  transition-all group-hover:border-blue-500 group-hover:text-blue-600 active:scale-[0.97]">
                           <span><%= leave.status === 'CANCELLATION_PENDING' ? 'Periksa Pembatalan' : 'Periksa Cuti' %></span>
                           <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 group-hover:text-blue-500"></i>
                         </a>
@@ -188,7 +186,7 @@
           </div>
         <% } else { %>
           <% activeLeaves.forEach(leave => { %>
-            <div class="bg-white border border-slate-200/60 rounded-2xl p-4 space-y-3.5 shadow-2xs">
+            <div class="bg-white border border-slate-200/60 rounded-2xl p-4 space-y-3.5 ">
               <div class="flex items-center justify-between gap-2">
                 <div>
                   <h4 class="text-[13px] font-semibold text-slate-800 tracking-tight">
@@ -238,10 +236,8 @@
 
     <div id="tab-content-history" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2 space-y-4">
       
-      <div class="hidden md:block bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50 shadow-2xs">
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <h3 class="text-xs font-bold text-slate-800 tracking-wide uppercase">Arsip Pengajuan Selesai</h3>
-        </div>
+      <div class="hidden md:block bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50 ">
+        
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-[13px]">
             <thead>
@@ -292,11 +288,11 @@
                     <td class="py-4 px-6 text-center font-semibold text-slate-700 tabular-nums"><%= leave.totalDays %> Hari</td>
                     <td class="py-4 px-6 text-center whitespace-nowrap">
                       <% if (leave.status === 'APPROVED' || leave.status === 'PENDING' || leave.status === 'CANCELLATION_PENDING' || leave.status === 'CANCELLED') { %>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 shadow-2xs">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 ">
                           <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Disetujui
                         </span>
                       <% } else { %>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/60 shadow-2xs">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/60 ">
                           <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Ditolak
                         </span>
                       <% } %>
@@ -316,7 +312,7 @@
           </div>
         <% } else { %>
           <% historyLeaves.forEach(leave => { %>
-            <div class="bg-white border border-slate-200/60 rounded-2xl p-4 space-y-3.5 shadow-2xs">
+            <div class="bg-white border border-slate-200/60 rounded-2xl p-4 space-y-3.5 ">
               <div class="flex items-center justify-between gap-2">
                 <div>
                   <h4 class="text-[13px] font-semibold text-slate-800 tracking-tight">
@@ -328,11 +324,11 @@
                   </p>
                 </div>
                 <% if (leave.status === 'APPROVED' || leave.status === 'PENDING' || leave.status === 'CANCELLATION_PENDING' || leave.status === 'CANCELLED') { %>
-                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 shadow-2xs shrink-0">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60  shrink-0">
                     Disetujui
                   </span>
                 <% } else { %>
-                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200/60 shadow-2xs shrink-0">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200/60  shrink-0">
                     Ditolak
                   </span>
                 <% } %>
@@ -368,7 +364,7 @@
     <div id="tab-content-calendar" class="tab-pane hidden opacity-0 transition-all duration-300 transform translate-y-2">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 ">
           <h3 id="form-calendar-title" class="text-xs font-bold text-slate-800 tracking-wide uppercase mb-4 flex items-center gap-2">
             <i class="fa-solid fa-calendar-plus text-blue-600"></i> Tambah Hari Libur
           </h3>
@@ -419,7 +415,7 @@
             </div>
 
             <div class="flex flex-col gap-2 pt-1">
-              <button type="submit" id="form-submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-xs transition duration-150 flex items-center justify-center gap-1.5" <%= user.role !== 'WAKIL_DIREKTUR' ? 'disabled' : 'style=cursor:pointer' %>>
+              <button type="submit" id="form-submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs  transition duration-150 flex items-center justify-center gap-1.5" <%= user.role !== 'WAKIL_DIREKTUR' ? 'disabled' : 'style=cursor:pointer' %>>
                 <i class="fa-solid fa-floppy-disk"></i> Simpan Agenda
               </button>
               <button type="button" id="form-cancel-btn" onclick="resetFormToCreate()" class="w-full hidden bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition duration-150 text-center cursor-pointer">
@@ -429,12 +425,12 @@
           </form>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs lg:col-span-2">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200  lg:col-span-2">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h3 class="text-xs font-bold text-slate-800 tracking-wide uppercase">Agenda Terdaftar Tahun <%= selectedYear %></h3>
             <form method="GET" action="/leave/manage-requests">
               <input type="hidden" name="tab" value="calendar">
-              <select name="year" onchange="this.form.submit()" class="border border-slate-200 rounded-xl py-1.5 px-3 text-xs font-bold text-slate-700 bg-white focus:outline-none cursor-pointer shadow-2xs w-full sm:w-auto">
+              <select name="year" onchange="this.form.submit()" class="border border-slate-200 rounded-xl py-1.5 px-3 text-xs font-bold text-slate-700 bg-white focus:outline-none cursor-pointer  w-full sm:w-auto">
                 <% const yr = new Date().getFullYear(); %>
                 <option value="<%= yr %>" <%= selectedYear === yr ? 'selected' : '' %>><%= yr %></option>
                 <option value="<%= yr + 1 %>" <%= selectedYear === (yr + 1) ? 'selected' : '' %>><%= yr + 1 %></option>
@@ -444,7 +440,7 @@
 
           <% if (holidays.length !== 0) { %>
             <div class="flex flex-wrap gap-1 mb-4 bg-slate-100/80 p-1 rounded-xl w-fit">
-              <button type="button" onclick="filterQuarter('ALL')" class="q-btn px-3 py-1.5 text-[11px] font-bold rounded-lg bg-white text-blue-600 shadow-2xs transition-all duration-150 cursor-pointer">Semua</button>
+              <button type="button" onclick="filterQuarter('ALL')" class="q-btn px-3 py-1.5 text-[11px] font-bold rounded-lg bg-white text-blue-600  transition-all duration-150 cursor-pointer">Semua</button>
               <button type="button" onclick="filterQuarter('Q1')" class="q-btn px-3 py-1.5 text-[11px] font-medium rounded-lg text-slate-600 hover:text-slate-800 transition-all duration-150 cursor-pointer">Q1 (Jan-Mar)</button>
               <button type="button" onclick="filterQuarter('Q2')" class="q-btn px-3 py-1.5 text-[11px] font-medium rounded-lg text-slate-600 hover:text-slate-800 transition-all duration-150 cursor-pointer">Q2 (Apr-Jun)</button>
               <button type="button" onclick="filterQuarter('Q3')" class="q-btn px-3 py-1.5 text-[11px] font-medium rounded-lg text-slate-600 hover:text-slate-800 transition-all duration-150 cursor-pointer">Q3 (Jul-Sep)</button>
@@ -458,7 +454,7 @@
             <% } else { %>
               <% holidays.forEach(h => { %>
                 <% const hMonth = new Date(h.date).getMonth(); %>
-                <div class="holiday-card flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/40 transition duration-150 <%= !h.isActive ? 'opacity-50 bg-slate-200/30' : 'hover:border-slate-200/80 hover:bg-white hover:shadow-2xs' %>" data-month="<%= hMonth %>">
+                <div class="holiday-card flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/40 transition duration-150 <%= !h.isActive ? 'opacity-50 bg-slate-200/30' : 'hover:border-slate-200/80 hover:bg-white hover:' %>" data-month="<%= hMonth %>">
                   <div class="flex items-center gap-4">
                     <div class="p-2.5 rounded-xl text-center font-bold text-xs min-w-[56px] tabular-nums border <%= !h.isActive ? 'bg-slate-200 text-slate-500 border-slate-300' : h.isDeductLeave ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-blue-50 text-blue-700 border-blue-100' %>">
                       <span class="block text-sm font-black leading-tight"><%= new Date(h.date).toLocaleDateString('id-ID', { day: '2-digit' }) %></span>
@@ -517,43 +513,7 @@
 </div>
 
 <script>
-  function switchTab(tabName) {
-    // Sembunyikan semua pane konten dengan transisi smooth
-    document.querySelectorAll('.tab-pane').forEach(pane => {
-      pane.classList.add('hidden');
-      pane.classList.remove('block', 'opacity-100', 'translate-y-0');
-    });
-
-    // Tampilkan pane konten aktif
-    const targetPane = document.getElementById(`tab-content-${tabName}`);
-    if (targetPane) {
-      targetPane.classList.remove('hidden');
-      targetPane.classList.add('block');
-      setTimeout(() => {
-        targetPane.classList.add('opacity-100', 'translate-y-0');
-      }, 10);
-    }
-
-    // Setel ulang class style semua button tab ke state non-aktif
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.className = "tab-btn px-5 py-2.5 text-xs font-medium rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-200 outline-none cursor-pointer flex items-center gap-2";
-      
-      const badge = btn.querySelector('span:not(.tab-text-label)');
-      if(badge) {
-        badge.className = "px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-md tabular-nums font-bold";
-      }
-    });
-
-    // Berikan gaya aktif mutlak untuk button yang diklik
-    const targetBtn = document.getElementById(`tab-btn-${tabName}`);
-    if (targetBtn) {
-      targetBtn.className = "tab-btn px-5 py-2.5 text-xs font-bold rounded-xl bg-blue-600 text-white shadow-xs transition-all duration-200 outline-none cursor-pointer flex items-center gap-2";
-      const activeBadge = targetBtn.querySelector('span:not(.tab-text-label)') || targetBtn.querySelectorAll('span')[1];
-      if(activeBadge) {
-        activeBadge.className = "px-1.5 py-0.5 text-[10px] bg-white/20 text-white rounded-md tabular-nums font-bold";
-      }
-    }
-  }
+ 
 
   // ==========================================
   // LOGIC SINKRONISASI KATEGORI & POTONG CUTI
@@ -681,7 +641,7 @@
       btn.className = "q-btn px-3 py-1.5 text-[11px] font-medium rounded-lg text-slate-600 hover:text-slate-800 transition-all duration-150 cursor-pointer";
     });
     if (targetButton) {
-      targetButton.className = "q-btn px-3 py-1.5 text-[11px] font-bold rounded-lg bg-white text-blue-600 shadow-2xs transition-all duration-150 cursor-pointer";
+      targetButton.className = "q-btn px-3 py-1.5 text-[11px] font-bold rounded-lg bg-white text-blue-600  transition-all duration-150 cursor-pointer";
     }
 
     document.querySelectorAll('.holiday-card').forEach(card => {

@@ -1,11 +1,11 @@
 <%- layout('layouts/main', { title: 'Pusat Approval Lembur' }) %>
 
-<div class=" min-h-screen md:ml-72 bg-slate-50/50  antialiased selection:bg-blue-50 selection:text-blue-600">
+<div>
   <div class="w-full max-w- mx-auto space-y-8">
 
     <%- include('../partials/page-header', {
       section: 'Kepegawaian',
-      module: 'Manajemen Waktu',
+      module: 'Manajemen Lembur',
       title: 'Pusat Approval Lembur',
       description: 'Sistem pengawasan, persetujuan, dan pencatatan riwayat lembur pegawai.'
     }) %>
@@ -28,24 +28,24 @@
           bgClass: 'bg-white border-slate-200/60', 
           iconBoxClass: 'bg-blue-50 text-blue-600 border-blue-100' 
         },
-        { 
-          label: 'Total Pengajuan', 
-          value: (activeOvertimes.length + historyOvertimes.length), 
-          unit: 'Keseluruhan', 
-          icon: 'fa-solid fa-chart-pie', 
-          bgClass: 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-800', 
-          labelClass: 'text-slate-300', 
-          valueClass: 'text-white', 
-          unitClass: 'text-slate-400',
-          iconBoxClass: 'bg-white/10 text-white border-transparent' 
-        }
+       { 
+  label: 'Total Pengajuan', 
+  value: (activeOvertimes.length + historyOvertimes.length), 
+  unit: 'Keseluruhan', 
+  icon: 'fa-solid fa-chart-pie', 
+  bgClass: 'bg-white border-slate-200/80', 
+  labelClass: 'text-slate-400 font-semibold', 
+  valueClass: 'text-slate-800 font-bold', 
+  unitClass: 'text-slate-500 font-medium', 
+  iconBoxClass: 'bg-slate-50 text-slate-500 border-slate-100' 
+}
       ]
     }) %>
 
     <%- include('../partials/_tab-nav', {
       tabs: [
         { id: 'active', label: `Permintaan Aktif (${activeOvertimes.length})` },
-        { id: 'history', label: `Riwayat Approval (${historyOvertimes.length})` }
+        { id: 'history', label: `Riwayat Permohonan (${historyOvertimes.length})` }
       ]
     }) %>
 

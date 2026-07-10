@@ -1,13 +1,13 @@
 <%- layout('layouts/main', { title }) %>
 
-<div class="min-h-screen md:ml-72 bg-slate-50/50 sm:p-8 antialiased">
+<div>
   <div class="max-w-none mx-auto space-y-6 sm:space-y-8">
 
     <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
-        module: 'Manajemen Klaim', 
-        title: 'Approval Klaim Operasional', 
-        description: 'Evaluasi substansi pengajuan klaim (reimbursement) pegawai sebelum diteruskan ke bagian keuangan.' 
+        module: 'Manajemen Reimbursement', 
+        title: 'Persetujuan Reimbursement', 
+        description: 'Tinjau pengajuan reimbursement pegawai sebelum diteruskan ke bagian keuangan.' 
     }) %>
 
     <% 
@@ -37,8 +37,8 @@
 
     <%- include('../partials/_tab-nav', {
       tabs: [
-        { id: 'active', label: `Antrean Verifikasi (${activeExpenses.length})` },
-        { id: 'history', label: `Riwayat Review (${historyExpenses.length})` }
+        { id: 'active', label: `Permintaan Aktif (${activeExpenses.length})` },
+        { id: 'history', label: `Riwayat (${historyExpenses.length})` }
       ]
     }) %>
 
@@ -52,7 +52,7 @@
                 <th class="px-6 py-4 w-48">Tgl Pengajuan</th>
                 <th class="px-6 py-4">Nama Pegawai</th>
                 <th class="px-6 py-4">Kategori</th>
-                <th class="px-6 py-4 text-right">Nominal Klaim</th>
+                <th class="px-6 py-4 text-right">Nominal</th>
                 <th class="px-6 py-4 text-center">Aksi</th>
               </tr>
             </thead>
@@ -135,7 +135,7 @@
                 <th class="px-6 py-4 w-48">Tgl Pengajuan</th>
                 <th class="px-6 py-4">Nama Pegawai</th>
                 <th class="px-6 py-4">Kategori</th>
-                <th class="px-6 py-4 text-right">Nominal Klaim</th>
+                <th class="px-6 py-4 text-right">Nominal</th>
                 <th class="px-6 py-4 text-center">Status Akhir</th>
                 <th class="px-6 py-4 text-center">Aksi</th>
               </tr>
@@ -143,7 +143,7 @@
             <tbody class="divide-y divide-slate-100 text-slate-600 font-medium bg-white">
               <% if (historyExpenses.length === 0) { %>
               <tr>
-                <td colspan="6" class="px-6 py-12 text-center text-slate-400">Belum ada jejak rekam riwayat pemeriksaan klaim dari Anda.</td>
+                <td colspan="6" class="px-6 py-12 text-center text-slate-400">Belum ada jejak rekam riwayat pemeriksaan reimbursement dari Anda.</td>
               </tr>
               <% } else { %>
               <% historyExpenses.forEach(e => { %>
@@ -193,7 +193,7 @@
       <div class="lg:hidden space-y-4">
         <% if (historyExpenses.length === 0) { %>
         <div class="p-8 text-center text-slate-400 text-xs bg-white border border-dashed border-slate-200 rounded-2xl">
-          Belum ada jejak rekam riwayat pemeriksaan klaim dari Anda.
+          Belum ada jejak rekam riwayat pemeriksaan reimbursement dari Anda.
         </div>
         <% } else { %>
         <% historyExpenses.forEach(e => { %>
