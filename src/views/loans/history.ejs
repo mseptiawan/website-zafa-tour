@@ -33,7 +33,7 @@
     </div>
 
     <div class="w-full">
-      <%- include('../partials/_stats-grid', {
+   <%- include('../partials/_stats-grid', {
         gridClass: 'grid-cols-2 lg:grid-cols-4', 
         items: [
           { 
@@ -41,8 +41,8 @@
             value: 'Rp ' + summary.maxLoan.toLocaleString('id-ID'), 
             unit: '', 
             icon: 'fa-solid fa-chart-pie', 
-            labelClass: '!font-medium text-slate-400', 
-            valueClass: '!font-medium text-slate-800', 
+            labelClass: '!text-[11px] !font-medium text-slate-400 uppercase tracking-wider', 
+            valueClass: '!text-base !font-semibold text-slate-800 tracking-tight', 
             iconBoxClass: 'bg-slate-50 text-slate-400 border border-slate-200/50' 
           },
           { 
@@ -50,8 +50,8 @@
             value: 'Rp ' + summary.activeLoan.toLocaleString('id-ID'), 
             unit: '', 
             icon: 'fa-solid fa-hand-holding-dollar', 
-            labelClass: '!font-medium text-slate-400', 
-            valueClass: '!font-medium text-slate-800', 
+            labelClass: '!text-[11px] !font-medium text-slate-400 uppercase tracking-wider', 
+            valueClass: '!text-base !font-semibold text-slate-800 tracking-tight', 
             iconBoxClass: 'bg-slate-50 text-slate-400 border border-slate-200/50' 
           },
           { 
@@ -59,8 +59,8 @@
             value: 'Rp ' + summary.installmentThisMonth.toLocaleString('id-ID'), 
             unit: '', 
             icon: 'fa-solid fa-calendar-minus', 
-            labelClass: '!font-medium text-amber-600', 
-            valueClass: '!font-medium text-amber-700', 
+            labelClass: '!text-[11px] !font-medium text-amber-600 uppercase tracking-wider', 
+            valueClass: '!text-base !font-semibold text-amber-700 tracking-tight', 
             iconBoxClass: 'bg-amber-50 text-amber-500 border border-amber-200/50' 
           },
           { 
@@ -68,8 +68,8 @@
             value: 'Rp ' + summary.remainingDebt.toLocaleString('id-ID'), 
             unit: '', 
             icon: 'fa-solid fa-wallet', 
-            labelClass: '!font-medium text-slate-500', 
-            valueClass: '!font-medium text-slate-900', 
+            labelClass: '!text-[11px] !font-medium text-slate-500 uppercase tracking-wider', 
+            valueClass: '!text-base !font-semibold text-slate-900 tracking-tight', 
             iconBoxClass: 'bg-slate-100 text-slate-500 border border-slate-200/50' 
           }
         ]

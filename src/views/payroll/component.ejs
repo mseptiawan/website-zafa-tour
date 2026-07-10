@@ -30,12 +30,12 @@
             <tr>
               <th class="text-left px-6 py-4">Kode & Nama Komponen</th>
               <th class="text-left px-6 py-4">Kategori</th>
-              <th class="text-left px-6 py-4">Sifat / Tipe</th>
+              <th class="text-left px-6 py-4">Tipe</th>
               <th class="text-right px-6 py-4">Aksi</th>
             </tr>
           </thead>
           <tbody id="component-table-body" class="divide-y divide-slate-100">
-            </tbody>
+          </tbody>
         </table>
       </div>
     </div>
@@ -79,18 +79,15 @@
             <option value="Tidak Tetap">Tidak Tetap (Variabel/Input Manual)</option>
           </select>
         </div>
+
+        <!-- Input Tipe Kalkulasi dihilangkan karena default sistem murni FIXED_AMOUNT (Nominal Rp) -->
+        <input type="hidden" id="form-calc-type" value="FIXED_AMOUNT">
+
         <div>
-          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Tipe Kalkulasi</label>
-          <select id="form-calc-type" onchange="updatePlaceholder()" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
-            <option value="FIXED_AMOUNT">Nominal Tetap (Rp)</option>
-            <option value="PERCENTAGE">Persentase (%)</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1" id="label-value">Nilai Nominal</label>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Nilai Nominal</label>
           <div class="relative">
             <input type="number" id="form-amount" required placeholder="0" class="w-full bg-[#f2f2f7]/50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all pr-8">
-            <span id="unit-symbol" class="absolute right-3 top-2.5 text-[12px] text-slate-400 font-bold">Rp</span>
+            <span class="absolute right-3 top-2.5 text-[12px] text-slate-400 font-bold">Rp</span>
           </div>
           <p id="error-form-defaultAmount" class="mt-1 hidden text-[11px] font-medium text-red-500"></p>
         </div>

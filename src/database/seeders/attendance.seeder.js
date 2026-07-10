@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import Attendance from "../../models/Attendance.model.js";
+import User from "../../models/basic/User.model.js";
+import Employee from "../../models/employee/Employee.model.js";
 
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-// Helper untuk mengacak urutan array (Fisher-Yates Shuffle)
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -14,21 +15,38 @@ const shuffleArray = (array) => {
 
 const seedAttendanceSpesifik = async () => {
   try {
-    const targetUserId = "6a477d30c4a00a8c27d142ea";
-    const objectIdUser = new mongoose.Types.ObjectId(targetUserId);
+    const targetUsername = "duwihartati";
+    console.log(`🔍 Mencari user dengan username: ${targetUsername}...`);
 
-    console.log(`👥 Memulai injeksi data absensi khusus USER ID: ${targetUserId}`);
+    const user = await User.findOne({ username: targetUsername });
+    if (!user) {
+      console.log(
+        `[ERROR] User dengan username "${targetUsername}" tidak ditemukan di database. Seeding dibatalkan.`
+      );
+      return;
+    }
 
-    // 1. Bersihkan data lama pada rentang tanggal target agar tidak duplikat
-    const deleteStart = new Date(Date.UTC(2026, 5, 10)); // 10 Juni 2026
-    const deleteEnd = new Date(Date.UTC(2026, 6, 9, 23, 59, 59)); // 9 Juli 2026
+    const employee = await Employee.findOne({ userId: user._id });
+    if (!employee) {
+      console.log(
+        `[ERROR] Profil Employee untuk user "${targetUsername}" tidak ditemukan. Seeding dibatalkan.`
+      );
+      return;
+    }
+
+    const objectIdEmployee = employee._id;
+    console.log(
+      `👥 Memulai injeksi data absensi khusus EMPLOYEE: ${employee.fullName} (ID: ${objectIdEmployee})`
+    );
+
+    const deleteStart = new Date(Date.UTC(2026, 5, 10));
+    const deleteEnd = new Date(Date.UTC(2026, 6, 9, 23, 59, 59));
 
     await Attendance.deleteMany({
-      userId: objectIdUser,
+      employeeId: objectIdEmployee,
       checkIn: { $gte: deleteStart, $lte: deleteEnd },
     });
 
-    // 2. Kumpulkan semua hari kerja (Senin - Jumat) di rentang tersebut
     const startDate = new Date(Date.UTC(2026, 5, 10));
     const endDate = new Date(Date.UTC(2026, 6, 9));
     let currentDate = new Date(startDate);
@@ -38,7 +56,6 @@ const seedAttendanceSpesifik = async () => {
     while (currentDate <= endDate) {
       const dayOfWeek = currentDate.getUTCDay();
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        // Bukan Sabtu/Minggu
         availableWorkDays.push(new Date(currentDate));
       }
       currentDate.setUTCDate(currentDate.getUTCDate() + 1);
@@ -51,20 +68,17 @@ const seedAttendanceSpesifik = async () => {
       return;
     }
 
-    // 3. Tentukan hari mana saja yang akan mendapatkan status HADIR/TELAT (Tepat 15 Hari)
     shuffleArray(availableWorkDays);
     const kehadiranDays = availableWorkDays.slice(0, 15);
     const absenDays = availableWorkDays.slice(15);
 
     const absensiData = [];
 
-    // 4. Proses data untuk hari-hari yang terpilih HADIR (15 Hari)
     for (const date of kehadiranDays) {
       let status = "HADIR";
       let note = "";
       let lateDuration = 0;
 
-      // Jam masuk standar 08:00 WIB = 01:00 UTC
       const checkInOffset = getRandomInt(-15, 20);
       const checkInTime = new Date(date);
       checkInTime.setUTCHours(1, checkInOffset, 0, 0);
@@ -79,7 +93,6 @@ const seedAttendanceSpesifik = async () => {
         note = "Hadir tepat waktu.";
       }
 
-      // Jam pulang standar 17:00 WIB = 10:00 UTC
       const checkOutOffset = getRandomInt(0, 15);
       const checkOutTime = new Date(date);
       checkOutTime.setUTCHours(10, checkOutOffset, 0, 0);
@@ -87,7 +100,7 @@ const seedAttendanceSpesifik = async () => {
       const workDuration = Math.round((checkOutTime - checkInTime) / (1000 * 60));
 
       absensiData.push({
-        userId: objectIdUser,
+        employeeId: objectIdEmployee,
         checkIn: checkInTime,
         checkOut: checkOutTime,
         workDuration,
@@ -98,7 +111,6 @@ const seedAttendanceSpesifik = async () => {
       });
     }
 
-    // 5. Proses sisa hari kerja sebagai SAKIT / IZIN
     for (const date of absenDays) {
       const randAbsen = getRandomInt(1, 2);
       const status = randAbsen === 1 ? "IZIN" : "SAKIT";
@@ -108,20 +120,19 @@ const seedAttendanceSpesifik = async () => {
           : "Sakit dengan keterangan surat dokter.";
 
       absensiData.push({
-        userId: objectIdUser,
-        checkIn: null, // Sesuai default model jika tidak masuk
+        employeeId: objectIdEmployee,
+        checkIn: null,
         checkOut: null,
         workDuration: 0,
         lateDuration: 0,
         status,
         type: "KANTOR",
         note,
+        createdAt: date,
       });
     }
 
-    // 6. Simpan ke database
     if (absensiData.length > 0) {
-      // Urutkan data berdasarkan tanggal checkIn/Date agar rapi di DB
       absensiData.sort((a, b) => (a.checkIn || a.createdAt) - (b.checkIn || b.createdAt));
 
       await Attendance.insertMany(absensiData);
@@ -130,7 +141,7 @@ const seedAttendanceSpesifik = async () => {
         (d) => d.status === "HADIR" || d.status === "TELAT"
       ).length;
       console.log(
-        `[SUCCESS] Seeding selesai! Berhasil menyuntikkan ${absensiData.length} data absensi. Total Kehadiran (HADIR/TELAT): ${totalHadir} kali.`
+        `[SUCCESS] Seeding selesai! Berhasil menyuntikkan ${absensiData.length} data absensi untuk "${targetUsername}". Total Kehadiran: ${totalHadir} kali.`
       );
     }
   } catch (error) {

@@ -3,7 +3,6 @@ import { buildRenderData } from "../utils/renderHelper.js";
 import Employee from "../models/employee/Employee.model.js";
 import moment from "moment";
 
-// NAMED IMPORT SEMUA SERVICE METHOD BERBENTUK DESTRUCTURING
 import {
   getKpiDetails,
   findActivitiesByDate,

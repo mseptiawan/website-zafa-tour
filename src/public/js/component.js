@@ -60,12 +60,11 @@ function renderTable() {
       </td>
       <td class="px-6 py-4">
         <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium tracking-wide ${textClass} ${bgClass} ${borderClass}">
-          <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
           <span>${category}</span>
         </div>
       </td>
       <td class="px-6 py-4">
-        <div class="text-slate-700 font-semibold text-xs">${type} (Val: ${displayValue})</div>
+        <div class="text-slate-700 font-semibold text-xs">${type} (Jumlah: ${displayValue})</div>
       </td>
       <td class="px-6 py-4">
         <div class="flex items-center justify-end gap-2">

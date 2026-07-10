@@ -5,7 +5,6 @@ import Holiday from "../../models/calender/Holiday.model.js";
 dotenv.config();
 
 const holidays = [
-  // === HARI LIBUR NASIONAL (isDeductLeave: false) ===
   {
     name: "Tahun Baru 2026 Masehi",
     date: new Date("2026-01-01"),

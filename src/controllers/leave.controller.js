@@ -636,7 +636,7 @@ export const applyLeave = async (req, res) => {
       await balance.save();
     }
 
-    return res.redirect("/leave/my-history");
+    return res.redirect("/leave/me");
   } catch (error) {
     console.error("Error pada applyLeave:", error);
     return res.status(500).render("leave/apply-form", {
@@ -683,7 +683,7 @@ export const myLeave = async (req, res) => {
       .filter((l) => l.status === "APPROVED")
       .reduce((acc, curr) => acc + curr.totalDays, 0);
 
-    res.render("leave/my-history", {
+    res.render("leave/history", {
       title: "Riwayat Cuti",
       leaves,
       holidays,
@@ -843,7 +843,7 @@ export const updateLeave = async (req, res) => {
       });
     }
 
-    res.redirect("/leave/my-history");
+    res.redirect("/leave/me");
   } catch (error) {
     return res.status(500).render("error", {
       title: "Tambah Agenda - Error",
@@ -859,7 +859,7 @@ export const cancelPendingLeave = async (req, res) => {
     if (!leave || leave.status !== "PENDING") {
       req.flash("error", "Pembatalan gagal. Pengajuan tidak ditemukan atau sudah diproses.");
 
-      return res.redirect("/leave/my-history");
+      return res.redirect("/leave/me");
     }
 
     leave.status = "CANCELLED";
@@ -876,13 +876,13 @@ export const cancelPendingLeave = async (req, res) => {
 
     req.flash("success", "Pengajuan cuti berhasil dibatalkan.");
 
-    return res.redirect("/leave/my-history");
+    return res.redirect("/leave/me");
   } catch (error) {
     console.error(error);
 
     req.flash("error", "Terjadi kesalahan sistem saat membatalkan pengajuan cuti.");
 
-    return res.redirect("/leave/my-history");
+    return res.redirect("/leave/me");
   }
 };
 
@@ -998,7 +998,7 @@ export const requestCancelApprovedLeave = async (req, res) => {
         await balance.save();
       }
 
-      return res.redirect("/leave/my-history");
+      return res.redirect("/leave/me");
     }
 
     await LeaveApproval.create({
@@ -1009,7 +1009,7 @@ export const requestCancelApprovedLeave = async (req, res) => {
       note: reason || "Mengajukan pembatalan cuti.",
     });
 
-    return res.redirect("/leave/my-history");
+    return res.redirect("/leave/me");
   } catch (error) {
     console.error("Error pada requestCancelApprovedLeave:", error);
 
@@ -1126,7 +1126,6 @@ export const myDelegations = async (req, res) => {
     });
   }
 };
-
 export const approveDelegation = async (req, res) => {
   try {
     const { note } = req.body;
@@ -1160,13 +1159,30 @@ export const approveDelegation = async (req, res) => {
     });
 
     const requester = leave.userId;
+    const requesterRoleName = requester.roleId?.name?.toString().trim().toUpperCase() || "";
 
-    const requesterRoleName =
-      requester.roleId && requester.roleId.name
-        ? requester.roleId.name.toString().trim().toUpperCase()
-        : "";
+    let nextStep = null;
+    let nextApproverId = null;
 
-    const { nextStep, nextApproverId } = await getNextApprover(requesterRoleName, "HANDOVER");
+    // =========================================================================
+    // PERBAIKAN ALUR DELEGASI: PENENTUAN APPROVER BERIKUTNYA SETELAH HANDOVER
+    // =========================================================================
+
+    if (requesterRoleName === "PEGAWAI") {
+      const manager = await getManagerByBidang(requester._id);
+      nextStep = manager.step;
+      nextApproverId = manager.approverId;
+    } else if (requesterRoleName.startsWith("MANAGER")) {
+      const roleDoc = await Role.findOne({ name: "WAKIL_DIREKTUR" });
+      const user = await User.findOne({ roleId: roleDoc._id });
+      nextStep = "WAKIL_DIREKTUR";
+      nextApproverId = user?._id;
+    } else if (requesterRoleName === "WAKIL_DIREKTUR") {
+      const roleDoc = await Role.findOne({ name: "DIREKTUR_UTAMA" });
+      const user = await User.findOne({ roleId: roleDoc._id });
+      nextStep = "DIREKTUR_UTAMA";
+      nextApproverId = user?._id;
+    }
 
     if (nextApproverId) {
       await LeaveApproval.create({
@@ -1175,6 +1191,7 @@ export const approveDelegation = async (req, res) => {
         approverId: nextApproverId,
         status: "PENDING",
       });
+      console.log(`[DELEGASI APPROVED] Berkas Pegawai diteruskan ke Step: ${nextStep}`);
     } else {
       leave.status = "APPROVED";
       await leave.save();
@@ -1182,18 +1199,18 @@ export const approveDelegation = async (req, res) => {
       const currentYear = new Date(leave.startDate).getFullYear();
       const balance = await LeaveBalance.findOne({ userId: requester._id, year: currentYear });
       if (balance) {
-        balance.used += leave.totalDays;
-        balance.remaining -= leave.totalDays;
+        balance.used += Number(leave.totalDays);
+        balance.remaining -= Number(leave.totalDays);
         await balance.save();
       }
     }
 
     res.redirect("/leave/my-delegations");
   } catch (error) {
+    console.error("Error pada approveDelegation:", error);
     res.status(500).render("error", { title: "Error", message: error.message });
   }
 };
-
 export const rejectDelegation = async (req, res) => {
   try {
     const { note } = req.body;

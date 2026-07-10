@@ -12,7 +12,6 @@ import notificationService from "./notification.service.js";
 export const findActiveCategoriesService = async () => {
   return await ExpenseCategory.find({ isActive: true }).sort({ name: 1 }).lean();
 };
-
 export const createExpenseService = async ({ body, file, currentUser }) => {
   const {
     title,
@@ -55,7 +54,10 @@ export const createExpenseService = async ({ body, file, currentUser }) => {
 
   if (cleanAmount > 200000 && !isManagerRole) {
     status = "PENDING_MANAGER";
-    const career = employee.careerData;
+
+    const career = Array.isArray(employee.careerData)
+      ? employee.careerData[0]
+      : employee.careerData;
 
     if (career && career.bidangId) {
       const bidang = await Bidang.findById(career.bidangId).lean();
@@ -66,7 +68,7 @@ export const createExpenseService = async ({ body, file, currentUser }) => {
 
     if (!approverRoleId) {
       throw new Error(
-        "Gagal: Bidang kerja atau posisi Manager penanggung jawab Anda tidak ditemukan."
+        "Gagal: Bidang kerja atau posisi Manager penanggung jawab Anda tidak ditemukan. Pastikan data karier dan data Bidang Anda di database sudah diatur dengan benar."
       );
     }
   }
@@ -131,12 +133,11 @@ export const createExpenseService = async ({ body, file, currentUser }) => {
       }
     }
   } catch (notifError) {
-    console.error(notifError.message);
+    console.error("Gagal mengirimkan notifikasi:", notifError.message);
   }
 
   return expense;
 };
-
 export const findMyExpenseService = async ({ userId, page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
   const filter = { userId };

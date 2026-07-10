@@ -1,0 +1,127 @@
+<%
+  // Helper Configuration untuk Badge Status Persetujuan
+  const getStatusConfig = (status) => {
+    switch(status) {
+      case 'PENDING':
+        return { label: 'Pending', badge: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500' };
+      case 'IN_REVIEW':
+        return { label: 'In Review', badge: 'bg-blue-50 text-blue-700 border-blue-200', dot: 'bg-blue-500' };
+      case 'APPROVED':
+        return { label: 'Approved', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500 animate-pulse' };
+      case 'READY_TO_TRAVEL':
+        return { label: 'Ready To Travel', badge: 'bg-cyan-50 text-cyan-700 border-cyan-200', dot: 'bg-cyan-500' };
+      case 'ON_TRIP':
+        return { label: 'On Trip', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200', dot: 'bg-indigo-500' };
+      case 'SUBMITTED':
+        return { label: 'Submitted', badge: 'bg-purple-50 text-purple-700 border-purple-200', dot: 'bg-purple-500' };
+      case 'REJECTED':
+        return { label: 'Rejected', badge: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-500' };
+      default:
+        return { label: status, badge: 'bg-slate-50 text-slate-600 border-slate-200', dot: 'bg-slate-500' };
+    }
+  };
+%>
+
+<div class="bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-[13px] table-fixed min-w-[900px]">
+      
+      <colgroup>
+        <col class="w-[18%]"> <!-- Pengaju -->
+        <col class="w-[27%]"> <!-- Judul Perjalanan -->
+        <col class="w-[20%]"> <!-- Tujuan -->
+        <% if (user?.role === "DIREKTUR_UTAMA" || user?.role === "WAKIL_DIREKTUR") { %>
+          <col class="w-[13%]"> <!-- Delegasi -->
+        <% } %>
+        <col class="w-[12%]"> <!-- Budget -->
+        <col class="w-[10%]"> <!-- Status -->
+        <col class="w-[7%]">  <!-- Aksi -->
+      </colgroup>
+
+      <thead>
+        <tr class="bg-slate-50/70 border-b border-slate-200/50 text-[10px] font-semibold text-slate-400 uppercase tracking-widest select-none">
+          <th class="py-4 px-8">Pengaju</th>
+          <th class="py-4 px-8">Judul Perjalanan</th>
+          <th class="py-4 px-8">Tujuan</th>
+          <% if (user?.role === "DIREKTUR_UTAMA" || user?.role === "WAKIL_DIREKTUR") { %>
+            <th class="py-4 px-8">Delegasi</th>
+          <% } %>
+          <th class="py-4 px-8">Budget</th>
+          <th class="py-4 px-8">Status</th>
+          <th class="py-4 px-8 text-center">Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-slate-100/80">
+        <% if (trips.length === 0) { %>
+          <tr>
+            <td colspan="<%= (user?.role === 'DIREKTUR_UTAMA' || user?.role === 'WAKIL_DIREKTUR') ? 7 : 6 %>" class="text-center py-12 text-slate-400 font-medium bg-slate-50/20">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/40 flex items-center justify-center text-slate-300 mb-1">
+                  <i class="fa-solid fa-folder-open text-sm"></i>
+                </div>
+                <span class="text-[12px] font-medium text-slate-400">Tidak ada pengajuan dinas luar dalam kategori ini</span>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+
+        <% trips.forEach(t => { %>
+          <tr class="hover:bg-slate-50/50 transition-colors duration-150 text-slate-600">
+            
+            <!-- PENGAJU -->
+            <td class="px-8 py-5 font-semibold text-slate-800 break-words">
+              <%= t.userId?.username || '-' %>
+            </td>
+
+            <!-- JUDUL -->
+            <td class="px-8 py-5 font-medium text-slate-700 break-words">
+              <%= t.title %>
+            </td>
+
+            <!-- TUJUAN -->
+            <td class="px-8 py-5 text-slate-500 break-words">
+              <%= t.destination || '-' %>
+            </td>
+
+            <!-- DELEGASI (KONDISIONAL DIREKSI) -->
+            <% if (user?.role === "DIREKTUR_UTAMA" || user?.role === "WAKIL_DIREKTUR") { %>
+              <td class="px-8 py-5 whitespace-nowrap">
+                <% if (t.delegation?.active && t.delegation?.to === 'WAKIL_DIREKTUR') { %>
+                  <span class="text-[10px] px-2.5 py-1 rounded-md font-semibold bg-amber-50 text-amber-700 border border-amber-200 tracking-wide">
+                    Direktur → Wadir
+                  </span>
+                <% } else { %>
+                  <span class="text-slate-400 font-normal">-</span>
+                <% } %>
+              </td>
+            <% } %>
+
+            <!-- BUDGET -->
+            <td class="px-8 py-5 font-bold text-slate-900 whitespace-nowrap tabular-nums">
+              Rp <%= (typeof t.budget === 'number' ? t.budget : (t.budget?.total || 0)).toLocaleString('id-ID') %>
+            </td>
+
+            <!-- STATUS BADGE -->
+            <td class="px-8 py-5 whitespace-nowrap">
+              <% const config = getStatusConfig(t.status); %>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider border <%= config.badge %>">
+                <span class="w-1.5 h-1.5 rounded-full <%= config.dot %>"></span>
+                <%= config.label %>
+              </span>
+            </td>
+
+            <!-- OPERATIONAL ACTION -->
+            <td class="px-8 py-5 text-center whitespace-nowrap">
+              <a href="/trip/approval/<%= t._id %>" title="Tinjau Berkas" 
+                 class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all group">
+                <i class="fa-solid fa-eye text-[11px] transform group-hover:scale-105 transition-transform"></i>
+              </a>
+            </td>
+
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

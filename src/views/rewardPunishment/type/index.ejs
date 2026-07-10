@@ -2,43 +2,43 @@
 
 <div id="types-data" data-json="<%= JSON.stringify(types || []) %>" class="hidden"></div>
 
-<div class=" overflow-hidden">
-  <div class="w-full max-w-none mx-auto mt-4 md:mt-0 space-y-6">
+<div class="overflow-hidden px-2 sm:px-4 md:px-0">
+  <div class="w-full max-w-none mx-auto mt-2 md:mt-0 space-y-4 md:space-y-6">
 
     <%- include('../../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Kepegawaian', 
         title: 'Master Jenis Reward & Punishment', 
-        description: 'Kelola standarisasi jenis penghargaan (reward) dan sanksi sanksi (punishment) pegawai secara terpusat.' 
+        description: 'Kelola standarisasi jenis penghargaan (reward) dan sanksi (punishment) pegawai secara terpusat.' 
     }) %>
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4  p-4  border-b border-slate-200/60 md:border-slate-200/80">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-white border border-slate-200/60 md:border-transparent rounded-2xl md:rounded-none md:border-b md:border-slate-200/80">
       <div>
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider select-none">Total Regulasi Aktif</p>
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider select-none">Total Regulasi Aturan</p>
         <h3 class="text-xl font-bold text-slate-800 mt-1 block tabular-nums" id="total-aktif-counter">0</h3>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="btn-add-type" class="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-semibold px-5 py-2.5 rounded-xl transition-all active:scale-98 cursor-pointer">
+      <div class="flex items-center w-full sm:w-auto">
+        <button id="btn-add-type" class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-semibold px-5 py-2.5 rounded-xl transition-all active:scale-98 cursor-pointer w-full sm:w-auto shadow-sm shadow-blue-500/10">
           <i class="fa-solid fa-plus text-[10px]"></i>
           <span>Tambah Jenis Baru</span>
         </button>
       </div>
     </div>
 
-    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-[800px]">
+    <div class="bg-white border border-slate-200/60 md:border-slate-200/80 rounded-2xl overflow-hidden shadow-xs">
+      <div class="overflow-x-auto w-full block scrollbar-thin">
+        <table class="w-full text-sm min-w-[768px] table-fixed md:table-auto">
           <thead class="bg-slate-50/70 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
             <tr>
-              <th class="text-left px-6 py-4 font-bold w-[15%]">Kategori</th>
-              <th class="text-left px-6 py-4 font-bold w-[25%]">Nama Regulasi / Aturan</th>
-              <th class="text-left px-6 py-4 font-bold w-[25%]">Deskripsi Cakupan</th>
-              <th class="text-left px-6 py-4 font-bold w-[10%]">Status</th>
-              <th class="text-right px-6 py-4 font-bold w-[10%]">Aksi</th>
+              <th class="text-left px-4 py-4 md:px-6 font-bold w-[20%] md:w-[15%]">Kategori</th>
+              <th class="text-left px-4 py-4 md:px-6 font-bold w-[30%] md:w-[25%]">Nama Regulasi / Aturan</th>
+              <th class="text-left px-4 py-4 md:px-6 font-bold w-[30%] md:w-[25%]">Deskripsi Cakupan</th>
+              <th class="text-left px-4 py-4 md:px-6 font-bold w-[10%]">Status</th>
+              <th class="text-right px-4 py-4 md:px-6 font-bold w-[10%]">Aksi</th>
             </tr>
           </thead>
           <tbody id="type-table-body" class="divide-y divide-slate-100 text-[13px]">
-             </tbody>
+          </tbody>
         </table>
       </div>
     </div>
@@ -47,7 +47,7 @@
 </div>
 
 <div id="type-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs hidden items-center justify-center p-4 z-[110] transition-all">
-  <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden border border-slate-200/60  transform transition-all">
+  <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden border border-slate-200/60 transform transition-all shadow-xl">
     <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
       <h3 id="modal-title" class="text-[13px] font-bold text-slate-800 uppercase tracking-wide">Tambah Jenis Aturan</h3>
       <button id="btn-close-modal-x" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer">

@@ -1,9 +1,8 @@
 import Employee from "../models/employee/Employee.model.js";
-import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 import Payroll from "../models/payroll/Payroll.model.js";
 import EmployeeAllowance from "../models/payroll/EmployeeAllowance.model.js";
-import { Overtime } from "../models/Overtime.model.js";
-import { getPayrollPeriod } from "../utils/payrollPeriod.js";
+import LoanPayment from "../models/loan/loanPayment.model.js";
+import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
 
 /**
  * Mengambil data master seluruh karyawan, komponen gaji, dan tunjangan tersimpan.
@@ -25,123 +24,116 @@ export const getPayrollData = async () => {
   return { employees, components, savedAllowances };
 };
 
-/**
- * Menyimpan atau memperbarui rekam jejak lembar payroll per periode bulan.
- */
-export const savePayrollRecord = async (data) => {
-  return await Payroll.findOneAndUpdate(
-    { employeeId: data.employeeId, periodMonth: data.periodMonth },
-    data,
-    { upsert: true, new: true }
-  );
-};
+export const closePayroll = async (periodMonth) => {
+  const employees = await Employee.find();
 
-/**
- * Menghitung akumulasi lembur karyawan berdasarkan rentang waktu penutupan buku.
- */
-export const calculateOvertimePayroll = async ({ userId, date }) => {
-  const period = getPayrollPeriod(date);
-  const records = await Overtime.find({
-    userId,
-    status: "APPROVED",
-    date: {
-      $gte: period.start,
-      $lte: period.end,
-    },
-  }).lean();
+  const processedResults = [];
 
-  const totalHours = records.reduce((sum, r) => sum + (r.totalHours || 0), 0);
-  const rate = records[0]?.overtimeRate || 0;
-  const multiplier = 1.5;
-  const totalPay = totalHours * rate * multiplier;
+  for (const employee of employees) {
+    const empId = employee._id;
+    const basicSalary = employee?.financialData?.basicSalary || 0;
 
-  return {
-    periodId: period.id,
-    period,
-    totalHours,
-    totalPay,
-  };
-};
+    const savedAllowances = await EmployeeAllowance.find({
+      employeeId: empId,
+    })
+      .populate("componentId")
+      .lean();
 
-/**
- * Menjalankan fungsi agregasi data lembur masal terhitung per periode bulan.
- */
-export const runPayrollAggregation = async (date = new Date()) => {
-  const period = getPayrollPeriod(date);
+    const allowances = [];
+    const deductions = [];
+    let totalEarnings = basicSalary;
+    let totalDeductions = 0;
 
-  const aggregated = await Overtime.aggregate([
-    {
-      $match: {
-        status: "APPROVED",
-        date: {
-          $gte: period.start,
-          $lte: period.end,
-        },
+    savedAllowances.forEach((item) => {
+      if (!item.componentId) return;
+
+      let finalAmount = item.amount || 0;
+      let displayName = item.componentId.name.split("(")[0].trim();
+
+      if (
+        item.componentId.calculationType === "PERCENTAGE" &&
+        item.componentId.basedOnComponent === "GAPOK"
+      ) {
+        const percentageValue = finalAmount < 100 ? finalAmount : 2;
+        finalAmount = (percentageValue / 100) * basicSalary;
+        displayName = `${displayName} (${percentageValue}%)`;
+      }
+
+      const componentData = {
+        componentName: displayName,
+        amount: finalAmount,
+      };
+
+      if (item.componentId.category === "EARNING") {
+        allowances.push(componentData);
+        totalEarnings += finalAmount;
+      } else if (item.componentId.category === "DEDUCTION") {
+        deductions.push(componentData);
+        totalDeductions += finalAmount;
+      }
+    });
+
+    const activeLoanPayments = await LoanPayment.find({
+      employeeId: empId,
+      periodMonth,
+      isPaid: false,
+    }).lean();
+
+    const loanDeduction = [];
+    let totalLoanDeduction = 0;
+
+    activeLoanPayments.forEach((loan) => {
+      loanDeduction.push({
+        loanPaymentId: loan._id,
+        amount: loan.amount,
+      });
+
+      totalLoanDeduction += loan.amount;
+    });
+
+    totalDeductions += totalLoanDeduction;
+
+    const payroll = await Payroll.findOneAndUpdate(
+      {
+        employeeId: empId,
+        periodMonth,
       },
-    },
-    {
-      $group: {
-        _id: "$userId",
-        totalHours: { $sum: "$totalHours" },
-        totalPay: {
-          $sum: {
-            $multiply: ["$totalHours", "$overtimeRateSnapshot", "$multiplierSnapshot"],
-          },
-        },
+      {
+        employeeId: empId,
+        periodMonth,
+        basicSalary,
+        allowances,
+        deductions,
+        loanDeduction,
+        totalEarnings,
+        totalDeductions,
+        netTakeHomePay: totalEarnings - totalDeductions,
+        status: "CLOSED",
+        paidAt: new Date(),
+        mutationFile: "/uploads/files/default-receipt.pdf",
       },
-    },
-  ]);
+      {
+        upsert: true,
+        new: true,
+      }
+    );
 
-  return {
-    period,
-    result: aggregated,
-  };
-};
+    await LoanPayment.updateMany(
+      {
+        employeeId: empId,
+        periodMonth,
+        isPaid: false,
+      },
+      {
+        $set: {
+          isPaid: true,
+          paidAt: new Date(),
+        },
+      }
+    );
 
-/**
- * Membangun draf komponen penerimaan (Earning) dan pemotongan (Deduction) payroll karyawan.
- */
-export const buildPayroll = async ({ employeeId, date, overtime }) => {
-  const employee = await Employee.findById(employeeId).lean();
-  const allowances = await EmployeeAllowance.find({ employeeId }).populate("componentId").lean();
+    processedResults.push(payroll);
+  }
 
-  const basicSalary = employee?.financialData?.basicSalary || 0;
-
-  const earning = allowances
-    .filter((a) => a.componentId?.category === "EARNING")
-    .reduce((sum, a) => sum + (a.amount || 0), 0);
-
-  const deduction = allowances
-    .filter((a) => a.componentId?.category === "DEDUCTION")
-    .reduce((sum, a) => sum + (a.amount || 0), 0);
-
-  const overtimePay = overtime?.totalPay || 0;
-  const totalEarnings = basicSalary + earning + overtimePay;
-  const totalDeductions = deduction;
-
-  return {
-    employeeId,
-    periodMonth: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
-    basicSalary,
-    overtime: {
-      hours: overtime?.totalHours || 0,
-      amount: overtimePay,
-    },
-    allowances: allowances
-      .filter((a) => a.componentId?.category === "EARNING")
-      .map((a) => ({
-        name: a.componentId?.name,
-        amount: a.amount,
-      })),
-    deductions: allowances
-      .filter((a) => a.componentId?.category === "DEDUCTION")
-      .map((a) => ({
-        name: a.componentId?.name,
-        amount: a.amount,
-      })),
-    totalEarnings,
-    totalDeductions,
-    netTakeHomePay: totalEarnings - totalDeductions,
-    status: "DRAFT",
-  };
+  return processedResults;
 };

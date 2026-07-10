@@ -2,10 +2,10 @@
 
 <% 
   // =========================================================================
-  // LOGIKA PEMISAH DATA (FILTERING DATA BERDASARKAN STATUS)
+  // LOGIKA PEMISAH DATA (PERBAIKAN: APPROVED MASUK KE RIWAYAT SELESAI)
   // =========================================================================
-  const activeLeaves = leaves.filter(l => l.status === 'PENDING' || l.status === 'APPROVED' || l.status === 'CANCELLATION_PENDING');
-  const historyLeaves = leaves.filter(l => l.status === 'REJECTED' || l.status === 'CANCELLED');
+  const activeLeaves = leaves.filter(l => l.status === 'PENDING' || l.status === 'CANCELLATION_PENDING');
+  const historyLeaves = leaves.filter(l => l.status === 'APPROVED' || l.status === 'REJECTED' || l.status === 'CANCELLED');
 
   // CONFIGURATION UNTUK DESAIN BADGE STATUS
   const getStatusConfig = (status) => {
@@ -13,7 +13,7 @@
       case 'PENDING':
         return { label: 'Pending', badge: 'bg-amber-50 text-amber-600 border-amber-200/50', dot: 'bg-amber-500' };
       case 'APPROVED':
-        return { label: 'Approved', badge: 'bg-emerald-50 text-emerald-600 border-emerald-200/50', dot: 'bg-emerald-500 animate-pulse' };
+        return { label: 'Approved', badge: 'bg-emerald-50 text-emerald-600 border-emerald-200/50', dot: 'bg-emerald-500' };
       case 'REJECTED':
         return { label: 'Rejected', badge: 'bg-rose-50 text-rose-600 border-rose-200/50', dot: 'bg-rose-500' };
       case 'CANCELLED':
@@ -26,7 +26,7 @@
   };
 %>
 
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50  sm:p-6 md:p-10 antialiased pb-24 md:pb-8">
+<div>
   <div class="w-full max-w-none mx-auto space-y-5 md:space-y-8">
 
     <!-- PAGE HEADER -->
@@ -496,4 +496,24 @@
       activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
     }
   }
+
+  // Tambahkan kode ini di dalam tag <script> paling bawah halaman kamu
+document.addEventListener("DOMContentLoaded", () => {
+  // Mencari semua elemen tombol di dalam container navigasi tab
+  const tabButtons = document.querySelectorAll('[id^="tab-btn-"], .tab-btn, button[role="tab"]');
+  
+  tabButtons.forEach((btn, index) => {
+    // Jika partial tidak memberi ID, kita pasang ID dinamis berdasarkan urutan data atau teksnya
+    if (!btn.id) {
+      btn.id = index === 0 ? 'tab-btn-active' : 'tab-btn-history';
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const tabName = btn.id.replace('tab-btn-', '');
+      switchTab(tabName);
+    });
+  });
+});
+
 </script>

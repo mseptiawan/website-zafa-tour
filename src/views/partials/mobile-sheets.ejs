@@ -162,7 +162,7 @@
       <a href="/leave/apply" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors"><div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-calendar-plus text-sm"></i></div><span class="text-xs font-bold text-slate-700">Ajukan Cuti</span></a>
       <% } %>
       <% if (typeof user !== 'undefined' && user?.permissions?.leave_my) { %>
-      <a href="/leave/my-history" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors"><div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-clock-rotate-left text-sm"></i></div><span class="text-xs font-bold text-slate-700">Riwayat Saya</span></a>
+      <a href="/leave/me" class="flex flex-col items-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-center gap-2 transition-colors"><div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-clock-rotate-left text-sm"></i></div><span class="text-xs font-bold text-slate-700">Riwayat Saya</span></a>
       <% } %>
       <% if (typeof user !== 'undefined' && user?.permissions?.leave_delegation) { %>
       <a href="/leave/my-delegations" class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-left transition-colors">

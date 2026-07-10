@@ -1,0 +1,81 @@
+<%
+  // Urutan hierarki approval dinas luar
+  const approvalSteps = [
+    { key: 'MANAGER_ADMINISTRASI', label: 'Manager Administrasi' },
+    { key: 'WAKIL_DIREKTUR', label: 'Wakil Direktur' },
+    { key: 'DIREKTUR_UTAMA', label: 'Direktur Utama' },
+    { key: 'MANAGER_KEUANGAN', label: 'Pencairan (Keuangan)' }
+  ];
+%>
+
+<div class="bg-white border border-slate-200/60 rounded-2xl p-4 md:p-5 shadow-2xs">
+  <div class="mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+    <h3 class="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Pelacakan Persetujuan</h3>
+    <span class="text-[10px] font-medium text-slate-400">Dinas Luar</span>
+  </div>
+
+  <div class="relative pl-6 space-y-5 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-slate-100 select-none">
+    <% approvalSteps.forEach((step, index) => { 
+      // Cari data approval yang cocok dengan step saat ini
+      const log = typeof approvals !== 'undefined' ? approvals.find(a => (a.step || '').toUpperCase() === step.key) : null;
+      
+      let iconColor = 'bg-slate-100 text-slate-400 border-slate-200';
+      let statusText = 'Menunggu Antrean';
+      let isCurrent = false;
+
+      if (log) {
+        if (log.status === 'APPROVED') {
+          iconColor = 'bg-emerald-50 text-emerald-600 border-emerald-200';
+          statusText = 'Disetujui';
+        } else if (log.status === 'REJECTED') {
+          iconColor = 'bg-rose-50 text-rose-600 border-rose-200';
+          statusText = 'Ditolak';
+        } else if (log.status === 'PENDING') {
+          iconColor = 'bg-amber-50 text-amber-600 border-amber-300 animate-pulse';
+          statusText = 'Perlu Tinjauan';
+          isCurrent = true;
+        }
+      }
+    %>
+      <div class="relative group">
+        <!-- Node Bullet -->
+        <div class="absolute -left-[25px] top-0.5 w-3.5 h-3.5 rounded-full border-2 bg-white flex items-center justify-center transition-all z-10 <%= iconColor %>">
+          <% if (log && log.status === 'APPROVED') { %>
+            <div class="w-1 h-1 rounded-full bg-emerald-600"></div>
+          <% } else if (log && log.status === 'REJECTED') { %>
+            <div class="w-1 h-1 rounded-full bg-rose-600"></div>
+          <% } else if (log && log.status === 'PENDING') { %>
+            <div class="w-1 h-1 rounded-full bg-amber-600"></div>
+          <% } %>
+        </div>
+
+        <!-- Content -->
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="text-[12px] font-semibold <%= isCurrent ? 'text-slate-900' : 'text-slate-700' %>">
+              <%= step.label %>
+            </span>
+            <span class="text-[9.5px] font-bold uppercase tracking-wider tabular-nums shrink-0
+              <%= statusText === 'Disetujui' ? 'text-emerald-600' : statusText === 'Ditolak' ? 'text-rose-600' : statusText === 'Perlu Tinjauan' ? 'text-amber-600' : 'text-slate-400' %>">
+              <%= statusText %>
+            </span>
+          </div>
+
+          <!-- Timestamp jika sudah diproses -->
+          <% if (log && log.updatedAt && log.status !== 'PENDING') { %>
+            <span class="text-[10px] text-slate-400 tabular-nums mt-0.5">
+              <%= new Date(log.updatedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) %>
+            </span>
+          <% } %>
+
+          <!-- Catatan Penolakan / Catatan Khusus -->
+          <% if (log && log.notes) { %>
+            <div class="mt-1.5 p-2 bg-slate-50 border border-slate-100 rounded-lg text-[11px] text-slate-500 italic break-words leading-normal">
+              "<%= log.notes %>"
+            </div>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>

@@ -33,7 +33,7 @@ const salaryComponentSchema = new mongoose.Schema(
     },
     calculationType: {
       type: String,
-      enum: ["FIXED_AMOUNT", "PERCENTAGE"],
+      enum: ["FIXED_AMOUNT"],
       required: true,
       default: "FIXED_AMOUNT",
     },

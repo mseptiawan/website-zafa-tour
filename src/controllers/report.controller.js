@@ -429,13 +429,11 @@ export const downloadSingleSlipPdf = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Cari data payroll
     const payroll = await Payroll.findById(id).lean();
     if (!payroll) {
       return res.status(404).send("Data dokumen slip gaji tidak ditemukan.");
     }
 
-    // 2. Ambil data employee beserta deep populate untuk data karir virtual
     const employee = await Employee.findById(payroll.employeeId)
       .populate({
         path: "careerData",
@@ -445,24 +443,21 @@ export const downloadSingleSlipPdf = async (req, res) => {
           { path: "unitId", model: "Unit" },
         ],
       })
-      .lean({ virtuals: true }); // Wajib menyertakan virtuals agar careerData bocor keluar
+      .lean({ virtuals: true });
 
     if (!employee) {
       return res.status(404).send("Profil karyawan pemilik dokumen tidak ditemukan.");
     }
 
-    // 3. Amankan struktur data careerData karena tipenya Array akibat [justOne: false] di schema
     if (employee.careerData && employee.careerData.length > 0) {
-      employee.careerData = employee.careerData[0]; // Ubah array menjadi objek tunggal agar template EJS terbaca
+      employee.careerData = employee.careerData[0];
     } else {
       employee.careerData = null;
     }
 
-    // 4. Masukkan array allowances & deductions bawaan payroll agar diproses oleh generator PDF
     const allowances = payroll.allowances || [];
     const deductions = payroll.deductions || [];
 
-    // Kirim data yang sudah matang ke fungsi generator puppeteer/pdfkit kamu
     const pdfBuffer = await generateSingleSlipPdf(payroll, employee, allowances, deductions);
 
     const safeFileName = `Slip_Gaji_${employee.fullName.replace(/\s+/g, "_")}_Periode_${payroll.periodMonth}.pdf`;
@@ -471,7 +466,7 @@ export const downloadSingleSlipPdf = async (req, res) => {
 
     return res.end(pdfBuffer);
   } catch (error) {
-    console.error("❌ Gagal mengekspor PDF Slip Gaji Individu:", error);
+    console.error("Gagal mengekspor PDF Slip Gaji Individu:", error);
     return res.status(500).send("Terjadi eror internal saat mencetak berkas PDF slip gaji.");
   }
 };

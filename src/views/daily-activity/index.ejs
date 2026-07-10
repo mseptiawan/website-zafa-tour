@@ -1,5 +1,5 @@
 <%- layout('layouts/main', { title }) %>
-<div class="ml-0 md:ml-72 min-h-screen bg-slate-50/50   md:p-10 antialiased text-slate-800 pb-24 md:pb-8 rounded-2xl overflow-hidden">
+<div >
   <div class="w-full max-w-none mx-auto mt-4 md:mt-0 space-y-4 md:space-y-6">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 select-none">
@@ -135,7 +135,6 @@
     }
 
     try {
-      // Endpoint disesuaikan dengan skema RESTful Controller sebelumnya
       const response = await fetch(`/daily-activities/api?tanggal=${selectedDate}`);
       const result = await response.json();
 
@@ -176,7 +175,6 @@
       });
       kpiOptionsHTML += `<option value="lainnya" ${!currentKpiId ? 'selected' : ''}>Lainnya (Aktivitas Non-KPI)</option>`;
       
-      // Sinkronisasi data dinamis inner HTML form update (Bahasa Inggris)
       const formInnerHTML = `
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div class="sm:col-span-2">
@@ -342,7 +340,6 @@
     event.preventDefault();
     const form = document.getElementById('form-create-activity');
     
-    // Properti payload disesuaikan penuh dengan ekspektasi backend (activityDate & title)
     const formData = {
       title: document.getElementById('add-title').value,
       kpiTemplateId: document.getElementById('add-kpiTemplateId').value,

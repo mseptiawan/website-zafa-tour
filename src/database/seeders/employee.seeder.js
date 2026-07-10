@@ -340,7 +340,7 @@ const employeeSeeder = async () => {
     if (emp.positionId || emp.bidangId || emp.unitId) {
       await EmployeeCareer.create({
         employee_id: newEmployee._id,
-        status_karyawan: "Pegawai Tetap",
+        status_pegawai: "Pegawai Tetap",
         tanggal_mulai_bergabung: new Date(),
         bidangId: emp.bidangId || null,
         unitId: emp.unitId || null,

@@ -1,128 +1,97 @@
 import mongoose from "mongoose";
 
+// =========================================================================
+// EMBEDDED SCHEMAS (Sub-Dokumen didefinisikan terpisah agar Mongoose rapi)
+// =========================================================================
+
+const budgetItemSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    quantity: { type: Number, required: true, default: 1, min: 1 },
+    unit: { type: String, required: true, default: "Hari" },
+    pricePerUnit: { type: Number, required: true, default: 0, min: 0 },
+    allocatedAmount: { type: Number, default: 0 },
+    description: String,
+  },
+  { _id: true }
+);
+
+const timelineSchema = new mongoose.Schema(
+  {
+    address: { type: String, required: true },
+    order: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
+const approvalSchema = new mongoose.Schema(
+  {
+    step: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    status: { type: String, enum: ["APPROVED", "REJECTED"], required: true },
+    date: { type: Date, default: Date.now },
+    note: String,
+  },
+  { _id: true }
+);
+
+// =========================================================================
+// MAIN BUSINESS TRIP SCHEMA (Embedded Main Object)
+// =========================================================================
+
 const businessTripSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    requesterRole: { type: String, required: true },
 
-    requesterRole: {
-      type: String,
-      enum: ["PEGAWAI", "MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "MANAGER_KEUANGAN"],
-      required: true,
-    },
-
-    title: String,
+    title: { type: String, required: true },
     purpose: {
       type: String,
       enum: ["KUNJUNGAN_SALES", "RAPAT", "PELATIHAN", "SURVEI", "LAINNYA"],
+      required: true,
     },
-
     meetWith: { type: String, required: true, maxlength: 100 },
-
-    startDate: Date,
-    endDate: Date,
-    destination: String,
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    destination: { type: String, required: true },
     description: String,
+
     budget: {
       total: { type: Number, default: 0 },
-      items: [
-        {
-          title: { type: String, required: true },
-          allocatedAmount: { type: Number, default: 0 },
-          description: { type: String },
-        },
-      ],
+      items: [budgetItemSchema],
     },
 
-    timeline: [
-      {
-        address: String,
-        order: Number,
-      },
-    ],
+    timeline: [timelineSchema],
+
+    currentStep: { type: String, default: null },
+    approvals: [approvalSchema],
+
+    payment: {
+      proofUrl: String,
+      paidAt: Date,
+      paidBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      note: String,
+    },
+
     tripReport: {
       isSubmitted: { type: Boolean, default: false },
-
       submittedAt: Date,
-
       description: String,
-
-      attachments: [
-        {
-          filename: String,
-          url: String,
-          mimetype: String,
-          size: Number,
-        },
-      ],
+      attachmentUrl: String,
     },
+
     status: {
       type: String,
       enum: [
         "PENDING",
-        "IN_REVIEW",
         "APPROVED",
-        "REJECTED",
-        "PAYMENT_PROCESSING",
-        "READY_TO_TRAVEL",
         "PAID",
-        "ON_TRIP",
-        "SUBMITTED",
+        "REJECTED",
+        "COMPLETED",
+        "IN_REVIEW",
+        "PAYMENT_PROCESSING",
       ],
       default: "PENDING",
-    },
-
-    currentStep: {
-      type: String,
-      default: null,
-    },
-
-    approvals: [
-      {
-        step: { type: String },
-        actor: { type: String },
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        status: { type: String, enum: ["APPROVED", "REJECTED"] },
-        date: Date,
-        note: String,
-      },
-    ],
-
-    delegation: {
-      active: { type: Boolean, default: false },
-      from: { type: String, enum: ["DIREKTUR_UTAMA"] },
-      to: { type: String, enum: ["WAKIL_DIREKTUR"] },
-      delegatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      delegatedAt: Date,
-      note: String,
-    },
-
-    payment: {
-      status: {
-        type: String,
-        enum: ["PENDING", "PROCESSING", "PAID", "FAILED"],
-        default: "PENDING",
-      },
-
-      proof: {
-        filename: String,
-        url: String,
-        uploadedAt: Date,
-      },
-
-      amount: { type: Number, default: 0 },
-
-      paidAt: Date,
-
-      paidBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-
-      note: String,
     },
   },
   { timestamps: true }

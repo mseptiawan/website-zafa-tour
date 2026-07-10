@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData } from "../utils/renderHelper.js";
 import * as payrollService from "../services/payroll.service.js";
@@ -14,14 +15,24 @@ import LoanPayment from "../models/loan/loanPayment.model.js";
  * Menampilkan halaman utama manajemen lembar kerja payroll perusahaan.
  */
 export const renderPayrollPage = asyncHandler(async (req, res) => {
+  const periodParam = req.query.period;
+
+  if (!periodParam) {
+    const kini = new Date();
+    const defaultPeriod = `${kini.getFullYear()}-${String(kini.getMonth() + 1).padStart(2, "0")}`;
+    return res.redirect(`/payroll/process?period=${defaultPeriod}`);
+  }
+
   const { employees, components, savedAllowances } = await payrollService.getPayrollData();
 
   const dropdownComponents = components.filter(
     (comp) => comp.sourceType !== "DYNAMIC" && comp.isLocked !== true
   );
 
-  const currentPeriod = getPayrollPeriod();
+  const [year, month] = periodParam.split("-");
+  const targetDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 2, 15, 0, 0, 0));
 
+  const currentPeriod = getPayrollPeriod(targetDate);
   const periodsFromDB = await Payroll.distinct("periodMonth");
 
   const availablePeriods = [...new Set([...generatePayrollPeriods(6, 3), ...periodsFromDB])].sort(
@@ -37,11 +48,10 @@ export const renderPayrollPage = asyncHandler(async (req, res) => {
       dropdownComponents,
       savedAllowances,
       availablePeriods,
-      currentPeriod: currentPeriod.id,
+      currentPeriod: periodParam || currentPeriod.id,
     }),
   });
 });
-
 /**
  * Menghitung estimasi kalkulasi nominal gaji bulanan karyawan (Draf/AJAX).
  */
@@ -49,33 +59,22 @@ export const calculatePayroll = asyncHandler(async (req, res) => {
   const { employeeId } = req.params;
   const period = req.query.period;
 
-  const now = new Date();
-  const currentPeriod = getPayrollPeriod();
-
-  const isPastPeriod = period < currentPeriod.id;
-
-  const existingPayroll = await Payroll.findOne({ employeeId, periodMonth: period }).lean();
+  const existingPayroll = await Payroll.findOne({
+    employeeId,
+    periodMonth: period,
+  }).lean();
 
   if (existingPayroll) {
-    return res.json({ isHistory: true, data: existingPayroll });
-  }
-
-  if (isPastPeriod) {
     return res.json({
-      isHistory: true,
-      data: {
-        basicSalary: 0,
-        allowances: [],
-        deductions: [],
-        loanDeduction: null,
-        overtime: { hours: 0, amount: 0 },
-      },
+      isHistory: existingPayroll.status === "CLOSED",
+      data: existingPayroll,
     });
   }
 
   const employee = await Employee.findById(employeeId).lean();
   const basicSalary = employee?.financialData?.basicSalary || 0;
 
+  // Pastikan pencarian pinjaman menggunakan string periode yang divalidasi
   const activeLoanPayments = await LoanPayment.find({
     employeeId,
     periodMonth: period,
@@ -91,38 +90,6 @@ export const calculatePayroll = asyncHandler(async (req, res) => {
         amount: l.amount,
       })),
     },
-  });
-});
-
-/**
- * Memproses penyimpanan draf payroll bulanan karyawan.
- */
-export const savePayroll = asyncHandler(async (req, res) => {
-  const { employeeId, date } = req.body;
-  if (!employeeId) {
-    return res.status(400).json({ success: false, message: "Karyawan wajib dipilih." });
-  }
-
-  const periodDate = new Date(date || Date.now());
-  const period = getPayrollPeriod(periodDate);
-  const overtime = await getOvertimeSummary(employeeId, periodDate);
-
-  const payrollData = await payrollService.buildPayroll({
-    employeeId,
-    date: periodDate,
-    overtime,
-  });
-
-  const saved = await Payroll.findOneAndUpdate(
-    { employeeId, periodMonth: period.id },
-    payrollData,
-    { upsert: true, new: true, runValidators: true }
-  );
-
-  return res.json({
-    success: true,
-    message: "Payroll bulanan berhasil dihitung & disimpan sebagai draf.",
-    data: saved,
   });
 });
 
@@ -197,140 +164,68 @@ export const getEmployeeAttendanceSummary = asyncHandler(async (req, res) => {
   const { employeeId } = req.params;
   const periodParam = req.query.period;
 
-  const employee = await Employee.findById(employeeId).lean();
-  if (!employee) {
-    return res.status(404).json({ success: false, message: "Pegawai tidak ditemukan." });
+  if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Format ID pegawai tidak valid.",
+    });
   }
 
-  const targetDate = periodParam ? new Date(`${periodParam}-01`) : new Date();
-  const summary = await getAttendanceSummary(employee.userId, targetDate);
+  let targetDate = new Date();
+
+  if (periodParam) {
+    const [year, month] = periodParam.split("-");
+    targetDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 2, 15, 0, 0, 0));
+  }
+
+  const summary = await getAttendanceSummary(employeeId, targetDate);
 
   return res.status(200).json({
     success: true,
-    totalDays: summary.totalDaysPresent,
-    periodInfo: summary.period,
+    totalDays: summary?.totalDaysPresent || 0,
+    periodInfo: summary?.period || null,
   });
 });
+
+/**
+ * Mengambil rekapitulasi lembur bulanan karyawan.
+ */
 export const getEmployeeOvertimeSummary = asyncHandler(async (req, res) => {
   const { employeeId } = req.params;
   const periodParam = req.query.period;
 
-  const targetDate = periodParam ? new Date(`${periodParam}-01`) : new Date();
+  if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+    return res.status(400).json({ success: false, message: "Format ID pegawai tidak valid." });
+  }
+
+  let targetDate = new Date();
+
+  if (periodParam) {
+    const [year, month] = periodParam.split("-");
+    targetDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 2, 15, 0, 0, 0));
+  }
 
   const summary = await getOvertimeSummary(employeeId, targetDate);
 
   return res.status(200).json({
     success: true,
-    totalHours: summary.totalHours,
-    totalPay: summary.totalPay,
-    period: summary.period || null,
+    totalHours: summary?.totalHours || 0,
+    totalPay: summary?.totalPay || 0,
+    period: summary?.period || null,
   });
 });
+
 /**
  * Melakukan proses finalisasi (Tutup Buku) penggajian karyawan secara kolektif per periode.
  */
 export const closePayrollForEmployees = asyncHandler(async (req, res) => {
-  const { employeeIds, periodMonth } = req.body;
+  const { periodMonth } = req.body;
 
-  if (!employeeIds || employeeIds.length === 0) {
-    return res.status(400).json({ success: false, message: "Tidak ada ID pegawai yang terpilih." });
-  }
-
-  const processedResults = [];
-
-  for (const empId of employeeIds) {
-    const employee = await Employee.findById(empId).lean();
-    const basicSalary = employee?.financialData?.basicSalary || 0;
-
-    const savedAllowances = await EmployeeAllowance.find({ employeeId: empId })
-      .populate("componentId")
-      .lean();
-
-    const allowances = [];
-    const deductions = [];
-    let totalEarnings = basicSalary;
-    let totalDeductions = 0;
-
-    savedAllowances.forEach((item) => {
-      if (!item.componentId) return;
-
-      let finalAmount = item.amount || 0;
-      let displayName = item.componentId.name.split("(")[0].trim();
-
-      if (
-        item.componentId.calculationType === "PERCENTAGE" &&
-        item.componentId.basedOnComponent === "GAPOK"
-      ) {
-        const percentageValue = finalAmount < 100 ? finalAmount : 2;
-        finalAmount = (percentageValue / 100) * basicSalary;
-        displayName = `${displayName} (${percentageValue}%)`;
-      }
-
-      const componentData = { componentName: displayName, amount: finalAmount };
-
-      if (item.componentId.category === "EARNING") {
-        allowances.push(componentData);
-        totalEarnings += finalAmount;
-      } else if (item.componentId.category === "DEDUCTION") {
-        deductions.push(componentData);
-        totalDeductions += finalAmount;
-      }
-    });
-
-    const activeLoanPayments = await LoanPayment.find({
-      employeeId: empId,
-      periodMonth: periodMonth,
-      isPaid: false,
-    }).lean();
-
-    let loanDeductionData = [];
-    let totalLoanDeduction = 0;
-
-    activeLoanPayments.forEach((loan) => {
-      loanDeductionData.push({ loanPaymentId: loan._id, amount: loan.amount });
-      totalLoanDeduction += loan.amount;
-    });
-
-    totalDeductions += totalLoanDeduction;
-
-    // ─── PERUBAHAN UTAMA DI SINI ──────────────────────────────────────
-    // Status langsung ditembak "PAID" dan langsung mencatat "paidAt"
-    const finalPayroll = await Payroll.findOneAndUpdate(
-      { employeeId: empId, periodMonth: periodMonth },
-      {
-        employeeId: empId,
-        periodMonth: periodMonth,
-        basicSalary,
-        allowances,
-        deductions,
-        loanDeduction: loanDeductionData,
-        totalEarnings,
-        totalDeductions,
-        netTakeHomePay: totalEarnings - totalDeductions,
-        status: "PAID", // Menggantikan "CLOSED" agar langsung lunas
-        paidAt: new Date(), // Langsung set waktu pembayaran sekarang
-        mutationFile: "/uploads/files/default-receipt.pdf", // Mengisi fallback bukti transfer otomatis
-      },
-      { upsert: true, new: true }
-    );
-    // ──────────────────────────────────────────────────────────────────
-
-    // Otomatis mengubah status tagihan pinjaman karyawan menjadi lunas terpotong payroll
-    await LoanPayment.updateMany(
-      { employeeId: empId, periodMonth: periodMonth, isPaid: false },
-      { $set: { isPaid: true, paidAt: new Date() } }
-    );
-
-    processedResults.push(finalPayroll);
-
-    // 💡 TIPS: Di baris ini, kamu bisa langsung panggil service / fungsi
-    // pengiriman email/notifikasi slip gaji ke pegawai, misalnya:
-    // await sendSalarySlipToEmail(empId, finalPayroll);
-  }
+  const processedResults = await payrollService.closePayroll(periodMonth);
 
   return res.status(200).json({
     success: true,
-    message: `Proses tutup buku dan pencairan payroll periode ${periodMonth} berhasil dieksekusi massal. Slip gaji siap dikirim!`,
+    message: `Proses tutup buku payroll periode ${periodMonth} berhasil.`,
     data: processedResults,
   });
 });
@@ -357,7 +252,7 @@ export const renderMySlipPage = asyncHandler(async (req, res) => {
 
   const payrolls = await Payroll.find({
     employeeId: employee._id,
-    status: { $in: ["CLOSED", "PAID"] },
+    status: { $in: ["CLOSED"] },
   })
     .sort({ periodMonth: -1 })
     .lean();

@@ -244,9 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
             message: result.message || "Data berhasil diperbarui.",
             type: "success",
           });
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
         } else {
           triggerGlobalToast({
             title: "Gagal",

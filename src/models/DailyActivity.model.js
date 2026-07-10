@@ -44,11 +44,6 @@ const dailyActivitySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/**
- * PERBAIKAN INDEX:
- * Diselaraskan dengan field 'employeeId' dan 'activityDate' yang kita pakai di atas.
- * Urutan compound index diletakkan dari kesamaan (employeeId) baru ke pengurutan/tanggal.
- */
 dailyActivitySchema.index({ employeeId: 1, activityDate: -1 });
 
 export default mongoose.model("DailyActivity", dailyActivitySchema);

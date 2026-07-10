@@ -38,19 +38,19 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
-export const getTodayAttendance = async (userId) => {
+export const getTodayAttendance = async (employeeId) => {
   const { start, end } = getTodayRange();
   return Attendance.findOne({
-    userId,
+    employeeId,
     checkIn: { $gte: start, $lte: end },
   });
 };
 
-export const processCheckIn = async (userId, body, file) => {
+export const processCheckIn = async (employeeId, body, file) => {
   const { start, end } = getTodayRange();
 
   const already = await Attendance.findOne({
-    userId,
+    employeeId,
     checkIn: { $gte: start, $lte: end },
   });
   if (already) throw new AppError("Anda sudah melakukan check-in hari ini.", 400);
@@ -98,7 +98,7 @@ export const processCheckIn = async (userId, body, file) => {
   }
 
   return Attendance.create({
-    userId,
+    employeeId,
     checkIn: now,
     status,
     lateDuration,
@@ -118,11 +118,11 @@ export const processCheckIn = async (userId, body, file) => {
   });
 };
 
-export const processCheckOut = async (userId, body, file) => {
+export const processCheckOut = async (employeeId, body, file) => {
   const { start, end } = getTodayRange();
 
   const attendance = await Attendance.findOne({
-    userId,
+    employeeId,
     checkIn: { $gte: start, $lte: end },
   });
   if (!attendance) throw new AppError("Anda belum memiliki record check-in hari ini.", 400);
@@ -172,13 +172,23 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     end = period.end;
   }
 
+  let targetEmployeeId = null;
+  if (!isAdmin || isPersonalView) {
+    const emp = await Employee.findOne({ userId: sessionUser._id }).select("_id");
+    if (emp) targetEmployeeId = emp._id;
+  }
+
   const matchQuery = {
     checkIn: { $gte: start, $lte: end },
-    ...(isAdmin && !isPersonalView ? {} : { userId: new mongoose.Types.ObjectId(sessionUser._id) }),
+    ...(isAdmin && !isPersonalView ? {} : { employeeId: targetEmployeeId }),
   };
 
   let listAttendance = await Attendance.find(matchQuery)
-    .populate("userId", "username")
+    .populate({
+      path: "employeeId",
+      select: "fullName",
+      populate: { path: "userId", select: "username" },
+    })
     .sort({ checkIn: -1 });
 
   listAttendance = listAttendance.map((doc) => doc.toObject());
@@ -186,16 +196,15 @@ export const getAttendanceHistory = async (sessionUser, query) => {
   if (isAdmin && !isPersonalView) {
     const attendedInPeriod = await Attendance.find({
       checkIn: { $gte: start, $lte: end },
-    }).distinct("userId");
+    }).distinct("employeeId");
 
-    const missingUsers = await User.find({
-      role: { $nin: ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA"] },
+    const missingEmployees = await Employee.find({
       _id: { $nin: attendedInPeriod },
-    }).select("username");
+    }).populate("userId", "username");
 
-    const missingAttendanceData = missingUsers.map((emp) => ({
+    const missingAttendanceData = missingEmployees.map((emp) => ({
       _id: `missing-${emp._id}`,
-      userId: { _id: emp._id, username: emp.username },
+      employeeId: emp,
       checkIn: null,
       checkOut: null,
       createdAt: start,
@@ -208,17 +217,8 @@ export const getAttendanceHistory = async (sessionUser, query) => {
     listAttendance = [...missingAttendanceData, ...listAttendance];
   }
 
-  const employees = await Employee.find({}).select("userId fullName");
-  const employeeMap = new Map();
-  employees.forEach((emp) => {
-    if (emp.userId) {
-      employeeMap.set(emp.userId.toString(), emp.fullName);
-    }
-  });
-
   listAttendance = listAttendance.map((item) => {
-    const userIdStr = item.userId?._id?.toString() || item.userId?.toString();
-    const fullName = employeeMap.get(userIdStr) || item.userId?.username || "-";
+    const fullName = item.employeeId?.fullName || "-";
     return { ...item, fullName };
   });
 
@@ -290,11 +290,11 @@ export const updateCompanyConfig = async (body) => {
   return config;
 };
 
-export const getAttendanceSummary = async (userId, date = new Date()) => {
+export const getAttendanceSummary = async (employeeId, date = new Date()) => {
   const period = getPayrollPeriod(date);
 
   const totalDaysPresent = await Attendance.countDocuments({
-    userId: userId,
+    employeeId: employeeId,
     checkIn: {
       $gte: period.start,
       $lte: period.end,

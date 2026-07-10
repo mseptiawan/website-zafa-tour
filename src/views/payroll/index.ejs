@@ -24,11 +24,13 @@
 
         <div class="relative min-w-[140px] sm:w-36">
           <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px] pointer-events-none"></i>
-          <select id="filterPeriod" class="w-full bg-white border border-slate-200 text-[11px] font-bold text-slate-700 rounded-xl pl-8 pr-7 h-11 appearance-none cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all">
+
+          <select id="periodFilter" class="w-full appearance-none bg-white border border-slate-200 rounded-xl pl-8 pr-7 py-1.5 text-[12px] font-semibold text-slate-700 shadow-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
             <% availablePeriods.forEach(p => { %>
-            <option value="<%= p %>" <%= p === currentPeriod ? 'selected' : '' %>><%= p %></option>
+            <option value="<%= p %>" <%= currentPeriod === p ? 'selected' : '' %>><%= p %></option>
             <% }) %>
           </select>
+
           <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] pointer-events-none"></i>
         </div>
 
@@ -339,9 +341,9 @@
   async function loadOvertime(idParam) {
     if (isReadOnlyMode) return;
     try {
-      const res = await fetch(
-  `/payroll/overtime-summary/${idParam}?period=${document.getElementById('filterPeriod').value}`
-);
+      // 🟢 FIX: Ubah filterPeriod -> periodFilter
+      const currentPeriod = document.getElementById('periodFilter').value;
+      const res = await fetch(`/payroll/overtime-summary/${idParam}?period=${currentPeriod}`);
       const data = await res.json();
       overtimeSummary = {
         totalHours: Number(data.totalHours || 0),
@@ -370,8 +372,11 @@
   async function loadAttendance(idParam) {
     if (isReadOnlyMode) return;
     try {
-      const res = await fetch(`/payroll/attendance-summary/${idParam}`);
+      // 🟢 FIX: Ambil nilai dari periodFilter dan teruskan ke URL
+      const currentPeriod = document.getElementById('periodFilter').value;
+      const res = await fetch(`/payroll/attendance-summary/${idParam}?period=${currentPeriod}`);
       const data = await res.json();
+
       if (data.success) {
         attendanceSummary.totalDays = Number(data.totalDays || 0);
         const activeCard = document.querySelector(`.employee-card[data-id="${idParam}"]`);
@@ -540,7 +545,7 @@
   }
 
   function fetchAndRenderPayrollData(employeeId) {
-    const period = document.getElementById('filterPeriod').value;
+    const period = document.getElementById('periodFilter').value;
     document.getElementById('labelPeriodSummary').innerText = period;
     const activeCard = document.querySelector(`.employee-card[data-id="${employeeId}"]`);
     if (!activeCard) return;
@@ -677,53 +682,45 @@
   async function triggerTutupBuku(event) {
     event.preventDefault();
 
-    const currentPeriod = document.getElementById('filterPeriod').value;
+    const currentPeriod = document.getElementById("periodFilter").value;
 
-    // 1. Sesuaikan teks alert konfirmasi menjadi 5 pegawai target
-    if (!confirm(`Apakah Anda yakin ingin melakukan Tutup Buku periode ${currentPeriod} untuk 5 pegawai target? Data yang dikunci tidak dapat diubah kembali.`)) {
+    if (
+      !confirm(
+        `Apakah Anda yakin ingin melakukan Tutup Buku periode ${currentPeriod} untuk seluruh pegawai? Data yang dikunci tidak dapat diubah kembali.`
+      )
+    ) {
       return;
     }
 
-    const allCards = document.querySelectorAll('.employee-card');
+    // Ambil seluruh ID pegawai
+    const employeeIds = [...document.querySelectorAll(".employee-card")]
+      .map(card => card.getAttribute("data-id"))
+      .filter(Boolean);
 
-    // 2. TAMBAHKAN USERNAME BARU DI SINI 👈
-    const targetUsernames = ["fajarjaniko", "adindarismayani", "abdulaziz", "meltisundari", "basoherman"];
-    const matchedEmployeeIds = [];
-
-    allCards.forEach(card => {
-      const nameText = card.querySelector('h4').innerText.toLowerCase().replace(/\s/g, "");
-      const empId = card.getAttribute('data-id');
-
-      const isTarget = targetUsernames.some(target => nameText.includes(target));
-      if (isTarget && empId) {
-        matchedEmployeeIds.push(empId);
-      }
-    });
-
-    if (matchedEmployeeIds.length === 0) {
-      alert("❌ Gagal memetakan ID Pegawai. Pastikan profil 5 pegawai target ada di database.");
+    if (employeeIds.length === 0) {
+      alert(" Tidak ada data pegawai.");
       return;
     }
 
     try {
-      const response = await fetch('/payroll/close-book', {
-        method: 'POST',
+      const response = await fetch("/payroll/close-book", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          employeeIds: matchedEmployeeIds,
-          periodMonth: currentPeriod
-        })
+          employeeIds,
+          periodMonth: currentPeriod,
+        }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        alert(`🔒 Sukses! ${result.message}`);
+        alert(`${result.message}`);
         window.location.reload();
       } else {
-        alert(`❌ Gagal: ${result.message}`);
+        alert(` ${result.message}`);
       }
     } catch (error) {
       console.error(error);
@@ -785,11 +782,9 @@
       });
   }
 
-  document.getElementById('filterPeriod').addEventListener('change', function() {
-    const activeCard = document.querySelector('.employee-card.bg-blue-50\\/40');
-    if (activeCard) {
-      fetchAndRenderPayrollData(activeCard.getAttribute('data-id'));
-    }
+  document.getElementById('periodFilter').addEventListener('change', function() {
+    const selectedPeriod = this.value;
+    window.location.href = `/payroll/process?period=${selectedPeriod}`;
   });
 
   document.getElementById('searchEmployeeInput').addEventListener('input', function(e) {

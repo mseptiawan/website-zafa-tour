@@ -1,108 +1,128 @@
 <%- layout('layouts/main', { title }) %>
 
-<div >
-  <div class="max-w-none mx-auto">
+<% 
+  // Periksa apakah user memiliki role manajemen/approver dinas luar
+  const APPROVER_ROLES = ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
+  
+  // Normalisasi role user untuk mencegah bug spasi atau huruf kapital
+  const currentRole = (user.role || '').toUpperCase().trim();
+  const isManagement = APPROVER_ROLES.includes(currentRole);
+  const backLink = isManagement ? '/trip/approval' : '/trip/my';
+%>
 
-    <% 
-      const APPROVER_ROLES = ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA"];
-      // FIX: Tambahkan .trim() untuk mencegah bug spasi di back link
-      const userRoleRaw = (user.role || '').toUpperCase().trim();
-      const isManagement = APPROVER_ROLES.includes(userRoleRaw);
-      const backLink = isManagement ? '/trip/approval' : '/trip/my';
-    %>
-    <a href="<%= backLink %>" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
-      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div>
+  <div class="w-full max-w-none mx-auto space-y-5 md:space-y-6">
+
+    <!-- BACK BUTTON -->
+    <a href="<%= backLink %>" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors group select-none">
+      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
       </svg>
-      Kembali
+      <span>Kembali</span>
     </a>
 
     <% if (typeof error !== 'undefined' && error) { %>
-      <div class="mb-5 px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-red-700 text-[13px] font-medium">
+      <div class="px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-red-700 text-[13px] font-medium shadow-3xs">
         <%= error %>
       </div>
     <% } %>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-      
-      <div class="lg:col-span-2 space-y-6">
-        
-        <div class="bg-white border border-slate-200/60 rounded-2xl  overflow-hidden">
-          
-          <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
-            <div class="flex items-center gap-4 min-w-0 flex-1">
-              <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-500 flex-shrink-0">
+    <!-- 3-COLUMN GRID LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6 items-start">
+
+      <!-- LEFT COLUMN: MAIN INFORMATION & OPERATIONAL ACTIONS -->
+      <div class="space-y-5 md:space-y-6 lg:col-span-2">
+
+        <!-- DETAIL CARD -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-2xs">
+
+          <!-- CARD HEADER -->
+          <div class="p-4 md:px-8 md:py-5 border-b border-slate-100 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/50 flex items-center justify-center text-slate-400 shrink-0 hidden sm:flex">
                 <i class="fa-solid fa-file-signature text-sm"></i>
               </div>
               <div class="min-w-0 flex-1">
-                <h1 class="text-[15px] font-semibold text-slate-900 tracking-tight leading-none mb-2 break-words">
+                <h1 class="text-[14px] md:text-[15px] font-semibold text-slate-900 tracking-tight truncate mb-0.5">
                   <%= trip.title %>
                 </h1>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                  Detail Lembar Persetujuan Perjalanan
+                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                  Detail Lembar Persetujuan Dinas Luar
                 </p>
               </div>
             </div>
 
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <span class="inline-flex items-center px-3 py-1 text-[10px] font-semibold tracking-wider rounded-full border uppercase
-                <%= trip.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : trip.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-200'
-                  : 'bg-blue-50 text-blue-700 border-blue-200' %>">
-                <%= trip.status %>
-              </span>
-            </div>
+            <span class="px-2.5 py-0.5 md:px-3 md:py-1 rounded-full font-bold text-[9.5px] md:text-[10px] uppercase tracking-wider border shrink-0 select-none
+              <%= trip.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
+                : trip.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200/50'
+                : 'bg-blue-50 text-blue-700 border-blue-200/50' %>">
+              <%= trip.status %>
+            </span>
           </div>
 
-          <div class="p-8 space-y-8">
-            
-            <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+          <!-- CARD BODY -->
+          <div class="p-5 md:p-6 space-y-5 bg-white">
+            <!-- GRID INFO UTAMA -->
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4 md:gap-x-8">
               <div>
-                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Nama Pengaju</div>
-                <div class="text-[14px] font-semibold text-slate-800 break-words"><%= trip.userId?.username || '-' %></div>
-              </div>
-              <div>
-                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Kota / Lokasi Tujuan</div>
-                <div class="text-[14px] font-semibold text-slate-800 break-words"><%= trip.destination || '-' %></div>
-              </div>
-            </div>
-
-            <div class="border-t border-slate-100 pt-6">
-              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Total Alokasi Anggaran (Budget)</div>
-              <div class="text-[18px] font-bold text-slate-900 tabular-nums mb-4">
-                Rp <%= (typeof trip.budget === 'number' ? trip.budget : (trip.budget?.total || 0)).toLocaleString('id-ID') %>
-              </div>
-
-              <% if (trip.budget && typeof trip.budget === 'object' && trip.budget.items && trip.budget.items.length > 0) { %>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1">
-                  <% trip.budget.items.forEach(function(item) { %>
-                    <div class="flex items-start justify-between bg-slate-50/60 border border-slate-200/30 rounded-xl p-3 hover:bg-slate-50 transition-colors gap-3">
-                      <div class="space-y-0.5 leading-tight min-w-0 flex-1">
-                        <span class="text-[11px] font-semibold text-slate-700 block break-words"><%= item.title %></span>
-                        <% if (item.description) { %>
-                          <span class="text-[10px] text-slate-400 block mt-0.5 break-words"><%= item.description %></span>
-                        <% } %>
-                      </div>
-                      <span class="text-[11px] font-bold text-slate-800 whitespace-nowrap tabular-nums flex-shrink-0">
-                        Rp <%= (item.allocatedAmount || 0).toLocaleString('id-ID') %>
-                      </span>
-                    </div>
-                  <% }); %>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Nama Pengaju</div>
+                <div class="text-[13px] md:text-[14px] font-semibold text-slate-800 break-words">
+                  <%= trip.userId?.username || '-' %>
                 </div>
-              <% } %>
+              </div>
+
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Kota / Lokasi Tujuan</div>
+                <div class="text-[13px] md:text-[14px] font-semibold text-slate-800 break-words">
+                  <%= trip.destination || '-' %>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Klien / Hubungan Kerja</div>
+                <div class="text-[13px] md:text-[14px] font-medium text-slate-800 break-words">
+                  <%= trip.meetWith || '-' %>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Kategori / Keperluan</div>
+                <div class="text-[13px] md:text-[14px] font-medium text-slate-800 break-words">
+                  <%= trip.purpose || '-' %>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 tracking-wider mb-0.5">TANGGAL MULAI DINAS</div>
+                <div class="text-[13px] font-medium text-slate-800 tabular-nums">
+                  <%= trip.startDate ? new Date(trip.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 tracking-wider mb-0.5">TANGGAL SELESAI DINAS</div>
+                <div class="text-[13px] font-medium text-slate-800 tabular-nums">
+                  <%= trip.endDate ? new Date(trip.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
+                </div>
+              </div>
             </div>
 
-            <div class="relative pl-5 border-l-2 border-slate-200 pt-0.5">
-              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Deskripsi / Maksud Dinas</div>
-              <p class="text-[13px] text-slate-600 leading-relaxed italic break-words whitespace-pre-line">"<%= trip.description || 'Tidak ada deskripsi tambahan.' %>"</p>
+            <!-- BOX DESKRIPSI -->
+            <div class="relative pl-4 border-l-2 border-slate-200/80 py-0.5">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Deskripsi / Maksud Dinas</span>
+              <p class="text-[12.5px] text-slate-600 leading-relaxed whitespace-pre-line italic">
+                "<%= trip.description || 'Tidak ada deskripsi tambahan.' %>"
+              </p>
             </div>
 
-            <div class="space-y-3 pt-2 border-t border-slate-100/60">
-              <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest block">Rute & Runtunan Linimasa Perjalanan</label>
+            <!-- LINIMASA RUTE JALAN -->
+            <% if (trip.timeline && trip.timeline.length > 0) { %>
+            <div class="space-y-3 pt-4 border-t border-slate-100">
+              <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Rute & Runtunan Linimasa Perjalanan</label>
               <div class="relative pl-5 space-y-4 before:absolute before:left-[4px] before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-200">
-                <% (trip.timeline || []).forEach((item)=> { %>
+                <% trip.timeline.forEach((item)=> { %>
                   <div class="relative group flex items-start">
-                    <div class="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full border border-white bg-slate-300 group-hover:bg-slate-500 transition-colors  ring-4 ring-white flex-shrink-0"></div>
+                    <div class="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full border border-white bg-slate-300 group-hover:bg-slate-500 transition-colors ring-4 ring-white flex-shrink-0"></div>
                     <div class="text-[12px] font-medium text-slate-600 group-hover:text-slate-900 transition-colors leading-snug break-words max-w-full">
                       <%= item.address %>
                     </div>
@@ -110,40 +130,109 @@
                 <% }) %>
               </div>
             </div>
+            <% } %>
 
+            <!-- ESTIMATED BUDGET -->
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Alokasi Anggaran (Budget)</div>
+                <div class="text-base md:text-lg font-extrabold text-slate-950 tabular-nums mt-0.5">
+                  Rp <%= (typeof trip.budget === 'number' ? trip.budget : (trip.budget?.total || 0)).toLocaleString('id-ID') %>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        <!-- MOBILE TRIGGER FOR BUDGET BREAKDOWN SHEET -->
+        <div class="flex flex-col gap-2.5 md:hidden w-full select-none">
+          <button type="button" onclick="toggleBottomSheet('budgetSheet', true)" class="w-full h-11 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-2xs active:bg-slate-50">
+            <i class="fa-solid fa-table-list text-slate-400"></i> Rincian Alokasi Dana Anggaran
+          </button>
+        </div>
+
+        <!-- DESKTOP BUDGET DETAILS TABLE -->
+        <div class="pt-2">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Rincian Pos Alokasi Anggaran</div>
+
+          <div class="overflow-x-auto border border-slate-200/60 rounded-xl bg-white shadow-2xs">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50/70 border-b border-slate-200/60">
+                  <th class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Komponen Alokasi / Item</th>
+                  <th class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Kuantitas</th>
+                  <th class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Satuan</th>
+                  <th class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-[12px] text-slate-700">
+                <% if (trip.budget && typeof trip.budget === 'object' && trip.budget.items && trip.budget.items.length > 0) { %>
+                  <% trip.budget.items.forEach(function(item) { %>
+                  <tr>
+                    <td class="p-3 font-medium text-slate-800">
+                      <%= item.title %>
+                      <% if(item.description) { %>
+                      <span class="block text-[10px] text-slate-400 italic font-normal"><%= item.description %></span>
+                      <% } %>
+                    </td>
+                    <td class="p-3 text-center tabular-nums text-slate-600">
+                      <%= item.quantity %> <%= item.unit || 'Hari' %>
+                    </td>
+                    <td class="p-3 text-right tabular-nums text-slate-600">
+                      Rp <%= (item.pricePerUnit || 0).toLocaleString('id-ID') %>
+                    </td>
+                    <td class="p-3 text-right font-semibold tabular-nums text-slate-900">
+                      Rp <%= (item.allocatedAmount || 0).toLocaleString('id-ID') %>
+                    </td>
+                  </tr>
+                  <% }); %>
+                <% } else { %>
+                <tr>
+                  <td colspan="4" class="p-4 text-center text-slate-400 italic text-[11px]">
+                    Tidak ada rincian alokasi anggaran.
+                  </td>
+                </tr>
+                <% } %>
+              </tbody>
+              <tfoot>
+                <tr class="bg-slate-50/50 font-bold border-t border-slate-200 text-slate-900">
+                  <td colspan="3" class="p-3 text-[10px] uppercase tracking-wider text-slate-500 text-right">Total Pagu Akhir:</td>
+                  <td class="p-3 text-right text-blue-600 tabular-nums text-[13px] font-extrabold">
+                    Rp <%= (typeof trip.budget === 'number' ? trip.budget : (trip.budget?.total || 0)).toLocaleString('id-ID') %>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- EVALUATION & VERIFICATION PANEL (ACC FIELD) -->
         <% 
-          // 1. NORMALISASI ROLE & STEP (Penting: .toUpperCase() dan .trim() agar bebas dari spasi tersembunyi)
-          const currentRole = (user.role || '').toUpperCase().trim();
           const currentStep = (trip.currentStep || '').toUpperCase().trim();
-          
           const isFinal = ['APPROVED', 'REJECTED'].includes(trip.status); 
 
-          // 2. CEK STATUS DELEGASI
+          // Pendelegasian status check
           const isDelegatedToWadir = trip.delegation?.active === true && trip.delegation?.to === 'WAKIL_DIREKTUR'; 
           
-          // 3. LOGIC DELEGASI SPESIFIK
-          // Wakil Direktur hanya bisa bertindak jika memang didelegasikan SAAT stepnya ada di DIREKTUR_UTAMA
+          // Wakil Direktur memegang wewenang jika langkah saat ini adalah Direktur Utama dan didelegasikan aktif
           const isWadirStep = isDelegatedToWadir && currentRole === 'WAKIL_DIREKTUR' && currentStep === 'DIREKTUR_UTAMA'; 
-          // Jika didelegasikan, Direktur Utama di-block dari action UI
+          
+          // Memblokir Direktur Utama jika wewenang didelegasikan ke Wadir
           const isPimpinanBlocked = currentRole === 'DIREKTUR_UTAMA' && isDelegatedToWadir && currentStep === 'DIREKTUR_UTAMA'; 
           
-          // 4. SIMPLIFIKASI canApprove
+          // Menentukan hak menyetujui
           const canApprove = !isFinal && (currentRole === currentStep || isWadirStep); 
           
-          // 5. LOGIC ACTION DELEGATE BUTTON
+          // Hak mendelegasikan
           const requesterRoleNormal = (trip.requesterRole || '').toUpperCase().trim();
           const requesterIsWadir = requesterRoleNormal === 'WAKIL_DIREKTUR'; 
           const canDelegate = currentRole === 'DIREKTUR_UTAMA' && currentStep === 'DIREKTUR_UTAMA' && !isDelegatedToWadir && !isFinal && !requesterIsWadir; 
         %>
 
-
         <% if (canApprove && !isPimpinanBlocked) { %>
-          <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-slate-200 ">
+          <div class="bg-white/90 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-slate-200 shadow-2xs">
             <h3 class="text-sm font-semibold text-slate-800 mb-5 flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-700">
+              <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-700 border border-blue-100">
                 <i class="fa-solid fa-check-double"></i>
               </div>
               Evaluasi & Verifikasi Dokumen Dinas
@@ -171,7 +260,7 @@
                 </button>
 
                 <button type="button" onclick="submitWithAction('APPROVE')"
-                  class="cursor-pointer px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold  transition active:scale-[0.98] whitespace-nowrap">
+                  class="cursor-pointer px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition active:scale-[0.98] whitespace-nowrap shadow-sm">
                   Setujui Pengajuan
                 </button>
 
@@ -182,7 +271,7 @@
         <% } %>
 
         <% if (!canApprove || isPimpinanBlocked) { %>
-          <div class="bg-white border border-slate-200/60 rounded-2xl p-5 flex items-center justify-between text-[13px]">
+          <div class="bg-white border border-slate-200/60 rounded-2xl p-5 flex items-center justify-between text-[13px] shadow-2xs">
             <div class="text-slate-500 font-medium flex items-center gap-2">
               <% if (trip.status === 'APPROVED') { %>
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -205,9 +294,9 @@
           </div>
         <% } %>
 
-
+        <!-- DELEGATE ACTION BOX -->
         <% if (canDelegate) { %>
-          <div class="bg-white border border-slate-200/60 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="bg-white border border-slate-200/60 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
             <div class="space-y-0.5">
               <h4 class="text-[13px] font-semibold text-slate-800">
                 Pendelegasian Berkas Otoritas
@@ -219,7 +308,7 @@
 
             <form method="POST" action="/trip/<%= trip._id %>/delegate" class="flex-shrink-0">
               <button type="submit"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-amber-50/50 text-amber-600 hover:text-amber-700 border border-amber-200 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all   active:scale-[0.98] cursor-pointer">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-amber-50/50 text-amber-600 hover:text-amber-700 border border-amber-200 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all active:scale-[0.98] cursor-pointer">
                 <i class="fa-solid fa-shuffle text-[10px]"></i> Delegasikan ke Wakil Direktur
               </button>
             </form>
@@ -228,115 +317,138 @@
 
       </div>
 
-      <div class="space-y-6">
-        <div class="bg-white border border-slate-200/60 rounded-2xl  p-6">
-          <div class="mb-8">
+      <!-- RIGHT COLUMN: TRACKING LOGS (RENDER LANGSUNG TANPA PARTIALS) -->
+      <div class="space-y-5 md:space-y-6 lg:col-span-1 w-full flex flex-col pb-24 md:pb-0">
+        
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-2xs">
+          <div class="mb-6">
             <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h2>
             <p class="text-[10px] text-slate-400 mt-0.5">Alur dan status persetujuan berkas dinas</p>
           </div>
 
           <div class="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
-            <% if (!trip.approvals || trip.approvals.length === 0) { %>
-              <div class="text-xs text-slate-400 italic py-2">Belum ada riwayat tracker approval.</div>
-            <% } %>
-
-            <% (trip.approvals || []).forEach((app, index) => { %>
-              <div class="relative mb-6">
-                <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center
-                  <%= app.status === 'APPROVED' ? 'bg-emerald-500' : app.status === 'REJECTED' ? 'bg-rose-500' : 'bg-amber-400' %>">
-                  <span class="text-[8px] text-white font-bold"><%= index + 1 %></span>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase truncate"><%= app.step %></span>
-                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border flex-shrink-0
-                      <%= app.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                        : app.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' 
-                        : 'bg-amber-50 text-amber-700 border-amber-200' %>">
-                      <%= app.status %>
-                    </span>
+            <% if (typeof approvals !== 'undefined' && approvals && approvals.length > 0) { %>
+              <% approvals.forEach(function(log, idx) { %>
+                <div class="relative flex items-start gap-4">
+                  <!-- Indicator Node -->
+                  <div class="absolute -left-[20px] top-1.5 w-3 h-3 rounded-full border-[2.5px] border-white ring-4 ring-white flex-shrink-0
+                    <%= log.status === 'APPROVED' ? 'bg-emerald-500' 
+                      : log.status === 'REJECTED' ? 'bg-rose-500' 
+                      : 'bg-amber-500 animate-pulse' %>">
                   </div>
-
-                  <div class="flex items-center gap-2 text-[10px] text-slate-500">
-                    <span class="font-semibold text-slate-700"><%= app.actor || 'Sistem / Staff' %></span>
-                    <span class="text-slate-300">|</span>
-                    <span><%= app.actionDate ? new Date(app.actionDate).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Selesai' %></span>
-                  </div>
-
-                  <% if (app.status !== 'PENDING' && app.note) { %>
-                    <div class="mt-2 text-[10px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic break-words">
-                      "<%= app.note %>"
+                  
+                  <div class="space-y-1 min-w-0 flex-1 leading-tight">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-[12px] font-bold text-slate-800 break-words">
+                        <%= (log.step || '').replace('_', ' ') %>
+                      </span>
+                      <span class="text-[9.5px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border select-none
+                        <%= log.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                          : log.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-100' 
+                          : 'bg-amber-50 text-amber-700 border-amber-100' %>">
+                        <%= log.status %>
+                      </span>
                     </div>
-                  <% } %>
-                </div>
-              </div>
-            <% }) %>
 
-            <% const isFinalState = ['APPROVED', 'REJECTED', 'CANCELLED'].includes(trip.status); %>
-            <% if (!isFinalState && trip.currentStep) { %>
-              <div class="relative mb-6">
-                <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 border-white bg-blue-500 flex items-center justify-center animate-pulse">
-                  <span class="text-[8px] text-white font-bold"><%= (trip.approvals || []).length + 1 %></span>
-                </div>
+                    <% if (log.approvedBy?.username) { %>
+                      <p class="text-[11px] text-slate-500 font-medium">
+                        Oleh: <%= log.approvedBy.username %>
+                      </p>
+                    <% } %>
 
-                <div class="flex flex-col gap-1">
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="text-[11px] font-bold text-slate-900 tracking-wide uppercase truncate">
-                      <%= trip.delegation?.active ? 'Wakil Direktur (DELEGATED)' : trip.currentStep %>
-                    </span>
-                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border flex-shrink-0 bg-blue-50 text-blue-700 border-blue-200">
-                      PENDING
-                    </span>
-                  </div>
+                    <% if (log.note) { %>
+                      <div class="bg-slate-50 border border-slate-150 rounded-lg p-2.5 mt-2 text-[11.5px] text-slate-600 italic break-words">
+                        "<%= log.note %>"
+                      </div>
+                    <% } %>
 
-                  <div class="flex items-center gap-2 text-[10px] text-slate-400">
-                    <span class="font-semibold text-slate-500">Otoritas Peninjau</span>
-                    <span class="text-slate-300">|</span>
-                    <span>Menunggu Tindakan</span>
-                  </div>
-
-                  <div class="mt-2 text-[10px] bg-blue-50/40 p-2.5 rounded-lg border border-blue-100/50 text-blue-600 italic leading-relaxed break-words">
-                    "Menunggu konfirmasi pada langkah otoritas saat ini."
+                    <% if (log.updatedAt) { %>
+                      <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-1.5">
+                        <%= new Date(log.updatedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                      </p>
+                    <% } %>
                   </div>
                 </div>
-              </div>
-            <% } %>
-
-            <% if (trip.status === 'CANCELLED') { %>
-              <div class="relative mt-4 pl-3 border-l border-slate-200">
-                <div class="flex flex-col gap-1">
-                  <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-semibold text-slate-500 tracking-wide uppercase">Pengajuan Dibatalkan</span>
-                    <span class="text-[9px] font-medium px-2 py-0.5 rounded-md uppercase border bg-slate-50 text-slate-600 border-slate-200">Cancelled</span>
-                  </div>
-                  <div class="mt-1.5 text-[10px] text-slate-500 bg-slate-50/50 p-2 rounded-lg border border-slate-100/80 italic leading-relaxed">
-                    "Pengajuan perjalanan dinas luar telah dibatalkan resmi oleh pemohon."
-                  </div>
-                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="text-center py-6 text-slate-400 italic text-[11px]">
+                Belum ada rekaman jejak log pemeriksaan.
               </div>
             <% } %>
           </div>
         </div>
+
+        <div class="h-14 block md:hidden pointer-events-none select-none"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- RESPONSIVE BOTTOM SHEET FOR BUDGET (MOBILE ONLY) -->
+<div id="budgetSheet" class="fixed inset-0 z-50 hidden bg-slate-950/40 backdrop-blur-xs transition-opacity duration-300 items-end justify-center" onclick="closeSheetOnOverlay(event, 'budgetSheet')">
+  <div class="w-full max-w-xl bg-white rounded-t-3xl border-t border-slate-200 p-4 space-y-4 max-h-[80vh] overflow-y-auto transform translate-y-0 transition-transform duration-300 pb-24">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3 select-none">
+      <div>
+        <h3 class="text-[12px] font-bold text-slate-800 uppercase tracking-wider">Rincian Komponen Anggaran</h3>
+        <p class="text-[10px] text-slate-400 mt-0.5">Alokasi dana operasional perjalanan dinas</p>
+      </div>
+      <button type="button" onclick="toggleBottomSheet('budgetSheet', false)" class="h-7 w-7 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center text-xs font-semibold border border-slate-200/50">✕</button>
+    </div>
+
+    <div class="space-y-2.5 text-xs">
+      <% if (trip.budget && typeof trip.budget === 'object' && trip.budget.items && trip.budget.items.length > 0) { %>
+        <% trip.budget.items.forEach(function(item) { %>
+          <div class="bg-slate-50/50 border border-slate-200/40 rounded-xl p-3 flex items-center justify-between">
+            <span class="font-semibold text-slate-500"><%= item.title %></span>
+            <span class="font-bold text-slate-900 tabular-nums">Rp <%= (item.allocatedAmount || 0).toLocaleString('id-ID') %></span>
+          </div>
+        <% }); %>
+      <% } %>
+      <div class="bg-blue-50/40 border border-blue-100 rounded-xl p-3.5 flex items-center justify-between border-dashed">
+        <span class="font-bold text-blue-600 uppercase text-[10px] tracking-wider">Total Keseluruhan</span>
+        <span class="font-extrabold text-blue-700 tabular-nums text-[13px]">
+          Rp <%= (typeof trip.budget === 'number' ? trip.budget : (trip.budget?.total || 0)).toLocaleString('id-ID') %>
+        </span>
       </div>
     </div>
   </div>
 </div>
 
+<!-- CLIENT HANDLERS & RESPONSIVE SCRIPTS -->
 <script>
+  function toggleBottomSheet(sheetId, shouldOpen) {
+    const sheet = document.getElementById(sheetId);
+    if (!sheet) return;
+
+    if (shouldOpen) {
+      sheet.classList.replace('hidden', 'flex');
+      document.body.style.overflow = 'hidden';
+    } else {
+      sheet.classList.replace('flex', 'hidden');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function closeSheetOnOverlay(event, sheetId) {
+    const sheet = document.getElementById(sheetId);
+    if (event.target === sheet) {
+      toggleBottomSheet(sheetId, false);
+    }
+  }
+
   function submitWithAction(actionType) {
     const form = document.getElementById('action-master-form');
-    const inputAction = document.getElementById('action-type-value');
+    const actionInput = document.getElementById('action-type-value');
     const noteInput = document.getElementById('approval-note-input');
 
-    inputAction.value = actionType;
-
-    if (actionType === 'REJECT' && !noteInput.value.trim()) {
-      noteInput.reportValidity();
+    if (actionType === 'REJECT' && (!noteInput.value || noteInput.value.trim() === '')) {
+      alert('Mohon isi catatan atau alasan penolakan terlebih dahulu.');
       noteInput.focus();
       return;
     }
 
+    actionInput.value = actionType;
     form.submit();
   }
 </script>

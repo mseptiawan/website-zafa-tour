@@ -1,4 +1,5 @@
 import AppError from "../utils/AppError.js";
+import Employee from "../models/employee/Employee.model.js";
 import {
   getTodayAttendance,
   processCheckIn,
@@ -7,13 +8,17 @@ import {
   updateCompanyConfig,
 } from "../services/attendance.service.js";
 
-// ─── Page: Form Absensi ──────────────────────────────────────────────────────
+const getEmployeeIdFromUser = async (userId) => {
+  const employee = await Employee.findOne({ userId }).select("_id");
+  if (!employee) throw new AppError("Profil pegawai tidak ditemukan untuk akun ini.", 404);
+  return employee._id;
+};
 
 export const renderAttendancePage = async (req, res, next) => {
   try {
     const user = req.user;
-
-    const attendance = await getTodayAttendance(user._id);
+    const employeeId = await getEmployeeIdFromUser(user._id);
+    const attendance = await getTodayAttendance(employeeId);
 
     res.render("attendance/create", {
       title: "Absensi",
@@ -26,8 +31,6 @@ export const renderAttendancePage = async (req, res, next) => {
   }
 };
 
-// ─── API: Check-In ───────────────────────────────────────────────────────────
-
 export const checkIn = async (req, res, next) => {
   try {
     const user = req.user;
@@ -35,7 +38,8 @@ export const checkIn = async (req, res, next) => {
 
     req.body._userAgent = req.headers["user-agent"] || "";
 
-    await processCheckIn(user._id, req.body, req.file);
+    const employeeId = await getEmployeeIdFromUser(user._id);
+    await processCheckIn(employeeId, req.body, req.file);
 
     res.status(201).json({
       success: true,
@@ -46,14 +50,13 @@ export const checkIn = async (req, res, next) => {
   }
 };
 
-// ─── API: Check-Out ──────────────────────────────────────────────────────────
-
 export const checkOut = async (req, res, next) => {
   try {
     const user = req.user;
     if (!user) throw new AppError("Sesi Anda telah berakhir.", 401);
 
-    await processCheckOut(user._id, req.body, req.file);
+    const employeeId = await getEmployeeIdFromUser(user._id);
+    await processCheckOut(employeeId, req.body, req.file);
 
     res.status(200).json({
       success: true,
@@ -63,8 +66,6 @@ export const checkOut = async (req, res, next) => {
     next(err);
   }
 };
-
-// ─── Page: Riwayat Absensi ───────────────────────────────────────────────────
 
 export const renderHistoryPage = async (req, res, next) => {
   try {
@@ -85,8 +86,6 @@ export const renderHistoryPage = async (req, res, next) => {
     next(err);
   }
 };
-
-// ─── API: Perbarui Lokasi Kantor ─────────────────────────────────────────────
 
 export const updateCompanyLocation = async (req, res, next) => {
   try {

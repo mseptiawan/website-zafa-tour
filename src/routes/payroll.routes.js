@@ -19,7 +19,7 @@ const PAYROLL_MANAGEMENT_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR", "HR"];
 router.use(authMiddleware);
 
 // --- Hak Akses Manajemen Keuangan & HR ---
-router.get("/manage", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), renderPayrollPage);
+router.get("/process", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), renderPayrollPage);
 router.post("/save", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), saveEmployeeAllowances);
 router.get("/calculate/:employeeId", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), calculatePayroll);
 router.post("/close-book", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), closePayrollForEmployees);

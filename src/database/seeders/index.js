@@ -6,25 +6,36 @@ import salaryComponentSeeder from "./salaryComponent.seeder.js";
 import attendanceSeeder from "./attendance.seeder.js";
 import overtimeSeeder from "./overtime.seeder.js";
 import holidaysSeeder from "./holidays.seeder.js";
-import seedLeaveBalance from "./leaveBalance.seeder.js";
+import leaveBalance from "./leaveBalance.seeder.js";
 import kpiTemplate from "./kpiTemplate.seeder.js";
 import kpiTemplateDetail from "./kpiTemplateDetail.seeder.js";
 import unitKpiMap from "./unitKpiMapping.seeder.js";
+import role from "./role.seeder.js";
+import bidang from "./bidang.seeder.js";
+import unit from "./unit.seeder.js";
+import Employee from "../../models/employee/Employee.model.js";
+import employee from "./employee.seeder.js";
+import position from "./position.seeder.js";
+import user from "./user.seeder.js";
+import holiday from "./holidays.seeder.js";
+import salaryComponent from "./salaryComponent.seeder.js";
 dotenv.config();
 
 const seeders = [
-  // kpiTemplate,
-  // kpiTemplateDetail,
-  // unitKpiMap,
-  attendanceSeeder,
-  // completeLoanSeeder,
+  role,
+  bidang,
+  position,
+  unit,
+  user,
+  employee,
+  holiday,
+  leaveBalance,
+  kpiTemplate,
+  kpiTemplateDetail,
+  unitKpiMap,
+  // attendanceSeeder,
+  salaryComponent,
   // overtimeSeeder,
-  // salaryComponentSeeder,
-  // overtimeSeeder,
-  // holidaysSeeder,
-  // seedLeaveBalance,
-  // expenseCategorySeeder,
-  // completePayrollHistorySeeder,
 ];
 
 const runSeeder = async () => {

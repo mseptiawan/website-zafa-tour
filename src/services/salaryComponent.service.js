@@ -14,8 +14,8 @@ export const createComponent = async (data) => {
     name: data.name,
     category: data.category,
     type: data.type,
-    calculationType: data.calculationType || "FIXED_AMOUNT",
-    defaultAmount: data.defaultAmount || 0,
+    calculationType: "FIXED_AMOUNT", // 🟢 FORCE: Selalu paksa FIXED_AMOUNT saat input baru
+    defaultAmount: parseFloat(data.defaultAmount) || 0,
     isActive: true,
   });
 };
@@ -27,8 +27,8 @@ export const updateComponent = async (id, data) => {
       name: data.name,
       category: data.category,
       type: data.type,
-      calculationType: data.calculationType,
-      defaultAmount: data.defaultAmount,
+      calculationType: "FIXED_AMOUNT", // 🟢 FORCE: Amankan state agar tetap FIXED_AMOUNT saat update
+      defaultAmount: parseFloat(data.defaultAmount) || 0,
     },
     { new: true }
   );

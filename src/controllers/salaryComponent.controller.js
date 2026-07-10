@@ -76,7 +76,7 @@ export const archiveComponent = async (req, res) => {
   try {
     const id = req.params.id;
 
-    const component = await salaryComponentService.archiveComponent(req.params.id);
+    const component = await salaryComponentService.archiveComponent(id);
 
     if (!component) {
       return res.status(404).json({ success: false, message: "Komponen tidak ditemukan" });
