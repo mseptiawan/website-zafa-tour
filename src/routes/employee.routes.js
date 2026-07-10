@@ -35,10 +35,8 @@ import {
 
 const router = express.Router();
 
-// Role yang diizinkan mengelola data kepegawaian & karir
 const HR_MANAGEMENT_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR", "HR"];
 
-// Semua rute di bawah ini wajib login
 router.use(authMiddleware);
 
 // ==========================================
@@ -54,7 +52,6 @@ router.get("/my-profile/edit", editProfileMandiriWeb);
 // 2. ROUTE PROSES DATA / ACTION FORM (POST & PUT)
 // ==========================================
 
-// Create Karyawan Baru (Hanya HR)
 router.post(
   "/create",
   roleMiddleware(...HR_MANAGEMENT_ROLES),
@@ -65,7 +62,6 @@ router.post(
   createEmployeeApi
 );
 
-// Pengajuan PHK (Hanya HR)
 router.post(
   "/phk",
   roleMiddleware(...HR_MANAGEMENT_ROLES),
@@ -73,7 +69,6 @@ router.post(
   ajukanPHKApi
 );
 
-// Update Tab Data Karyawan (API / AJAX Fetch)
 router.put("/:id/pribadi", updatePribadiApi);
 
 router.put("/:id/karir", roleMiddleware(...HR_MANAGEMENT_ROLES), updateKarirApi);
@@ -88,7 +83,6 @@ router.put("/:id/keluarga", validate(updateFamilySchema), updateKeluargaApi);
 
 router.put("/:id/finansial", validate(updateFinancialSchema), updateFinansialApi);
 
-// Upload Avatar / Foto Profil
 router.post("/upload-avatar/:id", uploadFile.single("foto_profile"), uploadAvatarWeb);
 
 export default router;

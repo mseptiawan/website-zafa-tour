@@ -133,7 +133,6 @@
           <div class="flex items-center justify-between select-none">
             <div>
               <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Rincian Anggaran Kunjungan</label>
-              <!-- Petunjuk Pengisian Satuan -->
               <span class="text-[10.5px] text-slate-400/90 font-medium">Satuan contoh: <b class="text-slate-500">Hari</b> (Hotel), <b class="text-slate-500">Kali/Porsi</b> (Makan), <b class="text-slate-500">Kilo</b> (Laundry).</span>
             </div>
             <button type="button" id="add-budget-item" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors outline-none cursor-pointer self-start mt-0.5">
@@ -438,7 +437,6 @@
       const badge = item.querySelector('.timeline-badge');
       badge.innerText = idx + 1;
       
-      // Mengubah warna badge index pertama agar mencolok sebagai titik awal start
       if (idx === 0) {
         badge.className = "timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-700 text-white text-[11px] font-bold flex items-center justify-center select-none shadow-xs";
       } else {

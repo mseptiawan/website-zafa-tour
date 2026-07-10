@@ -1,4 +1,3 @@
-// Ambil initial data yang diinjeksi lewat window object
 let components = window.__INITIAL_COMPONENTS__ || [];
 
 const tableBody = document.getElementById("component-table-body");
@@ -6,7 +5,6 @@ const totalCounter = document.getElementById("total-komponen");
 const compModal = document.getElementById("component-modal");
 const docModal = document.getElementById("doc-modal");
 
-// Helper Functions
 function normalizeCategory(category) {
   return category === "EARNING" ? "Pendapatan" : "Potongan";
 }
@@ -15,7 +13,6 @@ function normalizeType(type) {
   return type === "FIXED" ? "Tetap" : "Tidak Tetap";
 }
 
-// Render Table Data
 function renderTable() {
   tableBody.innerHTML = "";
 
@@ -99,7 +96,6 @@ function renderTable() {
   totalCounter.textContent = components.filter((c) => c.isActive).length;
 }
 
-// Reset dan bersihkan pesan error kustom sebelum modal terbuka
 function clearValidationErrors() {
   const errorElements = document.querySelectorAll("[id^='error-form-']");
   errorElements.forEach((el) => {
@@ -142,7 +138,6 @@ function closeModal() {
   compModal.classList.remove("flex");
 }
 
-// Handler Submit Form (Aman terhadap Error Object Zod)
 async function saveComponent(e) {
   e.preventDefault();
   clearValidationErrors();
@@ -175,7 +170,6 @@ async function saveComponent(e) {
     } else {
       let globalMessage = "Gagal memproses komponen gaji.";
 
-      // Menampilkan error secara modular sesuai field target dari Object Zod
       if (result.errors && typeof result.errors === "object") {
         Object.keys(result.errors).forEach((fieldKey) => {
           const targetEl = document.getElementById(`error-form-${fieldKey}`);
@@ -189,7 +183,6 @@ async function saveComponent(e) {
         globalMessage = result.message;
       }
 
-      // Gunakan triggerGlobalToast jika terpasang di global layout utama kamu
       if (typeof triggerGlobalToast === "function") {
         triggerGlobalToast({ title: "Gagal Validasi", message: globalMessage, type: "error" });
       } else {
@@ -261,5 +254,4 @@ function generateDocument(event) {
   closeDocModal();
 }
 
-// Inisialisasi Tampilan Pertama Kali
 renderTable();

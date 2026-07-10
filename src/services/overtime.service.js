@@ -38,7 +38,6 @@ export const createOvertime = async ({ user, body, file }) => {
     throw new Error("Profil karyawan (Employee ID) tidak ditemukan pada sesi Anda.");
   }
 
-  // Ambil data Employee untuk mendapatkan financialData (overtimeRate)
   const employeeData = await Employee.findById(employeeId).lean();
   if (!employeeData) {
     throw new Error("Data karyawan tidak ditemukan di sistem.");

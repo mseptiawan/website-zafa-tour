@@ -43,15 +43,12 @@ export const getKpiFormData = async (employeeId) => {
     throw new AppError("Employee tidak ditemukan", 404);
   }
 
-  // FIX: Karena careerData adalah array, ambil indeks ke-0 (data karir aktif)
   const currentCareer = employee.careerData && employee.careerData[0];
 
-  // Jalankan validasi pada objek karir aktif hasil ekstraksi
   if (!currentCareer || !currentCareer.unitId || !currentCareer.positionId) {
     throw new AppError("Data karier, unit, atau posisi pegawai belum diatur.", 404);
   }
 
-  // FIX: Sesuaikan pemanggilan parameter id dari currentCareer
   const mapping = await unitKpiMapping.findOne({
     unitId: currentCareer.unitId._id,
     positionId: currentCareer.positionId._id,

@@ -262,7 +262,6 @@
         let statusClass = log.status === 'Completed' ? 'text-emerald-600 bg-emerald-50' : (log.status === 'Pending' ? 'text-amber-600 bg-amber-50' : 'text-slate-500 bg-slate-50');
         const indicator = log.kpiTemplateId?.indikator || "Non-KPI (Aktivitas Umum)";
 
-        // SINKRONISASI FIELD MOBILE: log.resultDescription & log.attachmentFile sesuai Model
         const block = `
           <div class="p-3.5 border border-slate-100 bg-slate-50/50 rounded-xl space-y-2">
             <div class="flex items-center justify-between gap-2 flex-wrap">

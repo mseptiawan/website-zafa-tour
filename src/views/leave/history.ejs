@@ -95,7 +95,6 @@
       }) %>
     </div>
 
-    <!-- TAB NAVIGATION & ACTION BAR (MOBILE) -->
     <!-- TAB NAVIGATION & ACTION BAR -->
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none md:shadow-none select-none">
   
@@ -483,13 +482,11 @@
       }, 10);
     }
 
-    // 2. Reset Semua Tombol Tab ke Gaya Dasar (State Non-Aktif)
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
       btn.classList.add('font-medium', 'text-slate-500');
     });
 
-    // 3. Terapkan Gaya Aktif Mutlak pada Tab yang Dipilih
     const activeBtn = document.getElementById(`tab-btn-${tabName}`);
     if (activeBtn) {
       activeBtn.classList.remove('font-medium', 'text-slate-500');
@@ -497,13 +494,10 @@
     }
   }
 
-  // Tambahkan kode ini di dalam tag <script> paling bawah halaman kamu
 document.addEventListener("DOMContentLoaded", () => {
-  // Mencari semua elemen tombol di dalam container navigasi tab
   const tabButtons = document.querySelectorAll('[id^="tab-btn-"], .tab-btn, button[role="tab"]');
   
   tabButtons.forEach((btn, index) => {
-    // Jika partial tidak memberi ID, kita pasang ID dinamis berdasarkan urutan data atau teksnya
     if (!btn.id) {
       btn.id = index === 0 ? 'tab-btn-active' : 'tab-btn-history';
     }

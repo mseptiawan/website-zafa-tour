@@ -122,7 +122,6 @@
   function openModalHandler(e) {
     const dataset = e.currentTarget.dataset;
 
-    // Inject teks data
     document.getElementById("mDate").textContent = dataset.date || "-";
     document.getElementById("mStatus").textContent = dataset.status || "-";
     document.getElementById("mType").textContent = dataset.type || "-";
@@ -131,13 +130,11 @@
     document.getElementById("mDuration").textContent = dataset.duration || "0";
     document.getElementById("mLate").textContent = dataset.lateduration || "0";
 
-    // Reset status error fallback
     document.getElementById("err-in").classList.add("hidden");
     document.getElementById("err-out").classList.add("hidden");
     document.getElementById("mInPhoto").style.display = "block";
     document.getElementById("mOutPhoto").style.display = "block";
 
-    // Tembak URL R2 langsung tanpa modifikasi prefix lokal
     if (
       dataset.inphoto &&
       dataset.inphoto.trim() !== "" &&
@@ -164,12 +161,10 @@
       document.getElementById("err-out").classList.remove("hidden");
     }
 
-    // Tampilkan modal secara flex centering
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   }
 
-  // Listener Klik Global untuk tombol .openModal
   document.addEventListener("click", (e) => {
     if (e.target.closest(".openModal")) {
       openModalHandler({ currentTarget: e.target.closest(".openModal") });

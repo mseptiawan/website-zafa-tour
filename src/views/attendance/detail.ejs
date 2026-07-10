@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const locationData = JSON.parse('<%- JSON.stringify(data.location ?? null) %>');
 
-  // debug (boleh dihapus)
   console.log("LOCATION:", locationData);
 
   if (!locationData || !locationData.lat || !locationData.lng) return;

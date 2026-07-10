@@ -6,7 +6,6 @@ import Role from "../models/basic/Role.model.js";
 import User from "../models/basic/User.model.js";
 import mongoose from "mongoose";
 
-// Helper mencocokkan nama karyawan
 export const attachEmployeeName = async (docs) => {
   const employees = await Employee.find().select("userId fullName");
   const map = new Map(employees.map((e) => [e.userId?.toString(), e.fullName]));
@@ -16,7 +15,6 @@ export const attachEmployeeName = async (docs) => {
   }));
 };
 
-// PERBAIKAN UTAMA: Validasi embedding rincian kuantitas & harga satuan budget
 const parseAndValidateBudget = (budgetData) => {
   let budgetItems = budgetData?.items;
   if (!Array.isArray(budgetItems)) {
@@ -32,7 +30,7 @@ const parseAndValidateBudget = (budgetData) => {
         quantity,
         unit: item?.unit?.trim() || "Hari",
         pricePerUnit,
-        allocatedAmount: quantity * pricePerUnit, // Otomatisasi kalkulasi nominal item
+        allocatedAmount: quantity * pricePerUnit, 
         description: item?.description?.trim() || "",
       };
     })
@@ -107,7 +105,6 @@ export const createTripService = async ({ user, body }) => {
     }))
     .filter((t) => t.address);
 
-  // Jalankan parser budget baru
   const processedBudget = parseAndValidateBudget(budget);
 
   const start = new Date(startDate);
@@ -311,7 +308,7 @@ export const handleApprovalService = async ({ id, user, action, note }) => {
       trip.currentStep = "DIREKTUR_UTAMA";
       trip.status = "IN_REVIEW";
     } else if (step === "DIREKTUR_UTAMA") {
-      trip.status = "APPROVED"; // Sesuai skema baru (Siap diproses bayar oleh finance)
+      trip.status = "APPROVED";
       trip.currentStep = null;
     }
 

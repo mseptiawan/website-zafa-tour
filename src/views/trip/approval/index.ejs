@@ -22,17 +22,16 @@
 
         <table class="w-full min-w-[900px] text-[13px] table-fixed">
           
-          <!-- COLGROUP: Mengunci lebar kolom secara ketat sesuai standar layout lu -->
           <colgroup>
-            <col class="w-[18%]"> <!-- Pengaju -->
-            <col class="w-[27%]"> <!-- Judul Perjalanan -->
-            <col class="w-[20%]"> <!-- Tujuan -->
+            <col class="w-[18%]"> 
+            <col class="w-[27%]"> 
+            <col class="w-[20%]"> 
             <% if (user?.role === "DIREKTUR_UTAMA" || user?.role === "WAKIL_DIREKTUR") { %>
-              <col class="w-[13%]"> <!-- Delegasi (Hanya muncul jika diakses Direksi) -->
+              <col class="w-[13%]"> 
             <% } %>
-            <col class="w-[12%]"> <!-- Budget -->
-            <col class="w-[10%]"> <!-- Status -->
-            <col class="w-[7%]">  <!-- Aksi -->
+            <col class="w-[12%]"> 
+            <col class="w-[10%]">
+            <col class="w-[7%]"> 
           </colgroup>
 
           <!-- TABLE HEADER -->

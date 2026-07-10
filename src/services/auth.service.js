@@ -96,7 +96,6 @@ export const requestResetToken = async (email) => {
   }
 
   const token = crypto.randomBytes(32).toString("hex");
-  // Set expiration ke 15 menit (900 detik)
   await redisClient.setEx(`reset:${token}`, 900, user.email);
 
   const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;

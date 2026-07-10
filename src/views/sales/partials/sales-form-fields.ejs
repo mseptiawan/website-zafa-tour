@@ -50,7 +50,6 @@
     Lampiran <span class="text-slate-400 font-normal">(Opsional)</span>
   </label>
   <div class="relative">
-    <!-- Hanya menerima berkas yang divalidasi backend -->
     <input type="file" name="attachments" id="file-input" accept="image/jpeg,image/png,image/webp,application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)" />
     
     <div id="dropzone-empty" class="<%= hasFile ? 'hidden' : '' %> w-full border border-slate-200 border-dashed rounded-xl p-5 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col items-center text-center">

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Overtime } from "../../models/Overtime.model.js"; // Sesuaikan path model Overtime kamu
+import { Overtime } from "../../models/Overtime.model.js";
 import User from "../../models/basic/User.model.js";
 import Employee from "../../models/employee/Employee.model.js";
 
@@ -35,14 +35,12 @@ const seedOvertimeSpesifik = async () => {
     }
 
     const objectIdEmployee = employee._id;
-    // Ambil bidangId dari careerData (jika ada), default fallback ke new ObjectId jika kosong
     const bidangId = employee.careerData?.bidangId || new mongoose.Types.ObjectId();
 
     console.log(
       `⏳ Memulai injeksi data LEMBUR khusus EMPLOYEE: ${employee.fullName} (ID: ${objectIdEmployee})`
     );
 
-    // 1. Rentang Hapus Data Lama (Sesuai Cutoff Juni - Juli 2026)
     const deleteStart = new Date(Date.UTC(2026, 5, 10));
     const deleteEnd = new Date(Date.UTC(2026, 6, 9, 23, 59, 59));
 
@@ -51,7 +49,6 @@ const seedOvertimeSpesifik = async () => {
       date: { $gte: deleteStart, $lte: deleteEnd },
     });
 
-    // 2. Kumpulkan Hari Kerja yang Tersedia
     const startDate = new Date(Date.UTC(2026, 5, 10));
     const endDate = new Date(Date.UTC(2026, 6, 9));
     let currentDate = new Date(startDate);
@@ -61,20 +58,17 @@ const seedOvertimeSpesifik = async () => {
     while (currentDate <= endDate) {
       const dayOfWeek = currentDate.getUTCDay();
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        // Kecualikan Sabtu & Minggu
         availableWorkDays.push(new Date(currentDate));
       }
       currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     }
 
-    // 3. Acak dan Ambil beberapa hari untuk dibuatkan Lembur (Misal: target 5 kali lembur)
     shuffleArray(availableWorkDays);
     const targetOvertimeCount = Math.min(5, availableWorkDays.length);
     const overtimeDays = availableWorkDays.slice(0, targetOvertimeCount);
 
     const overtimeData = [];
 
-    // Deskripsi pekerjaan acak untuk variasi data seeder
     const taskDescriptions = [
       "Optimasi query database core system dan penyesuaian index.",
       "Fix bug modul penggajian karyawan dan sinkronisasi UTC date.",
@@ -86,9 +80,8 @@ const seedOvertimeSpesifik = async () => {
     for (let i = 0; i < overtimeDays.length; i++) {
       const date = overtimeDays[i];
 
-      // Tentukan jam lembur acak (Misal: 2 sampai 4 jam)
       const totalHours = getRandomInt(2, 4);
-      const startHour = 17; // Lembur dimulai jam 17:00
+      const startHour = 17;
       const endHour = startHour + totalHours;
 
       overtimeData.push({
@@ -106,8 +99,8 @@ const seedOvertimeSpesifik = async () => {
           type: "OFFICE",
           detail: "Ruang Kerja IT Lt. 2",
         },
-        status: "APPROVED", // Set langsung APPROVED agar langsung masuk kalkulasi payroll
-        approvedBy: new mongoose.Types.ObjectId(), // Mock ID Manager yang menyetujui
+        status: "APPROVED",
+        approvedBy: new mongoose.Types.ObjectId(),
         approvedAt: new Date(),
         approvalHistory: [
           {
@@ -125,9 +118,9 @@ const seedOvertimeSpesifik = async () => {
             at: new Date(date),
           },
         ],
-        payrollPeriodId: "2026-07", // Sesuai target dropdown periode kamu di UI
+        payrollPeriodId: "2026-07",
         payrollStatus: "PENDING",
-        overtimeRateSnapshot: 25000, // Nilai rupiah per jam lembur
+        overtimeRateSnapshot: 25000,
         multiplierSnapshot: 1.5,
         bidangId: bidangId,
         requiredManagerRole: "HR",
@@ -135,7 +128,6 @@ const seedOvertimeSpesifik = async () => {
     }
 
     if (overtimeData.length > 0) {
-      // Urutkan berdasarkan tanggal lembur terlama ke terbaru
       overtimeData.sort((a, b) => a.date - b.date);
 
       await Overtime.insertMany(overtimeData);

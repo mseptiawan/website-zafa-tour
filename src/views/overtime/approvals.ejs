@@ -71,7 +71,6 @@
 </div>
 
 <script>
-  // Fungsi untuk menjaga tab tetap aktif jika ada parameter filter/pagination di URL
   document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const activeTab = urlParams.get('tab') || 'active';

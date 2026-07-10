@@ -4,12 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (fileInput) {
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files[0];
-      // Ambil employeeId dari data-attribute HTML
       const employeeId = fileInput.dataset.employeeId;
 
       if (!file || !employeeId) return;
 
-      // Validasi Ukuran File (Max 2MB)
       if (file.size > 2 * 1024 * 1024) {
         Swal.fire({ icon: "error", title: "Gagal", text: "Ukuran file maksimal adalah 2MB!" });
         fileInput.value = "";
@@ -19,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData();
       formData.append("foto_profile", file);
 
-      // Loading State
       Swal.fire({
         title: "Mengupload...",
         text: "Mohon tunggu sebentar.",
@@ -46,14 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
             showConfirmButton: false,
           });
 
-          // Update Preview secara Realtime
           const previewImg = document.getElementById("avatar-preview");
           const avatarIcon = document.getElementById("avatar-icon");
 
           if (previewImg) {
             previewImg.src = result.imageUrl;
           } else if (avatarIcon) {
-            // Jika sebelumnya pakai icon default, ganti jadi tag img
             const container = avatarIcon.parentElement;
             avatarIcon.remove();
 

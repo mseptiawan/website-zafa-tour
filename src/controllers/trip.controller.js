@@ -36,7 +36,7 @@ export const create = async (req, res) => {
 
     return res.status(status).render("trip/user/create", {
       title: "Pengajuan Dinas Luar",
-      old: req.body, // Mempertahankan input form agar tidak ketik ulang
+      old: req.body,
       errors: { global: errorMessage },
     });
   }
@@ -49,7 +49,6 @@ export const approvalPage = async (req, res) => {
 
     const trips = await getApprovalTripsService(user);
 
-    // Filter data trip berdasarkan statusnya
     const activeStatuses = ["PENDING", "IN_REVIEW"];
     const activeTrips = trips.filter((t) =>
       activeStatuses.includes((t.status || "").toUpperCase().trim())
@@ -60,8 +59,8 @@ export const approvalPage = async (req, res) => {
 
     return res.render("trip/user/approvals", {
       title: "Approval Dinas Luar",
-      activeTrips, // Dikirim ke view
-      historyTrips, // Dikirim ke view
+      activeTrips, 
+      historyTrips, 
       user,
       error: null,
     });

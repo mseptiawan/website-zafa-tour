@@ -67,7 +67,6 @@
     if (actionInput && form) {
       actionInput.value = status;
 
-      // Validasi sederhana: Jika tolak, paksa isi catatan biar jelas
       const notes = form.querySelector('textarea[name="notes"]').value.trim();
       if (status === "REJECT" && !notes) {
         alert("Harap masukkan alasan penolakan pada kolom catatan keputusan.");

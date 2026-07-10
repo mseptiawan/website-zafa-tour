@@ -1,9 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Ambil element transport data dari EJS
   const unitsDataEl = document.getElementById("units-data");
   if (!unitsDataEl) return;
 
-  // Baca data-attributes dinamis
   const employeeId = unitsDataEl.dataset.employeeId || "";
   const unitsData = JSON.parse(unitsDataEl.dataset.json || "[]");
 
@@ -28,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // --- DEPENDENSI BIDANG VS UNIT ---
   const bidangSelect = document.getElementById("select-bidang");
   const unitSelect = document.getElementById("select-unit");
 

@@ -8,7 +8,6 @@ export const validate =
     if (!result.success) {
       req.validationErrors = formatZodError(result.error);
 
-      // Hindari req.body undefined
       req.body ??= {};
       req.params ??= {};
       req.query ??= {};

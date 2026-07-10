@@ -125,7 +125,6 @@
 
 <div>
   <div class="text-[9px] text-slate-400 uppercase tracking-wider mb-0.5">Berakhir Kontrak</div>
-  <!-- 💡 Warna dinamis: rose-600 kalau ada tanggalnya, slate-400 kalau kosong -->
   <div class="text-[11px] sm:text-xs font-semibold truncate <%= employee.careerData?.tanggal_berakhir_kontrak ? 'text-rose-600' : 'text-slate-400 font-normal' %>">
     <%= employee.careerData?.tanggal_berakhir_kontrak ? new Date(employee.careerData.tanggal_berakhir_kontrak).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
   </div>

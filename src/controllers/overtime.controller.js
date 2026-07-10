@@ -97,7 +97,6 @@ export const approveManagerOvertime = asyncHandler(async (req, res) => {
     return res.status(403).send("Anda tidak berhak approve lembur ini");
   }
 
-  // Membaca langsung dari model Employee terpadu
   const employeeData = await Employee.findById(overtime.employeeId).lean();
   if (!employeeData) return res.status(404).send("Data karyawan tidak ditemukan");
 
@@ -165,4 +164,3 @@ export const getOvertimeDetail = asyncHandler(async (req, res) => {
     }),
   });
 });
-

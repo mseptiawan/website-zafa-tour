@@ -14,7 +14,7 @@ export const createComponent = async (data) => {
     name: data.name,
     category: data.category,
     type: data.type,
-    calculationType: "FIXED_AMOUNT", // 🟢 FORCE: Selalu paksa FIXED_AMOUNT saat input baru
+    calculationType: "FIXED_AMOUNT",
     defaultAmount: parseFloat(data.defaultAmount) || 0,
     isActive: true,
   });
@@ -27,7 +27,7 @@ export const updateComponent = async (id, data) => {
       name: data.name,
       category: data.category,
       type: data.type,
-      calculationType: "FIXED_AMOUNT", // 🟢 FORCE: Amankan state agar tetap FIXED_AMOUNT saat update
+      calculationType: "FIXED_AMOUNT",
       defaultAmount: parseFloat(data.defaultAmount) || 0,
     },
     { new: true }

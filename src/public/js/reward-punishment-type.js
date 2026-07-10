@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Ambil raw data dari HTML data attribute
   const dataEl = document.getElementById("types-data");
   let types = [];
 
@@ -11,21 +10,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // DOM Selectors
   const tableBody = document.getElementById("type-table-body");
   const totalCounter = document.getElementById("total-aktif-counter");
   const typeModal = document.getElementById("type-modal");
   const typeForm = document.getElementById("type-form");
   const modalTitle = document.getElementById("modal-title");
 
-  // Input Fields Selector
   const formId = document.getElementById("form-id");
   const formCategory = document.getElementById("form-category");
   const formName = document.getElementById("form-name");
   const formImpact = document.getElementById("form-impact");
   const formDescription = document.getElementById("form-description");
 
-  // Buttons Selector
   const btnAddType = document.getElementById("btn-add-type");
   const btnCloseModalX = document.getElementById("btn-close-modal-x");
   const btnCloseModalCancel = document.getElementById("btn-close-modal-cancel");
@@ -59,13 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
         : "text-slate-500 bg-slate-100 border-slate-200";
       const dotClass = item.isActive ? "bg-emerald-500" : "bg-slate-400";
 
-      // Badge Kategori
       const categoryBadge =
         item.category === "REWARD"
           ? `<span class="px-2 py-0.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-md font-bold text-[10px]">REWARD</span>`
           : `<span class="px-2 py-0.5 bg-purple-50 border border-purple-200 text-purple-700 rounded-md font-bold text-[10px]">PUNISHMENT</span>`;
 
-      // Format Rupiah
       const formattedImpact = new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
@@ -160,7 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const action = e.currentTarget.getAttribute("data-action");
         const shouldActivate = action === "activate";
 
-        // Menggunakan Custom Confirm Modal bawaan sistem (seperti code base kamu)
         if (typeof openConfirmModal === "function") {
           openConfirmModal({
             title: shouldActivate ? "Aktifkan Aturan" : "Nonaktifkan Aturan",

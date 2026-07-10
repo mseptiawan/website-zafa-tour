@@ -111,7 +111,6 @@ function showMessage(type, message) {
   }
 }
 
-// Fungsi Update Badge Status untuk UI Mobile
 function updateBadge(id, type, text) {
   const badge = document.getElementById(`status-${id}`);
   const dot = document.getElementById(`dot-${id}`);
@@ -211,7 +210,6 @@ async function startCamera() {
     });
     video.srcObject = stream;
     updateBadge('cam', 'success', 'Kamera Aktif');
-    // Auto-trigger pemindaian GPS saat kamera menyala agar user tidak menunggu lama saat klik submit
     getLocation(); 
   } catch (err) {
     updateBadge('cam', 'danger', 'Izin Kamera Ditolak');

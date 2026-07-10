@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Parsing data awal dari elemen HTML penyimpan JSON murni
   const categoriesDataEl = document.getElementById("categories-data");
   let categories = [];
 
@@ -11,19 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // DOM Elements Selector
   const tableBody = document.getElementById("category-table-body");
   const totalCounter = document.getElementById("total-kategori");
   const categoryModal = document.getElementById("category-modal");
   const categoryForm = document.getElementById("category-form");
   const modalTitle = document.getElementById("modal-title");
 
-  // Input Fields Selector
   const formId = document.getElementById("form-id");
   const formName = document.getElementById("form-name");
   const formDescription = document.getElementById("form-description");
 
-  // Action Buttons Selector
   const btnAddCategory = document.getElementById("btn-add-category");
   const btnCloseModalX = document.getElementById("btn-close-modal-x");
   const btnCloseModalCancel = document.getElementById("btn-close-modal-cancel");
@@ -153,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const shouldActivate = action === "activate";
 
-        // Integrasi Sistem Modal Konfirmasi Kustom (Mengganti window.confirm)
         openConfirmModal({
           title: shouldActivate ? "Aktifkan Kategori" : "Nonaktifkan Kategori",
           message: shouldActivate
@@ -171,7 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // API Submit Form handler
   if (categoryForm) {
     categoryForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -200,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // API Toggle status handler
   async function handleToggleStatus(id, shouldActivate) {
     try {
       const response = await fetch(`/expense-categories/toggle-status/${id}`, {
@@ -217,11 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Static Event Listeners untuk Form CRUD Modal
   if (btnAddCategory) btnAddCategory.addEventListener("click", () => openModal("add"));
   if (btnCloseModalX) btnCloseModalX.addEventListener("click", closeModal);
   if (btnCloseModalCancel) btnCloseModalCancel.addEventListener("click", closeModal);
 
-  // Jalankan render tabel saat halaman pertama dimuat
   renderTable();
 });

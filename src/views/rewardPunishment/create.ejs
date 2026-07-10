@@ -148,7 +148,6 @@
 </div>
 <script src="/js/file-upload.js"></script>
 <script>
-  // Logika Visibilitas Kolom Finansial via Toggle Switch
   function toggleFinancialSection() {
     const toggleCheckbox = document.getElementById("hasFinancialImpact");
     const amountSection = document.getElementById("financialAmountSection");
@@ -161,7 +160,6 @@
       toggleLabel.textContent = "Ada";
       toggleLabel.className = "text-[11.5px] font-bold text-blue-600 uppercase tracking-wider min-w-[70px] text-right";
       
-      // Fokus ke input jika baru di-ON-kan dan nilainya 0
       if(amountReal.value === "0" || amountReal.value === "") {
         nominalInput.value = "";
         amountReal.value = "0";
@@ -171,7 +169,6 @@
       toggleLabel.textContent = "Tidak Ada";
       toggleLabel.className = "text-[11.5px] font-bold text-slate-400 uppercase tracking-wider min-w-[70px] text-right";
       
-      // Reset nilai ke nol jika dimatikan
       nominalInput.value = "";
       amountReal.value = "0";
     }
@@ -180,7 +177,6 @@
   
 
   document.addEventListener("DOMContentLoaded", () => {
-    // Jalankan pengecekan toggle pertama kali saat halaman selesai dimuat (untuk retensi old value)
     toggleFinancialSection();
 
     const nominalInput = document.getElementById("nominalInput");

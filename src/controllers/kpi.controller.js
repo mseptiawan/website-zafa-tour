@@ -12,7 +12,7 @@ export const indexAppraisal = async (req, res, next) => {
       title: "Input KPI Pegawai",
     });
   } catch (error) {
-    next(error); // Disarankan melempar ke global error handler middleware jika ada
+    next(error);
   }
 };
 
@@ -42,7 +42,7 @@ export const storeAppraisal = async (req, res, next) => {
 
     await kpiService.processKpiSubmission(employeeId, req.body, userId);
 
-    res.redirect("/kpi/histories"); // Sesuaikan dengan nama rute baru Anda
+    res.redirect("/kpi/histories");
   } catch (error) {
     next(error);
   }

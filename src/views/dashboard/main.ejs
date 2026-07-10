@@ -1,6 +1,5 @@
 <%- layout('layouts/main') -%>
 
-<!-- FIX: Menggunakan md:ml-16 xl:ml-72 (atau xl:ml-64) agar sinkron dengan perubahan lebar posisi sidebar -->
 <div class="  relative z-10">
   
   <!-- HEADER DASHBOARD -->
@@ -13,14 +12,12 @@
       </p>
     </div>
     <div class="flex items-center gap-3 w-full sm:w-auto">
-  <!-- Perubahan: bg-slate-900 text-slate-100 -->
   <span class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-900 text-slate-100 px-4 py-2 text-xs font-semibold rounded-xl uppercase tracking-wider">
     <i class="fa-solid fa-calendar-day text-sm text-slate-400"></i> Tahun Buku: <%= new Date().getFullYear() %>
   </span>
 </div>
   </div>
 
-  <!-- MAIN GRID 3 BLOCK (RESPONSIVE: 1 KOLOM DI HP, 16 KOLOM DI LAPTOP) -->
   <div class="grid grid-cols-1 lg:grid-cols-16 gap-6 items-stretch">
     
     <!-- =========================================================================
@@ -28,7 +25,6 @@
          ========================================================================= -->
     <div class="grid-cols-1 lg:col-span-7 flex flex-col gap-6">
       <% if (user.role !== "DIREKTUR_UTAMA") { %>
-      <!-- 1. BOKS PRESENSI HARI INI -->
       <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col justify-between">
         <div class="px-5 py-4 border-b border-slate-100 flex flex-row justify-between items-center bg-white gap-2">
           <h5 class="text-xs font-semibold tracking-wide text-slate-900 uppercase flex items-center gap-2">
@@ -74,14 +70,12 @@
               </div>
             </div>
             
-          <div class="w-full mt-4 sm:mt-0"> <!-- Ditambahkan margin top sedikit agar rapi saat mode responsive -->
+          <div class="w-full mt-4 sm:mt-0">
   <p class="text-center text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Rekap Kehadiran Bulan Ini</p>
   
-  <!-- FIX: Menggunakan grid-cols-3 dasar, berubah jadi 1 kolom di tablet (md:grid-cols-1), dan balik 3 kolom di komputer (xl:grid-cols-3) -->
   <div class="grid grid-cols-3 md:grid-cols-1 xl:grid-cols-3 gap-2 text-center">
     
     <!-- CARD HADIR -->
-    <!-- Di tablet (md), layout diubah jadi flex kesamping agar hemat ruang dan teks tidak patah -->
     <div class="bg-emerald-50/40 p-2.5 rounded-xl border border-emerald-100/30 flex flex-col md:flex-row xl:flex-col items-center justify-center md:gap-2">
       <span class="block text-lg font-semibold text-emerald-600"><%= rekapAbsen.hadir %></span>
       <small class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Hadir</small>

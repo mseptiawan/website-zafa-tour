@@ -12,7 +12,6 @@ import {
 
 import fs from "fs";
 
-// Rendisi Form Pengajuan Izin Baru
 export const renderCreatePermitForm = asyncHandler(async (req, res) => {
   return res.render("permit/create", {
     ...buildRenderData(req, {
@@ -22,7 +21,6 @@ export const renderCreatePermitForm = asyncHandler(async (req, res) => {
   });
 });
 
-// Menyimpan Pengajuan Izin Baru ke Database
 export const storePermit = asyncHandler(async (req, res) => {
   if (req.validationErrors) {
     if (req.file) {

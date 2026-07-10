@@ -49,7 +49,6 @@
     }
   }
 
-  // Bersihkan Alokasi Memori Objek URL saat berpindah halaman
   window.addEventListener("beforeunload", () => {
     if (currentFileUrl) { URL.revokeObjectURL(currentFileUrl); }
   });

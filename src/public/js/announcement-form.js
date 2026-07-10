@@ -1,4 +1,3 @@
-// Fungsi untuk Dropzone File Lampiran
 function handleFileSelect(input) {
   if (input.files && input.files.length > 0) {
     const file = input.files[0];
@@ -10,7 +9,6 @@ function handleFileSelect(input) {
   }
 }
 
-// Fungsi untuk Custom Dropdown Kategori
 function toggleCategoryDropdown() {
   const menu = document.getElementById("category-menu");
   const arrow = document.getElementById("category-arrow");

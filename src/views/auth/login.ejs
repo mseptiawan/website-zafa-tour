@@ -57,7 +57,6 @@
           <p class="text-xs sm:text-[13px] text-slate-400 font-medium mt-1">Enter valid user name & password to continue</p>
         </div>
 
-        <!-- Handler Eror untuk Akun Inactive / Salah Kredensial dari Catch Block -->
         <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
           <div class="w-full mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-800">
             <% error.forEach(err => { %>
@@ -69,7 +68,6 @@
           </div>
         <% } %>
 
-        <!-- Handler Cadangan jika menggunakan Flash Messages (req.flash) -->
         <% if (typeof messages !== 'undefined' && messages.error) { %>
           <div class="w-full mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 text-rose-800">
             <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-rose-500"></i>
@@ -77,7 +75,6 @@
           </div>
         <% } %>
 
-        <!-- Handler Eror Validasi Form Data (Express Validator) -->
         <% if (typeof errors !== 'undefined' && Object.keys(errors).length > 0) { %>
           <div class="w-full mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-800">
             <% Object.values(errors).forEach(err => { %>

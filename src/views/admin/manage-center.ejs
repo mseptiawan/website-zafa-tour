@@ -179,13 +179,11 @@
 </div>
 <script>
   function switchTab(tabName) {
-    // 1. Sembunyikan semua pane konten
     document.querySelectorAll('.tab-pane').forEach(pane => {
       pane.classList.add('hidden');
       pane.classList.remove('block', 'opacity-100');
     });
 
-    // Tampilkan kontainer pane yang dipilih oleh user
     const activeContent = document.getElementById(`tab-content-${tabName}`);
     if (activeContent) {
       activeContent.classList.remove('hidden');
@@ -193,16 +191,12 @@
       setTimeout(() => { activeContent.classList.add('opacity-100'); }, 10);
     }
 
-    // 2. Reset semua tombol tab ke gaya dasar kapsul (State Non-Aktif + Kembalikan Hover)
     document.querySelectorAll('.tab-btn').forEach(btn => {
-      // Hapus state aktif jika ada
       btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
       
-      // Kembalikan state dasar DAN pastikan hover:text-slate-800 dipasang lagi!
       btn.classList.add('font-medium', 'text-slate-500', 'hover:text-slate-800');
     });
 
-    // 3. Terapkan gaya aktif mutlak pada tab yang dipilih (Hapus hover saat aktif agar tidak bentrok)
     const activeBtn = document.getElementById(`tab-btn-${tabName}`);
     if (activeBtn) {
       activeBtn.classList.remove('font-medium', 'text-slate-500', 'hover:text-slate-800');

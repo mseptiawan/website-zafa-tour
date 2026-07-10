@@ -301,7 +301,6 @@
           let finalAmount = inputVal;
           let displayLabel = nameInput.value;
 
-          // HANYA hitung rumus persen jika unit di UI saat itu terdeteksi '%' (Artinya sedang di mode DRAFT)
           const isPercentageUnit = unitSpan && unitSpan.innerText === '%';
 
           if (isPercentageUnit && (nameInput.value.toUpperCase().includes('BPJS') || nameInput.value.toUpperCase().includes('PPH') || nameInput.value.toUpperCase().includes('PAJAK'))) {
@@ -341,7 +340,6 @@
   async function loadOvertime(idParam) {
     if (isReadOnlyMode) return;
     try {
-      // 🟢 FIX: Ubah filterPeriod -> periodFilter
       const currentPeriod = document.getElementById('periodFilter').value;
       const res = await fetch(`/payroll/overtime-summary/${idParam}?period=${currentPeriod}`);
       const data = await res.json();
@@ -372,7 +370,6 @@
   async function loadAttendance(idParam) {
     if (isReadOnlyMode) return;
     try {
-      // 🟢 FIX: Ambil nilai dari periodFilter dan teruskan ke URL
       const currentPeriod = document.getElementById('periodFilter').value;
       const res = await fetch(`/payroll/attendance-summary/${idParam}?period=${currentPeriod}`);
       const data = await res.json();
@@ -427,7 +424,6 @@
     }
   }
 
-  // --- REVISI UTAMA FIX 404 & FIX RIBAUAN PERSEN DI HISTORY MODE ---
   function generateRowHTML(name, amount, isFixed, type) {
     const colorClass = type === 'allowance' ? 'blue' : 'rose';
 
@@ -488,7 +484,7 @@
     });
 
     if (isDuplicate) {
-      alert(`❌ Komponen "${componentName}" sudah ada di daftar tunjangan!`);
+      alert(`Komponen "${componentName}" sudah ada di daftar tunjangan!`);
       select.value = "";
       return;
     }
@@ -516,7 +512,7 @@
     });
 
     if (isDuplicate) {
-      alert(`❌ Komponen "${componentName}" sudah ada di daftar potongan!`);
+      alert(` Komponen "${componentName}" sudah ada di daftar potongan!`);
       select.value = "";
       return;
     }
@@ -621,7 +617,6 @@
           const arrDed = data.deductions || [];
           arrDed.forEach(item => {
             const cName = item.componentName || item.name;
-            // Force true (Fixed) saat History agar generateRowHTML memicu mode Rupiah
             deductionContainer.insertAdjacentHTML('beforeend', generateRowHTML(cName, item.amount, true, 'deduction'));
           });
 
@@ -692,7 +687,6 @@
       return;
     }
 
-    // Ambil seluruh ID pegawai
     const employeeIds = [...document.querySelectorAll(".employee-card")]
       .map(card => card.getAttribute("data-id"))
       .filter(Boolean);
