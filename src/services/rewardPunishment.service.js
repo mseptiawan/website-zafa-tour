@@ -19,7 +19,6 @@ export const findAvailableEmployees = async () => {
   return await Employee.find({}, "_id fullName").sort({ fullName: 1 }).lean();
 };
 
-// SESUAIKAN: Menambahkan field baru agar tersimpan ke model EmployeeLog
 export const createLog = async ({ body, userId, attachmentPath }) => {
   const { employeeId, typeId, reason, skNumber, dateIssued, effectiveDate, amount } = body;
 
@@ -29,11 +28,8 @@ export const createLog = async ({ body, userId, attachmentPath }) => {
     reason,
     skNumber,
     dateIssued: new Date(dateIssued),
-    // Simpan effectiveDate jika diisi, jika kosong set null sesuai default skema
     effectiveDate: effectiveDate ? new Date(effectiveDate) : null,
-    // Simpan nominal finansial (otomatis dikonversi ke Number)
     amount: Number(amount) || 0,
-    // Jalur string penyimpanan berkas/file upload
     attachment: attachmentPath || "",
     createdBy: userId,
   });

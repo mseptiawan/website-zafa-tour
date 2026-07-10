@@ -1,9 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildRenderData } from "../utils/renderHelper.js";
 import * as payrollService from "../services/payroll.service.js";
-import { getAttendanceSummary } from "../services/attendanceSummary.service.js";
-import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
-import { getPayrollPeriod } from "../utils/payrollPeriod.js";
+import { getAttendanceSummary } from "../services/attendance.service.js";
+import { getOvertimeSummary } from "../services/overtime.service.js";
+import { getPayrollPeriod, generatePayrollPeriods } from "../utils/payrollPeriod.js";
 import Employee from "../models/employee/Employee.model.js";
 import Payroll from "../models/payroll/Payroll.model.js";
 import SalaryComponent from "../models/payroll/SalaryComponent.model.js";
@@ -20,14 +20,13 @@ export const renderPayrollPage = asyncHandler(async (req, res) => {
     (comp) => comp.sourceType !== "DYNAMIC" && comp.isLocked !== true
   );
 
-  const now = new Date();
-  const currentMonthRaw = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const currentPeriod = getPayrollPeriod();
 
   const periodsFromDB = await Payroll.distinct("periodMonth");
-  const periodsSet = new Set(periodsFromDB);
-  periodsSet.add(currentMonthRaw);
 
-  const availablePeriods = Array.from(periodsSet).sort((a, b) => b.localeCompare(a));
+  const availablePeriods = [...new Set([...generatePayrollPeriods(6, 3), ...periodsFromDB])].sort(
+    (a, b) => b.localeCompare(a)
+  );
 
   res.render("payroll/index", {
     ...buildRenderData(req, {
@@ -38,7 +37,7 @@ export const renderPayrollPage = asyncHandler(async (req, res) => {
       dropdownComponents,
       savedAllowances,
       availablePeriods,
-      currentPeriod: currentMonthRaw,
+      currentPeriod: currentPeriod.id,
     }),
   });
 });
@@ -51,8 +50,9 @@ export const calculatePayroll = asyncHandler(async (req, res) => {
   const period = req.query.period;
 
   const now = new Date();
-  const currentMonthRaw = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const isPastPeriod = period < currentMonthRaw;
+  const currentPeriod = getPayrollPeriod();
+
+  const isPastPeriod = period < currentPeriod.id;
 
   const existingPayroll = await Payroll.findOne({ employeeId, periodMonth: period }).lean();
 
@@ -211,7 +211,21 @@ export const getEmployeeAttendanceSummary = asyncHandler(async (req, res) => {
     periodInfo: summary.period,
   });
 });
+export const getEmployeeOvertimeSummary = asyncHandler(async (req, res) => {
+  const { employeeId } = req.params;
+  const periodParam = req.query.period;
 
+  const targetDate = periodParam ? new Date(`${periodParam}-01`) : new Date();
+
+  const summary = await getOvertimeSummary(employeeId, targetDate);
+
+  return res.status(200).json({
+    success: true,
+    totalHours: summary.totalHours,
+    totalPay: summary.totalPay,
+    period: summary.period || null,
+  });
+});
 /**
  * Melakukan proses finalisasi (Tutup Buku) penggajian karyawan secara kolektif per periode.
  */

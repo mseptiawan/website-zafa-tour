@@ -289,3 +289,21 @@ export const updateCompanyConfig = async (body) => {
   await config.save();
   return config;
 };
+
+export const getAttendanceSummary = async (userId, date = new Date()) => {
+  const period = getPayrollPeriod(date);
+
+  const totalDaysPresent = await Attendance.countDocuments({
+    userId: userId,
+    checkIn: {
+      $gte: period.start,
+      $lte: period.end,
+    },
+    status: { $in: ["HADIR", "TELAT"] },
+  });
+
+  return {
+    period,
+    totalDaysPresent,
+  };
+};

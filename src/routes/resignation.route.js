@@ -18,7 +18,6 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-// Halaman form pengajuan baru
 router.get("/new", renderResignationForm);
 
 router.get("/my", getMyResignations);

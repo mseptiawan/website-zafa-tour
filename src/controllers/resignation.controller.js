@@ -86,7 +86,6 @@ export const renderResignationIndex = asyncHandler(async (req, res) => {
     currentUser: req.session.user,
   });
 
-  // Hitung summary global secara dinamis dari array atau buat konstan statis untuk pelaporan
   const totalResignations = resignations.length;
   const pending = resignations.filter((r) =>
     ["PENDING_WADIR", "PENDING_DIRUT"].includes(r.status)

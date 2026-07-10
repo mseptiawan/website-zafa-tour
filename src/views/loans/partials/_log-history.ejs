@@ -7,7 +7,6 @@
   <div class="relative pl-6 space-y-6 <%= approvals && approvals.length > 0 ? 'before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100' : '' %>">
     
     <% if (!approvals || approvals.length === 0) { %>
-      <!-- STATE KETIKA BELUM ADA LOG PERSETUJUAN SAMA SEKALI -->
       <div class="flex flex-col items-center justify-center py-8 text-center select-none">
         <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 mb-2.5">
           <i class="fa-solid fa-folder-open text-xs"></i>
@@ -51,7 +50,6 @@
 
     <% } %>
 
-    <!-- HANDLING KONDISI KHUSUS STATUS CANCELLED OLEH PEMOHON -->
     <% if (typeof loan !== 'undefined' && loan.status === 'CANCELLED') { %>
       <div class="relative pl-0 pt-2">
         <div class="flex flex-col gap-1">

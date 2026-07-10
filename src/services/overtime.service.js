@@ -126,7 +126,6 @@ export const createOvertime = async ({ user, body, file }) => {
     approvalHistory: historyAction,
   });
 
-  // KIRIM NOTIFIKASI KE MANAGER JIKA STATUS SUBMITTED
   if (status === "SUBMITTED") {
     try {
       const managerCareer = await EmployeeCareer.findOne({
@@ -217,4 +216,46 @@ export const findManagerApprovalList = async ({ user, query }) => {
     active: { data: activeData, meta: getPaginationMeta({ page, limit, total: totalActive }) },
     history: { data: historyData, meta: getPaginationMeta({ page, limit, total: totalHistory }) },
   };
+};
+
+export const getOvertimeSummary = async (employeeId, date = new Date()) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+      console.log(`ID Karyawan tidak valid: ${employeeId}`);
+      return { totalHours: 0, totalPay: 0 };
+    }
+
+    const period = getPayrollPeriod(date);
+    const empObjectId = new mongoose.Types.ObjectId(employeeId);
+
+    const records = await Overtime.find({
+      employeeId: empObjectId,
+      status: "APPROVED",
+      payrollPeriodId: period.id,
+    }).lean();
+
+    console.log(`Ditemukan ${records.length} data lembur APPROVED untuk periode ${period.id}`);
+
+    const totalHours = records.reduce((sum, r) => sum + (r.totalHours || 0), 0);
+
+    const totalPay = records.reduce((sum, r) => {
+      const rate = r.overtimeRateSnapshot || 0;
+      const multiplier = r.multiplierSnapshot || 1.5;
+
+      return sum + (r.totalHours || 0) * rate * multiplier;
+    }, 0);
+
+    return {
+      period,
+      totalHours,
+      totalPay,
+    };
+  } catch (error) {
+    console.error("Error di getOvertimeSummary Service:", error);
+    return {
+      period: null,
+      totalHours: 0,
+      totalPay: 0,
+    };
+  }
 };

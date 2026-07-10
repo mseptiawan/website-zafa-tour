@@ -8,7 +8,6 @@ import {
   findMineOvertime,
   findManagerApprovalList,
 } from "../services/overtime.service.js";
-import { getOvertimeSummary } from "../services/overtimeSummary.service.js";
 
 export const renderCreateOvertimeForm = asyncHandler(async (req, res) => {
   const today = new Date();
@@ -167,13 +166,3 @@ export const getOvertimeDetail = asyncHandler(async (req, res) => {
   });
 });
 
-export const getPayrollOvertimeSummary = asyncHandler(async (req, res) => {
-  const { employeeId } = req.params;
-  const result = await getOvertimeSummary(employeeId);
-
-  return res.status(200).json({
-    success: true,
-    totalHours: result?.totalHours || 0,
-    totalPay: result?.totalPay || 0,
-  });
-});

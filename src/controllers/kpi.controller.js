@@ -1,6 +1,7 @@
 import * as kpiService from "../services/kpi.service.js";
 
-export const getAppraisalList = async (req, res, next) => {
+// GET /api/kpi/appraisals
+export const indexAppraisal = async (req, res, next) => {
   try {
     const { employees, evaluatedIds } = await kpiService.getEmployeesToAppraise();
 
@@ -11,18 +12,12 @@ export const getAppraisalList = async (req, res, next) => {
       title: "Input KPI Pegawai",
     });
   } catch (error) {
-    res.status(error.statusCode || 500).render("error", {
-      title: "Terjadi Kesalahan",
-      message:
-        error.statusCode === 500
-          ? "Maaf, sistem sedang mengalami gangguan. Mohon coba beberapa saat lagi."
-          : error.message,
-      statusCode: error.statusCode || 500,
-    });
+    next(error); // Disarankan melempar ke global error handler middleware jika ada
   }
 };
 
-export const getAppraisalForm = async (req, res, next) => {
+// GET /api/kpi/appraisals/form/:employeeId
+export const createAppraisal = async (req, res, next) => {
   try {
     const { employeeId } = req.params;
     const { employee, kpiDetails } = await kpiService.getKpiFormData(employeeId);
@@ -34,72 +29,49 @@ export const getAppraisalForm = async (req, res, next) => {
       user: req.session.user,
     });
   } catch (error) {
-    res.status(error.statusCode || 500).render("error", {
-      title: "Terjadi Kesalahan",
-      message:
-        error.statusCode === 500
-          ? "Maaf, sistem sedang mengalami gangguan. Mohon coba beberapa saat lagi."
-          : error.message,
-      statusCode: error.statusCode || 500,
-    });
+    next(error);
   }
 };
 
-export const submitAppraisal = async (req, res, next) => {
+// POST /api/kpi/appraisals/:employeeId
+// Catatan: Jika mengikuti saran rute sebelumnya tanpa parameter di URL, sesuaikan req.body-nya
+export const storeAppraisal = async (req, res, next) => {
   try {
     const { employeeId } = req.params;
     const userId = req.session.user?._id;
 
     await kpiService.processKpiSubmission(employeeId, req.body, userId);
 
-    res.redirect("/kpi/history-list");
+    res.redirect("/kpi/histories"); // Sesuaikan dengan nama rute baru Anda
   } catch (error) {
-    res.status(error.statusCode || 500).render("error", {
-      title: "Terjadi Kesalahan",
-      message:
-        error.statusCode === 500
-          ? "Maaf, sistem sedang mengalami gangguan. Mohon coba beberapa saat lagi."
-          : error.message,
-      statusCode: error.statusCode || 500,
-    });
+    next(error);
   }
 };
 
-export const getHistoryList = async (req, res, next) => {
+// GET /api/kpi/histories
+export const indexHistory = async (req, res, next) => {
   try {
     const kpiList = await kpiService.getAllKpiHistory();
-
-    res.render("kpi/history-list", { title: "daftar kpi Pegawai", kpiList });
+    res.render("kpi/history-list", { title: "Daftar KPI Pegawai", kpiList });
   } catch (error) {
-    res.status(error.statusCode || 500).render("error", {
-      title: "Terjadi Kesalahan",
-      message:
-        error.statusCode === 500
-          ? "Maaf, sistem sedang mengalami gangguan. Mohon coba beberapa saat lagi."
-          : error.message,
-      statusCode: error.statusCode || 500,
-    });
+    next(error);
   }
 };
 
-export const getHistoryDetail = async (req, res, next) => {
+// GET /api/kpi/histories/:employeeId/:periode
+export const showHistory = async (req, res, next) => {
   try {
     const { employeeId, periode } = req.params;
     const kpi = await kpiService.getKpiHistoryDetail(employeeId, periode);
 
-    res.render("kpi/history-detail", { title: "Daftar detail kpi", kpi });
+    res.render("kpi/history-detail", { title: "Daftar Detail KPI", kpi });
   } catch (error) {
-    res.status(error.statusCode || 500).render("error", {
-      title: "Terjadi Kesalahan",
-      message:
-        error.statusCode === 500
-          ? "Maaf, sistem sedang mengalami gangguan. Mohon coba beberapa saat lagi."
-          : error.message,
-      statusCode: error.statusCode || 500,
-    });
+    next(error);
   }
 };
-export const getMyKpiHistory = async (req, res, next) => {
+
+// GET /api/kpi/my-histories
+export const showMyHistory = async (req, res, next) => {
   try {
     const employeeId = req.session.user?.employeeId;
 
@@ -114,10 +86,6 @@ export const getMyKpiHistory = async (req, res, next) => {
       kpiList,
     });
   } catch (error) {
-    res.status(error.statusCode || 500).render("error", {
-      title: "Terjadi Kesalahan",
-      message: error.message,
-      statusCode: error.statusCode || 500,
-    });
+    next(error);
   }
 };

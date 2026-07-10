@@ -6,6 +6,7 @@ import {
   calculatePayroll,
   closePayrollForEmployees,
   renderMySlipPage,
+  getEmployeeOvertimeSummary,
 } from "../controllers/payroll.controller.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
@@ -27,7 +28,11 @@ router.get(
   roleMiddleware(...PAYROLL_MANAGEMENT_ROLES),
   getEmployeeAttendanceSummary
 );
-
+router.get(
+  "/overtime-summary/:employeeId",
+  roleMiddleware(...PAYROLL_MANAGEMENT_ROLES),
+  getEmployeeOvertimeSummary
+);
 // --- Hak Akses Karyawan Mandiri ---
 router.get("/my-slip", renderMySlipPage);
 

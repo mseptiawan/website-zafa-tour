@@ -1,13 +1,9 @@
 <%- layout('layouts/main', { title }) %>
 
 <% 
-  // =========================================================================
-  // LOGIKA PEMISAH DATA (FILTERING DATA BERDASARKAN STATUS)
-  // =========================================================================
   const activeLoans = loans.filter(l => l.status === 'PENDING' || l.status === 'APPROVED');
   const historyLoans = loans.filter(l => l.status === 'REJECTED' || l.status === 'CANCELLED');
 
-  // CONFIGURATION UNTUK DESAIN BADGE STATUS
   const getStatusConfig = (status) => {
     switch(status) {
       case 'PENDING':

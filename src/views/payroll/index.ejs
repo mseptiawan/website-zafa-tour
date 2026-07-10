@@ -339,7 +339,9 @@
   async function loadOvertime(idParam) {
     if (isReadOnlyMode) return;
     try {
-      const res = await fetch(`/overtime/summary/${idParam}`);
+      const res = await fetch(
+  `/payroll/overtime-summary/${idParam}?period=${document.getElementById('filterPeriod').value}`
+);
       const data = await res.json();
       overtimeSummary = {
         totalHours: Number(data.totalHours || 0),

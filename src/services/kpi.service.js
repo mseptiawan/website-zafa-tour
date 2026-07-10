@@ -5,6 +5,7 @@ import Kpi from "../models/kpi/Kpi.model.js";
 import unitKpiMapping from "../models/kpi/UnitKpiMapping.model.js";
 import AppError from "../utils/AppError.js";
 import mongoose from "mongoose";
+
 export const getEmployeesToAppraise = async () => {
   const atasan = [
     "Rafika Fitrianti",
@@ -42,17 +43,22 @@ export const getKpiFormData = async (employeeId) => {
     throw new AppError("Employee tidak ditemukan", 404);
   }
 
-  if (!employee.careerData || !employee.careerData.unitId || !employee.careerData.positionId) {
+  // FIX: Karena careerData adalah array, ambil indeks ke-0 (data karir aktif)
+  const currentCareer = employee.careerData && employee.careerData[0];
+
+  // Jalankan validasi pada objek karir aktif hasil ekstraksi
+  if (!currentCareer || !currentCareer.unitId || !currentCareer.positionId) {
     throw new AppError("Data karier, unit, atau posisi pegawai belum diatur.", 404);
   }
 
+  // FIX: Sesuaikan pemanggilan parameter id dari currentCareer
   const mapping = await unitKpiMapping.findOne({
-    unitId: employee.careerData.unitId._id,
-    positionId: employee.careerData.positionId._id,
+    unitId: currentCareer.unitId._id,
+    positionId: currentCareer.positionId._id,
   });
 
   if (!mapping) {
-    throw new AppError("Mapping KPI tidak ditemukan", 404);
+    throw new AppError("Mapping KPI tidak ditemukan untuk unit dan posisi pegawai ini.", 404);
   }
 
   const kpiTemplate = await KpiTemplate.findById(mapping.kpiTemplateId);
@@ -133,6 +139,7 @@ export const getKpiHistoryDetail = async (employeeId, periode) => {
 
   return kpi;
 };
+
 export const getKpiHistoryByEmployee = async (employeeId) => {
   try {
     const targetId = mongoose.Types.ObjectId.isValid(employeeId)
@@ -140,9 +147,7 @@ export const getKpiHistoryByEmployee = async (employeeId) => {
       : employeeId;
 
     return await Kpi.find({ employeeId: targetId })
-
       .populate("evaluatedBy", "name username")
-
       .sort({ periode: -1 });
   } catch (error) {
     throw error;

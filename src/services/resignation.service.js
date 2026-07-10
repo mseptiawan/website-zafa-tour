@@ -69,7 +69,7 @@ export const findMine = async ({ employeeId, page, limit }) => {
   const total = await Resignation.countDocuments(filter);
 
   const data = await Resignation.find(filter)
-    .populate("employee_id") // 🔥 Tambahkan populate di sini
+    .populate("employee_id")
     .sort({ createdAt: -1 })
     .skip(paginationArgs.skip)
     .limit(paginationArgs.limit)

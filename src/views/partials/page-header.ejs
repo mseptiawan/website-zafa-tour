@@ -1,6 +1,5 @@
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8 hidden md:block">
   <div>
-    <!-- Breadcrumb: Dibuat lebih tipis (font-semibold) dan tracking normal agar tidak kaku -->
     <div class="mb-2 flex items-center gap-2">
       <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
         <%= typeof section !== 'undefined' ? section : "Area Kerja" %>
@@ -13,12 +12,10 @@
       </span>
     </div>
 
-    <!-- Title: Menggunakan font-semibold agar lebih bersahabat & tracking-tight agar rapi -->
     <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">
       <%= typeof title !== 'undefined' ? title : "" %>
     </h1>
 
-    <!-- Description: Warna disesuaikan ke slate-400/80 agar teks panjang terasa tenang di mata -->
     <% if (typeof description !== 'undefined' && description) { %>
     <p class="text-slate-400 mt-0.5 text-[13px] leading-relaxed">
       <%= description %>

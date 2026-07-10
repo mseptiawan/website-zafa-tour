@@ -8,7 +8,6 @@ import {
   renderCreateOvertimeForm,
   storeOvertime,
   getMyOvertime,
-  getPayrollOvertimeSummary,
   approvalOvertimePage,
   approveManagerOvertime,
   getOvertimeDetail,
@@ -40,6 +39,5 @@ router.post("/approval/:id/reject", roleMiddleware(...APPROVAL_ROLES), rejectOve
 
 // Rute Detail & Integrasi Payroll
 router.get("/detail/:id", getOvertimeDetail);
-router.get("/summary/:employeeId", getPayrollOvertimeSummary);
 
 export default router;

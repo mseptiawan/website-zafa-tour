@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title: 'Input KPI Pegawai' }) %>
 
-<div >
+<div>
   <div class="mx-auto max-w-none">
     <%- include('../partials/page-header', {
       section: 'Area Kerja',
@@ -34,39 +34,39 @@
               </td>
               <td class="px-6 py-4">
                 <span class="inline-flex items-center rounded-md border border-slate-100 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
-                  <%= emp.careerData?.unitId?.name || '-' %>
+                  <%= emp.careerData && emp.careerData[0]?.unitId?.name || '-' %>
                 </span>
               </td>
-              <td class="px-6 py-4 text-slate-500"><%= emp.careerData?.bidangId?.name || '-' %></td>
+              <td class="px-6 py-4 text-slate-500">
+                <%= emp.careerData && emp.careerData[0]?.bidangId?.name || '-' %>
+              </td>
 
-            <td class="px-6 py-4 text-center">
-  <% if (isEvaluated) { %>
-    <!-- Status: Sudah Dinilai -->
-    <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100" title="Sudah Dinilai">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-      </svg>
-    </div>
+              <td class="px-6 py-4 text-center">
+                <% if (isEvaluated) { %>
+                <!-- Status: Sudah Dinilai -->
+                <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100" title="Sudah Dinilai">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
 
-  <% } else if (!isPeriodOpen) { %>
-    <!-- Status: Menunggu Kuartal -->
-    <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-400 border border-slate-100" title="Menunggu Kuartal">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    </div>
+                <% } else if (!isPeriodOpen) { %>
+                <!-- Status: Menunggu Kuartal -->
+                <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-400 border border-slate-100" title="Menunggu Kuartal">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
 
-  <% } else { %>
-    <!-- Action: Nilai Kinerja -->
-    <a href="/kpi/appraisal-form/<%= emp._id %>" 
-       class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white transition-all hover:bg-blue-700 active:scale-[0.95]" 
-       title="Nilai Kinerja">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-      </svg>
-    </a>
-  <% } %>
-</td>
+                <% } else { %>
+                <!-- Action: Nilai Kinerja -->
+                <a href="/kpi/appraisals/form/<%= emp._id %>" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white transition-all hover:bg-blue-700 active:scale-[0.95]" title="Nilai Kinerja">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <% } %>
+              </td>
             </tr>
             <% }) %>
           </tbody>
