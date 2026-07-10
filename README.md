@@ -1,14 +1,14 @@
-# Sistem Informasi Kepegawaian
+# Sistem Informasi Kepegawaian (SIK)
 
-Sistem Informasi Kepegawaian merupakan aplikasi berbasis web yang dirancang untuk membantu digitalisasi proses administrasi kepegawaian di perusahaan. Sistem ini mengelola berbagai proses operasional seperti manajemen data pegawai, kehadiran, cuti, lembur, hingga dinas luar melalui mekanisme persetujuan bertingkat (multi-level approval).
+Sistem Informasi Kepegawaian (SIK) merupakan aplikasi berbasis web yang dirancang untuk membantu digitalisasi proses administrasi kepegawaian di perusahaan. Sistem ini mengelola berbagai proses operasional seperti manajemen data pegawai, kehadiran, cuti, lembur, hingga dinas luar melalui mekanisme persetujuan bertingkat (_multi-level approval_).
 
-Proyek ini dikembangkan sebagai bagian dari tugas akhir dan berfokus pada penerapan arsitektur backend yang modular, workflow approval, serta manajemen data menggunakan MongoDB.
+Proyek ini dikembangkan sebagai bagian dari tugas akhir dan berfokus pada penerapan arsitektur backend yang modular, workflow approval, serta manajemen data menggunakan MongoDB dan Redis.
 
 ---
 
-## 🚀 Fitur Utama
+# 🚀 Fitur Utama
 
-### 👤 Manajemen Kepegawaian
+## 👤 Manajemen Kepegawaian
 
 - Manajemen data pegawai
 - Role-Based Access Control (RBAC)
@@ -16,28 +16,28 @@ Proyek ini dikembangkan sebagai bagian dari tugas akhir dan berfokus pada penera
 - Manajemen jabatan dan divisi
 - Profil pegawai
 
-### 🕒 Manajemen Kehadiran
+## 🕒 Manajemen Kehadiran
 
 - Check In / Check Out
 - Riwayat kehadiran
 - Koreksi absensi
 - Monitoring kehadiran pegawai
 
-### 🌴 Manajemen Cuti
+## 🌴 Manajemen Cuti
 
 - Pengajuan cuti
 - Persetujuan bertingkat
 - Perhitungan sisa kuota cuti
 - Riwayat pengajuan cuti
 
-### ⏱️ Manajemen Lembur
+## ⏱️ Manajemen Lembur
 
 - Pengajuan lembur
 - Approval oleh manajer
 - Dokumentasi hasil pekerjaan
 - Riwayat lembur
 
-### ✈️ Manajemen Dinas Luar
+## ✈️ Manajemen Dinas Luar
 
 - Pengajuan dinas luar
 - Workflow persetujuan multi-level
@@ -47,21 +47,36 @@ Proyek ini dikembangkan sebagai bagian dari tugas akhir dan berfokus pada penera
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
-| Layer           | Technology                       |
-| --------------- | -------------------------------- |
-| Backend         | Node.js, Express.js              |
-| Database        | MongoDB                          |
-| ODM             | Mongoose                         |
-| Template Engine | EJS                              |
-| CSS Framework   | Tailwind CSS                     |
-| Authentication  | Session Authentication           |
-| Authorization   | Role-Based Access Control (RBAC) |
+| Layer                 | Technology                       |
+| --------------------- | -------------------------------- |
+| Backend               | Node.js, Express.js              |
+| Database              | MongoDB                          |
+| Cache & Session Store | Redis                            |
+| ODM                   | Mongoose                         |
+| Template Engine       | EJS                              |
+| CSS Framework         | Tailwind CSS                     |
+| Authentication        | Session-based Authentication     |
+| Authorization         | Role-Based Access Control (RBAC) |
 
 ---
 
-## 📁 Struktur Proyek
+# ⚡ Infrastruktur
+
+Sistem menggunakan beberapa komponen utama berikut:
+
+- **Node.js** sebagai runtime aplikasi.
+- **Express.js** sebagai framework backend.
+- **MongoDB** sebagai database utama.
+- **Redis** sebagai session store dan cache untuk meningkatkan performa aplikasi.
+- **Mongoose** sebagai Object Data Modeling (ODM).
+- **EJS** sebagai template engine berbasis Server-Side Rendering (SSR).
+- **Tailwind CSS** sebagai framework CSS.
+
+---
+
+# 📁 Struktur Proyek
 
 ```text
 src/
@@ -79,7 +94,7 @@ src/
 
 ---
 
-## 👥 Role Pengguna
+# 👥 Role Pengguna
 
 | Role     | Deskripsi                                                                        |
 | -------- | -------------------------------------------------------------------------------- |
@@ -91,9 +106,9 @@ src/
 
 ---
 
-## 🔄 Workflow Approval
+# 🔄 Workflow Approval
 
-### Cuti
+## Cuti
 
 ```text
 Pegawai
@@ -105,9 +120,7 @@ Manajer
 HR
 ```
 
----
-
-### Lembur
+## Lembur
 
 ```text
 Pegawai
@@ -116,9 +129,7 @@ Pegawai
 Manajer
 ```
 
----
-
-### Dinas Luar
+## Dinas Luar
 
 ```text
 Pegawai
@@ -135,9 +146,9 @@ Keuangan
 
 ---
 
-## ⚙️ Instalasi
+# ⚙️ Instalasi
 
-### 1. Clone Repository
+## 1. Clone Repository
 
 ```bash
 git clone https://github.com/mseptiawan/hris-zafa.git
@@ -147,7 +158,7 @@ cd hris-zafa
 
 ---
 
-### 2. Install Dependency
+## 2. Install Dependency
 
 ```bash
 npm install
@@ -155,14 +166,30 @@ npm install
 
 ---
 
-### 3. Konfigurasi Environment
+## 📌 Catatan
 
-Buat file `.env`
+Sebelum menjalankan aplikasi untuk pertama kali, lakukan proses seeding database agar data awal seperti akun, role, jabatan, divisi, dan data pendukung lainnya tersedia.
+
+Jalankan perintah berikut:
+
+```bash
+npm run seed
+```
+
+> **Catatan:** Jalankan seeder hanya saat pertama kali menginisialisasi database atau ketika ingin mengisi ulang data awal. Jika database sudah berisi data, Anda tidak perlu menjalankan seeder kembali.
+
+---
+
+## 3. Konfigurasi Environment
+
+Buat file `.env` pada root project.
 
 ```env
 PORT=3000
 
 MONGODB_URI=mongodb://localhost:27017/hris_zafa_tour
+
+REDIS_URL=redis://localhost:6379
 
 SESSION_SECRET=your_session_secret
 
@@ -171,34 +198,58 @@ NODE_ENV=development
 
 ---
 
-### 4. Jalankan Aplikasi
+## 4. Jalankan Redis
 
-Mode Development
+Pastikan Redis sudah berjalan sebelum menjalankan aplikasi.
+
+### Linux / macOS
+
+```bash
+redis-server
+```
+
+### Docker
+
+```bash
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  redis:7
+```
+
+---
+
+## 5. Jalankan Aplikasi
+
+### Development
 
 ```bash
 npm run dev
 ```
 
-Mode Production
+### Production
 
 ```bash
 npm start
 ```
 
-Aplikasi akan berjalan pada:
+Aplikasi akan berjalan di:
 
-```
+```text
 http://localhost:3000
 ```
 
 ---
 
-## 📂 Arsitektur
+# 📂 Arsitektur
 
-Aplikasi menggunakan pendekatan modular sehingga setiap fitur dipisahkan ke dalam beberapa layer.
+Aplikasi menggunakan arsitektur modular agar setiap layer memiliki tanggung jawab yang jelas.
 
 ```text
-Routes
+Client
+   │
+   ▼
+Express Routes
    │
    ▼
 Controllers
@@ -207,60 +258,66 @@ Controllers
 Services
    │
    ▼
-Models (MongoDB)
+Models (Mongoose)
+   │
+   ▼
+MongoDB
 ```
+
+Redis digunakan sebagai **Session Store** dan **Cache Layer** untuk meningkatkan performa aplikasi.
 
 ---
 
-## 🔒 Authentication & Authorization
+# 🔒 Authentication & Authorization
 
 Sistem menggunakan:
 
 - Session-based Authentication
+- Redis Session Store
 - Role-Based Access Control (RBAC)
 - Middleware Authorization
 - Middleware Validation
 
 ---
 
-## 📌 Modul yang Tersedia
+# 📌 Modul yang Tersedia
 
 - Authentication
 - Employee Management
-- Attendance
+- Attendance Management
 - Leave Management
 - Overtime Management
 - Business Trip Management
-- Approval Workflow
+- Multi-Level Approval Workflow
 - Notification
 - Dashboard
 - Reporting
 
 ---
 
-## 📈 Status Proyek
+# 📈 Status Proyek
 
-Status saat ini:
-
-- ✅ Employee Management
-- ✅ Authentication
-- ✅ Attendance
-- ✅ Leave Management
-- ✅ Overtime Management
-- ✅ Business Trip Management
-- ✅ Multi-Level Approval
-- 🚧 Payroll (Development)
-- 🚧 Reward & Punishment (Development)
+| Modul                    | Status         |
+| ------------------------ | -------------- |
+| Authentication           | ✅             |
+| Employee Management      | ✅             |
+| Attendance               | ✅             |
+| Leave Management         | ✅             |
+| Overtime Management      | ✅             |
+| Business Trip Management | ✅             |
+| Multi-Level Approval     | ✅             |
+| Payroll                  | 🚧 Development |
+| Reward & Punishment      | 🚧 Development |
 
 ---
 
-## 📝 Lisensi
+# 📝 Lisensi
 
 Proyek ini dikembangkan sebagai bagian dari penelitian akademik (Tugas Akhir) dan digunakan untuk tujuan edukasi.
 
 ---
 
-## 👨‍💻 Author
+# 👨‍💻 Author
 
 **M. Septiawan**
 
