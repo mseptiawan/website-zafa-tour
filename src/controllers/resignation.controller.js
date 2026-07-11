@@ -55,7 +55,7 @@ export const storeResignation = asyncHandler(async (req, res) => {
     });
   });
 
-  return res.redirect("/resignation/my");
+  return res.redirect("/resignation/me");
 });
 
 export const getMyResignations = asyncHandler(async (req, res) => {

@@ -210,10 +210,21 @@ export const showExpense = asyncHandler(async (req, res) => {
 
   const expense = await findExpenseByIdService(expenseId, currentUser);
 
+  // ─── LOGIKA BACKLINK UNTUK 3 STRATEGI RUTE ASAL ───
+  const referrer = req.get("Referer") || "";
+  let backLink = "/expense/me"; // Default fallback ke riwayat pribadi
+
+  if (referrer.includes("/expense/approval/manager")) {
+    backLink = "/expense/approval/manager";
+  } else if (referrer.includes("/expense/finance")) {
+    backLink = "/expense/finance";
+  }
+
   res.render("expense/detail", {
     ...buildRenderData(req, {
       title: `Detail Reimbursement - ${expense.title}`,
       expense,
+      backLink, // Kirim variabel backLink ke view detail
     }),
   });
 });

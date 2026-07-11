@@ -20,7 +20,7 @@ router.use(authMiddleware);
 
 router.get("/new", renderResignationForm);
 
-router.get("/my", getMyResignations);
+router.get("/me", getMyResignations);
 
 router.post("/", validate(createResignationSchema), storeResignation);
 

@@ -12,6 +12,7 @@ import notificationService from "./notification.service.js";
 export const findActiveCategoriesService = async () => {
   return await ExpenseCategory.find({ isActive: true }).sort({ name: 1 }).lean();
 };
+
 export const createExpenseService = async ({ body, file, currentUser }) => {
   const {
     title,
@@ -102,7 +103,7 @@ export const createExpenseService = async ({ body, file, currentUser }) => {
           senderName: employee.fullName,
           title: "Persetujuan Reimbursement Baru",
           text: `${employee.fullName} mengajukan reimbursement "${title}" sebesar Rp ${formattedAmount}.`,
-          module: "EXPENSE",
+          module: MODULES.EXPENSE || "EXPENSE",
           referenceId: expense._id,
           actionUrl: `/expense/detail/${expense._id}`,
           type: "EXPENSE",
@@ -123,7 +124,7 @@ export const createExpenseService = async ({ body, file, currentUser }) => {
             senderName: employee.fullName,
             title: "Antrean Reimbursement Finansial",
             text: `Reimbursement operasional baru "${title}" Rp ${formattedAmount} menunggu pencairan dana.`,
-            module: "EXPENSE",
+            module: MODULES.EXPENSE || "EXPENSE",
             referenceId: expense._id,
             actionUrl: `/expense/detail/${expense._id}`,
             type: "EXPENSE",
@@ -133,11 +134,12 @@ export const createExpenseService = async ({ body, file, currentUser }) => {
       }
     }
   } catch (notifError) {
-    console.error("Gagal mengirimkan notifikasi:", notifError.message);
+    console.error("Gagal mengirimkan notifikasi pembuatan expense:", notifError.message);
   }
 
   return expense;
 };
+
 export const findMyExpenseService = async ({ userId, page }) => {
   const paginationArgs = getPagination({ page, limit: 10 });
   const filter = { userId };
@@ -242,7 +244,7 @@ export const processApprovalService = async ({ id, userId, role, file, note, cur
             senderName: "Manager Bidang",
             title: "Tagihan Siap Dicairkan",
             text: `Reimbursement "${expense.title}" Rp ${formattedAmount} disetujui Manager & diteruskan ke Keuangan.`,
-            module: "EXPENSE",
+            module: MODULES.EXPENSE || "EXPENSE",
             referenceId: expense._id,
             actionUrl: `/expense/detail/${expense._id}`,
             type: "EXPENSE",
@@ -257,7 +259,7 @@ export const processApprovalService = async ({ id, userId, role, file, note, cur
         senderName: "Manager Bidang",
         title: "Reimbursement Disetujui Manager",
         text: `Reimbursement "${expense.title}" telah disetujui dan kini berada dalam antrean Bagian Keuangan.`,
-        module: "EXPENSE",
+        module: MODULES.EXPENSE || "EXPENSE",
         referenceId: expense._id,
         actionUrl: `/expense/detail/${expense._id}`,
         type: "EXPENSE",
@@ -268,9 +270,9 @@ export const processApprovalService = async ({ id, userId, role, file, note, cur
         userId: expense.userId,
         senderId: userId,
         senderName: "Bagian Keuangan",
-        title: "Dana Reimbursement Dicairkan",
+        title: "Dana Reimbursement Dicairkan 🎉",
         text: `Reimbursement "${expense.title}" senilai Rp ${formattedAmount} telah ditransfer dan Lunas.`,
-        module: "EXPENSE",
+        module: MODULES.EXPENSE || "EXPENSE",
         referenceId: expense._id,
         actionUrl: `/expense/detail/${expense._id}`,
         type: "EXPENSE",
@@ -278,7 +280,7 @@ export const processApprovalService = async ({ id, userId, role, file, note, cur
       });
     }
   } catch (notifError) {
-    console.error(notifError.message);
+    console.error("Gagal mengirimkan notifikasi berantai approval:", notifError.message);
   }
 
   return { expense, nextStatus };
@@ -293,29 +295,33 @@ export const rejectByManagerService = async ({ id, userId, role, note }) => {
     { returnDocument: "after" }
   );
 
+  const roleUpper = (role || "").toUpperCase().trim();
+  const logRole = roleUpper === "MANAGER_KEUANGAN" ? "FINANCE" : "MANAGER";
+  const senderLabel = roleUpper === "MANAGER_KEUANGAN" ? "Bagian Keuangan" : "Manager Bidang";
+
   await ExpenseLog.create({
     expenseId: id,
     userId,
-    role,
+    role: logRole,
     action: "REJECTED",
-    note: note || "Ditolak oleh Manager Bidang",
+    note: note || `Ditolak oleh ${senderLabel}`,
   });
 
   try {
     await notificationService.createNotification({
       userId: expense.userId,
       senderId: userId,
-      senderName: "Manager Bidang",
-      title: "Reimbursement Ditolak ",
-      text: `Pengajuan "${expense.title}" ditolak. Alasan: "${note || "Tidak ada catatan"}"`,
-      module: "EXPENSE",
+      senderName: senderLabel,
+      title: "Reimbursement Ditolak",
+      text: `Pengajuan "${expense.title}" ditolak oleh ${senderLabel}. Alasan: "${note || "Tidak ada catatan"}"`,
+      module: MODULES.EXPENSE || "EXPENSE",
       referenceId: expense._id,
       actionUrl: `/expense/detail/${expense._id}`,
       type: "EXPENSE",
       category: NOTIF_CATEGORIES.INFO,
     });
   } catch (notifError) {
-    console.error(notifError.message);
+    console.error("Gagal mengirimkan notifikasi penolakan expense:", notifError.message);
   }
 
   return expense;
@@ -364,17 +370,17 @@ export const processPaymentService = async ({ id, userId, file, note }) => {
     await notificationService.createNotification({
       userId: expense.userId,
       senderId: userId,
-      senderName: "Finance",
+      senderName: "Bagian Keuangan",
       title: "Dana Reimbursement Berhasil Dicairkan 🎉",
       text: `Hore! Dana untuk reimbursement "${expense.title}" senilai Rp ${formattedAmount} telah dikirim oleh tim keuangan.`,
-      module: "EXPENSE",
+      module: MODULES.EXPENSE || "EXPENSE",
       referenceId: expense._id,
       actionUrl: `/expense/detail/${expense._id}`,
       type: "EXPENSE",
       category: NOTIF_CATEGORIES.INFO,
     });
   } catch (notifError) {
-    console.error(notifError.message);
+    console.error("Gagal mengirimkan notifikasi pencairan dana kas:", notifError.message);
   }
 
   return expense;

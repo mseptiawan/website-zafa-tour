@@ -85,7 +85,7 @@
       <div class="flex items-center justify-between gap-3 w-full md:hidden">
         <h3 class="text-[14px] font-medium text-slate-800 tracking-tight">Daftar Berkas</h3>
         <% if (!isApprover) { %>
-          <a href="/resignation/create" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 text-white text-[11px] font-medium rounded-full transition-all active:scale-95 outline-none cursor-pointer">
+          <a href="/resignation/new" class="inline-flex items-center justify-center gap-1.5 h-8.5 px-4 bg-blue-600 text-white text-[11px] font-medium rounded-full transition-all active:scale-95 outline-none cursor-pointer">
             <i class="fa-solid fa-plus text-[9px]"></i>
             <span>Ajukan</span>
           </a>
@@ -109,12 +109,6 @@
             ]
           }) %>
         </div>
-        <% if (!isApprover) { %>
-          <a href="/resignation/create" class="hidden md:inline-flex items-center justify-center gap-2 h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-semibold rounded-xl transition-all active:scale-98 cursor-pointer shadow-sm">
-            <i class="fa-solid fa-plus text-[10px]"></i>
-            <span>Ajukan Resign Baru</span>
-          </a>
-        <% } %>
       </div>
     </div>
 

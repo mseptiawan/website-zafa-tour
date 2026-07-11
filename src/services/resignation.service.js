@@ -2,10 +2,10 @@ import { getPagination, getPaginationMeta } from "../utils/pagination.js";
 import { PAGINATION, MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 import Resignation from "../models/Resignation.model.js";
 import EmployeeCareer from "../models/employee/EmployeeCareer.js";
-import User from "../models//basic/User.model.js";
+import User from "../models/basic/User.model.js";
 import Employee from "../models/employee/Employee.model.js";
 import notificationService from "./notification.service.js";
-
+import Role from "../models/basic/Role.model.js";
 export const createSubmission = async ({ body, employeeId }) => {
   if (!employeeId) {
     const err = new Error("Profil karyawan tidak valid.");
@@ -24,6 +24,13 @@ export const createSubmission = async ({ body, employeeId }) => {
     throw err;
   }
 
+  const requesterEmployee = await Employee.findById(employeeId).select("userId fullName").lean();
+  if (!requesterEmployee) {
+    const err = new Error("Data profil karyawan pengaju tidak ditemukan.");
+    err.statusCode = 400;
+    throw err;
+  }
+
   const resignation = await Resignation.create({
     employee_id: employeeId,
     effective_date: body.effective_date,
@@ -32,22 +39,34 @@ export const createSubmission = async ({ body, employeeId }) => {
   });
 
   try {
-    const wadirUsers = await Employee.find({ role: "WAKIL_DIREKTUR" }).select("userId").lean();
-    const targetUserIds = wadirUsers.map((w) => w.userId).filter((id) => id != null);
+    const roleWadir = await Role.findOne({ name: "WAKIL_DIREKTUR" }).lean();
+
+    let wadirUsers = [];
+    if (roleWadir) {
+      wadirUsers = await User.find({ roleId: roleWadir._id }).select("_id").lean();
+    } else {
+      wadirUsers = await User.find({ role: "WAKIL_DIREKTUR" }).select("_id").lean();
+    }
+
+    const targetUserIds = wadirUsers.map((u) => u._id).filter((id) => id != null);
+
+    console.log("FIXED DEBUG TARGET WADIR IDS:", targetUserIds);
 
     if (targetUserIds.length > 0) {
       await notificationService.createManyNotifications({
         userIds: targetUserIds,
-        senderId: resignation._id,
-        senderName: "Sistem HRIS",
+        senderId: requesterEmployee.userId || resignation._id,
+        senderName: requesterEmployee.fullName || "Karyawan",
         title: "Pengajuan Resign Baru",
-        text: "Terdapat dokumen pengunduran diri baru yang membutuhkan verifikasi Anda.",
+        text: `${requesterEmployee.fullName || "Seorang karyawan"} mengajukan permohonan dinas luar/pengunduran diri baru.`,
         module: MODULES.RESIGNATION || "RESIGNATION",
         referenceId: resignation._id,
-        actionUrl: `/resignation/${resignation._id}`,
+        actionUrl: `/resignation`,
         type: "RESIGNATION",
         category: NOTIF_CATEGORIES.INFO,
       });
+    } else {
+      console.warn("PERINGATAN: Tidak ada akun WAKIL_DIREKTUR yang ditemukan di database.");
     }
   } catch (notifError) {
     console.error("ERROR NOTIFIKASI RESIGN:", notifError.message);
@@ -55,7 +74,6 @@ export const createSubmission = async ({ body, employeeId }) => {
 
   return resignation;
 };
-
 export const findMine = async ({ employeeId, page, limit }) => {
   if (!employeeId) {
     return {
@@ -80,7 +98,12 @@ export const findMine = async ({ employeeId, page, limit }) => {
     meta: getPaginationMeta({ page: paginationArgs.page, limit: paginationArgs.limit, total }),
   };
 };
-export const findAllPending = async ({ page = 1, limit = PAGINATION.DEFAULT_LIMIT, currentUser }) => {
+
+export const findAllPending = async ({
+  page = 1,
+  limit = PAGINATION.DEFAULT_LIMIT,
+  currentUser,
+}) => {
   const paginationArgs = getPagination({ page, limit });
   const filter = {};
   const role = currentUser?.role?.toUpperCase();
@@ -98,9 +121,9 @@ export const findAllPending = async ({ page = 1, limit = PAGINATION.DEFAULT_LIMI
   const total = await Resignation.countDocuments(filter);
 
   const data = await Resignation.find(filter)
-    .populate({ 
-      path: "employee_id", 
-      select: "fullName employeeIdNumber careerData" 
+    .populate({
+      path: "employee_id",
+      select: "fullName employeeIdNumber careerData",
     })
     .sort({ createdAt: -1 })
     .skip(paginationArgs.skip)
@@ -112,12 +135,13 @@ export const findAllPending = async ({ page = 1, limit = PAGINATION.DEFAULT_LIMI
     meta: getPaginationMeta({ page: paginationArgs.page, limit: paginationArgs.limit, total }),
   };
 };
+
 export const findById = async (id) => {
   return await Resignation.findById(id)
     .populate([
       { path: "employee_id" },
       { path: "approvals.wadir.approved_by", select: "username email" },
-      { path: "approvals.dirut.approved_by", select: "username email" }
+      { path: "approvals.dirut.approved_by", select: "username email" },
     ])
     .lean();
 };
@@ -140,10 +164,20 @@ export const processWadirApproval = async ({ resignationId, userId, action, note
     { new: true }
   );
 
-  if (status === "PENDING_DIRUT") {
-    try {
-      const dirutUsers = await Employee.find({ role: "DIREKTUR_UTAMA" }).select("userId").lean();
-      const targetUserIds = dirutUsers.map((d) => d.userId).filter((id) => id != null);
+  try {
+    const employeeData = await Employee.findById(resignation.employee_id).lean();
+
+    if (status === "PENDING_DIRUT") {
+      const roleDirut = await Role.findOne({ name: "DIREKTUR_UTAMA" }).lean();
+
+      let dirutUsers = [];
+      if (roleDirut) {
+        dirutUsers = await User.find({ roleId: roleDirut._id }).select("_id").lean();
+      } else {
+        dirutUsers = await User.find({ role: "DIREKTUR_UTAMA" }).select("_id").lean();
+      }
+
+      const targetUserIds = dirutUsers.map((u) => u._id).filter((id) => id != null);
 
       if (targetUserIds.length > 0) {
         await notificationService.createManyNotifications({
@@ -151,21 +185,37 @@ export const processWadirApproval = async ({ resignationId, userId, action, note
           senderId: userId,
           senderName: "Wakil Direktur",
           title: "Persetujuan Resign Tahap 1",
-          text: "Berkas pengunduran diri telah disetujui Wadir dan menunggu keputusan final Anda.",
+          text: `Berkas pengunduran diri ${employeeData?.fullName || "Karyawan"} telah disetujui Wadir & menunggu keputusan final Anda.`,
           module: MODULES.RESIGNATION || "RESIGNATION",
           referenceId: resignation._id,
-          actionUrl: `/resignation/${resignation._id}`,
+          actionUrl: `/resignation`,
           type: "RESIGNATION",
           category: NOTIF_CATEGORIES.INFO,
         });
       }
-    } catch (notifError) {
-      console.error("ERROR NOTIFIKASI WADIR APPROVAL:", notifError.message);
+    } else if (status === "REJECTED_WADIR") {
+      if (employeeData && employeeData.userId) {
+        await notificationService.createNotification({
+          userId: employeeData.userId,
+          senderId: userId,
+          senderName: "Wakil Direktur",
+          title: "Pengajuan Resign Ditolak",
+          text: `Mohon maaf, permohonan pengunduran diri Anda ditolak oleh Wakil Direktur. Catatan: "${note || "-"}"`,
+          module: MODULES.RESIGNATION || "RESIGNATION",
+          referenceId: resignation._id,
+          actionUrl: `/resignation/me`,
+          type: "RESIGNATION",
+          category: NOTIF_CATEGORIES.INFO,
+        });
+      }
     }
+  } catch (notifError) {
+    console.error("ERROR NOTIFIKASI WADIR APPROVAL:", notifError.message);
   }
 
   return resignation;
 };
+
 export const processFinalApproval = async ({ resignationId, userId, action, note, attachment }) => {
   const status = action === "APPROVE" ? "APPROVED" : "REJECTED_DIRUT";
 
@@ -184,11 +234,9 @@ export const processFinalApproval = async ({ resignationId, userId, action, note
     updateData.$set.attachment = attachment;
   }
 
-  const resignation = await Resignation.findByIdAndUpdate(
-    resignationId,
-    updateData,
-    { new: true }
-  );
+  const resignation = await Resignation.findByIdAndUpdate(resignationId, updateData, { new: true });
+
+  const employeeData = await Employee.findById(resignation.employee_id).lean();
 
   if (status === "APPROVED") {
     await EmployeeCareer.findOneAndUpdate(
@@ -196,13 +244,45 @@ export const processFinalApproval = async ({ resignationId, userId, action, note
       { status_pegawai: "Resign" }
     );
 
-    const employeeData = await Employee.findById(resignation.employee_id).lean();
-    
     if (employeeData && employeeData.userId) {
       await User.findByIdAndUpdate(employeeData.userId, {
-        status: "Inactive"
+        status: "Inactive",
       });
     }
+  }
+
+  try {
+    if (employeeData && employeeData.userId) {
+      if (status === "APPROVED") {
+        await notificationService.createNotification({
+          userId: employeeData.userId,
+          senderId: userId,
+          senderName: "Direktur Utama",
+          title: "Pengajuan Resign Disetujui (Final) 🎉",
+          text: "Pengajuan pengunduran diri Anda telah disetujui sepenuhnya oleh Direktur Utama. Terima kasih atas dedikasi Anda.",
+          module: MODULES.RESIGNATION || "RESIGNATION",
+          referenceId: resignation._id,
+          actionUrl: `/resignation/me`,
+          type: "RESIGNATION",
+          category: NOTIF_CATEGORIES.INFO,
+        });
+      } else if (status === "REJECTED_DIRUT") {
+        await notificationService.createNotification({
+          userId: employeeData.userId,
+          senderId: userId,
+          senderName: "Direktur Utama",
+          title: "Pengajuan Resign Ditolak (Final)",
+          text: `Permohonan pengunduran diri Anda ditolak pada verifikasi tingkat akhir oleh Direktur Utama. Catatan: "${note || "-"}"`,
+          module: MODULES.RESIGNATION || "RESIGNATION",
+          referenceId: resignation._id,
+          actionUrl: `/resignation/me`,
+          type: "RESIGNATION",
+          category: NOTIF_CATEGORIES.INFO,
+        });
+      }
+    }
+  } catch (notifError) {
+    console.error("ERROR NOTIFIKASI FINAL DIRUT APPROVAL:", notifError.message);
   }
 
   return resignation;
