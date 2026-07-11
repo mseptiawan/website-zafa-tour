@@ -1,0 +1,194 @@
+<%- layout('layouts/main', { title }) %>
+
+<% 
+  // Periksa apakah user memiliki role manajemen/approver dinas luar
+  const APPROVER_ROLES = ["MANAGER_ADMINISTRASI", "WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
+  const isManagement = APPROVER_ROLES.includes((user.role || '').toUpperCase());
+  
+  // Jika manajemen membuka halaman ini melalui list approval, tombol kembali mengarah ke list incoming
+  const backLink = isManagement ? '/trip/incoming' : '/trip/me';
+  
+  // Penentuan Aktif Approval yang dinamis tanpa dummy data di database
+  const isTargetApprover = user && trip.currentStep === user.role && ["PENDING", "IN_REVIEW"].includes(trip.status);
+  const activeApproval = isTargetApprover ? { _id: trip._id } : null;
+%>
+
+<div>
+  <div class="w-full max-w-none mx-auto space-y-5 md:space-y-6">
+
+    <!-- BACK BUTTON -->
+    <a href="<%= backLink %>" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors group select-none">
+      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      <span>Kembali</span>
+    </a>
+
+    <!-- 3-COLUMN GRID LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6 items-start">
+
+      <!-- LEFT COLUMN: MAIN INFORMATION & OPERATIONAL ACTIONS -->
+      <div class="space-y-5 md:space-y-6 lg:col-span-2">
+
+        <!-- DETAIL CARD -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-2xs">
+          <!-- CARD HEADER -->
+          <div class="p-4 md:px-8 md:py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- BAGIAN KIRI: Profil & Identitas -->
+            <div class="min-w-0 flex-1">
+              <h1 class="text-[14px] md:text-[15px] font-semibold text-slate-900 tracking-tight truncate">
+                <%= trip.userId?.employeeProfile?.fullName || trip.userId?.username %>
+              </h1>
+
+              <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[10px] md:text-[11px] font-medium">
+                <span class="inline-flex items-center gap-1.5 bg-slate-50 text-slate-600 px-2 py-0.5 rounded-lg border border-slate-200/60">
+                  <i class="fa-solid fa-briefcase text-[9px] opacity-70"></i>
+                  <%= trip.userId?.employeeProfile?.career?.bidangId?.name || 'Tidak ada bidang' %>
+                </span>
+                <span class="inline-flex items-center gap-1.5 bg-blue-50/50 text-blue-700 px-2 py-0.5 rounded-lg border border-blue-200/30">
+                  <i class="fa-solid fa-building text-[9px] opacity-70"></i>
+                  <%= trip.userId?.employeeProfile?.career?.unitId?.name || 'Tidak ada unit' %>
+                </span>
+              </div>
+            </div>
+
+            <div class="shrink-0">
+              <span class="inline-flex items-center px-3 py-1 rounded-full font-medium text-[10px] uppercase tracking-wider border select-none
+      <%= trip.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200/50'
+        : trip.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
+        : trip.status === 'IN_REVIEW' ? 'bg-blue-50 text-blue-700 border-blue-200/50'
+        : 'bg-rose-50 text-rose-700 border-rose-200/50' %>">
+                <span class="w-1.5 h-1.5 rounded-full mr-2 opacity-80 <%= trip.status === 'PENDING' ? 'bg-amber-500' : trip.status === 'APPROVED' ? 'bg-emerald-500' : 'bg-rose-500' %>"></span>
+                <%= trip.status %>
+              </span>
+            </div>
+          </div>
+          <!-- CARD BODY -->
+          <div class="p-5 md:p-6 space-y-5 bg-white">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4 md:gap-x-8">
+              <div>
+                <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-0.5">Kota / Lokasi Tujuan</div>
+                <div class="text-[13px] md:text-[14px] font-medium text-slate-800 break-words"><%= trip.destination || '-' %></div>
+              </div>
+              <div>
+                <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-0.5">Klien / Hubungan Kerja</div>
+                <div class="text-[13px] md:text-[14px] font-medium text-slate-800 break-words"><%= trip.meetWith || '-' %></div>
+              </div>
+              <div>
+                <div class="text-[10px] font-medium text-slate-400 tracking-wider mb-0.5">TANGGAL MULAI DINAS</div>
+                <div class="text-[13px] font-medium text-slate-800 tabular-nums">
+                  <%= trip.startDate ? new Date(trip.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
+                </div>
+              </div>
+              <div>
+                <div class="text-[10px] font-medium text-slate-400 tracking-wider mb-0.5">TANGGAL SELESAI DINAS</div>
+                <div class="text-[13px] font-medium text-slate-800 tabular-nums">
+                  <%= trip.endDate ? new Date(trip.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' %>
+                </div>
+              </div>
+              <div class="col-span-2 pt-1">
+                <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1">Kategori / Keperluan</div>
+                <div class="text-[12px] font-medium text-slate-700 break-words max-w-full">
+                  <%= trip.purpose || '-' %>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-50/80 rounded-lg p-3 border border-slate-200/50">
+              <span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider block mb-1">Deskripsi / Maksud Dinas</span>
+              <p class="text-[12px] text-slate-600 leading-relaxed whitespace-normal break-words"><%= trip.description || '-' %></p>
+            </div>
+
+            <!-- TOTAL ANGGARAN & BUKTI TRANSFER -->
+            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Estimasi Anggaran</div>
+                <div class="text-sm md:text-base font-medium text-blue-600 tabular-nums mt-0.5">
+                  Rp <%= (trip.budget?.total || 0).toLocaleString('id-ID') %>
+                </div>
+              </div>
+
+              <!-- TAMPILKAN JIKA BERKAS DARI FIELD PAYMENT TERSEDIA -->
+              <% if (trip.payment && trip.payment.proofUrl) { %>
+              <div class="sm:text-right">
+                <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1">Dokumen Pencairan Dana</div>
+                <a href="/uploads/receipts/<%= trip.payment.proofUrl %>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-[11.5px] font-semibold rounded-lg transition-colors group">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Lihat Bukti Transfer</span>
+                </a>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIMELINE COMPONENT / DETAIL BUDGET TABLE -->
+        <div class="pt-4 border-t border-slate-100">
+          <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2">Rincian Pos Alokasi Anggaran</div>
+          <div class="overflow-x-auto border border-slate-200/60 rounded-lg">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200/60">
+                  <th class="p-2.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Item Komponen</th>
+                  <th class="p-2.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider text-center">Kuantitas</th>
+                  <th class="p-2.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider text-right">Harga Satuan</th>
+                  <th class="p-2.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider text-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-[12px] text-slate-700">
+                <% if (trip.budget?.items && trip.budget.items.length > 0) { %>
+                <% trip.budget.items.forEach(function(item) { %>
+                <tr>
+                  <td class="p-2.5 font-medium text-slate-800">
+                    <%= item.title %>
+                    <% if(item.description) { %>
+                    <span class="block text-[10px] text-slate-400 italic font-normal"><%= item.description %></span>
+                    <% } %>
+                  </td>
+                  <td class="p-2.5 text-center tabular-nums text-slate-600"><%= item.quantity %> <%= item.unit || 'Hari' %></td>
+                  <td class="p-2.5 text-right tabular-nums text-slate-600">Rp <%= (item.pricePerUnit || 0).toLocaleString('id-ID') %></td>
+                  <td class="p-2.5 text-right font-semibold tabular-nums text-slate-900">Rp <%= (item.allocatedAmount || 0).toLocaleString('id-ID') %></td>
+                </tr>
+                <% }); %>
+                <% } else { %>
+                <tr>
+                  <td colspan="4" class="p-4 text-center text-slate-400 italic text-[11px]">Tidak ada rincian alokasi anggaran.</td>
+                </tr>
+                <% } %>
+              </tbody>
+              <tfoot>
+                <tr class="bg-blue-50/50 font-medium border-t border-slate-200 text-slate-900">
+                  <td colspan="3" class="p-2.5 text-[10px] uppercase tracking-wider text-slate-500 text-right">Total Akhir:</td>
+                  <td class="p-2.5 text-right text-blue-600 tabular-nums text-[13px]">Rp <%= (trip.budget?.total || 0).toLocaleString('id-ID') %></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-5 md:space-y-6 lg:col-span-1 w-full flex flex-col pb-24 md:pb-0">
+        <% if (error) { %>
+        <div class="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-xs font-medium">
+          <strong>Gagal:</strong> <%= error %>
+        </div>
+        <% } %>
+
+        <!-- LOG HISTORY COMPONENT -->
+        <div class="w-full">
+          <%- include('partials/_log-history', { approvals, trip }) %>
+        </div>
+
+        <!-- ACTION PANEL WIDGET -->
+        <% if (activeApproval) { %>
+        <div class="w-full bg-white border border-slate-200/60 rounded-2xl p-4 md:p-5 shadow-2xs">
+          <%- include('partials/_action-panel', { activeApproval, user, approvals, trip }) %>
+        </div>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+</div>

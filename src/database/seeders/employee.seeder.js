@@ -325,6 +325,28 @@ const employeeSeeder = async () => {
     const shortIdFromKtp = generatedKtpMentah.slice(-6);
     const professionalId = `ZFT-${shortIdFromKtp}`;
 
+    let basicSalary = 4500000;
+    let overtimeRate = 25000;
+
+    if (emp.positionId) {
+      if (emp.positionId.toString() === komisaris?._id.toString()) {
+        basicSalary = 25000000;
+        overtimeRate = 0;
+      } else if (emp.positionId.toString() === direkturUtama?._id.toString()) {
+        basicSalary = 20000000;
+        overtimeRate = 0;
+      } else if (emp.positionId.toString() === wakilDirektur?._id.toString()) {
+        basicSalary = 15000000;
+        overtimeRate = 0;
+      } else if (emp.positionId.toString() === generalManager?._id.toString()) {
+        basicSalary = 12000000;
+        overtimeRate = 50000;
+      } else if (emp.positionId.toString() === manager?._id.toString()) {
+        basicSalary = 8000000;
+        overtimeRate = 35000;
+      }
+    }
+
     const newEmployee = await Employee.create({
       userId: emp.userId,
       employeeIdNumber: professionalId,
@@ -335,6 +357,13 @@ const employeeSeeder = async () => {
       jenis_kelamin: emp.gender === "Laki-Laki" ? "Laki-Laki" : "Perempuan",
       agama: "Islam",
       status_pernikahan: "Lajang",
+      financialData: {
+        basicSalary: basicSalary,
+        overtimeRate: overtimeRate,
+        nama_bank: "BCA",
+        nomor_rekening: `1234567${(i + 1).toString().padStart(3, "0")}`,
+        nama_pemilik_rekening: emp.fullName,
+      },
     });
 
     if (emp.positionId || emp.bidangId || emp.unitId) {
@@ -350,7 +379,7 @@ const employeeSeeder = async () => {
   }
 
   console.log(
-    `Successfully seeded ${rawEmployees.length} employees and profiles into separate career schema.`
+    `Successfully seeded ${rawEmployees.length} employees with financial data and profiles into separate career schema.`
   );
 };
 

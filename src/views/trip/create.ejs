@@ -3,7 +3,7 @@
 <div class="overflow-hidden">
   <div class="w-full max-w-2xl mx-auto mt-4 md:mt-0">
 
-    <%- include('../../partials/page-header', { 
+    <%- include('../partials/page-header', { 
         section: 'Area Kerja', 
         module: 'Dinas Luar', 
         title: typeof mode !== 'undefined' && mode === 'EDIT' ? 'Ubah Dinas Luar' : 'Pengajuan Dinas Luar', 
@@ -135,7 +135,7 @@
               <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Rincian Anggaran Kunjungan</label>
               <span class="text-[10.5px] text-slate-400/90 font-medium">Satuan contoh: <b class="text-slate-500">Hari</b> (Hotel), <b class="text-slate-500">Kali/Porsi</b> (Makan), <b class="text-slate-500">Kilo</b> (Laundry).</span>
             </div>
-            <button type="button" id="add-budget-item" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors outline-none cursor-pointer self-start mt-0.5">
+            <button type="button" id="add-budget-item" class="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 hover:text-blue-700 transition-colors outline-none cursor-pointer self-start mt-0.5">
               <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
@@ -163,7 +163,7 @@
                     <div class="col-span-4 sm:col-span-3 pr-7 relative">
                       <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-medium text-slate-400">@</span>
                       <input type="text" placeholder="Harga" value="<%= item.pricePerUnit ? item.pricePerUnit.toLocaleString('id-ID') : '' %>" oninput="formatCurrency(this)"
-                             class="budget-price-display w-full bg-white border border-slate-200 rounded-lg text-[12px] font-bold h-9 pl-5 pr-2 text-slate-800 text-right outline-none focus:border-blue-500 transition-colors tabular-nums" />
+                             class="budget-price-display w-full bg-white border border-slate-200 rounded-lg text-[12px] font-medium h-9 pl-5 pr-2 text-slate-800 text-right outline-none focus:border-blue-500 transition-colors tabular-nums" />
                       <input type="hidden" name="budget[items][<%= idx %>][pricePerUnit]" class="budget-price-raw" value="<%= item.pricePerUnit || 0 %>" />
                     </div>
                   </div>
@@ -171,7 +171,7 @@
                     <input type="text" name="budget[items][<%= idx %>][description]" placeholder="Keterangan rincian opsional..." value="<%= item.description || '' %>"
                            class="w-full sm:flex-1 bg-transparent border-none text-[11px] font-medium p-0 text-slate-600 placeholder:text-slate-400/60 outline-none" />
                     <div class="text-[11px] font-semibold text-slate-500 select-none w-full sm:w-auto text-right sm:pr-7">
-                      Subtotal: <span class="budget-item-subtotal text-slate-800 font-bold">Rp <%= ((item.quantity || 1) * (item.pricePerUnit || 0)).toLocaleString('id-ID') %></span>
+                      Subtotal: <span class="budget-item-subtotal text-slate-800 font-medium">Rp <%= ((item.quantity || 1) * (item.pricePerUnit || 0)).toLocaleString('id-ID') %></span>
                     </div>
                   </div>
                   <button type="button" onclick="removeBudgetItem(this)" class="delete-budget-btn absolute top-3.5 right-3 text-slate-400 hover:text-rose-600 transition-colors hidden cursor-pointer">
@@ -197,7 +197,7 @@
                   <div class="col-span-4 sm:col-span-3 pr-7 relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-medium text-slate-400">@</span>
                     <input type="text" placeholder="Harga" oninput="formatCurrency(this)"
-                           class="budget-price-display w-full bg-white border border-slate-200 rounded-lg text-[12px] font-bold h-9 pl-5 pr-2 text-slate-800 text-right outline-none focus:border-blue-500 transition-colors tabular-nums" />
+                           class="budget-price-display w-full bg-white border border-slate-200 rounded-lg text-[12px] font-medium h-9 pl-5 pr-2 text-slate-800 text-right outline-none focus:border-blue-500 transition-colors tabular-nums" />
                     <input type="hidden" name="budget[items][0][pricePerUnit]" class="budget-price-raw" value="0" />
                   </div>
                 </div>
@@ -205,7 +205,7 @@
                   <input type="text" name="budget[items][0][description]" placeholder="Keterangan rincian opsional..."
                          class="w-full sm:flex-1 bg-transparent border-none text-[11px] font-medium p-0 text-slate-600 placeholder:text-slate-400/60 outline-none" />
                   <div class="text-[11px] font-semibold text-slate-500 select-none w-full sm:w-auto text-right sm:pr-7">
-                    Subtotal: <span class="budget-item-subtotal text-slate-800 font-bold">Rp 0</span>
+                    Subtotal: <span class="budget-item-subtotal text-slate-800 font-medium">Rp 0</span>
                   </div>
                 </div>
                 <button type="button" onclick="removeBudgetItem(this)" class="delete-budget-btn absolute top-3.5 right-3 text-slate-400 hover:text-rose-600 transition-colors hidden cursor-pointer">
@@ -216,12 +216,11 @@
           </div>
 
           <div class="flex justify-between items-center bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-[11.5px] select-none shadow-[0_4px_12px_rgba(0,0,0,0.01)]">
-            <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Estimasi Total Keseluruhan:</span>
-            <span id="budget-total-display" class="font-bold text-blue-600 tabular-nums text-[13px]">Rp 0</span>
+            <span class="font-medium text-slate-400 uppercase tracking-wider text-[10px]">Estimasi Total Keseluruhan:</span>
+            <span id="budget-total-display" class="font-medium text-blue-600 tabular-nums text-[13px]">Rp 0</span>
           </div>
         </div>
 
-        <!-- Row: Timeline Rute Perjalanan (GAYA BARU: CARD-BASED INDEX) -->
         <div class="space-y-3 pt-1">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide block select-none">Timeline Rute Perjalanan</label>
 
@@ -229,7 +228,7 @@
             <% if (old?.timeline && old.timeline.length > 0) { %>
               <% old.timeline.forEach((tl, idx) => { %>
                 <div class="timeline-item bg-slate-50/50 border border-slate-200/60 rounded-xl p-3 flex items-center gap-3 group transition-all hover:bg-slate-50 focus-within:border-slate-300">
-                  <div class="timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-bold flex items-center justify-center select-none shadow-xs">
+                  <div class="timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-medium flex items-center justify-center select-none shadow-xs">
                     <%= idx + 1 %>
                   </div>
                   <input type="text" name="timeline[<%= idx %>][address]" placeholder="Alamat rute rincian..." value="<%= tl.address || '' %>" required
@@ -242,7 +241,7 @@
               <% }) %>
             <% } else { %>
               <div class="timeline-item bg-slate-50/50 border border-slate-200/60 rounded-xl p-3 flex items-center gap-3 group transition-all hover:bg-slate-50 focus-within:border-slate-300">
-                <div class="timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-700 text-white text-[11px] font-bold flex items-center justify-center select-none shadow-xs">
+                <div class="timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-700 text-white text-[11px] font-medium flex items-center justify-center select-none shadow-xs">
                   1
                 </div>
                 <input type="text" name="timeline[0][address]" placeholder="Lokasi keberangkatan / alamat titik awal..." required
@@ -257,7 +256,7 @@
 
           <!-- Tombol Tambah Destinasi Card Minimalis -->
           <button type="button" onclick="addTimeline()" 
-                  class="w-full py-2.5 border border-dashed border-slate-200 rounded-xl text-[11.5px] font-bold text-slate-400/90 hover:text-blue-600 hover:border-blue-400/60 flex items-center justify-center gap-1.5 transition-all outline-none bg-slate-200/5 hover:bg-blue-50/10 cursor-pointer">
+                  class="w-full py-2.5 border border-dashed border-slate-200 rounded-xl text-[11.5px] font-medium text-slate-400/90 hover:text-blue-600 hover:border-blue-400/60 flex items-center justify-center gap-1.5 transition-all outline-none bg-slate-200/5 hover:bg-blue-50/10 cursor-pointer">
             <i class="fa-solid fa-plus text-[10px]"></i>
             Tambah Destinasi Rute Berikutnya
           </button>
@@ -265,7 +264,7 @@
 
         <!-- ACTION BUTTONS FOOTER -->
         <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-          <a href="/trip/my" class="px-5 py-2.5 rounded-xl text-[12px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all select-none">
+          <a href="/trip/me" class="px-5 py-2.5 rounded-xl text-[12px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all select-none">
             Batal
           </a>
           <button type="submit" class="w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-[12px] font-semibold transition-colors shadow-xs">
@@ -280,8 +279,8 @@
 
 <!-- SCRIPTS HANDLERS -->
 <script>
-  let timelineIndex = document.querySelectorAll('.timeline-item').length || 1;    
-  let budgetItemIndex = document.querySelectorAll('.budget-item').length || 1;  
+let timelineIndex = document.querySelectorAll('.timeline-item').length;    
+let budgetItemIndex = document.querySelectorAll('.budget-item').length;
 
   function calculateItemSubtotal(element) {
     const row = element.closest('.budget-item');
@@ -340,7 +339,7 @@
         <div class="col-span-4 sm:col-span-3 pr-7 relative">
           <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-medium text-slate-400">@</span>
           <input type="text" placeholder="Harga" oninput="formatCurrency(this)"
-            class="budget-price-display w-full bg-white border border-slate-200 rounded-lg text-[12px] font-bold h-9 pl-5 pr-2 text-slate-800 text-right outline-none focus:border-blue-500 transition-colors tabular-nums" />
+            class="budget-price-display w-full bg-white border border-slate-200 rounded-lg text-[12px] font-medium h-9 pl-5 pr-2 text-slate-800 text-right outline-none focus:border-blue-500 transition-colors tabular-nums" />
           <input type="hidden" name="budget[items][${budgetItemIndex}][pricePerUnit]" class="budget-price-raw" value="0" />
         </div>
       </div>
@@ -348,7 +347,7 @@
         <input type="text" name="budget[items][${budgetItemIndex}][description]" placeholder="Keterangan rincian opsional..."
           class="w-full sm:flex-1 bg-transparent border-none text-[11px] font-medium p-0 text-slate-600 placeholder:text-slate-400/60 outline-none" />
         <div class="text-[11px] font-semibold text-slate-500 select-none w-full sm:w-auto text-right sm:pr-7">
-          Subtotal: <span class="budget-item-subtotal text-slate-800 font-bold">Rp 0</span>
+          Subtotal: <span class="budget-item-subtotal text-slate-800 font-medium">Rp 0</span>
         </div>
       </div>
       <button type="button" onclick="removeBudgetItem(this)" class="delete-budget-btn absolute top-3.5 right-3 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
@@ -399,7 +398,7 @@
     div.className = "timeline-item bg-slate-50/50 border border-slate-200/60 rounded-xl p-3 flex items-center gap-3 group transition-all hover:bg-slate-50 focus-within:border-slate-300 animate-fadeIn";
 
     div.innerHTML = `
-      <div class="timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-bold flex items-center justify-center select-none shadow-xs">
+      <div class="timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-medium flex items-center justify-center select-none shadow-xs">
         ${timelineIndex + 1}
       </div>
       
@@ -438,9 +437,9 @@
       badge.innerText = idx + 1;
       
       if (idx === 0) {
-        badge.className = "timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-700 text-white text-[11px] font-bold flex items-center justify-center select-none shadow-xs";
+        badge.className = "timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-700 text-white text-[11px] font-medium flex items-center justify-center select-none shadow-xs";
       } else {
-        badge.className = "timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-bold flex items-center justify-center select-none shadow-xs";
+        badge.className = "timeline-badge flex-shrink-0 w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-medium flex items-center justify-center select-none shadow-xs";
       }
 
       item.querySelector('input[name*="[address]"]').setAttribute('name', `timeline[${idx}][address]`);

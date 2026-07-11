@@ -1,0 +1,94 @@
+<%
+  // Deteksi apakah yang membuka adalah finance di step finance (setelah dirut)
+  const hasPassedDirutLog = approvals.some(a => a.step === 'DIREKTUR_UTAMA' && a.status === 'APPROVED');
+  const isFinanceFinalStage = (user.role === 'MANAGER_KEUANGAN' && trip.currentStep === 'MANAGER_KEUANGAN' && hasPassedDirutLog);
+%>
+
+<div class="space-y-4">
+  <div class="flex items-start gap-3">
+    <div>
+      <h4 class="text-[12px] font-medium tracking-wider text-slate-900 uppercase">Aksi Persetujuan</h4>
+      <p class="mt-0.5 text-[11px] text-slate-400">
+        Tinjau kesesuaian anggaran operasional dinas sebelum memberikan keputusan resmi.
+      </p>
+    </div>
+  </div>
+
+  <!-- FORM KEPUTUSAN DENGAN ENCTYPE MULTIPART -->
+  <form id="approvalForm" method="POST" action="/trip/approval/<%= activeApproval._id %>" enctype="multipart/form-data" class="m-0 space-y-3.5">
+    <input type="hidden" name="action" id="actionInput" value="" />
+
+    <!-- INPUT FILE MANDATORI UNTUK FINANCE DI FASE AKHIR -->
+    <% if (isFinanceFinalStage) { %>
+      <div class="p-3 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2">
+        <label class="block text-[9px] font-medium tracking-widest text-blue-600 uppercase">
+          Unggah Bukti Pencairan / Transfer Dana <span class="text-rose-500">*</span>
+        </label>
+        <input 
+          type="file" 
+          name="disbursementFile" 
+          id="disbursementFile"
+          accept=".pdf,.png,.jpg,.jpeg"
+          class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer transition-all"
+        />
+        <p class="text-[10px] text-slate-400">Format yang didukung: PDF, PNG, atau JPG.</p>
+      </div>
+    <% } %>
+
+    <div>
+      <label class="mb-1 block text-[9px] font-semibold tracking-widest text-slate-400 uppercase">
+        Catatan Keputusan <%= isFinanceFinalStage ? '(Opsional)' : '(Wajib jika menolak)' %>
+      </label>
+      <textarea
+        name="note"
+        rows="3"
+        class="w-full resize-none rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-[12px] text-slate-800 placeholder-slate-400 transition outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+        placeholder="Tulis instruksi tambahan atau alasan penolakan di sini..."></textarea>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2.5 pt-1">
+      <button
+        type="button"
+        onclick="submitDecision('REJECT')"
+        class="flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/30 text-xs font-semibold text-rose-700 transition-all hover:bg-rose-50 active:scale-[0.98]"
+      >
+        <i class="fa-solid fa-xmark text-[11px]"></i>
+        Tolak Dinas
+      </button>
+
+      <button
+        type="button"
+        onclick="submitDecision('APPROVE')"
+        class="flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-emerald-600 text-xs font-semibold text-white shadow-xs transition-all hover:bg-emerald-700 active:scale-[0.98]"
+      >
+        <i class="fa-solid fa-check text-[11px]"></i>
+        Setujui
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function submitDecision(status) {
+    const actionInput = document.getElementById("actionInput");
+    const form = document.getElementById("approvalForm");
+
+    if (actionInput && form) {
+      actionInput.value = status;
+      const noteValue = form.querySelector('textarea[name="note"]').value.trim();
+      const fileInput = document.getElementById("disbursementFile");
+
+      if (status === "REJECT" && noteValue.length < 5) {
+        alert("Harap masukkan alasan penolakan pada kolom catatan keputusan (minimal 5 karakter).");
+        return;
+      }
+
+      if (status === "APPROVE" && fileInput && fileInput.files.length === 0) {
+        alert("Sebagai Finance, Anda wajib mengunggah dokumen bukti pencairan dana/transfer sebelum menyetujui.");
+        return;
+      }
+
+      form.submit();
+    }
+  }
+</script>

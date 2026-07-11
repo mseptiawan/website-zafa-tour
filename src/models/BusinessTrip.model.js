@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
 
-// =========================================================================
-// EMBEDDED SCHEMAS (Sub-Dokumen didefinisikan terpisah agar Mongoose rapi)
-// =========================================================================
-
 const budgetItemSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -27,6 +23,7 @@ const timelineSchema = new mongoose.Schema(
 const approvalSchema = new mongoose.Schema(
   {
     step: { type: String, required: true },
+    actor: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     status: { type: String, enum: ["APPROVED", "REJECTED"], required: true },
     date: { type: Date, default: Date.now },
@@ -34,10 +31,6 @@ const approvalSchema = new mongoose.Schema(
   },
   { _id: true }
 );
-
-// =========================================================================
-// MAIN BUSINESS TRIP SCHEMA (Embedded Main Object)
-// =========================================================================
 
 const businessTripSchema = new mongoose.Schema(
   {
@@ -73,24 +66,9 @@ const businessTripSchema = new mongoose.Schema(
       note: String,
     },
 
-    tripReport: {
-      isSubmitted: { type: Boolean, default: false },
-      submittedAt: Date,
-      description: String,
-      attachmentUrl: String,
-    },
-
     status: {
       type: String,
-      enum: [
-        "PENDING",
-        "APPROVED",
-        "PAID",
-        "REJECTED",
-        "COMPLETED",
-        "IN_REVIEW",
-        "PAYMENT_PROCESSING",
-      ],
+      enum: ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"],
       default: "PENDING",
     },
   },

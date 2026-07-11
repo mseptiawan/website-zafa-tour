@@ -2,8 +2,8 @@
 
 <% 
   // Memisahkan data dinas berdasarkan status untuk Tab Navigasi seperti contoh referensi
-  const activeTrips = trips.filter(t => ['PENDING', 'IN_REVIEW', 'APPROVED', 'PAYMENT_PROCESSING', 'READY_TO_TRAVEL', 'ON_TRIP', 'SUBMITTED'].includes(t.status));
-  const historyTrips = trips.filter(t => ['PAID', 'REJECTED', 'CANCELLED'].includes(t.status));
+  const activeTrips = trips.filter(t => ['PENDING', 'IN_REVIEW'].includes(t.status));
+  const historyTrips = trips.filter(t => ['APPROVED', 'REJECTED', 'CANCELLED'].includes(t.status));
 
   // Fungsi pembantu untuk memetakan konfigurasi warna status tag agar serasi
   const getStatusConfig = (status) => {
@@ -30,7 +30,7 @@
   <div class="w-full max-w-none mx-auto space-y-5 md:space-y-8">
 
     <div class="border border-slate-200/60 md:border-none md:shadow-none">
-      <%- include('../../partials/page-header', { 
+      <%- include('../partials/page-header', { 
           section: 'Area Kerja', 
           module: 'Dinas luar', 
           title: 'Daftar Pengajuan Dinas', 
@@ -39,7 +39,7 @@
     </div>
 
     <div class="w-full">
-      <%- include('../../partials/_stats-grid', {
+      <%- include('../partials/_stats-grid', {
         gridClass: 'grid-cols-2 lg:grid-cols-3', 
         items: [
           { 
@@ -82,7 +82,7 @@
         </a>
       </div>
 
-      <%- include('../../partials/_tab-nav', {
+      <%- include('../partials/_tab-nav', {
         tabs: [
           { 
             id: 'active', 
@@ -123,7 +123,7 @@
                   <tr class="hover:bg-slate-50/50 transition-colors">
                     <td class="py-4 px-6 font-medium text-slate-800 break-words"><%= t.title %></td>
                     <td class="py-4 px-6 text-slate-500 break-words"><%= t.destination || '-' %></td>
-                    <td class="py-4 px-6 text-right font-bold text-slate-900 tabular-nums">
+                    <td class="py-4 px-6 text-right font-medium text-slate-900 tabular-nums">
                       Rp <%= (t.budget?.total || 0).toLocaleString('id-ID') %>
                     </td>
                     <td class="py-4 px-6 text-center select-none">
@@ -134,16 +134,16 @@
                     </td>
                     <td class="py-4 px-6 text-center">
                       <div class="flex items-center justify-center gap-1.5">
-                        <a href="/trip/<%= t._id %>" title="Lihat Berkas" class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 inline-flex items-center justify-center transition-all active:scale-[0.95]">
+                        <a href="/trip/detail/<%= t._id %>" title="Lihat Berkas" class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 inline-flex items-center justify-center transition-all active:scale-[0.95]">
                           <i class="fa-solid fa-eye text-[11px]"></i>
                         </a>
                         <% if (t.status === 'PENDING') { %>
-                          <a href="/trip/<%= t._id %>/edit" title="Ubah Formulir" class="w-8 h-8 rounded-lg bg-amber-400 text-white inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-amber-500">
+                          <a href="/trip/edit/<%= t._id %>" title="Ubah Formulir" class="w-8 h-8 rounded-lg bg-amber-400 text-white inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-amber-500">
                             <i class="fa-solid fa-pen-to-square text-[11px]"></i>
                           </a>
                         <% } %>
                         <% if (t.status === 'REJECTED') { %>
-                          <a href="/trip/<%= t._id %>/edit" title="Ajukan Kembali" class="w-8 h-8 rounded-lg bg-emerald-500 text-white inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-emerald-600">
+                          <a href="/trip/edit/<%= t._id %>" title="Ajukan Kembali" class="w-8 h-8 rounded-lg bg-emerald-500 text-white inline-flex items-center justify-center transition-all active:scale-[0.95] hover:bg-emerald-600">
                             <i class="fa-solid fa-rotate-left text-[11px]"></i>
                           </a>
                         <% } %>
@@ -186,9 +186,9 @@
                 <span class="text-[11px] font-medium text-slate-500"><i class="fa-solid fa-briefcase text-slate-400 mr-1.5"></i>Dinas Luar</span>
                 <div class="flex items-center gap-1.5">
                   <% if (t.status === 'PENDING' || t.status === 'REJECTED') { %>
-                    <a href="/trip/<%= t._id %>/edit" class="h-8 w-8 rounded-lg bg-amber-400 text-white flex items-center justify-center text-xs active:scale-95"><i class="fa-solid fa-marker"></i></a>
+                    <a href="/trip/edit/<%= t._id %>" class="h-8 w-8 rounded-lg bg-amber-400 text-white flex items-center justify-center text-xs active:scale-95"><i class="fa-solid fa-marker"></i></a>
                   <% } %>
-                  <a href="/trip/<%= t._id %>" class="h-8 px-3.5 bg-blue-50 text-blue-600 text-[11px] font-medium rounded-lg flex items-center justify-center tracking-wide active:scale-95">
+                  <a href="/trip/detail/<%= t._id %>" class="h-8 px-3.5 bg-blue-50 text-blue-600 text-[11px] font-medium rounded-lg flex items-center justify-center tracking-wide active:scale-95">
                     DETAIL
                   </a>
                 </div>
@@ -224,7 +224,7 @@
                   <tr class="hover:bg-slate-50/50 transition-colors">
                     <td class="py-4 px-6 font-medium text-slate-800 break-words"><%= t.title %></td>
                     <td class="py-4 px-6 text-slate-500 break-words"><%= t.destination || '-' %></td>
-                    <td class="py-4 px-6 text-right font-bold text-slate-900 tabular-nums">
+                    <td class="py-4 px-6 text-right font-medium text-slate-900 tabular-nums">
                       Rp <%= (t.budget?.total || 0).toLocaleString('id-ID') %>
                     </td>
                     <td class="py-4 px-6 text-center select-none">
@@ -234,7 +234,7 @@
                       </div>
                     </td>
                     <td class="py-4 px-6 text-center">
-                      <a href="/trip/<%= t._id %>" title="Lihat Berkas" class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 inline-flex items-center justify-center transition-all active:scale-[0.95]">
+                      <a href="/trip/detail/<%= t._id %>" title="Lihat Berkas" class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 inline-flex items-center justify-center transition-all active:scale-[0.95]">
                         <i class="fa-solid fa-eye text-[11px]"></i>
                       </a>
                     </td>
@@ -286,17 +286,17 @@
     <% if (pagination && pagination.totalPages > 1) { %>
       <div class="flex items-center justify-between mt-6 px-5 py-4 bg-white border border-slate-200/50 rounded-2xl text-[13px] select-none antialiased shadow-[0_4px_12px_rgba(0,0,0,0.01)]">
         <div class="text-slate-500 font-medium">
-          Menampilkan halaman <span class="font-bold text-slate-900"><%= pagination.page %></span> dari <span class="font-bold text-slate-900"><%= pagination.totalPages %></span>
+          Menampilkan halaman <span class="font-medium text-slate-900"><%= pagination.page %></span> dari <span class="font-medium text-slate-900"><%= pagination.totalPages %></span>
         </div>
         <div class="flex items-center gap-2">
-          <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+          <a href="?page=<%= pagination.page - 1 %>" class="px-4 py-2 rounded-xl border font-medium transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
             <%= pagination.hasPrev ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900' : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
             Prev
           </a>
-          <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-bold transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
+          <a href="?page=<%= pagination.page + 1 %>" class="px-4 py-2 rounded-xl border font-medium transition-all focus:ring-4 focus:ring-slate-100 flex items-center gap-1.5
             <%= pagination.hasNext ? 'text-slate-700 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900' : 'text-slate-300 border-slate-100 bg-slate-50/50 pointer-events-none' %>">
             Next
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -327,14 +327,14 @@
     }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.classList.remove('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+      btn.classList.remove('bg-white', 'font-medium', 'text-slate-900', 'shadow-xs');
       btn.classList.add('font-medium', 'text-slate-500');
     });
 
     const activeBtn = document.getElementById(`tab-btn-${tabName}`);
     if (activeBtn) {
       activeBtn.classList.remove('font-medium', 'text-slate-500');
-      activeBtn.classList.add('bg-white', 'font-bold', 'text-slate-900', 'shadow-xs');
+      activeBtn.classList.add('bg-white', 'font-medium', 'text-slate-900', 'shadow-xs');
     }
   }
 </script>

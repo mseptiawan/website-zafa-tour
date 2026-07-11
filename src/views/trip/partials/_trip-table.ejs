@@ -1,0 +1,70 @@
+<div class="overflow-hidden bg-white border border-slate-200/60 rounded-2xl shadow-2xs">
+  <div class="overflow-x-auto w-full">
+    <table class="w-full text-left border-collapse whitespace-nowrap">
+      <thead>
+        <tr class="bg-slate-50/75 border-b border-slate-200/60 text-[10px] font-medium text-slate-400 uppercase tracking-wider select-none">
+          <th class="py-3 px-4 md:px-6">Pegawai</th>
+          <th class="py-3 px-4">Agenda / Keperluan</th>
+          <th class="py-3 px-4">Destinasi</th>
+          <th class="py-3 px-4 text-right">Anggaran</th>
+          <th class="py-3 px-4 text-center">Status</th>
+          <th class="py-3 px-4 md:px-6 text-center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 text-[13px] text-slate-700">
+        <% if (trips && trips.length > 0) { %>
+          <% trips.forEach(function(trip) { %>
+            <tr class="hover:bg-slate-50/40 transition-colors group">
+              <!-- Nama Karyawan -->
+              <td class="py-3.5 px-4 md:px-6">
+                <div class="font-semibold text-slate-900"><%= trip.userId?.username || 'Pegawai' %></div>
+                <div class="text-[10px] text-slate-400 font-mono mt-0.5"><%= trip.requesterRole %></div>
+              </td>
+              
+              <!-- Judul / Keperluan -->
+              <td class="py-3.5 px-4">
+                <div class="font-medium text-slate-800 max-w-[180px] truncate"><%= trip.title %></div>
+                <div class="text-[11px] text-slate-400 mt-0.5"><%= trip.purpose %></div>
+              </td>
+              
+              <!-- Destinasi -->
+              <td class="py-3.5 px-4">
+                <div class="text-slate-700 font-medium"><%= trip.destination %></div>
+                <div class="text-[11px] text-slate-400"><%= trip.meetWith || '-' %></div>
+              </td>
+              
+              <!-- Estimasi Dana -->
+              <td class="py-3.5 px-4 text-right font-medium tabular-nums text-slate-900">
+                Rp <%= (trip.budget?.total || 0).toLocaleString('id-ID') %>
+              </td>
+              
+              <!-- Badge Status -->
+              <td class="py-3.5 px-4 text-center">
+                <span class="px-2.5 py-0.5 rounded-full font-medium text-[9px] uppercase tracking-wider border inline-block
+                  <%= trip.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200/50'
+                    : trip.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
+                    : trip.status === 'IN_REVIEW' ? 'bg-blue-50 text-blue-700 border-blue-200/50'
+                    : 'bg-rose-50 text-rose-700 border-rose-200/50' %>">
+                  <%= trip.status %>
+                </span>
+              </td>
+              
+              <!-- Tombol Aksi -->
+              <td class="py-3.5 px-6 text-center">
+                <a href="/trip/detail/<%= trip._id %>" class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-blue-600 hover:border-blue-200 inline-flex items-center justify-center transition-all active:scale-[0.95] shadow-2xs">
+                  <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" class="py-12 text-center text-slate-400 italic text-[12px] bg-slate-50/20">
+              Tidak ada data pengajuan dinas luar.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>

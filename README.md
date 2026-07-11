@@ -20,7 +20,7 @@ Proyek ini dikembangkan sebagai bagian dari tugas akhir dan berfokus pada penera
 
 - Check In / Check Out
 - Riwayat kehadiran
-- Koreksi absensi
+- Koreksi absensi 
 - Monitoring kehadiran pegawai
 
 ## 🌴 Manajemen Cuti

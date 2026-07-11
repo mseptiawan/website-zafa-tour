@@ -1,0 +1,183 @@
+<%
+  // MEMBUILD TIMELINE DINAMIS BERDASARKAN LEVEL ROLE PENGAJU
+  const approvalSteps = [];
+  
+  const normalizedLogs = approvals.map(a => ({
+    ...a,
+    stepUpper: (a.step || '').toUpperCase().trim()
+  }));
+
+  const requesterRole = (trip.requesterRole || '').toUpperCase().trim();
+
+  // MENDETEKSI APAKAH PENGAJU ADALAH DIREKSI / TOP MANAGEMENT (Cukup 2 Tahap)
+  const isDireksiFlow = requesterRole === 'WAKIL_DIREKTUR' || requesterRole === 'DIREKTUR_UTAMA';
+
+  if (isDireksiFlow) {
+    // ==========================================
+    // ALUR JALUR KHUSUS DIREKSI (HANYA 2 TAHAP)
+    // ==========================================
+    
+    // 1. LANGKAH PERTAMA: DIREKTUR UTAMA
+    approvalSteps.push({ 
+      key: 'direktur_utama', 
+      label: 'Direktur Utama', 
+      type: 'DIRUT' 
+    });
+
+    // 2. LANGKAH KEDUA: PENCAIRAN KEUANGAN
+    approvalSteps.push({ 
+      key: 'manager_keuangan', 
+      label: 'Pencairan (Keuangan)', 
+      type: 'FINANCE_END' 
+    });
+
+  } else {
+    // ==========================================
+    // ALUR JALUR NORMAL PEGAWAI BIASA (3 TAHAP)
+    // ==========================================
+    
+    // 1. STEP 1: MANAGER BIDANG
+    const firstLog = normalizedLogs[0];
+    let step1Key = trip.currentStep; 
+    let step1Label = 'Manager Bidang';
+
+    if (firstLog) {
+      step1Key = firstLog.step;
+      step1Label = firstLog.stepUpper === 'MANAGER_KEUANGAN' ? 'Manager Keuangan (Atasan)' : 'Manager Bidang';
+    } else {
+      if (trip.currentStep && trip.currentStep.toUpperCase() !== 'DIREKTUR_UTAMA' && trip.currentStep.toUpperCase() !== 'MANAGER_KEUANGAN') {
+        step1Key = trip.currentStep;
+      }
+    }
+    approvalSteps.push({ key: step1Key, label: step1Label, type: 'FIRST_ACC' });
+
+    // 2. STEP 2: DIREKTUR UTAMA
+    approvalSteps.push({ key: 'direktur_utama', label: 'Direktur Utama', type: 'DIRUT' });
+
+    // 3. STEP 3: PENCAIRAN (KEUANGAN)
+    approvalSteps.push({ key: 'manager_keuangan', label: 'Pencairan (Keuangan)', type: 'FINANCE_END' });
+  }
+%>
+
+<div class="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-2xs">
+  <div class="mb-5 pb-3 border-b border-slate-100 flex items-center justify-between select-none">
+    <div>
+      <h3 class="text-xs font-medium text-slate-900 uppercase tracking-wider">Jejak Log Pemeriksaan</h3>
+      <p class="text-[10px] text-slate-400 mt-0.5">Alur dan status persetujuan dinas luar</p>
+    </div>
+    <span class="text-[9.5px] font-medium px-2 py-0.5 bg-slate-50 text-slate-400 border border-slate-200/60 rounded-full uppercase tracking-wider select-none">
+      Dinas Luar
+    </span>
+  </div>
+
+  <div class="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100 select-none">
+    <% approvalSteps.forEach((step, index) => { 
+      let log = null;
+      let isCurrent = false;
+
+      // PEMETAAN LOG ADAPTIF
+      if (step.type === 'FIRST_ACC') {
+        log = approvals[0] || null;
+        if (!log && trip.status !== 'REJECTED') {
+          isCurrent = true;
+        }
+      } 
+      
+      else if (step.type === 'DIRUT') {
+        log = approvals.find(a => (a.step || '').toUpperCase() === 'DIREKTUR_UTAMA');
+        
+        if (!log && trip.status !== 'REJECTED') {
+          if (isDireksiFlow) {
+            // Jalur direksi: PROSES aktif jika belum ada log sama sekali
+            if (approvals.length === 0 && (trip.currentStep || '').toUpperCase() === 'DIREKTUR_UTAMA') {
+              isCurrent = true;
+            }
+          } else {
+            // Jalur normal: PROSES aktif jika manager bidang sudah approve (log length 1)
+            if (approvals.length === 1 && (trip.currentStep || '').toUpperCase() === 'DIREKTUR_UTAMA') {
+              isCurrent = true;
+            }
+          }
+        }
+      } 
+      
+      else if (step.type === 'FINANCE_END') {
+        const financeLogs = approvals.filter(a => (a.step || '').toUpperCase() === 'MANAGER_KEUANGAN');
+        
+        if (isDireksiFlow) {
+          // Jalur direksi: Keuangan akhir berada pada log indeks ke-1 (setelah dirut)
+          log = financeLogs[0] || null;
+          
+          if (!log && approvals.length === 1 && (trip.currentStep || '').toUpperCase() === 'MANAGER_KEUANGAN' && trip.status !== 'REJECTED') {
+            isCurrent = true;
+          }
+        } else {
+          // Jalur normal
+          if (approvals.length > 2) {
+            log = financeLogs[financeLogs.length - 1];
+          } else if (approvals.length === 2 && normalizedLogs[0].stepUpper !== 'MANAGER_KEUANGAN') {
+            log = financeLogs[0];
+          }
+          
+          if (!log && approvals.length >= 2 && (trip.currentStep || '').toUpperCase() === 'MANAGER_KEUANGAN' && trip.status !== 'REJECTED') {
+            isCurrent = true;
+          }
+        }
+      }
+
+      let iconColor = 'bg-slate-200 border-white';
+      let statusBadge = 'bg-slate-50 text-slate-400 border-slate-200';
+      let statusText = 'MENUNGGU';
+
+      if (log) {
+        if (log.status === 'APPROVED') {
+          iconColor = 'bg-emerald-500 border-white';
+          statusBadge = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+          statusText = 'SETUJU';
+        } else if (log.status === 'REJECTED') {
+          iconColor = 'bg-rose-500 border-white';
+          statusBadge = 'bg-rose-50 text-rose-700 border-rose-200';
+          statusText = 'DITOLAK';
+        }
+      } else if (isCurrent) {
+        iconColor = 'bg-amber-400 border-white animate-pulse';
+        statusBadge = 'bg-amber-50 text-amber-700 border-amber-200';
+        statusText = 'PROSES';
+      } else if (trip.status === 'REJECTED') {
+        statusBadge = 'bg-slate-50 text-slate-400 border-slate-200';
+        statusText = 'BATAL';
+      }
+    %>
+      <!-- Bagian render HTML bawah tetap aman tidak ada perubahan -->
+      <div class="relative">
+        <div class="absolute -left-[27px] top-0 w-6 h-6 rounded-full border-4 flex items-center justify-center text-white z-10 transition-all text-[8px] font-medium <%= iconColor %>">
+          <%= index + 1 %>
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] font-medium tracking-wide uppercase <%= isCurrent ? 'text-slate-900' : 'text-slate-700' %>">
+              <%= step.label %> <span class="text-[9.5px] font-normal text-slate-400 font-mono lowercase border-none shadow-none bg-transparent p-0">(<%= step.key %>)</span>
+            </span>
+            <span class="text-[9px] font-medium px-2 py-0.5 rounded-full uppercase border tracking-wider shrink-0 select-none <%= statusBadge %>">
+              <%= statusText %>
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[10px] text-slate-500">
+            <span class="font-semibold text-slate-700 truncate max-w-[120px]">
+              <%= log?.approverId?.employeeData?.fullName || (log ? 'Sistem' : 'Antrean Sistem') %>
+            </span>
+            <span class="text-slate-300">|</span>
+            <span class="font-medium text-slate-400 tabular-nums">
+              <%= log && (log.actionDate || log.date || log.createdAt) ? new Date(log.actionDate || log.date || log.createdAt).toLocaleString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit'}) : 'Dalam Antrean' %>
+            </span>
+          </div>
+          <% if (log && log.status !== 'PENDING' && log.note) { %>
+            <div class="mt-1.5 text-[10.5px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-600 italic leading-relaxed break-words">
+              "<%= log.note %>"
+            </div>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
