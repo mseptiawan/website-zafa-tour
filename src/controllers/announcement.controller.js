@@ -75,10 +75,14 @@ export const getAnnouncementById = asyncHandler(async (req, res) => {
     throw err;
   }
 
+  const referrer = req.get("Referer") || "";
+  let backLink = "/announcement";
+
   res.render("announcement/show", {
     ...buildRenderData(req, {
       title: announcement.title,
       announcement,
+      backLink,
     }),
   });
 });
