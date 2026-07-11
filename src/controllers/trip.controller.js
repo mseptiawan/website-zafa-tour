@@ -23,6 +23,14 @@ export const getTripDetail = async (req, res) => {
     }
 
     const user = req.session.user;
+
+    const referrer = req.get("Referer") || "";
+    let backLink = "/trip/me";
+
+    if (referrer.includes("/trip/incoming")) {
+      backLink = "/trip/incoming";
+    }
+
     const rawApprovals = trip.approvals || [];
     const sortedApprovals = [...rawApprovals].sort((a, b) => {
       const dateA = new Date(a.date || 0);
@@ -35,6 +43,7 @@ export const getTripDetail = async (req, res) => {
       trip,
       approvals: sortedApprovals,
       user,
+      backLink,
       error: req.query.error || null,
     });
   } catch (err) {

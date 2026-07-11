@@ -14,11 +14,9 @@
     </div>
   </div>
 
-  <!-- FORM KEPUTUSAN DENGAN ENCTYPE MULTIPART -->
   <form id="approvalForm" method="POST" action="/trip/approval/<%= activeApproval._id %>" enctype="multipart/form-data" class="m-0 space-y-3.5">
     <input type="hidden" name="action" id="actionInput" value="" />
 
-    <!-- INPUT FILE MANDATORI UNTUK FINANCE DI FASE AKHIR -->
     <% if (isFinanceFinalStage) { %>
       <div class="p-3 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2">
         <label class="block text-[9px] font-medium tracking-widest text-blue-600 uppercase">

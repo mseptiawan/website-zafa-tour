@@ -3,6 +3,10 @@ import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import Bidang from "../models/basic/Bidang.model.js";
 import BusinessTrip from "../models/BusinessTrip.model.js";
 import mongoose from "mongoose";
+import User from "../models/basic/User.model.js";
+import Role from "../models/basic/Role.model.js";
+import notificationService from "./notification.service.js";
+import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 
 const parseAndValidateBudget = (budgetData) => {
   let budgetItems = budgetData?.items;
@@ -34,7 +38,6 @@ const parseAndValidateBudget = (budgetData) => {
   const totalBudget = normalizedBudgetItems.reduce((sum, item) => sum + item.allocatedAmount, 0);
   return { total: totalBudget, items: normalizedBudgetItems };
 };
-
 export const createTripService = async ({ user, body }) => {
   if (!user) {
     const err = new Error("Session tidak valid");
@@ -45,6 +48,8 @@ export const createTripService = async ({ user, body }) => {
   let { title, purpose, startDate, endDate, destination, description, budget, meetWith, timeline } =
     body;
   const userRole = (user.role || "").toUpperCase().trim();
+
+  let newTrip;
 
   if (userRole === "WAKIL_DIREKTUR" || userRole === "DIREKTUR_UTAMA") {
     if (!title || title.trim().length < 5) throw new Error("Judul minimal 5 karakter");
@@ -67,7 +72,84 @@ export const createTripService = async ({ user, body }) => {
     const initialStep = userRole === "WAKIL_DIREKTUR" ? "DIREKTUR_UTAMA" : "MANAGER_KEUANGAN";
     const initialStatus = "IN_REVIEW";
 
-    return await BusinessTrip.create({
+    newTrip = await BusinessTrip.create({
+      userId: user._id,
+      requesterRole: user.role,
+      title: title.trim(),
+      purpose,
+      startDate: start,
+      endDate: end,
+      destination: destination.trim(),
+      description: description?.trim(),
+      meetWith,
+      timeline: normalizedTimeline,
+      budget: processedBudget,
+      status: initialStatus,
+      currentStep: initialStep,
+      approvals: [],
+    });
+  } else {
+    const employee = await Employee.findOne({ userId: user._id });
+    if (!employee) {
+      const err = new Error("Data karyawan pengaju tidak ditemukan");
+      err.status = 400;
+      throw err;
+    }
+
+    const career = await EmployeeCareer.findOne({ employee_id: employee._id });
+    if (!career) {
+      const err = new Error("Data karier karyawan tidak ditemukan");
+      err.status = 400;
+      throw err;
+    }
+
+    if (!career.bidangId) {
+      const err = new Error("Akun Anda belum ditempatkan di bidang manapun. Hubungi HRD.");
+      err.status = 400;
+      throw err;
+    }
+
+    const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
+    if (!bidang) {
+      const err = new Error("Data Bidang tidak ditemukan di database");
+      err.status = 400;
+      throw err;
+    }
+
+    if (!bidang.managerRoleId) {
+      const err = new Error(`Manager bidang untuk divisi '${bidang.name}' belum dikonfigurasi`);
+      err.status = 400;
+      throw err;
+    }
+
+    const managerRole = (bidang.managerRoleId.name || "").toUpperCase().trim();
+
+    if (!Array.isArray(timeline)) timeline = timeline ? [timeline] : [];
+    const normalizedTimeline = timeline
+      .map((t, index) => ({
+        address: typeof t === "string" ? t : t?.address?.trim?.(),
+        order: index + 1,
+      }))
+      .filter((t) => t.address);
+
+    const processedBudget = parseAndValidateBudget(budget);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (!title || title.trim().length < 5) throw new Error("Judul minimal 5 karakter");
+    if (isNaN(start) || isNaN(end) || start > end) throw new Error("Rentang tanggal tidak valid");
+    if (!destination || destination.trim().length < 3) throw new Error("Destinasi tidak valid");
+    if (normalizedTimeline.length === 0) throw new Error("Timeline rute perjalanan wajib diisi");
+
+    let initialStep = managerRole;
+    let initialStatus = "PENDING";
+
+    if (userRole === managerRole) {
+      initialStep = "DIREKTUR_UTAMA";
+      initialStatus = "IN_REVIEW";
+    }
+
+    newTrip = await BusinessTrip.create({
       userId: user._id,
       requesterRole: user.role,
       title: title.trim(),
@@ -85,84 +167,45 @@ export const createTripService = async ({ user, body }) => {
     });
   }
 
-  const employee = await Employee.findOne({ userId: user._id });
-  if (!employee) {
-    const err = new Error("Data karyawan pengaju tidak ditemukan");
-    err.status = 400;
-    throw err;
+  try {
+    const targetRoleName = newTrip.currentStep;
+
+    if (targetRoleName) {
+      const targetRole = await Role.findOne({
+        name: { $regex: new RegExp(`^${targetRoleName.replace(/_/g, "[-_ ]?")}$`, "i") },
+      }).lean();
+
+      if (targetRole) {
+        let reviewers = await User.find({ roleId: targetRole._id }).select("_id").lean();
+
+        if (reviewers.length === 0) {
+          reviewers = await User.find({ role: targetRole.name }).select("_id").lean();
+        }
+
+        const reviewerUserIds = reviewers.map((rev) => rev._id);
+
+        if (reviewerUserIds.length > 0) {
+          await notificationService.createManyNotifications({
+            userIds: reviewerUserIds,
+            senderId: user._id,
+            senderName: user.username,
+            title: "Pengajuan Dinas Baru",
+            text: `${user.username} mengajukan permohonan dinas luar: ${newTrip.title}.`,
+            module: MODULES.TRIP || "TRIP",
+            referenceId: newTrip._id,
+            actionUrl: `/trip/detail/${newTrip._id}`,
+            type: "TRIP",
+            category: NOTIF_CATEGORIES.INFO,
+          });
+        }
+      }
+    }
+  } catch (notifError) {
+    console.error("Gagal mengirim notifikasi trip:", notifError.message);
   }
 
-  const career = await EmployeeCareer.findOne({ employee_id: employee._id });
-  if (!career) {
-    const err = new Error("Data karier karyawan tidak ditemukan");
-    err.status = 400;
-    throw err;
-  }
-
-  if (!career.bidangId) {
-    const err = new Error("Akun Anda belum ditempatkan di bidang manapun. Hubungi HRD.");
-    err.status = 400;
-    throw err;
-  }
-
-  const bidang = await Bidang.findById(career.bidangId).populate("managerRoleId");
-  if (!bidang) {
-    const err = new Error("Data Bidang tidak ditemukan di database");
-    err.status = 400;
-    throw err;
-  }
-
-  if (!bidang.managerRoleId) {
-    const err = new Error(`Manager bidang untuk divisi '${bidang.name}' belum dikonfigurasi`);
-    err.status = 400;
-    throw err;
-  }
-
-  const managerRole = (bidang.managerRoleId.name || "").toUpperCase().trim();
-
-  if (!Array.isArray(timeline)) timeline = timeline ? [timeline] : [];
-  const normalizedTimeline = timeline
-    .map((t, index) => ({
-      address: typeof t === "string" ? t : t?.address?.trim?.(),
-      order: index + 1,
-    }))
-    .filter((t) => t.address);
-
-  const processedBudget = parseAndValidateBudget(budget);
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  if (!title || title.trim().length < 5) throw new Error("Judul minimal 5 karakter");
-  if (isNaN(start) || isNaN(end) || start > end) throw new Error("Rentang tanggal tidak valid");
-  if (!destination || destination.trim().length < 3) throw new Error("Destinasi tidak valid");
-  if (normalizedTimeline.length === 0) throw new Error("Timeline rute perjalanan wajib diisi");
-
-  let initialStep = managerRole;
-  let initialStatus = "PENDING";
-
-  if (userRole === managerRole) {
-    initialStep = "DIREKTUR_UTAMA";
-    initialStatus = "IN_REVIEW";
-  }
-
-  return await BusinessTrip.create({
-    userId: user._id,
-    requesterRole: user.role,
-    title: title.trim(),
-    purpose,
-    startDate: start,
-    endDate: end,
-    destination: destination.trim(),
-    description: description?.trim(),
-    meetWith,
-    timeline: normalizedTimeline,
-    budget: processedBudget,
-    status: initialStatus,
-    currentStep: initialStep,
-    approvals: [],
-  });
+  return newTrip;
 };
-
 export const getApprovalTripsService = async (user) => {
   const role = (user.role || "").toUpperCase().trim();
 
@@ -211,6 +254,8 @@ export const handleApprovalService = async ({ id, user, action, note, file }) =>
     (approval) => approval.step === "DIREKTUR_UTAMA" && approval.status === "APPROVED"
   );
 
+  const requesterId = trip.userId?._id || trip.userId;
+
   if (action === "APPROVE") {
     if (step === "MANAGER_KEUANGAN" && hasPassedDirut) {
       if (!file) {
@@ -248,6 +293,58 @@ export const handleApprovalService = async ({ id, user, action, note, file }) =>
     }
 
     await trip.save();
+
+    // ==========================================
+    // ALUR DISTRIBUSI NOTIFIKASI UNTUK APPROVE
+    // ==========================================
+    try {
+      if (trip.status === "APPROVED") {
+        await notificationService.createNotification({
+          userId: requesterId,
+          senderId: user._id,
+          senderName: user.username,
+          title: "Status Dinas Luar: APPROVED",
+          text: `Pengajuan dinas "${trip.title}" telah disetujui sepenuhnya oleh Keuangan.`,
+          module: MODULES.TRIP || "TRIP",
+          referenceId: trip._id,
+          actionUrl: `/trip/detail/${trip._id}`,
+          type: "TRIP",
+          category: NOTIF_CATEGORIES.INFO,
+        });
+      } else if (trip.currentStep) {
+        const nextRoleName = trip.currentStep;
+        const targetRole = await Role.findOne({
+          name: { $regex: new RegExp(`^${nextRoleName.replace(/_/g, "[-_ ]?")}$`, "i") },
+        }).lean();
+
+        if (targetRole) {
+          let reviewers = await User.find({ roleId: targetRole._id }).select("_id").lean();
+          if (reviewers.length === 0) {
+            reviewers = await User.find({ role: targetRole.name }).select("_id").lean();
+          }
+
+          const reviewerUserIds = reviewers.map((rev) => rev._id);
+
+          if (reviewerUserIds.length > 0) {
+            await notificationService.createManyNotifications({
+              userIds: reviewerUserIds,
+              senderId: user._id,
+              senderName: user.username,
+              title: "Persetujuan Dinas Luar Baru",
+              text: `Mohon tinjau pengajuan dinas luar dari ${trip.userId?.username || "Karyawan"}: ${trip.title}.`,
+              module: MODULES.TRIP || "TRIP",
+              referenceId: trip._id,
+              actionUrl: `/trip/detail/${trip._id}`,
+              type: "TRIP",
+              category: NOTIF_CATEGORIES.INFO,
+            });
+          }
+        }
+      }
+    } catch (notifError) {
+      console.error("Gagal mengirim notifikasi berantai approve:", notifError.message);
+    }
+
     return { message: "Pengajuan berhasil disetujui" };
   }
 
@@ -271,6 +368,27 @@ export const handleApprovalService = async ({ id, user, action, note, file }) =>
     trip.currentStep = null;
 
     await trip.save();
+
+    // ==========================================
+    // ALUR DISTRIBUSI NOTIFIKASI UNTUK REJECT
+    // ==========================================
+    try {
+      await notificationService.createNotification({
+        userId: requesterId,
+        senderId: user._id,
+        senderName: user.username,
+        title: "Status Dinas Luar: REJECTED",
+        text: `Pengajuan dinas "${trip.title}" telah ditolak oleh ${user.role}. Alasan: "${note}"`,
+        module: MODULES.TRIP || "TRIP",
+        referenceId: trip._id,
+        actionUrl: `/trip/detail/${trip._id}`,
+        type: "TRIP",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    } catch (notifError) {
+      console.error("Gagal mengirim notifikasi penolakan trip:", notifError.message);
+    }
+
     return { message: "Pengajuan resmi ditolak" };
   }
 
@@ -278,7 +396,6 @@ export const handleApprovalService = async ({ id, user, action, note, file }) =>
   err.status = 400;
   throw err;
 };
-
 export const getTripDetailService = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) throw new Error("INVALID_ID");
   const trip = await BusinessTrip.findById(id).populate({

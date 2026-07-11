@@ -32,6 +32,7 @@ export const MODULES = {
   OVERTIME: "overtime",
   ANNOUNCEMENT: "announcement",
   LOAN: "loan",
+  TRIP: "trip",
 };
 
 export const NOTIF_CATEGORIES = {

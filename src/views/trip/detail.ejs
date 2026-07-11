@@ -16,7 +16,6 @@
 <div>
   <div class="w-full max-w-none mx-auto space-y-5 md:space-y-6">
 
-    <!-- BACK BUTTON -->
     <a href="<%= backLink %>" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors group select-none">
       <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -24,17 +23,12 @@
       <span>Kembali</span>
     </a>
 
-    <!-- 3-COLUMN GRID LAYOUT -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6 items-start">
 
-      <!-- LEFT COLUMN: MAIN INFORMATION & OPERATIONAL ACTIONS -->
       <div class="space-y-5 md:space-y-6 lg:col-span-2">
 
-        <!-- DETAIL CARD -->
         <div class="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-2xs">
-          <!-- CARD HEADER -->
           <div class="p-4 md:px-8 md:py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <!-- BAGIAN KIRI: Profil & Identitas -->
             <div class="min-w-0 flex-1">
               <h1 class="text-[14px] md:text-[15px] font-semibold text-slate-900 tracking-tight truncate">
                 <%= trip.userId?.employeeProfile?.fullName || trip.userId?.username %>
@@ -63,7 +57,6 @@
               </span>
             </div>
           </div>
-          <!-- CARD BODY -->
           <div class="p-5 md:p-6 space-y-5 bg-white">
             <div class="grid grid-cols-2 gap-x-6 gap-y-4 md:gap-x-8">
               <div>
@@ -99,7 +92,6 @@
               <p class="text-[12px] text-slate-600 leading-relaxed whitespace-normal break-words"><%= trip.description || '-' %></p>
             </div>
 
-            <!-- TOTAL ANGGARAN & BUKTI TRANSFER -->
             <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Estimasi Anggaran</div>
@@ -108,11 +100,10 @@
                 </div>
               </div>
 
-              <!-- TAMPILKAN JIKA BERKAS DARI FIELD PAYMENT TERSEDIA -->
               <% if (trip.payment && trip.payment.proofUrl) { %>
               <div class="sm:text-right">
                 <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1">Dokumen Pencairan Dana</div>
-                <a href="/uploads/receipts/<%= trip.payment.proofUrl %>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-[11.5px] font-semibold rounded-lg transition-colors group">
+                <a href="/uploads/files/<%= trip.payment.proofUrl %>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-[11.5px] font-semibold rounded-lg transition-colors group">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -124,7 +115,6 @@
           </div>
         </div>
 
-        <!-- TIMELINE COMPONENT / DETAIL BUDGET TABLE -->
         <div class="pt-4 border-t border-slate-100">
           <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2">Rincian Pos Alokasi Anggaran</div>
           <div class="overflow-x-auto border border-slate-200/60 rounded-lg">
@@ -176,12 +166,10 @@
         </div>
         <% } %>
 
-        <!-- LOG HISTORY COMPONENT -->
         <div class="w-full">
           <%- include('partials/_log-history', { approvals, trip }) %>
         </div>
 
-        <!-- ACTION PANEL WIDGET -->
         <% if (activeApproval) { %>
         <div class="w-full bg-white border border-slate-200/60 rounded-2xl p-4 md:p-5 shadow-2xs">
           <%- include('partials/_action-panel', { activeApproval, user, approvals, trip }) %>

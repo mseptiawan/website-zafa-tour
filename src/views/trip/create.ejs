@@ -19,7 +19,6 @@
         </div>
         <% } %>
 
-        <!-- Row: Judul Perjalanan -->
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Judul Perjalanan</label>
           <input type="text" name="title" placeholder="Masukkan judul agenda perjalanan..." value="<%= old?.title || '' %>" required
@@ -29,7 +28,6 @@
           <% } %>
         </div>
 
-        <!-- Row: Tujuan Perjalanan (Dropdown Custom) -->
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Tujuan Perjalanan</label>
           <div class="relative w-full" id="custom-dropdown">
@@ -77,7 +75,6 @@
           <% } %>
         </div>
 
-        <!-- Row: Tanggal Mulai & Selesai -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="space-y-2">
             <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Tanggal Mulai</label>
@@ -98,7 +95,6 @@
           </div>
         </div>
 
-        <!-- Row: Lokasi Tujuan -->
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Tujuan / Lokasi</label>
           <input type="text" name="destination" placeholder="Masukkan kota atau nama instansi tujuan..." value="<%= old?.destination || '' %>" required
@@ -108,7 +104,6 @@
           <% } %>
         </div>
 
-        <!-- Row: Deskripsi Kegiatan -->
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Deskripsi Kegiatan</label>
           <textarea name="description" rows="4" placeholder="Jelaskan detail agenda dan target operasional perjalanan dinas Anda..." required
@@ -118,7 +113,6 @@
           <% } %>
         </div>
 
-        <!-- Row: Bertemu Dengan -->
         <div class="space-y-2">
           <label class="text-[12px] font-semibold text-slate-700 tracking-wide block">Bertemu dengan (Klien / PIC)</label>
           <input type="text" name="meetWith" placeholder="Contoh: M Septiawan" value="<%= old?.meetWith || '' %>" required
@@ -128,7 +122,6 @@
           <% } %>
         </div>
 
-        <!-- Row: Anggaran Kunjungan -->
         <div class="space-y-3 pt-1">
           <div class="flex items-center justify-between select-none">
             <div>
@@ -254,7 +247,6 @@
             <% } %>
           </div>
 
-          <!-- Tombol Tambah Destinasi Card Minimalis -->
           <button type="button" onclick="addTimeline()" 
                   class="w-full py-2.5 border border-dashed border-slate-200 rounded-xl text-[11.5px] font-medium text-slate-400/90 hover:text-blue-600 hover:border-blue-400/60 flex items-center justify-center gap-1.5 transition-all outline-none bg-slate-200/5 hover:bg-blue-50/10 cursor-pointer">
             <i class="fa-solid fa-plus text-[10px]"></i>
@@ -262,7 +254,6 @@
           </button>
         </div>
 
-        <!-- ACTION BUTTONS FOOTER -->
         <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
           <a href="/trip/me" class="px-5 py-2.5 rounded-xl text-[12px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all select-none">
             Batal
@@ -277,7 +268,6 @@
   </div>
 </div>
 
-<!-- SCRIPTS HANDLERS -->
 <script>
 let timelineIndex = document.querySelectorAll('.timeline-item').length;    
 let budgetItemIndex = document.querySelectorAll('.budget-item').length;

@@ -1,11 +1,9 @@
 <%- layout('layouts/main', { title }) %>
 
 <% 
-  // Memisahkan data dinas berdasarkan status untuk Tab Navigasi seperti contoh referensi
   const activeTrips = trips.filter(t => ['PENDING', 'IN_REVIEW'].includes(t.status));
   const historyTrips = trips.filter(t => ['APPROVED', 'REJECTED', 'CANCELLED'].includes(t.status));
 
-  // Fungsi pembantu untuk memetakan konfigurasi warna status tag agar serasi
   const getStatusConfig = (status) => {
     const maps = {
       'PENDING': { label: 'Pending', badge: 'bg-amber-50 text-amber-600 border-amber-200/50', dot: 'bg-amber-500' },
@@ -22,7 +20,6 @@
     return maps[status] || { label: status, badge: 'bg-slate-50 text-slate-600 border-slate-200/50', dot: 'bg-slate-500' };
   };
 
-  // Kalkulasi sederhana untuk data statistik di atas halaman (menghindari error jika stats dikirim parsial dari controller)
   const totalActiveBudget = activeTrips.reduce((acc, curr) => acc + (curr.budget?.total || 0), 0);
 %>
 

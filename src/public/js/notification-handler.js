@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fetchNotifications();
 
-  // ─── INTEGRASI SOCKET.IO REALTIME ──────────────────────────────────────────
   const currentUserId = "<%= typeof user !== 'undefined' && user ? user._id : '' %>";
 
   if (currentUserId && typeof io !== "undefined") {
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.emit("join-room", currentUserId);
 
     socket.on("new-notification", (notif) => {
-      console.log(" Live Notifikasi Masuk:", notif);
       fetchNotifications();
     });
   }
@@ -39,9 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /**
-   * Mengambil data notifikasi dari backend
-   */
   async function fetchNotifications() {
     try {
       const response = await fetch("/notifications");
@@ -50,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderNotifications(resData.notifications, resData.unreadCount);
       }
     } catch (error) {
-      console.error("Gagal memuat data notifikasi:", error);
       notifContainer.innerHTML = `
         <div class="p-4 text-center text-xs text-red-500">Gagal memuat notifikasi.</div>
       `;
@@ -94,6 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
       EXPENSE: {
         bg: "bg-rose-50 text-rose-600 border border-rose-100",
         icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+      },
+      TRIP: {
+        bg: "bg-sky-50 text-sky-600 border border-sky-100",
+        icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
       },
       DEFAULT: {
         bg: "bg-slate-50 text-slate-600 border border-slate-100",
@@ -142,17 +140,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const notifId = targetLink.getAttribute("data-id");
     try {
       await fetch(`/notifications/${notifId}/read`, { method: "PATCH" });
-    } catch (error) {
-      console.error("Gagal menandai notifikasi terbaca:", error);
-    }
+    } catch (error) {}
   });
 
   markAllReadBtn.addEventListener("click", async () => {
     try {
       await fetch("/notifications/mark-all-read", { method: "POST" });
       fetchNotifications();
-    } catch (error) {
-      console.error("Gagal memperbarui status baca:", error);
-    }
+    } catch (error) {}
   });
 });

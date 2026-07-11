@@ -56,6 +56,7 @@
     --color-cyan-700: oklch(52% 0.105 223.128);
     --color-cyan-900: oklch(39.8% 0.07 227.392);
     --color-sky-50: oklch(97.7% 0.013 236.62);
+    --color-sky-100: oklch(95.1% 0.026 236.824);
     --color-sky-200: oklch(90.1% 0.058 230.902);
     --color-sky-500: oklch(68.5% 0.169 237.323);
     --color-sky-600: oklch(58.8% 0.158 241.966);
@@ -2053,6 +2054,9 @@
   }
   .border-rose-500 {
     border-color: var(--color-rose-500);
+  }
+  .border-sky-100 {
+    border-color: var(--color-sky-100);
   }
   .border-sky-200\/50 {
     border-color: color-mix(in srgb, oklch(90.1% 0.058 230.902) 50%, transparent);
