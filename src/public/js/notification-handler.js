@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Ambil elemen untuk Desktop
   const notifButton = document.getElementById("notifButton");
   const notifMenu = document.getElementById("notifMenu");
   const notifContainer = document.getElementById("notifContainer");
@@ -6,7 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const notifCountText = document.getElementById("notifCountText");
   const markAllReadBtn = document.getElementById("markAllReadBtn");
 
-  if (!notifButton) return;
+  // Ambil elemen untuk Mobile
+  const notifButtonMobile = document.getElementById("notifButtonMobile");
+  const notifMenuMobile = document.getElementById("notifMenuMobile");
+  const notifContainerMobile = document.getElementById("notifContainerMobile");
+  const notifBadgeMobile = document.getElementById("notifBadgeMobile");
+  const notifCountTextMobile = document.getElementById("notifCountTextMobile");
+  const markAllReadBtnMobile = document.getElementById("markAllReadBtnMobile");
+
+  // Pastikan salah satu tombol ada sebelum jalan terus
+  if (!notifButton && !notifButtonMobile) return;
 
   fetchNotifications();
 
@@ -14,26 +24,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (currentUserId && typeof io !== "undefined") {
     const socket = io();
-
     socket.emit("join-room", currentUserId);
-
     socket.on("new-notification", (notif) => {
       fetchNotifications();
     });
   }
 
-  notifButton.addEventListener("click", (e) => {
-    e.stopPropagation();
-    notifMenu.classList.toggle("hidden");
-    if (!notifMenu.classList.contains("hidden")) {
-      fetchNotifications();
-    }
-  });
+  // Event Click - Desktop Toggle
+  if (notifButton && notifMenu) {
+    notifButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      notifMenu.classList.toggle("hidden");
+      if (!notifMenu.classList.contains("hidden")) {
+        if (notifMenuMobile) notifMenuMobile.classList.add("hidden"); // tutup mobile jika desktop buka
+        fetchNotifications();
+      }
+    });
+  }
 
+  // Event Click - Mobile Toggle
+  if (notifButtonMobile && notifMenuMobile) {
+    notifButtonMobile.addEventListener("click", (e) => {
+      e.stopPropagation();
+      notifMenuMobile.classList.toggle("hidden");
+      if (!notifMenuMobile.classList.contains("hidden")) {
+        if (notifMenu) notifMenu.classList.add("hidden"); // tutup desktop jika mobile buka
+        fetchNotifications();
+      }
+    });
+  }
+
+  // Tutup dropdown jika klik di luar area menu
   window.addEventListener("click", (e) => {
     const dropdown = document.getElementById("notificationDropdown");
-    if (dropdown && !dropdown.contains(e.target)) {
+    const dropdownMobile = document.getElementById("notificationDropdownMobile");
+
+    if (notifMenu && dropdown && !dropdown.contains(e.target)) {
       notifMenu.classList.add("hidden");
+    }
+    if (notifMenuMobile && dropdownMobile && !dropdownMobile.contains(e.target)) {
+      notifMenuMobile.classList.add("hidden");
     }
   });
 
@@ -45,26 +75,34 @@ document.addEventListener("DOMContentLoaded", () => {
         renderNotifications(resData.notifications, resData.unreadCount);
       }
     } catch (error) {
-      notifContainer.innerHTML = `
-        <div class="p-4 text-center text-xs text-red-500">Gagal memuat notifikasi.</div>
-      `;
+      const fallbackError = `<div class="p-4 text-center text-xs text-red-500">Gagal memuat notifikasi.</div>`;
+      if (notifContainer) notifContainer.innerHTML = fallbackError;
+      if (notifContainerMobile) notifContainerMobile.innerHTML = fallbackError;
     }
   }
 
   function renderNotifications(notifications, unreadCount) {
-    if (unreadCount > 0) {
-      notifBadge.classList.remove("hidden");
-      notifCountText.classList.remove("hidden");
-      notifCountText.innerText = unreadCount;
-    } else {
-      notifBadge.classList.add("hidden");
-      notifCountText.classList.add("hidden");
-    }
+    // Update Badge & Counter Text untuk Desktop & Mobile
+    const updateBadgeState = (badge, countText) => {
+      if (!badge || !countText) return;
+      if (unreadCount > 0) {
+        badge.classList.remove("hidden");
+        countText.classList.remove("hidden");
+        countText.innerText = unreadCount;
+      } else {
+        badge.classList.add("hidden");
+        countText.classList.add("hidden");
+      }
+    };
+
+    updateBadgeState(notifBadge, notifCountText);
+    updateBadgeState(notifBadgeMobile, notifCountTextMobile);
+
+    const emptyState = `<div class="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi baru.</div>`;
 
     if (!notifications || notifications.length === 0) {
-      notifContainer.innerHTML = `
-        <div class="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi baru.</div>
-      `;
+      if (notifContainer) notifContainer.innerHTML = emptyState;
+      if (notifContainerMobile) notifContainerMobile.innerHTML = emptyState;
       return;
     }
 
@@ -130,10 +168,12 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     });
 
-    notifContainer.innerHTML = htmlContent;
+    if (notifContainer) notifContainer.innerHTML = htmlContent;
+    if (notifContainerMobile) notifContainerMobile.innerHTML = htmlContent;
   }
 
-  notifContainer.addEventListener("click", async (e) => {
+  // Event click handling saat notifikasi ditekan (berlaku untuk dua container)
+  const handleNotifClick = async (e) => {
     const targetLink = e.target.closest("a[data-id]");
     if (!targetLink) return;
 
@@ -141,12 +181,19 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await fetch(`/notifications/${notifId}/read`, { method: "PATCH" });
     } catch (error) {}
-  });
+  };
 
-  markAllReadBtn.addEventListener("click", async () => {
+  if (notifContainer) notifContainer.addEventListener("click", handleNotifClick);
+  if (notifContainerMobile) notifContainerMobile.addEventListener("click", handleNotifClick);
+
+  // Event handler tandai semua dibaca
+  const markAllReadAction = async () => {
     try {
       await fetch("/notifications/mark-all-read", { method: "POST" });
       fetchNotifications();
     } catch (error) {}
-  });
+  };
+
+  if (markAllReadBtn) markAllReadBtn.addEventListener("click", markAllReadAction);
+  if (markAllReadBtnMobile) markAllReadBtnMobile.addEventListener("click", markAllReadAction);
 });

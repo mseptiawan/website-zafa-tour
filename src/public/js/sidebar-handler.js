@@ -1,29 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // ==========================================
-  // 1. HANDLER UNTUK MOBILE SIDEBAR (TOGGLE)
-  // ==========================================
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("sidebarOverlay");
   const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const mobileCloseBtn = document.getElementById("mobileCloseBtn");
 
-  const toggleSidebar = () => {
+  const openSidebar = () => {
     if (sidebar && overlay) {
-      sidebar.classList.toggle("-translate-x-full");
-      overlay.classList.toggle("hidden");
+      sidebar.classList.remove("-translate-x-full");
+      overlay.classList.remove("hidden");
     }
   };
 
-  if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener("click", toggleSidebar);
-  }
+  const closeSidebar = () => {
+    if (sidebar && overlay) {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    }
+  };
 
-  if (overlay) {
-    overlay.addEventListener("click", toggleSidebar);
-  }
+  if (mobileMenuBtn) mobileMenuBtn.addEventListener("click", openSidebar);
+  if (mobileCloseBtn) mobileCloseBtn.addEventListener("click", closeSidebar);
+  if (overlay) overlay.addEventListener("click", closeSidebar);
 
-  // ==========================================
-  // 2. HANDLER UNTUK ACTIVE MENU & SCROLL
-  // ==========================================
   const currentPath = window.location.pathname;
   const sidebarNav = document.getElementById("sidebarNav");
 
@@ -101,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const activeMenu = localStorage.getItem("activeMenu");
-  if (activeMenu) {
+  if (activeMenu && window.innerWidth >= 1280) {
     const activeDetails = sidebarNav.querySelector(`details[data-menu="${activeMenu}"]`);
     if (activeDetails) {
       activeDetails.open = true;
