@@ -2,7 +2,7 @@ import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 import { uploadFile } from "../middlewares/uploadFile.js";
-import { validate } from "../middlewares/validate.v2.js";
+import { validate } from "../middlewares/validate.js";
 import { createAssignmentSchema } from "../validations/assignment.schema.js";
 
 import {

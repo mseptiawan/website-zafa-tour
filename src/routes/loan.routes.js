@@ -22,7 +22,6 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-// --- Akses Fitur Karyawan Mandiri ---
 router.get("/new", renderCreateForm);
 router.post("/", storeLoan);
 router.get("/me", getMyLoans);
@@ -31,7 +30,6 @@ router.get("/edit/:id", editLoan);
 router.post("/update/:id", updateLoan);
 router.post("/cancel/:id", cancelLoan);
 
-// --- Akses Manajemen Utama
 router.get("/approval", roleMiddleware("WAKIL_DIREKTUR", "DIREKTUR_UTAMA"), getManageLoanPage);
 router.post(
   "/approval/approve/:id",
@@ -40,7 +38,6 @@ router.post(
 );
 router.post("/approval/reject/:id", roleMiddleware("WAKIL_DIREKTUR", "DIREKTUR_UTAMA"), rejectLoan);
 
-// --- Akses Finance & Kasir Perusahaan (Pencairan Dana) ---
 router.get("/disbursement", roleMiddleware("MANAGER_KEUANGAN"), getFinanceCenterPageLoan);
 router.post(
   "/approval/disburse/:id",

@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
-<div >
+<div>
   <div class="mx-auto max-w-none space-y-6">
 
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-200 pb-5">
@@ -10,20 +10,30 @@
       </div>
 
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
-        <form method="GET" action="/report/payroll" class="flex flex-1 sm:flex-none items-center gap-2 bg-white border border-slate-200 rounded-lg p-1 h-9 shadow-xs">
-          <div class="flex items-center gap-1 px-2 text-xs font-medium text-slate-600">
-            <span class="text-slate-400">Periode:</span>
-            <input type="month" name="periodMonth" value="<%= filters.periodMonth %>" class="bg-transparent outline-none cursor-pointer font-semibold text-slate-700">
+        
+        <!-- FORM FILTER MURNI PERIODE -->
+        <form method="GET" action="/report/payroll" id="periodFilterForm" class="flex items-center bg-white border border-slate-200 rounded-xl p-1 h-9 shadow-xs">
+          <div class="flex items-center px-2 text-xs font-medium text-slate-600 bg-slate-50 rounded-lg h-7 border border-slate-200/60">
+            <span class="text-slate-400 mr-2">Periode:</span>
+            <select name="periodMonth" onchange="document.getElementById('periodFilterForm').submit()" class="bg-transparent outline-none text-xs font-bold text-slate-800 cursor-pointer pr-1">
+              <% availablePeriods.forEach(p => { %>
+                <option value="<%= p %>" <%= filters.periodMonth === p ? 'selected' : '' %>>Siklus <%= p %></option>
+              <% }) %>
+            </select>
           </div>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium h-7 px-3 rounded-md transition-colors cursor-pointer">
-            Saring
-          </button>
         </form>
 
-        <a href="/report/payroll/download-pdf?periodMonth=<%= filters.periodMonth %>" 
-           class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
-          Cetak Dokumen (PDF)
-        </a>
+        <!-- BUTTON EXPORT -->
+        <div class="flex gap-2">
+          <a href="/report/payroll/download-pdf?periodMonth=<%= filters.periodMonth %>" 
+             class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+            PDF
+          </a>
+          <a href="/report/payroll/download-excel?periodMonth=<%= filters.periodMonth %>" 
+             class="bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium h-9 px-4 rounded-lg border border-green-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+            Excel
+          </a>
+        </div>
       </div>
     </div>
 
@@ -46,9 +56,10 @@
       <% }) %>
     </div>
 
+    <!-- MAIN TABLE -->
     <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
       <div class="p-6 border-b border-slate-200">
-        <h3 class="text-sm font-semibold text-slate-900">Matriks Penggajian Pegawai</h3>
+        <h3 class="text-sm font-semibold text-slate-900">Matriks Penggajian — Siklus <%= filters.periodMonth %></h3>
         <p class="text-xs text-slate-400 mt-0.5">Daftar komparatif rincian pendapatan kotor, potongan wajib, dan upah bersih harian karyawan.</p>
       </div>
 

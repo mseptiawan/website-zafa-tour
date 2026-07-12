@@ -4,7 +4,6 @@ import LoanApproval from "../models/loan/LoanApproval.model.js";
 import LoanPayment from "../models/loan/loanPayment.model.js";
 import User from "../models/basic/User.model.js";
 import Role from "../models/basic/Role.model.js";
-import { getTotalMonthlyDeduction } from "../helpers/loan.helper.js";
 import { getPayrollPeriod } from "../utils/payrollPeriod.js";
 import notificationService from "./notification.service.js";
 import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
@@ -14,6 +13,17 @@ import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
  * @type {string[]}
  */
 const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
+
+export async function getTotalMonthlyDeduction(employeeId) {
+  const activeLoans = await Loan.find({
+    employeeId,
+    status: { $in: ["PENDING", "APPROVED"] },
+  });
+
+  return activeLoans.reduce((sum, loan) => {
+    return sum + (loan.monthlyDeduction || 0);
+  }, 0);
+}
 
 /**
  * Menentukan tahapan approval berikutnya berdasarkan alur kerja perusahaan.

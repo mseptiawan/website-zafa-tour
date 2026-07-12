@@ -21,17 +21,14 @@ router.use(authMiddleware);
 
 const ALLOWED_DIRECTORATE_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR"];
 
-// Aksesibilitas Sisi Karyawan (Pengaju Pemohon)
 router.get("/new", renderCreatePermitForm);
 router.post("/", uploadFile.single("document"), validate(createPermitSchema), storePermit);
 router.get("/me", getHistoryPermits);
 
-// Tambahkan rute Edit & Delete khusus Sisi Karyawan di bawah ini:
 router.get("/edit/:id", editPermit);
 router.post("/edit/:id", uploadFile.single("document"), validate(createPermitSchema), updatePermit);
 router.get("/cancel/:id", cancelPermit);
 
-// Aksesibilitas Sisi Atasan (Otorisasi Direksi)
 router.get("/incoming", roleMiddleware(...ALLOWED_DIRECTORATE_ROLES), getIncomingPermits);
 router.post("/approval/:id", roleMiddleware(...ALLOWED_DIRECTORATE_ROLES), actionApproval);
 

@@ -1,3 +1,5 @@
+import Leave from "../models/leave/Leave.model.js";
+import Permit from "../models/Permit.model.js";
 import { getPayrollPeriod } from "../utils/payrollPeriod.js";
 import mongoose from "mongoose";
 import Attendance from "../models/Attendance.model.js";
@@ -38,6 +40,33 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
+export const checkTodayAbsenceStatus = async (employeeId, userId) => {
+  const { start, end } = getTodayRange();
+
+  const [permit, leave] = await Promise.all([
+    Permit.findOne({
+      employeeId,
+      date: { $gte: start, $lte: end },
+      status: "APPROVED",
+    }).lean(),
+    Leave.findOne({
+      userId,
+      startDate: { $lte: end },
+      endDate: { $gte: start },
+      status: "APPROVED",
+    }).lean(),
+  ]);
+
+  if (permit) {
+    return { type: "IZIN", detail: `IZIN (${permit.type})` };
+  }
+  if (leave) {
+    return { type: "CUTI", detail: `CUTI (${leave.totalDays} Hari)` };
+  }
+
+  return null;
+};
+
 export const getTodayAttendance = async (employeeId) => {
   const { start, end } = getTodayRange();
   return Attendance.findOne({
@@ -46,7 +75,15 @@ export const getTodayAttendance = async (employeeId) => {
   });
 };
 
-export const processCheckIn = async (employeeId, body, file) => {
+export const processCheckIn = async (employeeId, body, file, userId) => {
+  const absenceStatus = await checkTodayAbsenceStatus(employeeId, userId);
+  if (absenceStatus) {
+    throw new AppError(
+      `Anda tidak dapat melakukan check-in karena hari ini berstatus ${absenceStatus.type}.`,
+      400
+    );
+  }
+
   const { start, end } = getTodayRange();
 
   const already = await Attendance.findOne({
@@ -119,7 +156,11 @@ export const processCheckIn = async (employeeId, body, file) => {
 };
 
 export const processCheckOut = async (employeeId, body, file) => {
-  const { start, end } = getTodayRange();
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
 
   const attendance = await Attendance.findOne({
     employeeId,
@@ -151,11 +192,12 @@ export const processCheckOut = async (employeeId, body, file) => {
 };
 
 export const getAttendanceHistory = async (sessionUser, query) => {
-  const { startDate, endDate, view } = query;
+  const { startDate, endDate, view = "all" } = query;
 
   const ADMIN_ROLES = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_ADMINISTRASI", "HRD", "ADMIN"];
   const isAdmin = ADMIN_ROLES.includes(sessionUser.role);
-  const isPersonalView = isAdmin && view === "personal";
+
+  const activeView = isAdmin ? view : "personal";
 
   let start;
   let end;
@@ -163,111 +205,219 @@ export const getAttendanceHistory = async (sessionUser, query) => {
   if (startDate && endDate) {
     start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
-
     end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
   } else {
-    const period = getPayrollPeriod();
-    start = period.start;
-    end = period.end;
+    start = new Date();
+    start.setHours(0, 0, 0, 0);
+    end = new Date();
+    end.setHours(23, 59, 59, 999);
   }
 
   let targetEmployeeId = null;
-  if (!isAdmin || isPersonalView) {
-    const emp = await Employee.findOne({ userId: sessionUser._id }).select("_id");
-    if (emp) targetEmployeeId = emp._id;
+  let targetUserId = sessionUser._id;
+
+  const currentEmp = await Employee.findOne({ userId: sessionUser._id }).select("_id userId");
+  if (currentEmp) {
+    targetEmployeeId = currentEmp._id;
   }
 
-  const matchQuery = {
-    checkIn: { $gte: start, $lte: end },
-    ...(isAdmin && !isPersonalView ? {} : { employeeId: targetEmployeeId }),
+  const isFilteringPersonal = activeView === "personal" || !isAdmin;
+
+  const attendanceMatch = {
+    $or: [
+      { checkIn: { $gte: start, $lte: end } },
+      { status: "ALPHA", createdAt: { $gte: start, $lte: end } },
+    ],
+    ...(isFilteringPersonal ? { employeeId: targetEmployeeId } : {}),
   };
 
-  let listAttendance = await Attendance.find(matchQuery)
-    .populate({
-      path: "employeeId",
-      select: "fullName",
-      populate: { path: "userId", select: "username" },
-    })
-    .sort({ checkIn: -1 });
+  const permitMatch = {
+    date: { $gte: start, $lte: end },
+    status: "APPROVED",
+    ...(isFilteringPersonal ? { employeeId: targetEmployeeId } : {}),
+  };
 
-  listAttendance = listAttendance.map((doc) => doc.toObject());
+  const leaveMatch = {
+    startDate: { $lte: end },
+    endDate: { $gte: start },
+    status: "APPROVED",
+    ...(isFilteringPersonal ? { userId: targetUserId } : {}),
+  };
 
-  if (isAdmin && !isPersonalView) {
-    const attendedInPeriod = await Attendance.find({
-      checkIn: { $gte: start, $lte: end },
-    }).distinct("employeeId");
+  let rawAttendance = [];
+  let rawPermits = [];
+  let rawLeaves = [];
+
+  try {
+    [rawAttendance, rawPermits, rawLeaves] = await Promise.all([
+      Attendance.find(attendanceMatch)
+        .populate({
+          path: "employeeId",
+          select: "fullName",
+          populate: { path: "userId", select: "username" },
+        })
+        .lean(),
+      Permit.find(permitMatch).populate("employeeId", "fullName").lean(),
+      Leave.find(leaveMatch).populate({ path: "userId", select: "username" }).lean(),
+    ]);
+  } catch (dbError) {
+    console.error("⚠️ DETEKSI DATA KOTOR/ERROR DI DATABASE:", dbError.message);
+  }
+
+  const formattedPermits = rawPermits
+    .filter(
+      (permit) =>
+        permit.employeeId &&
+        mongoose.Types.ObjectId.isValid(permit.employeeId._id || permit.employeeId)
+    )
+    .map((permit) => ({
+      _id: permit._id,
+      employeeId: permit.employeeId,
+      fullName: permit.employeeId?.fullName || "-",
+      checkIn: permit.date,
+      checkOut: null,
+      status: "IZIN",
+      displayStatus: `IZIN (${permit.type})`,
+      note: permit.reason,
+      isAdditionalData: true,
+    }));
+
+  let userToEmployeeMap = {};
+  if (isAdmin) {
+    const allEmployees = await Employee.find().select("userId fullName").lean();
+    allEmployees.forEach((emp) => {
+      if (emp.userId) {
+        userToEmployeeMap[emp.userId.toString()] = emp.fullName;
+      }
+    });
+  }
+
+  const formattedLeaves = rawLeaves.map((leave) => {
+    const isOwnLeave =
+      leave.userId?._id?.toString() === targetUserId?.toString() ||
+      leave.userId?.toString() === targetUserId?.toString();
+    const fullName = isOwnLeave
+      ? sessionUser.username
+      : userToEmployeeMap[leave.userId?._id?.toString() || leave.userId?.toString()] || "-";
+
+    return {
+      _id: leave._id,
+      userId: leave.userId,
+      fullName: fullName,
+      checkIn: leave.startDate,
+      endDate: leave.endDate,
+      checkOut: null,
+      status: "CUTI",
+      displayStatus: `CUTI (${leave.totalDays} Hari)`,
+      note: leave.reason,
+      isAdditionalData: true,
+    };
+  });
+
+  let baseAttendance = rawAttendance
+    .filter((doc) => doc.employeeId && typeof doc.employeeId === "object" && doc.employeeId._id)
+    .map((obj) => ({
+      ...obj,
+      fullName: obj.employeeId?.fullName || "-",
+      displayStatus: obj.status,
+    }));
+
+  const allTabRecords = [...baseAttendance, ...formattedPermits, ...formattedLeaves];
+
+  const alphaTabRecords = allTabRecords.filter((item) => item.status === "ALPHA");
+
+  let missingAttendanceData = [];
+  if (isAdmin) {
+    const attendedInPeriod = baseAttendance
+      .map((b) => b.employeeId?._id?.toString())
+      .filter(Boolean);
+    const permittedEmpIds = formattedPermits
+      .map((p) => p.employeeId?._id?.toString() || p.employeeId?.toString())
+      .filter(Boolean);
 
     const missingEmployees = await Employee.find({
-      _id: { $nin: attendedInPeriod },
-    }).populate("userId", "username");
+      _id: { $nin: [...attendedInPeriod, ...permittedEmpIds] },
+    })
+      .populate("userId", "username")
+      .lean();
 
-    const missingAttendanceData = missingEmployees.map((emp) => ({
+    missingAttendanceData = missingEmployees.map((emp) => ({
       _id: `missing-${emp._id}`,
       employeeId: emp,
+      fullName: emp.fullName || "-",
       checkIn: null,
       checkOut: null,
       createdAt: start,
       status: "BELUM ABSEN",
+      displayStatus: "BELUM ABSEN",
       lateDuration: 0,
       checkInPhoto: null,
       isMissing: true,
     }));
-
-    listAttendance = [...missingAttendanceData, ...listAttendance];
   }
 
-  listAttendance = listAttendance.map((item) => {
-    const fullName = item.employeeId?.fullName || "-";
-    return { ...item, fullName };
+  const personalTabRecords = allTabRecords.filter(
+    (item) =>
+      item.employeeId?._id?.toString() === targetEmployeeId?.toString() ||
+      item.userId?._id?.toString() === targetUserId?.toString() ||
+      item.userId === targetUserId?.toString()
+  );
+
+  const tabCounters = {
+    all: isAdmin ? allTabRecords.length : 0,
+    missing: isAdmin ? missingAttendanceData.length : 0,
+    alpha: isAdmin ? alphaTabRecords.length : 0,
+    personal: isAdmin ? personalTabRecords.length : allTabRecords.length,
+  };
+
+  let listAttendance = [];
+  if (activeView === "all") {
+    listAttendance = allTabRecords;
+  } else if (activeView === "missing") {
+    listAttendance = missingAttendanceData;
+  } else if (activeView === "alpha") {
+    listAttendance = alphaTabRecords;
+  } else if (activeView === "personal") {
+    listAttendance = isAdmin ? personalTabRecords : allTabRecords;
+  }
+
+  listAttendance.sort((a, b) => {
+    const dateA = a.checkIn ? new Date(a.checkIn) : new Date(a.createdAt || 0);
+    const dateB = b.checkIn ? new Date(b.checkIn) : new Date(b.createdAt || 0);
+    return dateB - dateA;
   });
 
-  const summary = await Attendance.aggregate([
-    { $match: matchQuery },
-    {
-      $group: {
-        _id: null,
-        totalLateMinutes: {
-          $sum: { $convert: { input: "$lateDuration", to: "int", onError: 0, onNull: 0 } },
-        },
-        totalLateDays: {
-          $sum: {
-            $cond: [
-              {
-                $gt: [
-                  { $convert: { input: "$lateDuration", to: "int", onError: 0, onNull: 0 } },
-                  0,
-                ],
-              },
-              1,
-              0,
-            ],
-          },
-        },
-        totalHadir: {
-          $sum: {
-            $cond: [
-              {
-                $and: [
-                  { $ne: ["$status", "BELUM ABSEN"] },
-                  { $ne: ["$status", "ALPHA"] },
-                  { $ne: ["$status", ""] },
-                ],
-              },
-              1,
-              0,
-            ],
-          },
-        },
-      },
-    },
-  ]);
+  const analytics = {
+    totalHadir: 0,
+    totalLateDays: 0,
+    totalLateMinutes: 0,
+    totalIzinCuti: 0,
+    totalAlpha: 0,
+  };
+
+  listAttendance.forEach((row) => {
+    if (row.status === "HADIR" || row.status === "TELAT") {
+      analytics.totalHadir += 1;
+    }
+    if (row.lateDuration > 0 || row.status === "TELAT") {
+      analytics.totalLateDays += 1;
+      analytics.totalLateMinutes += parseInt(row.lateDuration || 0, 10);
+    }
+    if (row.status === "IZIN" || row.status === "CUTI") {
+      analytics.totalIzinCuti += 1;
+    }
+    if (row.status === "ALPHA") {
+      analytics.totalAlpha += 1;
+    }
+  });
 
   return {
     listAttendance,
-    analytics: summary[0] || { totalLateMinutes: 0, totalLateDays: 0, totalHadir: 0 },
+    analytics,
     isAdmin,
-    isPersonalView,
+    activeView,
+    tabCounters,
     filters: {
       startDate: start.toISOString().split("T")[0],
       endDate: end.toISOString().split("T")[0],

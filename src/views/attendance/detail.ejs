@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title: "Detail Absensi" }) %>
 
-<div >
+<div>
 
   <!-- HEADER -->
   <div class="mb-6">
@@ -33,40 +33,36 @@
         </span>
       </div>
 
-     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6 border-t border-slate-100 pt-6">
-  <div>
-    <p class="text-slate-400 text-xs uppercase mb-2">Foto Check In</p>
-    <% if (data.checkInPhoto) { %>
-      <img src="https://pub-ded19618cf1e41db87040f444dcb8e7c.r2.dev/zafa-tour/checkin/<%= data.checkInPhoto %>" 
-           alt="Check In" 
-           class="w-full max-w-[200px] h-auto rounded-lg border border-slate-200 shadow-sm object-cover">
-    <% } else { %>
-      <div class="w-full max-w-[200px] h-32 bg-slate-50 border border-slate-200 border-dashed rounded-lg flex items-center justify-center text-slate-400 text-xs">
-        Tidak ada foto
-      </div>
-    <% } %>
-  </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6 border-t border-slate-100 pt-6">
+        <div>
+          <p class="text-slate-400 text-xs uppercase mb-2">Foto Check In</p>
+          <% if (data.checkInPhoto) { %>
+          <img src="https://pub-ded19618cf1e41db87040f444dcb8e7c.r2.dev/zafa-tour/checkin/<%= data.checkInPhoto %>" alt="Check In" class="w-full max-w-[200px] h-auto rounded-lg border border-slate-200 shadow-sm object-cover">
+          <% } else { %>
+          <div class="w-full max-w-[200px] h-32 bg-slate-50 border border-slate-200 border-dashed rounded-lg flex items-center justify-center text-slate-400 text-xs">
+            Tidak ada foto
+          </div>
+          <% } %>
+        </div>
 
-  <div>
-    <p class="text-slate-400 text-xs uppercase mb-2">Foto Check Out</p>
-    <% if (data.checkOutPhoto) { %>
-      <img src="https://pub-ded19618cf1e41db87040f444dcb8e7c.r2.dev/zafa-tour/checkout/<%= data.checkOutPhoto %>" 
-           alt="Check Out" 
-           class="w-full max-w-[200px] h-auto rounded-lg border border-slate-200 shadow-sm object-cover">
-    <% } else { %>
-      <div class="w-full max-w-[200px] h-32 bg-slate-50 border border-slate-200 border-dashed rounded-lg flex items-center justify-center text-slate-400 text-xs">
-        Tidak ada foto
+        <div>
+          <p class="text-slate-400 text-xs uppercase mb-2">Foto Check Out</p>
+          <% if (data.checkOutPhoto) { %>
+          <img src="https://pub-ded19618cf1e41db87040f444dcb8e7c.r2.dev/zafa-tour/checkout/<%= data.checkOutPhoto %>" alt="Check Out" class="w-full max-w-[200px] h-auto rounded-lg border border-slate-200 shadow-sm object-cover">
+          <% } else { %>
+          <div class="w-full max-w-[200px] h-32 bg-slate-50 border border-slate-200 border-dashed rounded-lg flex items-center justify-center text-slate-400 text-xs">
+            Tidak ada foto
+          </div>
+          <% } %>
+        </div>
       </div>
-    <% } %>
-  </div>
-</div>
 
     </div>
 
     <% if (data.location && data.location.lat && data.location.lng) { %>
-      <div id="map" class="w-full h-80 mt-6 rounded-xl border"></div>
+    <div id="map" class="w-full h-80 mt-6 rounded-xl border"></div>
     <% } else { %>
-      <p class="text-slate-400 mt-6 text-sm">Tidak ada lokasi tersedia</p>
+    <p class="text-slate-400 mt-6 text-sm">Tidak ada lokasi tersedia</p>
     <% } %>
 
   </div>
@@ -76,10 +72,7 @@
 <!-- ===================== -->
 <!-- LEAFLET CDN WAJIB -->
 <!-- ===================== -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -87,27 +80,27 @@
 <!-- MAP SCRIPT (FIXED) -->
 <!-- ===================== -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function() {
 
-  const locationData = JSON.parse('<%- JSON.stringify(data.location ?? null) %>');
+    const locationData = JSON.parse('<%- JSON.stringify(data.location ?? null) %>');
 
-  console.log("LOCATION:", locationData);
+    console.log("LOCATION:", locationData);
 
-  if (!locationData || !locationData.lat || !locationData.lng) return;
+    if (!locationData || !locationData.lat || !locationData.lng) return;
 
-  const map = L.map('map').setView(
-    [locationData.lat, locationData.lng],
-    16
-  );
+    const map = L.map('map').setView(
+      [locationData.lat, locationData.lng],
+      16
+    );
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
 
-  L.marker([locationData.lat, locationData.lng])
-    .addTo(map)
-    .bindPopup("Lokasi Absen")
-    .openPopup();
+    L.marker([locationData.lat, locationData.lng])
+      .addTo(map)
+      .bindPopup("Lokasi Absen")
+      .openPopup();
 
-});
+  });
 </script>

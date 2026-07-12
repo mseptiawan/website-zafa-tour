@@ -24,20 +24,16 @@ const APPROVAL_ROLES = [
   "MANAGER_HAJI_UMRAH",
 ];
 
-// Semua rute wajib login terlebih dahulu
 router.use(authMiddleware);
 
-// Rute khusus Karyawan (Pengajuan & Riwayat Mandiri)
 router.get("/new", renderCreateOvertimeForm);
 router.post("/", uploadFile.single("proofFile"), validate(createOvertimeSchema), storeOvertime);
 router.get("/my", getMyOvertime);
 
-// Rute Manajemen & Persetujuan (Approval)
 router.get("/approval", roleMiddleware(...APPROVAL_ROLES), approvalOvertimePage);
 router.post("/approval/:id/manager", roleMiddleware(...APPROVAL_ROLES), approveManagerOvertime);
 router.post("/approval/:id/reject", roleMiddleware(...APPROVAL_ROLES), rejectOvertime);
 
-// Rute Detail & Integrasi Payroll
 router.get("/detail/:id", getOvertimeDetail);
 
 export default router;

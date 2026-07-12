@@ -1,61 +1,100 @@
 <%- layout('layouts/main', { title }) %>
 
-<div >
+<div>
   <div class="mx-auto max-w-none space-y-6">
 
+    <!-- HEADER PAGE -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
       <div class="min-w-0">
         <h1 class="text-xl font-bold tracking-tight text-slate-900">Daftar Data Karyawan</h1>
-        <p class="text-xs text-slate-500 mt-1">Halaman pusat kendali administrasi berkas dan sebaran demografi staf.</p>
+        <p class="text-xs text-slate-500 mt-1">Halaman pusat kendali administrasi berkas, sebaran demografi, dan status kepegawaian staf.</p>
       </div>
 
-      <div class="shrink-0 w-full sm:w-auto">
-        <button onclick="executeDownloadEmployeePdf()" class="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer">
-          Cetak Berkas (PDF)
-        </button>
-      </div>
+     <div class="shrink-0 w-full sm:w-auto flex flex-wrap items-center gap-2">
+  <button onclick="executeDownloadEmployeePdf()" class="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer">
+    Cetak PDF
+  </button>
+  <button onclick="executeDownloadEmployeeExcel()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium h-9 px-4 rounded-lg shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer">
+    Unduh Excel (.xlsx)
+  </button>
+</div>
     </div>
 
+    <!-- LOGIK AGREGASI DATA ATAS (ANALYTICS) -->
     <% 
       let lakiCount = 0; let perempuanCount = 0;
+      let tetapCount = 0; let kontrakCount = 0; let magangCount = 0;
+
       employees.forEach(emp => {
+        // Hitung Gender
         if(emp.jenis_kelamin === 'Laki-Laki') lakiCount++;
         if(emp.jenis_kelamin === 'Perempuan') perempuanCount++;
+
+        // Hitung Status Pegawai dari careerData (Array Virtual Index 0)
+        const career = (emp.careerData && emp.careerData.length > 0) ? emp.careerData[0] : null;
+        if (career) {
+          if (career.status_pegawai === 'Pegawai Tetap') tetapCount++;
+          if (career.status_pegawai === 'Pegawai Kontrak') kontrakCount++;
+          if (career.status_pegawai === 'Magang / Intern') magangCount++;
+        }
       });
+
       let totalEmp = employees.length || 1;
       let pctLaki = Math.round((lakiCount / totalEmp) * 100);
       let pctPerempuan = Math.round((perempuanCount / totalEmp) * 100);
     %>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- CARDS ANALYTICS WIDGET -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
       
-      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs lg:col-span-4">
+      <!-- Card 1: Total Staf -->
+      <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs lg:col-span-3">
         <span class="text-xs font-medium text-slate-500 block">Total Staf Aktif</span>
         <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-4xl font-semibold tracking-tight text-slate-900 tabular-nums"><%= employees.length %></span>
+          <span class="text-3xl font-semibold tracking-tight text-slate-900 tabular-nums"><%= employees.length %></span>
           <span class="text-xs font-medium text-slate-400">orang terdaftar</span>
         </div>
       </div>
 
-      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs lg:col-span-8 flex flex-col justify-between">
+      <!-- Card 2: Komposisi Kontrak Kerja -->
+      <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs lg:col-span-4 flex flex-col justify-between">
+        <span class="text-xs font-medium text-slate-500 block">Status Kepegawaian</span>
+        <div class="flex items-center gap-4 mt-2 text-xs font-medium text-slate-700">
+          <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-2 flex-1 text-center">
+            <span class="text-emerald-700 block text-lg font-bold"><%= tetapCount %></span>
+            <span class="text-[10px] text-slate-500">Tetap</span>
+          </div>
+          <div class="bg-blue-50 border border-blue-100 rounded-lg p-2 flex-1 text-center">
+            <span class="text-blue-700 block text-lg font-bold"><%= kontrakCount %></span>
+            <span class="text-[10px] text-slate-500">Kontrak</span>
+          </div>
+          <div class="bg-amber-50 border border-amber-100 rounded-lg p-2 flex-1 text-center">
+            <span class="text-amber-700 block text-lg font-bold"><%= magangCount %></span>
+            <span class="text-[10px] text-slate-500">Magang</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Proporsi Gender -->
+      <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs lg:col-span-5 flex flex-col justify-between">
         <div>
           <span class="text-xs font-medium text-slate-500 block">Proporsi Gender</span>
         </div>
         
-        <div class="my-3 sm:my-0">
+        <div class="my-2">
           <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
             <div class="bg-blue-600 h-full transition-all" style="width: <%= pctLaki %>%"></div>
-            <div class="bg-slate-400 h-full transition-all" style="width: <%= pctPerempuan %>%"></div>
+            <div class="bg-pink-500 h-full transition-all" style="width: <%= pctPerempuan %>%"></div>
           </div>
           
-          <div class="flex items-center gap-4 mt-3 text-xs">
-            <div class="flex items-center gap-1.5 font-medium text-slate-600">
+          <div class="flex items-center justify-between mt-3 text-[11px] font-medium text-slate-600">
+            <div class="flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-blue-600 block"></span>
-              <span>Laki-Laki (<%= lakiCount %> Karyawan — <%= pctLaki %>%)</span>
+              <span>Laki-Laki (<%= lakiCount %> — <%= pctLaki %>%)</span>
             </div>
-            <div class="flex items-center gap-1.5 font-medium text-slate-600">
-              <span class="w-2 h-2 rounded-full bg-slate-400 block"></span>
-              <span>Perempuan (<%= perempuanCount %> Karyawan — <%= pctPerempuan %>%)</span>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-pink-500 block"></span>
+              <span>Perempuan (<%= perempuanCount %> — <%= pctPerempuan %>%)</span>
             </div>
           </div>
         </div>
@@ -63,41 +102,113 @@
 
     </div>
 
+    <!-- MAIN DATA TABLE -->
     <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
       <div class="p-6 border-b border-slate-200">
-        <h3 class="text-sm font-semibold text-slate-900">Biodata Lengkap Karyawan</h3>
-        <p class="text-xs text-slate-400 mt-0.5">Daftar komparatif data identitas pokok dan status perkawinan personel.</p>
+        <h3 class="text-sm font-semibold text-slate-900">Biodata & Status Profesional Karyawan</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Daftar komparatif data identitas pokok, penempatan posisi, masa kerja, dan rekam pendidikan staf.</p>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
           <thead>
             <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-              <th class="p-4 pl-6">Nama Karyawan</th>
-              <th class="p-4">Id</th>
-              <th class="p-4">Jenis Kelamin</th>
-              <th class="p-4">Tempat Lahir</th>
-              <th class="p-4 text-right pr-6">Status Pernikahan</th>
+              <th class="p-4 pl-6">Karyawan</th>
+              <th class="p-4">Jabatan & Bidang</th>
+              <th class="p-4">Status Kerja</th>
+              <th class="p-4">Masa Kerja & Usia</th>
+              <th class="p-4">Pendidikan</th>
+              <th class="p-4 text-right pr-6">Status Nikah</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
             <% if (employees && employees.length > 0) { %>
-              <% employees.forEach((emp) => { %>
+              <% employees.forEach((emp) => { 
+                // Deklarasikan variabel pembantu dari data virtual populate careerData
+                const career = (emp.careerData && emp.careerData.length > 0) ? emp.careerData[0] : null;
+                const edu = emp.educationData || null;
+
+                // 1. Kalkulasi Usia Dinamis
+                let usiaStr = '—';
+                if (emp.tanggal_lahir) {
+                  const diffAge = Date.now() - new Date(emp.tanggal_lahir).getTime();
+                  usiaStr = Math.floor(diffAge / (1000 * 60 * 60 * 24 * 365.25)) + ' Thn';
+                }
+
+                // 2. Kalkulasi Masa Kerja (Tenure) Dinamis
+                let masaKerjaStr = '—';
+                if (career && career.tanggal_mulai_bergabung) {
+                  const diffJoin = Date.now() - new Date(career.tanggal_mulai_bergabung).getTime();
+                  const totalMonths = Math.floor(diffJoin / (1000 * 60 * 60 * 24 * 30.4375));
+                  const years = Math.floor(totalMonths / 12);
+                  const months = totalMonths % 12;
+                  
+                  if (years > 0) {
+                    masaKerjaStr = `${years} Thn ${months} Bln`;
+                  } else {
+                    masaKerjaStr = `${months} Bln`;
+                  }
+                }
+              %>
                 <tr class="hover:bg-slate-50/50 transition-colors">
-                  <td class="p-4 pl-6 font-semibold text-slate-900"><%= emp.fullName %></td>
-                  <td class="p-4 tabular-nums text-slate-600">
-                    <span class="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[11px]">
-                      <%= emp.employeeIdNumber %>
-                    </span>
+                  <!-- Nama & ID Badge -->
+                  <td class="p-4 pl-6">
+                    <div class="font-semibold text-slate-900"><%= emp.fullName %></div>
+                    <div class="mt-0.5 font-mono text-[10px] text-slate-400"><%= emp.employeeIdNumber %></div>
                   </td>
-                  <td class="p-4 text-slate-600"><%= emp.jenis_kelamin %></td>
-                  <td class="p-4 text-slate-600"><%= emp.tempat_lahir || '—' %></td>
-                  <td class="p-4 text-right pr-6 text-slate-500"><%= emp.status_pernikahan %></td>
+
+                  <!-- Jabatan & Bidang -->
+                  <td class="p-4">
+                    <div class="text-slate-800"><%= (career && career.positionId) ? career.positionId.name || career.positionId.nama : 'Belum Diatur' %></div>
+                    <div class="text-[11px] text-slate-400 font-normal"><%= (career && career.bidangId) ? career.bidangId.name || career.bidangId.nama : '—' %></div>
+                  </td>
+
+                  <!-- Status Kerja Badge -->
+                  <td class="p-4">
+                    <% if (career) { %>
+                      <% if (career.status_pegawai === 'Pegawai Tetap') { %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <%= career.status_pegawai %>
+                        </span>
+                      <% } else if (career.status_pegawai === 'Pegawai Kontrak') { %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                          <%= career.status_pegawai %>
+                        </span>
+                      <% } else { %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                          <%= career.status_pegawai %>
+                        </span>
+                      <% } %>
+                    <% } else { %>
+                      <span class="text-slate-400 font-normal">—</span>
+                    <% } %>
+                  </td>
+
+                  <!-- Masa Kerja & Usia -->
+                  <td class="p-4 text-slate-600">
+                    <div class="tabular-nums">Masa Kerja: <span class="text-slate-900 font-semibold"><%= masaKerjaStr %></span></div>
+                    <div class="text-[11px] text-slate-400 font-normal">Usia: <%= usiaStr %> (<%= emp.jenis_kelamin === 'Laki-Laki' ? 'L' : 'P' %>)</div>
+                  </td>
+
+                  <!-- Pendidikan Terakhir -->
+                  <td class="p-4 text-slate-600">
+                    <% if (edu && edu.pendidikan_terakhir) { %>
+                      <div class="text-slate-800 font-medium"><%= edu.pendidikan_terakhir %></div>
+                      <div class="text-[11px] text-slate-400 font-normal"><%= edu.jurusan || '-' %></div>
+                    <% } else { %>
+                      <span class="text-slate-400 font-normal">—</span>
+                    <% } %>
+                  </td>
+
+                  <!-- Status Pernikahan -->
+                  <td class="p-4 text-right pr-6 text-slate-500 tabular-nums">
+                    <%= emp.status_pernikahan || '—' %>
+                  </td>
                 </tr>
               <% }) %>
             <% } else { %>
               <tr>
-                <td colspan="5" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan repositori data karyawan.</td>
+                <td colspan="6" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan repositori data karyawan.</td>
               </tr>
             <% } %>
           </tbody>
@@ -111,5 +222,9 @@
 <script>
   function executeDownloadEmployeePdf() {
     window.location.href = "/report/employees/download-pdf";
+  }
+
+  function executeDownloadEmployeeExcel() {
+    window.location.href = "/report/employees/download-excel"; // <-- Pemicu Unduh Excel
   }
 </script>

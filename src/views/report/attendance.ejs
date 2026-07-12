@@ -1,8 +1,9 @@
 <%- layout('layouts/main', { title }) %>
 
-<div >
+<div>
   <div class="mx-auto max-w-none space-y-5 md:space-y-6">
 
+    <!-- Header & Action Panel -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-200 pb-5">
       <div class="min-w-0 hidden md:block">
         <h1 class="text-xl font-bold tracking-tight text-slate-900"><%= title %></h1>
@@ -10,112 +11,68 @@
       </div>
 
       <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full lg:w-auto shrink-0">
-        <form method="GET" action="/report/attendance" class="flex flex-col sm:flex-row sm:items-center gap-2 bg-white border border-slate-200 rounded-xl p-2 sm:p-1 min-h-9 shadow-xs">
-          <div class="flex items-center justify-between sm:justify-start gap-2 px-1 text-xs font-medium text-slate-600 w-full sm:w-auto">
-            <input type="date" name="startDate" value="<%= filters.startDate %>" class="bg-slate-50 sm:bg-transparent border border-slate-200 sm:border-none p-1.5 sm:p-0 rounded-md outline-none cursor-pointer text-center w-[45%] sm:w-auto">
-            <span class="text-slate-300 hidden sm:inline">—</span>
-            <span class="text-slate-400 text-[10px] font-bold uppercase sm:hidden">s/d</span>
-            <input type="date" name="endDate" value="<%= filters.endDate %>" class="bg-slate-50 sm:bg-transparent border border-slate-200 sm:border-none p-1.5 sm:p-0 rounded-md outline-none cursor-pointer text-center w-[45%] sm:w-auto">
+        
+        <!-- FORM FILTER MURNI PERIODE (SAMA PERSIS SEPERTI OVERTIME) -->
+        <form method="GET" action="/report/attendance" id="periodFilterForm" class="flex items-center bg-white border border-slate-200 rounded-xl p-1 h-9 shadow-xs">
+          <div class="flex items-center px-2 text-xs font-medium text-slate-600 bg-slate-50 rounded-lg h-7 border border-slate-200/60">
+            <span class="text-slate-400 mr-2">Filter Cut Off:</span>
+            <select name="period" onchange="document.getElementById('periodFilterForm').submit()" class="bg-transparent outline-none text-xs font-bold text-slate-800 cursor-pointer pr-1">
+              <% availablePeriods.forEach(p => { %>
+                <option value="<%= p %>" <%= filters.period === p ? 'selected' : '' %>>Siklus <%= p %></option>
+              <% }) %>
+            </select>
             <% if (isAdmin && isPersonalView) { %>
               <input type="hidden" name="view" value="personal">
             <% } %>
           </div>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium h-9 sm:h-7 px-4 rounded-lg sm:rounded-md transition-colors cursor-pointer w-full sm:w-auto mt-1 sm:mt-0">
-            Saring Data
-          </button>
         </form>
 
-        <a href="/report/attendance/download-pdf?startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %><%= (isAdmin && !isPersonalView) ? '' : '&view=personal' %>" 
-           class="flex bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs items-center justify-center gap-2 transition-colors no-underline w-full md:w-auto">
-          Cetak Dokumen (PDF)
-        </a>
+        <!-- TAUTAN UNDUHAN DENGAN METODE TRANSFER STATE SINGLE PERIOD -->
+        <div class="flex gap-2">
+          <!-- Tombol Ekspor PDF -->
+          <a href="/report/attendance/download-pdf?period=<%= filters.period %><%= (isAdmin && !isPersonalView) ? '&view=all' : '&view=personal' %>" 
+             class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+            PDF
+          </a>
+
+          <!-- Tombol Ekspor Excel -->
+          <a href="/report/attendance/download-excel?period=<%= filters.period %><%= (isAdmin && !isPersonalView) ? '&view=all' : '&view=personal' %>" 
+             class="bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium h-9 px-4 rounded-lg border border-green-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+            Excel
+          </a>
+        </div>
+
       </div>
     </div>
 
+    <!-- Statistik Panel Atas -->
     <%
       const statItems = [
-        { label: 'Total Kehadiran', value: analytics.totalHadir, unit: 'log masuk' },
-        { label: 'Frekuensi Terlambat', value: analytics.totalLateDays, unit: 'hari kerja' },
-        { label: 'Akumulasi Keterlambatan', value: analytics.totalLateMinutes, unit: 'menit' }
+        { label: 'Total Kehadiran / Log', value: analytics.totalHadir, unit: 'log masuk' },
+        { label: 'Ketidakhadiran (Izin / Cuti)', value: analytics.totalIzinCuti || 0, unit: 'hari' },
+        { label: 'Akumulasi Keterlambatan', value: analytics.totalLateMinutes || 0, unit: 'menit' }
       ];
     %>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 select-none">
       <% statItems.forEach(item => { %>
-        <div class="bg-white border border-slate-200 rounded-xl p-5 md:p-6 shadow-2xs">
+        <div class="bg-white border border-slate-200 rounded-xl p-5 md:p-6 shadow-xs">
           <span class="text-xs font-medium text-slate-500 block"><%= item.label %></span>
           <div class="mt-1.5 flex items-baseline gap-1.5">
             <span class="text-3xl md:text-4xl font-semibold tracking-tight text-slate-900 tabular-nums"><%= item.value %></span>
-            <% if (item.unit) { %>
-              <span class="text-xs font-medium text-slate-400"><%= item.unit %></span>
-            <% } %>
+            <span class="text-xs font-medium text-slate-400"><%= item.unit %></span>
           </div>
         </div>
       <% }) %>
     </div>
 
-    <% if (isAdmin && !isPersonalView) { %>
-      <% 
-        let kantorCount = 0; let luarKantorCount = 0;
-        listAttendance.forEach(item => {
-          if(item.type === 'KANTOR') kantorCount++;
-          if(item.type === 'LUAR KANTOR') luarKantorCount++;
-        });
-        let totalLoc = (kantorCount + luarKantorCount) || 1;
-        let pctKantor = Math.round((kantorCount / totalLoc) * 100);
-        let pctLuar = Math.round((luarKantorCount / totalLoc) * 100);
-      %>
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-        
-        <div class="bg-white border border-slate-200 rounded-xl p-5 md:p-6 lg:col-span-8 flex flex-col justify-between">
-          <div>
-            <h3 class="text-sm font-semibold text-slate-900">Lokasi Presensi</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Rasio validasi masuk berdasarkan klasifikasi titik koordinat kerja.</p>
-          </div>
-          
-          <div class="my-5 lg:my-6">
-            <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
-              <div class="bg-blue-600 h-full transition-all" style="width: <%= pctKantor %>%"></div>
-              <div class="bg-slate-400 h-full transition-all" style="width: <%= pctLuar %>%"></div>
-            </div>
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 text-xs">
-              <div class="flex items-center gap-1.5 font-medium text-slate-600">
-                <span class="w-2 h-2 rounded-full bg-blue-600 block"></span>
-                <span>Kantor Utama (<%= pctKantor %>%)</span>
-              </div>
-              <div class="flex items-center gap-1.5 font-medium text-slate-600">
-                <span class="w-2 h-2 rounded-full bg-slate-400 block"></span>
-                <span>Dinas Lapangan (<%= pctLuar %>%)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-xl p-5 md:p-6 lg:col-span-4 flex flex-col justify-between">
-          <div>
-            <h3 class="text-sm font-semibold text-slate-900">Analisis Otomatis</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Kesimpulan performa tim pada rentang tanggal aktif.</p>
-          </div>
-          <div class="bg-slate-50 border border-slate-100 p-4 rounded-lg mt-3">
-            <p class="text-xs text-slate-600 leading-relaxed font-medium m-0">
-              Mayoritas log presensi dilakukan dari <strong class="text-blue-600">Kantor Utama (<%= pctKantor %>%)</strong>. 
-              <% if (analytics.totalLateMinutes > 180) { %>
-                Perlu evaluasi berkala terhadap akumulasi keterlambatan jam kerja tim yang saat ini menyentuh <%= analytics.totalLateMinutes %> menit.
-              <% } else { %>
-                Tingkat kebocoran waktu dari keterlambatan staf berada di bawah ambang batas toleransi perusahaan.
-              <% } %>
-            </p>
-          </div>
-        </div>
-
-      </div>
-    <% } %>
-
-    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <!-- Konten Utama Berdasarkan Hak Akses / View Mode -->
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
       
       <% if (isAdmin && !isPersonalView) { %>
+        <!-- ==================== BAGIAN ADMIN (RINGKASAN GLOBAL) ==================== -->
         <div class="p-5 md:p-6 border-b border-slate-200">
-          <h3 class="text-sm font-semibold text-slate-900">Ringkasan Kedisiplinan</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Komparasi total kehadiran dan akumulasi waktu terlambat seluruh staf.</p>
+          <h3 class="text-sm font-semibold text-slate-900">Ringkasan Kedisiplinan & Ketidakhadiran — Siklus <%= filters.period %></h3>
+          <p class="text-xs text-slate-400 mt-0.5">Komparasi total kehadiran, rekap izin, cuti, serta durasi terlambat staf.</p>
         </div>
 
         <%
@@ -129,68 +86,93 @@
             }
             name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
 
-            if(!userReportMap[name]) { userReportMap[name] = { hadir: 0, telat: 0, menitTelat: 0 }; }
-            if(item.status === 'HADIR') userReportMap[name].hadir++;
-            if(item.status === 'TELAT') {
+            if(!userReportMap[name]) { 
+              userReportMap[name] = { hadir: 0, telat: 0, menitTelat: 0, izin: 0, cuti: 0, alpa: 0 }; 
+            }
+            
+            let stat = item.status ? item.status.toUpperCase() : "ALPHA";
+            if (item.isMissing || stat === 'ALPHA' || stat === 'BELUM ABSEN') userReportMap[name].alpa++;
+            else if(stat === 'HADIR') userReportMap[name].hadir++;
+            else if(stat === 'TELAT') {
               userReportMap[name].telat++;
               userReportMap[name].menitTelat += parseInt(item.lateDuration || 0);
             }
+            else if(stat === 'IZIN') userReportMap[name].izin++;
+            else if(stat === 'CUTI') userReportMap[name].cuti++;
           });
           const adminUsers = Object.keys(userReportMap).sort();
         %>
 
+        <!-- Admin Mobile View (Card List) -->
         <div class="block md:hidden divide-y divide-slate-100">
           <% if (adminUsers.length > 0) { %>
             <% adminUsers.forEach((name) => { let uData = userReportMap[name]; %>
               <div class="p-4 space-y-2">
                 <div class="flex justify-between items-center">
                   <span class="font-semibold text-sm text-slate-900"><%= name %></span>
-                  <span class="text-xs font-semibold tracking-tight font-mono <%= uData.menitTelat > 0 ? 'text-red-600' : 'text-slate-500' %>">
+                  <span class="text-xs font-mono font-semibold <%= uData.menitTelat > 0 ? 'text-red-600' : 'text-slate-500' %>">
                     <%= uData.menitTelat %>m telat
                   </span>
                 </div>
-                <div class="flex items-center gap-4 text-xs text-slate-500">
-                  <span>Hadir: <strong class="text-slate-700 font-semibold"><%= uData.hadir %> hari</strong></span>
-                  <span>Frekuensi Telat: <strong class="text-slate-700 font-semibold"><%= uData.telat %>x</strong></span>
+                <div class="grid grid-cols-2 gap-y-1 text-xs text-slate-500">
+                  <div>Hadir: <strong class="text-slate-700 font-semibold"><%= uData.hadir %> hari</strong></div>
+                  <div>Telat: <strong class="text-slate-700 font-semibold"><%= uData.telat %>x</strong></div>
+                  <div>Izin/Cuti: <strong class="text-blue-600 font-semibold"><%= uData.izin %> / <%= uData.cuti %> hari</strong></div>
+                  <div>Alpha: <strong class="text-red-500 font-semibold"><%= uData.alpa %> hari</strong></div>
                 </div>
               </div>
             <% }) %>
           <% } else { %>
-            <div class="p-6 text-center text-slate-400">Tidak ada data.</div>
+            <div class="p-6 text-center text-slate-400 text-xs">Tidak ada data rekap absensi.</div>
           <% } %>
         </div>
 
+        <!-- Admin Desktop View (Table) -->
         <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                 <th class="p-4 pl-6">Nama Karyawan</th>
-                <th class="p-4">Total Hadir</th>
-                <th class="p-4">Frekuensi Telat</th>
-                <th class="p-4 text-right pr-6">Durasi Keterlambatan</th>
+                <th class="p-4">Hadir</th>
+                <th class="p-4">Telat (Frekuensi)</th>
+                <th class="p-4">Izin</th>
+                <th class="p-4">Cuti</th>
+                <th class="p-4">Alpha</th>
+                <th class="p-4 text-right pr-6">Durasi Terlambat</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
-              <% adminUsers.forEach((name) => { let uData = userReportMap[name]; %>
-                <tr class="hover:bg-slate-50/50 transition-colors">
-                  <td class="p-4 pl-6 font-semibold text-slate-900"><%= name %></td>
-                  <td class="p-4 tabular-nums"><%= uData.hadir %> hari</td>
-                  <td class="p-4 tabular-nums text-slate-600"><%= uData.telat %> kali</td>
-                  <td class="p-4 text-right pr-6 tabular-nums font-semibold <%= uData.menitTelat > 0 ? 'text-red-600' : 'text-slate-500' %>">
-                    <%= uData.menitTelat %> menit
-                  </td>
+              <% if (adminUsers.length > 0) { %>
+                <% adminUsers.forEach((name) => { let uData = userReportMap[name]; %>
+                  <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="p-4 pl-6 font-semibold text-slate-900"><%= name %></td>
+                    <td class="p-4 tabular-nums"><%= uData.hadir %> hari</td>
+                    <td class="p-4 tabular-nums text-slate-600"><%= uData.telat %> kali</td>
+                    <td class="p-4 tabular-nums text-blue-600"><%= uData.izin %> hari</td>
+                    <td class="p-4 tabular-nums text-indigo-600"><%= uData.cuti %> hari</td>
+                    <td class="p-4 tabular-nums text-red-500"><%= uData.alpa %> hari</td>
+                    <td class="p-4 text-right pr-6 tabular-nums font-semibold <%= uData.menitTelat > 0 ? 'text-red-600' : 'text-slate-500' %>">
+                      <%= uData.menitTelat %> menit
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="7" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan record data absensi karyawan pada periode siklus ini.</td>
                 </tr>
-              <% }) %>
+              <% } %>
             </tbody>
           </table>
         </div>
 
       <% } else { %>
+        <!-- ==================== BAGIAN PERSONAL (LOG HARIAN KARYAWAN) ==================== -->
         <div class="p-5 md:p-6 border-b border-slate-200">
-          <h3 class="text-sm font-semibold text-slate-900">Log Presensi Harian</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Daftar lengkap catatan waktu masuk dan pulang kerja Anda.</p>
+          <h3 class="text-sm font-semibold text-slate-900">Log Aktivitas & Presensi Harian — Siklus <%= filters.period %></h3>
+          <p class="text-xs text-slate-400 mt-0.5">Daftar lengkap catatan waktu masuk, pulang, dinas luar, cuti, serta izin Anda.</p>
         </div>
 
+        <!-- Personal Mobile View -->
         <div class="block md:hidden divide-y divide-slate-100">
           <% if (listAttendance && listAttendance.length > 0) { %>
             <% listAttendance.forEach(log => { %>
@@ -204,6 +186,8 @@
                       <span class="text-green-600 font-semibold text-xs">Tepat Waktu</span>
                     <% } else if(log.status === 'TELAT') { %>
                       <span class="text-red-600 font-semibold text-xs">Terlambat (+<%= log.lateDuration %>m)</span>
+                    <% } else if(log.status === 'IZIN' || log.status === 'CUTI') { %>
+                      <span class="text-blue-600 font-semibold text-xs"><%= log.displayStatus || log.status %></span>
                     <% } else { %>
                       <span class="text-slate-400 text-xs">Alpha</span>
                     <% } %>
@@ -217,13 +201,17 @@
                   </div>
                   <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono uppercase"><%= log.type || 'KANTOR' %></span>
                 </div>
+                <% if (log.note) { %>
+                  <p class="text-[11px] text-slate-400 italic mt-0.5 mb-0">Catatan: "<%= log.note %>"</p>
+                <% } %>
               </div>
             <% }) %>
           <% } else { %>
-            <div class="p-8 text-center text-slate-400 text-xs">Tidak ditemukan record aktivitas.</div>
+            <div class="p-8 text-center text-slate-400 text-xs">Tidak ditemukan record aktivitas presensi pada periode siklus ini.</div>
           <% } %>
         </div>
 
+        <!-- Personal Desktop View -->
         <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
             <thead>
@@ -231,8 +219,8 @@
                 <th class="p-4 pl-6">Tanggal Berjalan</th>
                 <th class="p-4">Jam Masuk</th>
                 <th class="p-4">Jam Pulang</th>
-                <th class="p-4">Klasifikasi Lokasi</th>
-                <th class="p-4 text-right pr-6">Status Log</th>
+                <th class="p-4">Klasifikasi Log</th>
+                <th class="p-4 text-right pr-6">Status Rekam</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
@@ -250,12 +238,18 @@
                         <span class="text-green-600 font-semibold">Tepat Waktu</span>
                       <% } else if(log.status === 'TELAT') { %>
                         <span class="text-red-600 font-semibold">Terlambat (+<%= log.lateDuration %>m)</span>
+                      <% } else if(log.status === 'IZIN' || log.status === 'CUTI') { %>
+                        <span class="text-blue-600 font-semibold"><%= log.displayStatus || log.status %></span>
                       <% } else { %>
-                        <span class="text-slate-400">Tidak Hadir</span>
+                        <span class="text-slate-400">Tidak Hadir (Alpha)</span>
                       <% } %>
                     </td>
                   </tr>
                 <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5" class="p-8 text-center text-slate-400 font-normal">Tidak ada rekam jejak presensi pada rentang periode siklus ini.</td>
+                </tr>
               <% } %>
             </tbody>
           </table>

@@ -19,23 +19,27 @@ import position from "./position.seeder.js";
 import user from "./user.seeder.js";
 import holiday from "./holidays.seeder.js";
 import salaryComponent from "./salaryComponent.seeder.js";
+import seedPermit from "./permit.seeder.js";
+import seedPayroll from "./seedPayroll.js";
 dotenv.config();
 
 const seeders = [
-  role,
-  bidang,
-  position,
-  unit,
-  user,
-  employee,
-  holiday,
-  leaveBalance,
-  kpiTemplate,
-  kpiTemplateDetail,
-  unitKpiMap,
+  // role,
+  // bidang,
+  // position,
+  // unit,
+  // user,
+  // employee,
+  // holiday,
+  // leaveBalance,
+  // kpiTemplate,
+  // kpiTemplateDetail,
+  // unitKpiMap,
   // attendanceSeeder,
-  salaryComponent,
+  // salaryComponent,
   // overtimeSeeder,
+  seedPayroll,
+  // seedPermit,
 ];
 
 const runSeeder = async () => {

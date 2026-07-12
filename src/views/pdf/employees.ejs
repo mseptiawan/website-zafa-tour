@@ -6,7 +6,7 @@
   <style>
     @page {
       size: A4;
-margin: 20mm 15mm 20mm 15mm;
+      margin: 20mm 15mm 20mm 15mm;
     }
     
     *, *::before, *::after {
@@ -22,9 +22,9 @@ margin: 20mm 15mm 20mm 15mm;
       line-height: 1.4;
     }
 
-   .main-content {
-  padding: 0;
-}
+    .main-content {
+      padding: 0;
+    }
 
     .meta-container {
       width: 100%;
@@ -45,7 +45,7 @@ margin: 20mm 15mm 20mm 15mm;
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 35px;
-      font-size: 9pt;
+      font-size: 8.5pt; /* Sedikit dikecilkan ke 8.5pt agar data padat muat dengan rapi */
     }
 
     .data-table th {
@@ -53,14 +53,14 @@ margin: 20mm 15mm 20mm 15mm;
       color: #ffffff;
       font-weight: bold;
       text-transform: uppercase;
-      font-size: 8.5pt;
+      font-size: 8pt;
       border: 1px solid #1a365d;
-      padding: 10px 12px;
+      padding: 8px 10px;
     }
 
     .data-table td {
       border: 1px solid #cbd5e1;
-      padding: 10px 12px;
+      padding: 8px 10px;
       color: #334155;
       vertical-align: middle;
     }
@@ -71,7 +71,27 @@ margin: 20mm 15mm 20mm 15mm;
 
     .text-center { text-align: center; }
     .text-left { text-align: left; }
+    .text-right { text-align: right; }
     .font-bold { font-weight: bold; }
+    
+    /* UTILITY STYLES UNTUK DATA BARU */
+    .text-muted {
+      font-size: 7.5pt;
+      color: #64748b;
+      font-weight: normal;
+      margin-top: 2px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      font-weight: bold;
+      font-size: 7.5pt;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .bg-tetap { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .bg-kontrak { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .bg-magang { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
   </style>
 </head>
 <body>
@@ -95,27 +115,99 @@ margin: 20mm 15mm 20mm 15mm;
     <table class="data-table">
       <thead>
         <tr>
-          <th style="width: 5%;" class="text-center">NO</th>
-          <th style="width: 20%;" class="text-left">ID KARYAWAN</th>
-          <th style="width: 35%;" class="text-left">NAMA LENGKAP</th>
-          <th style="width: 15%;" class="text-center">GENDER</th>
-          <th style="width: 25%;" class="text-left">TEMPAT LAHIR</th>
+          <th style="width: 4%;" class="text-center">NO</th>
+          <th style="width: 24%;" class="text-left">KARYAWAN</th>
+          <th style="width: 22%;" class="text-left">JABATAN & BIDANG</th>
+          <th style="width: 14%;" class="text-center">STATUS</th>
+          <th style="width: 16%;" class="text-left">MASA KERJA / USIA</th>
+          <th style="width: 12%;" class="text-left">PENDIDIKAN</th>
+          <th style="width: 8%;" class="text-right">NIKAH</th>
         </tr>
       </thead>
       <tbody>
         <% if (employees && employees.length > 0) { %>
-          <% employees.forEach((emp, idx) => { %>
+          <% employees.forEach((emp, idx) => { 
+            // Inisialisasi data virtual career & education
+            const career = (emp.careerData && emp.careerData.length > 0) ? emp.careerData[0] : null;
+            const edu = emp.educationData || null;
+
+            // 1. Hitung Usia Dinamis
+            let usiaStr = '—';
+            if (emp.tanggal_lahir) {
+              const diffAge = Date.now() - new Date(emp.tanggal_lahir).getTime();
+              usiaStr = Math.floor(diffAge / (1000 * 60 * 60 * 24 * 365.25)) + ' Thn';
+            }
+
+            // 2. Hitung Masa Kerja Dinamis
+            let masaKerjaStr = '—';
+            if (career && career.tanggal_mulai_bergabung) {
+              const diffJoin = Date.now() - new Date(career.tanggal_mulai_bergabung).getTime();
+              const totalMonths = Math.floor(diffJoin / (1000 * 60 * 60 * 24 * 30.4375));
+              const years = Math.floor(totalMonths / 12);
+              const months = totalMonths % 12;
+              
+              if (years > 0) {
+                masaKerjaStr = `${years} Thn ${months} Bln`;
+              } else {
+                masaKerjaStr = `${months} Bln`;
+              }
+            }
+          %>
             <tr>
+              <!-- NO -->
               <td class="text-center"><%= idx + 1 %></td>
-              <td class="font-bold" style="color: #1a365d;"><%= emp.employeeIdNumber || '-' %></td>
-              <td class="font-bold"><%= emp.fullName %></td>
-              <td class="text-center"><%= emp.jenis_kelamin || '-' %></td>
-              <td><%= emp.tempat_lahir || '-' %></td>
+              
+              <!-- KARYAWAN -->
+              <td>
+                <div class="font-bold" style="color: #0f172a;"><%= emp.fullName %></div>
+                <div style="font-family: monospace; font-size: 8pt; color: #1a365d; margin-top: 1px;"><%= emp.employeeIdNumber || '-' %></div>
+              </td>
+              
+              <!-- JABATAN & BIDANG -->
+              <td>
+                <div class="font-bold"><%= (career && career.positionId) ? career.positionId.name || career.positionId.nama : 'Belum Diatur' %></div>
+                <div class="text-muted"><%= (career && career.bidangId) ? career.bidangId.name || career.bidangId.nama : '—' %></div>
+              </td>
+              
+              <!-- STATUS BADGE -->
+              <td class="text-center">
+                <% if (career && career.status_pegawai) { %>
+                  <% 
+                    let badgeClass = 'bg-magang';
+                    if (career.status_pegawai === 'Pegawai Tetap') badgeClass = 'bg-tetap';
+                    if (career.status_pegawai === 'Pegawai Kontrak') badgeClass = 'bg-kontrak';
+                  %>
+                  <span class="badge <%= badgeClass %>"><%= career.status_pegawai %></span>
+                <% } else { %>
+                  <span style="color: #94a3b8;">—</span>
+                <% } %>
+              </td>
+              
+              <!-- MASA KERJA / USIA -->
+              <td>
+                <div><%= masaKerjaStr %></div>
+                <div class="text-muted">Usia: <%= usiaStr %> (<%= emp.jenis_kelamin === 'Laki-Laki' ? 'L' : 'P' %>)</div>
+              </td>
+              
+              <!-- PENDIDIKAN -->
+              <td>
+                <% if (edu && edu.pendidikan_terakhir) { %>
+                  <div class="font-bold"><%= edu.pendidikan_terakhir %></div>
+                  <div class="text-muted"><%= edu.jurusan || '-' %></div>
+                <% } else { %>
+                  <span style="color: #94a3b8;">—</span>
+                <% } %>
+              </td>
+              
+              <!-- STATUS PERNIKAHAN -->
+              <td class="text-right font-bold" style="color: #475569;">
+                <%= emp.status_pernikahan || '—' %>
+              </td>
             </tr>
           <% }) %>
         <% } else { %>
           <tr>
-            <td colspan="5" class="text-center" style="padding: 20px; color: #94a3b8;">Tidak ada data karyawan ditemukan.</td>
+            <td colspan="7" class="text-center" style="padding: 20px; color: #94a3b8;">Tidak ada data karyawan ditemukan.</td>
           </tr>
         <% } %>
       </tbody>
@@ -139,7 +231,6 @@ margin: 20mm 15mm 20mm 15mm;
     </table>
 
   </div>
-
 
 </body>
 </html>

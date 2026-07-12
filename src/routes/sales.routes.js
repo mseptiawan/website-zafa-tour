@@ -18,11 +18,9 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-// FORM + CREATE
 router.get("/new", create);
 router.post("/", uploadFile.single("attachments"), validate(createSalesVisitSchema), store);
 
-// READ
 router.get("/my", my);
 router.get("/my/export-pdf", exportPdf);
 router.get("/employee-visits", employeeVisits);

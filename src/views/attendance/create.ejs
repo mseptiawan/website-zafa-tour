@@ -35,195 +35,236 @@
       </div>
     </div>
 
-    <% if (already && hasCheckedOut) { %>
-      <div class="bg-white border border-slate-200/60 rounded-2xl p-8 text-center shadow-3xs flex flex-col items-center justify-center">
-        <div class="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 mb-4">
-          <i class="fa-solid fa-calendar-check text-xl"></i>
-        </div>
-        <h2 class="text-[14px] font-bold text-slate-900 tracking-tight mb-1">Sesi Absensi Selesai</h2>
-        <p class="text-[11.5px] text-slate-400 max-w-xs leading-relaxed mb-6">
-          Kerja bagus hari ini! Anda telah melengkapi seluruh pencatatan kehadiran.
-        </p>
-        <a href="/attendance/history" 
-           class="inline-flex items-center justify-center gap-2 h-11 w-full text-[12px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98]">
-          <i class="fa-solid fa-clock-rotate-left text-slate-400"></i> Buka Riwayat Kehadiran
-        </a>
+    <!-- KONDISI 1: JIKA HARI INI SEDANG IZIN ATAU CUTI -->
+    <% if (typeof absenceStatus !== 'undefined' && absenceStatus) { %>
+    <div class="bg-white border border-slate-200/60 rounded-2xl p-8 text-center shadow-3xs flex flex-col items-center justify-center">
+      <div class="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 border border-amber-100 text-amber-500 mb-4">
+        <i class="fa-solid fa-user-clock text-xl"></i>
       </div>
+      <h2 class="text-[14px] font-bold text-slate-900 tracking-tight mb-1">Status Absensi Terkunci</h2>
+      <p class="text-[11.5px] text-slate-400 max-w-xs leading-relaxed mb-6">
+        Hari ini Anda tidak perlu mencatatkan kehadiran fisik karena pengajuan <strong class="text-slate-700"><%= absenceStatus.detail %></strong> Anda telah disetujui sistem.
+      </p>
+      <a href="/attendance/history" class="inline-flex items-center justify-center gap-2 h-11 w-full text-[12px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98]">
+        <i class="fa-solid fa-clock-rotate-left text-slate-400"></i> Buka Riwayat Kehadiran
+      </a>
+    </div>
 
+    <!-- KONDISI 2: JIKA SUDAH ABSEN MASUK & PULANG -->
+    <% } else if (already && hasCheckedOut) { %>
+    <div class="bg-white border border-slate-200/60 rounded-2xl p-8 text-center shadow-3xs flex flex-col items-center justify-center">
+      <div class="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 mb-4">
+        <i class="fa-solid fa-calendar-check text-xl"></i>
+      </div>
+      <h2 class="text-[14px] font-bold text-slate-900 tracking-tight mb-1">Sesi Absensi Selesai</h2>
+      <p class="text-[11.5px] text-slate-400 max-w-xs leading-relaxed mb-6">
+        Kerja bagus hari ini! Anda telah melengkapi seluruh pencatatan kehadiran.
+      </p>
+      <a href="/attendance/history" class="inline-flex items-center justify-center gap-2 h-11 w-full text-[12px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98]">
+        <i class="fa-solid fa-clock-rotate-left text-slate-400"></i> Buka Riwayat Kehadiran
+      </a>
+    </div>
+
+    <!-- KONDISI 3: JIKA BELUM ABSEN MASUK ATAU BELUM ABSEN PULANG (TAMPILKAN KAMERA) -->
     <% } else { %>
-      <div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-slate-950 border border-slate-900 shadow-sm">
-        
-        <video id="video" autoplay playsinline muted class="w-full h-full object-cover scale-x-[-1]"></video>
-        <canvas id="canvas" class="hidden"></canvas>
-        
-        <div class="absolute inset-0 flex flex-col items-center justify-between p-5 pointer-events-none">
-          
-          <div class="flex gap-2 w-full justify-center">
-            <span id="status-cam" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-rose-400 backdrop-blur-md transition-colors">
-              <span class="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" id="dot-cam"></span> <span id="text-cam">Kamera Mati</span>
-            </span>
-            <span id="status-gps" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-amber-400 backdrop-blur-md transition-colors">
-              <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" id="dot-gps"></span> <span id="text-gps">Mencari GPS</span>
-            </span>
-          </div>
+    <div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-slate-950 border border-slate-900 shadow-sm">
 
-          <div class="w-56 h-56 rounded-full border-2 border-dashed border-white/40 bg-white/5 backdrop-blur-[0.2px] flex items-center justify-center my-auto shadow-2xl">
-            <div class="w-2 h-2 rounded-full bg-white/40"></div>
-          </div>
+      <video id="video" autoplay playsinline muted class="w-full h-full object-cover scale-x-[-1]"></video>
+      <canvas id="canvas" class="hidden"></canvas>
 
-          <p class="text-[11px] font-semibold text-white/90 bg-slate-950/60 backdrop-blur-sm px-4 py-1.5 rounded-full tracking-wide">
-            Posisikan wajah tepat pada area lingkaran
-          </p>
+      <div class="absolute inset-0 flex flex-col items-center justify-between p-5 pointer-events-none">
+
+        <div class="flex gap-2 w-full justify-center">
+          <span id="status-cam" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-rose-400 backdrop-blur-md transition-colors">
+            <span class="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" id="dot-cam"></span> <span id="text-cam">Kamera Mati</span>
+          </span>
+          <span id="status-gps" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-amber-400 backdrop-blur-md transition-colors">
+            <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" id="dot-gps"></span> <span id="text-gps">Mencari GPS</span>
+          </span>
         </div>
-      </div>
 
-     <div class="mt-4">
-  <% if (!already) { %>
-    <button type="button" onclick="submitAttendance(event, 'checkin')" id="btn-submit"
-      class="w-full h-11.5 text-[12px] font-semibold bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-xl transition-colors outline-none cursor-pointer border-none flex items-center justify-center gap-2">
-      <i class="fa-solid fa-right-to-bracket text-[11px]"></i> Lakukan Check-In
-    </button>
-  <% } else { %>
-    <button type="button" onclick="submitAttendance(event, 'checkout')" id="btn-submit"
-      class="w-full h-11.5 text-[12px] font-semibold bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-xl transition-colors outline-none cursor-pointer border-none flex items-center justify-center gap-2">
-      <i class="fa-solid fa-right-from-bracket text-[11px]"></i> Lakukan Check-Out
-    </button>
-  <% } %>
-</div>
+        <div class="w-56 h-56 rounded-full border-2 border-dashed border-white/40 bg-white/5 backdrop-blur-[0.2px] flex items-center justify-center my-auto shadow-2xl">
+          <div class="w-2 h-2 rounded-full bg-white/40"></div>
+        </div>
+
+        <p class="text-[11px] font-semibold text-white/90 bg-slate-950/60 backdrop-blur-sm px-4 py-1.5 rounded-full tracking-wide">
+          Posisikan wajah tepat pada area lingkaran
+        </p>
+      </div>
+    </div>
+
+    <!-- Tombol Aksi Dinamis -->
+    <div class="mt-4">
+      <% if (!already) { %>
+      <button type="button" onclick="submitAttendance(event, 'checkin')" id="btn-submit" class="w-full h-11.5 text-[12px] font-semibold bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-xl transition-colors outline-none cursor-pointer border-none flex items-center justify-center gap-2">
+        <i class="fa-solid fa-right-to-bracket text-[11px]"></i> Lakukan Check-In
+      </button>
+      <% } else { %>
+      <button type="button" onclick="submitAttendance(event, 'checkout')" id="btn-submit" class="w-full h-11.5 text-[12px] font-semibold bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-xl transition-colors outline-none cursor-pointer border-none flex items-center justify-center gap-2">
+        <i class="fa-solid fa-right-from-bracket text-[11px]"></i> Lakukan Check-Out
+      </button>
+      <% } %>
+    </div>
     <% } %>
 
   </div>
 </div>
 
 <script>
-let stream = null, lat = null, lng = null;
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
+  let stream = null,
+    lat = null,
+    lng = null;
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
 
-const isAlreadyCheckIn = <%- already %>;
-const isAlreadyCheckOut = <%- hasCheckedOut %>;
+  const isAlreadyCheckIn = <%- already %>;
+  const isAlreadyCheckOut = <%- hasCheckedOut %>;
+  const isAbsenceLocked = <%- typeof absenceStatus !== 'undefined' && absenceStatus ? 'true' : 'false' %>;
 
-function showMessage(type, message) {
-  if (type === "success") {
-    triggerGlobalToast({ title: "Berhasil", message: message, type: "success" });
-  } else {
-    triggerGlobalToast({ title: "Gagal", message: message, type: "error" });
-  }
-}
-
-function updateBadge(id, type, text) {
-  const badge = document.getElementById(`status-${id}`);
-  const dot = document.getElementById(`dot-${id}`);
-  const txt = document.getElementById(`text-${id}`);
-  
-  if (!badge) return;
-  
-  if (type === 'success') {
-    badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-emerald-400 backdrop-blur-md";
-    dot.className = "h-1.5 w-1.5 rounded-full bg-emerald-500";
-  } else if (type === 'danger') {
-    badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-rose-400 backdrop-blur-md";
-    dot.className = "h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse";
-  }
-  txt.innerText = text;
-}
-
-async function submitAttendance(event, actionType) {
-  const btn = event.currentTarget;
-  const originalHtml = btn.innerHTML;
-
-  btn.disabled = true;
-  btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses Absensi...`;
-
-  try {
-    if(!lat || !lng) {
-      const pos = await getLocation();
-      lat = pos.lat;
-      lng = pos.lng;
-    }
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.8));
-
-    const formData = new FormData();
-    formData.append("photo", blob, `${actionType}_selfie.jpg`);
-    formData.append("lat", lat);
-    formData.append("lng", lng);
-
-    if (actionType === "checkin") {
-      const noteInput = document.getElementById("note");
-      formData.append("note", noteInput ? noteInput.value : "");
-    }
-
-    const targetUrl = actionType === "checkin" ? "/attendance/checkin" : "/attendance/checkout";
-
-    const res = await fetch(targetUrl, { method: "POST", body: formData });
-    const data = await res.json();
-
-    if (data.success) {
-      showMessage("success", data.message);
-      stopCamera();
-      setTimeout(() => { window.location.href = "/attendance/history"; }, 1500);
+  function showMessage(type, message) {
+    if (type === "success") {
+      triggerGlobalToast({
+        title: "Berhasil",
+        message: message,
+        type: "success"
+      });
     } else {
-      showMessage("error", data.message);
+      triggerGlobalToast({
+        title: "Gagal",
+        message: message,
+        type: "error"
+      });
+    }
+  }
+
+  function updateBadge(id, type, text) {
+    const badge = document.getElementById(`status-${id}`);
+    const dot = document.getElementById(`dot-${id}`);
+    const txt = document.getElementById(`text-${id}`);
+
+    if (!badge) return;
+
+    if (type === 'success') {
+      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-emerald-400 backdrop-blur-md";
+      dot.className = "h-1.5 w-1.5 rounded-full bg-emerald-500";
+    } else if (type === 'danger') {
+      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 text-rose-400 backdrop-blur-md";
+      dot.className = "h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse";
+    }
+    txt.innerText = text;
+  }
+
+  async function submitAttendance(event, actionType) {
+    const btn = event.currentTarget;
+    const originalHtml = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses Absensi...`;
+
+    try {
+      if (!lat || !lng) {
+        const pos = await getLocation();
+        lat = pos.lat;
+        lng = pos.lng;
+      }
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.8));
+
+      const formData = new FormData();
+      formData.append("photo", blob, `${actionType}_selfie.jpg`);
+      formData.append("lat", lat);
+      formData.append("lng", lng);
+
+      if (actionType === "checkin") {
+        const noteInput = document.getElementById("note");
+        formData.append("note", noteInput ? noteInput.value : "");
+      }
+
+      const targetUrl = actionType === "checkin" ? "/attendance/checkin" : "/attendance/checkout";
+
+      const res = await fetch(targetUrl, {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showMessage("success", data.message);
+        stopCamera();
+        setTimeout(() => {
+          window.location.href = "/attendance/history";
+        }, 1500);
+      } else {
+        showMessage("error", data.message);
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+
+    } catch (e) {
+      console.error(e);
+      showMessage("error", "Gagal mengunci GPS. Harap nyalakan lokasi ponsel Anda.");
       btn.disabled = false;
       btn.innerHTML = originalHtml;
     }
-
-  } catch (e) {
-    console.error(e);
-    showMessage("error", "Gagal mengunci GPS. Harap nyalakan lokasi ponsel Anda.");
-    btn.disabled = false;
-    btn.innerHTML = originalHtml;
   }
-}
 
-function getLocation() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) return reject(new Error("GPS tidak didukung"));
-    navigator.geolocation.getCurrentPosition(
-      p => {
-        lat = p.coords.latitude;
-        lng = p.coords.longitude;
-        updateBadge('gps', 'success', 'GPS Terkunci');
-        resolve({ lat, lng });
-      },
-      err => {
-        updateBadge('gps', 'danger', 'GPS Gagal');
-        reject(err);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  });
-}
-
-async function startCamera() {
-  if (isAlreadyCheckIn && isAlreadyCheckOut) return;
-  if (!video) return;
-
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480, facingMode: "user" }
+  function getLocation() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject(new Error("GPS tidak didukung"));
+      navigator.geolocation.getCurrentPosition(
+        p => {
+          lat = p.coords.latitude;
+          lng = p.coords.longitude;
+          updateBadge('gps', 'success', 'GPS Terkunci');
+          resolve({
+            lat,
+            lng
+          });
+        },
+        err => {
+          updateBadge('gps', 'danger', 'GPS Gagal');
+          reject(err);
+        }, {
+          enableHighAccuracy: true,
+          timeout: 10000
+        }
+      );
     });
-    video.srcObject = stream;
-    updateBadge('cam', 'success', 'Kamera Aktif');
-    getLocation(); 
-  } catch (err) {
-    updateBadge('cam', 'danger', 'Izin Kamera Ditolak');
   }
-}
 
-function stopCamera() {
-  if (!stream) return;
-  stream.getTracks().forEach(track => track.stop());
-}
+  async function startCamera() {
+    if (isAbsenceLocked || (isAlreadyCheckIn && isAlreadyCheckOut)) return;
+    if (!video) return;
 
-startCamera();
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: 640,
+          height: 480,
+          facingMode: "user"
+        }
+      });
+      video.srcObject = stream;
+      updateBadge('cam', 'success', 'Kamera Aktif');
+      getLocation();
+    } catch (err) {
+      updateBadge('cam', 'danger', 'Izin Kamera Ditolak');
+    }
+  }
 
-document.addEventListener("visibilitychange", () => {
-  document.hidden ? stopCamera() : startCamera();
-});
+  function stopCamera() {
+    if (!stream) return;
+    stream.getTracks().forEach(track => track.stop());
+  }
+
+  // Inisialisasi awal kamera dijalankan otomatis
+  startCamera();
+
+  document.addEventListener("visibilitychange", () => {
+    document.hidden ? stopCamera() : startCamera();
+  });
 </script>

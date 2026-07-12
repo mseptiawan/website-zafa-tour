@@ -13,12 +13,10 @@ import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
-// Role dengan hak otorisasi manajemen payroll perusahaan
 const PAYROLL_MANAGEMENT_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR", "HR"];
 
 router.use(authMiddleware);
 
-// --- Hak Akses Manajemen Keuangan & HR ---
 router.get("/process", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), renderPayrollPage);
 router.post("/save", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), saveEmployeeAllowances);
 router.get("/calculate/:employeeId", roleMiddleware(...PAYROLL_MANAGEMENT_ROLES), calculatePayroll);
@@ -33,7 +31,6 @@ router.get(
   roleMiddleware(...PAYROLL_MANAGEMENT_ROLES),
   getEmployeeOvertimeSummary
 );
-// --- Hak Akses Karyawan Mandiri ---
 router.get("/my-slip", renderMySlipPage);
 
 export default router;

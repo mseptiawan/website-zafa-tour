@@ -45,17 +45,11 @@
       </div>
       <div class="flex items-center justify-between border-b border-slate-50 pb-1.5">
         <span class="font-medium text-slate-400">Durasi Total Kerja</span>
-        <span class="font-semibold text-slate-800 tabular-nums">
-          <span id="mDuration"></span>
-          Menit
-        </span>
+        <span id="mDuration" class="font-semibold text-slate-800 tabular-nums"></span>
       </div>
       <div class="flex items-center justify-between pb-0.5">
         <span class="font-medium text-slate-400">Durasi Keterlambatan</span>
-        <span class="font-semibold text-rose-600 tabular-nums">
-          <span id="mLate"></span>
-          Menit
-        </span>
+        <span id="mLate" class="font-semibold text-rose-600 tabular-nums"></span>
       </div>
 
       <div
@@ -115,9 +109,21 @@
     </div>
   </div>
 </div>
-
 <script>
   const modal = document.getElementById("detailModal");
+
+  function formatMenit(totalMenit, defaultText = "-") {
+    const menitNum = parseInt(totalMenit, 10);
+    if (isNaN(menitNum) || menitNum <= 0) return defaultText;
+
+    const jam = Math.floor(menitNum / 60);
+    const sisaMenit = menitNum % 60;
+
+    if (jam > 0) {
+      return `${jam} jam ${sisaMenit > 0 ? sisaMenit + " menit" : ""}`;
+    }
+    return `${sisaMenit} menit`;
+  }
 
   function openModalHandler(e) {
     const dataset = e.currentTarget.dataset;
@@ -127,8 +133,9 @@
     document.getElementById("mType").textContent = dataset.type || "-";
     document.getElementById("mIn").textContent = dataset.checkin || "-";
     document.getElementById("mOut").textContent = dataset.checkout || "-";
-    document.getElementById("mDuration").textContent = dataset.duration || "0";
-    document.getElementById("mLate").textContent = dataset.lateduration || "0";
+
+    document.getElementById("mDuration").textContent = formatMenit(dataset.duration, "0 menit");
+    document.getElementById("mLate").textContent = formatMenit(dataset.lateduration, "-");
 
     document.getElementById("err-in").classList.add("hidden");
     document.getElementById("err-out").classList.add("hidden");

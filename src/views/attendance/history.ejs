@@ -1,132 +1,138 @@
 <%- layout('layouts/main', { title: title }) %>
 
 <% 
-  // ==========================================
-  // COMPONENT-LEVEL UTILITIES (JS PARSING)
-  // ==========================================
-  
-  // Fungsi presisi untuk menghitung durasi kerja dari objek Date database
   const calculateDurationSecure = (checkInDate, checkOutDate) => {
     if (!checkInDate || !checkOutDate) return null;
-
     const inDate = new Date(checkInDate);
     const outDate = new Date(checkOutDate);
-
-    // Validasi apakah parsing objek Date berhasil
     if (isNaN(inDate.getTime()) || isNaN(outDate.getTime())) return null;
-
-    // Hitung selisih milidetik
     let diffInMs = outDate - inDate;
-
-    // Antisipasi jika ada shift malam (Check Out melewati tengah malam / keesokan hari)
-    if (diffInMs < 0) {
-      diffInMs += 24 * 60 * 60 * 1000; // Tambah nilai 1 hari penuh
-    }
-
+    if (diffInMs < 0) diffInMs += 24 * 60 * 60 * 1000;
     const hours = diffInMs / (1000 * 60 * 60);
-
-    // Proteksi logika batas maksimal jam kerja normal dalam 1 shift
     if (hours > 24) return null;
-
-    // Tampilkan desimal jika ada menitnya (misal 8.5), hilangkan jika bulat (misal 8)
     return hours % 1 === 0 ? hours.toFixed(0) : hours.toFixed(1);
   };
 %>
 
-<div class=" overflow-hidden">
-  <div class="w-full max-w-none mx-auto md:mt-12 md:mt-0 space-y-6 md:space-y-8">
+<div class="overflow-hidden">
+  <div class="w-full max-w-none mx-auto space-y-6 md:space-y-8">
 
     <div class="hidden md:block">
       <%- include('../partials/page-header', { 
           section: 'Area Kerja', 
           module: 'Kehadiran', 
           title: 'Riwayat Absensi', 
-          description: 'Pantau data kehadiran, jam kerja, dan kedisiplinan Anda secara berkala.' 
+          description: 'Pantau data kehadiran, jam kerja, dan kedisiplinan secara berkala.' 
       }) %>
     </div>
 
+    <!-- STATS GRID DENGAN INDIKATOR DINAMIS BARU (TERMASUK IZIN/CUTI) -->
     <div class="w-full">
       <%- include('../partials/_stats-grid', {
         items: [
           { 
-            label: isAdmin && !isPersonalView ? 'Hari Hadir' : 'Hari Hadir', 
+            label: 'Hari Hadir', 
             value: analytics.totalHadir, 
             unit: 'Hari', 
             icon: 'fa-solid fa-user-check', 
-            bgClass: 'bg-white  border-slate-200/50 ', 
+            bgClass: 'bg-white border-slate-200/50', 
             iconBoxClass: 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' 
           },
           { 
-            label: isAdmin && !isPersonalView ? 'Keterlambatan' : 'Keterlambatan', 
+            label: 'Izin & Cuti', 
+            value: analytics.totalIzinCuti, 
+            unit: 'Hari', 
+            icon: 'fa-solid fa-calendar-minus', 
+            bgClass: 'bg-white border-slate-200/50', 
+            iconBoxClass: 'bg-sky-50 text-sky-600 border border-sky-200/50' 
+          },
+          { 
+            label: 'Keterlambatan', 
             value: analytics.totalLateDays, 
             unit: 'Kali', 
             icon: 'fa-solid fa-user-clock', 
-            bgClass: 'bg-white border border-slate-200/50 ', 
-            labelClass: 'text-rose-600', 
-            valueClass: 'text-rose-700', 
-            unitClass: 'text-rose-600',
+            bgClass: 'bg-white border border-slate-200/50', 
             iconBoxClass: 'bg-white text-rose-500 border border-rose-200/50' 
           },
           { 
-            label: isAdmin && !isPersonalView ? 'Total Menit Telat' : 'Total Menit Telat', 
+            label: 'Total Durasi Telat', 
             value: analytics.totalLateMinutes, 
             unit: 'Menit', 
             icon: 'fa-solid fa-stopwatch', 
-            bgClass: 'bg-white border border-slate-200/50 ', 
+            bgClass: 'bg-white border border-slate-200/50', 
             iconBoxClass: 'bg-amber-50 text-amber-600 border border-amber-200/50' 
           }
         ]
       }) %>
     </div>
 
-    <div class="flex flex-col gap-3.5 w-full bg-white border border-slate-200/50 p-4 rounded-2xl  select-none">
-      
-      <div class="block md:hidden">
-        <h3 class="text-[15px] font-medium text-slate-800 tracking-tight">Log Kehadiran</h3>
-      </div>
+    <!-- CONTROL PANEL: TAB NAV & FILTER CONDITIONAL -->
+  <!-- CONTROL PANEL: TAB NAV & FILTER CONDITIONAL -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full bg-white border border-slate-200/50 p-4 rounded-2xl select-none">
 
-      <div class="flex items-center justify-between gap-3 w-full">
-        <div class="flex items-center gap-2 flex-1 sm:flex-none">
-          <% if (isAdmin) { %>
-            <div class="inline-flex items-center p-0.5 bg-slate-100/80 rounded-full w-full sm:w-auto">
-              <a href="/attendance/history" 
-                 class="flex-1 sm:flex-none text-center px-4 py-1.5 text-[11px] rounded-full transition-all duration-200 <%= !isPersonalView ? 'font-medium bg-white text-slate-900 ' : 'font-semibold text-slate-400 hover:text-slate-600' %>">
-                Semua
-              </a>
-              <a href="/attendance/history?view=personal" 
-                 class="flex-1 sm:flex-none text-center px-4 py-1.5 text-[11px] rounded-full transition-all duration-200 <%= isPersonalView ? 'font-medium bg-white text-slate-900 ' : 'font-semibold text-slate-400 hover:text-slate-600' %>">
-                Saya
-              </a>
-            </div>
-          <% } else { %>
-            <h3 class="hidden md:block text-[14px] font-medium text-slate-800 tracking-tight">Attendance log</h3>
-          <% } %>
-        </div>
+  <!-- Container Navigasi Utama -->
+  <div class="flex items-center gap-2 flex-1 w-full sm:w-auto">
+    <!-- Background Wrapper Abu-abu Tipis -->
+    <div class="inline-flex flex-wrap items-center p-1 bg-slate-100 rounded-xl w-full sm:w-auto gap-1">
+      <% if (isAdmin) { %>
+      <!-- Tab: Semua Catatan Kehadiran -->
+      <a href="/attendance/history?view=all" class="flex-1 sm:flex-none text-center px-4 py-2 text-[12px] rounded-lg transition-all duration-200 <%= activeView === 'all' ? 'font-semibold bg-white text-slate-900 shadow-xs' : 'font-medium text-slate-500 hover:text-slate-700' %>">
+        Mencatat Kehadiran (<%= tabCounters.all %>)
+      </a>
 
-        <button onclick="openFilterModal()" type="button" class="inline-flex items-center justify-center gap-2 h-8.5 px-4 bg-blue-500 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-full  transition-all active:scale-95 cursor-pointer outline-none shrink-0">
-          <i class="fa-solid fa-filter text-[9px] text-slate-300"></i>
-          <span>Filter</span>
-        </button>
-      </div>
+      <!-- Tab: Belum Catat Kehadiran (Hari Ini / Belum ada Status) -->
+      <a href="/attendance/history?view=missing" class="flex-1 sm:flex-none text-center px-4 py-2 text-[12px] rounded-lg transition-all duration-200 <%= activeView === 'missing' ? 'font-semibold bg-white text-slate-900 shadow-xs' : 'font-medium text-slate-500 hover:text-slate-700' %>">
+        Belum Catat Kehadiran (<%= tabCounters.missing %>)
+      </a>
 
+      <!-- Tab: Alpha (Mangkir) -->
+      <a href="/attendance/history?view=alpha" class="flex-1 sm:flex-none text-center px-4 py-2 text-[12px] rounded-lg transition-all duration-200 <%= activeView === 'alpha' ? 'font-semibold bg-white text-slate-900 shadow-xs' : 'font-medium text-slate-500 hover:text-slate-700' %>">
+        Alpha (<%= tabCounters.alpha || 0 %>)
+      </a>
+      <% } %>
+
+      <!-- Tab: Saya -->
+      <a href="/attendance/history?view=personal" class="flex-1 sm:flex-none text-center px-4 py-2 text-[12px] rounded-lg transition-all duration-200 <%= activeView === 'personal' ? 'font-semibold bg-white text-slate-900 shadow-xs' : 'font-medium text-slate-500 hover:text-slate-700' %>">
+        Saya (<%= tabCounters.personal %>)
+      </a>
     </div>
+  </div>
 
+  <!-- Aksi Samping (Tombol Filter / Status Hari Ini) -->
+  <div class="flex items-center justify-end shrink-0">
+    <% if (activeView === 'personal') { %>
+    <button onclick="openFilterModal()" type="button" class="inline-flex items-center justify-center gap-2 h-9 px-4 bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-semibold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer outline-none">
+      <i class="fa-solid fa-filter text-[9px] text-blue-200"></i>
+      <span>Filter Tanggal</span>
+    </button>
+    <% } else { %>
+    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200/60 rounded-xl text-[11px] font-medium text-slate-500">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      Hari Ini
+    </span>
+    <% } %>
+  </div>
+
+</div>
+
+    <!-- LIST CONTAINER DATA -->
     <% if (listAttendance.length === 0) { %>
-    <div class="bg-white border border-slate-200/50 rounded-2xl py-16 text-center  px-4">
+    <div class="bg-white border border-slate-200/50 rounded-2xl py-16 text-center px-4">
       <div class="w-10 h-10 bg-slate-50 border border-slate-200/50 rounded-xl flex items-center justify-center mx-auto mb-3 text-slate-400">
         <i class="fa-solid fa-clock-rotate-left text-sm"></i>
       </div>
-      <p class="text-[12px] font-semibold text-slate-700">Belum ada data absensi</p>
-      <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-0.5 leading-relaxed">Data kehadiran akan muncul setelah pegawai melakukan check-in atau check-out.</p>
+      <p class="text-[12px] font-semibold text-slate-700">Belum ada rekaman data</p>
+      <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-0.5 leading-relaxed">Tidak ditemukan riwayat data untuk kategori log ini pada periode berjalan.</p>
     </div>
     <% } else { %>
 
-    <div class="hidden md:block bg-white rounded-2xl  overflow-hidden w-full border border-slate-200/50">
+    <!-- VIEW DESKTOP TABLE -->
+    <div class="hidden md:block bg-white rounded-2xl overflow-hidden w-full border border-slate-200/50">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-slate-50/40 border-b border-slate-200/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider select-none">
-              <% if (isAdmin && !isPersonalView) { %><th class="py-4 px-6 w-48">Pegawai</th><% } %>
+              <% if (isAdmin && activeView !== 'personal') { %><th class="py-4 px-6 w-48">Pegawai</th><% } %>
               <th class="py-4 px-6 w-36">Tanggal</th>
               <th class="py-4 px-6 w-32 text-center">Check In</th>
               <th class="py-4 px-6 w-32 text-center">Check Out</th>
@@ -139,7 +145,7 @@
             <% listAttendance.forEach(row => { %>
             <tr class="hover:bg-slate-50 transition-colors text-[13px] font-medium text-slate-600">
 
-              <% if (isAdmin && !isPersonalView) { %>
+              <% if (isAdmin && activeView !== 'personal') { %>
               <td class="py-4 px-6 font-medium text-slate-800 truncate max-w-[180px]">
                 <%= row.fullName %>
               </td>
@@ -150,26 +156,35 @@
               </td>
 
               <td class="py-4 px-6 text-center tabular-nums font-semibold text-slate-700">
-                <%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
+                <%= row.isAdditionalData ? '--:--' : (row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--') %>
               </td>
 
               <td class="py-4 px-6 text-center tabular-nums font-semibold text-slate-700">
                 <%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
               </td>
-
-              <td class="py-4 px-6 text-center tabular-nums font-semibold <%= row.lateDuration > 0 ? 'text-rose-600' : 'text-slate-400' %>">
-                <%= row.lateDuration > 0 ? row.lateDuration + ' mnt' : '-' %>
+              <td class="px-4 py-3 text-[12px] text-slate-600 font-medium">
+                <% if (row.lateDuration && row.lateDuration > 0) { %>
+                <% const j = Math.floor(row.lateDuration / 60); %>
+                <% const m = row.lateDuration % 60; %>
+                <%= j > 0 ? `${j} jam ${m > 0 ? m + ' menit' : ''}` : `${m} menit` %>
+                <% } else { %>
+                -
+                <% } %>
               </td>
 
               <td class="py-4 px-6 text-center whitespace-nowrap select-none">
                 <% 
                   const status = row.status || '';
                   let badgeClass;
-                  let statusText = status ? status.toUpperCase() : '';
+                  let statusText = row.displayStatus ? row.displayStatus.toUpperCase() : '';
                   
                   if (status === 'BELUM ABSEN' || status === 'ALFA') {
                     badgeClass = 'bg-rose-50 text-rose-600 border border-rose-200/50';
-                  } else if (status === 'TERLAMBAT' || row.lateDuration > 0) {
+                  } else if (status === 'CUTI') {
+                    badgeClass = 'bg-sky-50 text-sky-600 border border-sky-200/50';
+                  } else if (status === 'IZIN') {
+                    badgeClass = 'bg-indigo-50 text-indigo-600 border border-indigo-200/50';
+                  } else if (status === 'TELAT' || row.lateDuration > 0) {
                     badgeClass = 'bg-amber-50 text-amber-600 border border-amber-200/50';
                     statusText = 'TERLAMBAT';
                   } else {
@@ -182,21 +197,12 @@
               </td>
 
               <td class="py-4 px-6 text-center">
-                <% if (row.status === 'BELUM ABSEN') { %>
+                <% if (row.status === 'BELUM ABSEN' || row.status === 'ALFA') { %>
                 <button class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200/50 text-slate-300 cursor-not-allowed inline-flex items-center justify-center" disabled>
                   <i class="fa-solid fa-eye text-[11px]"></i>
                 </button>
                 <% } else { %>
-                <button class="openModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer  outline-none" 
-                  data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}) %>" 
-                  data-status="<%= row.status %>" 
-                  data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>" 
-                  data-checkout="<%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>" 
-                  data-duration="<%= row.workDuration || 0 %>" 
-                  data-lateduration="<%= row.lateDuration || 0 %>" 
-                  data-inphoto="<%= encodeURI(row.checkInPhoto || '') %>" 
-                  data-outphoto="<%= encodeURI(row.checkOutPhoto || '') %>" 
-                  data-type="<%= row.type || 'Reguler' %>">
+                <button class="openModal w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-400 hover:text-slate-800 hover:bg-slate-50 inline-flex items-center justify-center transition-all active:scale-[0.95] cursor-pointer outline-none" data-date="<%= new Date(row.checkIn || row.createdAt).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}) %>" data-status="<%= row.displayStatus || row.status %>" data-checkin="<%= row.isAdditionalData ? '-' : (row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-') %>" data-checkout="<%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>" data-duration="<%= row.workDuration || 0 %>" data-lateduration="<%= row.lateDuration || 0 %>" data-inphoto="<%= encodeURI(row.checkInPhoto || '') %>" data-outphoto="<%= encodeURI(row.checkOutPhoto || '') %>" data-type="<%= row.isAdditionalData ? 'Pengajuan' : (row.type || 'Reguler') %>" data-note="<%= row.note || '' %>">
                   <i class="fa-solid fa-eye text-[11px]"></i>
                 </button>
                 <% } %>
@@ -209,17 +215,21 @@
       </div>
     </div>
 
+    <!-- VIEW MOBILE CARDS -->
     <div class="block md:hidden space-y-4 w-full">
       <% listAttendance.forEach(row => { %>
-        
-        <% 
+      <% 
           const status = row.status || '';
           let badgeClass;
-          let statusText = status ? status.toUpperCase() : '';
+          let statusText = row.displayStatus ? row.displayStatus.toUpperCase() : '';
           
           if (status === 'BELUM ABSEN' || status === 'ALFA') {
             badgeClass = 'bg-rose-50 text-rose-600 border border-rose-200/50';
-          } else if (status === 'TERLAMBAT' || row.lateDuration > 0) {
+          } else if (status === 'CUTI') {
+            badgeClass = 'bg-sky-50 text-sky-600 border border-sky-200/50';
+          } else if (status === 'IZIN') {
+            badgeClass = 'bg-indigo-50 text-indigo-600 border border-indigo-200/50';
+          } else if (status === 'TELAT' || row.lateDuration > 0) {
             badgeClass = 'bg-amber-50 text-amber-600 border border-amber-200/50';
             statusText = 'TERLAMBAT';
           } else {
@@ -227,78 +237,73 @@
           }
         %>
 
-        <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5  space-y-4">
-          
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex flex-col">
-              <% if (isAdmin && !isPersonalView) { %>
-                <span class="text-[13px] font-medium text-slate-800 block truncate max-w-[150px]"><%= row.fullName %></span>
-              <% } %>
-              <span class="text-[12px] font-medium text-slate-900 tracking-tight"><%= new Date(row.checkIn || row.createdAt).toLocaleDateString("id-ID", {day:'2-digit', month:'short', year:'numeric'}) %></span>
-            </div>
-            
-            <div class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wider <%= badgeClass %>">
-              <%= statusText %>
-            </div>
+      <div class="bg-white border border-slate-200/50 rounded-2xl p-4.5 space-y-4">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex flex-col">
+            <% if (isAdmin && activeView !== 'personal') { %>
+            <span class="text-[13px] font-medium text-slate-800 block truncate max-w-[150px]"><%= row.fullName %></span>
+            <% } %>
+            <span class="text-[12px] font-medium text-slate-900 tracking-tight"><%= new Date(row.checkIn || row.createdAt).toLocaleDateString("id-ID", {day:'2-digit', month:'short', year:'numeric'}) %></span>
           </div>
+          <div class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wider <%= badgeClass %>">
+            <%= statusText %>
+          </div>
+        </div>
 
-          <div class="flex flex-col gap-2 bg-slate-50/50 rounded-xl px-4 py-3 select-none border border-slate-100/50">
-            <div class="flex items-center gap-2.5 text-[13.5px] font-medium text-slate-700">
-              <span class="text-slate-400 text-xs">⏱</span>
-              <span class="tabular-nums font-medium text-slate-800">
-                <%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
-              </span>
-              <span class="text-slate-300">→</span>
-              <span class="tabular-nums font-medium text-slate-800">
-                <%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
-              </span>
-            </div>
-            
-            <% const duration = calculateDurationSecure(row.checkIn, row.checkOut); %>
-            <% if (duration) { %>
-              <div class="text-[11px] font-medium text-slate-500 pl-6">
-                Durasi kerja: <span class="text-slate-700 font-medium"><%= duration %> jam</span>
-              </div>
+        <div class="flex flex-col gap-2 bg-slate-50/50 rounded-xl px-4 py-3 select-none border border-slate-100/50">
+          <% if (row.isAdditionalData) { %>
+          <div class="text-[13px] font-medium text-slate-700 flex items-start gap-2">
+            <span class="text-slate-400 text-xs">📝</span>
+            <span class="text-slate-800 leading-relaxed"><%= row.note || '-' %></span>
+          </div>
+          <% } else { %>
+          <div class="flex items-center gap-2.5 text-[13.5px] font-medium text-slate-700">
+            <span class="text-slate-400 text-xs">⏱</span>
+            <span class="tabular-nums font-medium text-slate-800">
+              <%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
+            </span>
+            <span class="text-slate-300">→</span>
+            <span class="tabular-nums font-medium text-slate-800">
+              <%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--' %>
+            </span>
+          </div>
+          <% const duration = calculateDurationSecure(row.checkIn, row.checkOut); %>
+          <% if (duration) { %>
+          <div class="text-[11px] font-medium text-slate-500 pl-6">
+            Durasi kerja: <span class="text-slate-700 font-medium"><%= duration %> jam</span>
+          </div>
+          <% } %>
+          <% } %>
+        </div>
+
+        <div class="flex items-center justify-between gap-3 pt-0.5">
+          <div class="text-[11.5px] font-semibold text-slate-500 flex items-center gap-1.5">
+            <% if (row.isAdditionalData) { %>
+            <span class="text-indigo-600 font-medium">DARI PENGAJUAN</span>
+            <% } else if (row.lateDuration > 0) { %>
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+            <span class="text-rose-600 font-medium">TELAT <%= row.lateDuration %> MNT</span>
+            <% } else if (row.status === 'BELUM ABSEN' || row.status === 'ALFA') { %>
+            <span class="text-slate-400">-</span>
+            <% } else { %>
+            <span class="text-emerald-600 font-medium">TEPAT WAKTU</span>
             <% } %>
           </div>
 
-          <div class="flex items-center justify-between gap-3 pt-0.5">
-            
-            <div class="text-[11.5px] font-semibold text-slate-500 flex items-center gap-1.5">
-              <% if (row.lateDuration > 0) { %>
-                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                <span class="text-rose-600 font-medium">TELAT <%= row.lateDuration %> MNT</span>
-              <% } else if (row.status === 'BELUM ABSEN') { %>
-                <span class="text-slate-400">-</span>
-              <% } else { %>
-                <span class="text-emerald-600 font-medium">TEPAT WAKTU</span>
-              <% } %>
-            </div>
-
-            <div class="shrink-0">
-              <% if (row.status === 'BELUM ABSEN') { %>
-                <button class="h-8.5 px-4 bg-slate-50 border border-slate-200/50 text-slate-300 text-[11.5px] font-semibold rounded-xl flex items-center justify-center cursor-not-allowed select-none" disabled>
-                  BELUM TERSEDIA
-                </button>
-              <% } else { %>
-                <button class="openModal h-8.5 px-4.5 bg-blue-50 text-blue-600 text-[11.5px] font-medium rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer "
-                  data-date="<%= new Date(row.createdAt).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}) %>"
-                  data-status="<%= row.status %>"
-                  data-checkin="<%= row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>"
-                  data-checkout="<%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>"
-                  data-duration="<%= duration || 0 %>"
-                  data-lateduration="<%= row.lateDuration || 0 %>"
-                  data-inphoto="<%= encodeURI(row.checkInPhoto || '') %>"
-                  data-outphoto="<%= encodeURI(row.checkOutPhoto || '') %>"
-                  data-type="<%= row.type || 'Reguler' %>">
-                  <span>DETAIL</span>
-                </button>
-              <% } %>
-            </div>
-
+          <div class="shrink-0">
+            <% if (row.status === 'BELUM ABSEN' || row.status === 'ALFA') { %>
+            <button class="h-8.5 px-4 bg-slate-50 border border-slate-200/50 text-slate-300 text-[11.5px] font-semibold rounded-xl flex items-center justify-center cursor-not-allowed select-none" disabled>
+              BELUM TERSEDIA
+            </button>
+            <% } else { %>
+            <% const duration = row.isAdditionalData ? 0 : calculateDurationSecure(row.checkIn, row.checkOut); %>
+            <button class="openModal h-8.5 px-4.5 bg-blue-50 text-blue-600 text-[11.5px] font-medium rounded-xl flex items-center justify-center transition-all active:scale-[0.97] outline-none cursor-pointer " data-date="<%= new Date(row.checkIn || row.createdAt).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}) %>" data-status="<%= row.displayStatus || row.status %>" data-checkin="<%= row.isAdditionalData ? '-' : (row.checkIn ? new Date(row.checkIn).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-') %>" data-checkout="<%= row.checkOut ? new Date(row.checkOut).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-' %>" data-duration="<%= duration || 0 %>" data-lateduration="<%= row.lateDuration || 0 %>" data-inphoto="<%= encodeURI(row.checkInPhoto || '') %>" data-outphoto="<%= encodeURI(row.checkOutPhoto || '') %>" data-type="<%= row.isAdditionalData ? 'Pengajuan' : (row.type || 'Reguler') %>" data-note="<%= row.note || '' %>">
+              <span>DETAIL</span>
+            </button>
+            <% } %>
           </div>
-
         </div>
+      </div>
       <% }) %>
     </div>
     <% } %>
@@ -306,12 +311,13 @@
   </div>
 </div>
 
+<!-- CONTAINER DIALOG MODAL MODIFIER FILTER TANGGAL -->
+<% if (activeView === 'personal') { %>
 <div id="filterModal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-slate-950/40 p-4 backdrop-blur-xs transition-all duration-300">
   <div class="w-full max-w-sm bg-white border border-slate-200/50 rounded-2xl shadow-xl overflow-hidden transform transition-all mx-3 sm:mx-auto">
-    
     <div class="flex justify-between border-b border-slate-200/50 px-5 py-4 bg-white select-none">
       <div>
-        <h2 class="text-[13px] font-medium text-slate-800 tracking-tight">Rentang Tanggal</h2>
+        <h2 class="text-[13px] font-medium text-slate-800 tracking-tight">Rentang Tanggal (Saya)</h2>
         <p class="text-[10.5px] font-medium text-slate-400 mt-0.5">Pilih periode riwayat absensi</p>
       </div>
       <button onclick="closeFilterModal()" class="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200/50 text-slate-400 hover:text-slate-800 flex items-center justify-center text-[10px] cursor-pointer outline-none">
@@ -320,9 +326,7 @@
     </div>
 
     <form action="/attendance/history" method="GET" class="p-5 space-y-4">
-      <% if (isAdmin && isPersonalView) { %>
-        <input type="hidden" name="view" value="personal">
-      <% } %>
+      <input type="hidden" name="view" value="personal">
 
       <div class="space-y-3 text-[12px] font-semibold text-slate-700">
         <div class="flex flex-col gap-1.5">
@@ -336,31 +340,30 @@
       </div>
 
       <div class="pt-2">
-        <button type="submit" class="w-full h-9 bg-blue-500 hover:bg-blue-700 text-white text-[11.5px] font-medium tracking-wide uppercase rounded-xl transition-all active:scale-[0.99]  cursor-pointer flex items-center justify-center gap-1.5">
+        <button type="submit" class="w-full h-9 bg-blue-500 hover:bg-blue-700 text-white text-[11.5px] font-medium tracking-wide uppercase rounded-xl transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5">
           TERAPKAN FILTER
         </button>
       </div>
     </form>
-    
   </div>
 </div>
 
-<%- include('./partials/attendance-modal.ejs') %>
-
 <script>
   const fModal = document.getElementById("filterModal");
-  
+
   function openFilterModal() {
     fModal.classList.remove("hidden");
     fModal.classList.add("flex");
   }
-  
+
   function closeFilterModal() {
     fModal.classList.add("hidden");
     fModal.classList.remove("flex");
   }
-
   fModal.addEventListener("click", (e) => {
     if (e.target === fModal) closeFilterModal();
   });
 </script>
+<% } %>
+
+<%- include('./partials/attendance-modal.ejs') %>

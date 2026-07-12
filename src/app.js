@@ -14,7 +14,7 @@ import useragent from "express-useragent";
 import MongoStore from "connect-mongo";
 import injectUser from "./middlewares/injectUser.js";
 import routes from "./routes/index.js";
-
+import initAlphaCronJob from "./cron/alphaHandler.cron.js";
 // Import Models
 import "./models/basic/Role.model.js";
 import "./models/basic/User.model.js";
@@ -50,7 +50,7 @@ app.use(useragent.express());
 // ==========================================
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
-
+initAlphaCronJob();
 // View Engine Setup
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");

@@ -1,33 +1,45 @@
 <%- layout('layouts/main', { title }) %>
 
-<div >
+<div>
   <div class="mx-auto max-w-none space-y-6">
 
+    <!-- HEADER PAGE -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-200 pb-5">
       <div class="min-w-0">
         <h1 class="text-xl font-bold tracking-tight text-slate-900">Rekap Jam Lembur</h1>
-        <p class="text-xs text-slate-500 mt-1">Laporan waktu kerja tambahan karyawan beserta akumulasi estimasi beban kompensasi.</p>
+        <p class="text-xs text-slate-500 mt-1">Laporan waktu kerja tambahan karyawan berdasarkan siklus periode penggajian.</p>
       </div>
 
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
-        <form method="GET" action="/report/overtime" class="flex flex-1 sm:flex-none items-center gap-2 bg-white border border-slate-200 rounded-lg p-1 h-9 shadow-xs">
-          <div class="flex items-center gap-1 px-2 text-xs font-medium text-slate-600">
-            <input type="date" name="startDate" id="filterStartDate" value="<%= filters.startDate %>" class="bg-transparent outline-none cursor-pointer">
-            <span class="text-slate-300">—</span>
-            <input type="date" name="endDate" id="filterEndDate" value="<%= filters.endDate %>" class="bg-transparent outline-none cursor-pointer">
+        
+        <!-- FORM FILTER MURNI PERIODE -->
+        <form method="GET" action="/report/overtime" id="periodFilterForm" class="flex items-center bg-white border border-slate-200 rounded-xl p-1 h-9 shadow-xs">
+          <div class="flex items-center px-2 text-xs font-medium text-slate-600 bg-slate-50 rounded-lg h-7 border border-slate-200/60">
+            <span class="text-slate-400 mr-2">Filter Cut Off:</span>
+            <select name="period" onchange="document.getElementById('periodFilterForm').submit()" class="bg-transparent outline-none text-xs font-bold text-slate-800 cursor-pointer pr-1">
+              <% availablePeriods.forEach(p => { %>
+                <option value="<%= p %>" <%= filters.period === p ? 'selected' : '' %>>Siklus <%= p %></option>
+              <% }) %>
+            </select>
           </div>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium h-7 px-3 rounded-md transition-colors cursor-pointer">
-            Saring
-          </button>
         </form>
 
-        <a href="/report/overtime/download-pdf?startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" 
-           class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
-          Cetak Dokumen (PDF)
-        </a>
+        <!-- LINK CETAK PDF (HANYA MEMBAWA STATE PERIODE) -->
+       <!-- Tambahkan di samping link PDF -->
+<div class="flex gap-2">
+  <a href="/report/overtime/download-pdf?period=<%= filters.period %>" 
+     class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+    PDF
+  </a>
+  <a href="/report/overtime/download-excel?period=<%= filters.period %>" 
+     class="bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium h-9 px-4 rounded-lg border border-green-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+    Excel
+  </a>
+</div>
       </div>
     </div>
 
+    <!-- CARDS ANALYTICS WIDGET -->
     <%
       const statItems = [
         { label: 'Total Pengajuan', value: analytics.totalCount, unit: 'disetujui' },
@@ -40,7 +52,7 @@
         <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
           <span class="text-xs font-medium text-slate-500 block"><%= item.label %></span>
           <div class="mt-2 flex items-baseline gap-1.5">
-            <span class="text-3xl font-semibold tracking-tight tabular-nums <%= index === 2 ? 'text-slate-900' : 'text-slate-900' %>">
+            <span class="text-3xl font-semibold tracking-tight tabular-nums text-slate-900">
               <%= item.value %>
             </span>
             <% if (item.unit) { %>
@@ -51,6 +63,7 @@
       <% }) %>
     </div>
 
+    <!-- AGREGASI PETA DATA -->
     <%
       let overtimeMap = {};
       listOvertime.forEach(item => { 
@@ -68,9 +81,10 @@
       const sortedNames = Object.keys(overtimeMap).sort();
     %>
 
+    <!-- MAIN TABLE -->
     <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
       <div class="p-6 border-b border-slate-200">
-        <h3 class="text-sm font-semibold text-slate-900">Rincian Lembur Karyawan</h3>
+        <h3 class="text-sm font-semibold text-slate-900">Rincian Lembur Karyawan — Siklus <%= filters.period %></h3>
         <p class="text-xs text-slate-400 mt-0.5">Daftar komparatif durasi kerja tambahan, frekuensi pengajuan, dan nilai kompensasi bersih.</p>
       </div>
 
@@ -103,7 +117,7 @@
               %>
             <% } else { %>
               <tr>
-                <td colspan="4" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan record data lembur yang disetujui pada periode ini.</td>
+                <td colspan="4" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan record data lembur yang disetujui pada periode siklus ini.</td>
               </tr>
             <% } %>
           </tbody>

@@ -40,3 +40,16 @@ export function generatePayrollPeriods(before = 6, after = 3, baseDate = new Dat
 
   return [...new Set(periods)].sort((a, b) => b.localeCompare(a));
 }
+
+export function getPayrollPeriodById(periodId) {
+  const [year, month] = periodId.split("-").map(Number);
+
+  const end = new Date(Date.UTC(year, month - 1, 9, 23, 59, 59, 999));
+  const start = new Date(Date.UTC(year, month - 2, 10, 0, 0, 0));
+
+  return {
+    id: periodId,
+    start,
+    end,
+  };
+}

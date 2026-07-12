@@ -39,18 +39,11 @@ const HR_MANAGEMENT_ROLES = ["DIREKTUR_UTAMA", "WAKIL_DIREKTUR", "HR"];
 
 router.use(authMiddleware);
 
-// ==========================================
-// 1. ROUTE TAMPILAN WEB (GET)
-// ==========================================
 router.get("/", getAllEmployeesWeb);
 router.get("/create", roleMiddleware(...HR_MANAGEMENT_ROLES), formEmployeeWeb);
 router.get("/edit/:id", editEmployeeWeb);
 router.get("/detail/:id", getEmployeeDetailWeb);
 router.get("/my-profile/edit", editProfileMandiriWeb);
-
-// ==========================================
-// 2. ROUTE PROSES DATA / ACTION FORM (POST & PUT)
-// ==========================================
 
 router.post(
   "/create",
