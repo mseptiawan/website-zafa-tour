@@ -1,0 +1,126 @@
+<%- layout('layouts/main', { title }) %>
+
+<div>
+  <div class="max-w-none mx-auto space-y-5 md:space-y-8">
+
+    <!-- Header Halaman -->
+    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+      <%- include('../../partials/page-header', { 
+        module: 'Master Data', 
+        title: 'Master KPI Template', 
+        description: 'Kelola master template indikator kerja penilaian berdasarkan posisi atau unit kerja staf.' 
+      }) %>
+    </div>
+
+    <!-- Stats Grid (Disesuaikan secara dinamis dari summary) -->
+    <div class="w-full">
+      <%- include('../../partials/_stats-grid', { 
+        gridClass: 'grid-cols-2 lg:grid-cols-3', 
+        items: [ 
+          { 
+            label: 'Total Template', 
+            value: templates.length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-folder-tree', 
+            labelClass: '!font-medium text-slate-400', 
+            valueClass: '!font-medium text-slate-800', 
+            iconBoxClass: 'bg-slate-50 text-slate-400 border border-slate-200/50' 
+          }, 
+          { 
+            label: 'Template Aktif', 
+            value: templates.filter(t => t.isActive).length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-check', 
+            labelClass: '!font-medium text-emerald-600', 
+            valueClass: '!font-medium text-emerald-700', 
+            iconBoxClass: 'bg-emerald-50 text-emerald-500 border border-emerald-200/50' 
+          }, 
+          { 
+            label: 'Template Non-Aktif', 
+            value: templates.filter(t => !t.isActive).length, 
+            unit: ' Berkas', 
+            icon: 'fa-solid fa-circle-xmark', 
+            labelClass: '!font-medium text-rose-600', 
+            valueClass: '!font-medium text-rose-700', 
+            iconBoxClass: 'bg-rose-50 text-rose-500 border border-rose-200/50' 
+          } 
+        ] 
+      }) %>
+    </div>
+
+    <!-- Toolbar Aksi Atas -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-end gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none select-none">
+      <a href="/master/kpi-template/create" class="inline-flex items-center justify-center h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all duration-150 cursor-pointer">
+        <i class="fa-solid fa-plus mr-2 text-[10px]"></i> Tambah Template Baru
+      </a>
+    </div>
+
+    <!-- Konten Utama / Tabel Master -->
+    <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse whitespace-nowrap">
+          <thead class="bg-slate-50/70 border-b border-slate-200/60 text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+            <tr>
+              <th class="px-6 py-4">Nama Template</th>
+              <th class="px-6 py-4">Deskripsi</th>
+              <th class="px-6 py-4 text-center">Jumlah Indikator</th>
+              <th class="px-6 py-4 text-center">Status</th>
+              <th class="px-6 py-4 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs text-slate-600 font-medium">
+            <% if (templates.length > 0) { %>
+              <% templates.forEach(template => { %>
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="px-6 py-4 font-bold text-slate-800"><%= template.name %></td>
+                  <td class="px-6 py-4 max-w-xs truncate font-normal text-slate-500"><%= template.description || '-' %></td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-50 text-slate-700 border border-slate-200/60">
+                      <%= template.indicatorsCount || 0 %> Indikator
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <% if (template.isActive) { %>
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
+                      </span>
+                    <% } else { %>
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-100">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Non-Aktif
+                      </span>
+                    <% } %>
+                  </td>
+                  <td class="px-6 py-4 text-right space-x-1">
+                    <a href="/master/kpi-template/<%= template._id %>/details" class="inline-flex items-center h-8 px-3 bg-cyan-50 border border-cyan-200 text-cyan-700 text-[11px] font-bold rounded-xl hover:bg-cyan-100 transition-colors">
+                      Kelola KPI
+                    </a>
+                    <a href="/master/kpi-template/<%= template._id %>/edit" class="inline-flex items-center h-8 px-3 bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold rounded-xl hover:bg-amber-100 transition-colors">
+                      Edit
+                    </a>
+                    <form action="/master/kpi-template/<%= template._id %>?_method=DELETE" method="POST" class="inline" onsubmit="return confirm('Hapus template ini beserta seluruh indikator di dalamnya?')">
+                      <button type="submit" class="inline-flex items-center h-8 px-3 bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-bold rounded-xl hover:bg-rose-100 transition-colors cursor-pointer">
+                        Hapus
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="5" class="px-6 py-16 text-center text-slate-400 font-normal">
+                  <div class="flex flex-col items-center justify-center space-y-2">
+                    <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 text-sm mb-1">
+                      <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <p class="text-xs text-slate-400">Belum ada dokumen master template KPI tersimpan.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

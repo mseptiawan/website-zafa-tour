@@ -32,13 +32,13 @@ const seeders = [
   // employee,
   // holiday,
   // leaveBalance,
-  // kpiTemplate,
-  // kpiTemplateDetail,
-  // unitKpiMap,
+  kpiTemplate,
+  kpiTemplateDetail,
+  unitKpiMap,
   // attendanceSeeder,
   // salaryComponent,
   // overtimeSeeder,
-  seedPayroll,
+  // seedPayroll,
   // seedPermit,
 ];
 

@@ -1,0 +1,77 @@
+<%- layout('layouts/main', { title }) %>
+
+<div>
+  <div class="max-w-none mx-auto space-y-5 md:space-y-8">
+
+    <!-- Header Halaman -->
+    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+      <%- include('../../partials/page-header', { 
+        module: 'Master Otorisasi', 
+        title: 'Mapping KPI & Unit Kerja', 
+        description: 'Petakan master template KPI ke setiap unit kerja dan posisi jabatan spesifik untuk otomatisasi form penilaian berkas pegawai.' 
+      }) %>
+    </div>
+
+    <!-- Toolbar Aksi Atas -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-end gap-3.5 w-full bg-white md:bg-transparent border border-slate-200/50 md:border-none p-4 md:p-0 rounded-2xl md:rounded-none select-none">
+      <a href="/master/kpi-mapping/create" class="inline-flex items-center justify-center h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-all duration-150 cursor-pointer">
+        <i class="fa-solid fa-plus mr-2 text-[10px]"></i> Tambah Mapping Baru
+      </a>
+    </div>
+
+    <!-- Konten Utama / Tabel Mapping -->
+    <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse whitespace-nowrap">
+          <thead class="bg-slate-50/70 border-b border-slate-200/60 text-[10px] font-semibold uppercase text-slate-400 tracking-wider">
+            <tr>
+              <th class="px-6 py-4">Unit Kerja</th>
+              <th class="px-6 py-4">Posisi / Jabatan</th>
+              <th class="px-6 py-4">Template KPI Terkait</th>
+              <th class="px-6 py-4 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs text-slate-600 font-medium">
+            <% if (mappings.length > 0) { %>
+              <% mappings.forEach(mapping => { %>
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="px-6 py-4 font-semibold text-slate-800"><%= mapping.unitId ? mapping.unitId.name : '-' %></td>
+                  <td class="px-6 py-4 text-slate-600"><%= mapping.positionId ? mapping.positionId.name : '-' %></td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-blue-50/70 text-blue-700 border border-blue-100/70">
+                      <i class="fa-solid fa-folder-tree mr-1.5 text-[10px]"></i> 
+                      <!-- 🛠️ DISESUAIKAN: Menggunakan kpiTemplateId sesuai skema mongoose Anda -->
+                      <%= mapping.kpiTemplateId ? mapping.kpiTemplateId.name : '-' %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right space-x-1">
+                    <a href="/master/kpi-mapping/<%= mapping._id %>/edit" class="inline-flex items-center h-8 px-3 bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-semibold rounded-xl hover:bg-amber-100 transition-colors">
+                      Edit
+                    </a>
+                    <form action="/master/kpi-mapping/<%= mapping._id %>?_method=DELETE" method="POST" class="inline" onsubmit="return confirm('Hapus konfigurasi mapping relasi indikator ini?')">
+                      <button type="submit" class="inline-flex items-center h-8 px-3 bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-semibold rounded-xl hover:bg-rose-100 transition-colors cursor-pointer">
+                        Hapus
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="4" class="px-6 py-16 text-center text-slate-400 font-normal">
+                  <div class="flex flex-col items-center justify-center space-y-2">
+                    <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 text-sm mb-1">
+                      <i class="fa-solid fa-link-slash"></i>
+                    </div>
+                    <p class="text-xs text-slate-400">Belum ada aturan mapping antara Template KPI dan Unit Kerja saat ini.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="max-w-xl mx-auto py-4 md:py-8">
+  <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden transform transition-all duration-200">
+    
+    <div class="p-5 space-y-4 border-b border-slate-100">
+      <div class="flex items-center gap-2.5 text-blue-600">
+        <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-link"></i>
+        </div>
+        <h3 class="text-sm font-semibold text-slate-800">Tambah Mapping KPI Baru</h3>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Petakan berkas master kriteria template KPI ke unit divisi kerja serta pos struktural internal pegawai.
+      </p>
+    </div>
+
+    <div class="p-6">
+      <!-- Menampilkan pesan error validasi duplikasi jika ada -->
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="mb-4 p-3 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-xs font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> <%= errorMessage %>
+        </div>
+      <% } %>
+
+      <form action="/master/kpi-mapping" method="POST" class="space-y-4">
+        
+        <div>
+          <label for="templateId" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Pilih Master Template KPI</label>
+          <select id="templateId" name="templateId" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 bg-white cursor-pointer" required>
+            <option value="">-- Pilih Template KPI --</option>
+            <% templates.forEach(template => { %>
+              <option value="<%= template._id %>" <%= typeof formData !== 'undefined' && formData.templateId === template._id.toString() ? 'selected' : '' %>><%= template.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div>
+          <label for="unitId" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Unit Kerja / Divisi</label>
+          <select id="unitId" name="unitId" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 bg-white cursor-pointer" required>
+            <option value="">-- Pilih Unit Kerja --</option>
+            <% units.forEach(unit => { %>
+              <option value="<%= unit._id %>" <%= typeof formData !== 'undefined' && formData.unitId === unit._id.toString() ? 'selected' : '' %>><%= unit.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div>
+          <label for="positionId" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Posisi / Jabatan Struktural (Wajib)</label>
+          <select id="positionId" name="positionId" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 bg-white cursor-pointer" required>
+            <option value="">-- Pilih Jabatan --</option>
+            <% positions.forEach(position => { %>
+              <option value="<%= position._id %>" <%= typeof formData !== 'undefined' && formData.positionId === position._id.toString() ? 'selected' : '' %>><%= position.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+          <a href="/master/kpi-mapping" class="inline-flex items-center justify-center h-8.5 px-3.5 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-colors">
+            Kembali
+          </a>
+          <button type="submit" class="inline-flex items-center justify-center h-8.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-all cursor-pointer">
+            Simpan Pemetaan
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

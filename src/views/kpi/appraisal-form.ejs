@@ -2,27 +2,27 @@
 
 <div>
   <div class="max-w-none mx-auto">
-
-
-    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl  border border-white p-6">
+    <div class="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl border border-white p-6">
 
       <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
       <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
 
-      <form action="/kpi/appraisals/<%= employee._id %>" method="POST" class="relative">
+      <!-- Pastikan employee._id aman terisi -->
+      <form action="/kpi/appraisals/<%= employee?._id %>" method="POST" class="relative">
 
         <div class="mb-6 flex gap-4 items-center">
           <div class="w-48">
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Periode Penilaian</label>
             <input type="month" name="periode" required value="2026-05" class="w-full bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition font-medium">
           </div>
-          <input type="hidden" name="kpiTemplateId" value="<%= kpiDetails[0]?.kpiTemplateId %>">
+          
+          <!-- 🛠️ OPTIMASI: Pastikan kpiTemplateId diambil dengan fallback string kosong agar tidak crash jika details kosong -->
+          <% const templateId = (kpiDetails && kpiDetails.length > 0) ? kpiDetails[0].kpiTemplateId : ''; %>
+          <input type="hidden" name="kpiTemplateId" value="<%= templateId %>">
         </div>
 
         <div class="overflow-x-auto">
-
           <table class="w-full text-sm">
-
             <thead>
               <tr class="text-left text-xs uppercase tracking-widest text-slate-400 border-b border-slate-200">
                 <th class="py-4 px-3">Area Kinerja</th>
@@ -33,50 +33,43 @@
             </thead>
 
             <tbody class="divide-y divide-slate-100">
-
-              <% kpiDetails.forEach((kpi) => { %>
-
-              <tr class="hover:bg-slate-50/60 transition">
-
-                <td class="py-4 px-3 font-semibold text-slate-700">
-                  <%= kpi.areaKinerja %>
-                </td>
-
-                <td class="py-4 px-3 text-slate-600">
-                  <%= kpi.indikator %>
-                </td>
-
-                <td class="py-4 px-3 font-medium text-slate-600 text-center">
-                  <%= kpi.bobot %>%
-                </td>
-
-                <td class="py-4 px-3 text-center">
-                  <input type="number" name="scores[<%= kpi._id %>][score]" min="0" max="100" required placeholder="0-100" class="w-24 bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 text-center rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition font-bold text-indigo-600" />
-                </td>
-
-              </tr>
-
-              <% }) %>
-
+              <% if (kpiDetails && kpiDetails.length > 0) { %>
+                <% kpiDetails.forEach((kpi) => { %>
+                  <tr class="hover:bg-slate-50/60 transition">
+                    <td class="py-4 px-3 font-semibold text-slate-700">
+                      <%= kpi.areaKinerja %>
+                    </td>
+                    <td class="py-4 px-3 text-slate-600 leading-relaxed">
+                      <%= kpi.indikator %>
+                    </td>
+                    <td class="py-4 px-3 font-medium text-slate-600 text-center">
+                      <%= kpi.bobot %>%
+                    </td>
+                    <td class="py-4 px-3 text-center">
+                      <!-- 🛠️ OPTIMASI: Menggunakan format name konvensional agar Express memparsing sebagai array of objects di backend -->
+                      <input type="number" name="scores[<%= kpi._id %>][score]" min="0" max="100" required placeholder="0-100" class="w-24 bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 text-center rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition font-bold text-indigo-600" />
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" class="py-8 text-center text-slate-400">Tidak ada indikator KPI yang ditemukan untuk template ini.</td>
+                </tr>
+              <% } %>
             </tbody>
-
           </table>
-
         </div>
 
         <div class="mt-10 flex items-center justify-end gap-3 pt-8 border-t border-slate-100">
-
-          <a href="/loans/me" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-2xl px-6 py-3.5 text-[12px] font-bold transition-all  active:scale-[0.98]">
+          <a href="/kpi/appraisals" class="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/80 rounded-2xl px-6 py-3.5 text-[12px] font-bold transition-all active:scale-[0.98]">
             Batal
           </a>
-
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold px-8 py-3.5 rounded-2xl  transition-all active:scale-[0.98] cursor-pointer">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold px-8 py-3.5 rounded-2xl transition-all active:scale-[0.98] cursor-pointer">
             Simpan
           </button>
         </div>
 
       </form>
-
     </div>
   </div>
 </div>

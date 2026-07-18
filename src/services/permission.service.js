@@ -10,7 +10,7 @@ export function getPermissions(role) {
     loan_my: false,
     loan_manage_center: false,
     loan_disbursement: false,
-    
+
     resignation_new: false,
     resignation_my: false,
 
@@ -20,6 +20,7 @@ export function getPermissions(role) {
     kpi_create: false,
     kpi_list: false,
     kpi_history: false,
+    kpi_manage: false,
 
     assignment_new: false,
     assignment_my: false,
@@ -104,9 +105,8 @@ export function getPermissions(role) {
       permissions.overtime_new = true;
 
       permissions.overtime_my = true;
-    permissions.resignation_new = true;
-    permissions.resignation_my = true;
-    
+      permissions.resignation_new = true;
+      permissions.resignation_my = true;
 
       permissions.attendance_new = true;
       permissions.attendance_my = true;
@@ -291,6 +291,7 @@ export function getPermissions(role) {
       permissions.kpi_create = true;
       permissions.kpi_list = true;
       permissions.kpi_history = true;
+      permissions.kpi_manage = true;
       permissions.assignment_new = true;
 
       permissions.assignment_my = true;
@@ -374,7 +375,7 @@ export function getPermissions(role) {
       permissions.claim_approval = true;
 
       permissions.payroll_history = true;
-      
+
       permissions.resignation_approval_dirut = true;
 
       permissions.report_employees = true;

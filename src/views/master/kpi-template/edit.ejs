@@ -1,0 +1,51 @@
+<%- layout('layouts/main', { title }) %>
+
+<div class="max-w-xl mx-auto py-4 md:py-8">
+  <div class="bg-white rounded-2xl border border-slate-200/60 shadow-xl overflow-hidden transform transition-all duration-200">
+    
+    <div class="p-5 space-y-4 border-b border-slate-100">
+      <div class="flex items-center gap-2.5 text-amber-600">
+        <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
+        <h3 class="text-sm font-bold text-slate-800">Ubah Penyesuaian KPI Template</h3>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Perbarui rincian data informasi template indikator master kinerja penilaian yang terdaftar di bawah.
+      </p>
+    </div>
+
+    <div class="p-6">
+      <form action="/master/kpi-template/<%= template._id %>?_method=PUT" method="POST" class="space-y-4">
+        
+        <div>
+          <label for="name" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nama Template</label>
+          <input type="text" id="name" name="name" value="<%= template.name %>" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700" required>
+        </div>
+
+        <div>
+          <label for="description" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Deskripsi Singkat</label>
+          <textarea id="description" name="description" rows="3" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700"><%= template.description %></textarea>
+        </div>
+
+        <div>
+          <label for="isActive" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Status Aktivasi Sistem</label>
+          <select id="isActive" name="isActive" class="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 bg-white cursor-pointer">
+            <option value="true" <%= template.isActive ? 'selected' : '' %>>Aktif (Dapat Digunakan Langsung)</option>
+            <option value="false" <%= !template.isActive ? 'selected' : '' %>>Non-Aktif (Simpan Sebagai Arsip Draf)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+          <a href="/master/kpi-template" class="inline-flex items-center justify-center h-8.5 px-3.5 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-colors">
+            Kembali
+          </a>
+          <button type="submit" class="inline-flex items-center justify-center h-8.5 px-4 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer">
+            Perbarui Template
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

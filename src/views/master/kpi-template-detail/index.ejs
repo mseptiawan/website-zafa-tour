@@ -1,0 +1,100 @@
+<%- layout('layouts/main', { title: title }) %>
+
+<div>
+  <div class="max-w-none mx-auto space-y-5 md:space-y-6">
+
+    <!-- Breadcrumb Navigasi Minimalis -->
+    <nav class="flex text-[11px] font-medium text-slate-400 select-none" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1.5">
+        <li>
+          <a href="/master/kpi-template" class="hover:text-blue-600 transition-colors flex items-center gap-1">
+            <i class="fa-solid fa-folder-tree text-[10px]"></i> Master Template
+          </a>
+        </li>
+        <li class="flex items-center gap-1.5">
+          <i class="fa-solid fa-angle-right text-[8px] text-slate-300"></i>
+          <span class="text-slate-500">Kelola Indikator KPI</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Header Judul Konten -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-slate-200/60 p-5 rounded-2xl">
+      <div class="space-y-1">
+        <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase block">Nama Berkas Template</span>
+        <h3 class="text-base font-semibold text-slate-800"><%= template.name %></h3>
+      </div>
+      <div>
+        <a href="/master/kpi-template/<%= template._id %>/details/create" class="inline-flex items-center justify-center h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-all duration-150 cursor-pointer">
+          <i class="fa-solid fa-plus mr-2 text-[10px]"></i> Tambah KPI
+        </a>
+      </div>
+    </div>
+
+    <!-- Tabel Master Detail Indikator -->
+    <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse whitespace-nowrap">
+          <thead class="bg-slate-50/70 border-b border-slate-200/60 text-[10px] font-semibold uppercase text-slate-400 tracking-wider">
+            <tr>
+              <th class="px-6 py-4 w-1/4">Area Kinerja</th>
+              <th class="px-6 py-4">Indikator KPI</th>
+              <th class="px-6 py-4 w-24 text-center">Bobot</th>
+              <th class="px-6 py-4 w-32">Target</th>
+              <th class="px-6 py-4 text-right w-36">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs text-slate-600 font-medium">
+            <% let totalBobot = 0; %>
+            <% if (details.length > 0) { %>
+              <% details.forEach(detail => { %>
+                <% totalBobot += detail.bobot; %>
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="px-6 py-4 font-semibold text-slate-800 whitespace-normal min-w-[180px]"><%= detail.areaKinerja %></td>
+                  <td class="px-6 py-4 text-slate-500 leading-relaxed whitespace-normal max-w-md font-normal"><%= detail.indikator %></td>
+                  <td class="px-6 py-4 text-center font-semibold text-slate-800"><%= detail.bobot %>%</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-medium rounded-md border border-blue-100/70">
+                      <%= detail.target %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+                    <a href="/master/kpi-template/<%= template._id %>/details/<%= detail._id %>/edit" class="inline-flex items-center h-7 px-2.5 bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-semibold rounded-lg hover:bg-amber-100 transition-colors">
+                      Edit
+                    </a>
+                    <form action="/master/kpi-template/<%= template._id %>/details/<%= detail._id %>?_method=DELETE" method="POST" class="inline" onsubmit="return confirm('Hapus indikator ini?')">
+                      <button type="submit" class="inline-flex items-center h-7 px-2.5 bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-semibold rounded-lg hover:bg-rose-100 transition-colors cursor-pointer">
+                        Hapus
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+              
+              <!-- Baris Akumulasi Total Bobot Netral -->
+              <tr class="bg-slate-50/70 text-slate-700 font-semibold text-xs">
+                <td colspan="3" class="px-6 py-4 text-right border-t border-slate-200/60">Total Akumulasi Bobot:</td>
+                <td class="px-6 py-4 text-center font-semibold border-t border-slate-200/60 bg-slate-100/50 text-slate-900"><%= totalBobot %>%</td>
+                <td colspan="2" class="px-6 py-4 border-t border-slate-200/60 text-[11px] font-normal text-slate-400 italic">
+                  Menampilkan total akumulasi persentase bobot indikator saat ini.
+                </td>
+              </tr>
+            <% } else { %>
+              <tr>
+                <td colspan="6" class="px-6 py-16 text-center text-slate-400 font-normal">
+                  <div class="flex flex-col items-center justify-center space-y-2">
+                    <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 text-sm mb-1">
+                      <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <p class="text-xs text-slate-400">Belum ada butir kriteria indikator KPI pada berkas ini.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
