@@ -7,7 +7,7 @@
     <div>
       <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-950">
         <span class="md:hidden">Zafa Tour</span>
-        <span class="hidden md:inline">Zafa Tour, Melayani Dengan Hati</span>
+        <span class="hidden md:block">Zafa Tour, Melayani Dengan Hati</span>
       </h1>
       <p class="text-sm text-slate-500 mt-0.5 flex flex-wrap items-center gap-1.5">
         Hai, <span class="font-semibold text-slate-900"><%= user.fullName || user.username %></span> 
@@ -194,6 +194,7 @@
     </div>
 
     <!-- KOLOM KANAN (4/16) - MAKLUMAT & PENGUMUMAN PERUSAHAAN -->
+   <!-- KOLOM KANAN (4/16) - MAKLUMAT & PENGUMUMAN PERUSAHAAN -->
     <div class="grid-cols-1 lg:col-span-4 flex flex-col gap-6">
       <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col min-h-[460px]">
         <div class="px-4 py-3.5 border-b border-slate-100 bg-white">
@@ -204,27 +205,46 @@
         <div class="p-4 space-y-4 flex-1 overflow-y-auto">
           <% if (latestAnnouncements && latestAnnouncements.length > 0) { %>
             <% latestAnnouncements.forEach(ann => { %>
-              <a href="/announcement/<%= ann._id %>" class="group block cursor-pointer border-b border-slate-100/50 last:border-none pb-3 last:pb-0">
-                <span class="text-[9px] font-semibold text-slate-400">
-                  Dipasang: <%= new Date(ann.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
-                </span>
-                <h6 class="text-xs font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mt-0.5 line-clamp-1">
-                  <%= ann.title %>
-                </h6>
-                <p class="text-[11px] text-slate-400 line-clamp-3 mt-1 font-medium leading-relaxed">
+              <a href="/announcement/<%= ann._id %>" class="group block cursor-pointer border-b border-slate-100/50 last:border-none pb-3 last:pb-0 no-underline">
+                
+                <!-- Baris Atas: Info Author & Tanggal -->
+                <div class="flex items-center justify-between text-[9px] text-slate-400 font-medium select-none mb-1">
+                  <span>Oleh: <span class="text-slate-700 font-semibold"><%= ann.authorName %></span></span>
+                  <span><%= moment(ann.publishDate || ann.createdAt).format('DD MMM YYYY') %></span>
+                </div>
+
+                <!-- Judul + Tag Kategori Resmi/Biasa -->
+                <div class="flex items-start gap-1.5 mt-0.5">
+                  <% if (ann.category === 'OFFICIAL') { %>
+                    <span class="inline-block shrink-0 text-[8px] font-extrabold px-1 py-0.2 rounded bg-rose-50 text-rose-600 border border-rose-100 tracking-wide uppercase select-none">RESMI</span>
+                  <% } %>
+                  <h6 class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 leading-tight">
+                    <%= ann.title %>
+                  </h6>
+                </div>
+
+                <!-- Konten Singkat -->
+                <p class="text-[11px] text-slate-400 line-clamp-3 mt-1 font-medium leading-relaxed break-words">
                   <%= ann.content %>
                 </p>
+
+                <!-- Indikator Lampiran Dokumen -->
+                <% if (ann.attachment) { %>
+                  <div class="mt-1.5 text-[9.5px] text-indigo-600 font-semibold flex items-center gap-0.5 select-none">
+                    <i class="fa-solid fa-file-pdf"></i> Lampiran Berkas Dokumen
+                  </div>
+                <% } %>
               </a>
             <% }) %>
           <% } else { %>
-            <div class="flex flex-col items-center justify-center h-full text-slate-400 py-12">
+            <div class="flex flex-col items-center justify-center h-full text-slate-400 py-12 select-none">
               <i class="fa-solid fa-bullhorn text-2xl mb-1 text-slate-200"></i>
               <span class="text-[11px] font-medium italic">Belum ada pengumuman resmi.</span>
             </div>
           <% } %>
         </div>
-        <div class="p-3 bg-slate-50/40 border-t border-slate-100 text-center">
-          <a href="/announcement" class="text-xs font-semibold text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 transition-colors">
+        <div class="p-3 bg-slate-50/40 border-t border-slate-100 text-center select-none">
+          <a href="/announcement" class="text-xs font-semibold text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 transition-colors no-underline">
             Lihat Semua Maklumat <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </a>
         </div>

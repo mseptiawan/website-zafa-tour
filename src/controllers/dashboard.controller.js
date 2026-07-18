@@ -58,7 +58,11 @@ export const renderDashboardPage = async (req, res, next) => {
         $or: [{ year: currentYear }, { isRecurring: true }],
       }).sort({ date: 1 }),
 
-      Announcement.find({ status: "PUBLISHED" }).sort({ createdAt: -1 }).limit(3),
+      Announcement.find({
+        publishDate: { $lte: new Date() }, // Hanya ambil yang tanggal rilisnya sudah lewat/hari ini
+      })
+        .sort({ createdAt: -1 }) // Urutkan dari yang terbaru
+        .limit(3), // Batasi 3 pengumuman teratas
     ]);
 
     // ─── 3. AMANKAN DATA BILA POPULATE KPI-NYA KOSONG ──────────────────────

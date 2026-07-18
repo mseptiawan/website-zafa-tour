@@ -267,7 +267,7 @@
       try {
         if (displayDays) displayDays.innerText = "...";
         
-        const response = await fetch(`/api/leave/calculate-days?startDate=${start}&endDate=${end}`);
+        const response = await fetch(`/leave/api/calculate-days?startDate=${start}&endDate=${end}`);
         const data = await response.json();
 
         if (data.success) {

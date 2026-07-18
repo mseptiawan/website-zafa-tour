@@ -1,5 +1,4 @@
 let confirmCallback = null;
-
 function openConfirmModal({
   title = "Konfirmasi",
   message = "Apakah Anda yakin?",
@@ -7,17 +6,37 @@ function openConfirmModal({
   confirmClass = "bg-red-600 hover:bg-red-700",
   onConfirm = null,
 } = {}) {
-  document.getElementById("confirmModalTitle").textContent = title;
-  document.getElementById("confirmModalMessage").textContent = message;
+  console.log("===== DEBUG MODAL =====");
 
+  const modal = document.getElementById("confirmModal");
+  const titleEl = document.getElementById("confirmModalTitle");
+  const messageEl = document.getElementById("confirmModalMessage");
   const button = document.getElementById("confirmModalButton");
+
+  console.log("modal:", modal);
+  console.log("title:", titleEl);
+  console.log("message:", messageEl);
+  console.log("button:", button);
+
+  if (!modal || !titleEl || !messageEl || !button) {
+    console.error("Ada element modal yang tidak ditemukan!");
+
+    console.log("confirmModal =", document.getElementById("confirmModal"));
+    console.log("confirmModalTitle =", document.getElementById("confirmModalTitle"));
+    console.log("confirmModalMessage =", document.getElementById("confirmModalMessage"));
+    console.log("confirmModalButton =", document.getElementById("confirmModalButton"));
+
+    return;
+  }
+
+  titleEl.textContent = title;
+  messageEl.textContent = message;
 
   button.textContent = confirmText;
   button.className = `px-4 py-2 text-white rounded-lg ${confirmClass}`;
 
   confirmCallback = onConfirm;
 
-  const modal = document.getElementById("confirmModal");
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
@@ -45,4 +64,13 @@ document.addEventListener("DOMContentLoaded", () => {
       closeConfirmModal();
     }
   });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("===== DOM READY =====");
+
+  console.log("confirmModal:", document.getElementById("confirmModal"));
+  console.log("confirmModalTitle:", document.getElementById("confirmModalTitle"));
+  console.log("confirmModalMessage:", document.getElementById("confirmModalMessage"));
+  console.log("confirmModalButton:", document.getElementById("confirmModalButton"));
 });
