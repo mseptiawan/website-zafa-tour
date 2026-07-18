@@ -1,60 +1,128 @@
 <%- layout('layouts/main', { title: 'Detail Penilaian KPI' }) %>
 
-<div>
-  <div class="max-w-none mx-auto">
+<!-- Wrapper utama dengan min-w-0 dan overflow-hidden agar anti-meluber di HP -->
+<div class="w-full min-w-0 px-2 sm:px-4 py-4 overflow-hidden">
+  <div class="w-full space-y-4 md:space-y-6">
 
-    <div class="mb-6">
-      <a href="/kpi/histories" class="text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-2 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- TOMBOL KEMBALI -->
+    <div class="w-full">
+      <a href="/kpi/histories" class="text-xs font-bold text-slate-500 hover:text-indigo-600 inline-flex items-center gap-1.5 transition-colors no-underline select-none">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        Kembali
+        Kembali ke Riwayat
       </a>
     </div>
 
-
-
-  <div class="bg-white border border-slate-200 rounded-2xl p-8  mb-6 flex justify-between items-start">
-      <div>
-        <h1 class="text-2xl font-bold text-slate-800"><%= kpi.employeeId.fullName %></h1>
-        <p class="text-slate-500 mt-1">Periode: <span class="font-medium text-slate-700"><%= kpi.periode %></span></p>
-        <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border bg-emerald-50/70 border-emerald-200/50 text-emerald-600 text-xs font-medium">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20"></span>
+    <!-- CARD RINGKASAN PROFIL & SKOR (Responsif Kolom ke Baris) -->
+    <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="min-w-0 flex-1">
+        <h1 class="text-lg font-black tracking-tight text-slate-900 sm:text-2xl break-words select-all">
+          <%= kpi.employeeId?.fullName || '-' %>
+        </h1>
+        <p class="text-xs text-slate-500 mt-1 select-none">
+          Periode Penilaian: <span class="font-bold text-slate-700 select-all"><%= kpi.periode %></span>
+        </p>
+        <div class="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border bg-emerald-50 text-emerald-600 border-emerald-200/50 text-[10px] font-bold uppercase select-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
           <%= kpi.status %>
         </div>
       </div>
 
-      <div class="text-center">
-        <div class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Skor Akhir</div>
-        <div class="text-5xl font-extrabold text-indigo-600"><%= kpi.totalKpiScore %></div>
+      <!-- Kotak Skor Akhir -->
+      <div class="w-full sm:w-auto flex sm:flex-col items-center justify-between sm:justify-center border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0 shrink-0 select-none">
+        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold sm:mb-0.5">Skor Akhir KPI</span>
+        <span class="text-4xl sm:text-5xl font-black text-indigo-600 tabular-nums"><%= kpi.totalKpiScore %></span>
       </div>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl  overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-          <tr>
-            <th class="text-left px-6 py-4">Indikator Kinerja</th>
-            <th class="text-center px-6 py-4">Bobot</th>
-            <th class="text-center px-6 py-4">Nilai Input</th>
-            <th class="text-center px-6 py-4">Skor</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
+    <!-- INDIKATOR DETAIL CONTAINER -->
+    <div class="w-full min-w-0">
+      
+      <!-- ==================== 1. MOBILE VIEW: CARD LIST (Hidden di layar md:) ==================== -->
+      <div class="block md:hidden space-y-3 w-full min-w-0">
+        <div class="w-full border-b border-slate-200/60 pb-1">
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rincian Capaian Indikator</h3>
+        </div>
+        
+        <% if (!kpi.results || kpi.results.length === 0) { %>
+          <div class="bg-white border border-slate-200 rounded-xl py-8 text-center px-4">
+            <p class="text-xs font-medium text-slate-400">Belum ada rincian indikator penilaian.</p>
+          </div>
+        <% } else { %>
           <% kpi.results.forEach(res => { %>
-          <tr class="hover:bg-slate-50/60 transition">
-            <td class="px-6 py-4">
-              <div class="font-medium text-slate-800"><%= res.indikator %></div>
-              <div class="text-[11px] text-slate-400 uppercase tracking-wide mt-0.5"><%= res.areaKinerja %></div>
-            </td>
-            <td class="px-6 py-4 text-center text-slate-600 font-medium"><%= res.bobot %>%</td>
-            <td class="px-6 py-4 text-center font-bold text-indigo-600"><%= res.score %></td>
-            <td class="px-6 py-4 text-center font-bold text-slate-800"><%= res.finalScore %></td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
+            <div class="w-full min-w-0 bg-white border border-slate-200 rounded-xl p-4 space-y-3 overflow-hidden">
+              
+              <!-- Nama Indikator & Area Kerja -->
+              <div class="w-full min-w-0">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wide block"><%= res.areaKinerja %></span>
+                <h4 class="text-xs font-bold text-slate-800 tracking-tight break-words mt-0.5">
+                  <%= res.indikator %>
+                </h4>
+              </div>
 
+              <!-- Grid Nilai (Bobot, Input, Skor Final) -->
+              <div class="grid grid-cols-3 gap-2 pt-1 border-t border-slate-100 select-none">
+                <div class="bg-slate-50/70 p-2 rounded-lg border border-slate-100/60 text-center min-w-0">
+                  <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tight">Bobot</p>
+                  <p class="text-xs font-bold text-slate-600 mt-0.5 tabular-nums"><%= res.bobot %>%</p>
+                </div>
+                <div class="bg-indigo-50/30 p-2 rounded-lg border border-indigo-100/40 text-center min-w-0">
+                  <p class="text-[8px] font-bold text-indigo-400 uppercase tracking-tight">Nilai Input</p>
+                  <p class="text-xs font-extrabold text-indigo-600 mt-0.5 tabular-nums"><%= res.score %></p>
+                </div>
+                <div class="bg-slate-900/[0.02] p-2 rounded-lg border border-slate-200/50 text-center min-w-0">
+                  <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tight">Skor</p>
+                  <p class="text-xs font-extrabold text-slate-800 mt-0.5 tabular-nums"><%= res.finalScore %></p>
+                </div>
+              </div>
+
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- ==================== 2. DESKTOP VIEW: TABLE (Hidden di layar < md:) ==================== -->
+      <div class="hidden md:block w-full bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="w-full overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs table-fixed">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider select-none">
+                <th class="py-3.5 px-6 w-[55%]">Indikator Kinerja</th>
+                <th class="py-3.5 px-4 w-[15%] text-center">Bobot</th>
+                <th class="py-3.5 px-4 w-[15%] text-center">Nilai Input</th>
+                <th class="py-3.5 px-6 w-[15%] text-center">Skor Akhir</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white text-slate-600 font-medium">
+              <% if (kpi.results && kpi.results.length > 0) { %>
+                <% kpi.results.forEach(res => { %>
+                  <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="py-3.5 px-6">
+                      <div class="font-bold text-slate-800 break-words"><%= res.indikator %></div>
+                      <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mt-0.5"><%= res.areaKinerja %></div>
+                    </td>
+                    <td class="py-3.5 px-4 text-center text-slate-500 font-bold tabular-nums">
+                      <%= res.bobot %>%
+                    </td>
+                    <td class="py-3.5 px-4 text-center font-extrabold text-indigo-600 tabular-nums">
+                      <%= res.score %>
+                    </td>
+                    <td class="py-3.5 px-6 text-center font-extrabold text-slate-900 tabular-nums">
+                      <%= res.finalScore %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" class="py-10 text-center text-slate-400 font-normal">Belum ada rincian penilaian</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

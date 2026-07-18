@@ -11,7 +11,7 @@ import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 /**
  * Alur kerja persetujuan pinjaman perusahaan berdasarkan urutan hierarki peran.
  * @type {string[]}
- */
+ 
 const LOAN_WORKFLOW = ["WAKIL_DIREKTUR", "DIREKTUR_UTAMA", "MANAGER_KEUANGAN"];
 
 export async function getTotalMonthlyDeduction(employeeId) {

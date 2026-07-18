@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
-<div>
+<div class="px-3 sm:px-4 py-4 max-w-full overflow-hidden">
   <div class="mx-auto max-w-none space-y-6">
 
     <!-- HEADER PAGE -->
@@ -11,10 +11,9 @@
       </div>
 
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
-        
         <!-- FORM FILTER MURNI PERIODE -->
-        <form method="GET" action="/report/overtime" id="periodFilterForm" class="flex items-center bg-white border border-slate-200 rounded-xl p-1 h-9 shadow-xs">
-          <div class="flex items-center px-2 text-xs font-medium text-slate-600 bg-slate-50 rounded-lg h-7 border border-slate-200/60">
+        <form method="GET" action="/report/overtime" id="periodFilterForm" class="flex items-center bg-white border border-slate-200 rounded-xl p-1 h-9 shadow-xs w-full sm:w-auto">
+          <div class="flex items-center justify-between sm:justify-start px-2 text-xs font-medium text-slate-600 bg-slate-50 rounded-lg h-7 border border-slate-200/60 w-full sm:w-auto">
             <span class="text-slate-400 mr-2">Filter Cut Off:</span>
             <select name="period" onchange="document.getElementById('periodFilterForm').submit()" class="bg-transparent outline-none text-xs font-bold text-slate-800 cursor-pointer pr-1">
               <% availablePeriods.forEach(p => { %>
@@ -24,18 +23,17 @@
           </div>
         </form>
 
-        <!-- LINK CETAK PDF (HANYA MEMBAWA STATE PERIODE) -->
-       <!-- Tambahkan di samping link PDF -->
-<div class="flex gap-2">
-  <a href="/report/overtime/download-pdf?period=<%= filters.period %>" 
-     class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
-    PDF
-  </a>
-  <a href="/report/overtime/download-excel?period=<%= filters.period %>" 
-     class="bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium h-9 px-4 rounded-lg border border-green-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
-    Excel
-  </a>
-</div>
+        <!-- LINK CETAK EXPORT BUTTONS -->
+        <div class="flex gap-2 w-full sm:w-auto">
+          <a href="/report/overtime/download-pdf?period=<%= filters.period %>" 
+             class="flex-1 sm:flex-none text-center bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+            PDF
+          </a>
+          <a href="/report/overtime/download-excel?period=<%= filters.period %>" 
+             class="flex-1 sm:flex-none text-center bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium h-9 px-4 rounded-lg border border-green-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+            Excel
+          </a>
+        </div>
       </div>
     </div>
 
@@ -47,12 +45,12 @@
         { label: 'Estimasi Beban Kompensasi', value: `Rp ${new Intl.NumberFormat('id-ID').format(analytics.estimatedCost)}`, unit: '' }
       ];
     %>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 select-none">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 select-none">
       <% statItems.forEach((item, index) => { %>
-        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs">
           <span class="text-xs font-medium text-slate-500 block"><%= item.label %></span>
           <div class="mt-2 flex items-baseline gap-1.5">
-            <span class="text-3xl font-semibold tracking-tight tabular-nums text-slate-900">
+            <span class="text-2xl sm:text-3xl font-semibold tracking-tight tabular-nums text-slate-900">
               <%= item.value %>
             </span>
             <% if (item.unit) { %>
@@ -81,25 +79,51 @@
       const sortedNames = Object.keys(overtimeMap).sort();
     %>
 
-    <!-- MAIN TABLE -->
+    <!-- MAIN INTERACTIVE CONTAINER -->
     <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-      <div class="p-6 border-b border-slate-200">
+      <div class="p-4 sm:p-6 border-b border-slate-200">
         <h3 class="text-sm font-semibold text-slate-900">Rincian Lembur Karyawan — Siklus <%= filters.period %></h3>
         <p class="text-xs text-slate-400 mt-0.5">Daftar komparatif durasi kerja tambahan, frekuensi pengajuan, dan nilai kompensasi bersih.</p>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
-          <thead>
-            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-              <th class="p-4 pl-6">Nama Karyawan</th>
-              <th class="p-4 text-center">Frekuensi Lembur</th>
-              <th class="p-4 text-center">Total Durasi</th>
-              <th class="p-4 text-right pr-6">Estimasi Kompensasi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
-            <% if (sortedNames.length > 0) { %>
+      <% if (sortedNames.length > 0) { %>
+
+        <!-- 1. MOBILE RESPONSIVE: CARD STACK LIST -->
+        <div class="block md:hidden divide-y divide-slate-100">
+          <% sortedNames.forEach((name) => { 
+               let oData = overtimeMap[name];
+               if(oData.frekuensi > 0) {
+          %>
+            <div class="p-4 space-y-2 bg-white text-xs">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-slate-900 text-sm"><%= name %></span>
+                <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                  Rp <%= new Intl.NumberFormat('id-ID').format(Math.round(oData.estBiaya)) %>
+                </span>
+              </div>
+              <div class="flex items-center gap-4 text-slate-600 font-medium">
+                <div>Frekuensi: <span class="text-slate-900 font-semibold"><%= oData.frekuensi %> kali</span></div>
+                <div class="text-slate-300">|</div>
+                <div>Total Durasi: <span class="text-slate-900 font-semibold"><%= oData.totalJam %> jam</span></div>
+              </div>
+            </div>
+          <%   } 
+             }) 
+          %>
+        </div>
+
+        <!-- 2. DESKTOP RESPONSIVE: HORIZONTAL TABLE -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <th class="p-4 pl-6">Nama Karyawan</th>
+                <th class="p-4 text-center">Frekuensi Lembur</th>
+                <th class="p-4 text-center">Total Durasi</th>
+                <th class="p-4 text-right pr-6">Estimasi Kompensasi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
               <% sortedNames.forEach((name) => { 
                    let oData = overtimeMap[name];
                    if(oData.frekuensi > 0) {
@@ -115,14 +139,13 @@
               <%   } 
                  }) 
               %>
-            <% } else { %>
-              <tr>
-                <td colspan="4" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan record data lembur yang disetujui pada periode siklus ini.</td>
-              </tr>
-            <% } %>
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+
+      <% } else { %>
+        <div class="p-8 text-center text-slate-400 font-normal text-xs">Tidak ditemukan record data lembur yang disetujui pada periode siklus ini.</div>
+      <% } %>
     </div>
 
   </div>

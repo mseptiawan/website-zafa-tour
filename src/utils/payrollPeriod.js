@@ -7,12 +7,14 @@ export function getPayrollPeriod(date = new Date()) {
 
   let start, end;
 
-  if (day >= 10) {
-    start = new Date(Date.UTC(year, month, 10, 0, 0, 0));
-    end = new Date(Date.UTC(year, month + 1, 9, 23, 59, 59, 999));
+  if (day >= 27) {
+    // Periode bulan berikutnya
+    start = new Date(Date.UTC(year, month, 27, 0, 0, 0));
+    end = new Date(Date.UTC(year, month + 1, 28, 23, 59, 59, 999));
   } else {
-    start = new Date(Date.UTC(year, month - 1, 10, 0, 0, 0));
-    end = new Date(Date.UTC(year, month, 9, 23, 59, 59, 999));
+    // Masih periode sebelumnya
+    start = new Date(Date.UTC(year, month - 1, 27, 0, 0, 0));
+    end = new Date(Date.UTC(year, month, 28, 23, 59, 59, 999));
   }
 
   const endYear = end.getUTCFullYear();
@@ -44,8 +46,8 @@ export function generatePayrollPeriods(before = 6, after = 3, baseDate = new Dat
 export function getPayrollPeriodById(periodId) {
   const [year, month] = periodId.split("-").map(Number);
 
-  const end = new Date(Date.UTC(year, month - 1, 9, 23, 59, 59, 999));
-  const start = new Date(Date.UTC(year, month - 2, 10, 0, 0, 0));
+  const start = new Date(Date.UTC(year, month - 2, 27, 0, 0, 0));
+  const end = new Date(Date.UTC(year, month - 1, 28, 23, 59, 59, 999));
 
   return {
     id: periodId,

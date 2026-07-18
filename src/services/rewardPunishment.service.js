@@ -1,9 +1,12 @@
 import EmployeeLog from "../models/rewardPunishment/EmployeeLog.model.js";
 import RewardPunishmentType from "../models/rewardPunishment/RewardPunishmentType.model.js";
 import Employee from "../models/employee/Employee.model.js";
+import User from "../models/basic/User.model.js";
+import notificationService from "./notification.service.js";
+import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
 
 // =========================================================================
-// ─── LOG TRANSACTION SERVICES (UPDATED) ───
+// ─── LOG TRANSACTION SERVICES (UPDATED WITH NOTIFICATION) ───
 // =========================================================================
 
 export const findAllLogs = async () => {
@@ -22,7 +25,20 @@ export const findAvailableEmployees = async () => {
 export const createLog = async ({ body, userId, attachmentPath }) => {
   const { employeeId, typeId, reason, skNumber, dateIssued, effectiveDate, amount } = body;
 
-  return await EmployeeLog.create({
+  // 1. Ambil data master tipe untuk keperluan teks notifikasi
+  const typeMaster = await RewardPunishmentType.findById(typeId).lean();
+  if (!typeMaster) {
+    throw new Error("Tipe Reward/Punishment yang dipilih tidak valid atau tidak ditemukan.");
+  }
+
+  // 2. Cari target Employee untuk mendapatkan relasi `userId` akunnya
+  const targetEmployee = await Employee.findById(employeeId).select("fullName userId").lean();
+  if (!targetEmployee) {
+    throw new Error("Data pegawai tidak ditemukan pada sistem.");
+  }
+
+  // 3. Simpan data transaksi ke database
+  const log = await EmployeeLog.create({
     employeeId,
     typeId,
     reason,
@@ -33,6 +49,35 @@ export const createLog = async ({ body, userId, attachmentPath }) => {
     attachment: attachmentPath || "",
     createdBy: userId,
   });
+
+  // 4. TRIGGER NOTIFIKASI OTOMATIS KE PEGAWAI BERSANGKUTAN
+  try {
+    if (targetEmployee.userId) {
+      const categoryLabel =
+        typeMaster.category === "REWARD"
+          ? "Penghargaan (Reward) 🎉"
+          : "Sanksi/Peringatan (Punishment) ⚠️";
+      const formattedAmount =
+        Number(amount) > 0 ? ` senilai Rp ${Number(amount).toLocaleString("id-ID")}` : "";
+
+      await notificationService.createNotification({
+        userId: targetEmployee.userId, // Mengirim langsung ke akun user pegawai
+        senderId: userId, // ID Admin / HRD penanggung jawab
+        senderName: "Manajemen SDM",
+        title: `${categoryLabel} Baru Diterbitkan`,
+        text: `Halo ${targetEmployee.fullName}, Anda menerima ${typeMaster.name}${formattedAmount} terkait: "${reason}". SK: ${skNumber}.`,
+        module: MODULES.REWARD_PUNISHMENT || "REWARD_PUNISHMENT",
+        referenceId: log._id,
+        actionUrl: `/reward-punishment/my-logs`, // Arahkan ke halaman log riwayat pegawai
+        type: "REWARD_PUNISHMENT",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    }
+  } catch (notifError) {
+    console.error("Gagal mengirimkan notifikasi Reward/Punishment:", notifError.message);
+  }
+
+  return log;
 };
 
 export const deleteLogById = async (id) => {

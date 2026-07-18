@@ -8,17 +8,18 @@
   const totalReward = logs.filter(log => log.typeId?.category === 'REWARD').length;
   const totalPunishment = logs.filter(log => log.typeId?.category === 'PUNISHMENT').length;
   
-  // Menghitung total dampak finansial bersih (Reward menambah, Punishment mengurangi)
   const totalFinancialImpact = logs.reduce((acc, log) => {
     if ((log.amount || 0) === 0) return acc;
     return log.typeId?.category === 'REWARD' ? acc + log.amount : acc - log.amount;
   }, 0);
 %>
 
-<div >
-  <div class="w-full max-w-none mx-auto space-y-5 md:space-y-8">
+<!-- Wrapper utama dengan min-w-0 dan overflow-hidden agar anti-meluber di HP -->
+<div class="w-full min-w-0 px-2 sm:px-4 py-4 overflow-hidden">
+  <div class="w-full space-y-5 md:space-y-8">
 
-    <div class="border border-slate-200/60 md:border-none md:shadow-none">
+    <!-- HEADER PAGE -->
+    <div class="w-full border border-slate-200/60 md:border-none">
       <%- include('../partials/page-header', {
         section: 'Area Kerja',
         module: 'Kepegawaian',
@@ -27,7 +28,8 @@
       }) %>
     </div>
 
-    <div class="w-full">
+    <!-- STATS GRID -->
+    <div class="w-full min-w-0">
       <%- include('../partials/_stats-grid', {
         gridClass: 'grid-cols-2 lg:grid-cols-4', 
         items: [
@@ -71,111 +73,195 @@
       }) %>
     </div>
 
-   <div class="flex items-center justify-end border-slate-200/60 pb-3 select-none">
-  <a href="/reward-punishment/new" class="inline-flex items-center justify-center gap-2 h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-semibold rounded-xl transition-all cursor-pointer">
-    <i class="fa-solid fa-plus text-[10px]"></i>
-    <span>Tambah Log Baru</span>
-  </a>
-</div>
+    <!-- ACTION BUTTON -->
+    <div class="flex items-center justify-end border-slate-200/60 pb-1 select-none">
+      <a href="/reward-punishment/new" class="inline-flex items-center justify-center gap-2 h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-semibold rounded-xl transition-all cursor-pointer no-underline">
+        <i class="fa-solid fa-plus text-[10px]"></i>
+        <span>Tambah Log Baru</span>
+      </a>
+    </div>
 
-    <div class="hidden md:block overflow-hidden w-full border border-slate-200/50 shadow-2xs rounded-2xl">
-      <div class="overflow-x-auto overflow-y-visible">
-        <table class="w-full text-left border-collapse text-[13px] table-fixed">
-          <thead>
-            <tr class="bg-slate-50/70 border-b border-slate-200/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-              <th class="py-4 px-6 w-[15%]">Tanggal</th>
-              <th class="py-4 px-6 w-[18%]">Nama Pegawai</th>
-              <th class="py-4 px-6 w-[15%]">Kategori</th>
-              <th class="py-4 px-6 w-[39%]">Alasan Resmi dan SK</th>
-              <th class="py-4 px-6 w-[13%] text-right">Dampak Finansial</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 bg-white font-medium text-slate-600">
-            <% if (logs.length === 0) { %>
-            <tr>
-              <td colspan="5" class="py-12 text-center text-slate-400 font-medium">Belum ada pencatatan data log.</td>
-            </tr>
-            <% } else { %>
-            <% logs.forEach(log => { %>
-            <tr class="hover:bg-slate-50/40 transition-colors">
-              <td class="py-4 px-6 text-slate-500 tabular-nums leading-relaxed">
-                <span class="block text-slate-700 font-medium" title="Tanggal Terbit Dokumen">
-                  <%= new Date(log.dateIssued).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
-                </span>
-                <% if (log.effectiveDate) { %>
-                <span class="text-[10.5px] text-emerald-600 block font-medium mt-0.5" title="Tanggal Mulai Berlaku">
-                  Efektif: <%= new Date(log.effectiveDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
-                </span>
-                <% } %>
-              </td>
-
-              <td class="py-4 px-6 font-semibold text-slate-800 truncate">
-                <%= log.employeeId ? log.employeeId.fullName : 'Pegawai Terhapus' %>
-              </td>
-
-              <td class="py-4 px-6">
-                <% if(log.typeId?.category === 'REWARD') { %>
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 border border-slate-200/80 rounded-md text-[11px] text-slate-700 font-semibold">
-                  <%= log.typeId?.name || 'Jenis Terhapus' %>
-                </span>
-                <% } else { %>
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 border border-slate-200/80 rounded-md text-[11px]  font-semibold uppercase">
-                  <%= log.typeId?.name || 'Jenis Terhapus' %>
-                </span>
-                <% } %>
-              </td>
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <div class="w-full min-w-0">
+      
+      <!-- ==================== 1. MOBILE VIEW: CARD LIST (Tampil di < md:) ==================== -->
+      <div class="block md:hidden space-y-3 w-full min-w-0">
+        <% if (logs.length === 0) { %>
+          <div class="bg-white border border-slate-200 rounded-xl py-8 text-center px-4">
+            <p class="text-xs font-medium text-slate-400">Belum ada pencatatan data log.</p>
+          </div>
+        <% } else { %>
+          <% logs.forEach(log => { %>
+            <div class="w-full min-w-0 bg-white border border-slate-200 rounded-xl p-4 space-y-3 overflow-hidden">
               
-              <td class="py-4 px-6">
-                <div class="flex items-center justify-between gap-4 w-full">
-                  <p class="text-slate-700 font-normal leading-relaxed truncate mb-0.5 flex-1">
-                    <%= log.reason %>
-                  </p>
-                  <button 
-                    type="button"
-                    class="open-reason-modal text-slate-400 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 p-1 rounded-md transition-all flex-shrink-0 cursor-pointer"
-                    data-sk="<%= log.skNumber || '-' %>"
-                    data-employee="<%= log.employeeId ? log.employeeId.fullName : 'Pegawai Terhapus' %>"
-                    data-category="<%= log.typeId?.category || 'UNKNOWN' %>"
-                    data-rule="<%= log.typeId?.name || 'Tidak Diketahui' %>"
-                    data-reason="<%= log.reason %>"
-                    data-issued="<%= new Date(log.dateIssued).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
-                    data-effective="<%= log.effectiveDate ? new Date(log.effectiveDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '-' %>"
-                    data-attachment="<%= log.attachment || '' %>"
-                    title="Lihat Detail Alasan"
-                  >
-                    <i class="fa-solid fa-eye text-[11px]"></i>
-                  </button>
+              <!-- Nama Pegawai & Kategori Label -->
+              <div class="flex items-start justify-between gap-3 w-full">
+                <div class="min-w-0 flex-1">
+                  <h4 class="text-xs font-bold text-slate-900 tracking-tight break-words">
+                    <%= log.employeeId ? log.employeeId.fullName : 'Pegawai Terhapus' %>
+                  </h4>
+                  <div class="flex flex-col gap-0.5 mt-1 select-none text-[10px] text-slate-400 font-medium">
+                    <span>📅 Terbit: <%= new Date(log.dateIssued).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %></span>
+                    <% if (log.effectiveDate) { %>
+                      <span class="text-emerald-600 font-semibold">Efektif: <%= new Date(log.effectiveDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %></span>
+                    <% } %>
+                  </div>
                 </div>
-                <div class="text-[10.5px] text-slate-400 font-medium tracking-wide block mt-0.5 truncate">
-                  <span>📄 SK: <%= log.skNumber || '-' %></span>
+                
+                <div class="shrink-0 select-none">
+                  <span class="inline-flex items-center px-2 py-0.5 border rounded-md text-[9px] font-bold uppercase tracking-wide bg-slate-50 border-slate-200/80 text-slate-700">
+                    <%= log.typeId?.name || 'Jenis Terhapus' %>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Deskripsi Ringkas Alasan & SK -->
+              <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-lg w-full space-y-1">
+                <div class="flex justify-between items-start gap-2">
+                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Keterangan Kasus</span>
                   <% if (log.attachment) { %>
-                    <span class="text-blue-600 ml-3 font-semibold bg-blue-50/60 border border-blue-100 rounded-sm px-1.5 py-0.5 text-[9.5px]">📎 Ada Lampiran Dokumen</span>
+                    <span class="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded px-1 shrink-0">📎 Ada Berkas</span>
                   <% } %>
                 </div>
-              </td>
+                <p class="text-[11px] text-slate-600 line-clamp-2 break-words leading-normal">
+                  <%= log.reason %>
+                </p>
+                <div class="text-[9.5px] text-slate-400 truncate pt-1 border-t border-slate-200/40 select-all font-mono">
+                  📄 SK: <%= log.skNumber || '-' %>
+                </div>
+              </div>
 
-              <td class="py-4 px-6 text-right tabular-nums font-semibold <%= log.typeId?.category === 'REWARD' ? 'text-emerald-600' : 'text-rose-600' %>">
-                <% if ((log.amount || 0) === 0) { %>
-                  <span class="text-slate-400 font-medium text-[12px]">Tidak Ada</span>
-                <% } else { %>
-                  <%= log.typeId?.category === 'REWARD' ? '+' : '-' %><%= (log.amount || 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }) %>
-                <% } %>
-              </td>
-            </tr>
-            <% }) %>
-            <% } %>
-          </tbody>
-        </table>
+              <!-- Dampak Finansial & Aksi Detail -->
+              <div class="flex items-center justify-between gap-3 pt-1 border-t border-slate-100">
+                <div class="min-w-0">
+                  <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tight block">Finansial</span>
+                  <p class="text-xs font-extrabold tabular-nums <%= log.typeId?.category === 'REWARD' ? 'text-emerald-600' : 'text-rose-600' %>">
+                    <% if ((log.amount || 0) === 0) { %>
+                      <span class="text-slate-400 font-medium">Tidak Ada</span>
+                    <% } else { %>
+                      <%= log.typeId?.category === 'REWARD' ? '+' : '-' %><%= (log.amount || 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }) %>
+                    <% } %>
+                  </p>
+                </div>
+                
+                <button 
+                  type="button"
+                  class="open-reason-modal h-8 px-3 bg-white border border-slate-200 text-slate-700 font-semibold text-[11px] rounded-lg inline-flex items-center justify-center gap-1.5 transition-colors active:bg-slate-50 cursor-pointer"
+                  data-sk="<%= log.skNumber || '-' %>"
+                  data-employee="<%= log.employeeId ? log.employeeId.fullName : 'Pegawai Terhapus' %>"
+                  data-category="<%= log.typeId?.category || 'UNKNOWN' %>"
+                  data-rule="<%= log.typeId?.name || 'Tidak Diketahui' %>"
+                  data-reason="<%= log.reason %>"
+                  data-issued="<%= new Date(log.dateIssued).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+                  data-effective="<%= log.effectiveDate ? new Date(log.effectiveDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '-' %>"
+                  data-attachment="<%= log.attachment || '' %>"
+                >
+                  <i class="fa-solid fa-eye text-slate-400 text-[10px]"></i>
+                  <span>Periksa Detail</span>
+                </button>
+              </div>
+
+            </div>
+          <% }) %>
+        <% } %>
       </div>
+
+      <!-- ==================== 2. DESKTOP VIEW: TABLE (Tampil di >= md:) ==================== -->
+      <div class="hidden md:block overflow-hidden w-full border border-slate-200/50 rounded-2xl bg-white">
+        <div class="w-full overflow-x-auto overflow-y-visible">
+          <table class="w-full text-left border-collapse text-[13px] table-fixed">
+            <thead>
+              <tr class="bg-slate-50/70 border-b border-slate-200/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider select-none">
+                <th class="py-4 px-6 w-[15%]">Tanggal</th>
+                <th class="py-4 px-6 w-[18%]">Nama Pegawai</th>
+                <th class="py-4 px-6 w-[15%]">Kategori</th>
+                <th class="py-4 px-6 w-[39%]">Alasan Resmi dan SK</th>
+                <th class="py-4 px-6 w-[13%] text-right">Dampak Finansial</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium text-slate-600">
+              <% if (logs.length === 0) { %>
+              <tr>
+                <td colspan="5" class="py-12 text-center text-slate-400 font-medium">Belum ada pencatatan data log.</td>
+              </tr>
+              <% } else { %>
+              <% logs.forEach(log => { %>
+              <tr class="hover:bg-slate-50/40 transition-colors">
+                <td class="py-4 px-6 text-slate-500 tabular-nums leading-relaxed">
+                  <span class="block text-slate-700 font-medium" title="Tanggal Terbit Dokumen">
+                    <%= new Date(log.dateIssued).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+                  </span>
+                  <% if (log.effectiveDate) { %>
+                  <span class="text-[10.5px] text-emerald-600 block font-medium mt-0.5" title="Tanggal Mulai Berlaku">
+                    Efektif: <%= new Date(log.effectiveDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) %>
+                  </span>
+                  <% } %>
+                </td>
+
+                <td class="py-4 px-6 font-semibold text-slate-800 truncate">
+                  <%= log.employeeId ? log.employeeId.fullName : 'Pegawai Terhapus' %>
+                </td>
+
+                <td class="py-4 px-6 select-none">
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 border border-slate-200/80 rounded-md text-[11px] text-slate-700 font-semibold tracking-wide uppercase">
+                    <%= log.typeId?.name || 'Jenis Terhapus' %>
+                  </span>
+                </td>
+                
+                <td class="py-4 px-6">
+                  <div class="flex items-center justify-between gap-4 w-full">
+                    <p class="text-slate-700 font-normal leading-relaxed truncate mb-0.5 flex-1">
+                      <%= log.reason %>
+                    </p>
+                    <button 
+                      type="button"
+                      class="open-reason-modal text-slate-400 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 p-1 rounded-md transition-all flex-shrink-0 cursor-pointer"
+                      data-sk="<%= log.skNumber || '-' %>"
+                      data-employee="<%= log.employeeId ? log.employeeId.fullName : 'Pegawai Terhapus' %>"
+                      data-category="<%= log.typeId?.category || 'UNKNOWN' %>"
+                      data-rule="<%= log.typeId?.name || 'Tidak Diketahui' %>"
+                      data-reason="<%= log.reason %>"
+                      data-issued="<%= new Date(log.dateIssued).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) %>"
+                      data-effective="<%= log.effectiveDate ? new Date(log.effectiveDate).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '-' %>"
+                      data-attachment="<%= log.attachment || '' %>"
+                      title="Lihat Detail Alasan"
+                    >
+                      <i class="fa-solid fa-eye text-[11px]"></i>
+                    </button>
+                  </div>
+                  <div class="text-[10.5px] text-slate-400 font-medium tracking-wide block mt-0.5 truncate">
+                    <span class="select-all">📄 SK: <%= log.skNumber || '-' %></span>
+                    <% if (log.attachment) { %>
+                      <span class="text-blue-600 ml-3 font-semibold bg-blue-50/60 border border-blue-100 rounded-sm px-1.5 py-0.5 text-[9.5px] select-none">📎 Ada Lampiran Dokumen</span>
+                    <% } %>
+                  </div>
+                </td>
+
+                <td class="py-4 px-6 text-right tabular-nums font-semibold <%= log.typeId?.category === 'REWARD' ? 'text-emerald-600' : 'text-rose-600' %>">
+                  <% if ((log.amount || 0) === 0) { %>
+                    <span class="text-slate-400 font-medium text-[12px]">Tidak Ada</span>
+                  <% } else { %>
+                    <%= log.typeId?.category === 'REWARD' ? '+' : '-' %><%= (log.amount || 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }) %>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
+<!-- CONTAINER MODAL DETAIL -->
 <div id="reasonModal" class="fixed inset-0 z-[150] hidden">
   <div id="modalOverlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"></div>
   
   <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/80 max-w-md w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-200 ease-out pointer-events-auto" id="modalContent">
+    <div class="bg-white rounded-2xl border border-slate-200/80 max-w-md w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-200 ease-out pointer-events-auto" id="modalContent">
       
       <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
         <div>
@@ -230,7 +316,7 @@
       </div>
       
       <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end">
-        <button id="closeModalBtn" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 active:bg-slate-100 transition-colors shadow-xs cursor-pointer">
+        <button id="closeModalBtn" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer">
           Tutup
         </button>
       </div>
@@ -307,8 +393,12 @@
       }, 150);
     }
 
-    document.querySelectorAll('.open-reason-modal').forEach(button => {
-      button.addEventListener('click', () => openModal(button));
+    // Mengikat trigger klik ke seluruh tombol bermarka class (.open-reason-modal) baik versi desktop maupun card mobile
+    document.addEventListener('click', (e) => {
+      const targetBtn = e.target.closest('.open-reason-modal');
+      if (targetBtn) {
+        openModal(targetBtn);
+      }
     });
 
     closeBtn.addEventListener('click', closeModal);

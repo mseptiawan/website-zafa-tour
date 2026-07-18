@@ -1,6 +1,6 @@
 <%- layout('layouts/main', { title }) %>
 
-<div>
+<div class="px-3 sm:px-4 py-4 max-w-full overflow-hidden">
   <div class="mx-auto max-w-none space-y-5 md:space-y-6">
 
     <!-- Header & Action Panel -->
@@ -11,37 +11,30 @@
       </div>
 
       <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full lg:w-auto shrink-0">
-        
-        <!-- FORM FILTER MURNI PERIODE (SAMA PERSIS SEPERTI OVERTIME) -->
-        <form method="GET" action="/report/attendance" id="periodFilterForm" class="flex items-center bg-white border border-slate-200 rounded-xl p-1 h-9 shadow-xs">
-          <div class="flex items-center px-2 text-xs font-medium text-slate-600 bg-slate-50 rounded-lg h-7 border border-slate-200/60">
+        <!-- FORM FILTER MURNI PERIODE -->
+        <form method="GET" action="/report/attendance" id="periodFilterForm" class="flex items-center bg-white border border-slate-200 rounded-xl p-1 h-9 shadow-xs w-full md:w-auto">
+          <div class="flex items-center justify-between md:justify-start px-2 text-xs font-medium text-slate-600 bg-slate-50 rounded-lg h-7 border border-slate-200/60 w-full md:w-auto">
             <span class="text-slate-400 mr-2">Filter Cut Off:</span>
             <select name="period" onchange="document.getElementById('periodFilterForm').submit()" class="bg-transparent outline-none text-xs font-bold text-slate-800 cursor-pointer pr-1">
               <% availablePeriods.forEach(p => { %>
-                <option value="<%= p %>" <%= filters.period === p ? 'selected' : '' %>>Siklus <%= p %></option>
+              <option value="<%= p %>" <%= filters.period === p ? 'selected' : '' %>>Siklus <%= p %></option>
               <% }) %>
             </select>
             <% if (isAdmin && isPersonalView) { %>
-              <input type="hidden" name="view" value="personal">
+            <input type="hidden" name="view" value="personal">
             <% } %>
           </div>
         </form>
 
         <!-- TAUTAN UNDUHAN DENGAN METODE TRANSFER STATE SINGLE PERIOD -->
-        <div class="flex gap-2">
-          <!-- Tombol Ekspor PDF -->
-          <a href="/report/attendance/download-pdf?period=<%= filters.period %><%= (isAdmin && !isPersonalView) ? '&view=all' : '&view=personal' %>" 
-             class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+        <div class="flex gap-2 w-full md:w-auto">
+          <a href="/report/attendance/download-pdf?period=<%= filters.period %><%= (isAdmin && !isPersonalView) ? '&view=all' : '&view=personal' %>" class="flex-1 md:flex-none text-center bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium h-9 px-4 rounded-lg border border-slate-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
             PDF
           </a>
-
-          <!-- Tombol Ekspor Excel -->
-          <a href="/report/attendance/download-excel?period=<%= filters.period %><%= (isAdmin && !isPersonalView) ? '&view=all' : '&view=personal' %>" 
-             class="bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium h-9 px-4 rounded-lg border border-green-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
+          <a href="/report/attendance/download-excel?period=<%= filters.period %><%= (isAdmin && !isPersonalView) ? '&view=all' : '&view=personal' %>" class="flex-1 md:flex-none text-center bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium h-9 px-4 rounded-lg border border-green-200 shadow-xs flex items-center justify-center gap-2 transition-colors no-underline">
             Excel
           </a>
         </div>
-
       </div>
     </div>
 
@@ -53,29 +46,29 @@
         { label: 'Akumulasi Keterlambatan', value: analytics.totalLateMinutes || 0, unit: 'menit' }
       ];
     %>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 select-none">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 select-none">
       <% statItems.forEach(item => { %>
-        <div class="bg-white border border-slate-200 rounded-xl p-5 md:p-6 shadow-xs">
-          <span class="text-xs font-medium text-slate-500 block"><%= item.label %></span>
-          <div class="mt-1.5 flex items-baseline gap-1.5">
-            <span class="text-3xl md:text-4xl font-semibold tracking-tight text-slate-900 tabular-nums"><%= item.value %></span>
-            <span class="text-xs font-medium text-slate-400"><%= item.unit %></span>
-          </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 md:p-6 shadow-xs">
+        <span class="text-xs font-medium text-slate-500 block"><%= item.label %></span>
+        <div class="mt-1.5 flex items-baseline gap-1.5">
+          <span class="text-2xl md:text-4xl font-semibold tracking-tight text-slate-900 tabular-nums"><%= item.value %></span>
+          <span class="text-xs font-medium text-slate-400"><%= item.unit %></span>
         </div>
+      </div>
       <% }) %>
     </div>
 
     <!-- Konten Utama Berdasarkan Hak Akses / View Mode -->
     <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-      
-      <% if (isAdmin && !isPersonalView) { %>
-        <!-- ==================== BAGIAN ADMIN (RINGKASAN GLOBAL) ==================== -->
-        <div class="p-5 md:p-6 border-b border-slate-200">
-          <h3 class="text-sm font-semibold text-slate-900">Ringkasan Kedisiplinan & Ketidakhadiran — Siklus <%= filters.period %></h3>
-          <p class="text-xs text-slate-400 mt-0.5">Komparasi total kehadiran, rekap izin, cuti, serta durasi terlambat staf.</p>
-        </div>
 
-        <%
+      <% if (isAdmin && !isPersonalView) { %>
+      <!-- ==================== BAGIAN ADMIN (RINGKASAN GLOBAL) ==================== -->
+      <div class="p-4 md:p-6 border-b border-slate-200">
+        <h3 class="text-sm font-semibold text-slate-900">Ringkasan Kedisiplinan & Ketidakhadiran — Siklus <%= filters.period %></h3>
+        <p class="text-xs text-slate-400 mt-0.5">Komparasi total kehadiran, rekap izin, cuti, serta durasi terlambat staf.</p>
+      </div>
+
+      <%
           let userReportMap = {};
           listAttendance.forEach(item => {
             let name = item.fullName;
@@ -103,157 +96,159 @@
           const adminUsers = Object.keys(userReportMap).sort();
         %>
 
-        <!-- Admin Mobile View (Card List) -->
-        <div class="block md:hidden divide-y divide-slate-100">
-          <% if (adminUsers.length > 0) { %>
-            <% adminUsers.forEach((name) => { let uData = userReportMap[name]; %>
-              <div class="p-4 space-y-2">
-                <div class="flex justify-between items-center">
-                  <span class="font-semibold text-sm text-slate-900"><%= name %></span>
-                  <span class="text-xs font-mono font-semibold <%= uData.menitTelat > 0 ? 'text-red-600' : 'text-slate-500' %>">
-                    <%= uData.menitTelat %>m telat
-                  </span>
-                </div>
-                <div class="grid grid-cols-2 gap-y-1 text-xs text-slate-500">
-                  <div>Hadir: <strong class="text-slate-700 font-semibold"><%= uData.hadir %> hari</strong></div>
-                  <div>Telat: <strong class="text-slate-700 font-semibold"><%= uData.telat %>x</strong></div>
-                  <div>Izin/Cuti: <strong class="text-blue-600 font-semibold"><%= uData.izin %> / <%= uData.cuti %> hari</strong></div>
-                  <div>Alpha: <strong class="text-red-500 font-semibold"><%= uData.alpa %> hari</strong></div>
-                </div>
-              </div>
-            <% }) %>
-          <% } else { %>
-            <div class="p-6 text-center text-slate-400 text-xs">Tidak ada data rekap absensi.</div>
-          <% } %>
+      <!-- 1. ADMIN MOBILE VIEW: STACKED CARD LIST -->
+      <div class="block md:hidden divide-y divide-slate-100">
+        <% if (adminUsers.length > 0) { %>
+        <% adminUsers.forEach((name) => { let uData = userReportMap[name]; %>
+        <div class="p-4 space-y-3 bg-white">
+          <div class="flex justify-between items-start">
+            <span class="font-bold text-sm text-slate-900"><%= name %></span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold font-mono <%= uData.menitTelat > 0 ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-slate-100 text-slate-600' %>">
+              <%= uData.menitTelat %>m telat
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-slate-600 bg-slate-50/50 p-2.5 rounded-lg border border-slate-100">
+            <div>Hadir: <span class="text-slate-900 font-semibold"><%= uData.hadir %> hari</span></div>
+            <div>Telat: <span class="text-slate-900 font-semibold"><%= uData.telat %>x frekuensi</span></div>
+            <div class="col-span-2 border-t border-slate-200/50 pt-1 mt-1 flex justify-between">
+              <span>Izin/Cuti: <strong class="text-blue-600"><%= uData.izin %> / <%= uData.cuti %> h</strong></span>
+              <span>Alpha: <strong class="text-red-500"><%= uData.alpa %> hari</strong></span>
+            </div>
+          </div>
         </div>
+        <% }) %>
+        <% } else { %>
+        <div class="p-8 text-center text-slate-400 text-xs">Tidak ada data rekap absensi.</div>
+        <% } %>
+      </div>
 
-        <!-- Admin Desktop View (Table) -->
-        <div class="hidden md:block overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-                <th class="p-4 pl-6">Nama Karyawan</th>
-                <th class="p-4">Hadir</th>
-                <th class="p-4">Telat (Frekuensi)</th>
-                <th class="p-4">Izin</th>
-                <th class="p-4">Cuti</th>
-                <th class="p-4">Alpha</th>
-                <th class="p-4 text-right pr-6">Durasi Terlambat</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
-              <% if (adminUsers.length > 0) { %>
-                <% adminUsers.forEach((name) => { let uData = userReportMap[name]; %>
-                  <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="p-4 pl-6 font-semibold text-slate-900"><%= name %></td>
-                    <td class="p-4 tabular-nums"><%= uData.hadir %> hari</td>
-                    <td class="p-4 tabular-nums text-slate-600"><%= uData.telat %> kali</td>
-                    <td class="p-4 tabular-nums text-blue-600"><%= uData.izin %> hari</td>
-                    <td class="p-4 tabular-nums text-indigo-600"><%= uData.cuti %> hari</td>
-                    <td class="p-4 tabular-nums text-red-500"><%= uData.alpa %> hari</td>
-                    <td class="p-4 text-right pr-6 tabular-nums font-semibold <%= uData.menitTelat > 0 ? 'text-red-600' : 'text-slate-500' %>">
-                      <%= uData.menitTelat %> menit
-                    </td>
-                  </tr>
-                <% }) %>
-              <% } else { %>
-                <tr>
-                  <td colspan="7" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan record data absensi karyawan pada periode siklus ini.</td>
-                </tr>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
+      <!-- 2. ADMIN DESKTOP VIEW: ORIGINAL TABLE -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <th class="p-4 pl-6">Nama Karyawan</th>
+              <th class="p-4">Hadir</th>
+              <th class="p-4">Telat (Frekuensi)</th>
+              <th class="p-4">Izin</th>
+              <th class="p-4">Cuti</th>
+              <th class="p-4">Alpha</th>
+              <th class="p-4 text-right pr-6">Durasi Terlambat</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+            <% if (adminUsers.length > 0) { %>
+            <% adminUsers.forEach((name) => { let uData = userReportMap[name]; %>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="p-4 pl-6 font-semibold text-slate-900"><%= name %></td>
+              <td class="p-4 tabular-nums"><%= uData.hadir %> hari</td>
+              <td class="p-4 tabular-nums text-slate-600"><%= uData.telat %> kali</td>
+              <td class="p-4 tabular-nums text-blue-600"><%= uData.izin %> hari</td>
+              <td class="p-4 tabular-nums text-indigo-600"><%= uData.cuti %> hari</td>
+              <td class="p-4 tabular-nums text-red-500"><%= uData.alpa %> hari</td>
+              <td class="p-4 text-right pr-6 tabular-nums font-semibold <%= uData.menitTelat > 0 ? 'text-red-600' : 'text-slate-500' %>">
+                <%= uData.menitTelat %> menit
+              </td>
+            </tr>
+            <% }) %>
+            <% } else { %>
+            <tr>
+              <td colspan="7" class="p-8 text-center text-slate-400 font-normal">Tidak ditemukan record data absensi karyawan pada periode siklus ini.</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
 
       <% } else { %>
-        <!-- ==================== BAGIAN PERSONAL (LOG HARIAN KARYAWAN) ==================== -->
-        <div class="p-5 md:p-6 border-b border-slate-200">
-          <h3 class="text-sm font-semibold text-slate-900">Log Aktivitas & Presensi Harian — Siklus <%= filters.period %></h3>
-          <p class="text-xs text-slate-400 mt-0.5">Daftar lengkap catatan waktu masuk, pulang, dinas luar, cuti, serta izin Anda.</p>
-        </div>
+      <!-- ==================== BAGIAN PERSONAL (LOG HARIAN KARYAWAN) ==================== -->
+      <div class="p-4 md:p-6 border-b border-slate-200">
+        <h3 class="text-sm font-semibold text-slate-900">Log Aktivitas & Presensi Harian — Siklus <%= filters.period %></h3>
+        <p class="text-xs text-slate-400 mt-0.5">Daftar lengkap catatan waktu masuk, pulang, dinas luar, cuti, serta izin Anda.</p>
+      </div>
 
-        <!-- Personal Mobile View -->
-        <div class="block md:hidden divide-y divide-slate-100">
-          <% if (listAttendance && listAttendance.length > 0) { %>
-            <% listAttendance.forEach(log => { %>
-              <div class="p-4 space-y-2">
-                <div class="flex justify-between items-baseline">
-                  <span class="font-semibold text-slate-900 text-xs">
-                    <%= log.checkIn ? new Date(log.checkIn).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date(log.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
-                  </span>
-                  <div>
-                    <% if(log.status === 'HADIR') { %>
-                      <span class="text-green-600 font-semibold text-xs">Tepat Waktu</span>
-                    <% } else if(log.status === 'TELAT') { %>
-                      <span class="text-red-600 font-semibold text-xs">Terlambat (+<%= log.lateDuration %>m)</span>
-                    <% } else if(log.status === 'IZIN' || log.status === 'CUTI') { %>
-                      <span class="text-blue-600 font-semibold text-xs"><%= log.displayStatus || log.status %></span>
-                    <% } else { %>
-                      <span class="text-slate-400 text-xs">Alpha</span>
-                    <% } %>
-                  </div>
-                </div>
-                <div class="flex justify-between items-center text-xs text-slate-500 font-medium">
-                  <div class="tabular-nums">
-                    <span><%= log.checkIn ? new Date(log.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></span>
-                    <span class="mx-1 text-slate-300">•</span>
-                    <span><%= log.checkOut ? new Date(log.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></span>
-                  </div>
-                  <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono uppercase"><%= log.type || 'KANTOR' %></span>
-                </div>
-                <% if (log.note) { %>
-                  <p class="text-[11px] text-slate-400 italic mt-0.5 mb-0">Catatan: "<%= log.note %>"</p>
-                <% } %>
-              </div>
-            <% }) %>
-          <% } else { %>
-            <div class="p-8 text-center text-slate-400 text-xs">Tidak ditemukan record aktivitas presensi pada periode siklus ini.</div>
+      <!-- 1. PERSONAL MOBILE VIEW: LIST CARDS -->
+      <div class="block md:hidden divide-y divide-slate-100">
+        <% if (listAttendance && listAttendance.length > 0) { %>
+        <% listAttendance.forEach(log => { %>
+        <div class="p-4 space-y-2 bg-white text-xs">
+          <div class="flex justify-between items-baseline">
+            <span class="font-bold text-slate-900">
+              <%= log.checkIn ? new Date(log.checkIn).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date(log.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+            </span>
+            <div>
+              <% if(log.status === 'HADIR') { %>
+              <span class="text-green-600 font-semibold">Tepat Waktu</span>
+              <% } else if(log.status === 'TELAT') { %>
+              <span class="text-red-600 font-semibold">Terlambat (+<%= log.lateDuration %>m)</span>
+              <% } else if(log.status === 'IZIN' || log.status === 'CUTI') { %>
+              <span class="text-blue-600 font-semibold"><%= log.displayStatus || log.status %></span>
+              <% } else { %>
+              <span class="text-slate-400">Alpha</span>
+              <% } %>
+            </div>
+          </div>
+          <div class="flex justify-between items-center text-slate-600 font-medium pt-1">
+            <div class="tabular-nums">
+              <span>Masuk: <strong class="text-slate-800"><%= log.checkIn ? new Date(log.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></strong></span>
+              <span class="mx-2 text-slate-300">|</span>
+              <span>Pulang: <strong class="text-slate-800"><%= log.checkOut ? new Date(log.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></strong></span>
+            </div>
+            <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono uppercase border border-slate-200/50"><%= log.type || 'KANTOR' %></span>
+          </div>
+          <% if (log.note) { %>
+          <p class="text-[11px] text-slate-400 italic bg-slate-50 p-1.5 rounded mt-1">Note: "<%= log.note %>"</p>
           <% } %>
         </div>
+        <% }) %>
+        <% } else { %>
+        <div class="p-8 text-center text-slate-400 text-xs">Tidak ditemukan record aktivitas presensi pada periode siklus ini.</div>
+        <% } %>
+      </div>
 
-        <!-- Personal Desktop View -->
-        <div class="hidden md:block overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
-            <thead>
-              <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-                <th class="p-4 pl-6">Tanggal Berjalan</th>
-                <th class="p-4">Jam Masuk</th>
-                <th class="p-4">Jam Pulang</th>
-                <th class="p-4">Klasifikasi Log</th>
-                <th class="p-4 text-right pr-6">Status Rekam</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
-              <% if (listAttendance && listAttendance.length > 0) { %>
-                <% listAttendance.forEach(log => { %>
-                  <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="p-4 pl-6 font-medium text-slate-900">
-                      <%= log.checkIn ? new Date(log.checkIn).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date(log.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
-                    </td>
-                    <td class="p-4 tabular-nums text-slate-600"><%= log.checkIn ? new Date(log.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></td>
-                    <td class="p-4 tabular-nums text-slate-600"><%= log.checkOut ? new Date(log.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></td>
-                    <td class="p-4 text-slate-500 text-[11px]"><%= log.type || 'KANTOR' %></td>
-                    <td class="p-4 text-right pr-6">
-                      <% if(log.status === 'HADIR') { %>
-                        <span class="text-green-600 font-semibold">Tepat Waktu</span>
-                      <% } else if(log.status === 'TELAT') { %>
-                        <span class="text-red-600 font-semibold">Terlambat (+<%= log.lateDuration %>m)</span>
-                      <% } else if(log.status === 'IZIN' || log.status === 'CUTI') { %>
-                        <span class="text-blue-600 font-semibold"><%= log.displayStatus || log.status %></span>
-                      <% } else { %>
-                        <span class="text-slate-400">Tidak Hadir (Alpha)</span>
-                      <% } %>
-                    </td>
-                  </tr>
-                <% }) %>
-              <% } else { %>
-                <tr>
-                  <td colspan="5" class="p-8 text-center text-slate-400 font-normal">Tidak ada rekam jejak presensi pada rentang periode siklus ini.</td>
-                </tr>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
+      <!-- 2. PERSONAL DESKTOP VIEW: ORIGINAL TABLE -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <th class="p-4 pl-6">Tanggal Berjalan</th>
+              <th class="p-4">Jam Masuk</th>
+              <th class="p-4">Jam Pulang</th>
+              <th class="p-4">Klasifikasi Log</th>
+              <th class="p-4 text-right pr-6">Status Rekam</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+            <% if (listAttendance && listAttendance.length > 0) { %>
+            <% listAttendance.forEach(log => { %>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="p-4 pl-6 font-medium text-slate-900">
+                <%= log.checkIn ? new Date(log.checkIn).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date(log.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+              </td>
+              <td class="p-4 tabular-nums text-slate-600"><%= log.checkIn ? new Date(log.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></td>
+              <td class="p-4 tabular-nums text-slate-600"><%= log.checkOut ? new Date(log.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '—' %></td>
+              <td class="p-4 text-slate-500 text-[11px]"><%= log.type || 'KANTOR' %></td>
+              <td class="p-4 text-right pr-6">
+                <% if(log.status === 'HADIR') { %>
+                <span class="text-green-600 font-semibold">Tepat Waktu</span>
+                <% } else if(log.status === 'TELAT') { %>
+                <span class="text-red-600 font-semibold">Terlambat (+<%= log.lateDuration %>m)</span>
+                <% } else if(log.status === 'IZIN' || log.status === 'CUTI') { %>
+                <span class="text-blue-600 font-semibold"><%= log.displayStatus || log.status %></span>
+                <% } else { %>
+                <span class="text-slate-400">Tidak Hadir (Alpha)</span>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %>
+            <% } else { %>
+            <tr>
+              <td colspan="5" class="p-8 text-center text-slate-400 font-normal">Tidak ada rekam jejak presensi pada rentang periode siklus ini.</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
       <% } %>
 
     </div>
