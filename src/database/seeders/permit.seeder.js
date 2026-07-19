@@ -67,7 +67,6 @@ const seedPermit = async () => {
         continue;
       }
 
-      // Hapus permit lama pada periode yang sama
       await Permit.deleteMany({
         employeeId: employee._id,
         date: {
@@ -84,7 +83,7 @@ const seedPermit = async () => {
         status: item.status,
         approvedBy:
           item.status === "APPROVED" || item.status === "REJECTED"
-            ? employee._id // ganti dengan manager/admin jika ada
+            ? employee._id 
             : null,
         approvalDate:
           item.status === "APPROVED" || item.status === "REJECTED"

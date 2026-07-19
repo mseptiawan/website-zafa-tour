@@ -1,4 +1,4 @@
-import UnitKpiMapping from "../models/kpi/UnitKpiMapping.model.js"; // Sesuaikan path model asli kamu
+import UnitKpiMapping from "../models/kpi/UnitKpiMapping.model.js";
 import KpiTemplate from "../models/kpi/KpiTemplate.model.js";
 import Unit from "../models/basic/Unit.model.js";
 import Position from "../models/basic/Position.model.js";

@@ -1,7 +1,7 @@
 import path from "path";
 import ejs from "ejs";
 import ExcelJS from "exceljs";
-import { renderHtmlToPdf } from "../../utils/pdfRenderer.js"; // Sesuaikan path utils renderHtmlToPdf milikmu
+import { renderHtmlToPdf } from "../../utils/pdfRenderer.js";
 
 export const generatePayrollPdf = async (listPayroll, analytics, filters) => {
   const exportDate = new Date().toLocaleDateString("id-ID", {

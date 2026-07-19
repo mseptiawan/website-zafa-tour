@@ -9,6 +9,8 @@ import Role from "../models/basic/Role.model.js";
 import EmployeeCareer from "../models/employee/EmployeeCareer.js";
 import Bidang from "../models/basic/Bidang.model.js";
 import LeaveCancellation from "../models/leave/LeaveCancellation.model.js";
+import { MODULES, NOTIF_CATEGORIES } from "../config/constants.js";
+import notificationService from "./notification.service.js";
 
 // ─── WORKFLOW & HELPER INTERNAL SERVICE ───────────────────
 const WORKFLOW = {
@@ -440,6 +442,10 @@ export const applyLeaveService = async ({ body, currentUser, file }) => {
   const documentPath = file ? `/uploads/files/${file.filename}` : null;
   const currentYear = new Date(startDate || Date.now()).getFullYear();
 
+  // 0. Ambil data profil karyawan untuk kebutuhan pengirim notifikasi (senderName)
+  const employee = await Employee.findOne({ userId: currentUser._id }).lean();
+  const senderName = employee?.fullName || currentUser.username || "Pegawai";
+
   // 1. Ambil data tipe cuti untuk mendeteksi apakah ini Cuti Tahunan atau bukan
   const leaveType = await LeaveType.findById(leaveTypeId);
   if (!leaveType) {
@@ -459,7 +465,7 @@ export const applyLeaveService = async ({ body, currentUser, file }) => {
     throw error;
   }
 
-  // 2. KONDISI FIX: Tentukan pakah jenis cuti ini adalah cuti tahunan
+  // 2. KONDISI FIX: Tentukan apakah jenis cuti ini adalah cuti tahunan
   const isCutiTahunan = leaveType.code === "CT" || leaveType.name.toLowerCase().includes("tahunan");
 
   // Validasi saldo HANYA berjalan jika pegawai memilih Cuti Tahunan
@@ -525,6 +531,58 @@ export const applyLeaveService = async ({ body, currentUser, file }) => {
       balance.remaining -= Number(finalTotalDays);
       await balance.save();
     }
+  }
+
+  // ─── INTEGRASI ENGINE NOTIFIKASI BERANTAI (LEAVE WORKFLOW) ───
+  try {
+    if (approverId) {
+      if (currentStep === "HANDOVER") {
+        // Notifikasi ke user yang ditunjuk untuk Handover Pekerjaan
+        await notificationService.createNotification({
+          userId: approverId,
+          senderId: currentUser._id,
+          senderName: senderName,
+          title: "Permintaan Handover Tugas Cuti",
+          text: `${senderName} mendelegasikan pekerjaan kepada Anda untuk pengajuan cuti (${leaveType.name}) selama ${finalTotalDays} hari kerja.`,
+          module: MODULES.LEAVE || "LEAVE",
+          referenceId: newLeave._id,
+          actionUrl: `/leave/detail/${newLeave._id}`,
+          type: "LEAVE",
+          category: NOTIF_CATEGORIES.INFO,
+        });
+      } else {
+        // Notifikasi ke Manager / Atasan untuk persetujuan (Approval)
+        await notificationService.createNotification({
+          userId: approverId,
+          senderId: currentUser._id,
+          senderName: senderName,
+          title: "Persetujuan Cuti Pegawai Baru",
+          text: `${senderName} mengajukan ${leaveType.name} selama ${finalTotalDays} hari kerja dan menunggu persetujuan Anda.`,
+          module: MODULES.LEAVE || "LEAVE",
+          referenceId: newLeave._id,
+          actionUrl: `/leave/detail/${newLeave._id}`,
+          type: "LEAVE",
+          category: NOTIF_CATEGORIES.INFO,
+        });
+      }
+    } else {
+      // Jika disetujui otomatis oleh sistem (Tanpa Alur Approval/Direksi)
+      await notificationService.createNotification({
+        userId: currentUser._id,
+        senderId: currentUser._id,
+        senderName: "Sistem HRIS",
+        title: "Pengajuan Cuti Disetujui Otomatis 🎉",
+        text: `Hore! Pengajuan ${leaveType.name} Anda selama ${finalTotalDays} hari berhasil disetujui secara otomatis.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: newLeave._id,
+        actionUrl: `/leave/detail/${newLeave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    }
+  } catch (notifError) {
+    // Memastikan core business logik pembuatan cuti tetap aman/berjalan meskipun server notifikasi drop
+    console.error("Gagal mengirimkan notifikasi alur cuti:", notifError.message);
   }
 
   return newLeave;
@@ -699,7 +757,6 @@ export const updateLeaveService = async ({ id, body, currentUser }) => {
   return leave;
 };
 
-// ─── SERVICE METHOD 14: PEMBATALAN CUTI STATUS PENDING ────
 export const cancelPendingLeaveService = async ({ id }) => {
   const leave = await Leave.findById(id);
   if (!leave || leave.status !== "PENDING") {
@@ -709,6 +766,12 @@ export const cancelPendingLeaveService = async ({ id }) => {
     error.statusCode = 400;
     throw error;
   }
+
+  // Cari siapa approver yang sedang memegang berkas pending ini SEBELUM statusnya diubah
+  const activeApprovals = await LeaveApproval.find({
+    leaveId: leave._id,
+    status: "PENDING",
+  }).lean();
 
   leave.status = "CANCELLED";
   await leave.save();
@@ -722,10 +785,35 @@ export const cancelPendingLeaveService = async ({ id }) => {
     }
   );
 
+  // ─── NOTIFIKASI PEMBATALAN OLEH PEGAWAI (STATUS PENDING) ───
+  try {
+    const employee = await Employee.findOne({ userId: leave.userId }).lean();
+    const requesterName = employee?.fullName || "Karyawan Pemohon";
+
+    const targetUserIds = activeApprovals.map((app) => app.approverId);
+
+    if (targetUserIds.length > 0) {
+      // Mengirimkan notifikasi ke satu atau beberapa approver yang memegang berkas terkait
+      await notificationService.createManyNotifications({
+        userIds: targetUserIds,
+        senderId: leave.userId,
+        senderName: requesterName,
+        title: "Penarikan / Pembatalan Berkas Cuti",
+        text: `${requesterName} membatalkan dokumen usulan cuti mereka yang sebelumnya berada di antrean Anda.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    }
+  } catch (notifError) {
+    console.error("Gagal mengirimkan notifikasi pembatalan pending cuti:", notifError.message);
+  }
+
   return leave;
 };
 
-// ─── SERVICE METHOD 15: AJUKAN PEMBATALAN CUTI APPROVED ───
 export const requestCancelApprovedLeaveService = async ({ id, body, currentUser }) => {
   const { reason } = body;
 
@@ -789,7 +877,7 @@ export const requestCancelApprovedLeaveService = async ({ id, body, currentUser 
     targetApproverId = approver._id;
   }
 
-  // Jika alur bypass/selesai, langsung eksekusi pembatalan mutlak
+  // Jika alur bypass/selesai, langsung eksekusi pembatalan mutlak (Instant Cancelled)
   if (!targetStep || !targetApproverId) {
     leave.status = "CANCELLED";
     await leave.save();
@@ -806,6 +894,25 @@ export const requestCancelApprovedLeaveService = async ({ id, body, currentUser 
       balance.remaining += Number(leave.totalDays);
       await balance.save();
     }
+
+    // ─── NOTIFIKASI JIKA INSTAN BATAL (TANPA ALUR PERSETUJUAN) ───
+    try {
+      await notificationService.createNotification({
+        userId: currentUser._id,
+        senderId: currentUser._id,
+        senderName: "Sistem HRIS",
+        title: "Pembatalan Cuti Berhasil 🎉",
+        text: "Permintaan pembatalan dokumen cuti Anda berhasil diproses secara instan oleh sistem.",
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    } catch (notifError) {
+      console.error("Gagal mengirimkan notifikasi instan cancellation:", notifError.message);
+    }
+
     return { instantCancelled: true };
   }
 
@@ -816,6 +923,27 @@ export const requestCancelApprovedLeaveService = async ({ id, body, currentUser 
     status: "PENDING",
     note: reason || "Mengajukan pembatalan cuti.",
   });
+
+  // ─── NOTIFIKASI MINTA BATAL KARENA SUDAH APPROVED (BUTUH APPROVAL ULANG) ───
+  try {
+    const employee = await Employee.findOne({ userId: currentUser._id }).lean();
+    const requesterName = employee?.fullName || currentUser.username || "Karyawan";
+
+    await notificationService.createNotification({
+      userId: targetApproverId,
+      senderId: currentUser._id,
+      senderName: requesterName,
+      title: "Permohonan Pembatalan Dokumen Cuti",
+      text: `${requesterName} memohon pembatalan atas cuti kerja yang terlanjur disetujui. Mohon tinjau ulang kelayakan operasional.`,
+      module: MODULES.LEAVE || "LEAVE",
+      referenceId: leave._id,
+      actionUrl: `/leave/detail/${leave._id}`,
+      type: "LEAVE",
+      category: NOTIF_CATEGORIES.INFO,
+    });
+  } catch (notifError) {
+    console.error("Gagal mengirimkan notifikasi request cancellation:", notifError.message);
+  }
 
   return { instantCancelled: false };
 };
@@ -875,7 +1003,6 @@ export const getMyDelegationsService = async ({ userId }) => {
   };
 };
 
-// ─── SERVICE METHOD 18: APPROVAL TANGGUNG JAWAB DELEGASI ─
 export const approveDelegationService = async ({ id, body, currentUser }) => {
   const { note } = body;
 
@@ -944,9 +1071,63 @@ export const approveDelegationService = async ({ id, body, currentUser }) => {
     }
   }
 
+  // ─── NOTIFIKASI APPROVE DELEGASI ───
+  try {
+    const approverEmp = await Employee.findOne({ userId: currentUser._id }).lean();
+    const requesterEmp = await Employee.findOne({ userId: requester._id }).lean();
+
+    const handlerName = approverEmp?.fullName || currentUser.username || "Rekan Kerja";
+    const requesterName = requesterEmp?.fullName || "Pegawai";
+
+    // 1. Notif ke Pemohon Cuti bahwa delegasinya diterima
+    await notificationService.createNotification({
+      userId: requester._id,
+      senderId: currentUser._id,
+      senderName: handlerName,
+      title: "Delegasi Tugas Cuti Diterima",
+      text: `${handlerName} telah menerima pelimpahan tugas Anda. Berkas kini diteruskan ke tahap persetujuan.`,
+      module: MODULES.LEAVE || "LEAVE",
+      referenceId: leave._id,
+      actionUrl: `/leave/detail/${leave._id}`,
+      type: "LEAVE",
+      category: NOTIF_CATEGORIES.INFO,
+    });
+
+    // 2. Notif ke Approver berikutnya (jika ada) atau langsung notif Approved Akhir
+    if (nextApproverId) {
+      await notificationService.createNotification({
+        userId: nextApproverId,
+        senderId: currentUser._id,
+        senderName: handlerName,
+        title: "Persetujuan Cuti Baru (Pasca Handover)",
+        text: `Tugas mandatori telah diserahterimakan. Pengajuan cuti ${requesterName} menunggu persetujuan Anda.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    } else {
+      await notificationService.createNotification({
+        userId: requester._id,
+        senderId: currentUser._id,
+        senderName: "Sistem HRIS",
+        title: "Cuti Disetujui Penuh 🎉",
+        text: `Hore! Karena tidak memerlukan approval lanjutan, cuti Anda resmi disetujui sistem setelah serah terima tugas.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    }
+  } catch (notifError) {
+    console.error("Gagal mengirimkan notifikasi approve delegation:", notifError.message);
+  }
+
   return approval;
 };
-// ─── SERVICE METHOD 19: REJECT TANGGUNG JAWAB DELEGASI ────
+
 export const rejectDelegationService = async ({ id, body, currentUser }) => {
   const { note } = body;
 
@@ -968,11 +1149,35 @@ export const rejectDelegationService = async ({ id, body, currentUser }) => {
   approval.actionDate = new Date();
   await approval.save();
 
-  await Leave.findByIdAndUpdate(approval.leaveId, { status: "REJECTED" });
+  const leave = await Leave.findByIdAndUpdate(
+    approval.leaveId,
+    { status: "REJECTED" },
+    { returnDocument: "after" }
+  );
+
+  // ─── NOTIFIKASI REJECT DELEGASI ───
+  try {
+    const approverEmp = await Employee.findOne({ userId: currentUser._id }).lean();
+    const handlerName = approverEmp?.fullName || currentUser.username || "Rekan Kerja";
+
+    await notificationService.createNotification({
+      userId: leave.userId,
+      senderId: currentUser._id,
+      senderName: handlerName,
+      title: "Delegasi Tugas Cuti Ditolak",
+      text: `Permintaan serah terima tugas cuti Anda ditolak oleh ${handlerName}. Alasan: "${note || "Tidak ada catatan"}"`,
+      module: MODULES.LEAVE || "LEAVE",
+      referenceId: leave._id,
+      actionUrl: `/leave/detail/${leave._id}`,
+      type: "LEAVE",
+      category: NOTIF_CATEGORIES.INFO,
+    });
+  } catch (notifError) {
+    console.error("Gagal mengirimkan notifikasi reject delegation:", notifError.message);
+  }
 
   return approval;
 };
-
 // ─── SERVICE METHOD 20: AMBIL DATA ANTREAN PERSETUJUAN ────
 export const getPendingApprovalsDataService = async ({ currentUser }) => {
   const approvals = await LeaveApproval.find({
@@ -1001,7 +1206,6 @@ export const getPendingApprovalsDataService = async ({ currentUser }) => {
   return { approvals, employee };
 };
 
-// ─── SERVICE METHOD 21: APPROVAL PERIZINAN BERKAS CUTI ───
 export const approveLeaveService = async ({ id, body, currentUser }) => {
   const { note } = body;
 
@@ -1053,6 +1257,27 @@ export const approveLeaveService = async ({ id, body, currentUser }) => {
       await balance.save();
     }
 
+    // ─── NOTIFIKASI PEMBATALAN APPROVED ───
+    try {
+      const approverEmp = await Employee.findOne({ userId: currentUser._id }).lean();
+      const handlerName = approverEmp?.fullName || currentUser.username || "Atasan";
+
+      await notificationService.createNotification({
+        userId: requester._id,
+        senderId: currentUser._id,
+        senderName: handlerName,
+        title: "Permohonan Pembatalan Cuti Disetujui",
+        text: `Pembatalan cuti Anda telah disetujui oleh ${handlerName}. Saldo kuota jatah cuti tahunan Anda telah dipulihkan.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    } catch (notifError) {
+      console.error("Gagal mengirimkan notifikasi approve cancellation:", notifError.message);
+    }
+
     return { type: "CANCELLATION", leave };
   }
 
@@ -1063,7 +1288,6 @@ export const approveLeaveService = async ({ id, body, currentUser }) => {
   let nextApproverId = null;
   const role = requesterRoleName;
 
-  // 1. Alur Pegawai Biasa
   if (role === "PEGAWAI") {
     if (approval.step === "HANDOVER") {
       const manager = await getManagerByBidang(requester._id);
@@ -1080,9 +1304,7 @@ export const approveLeaveService = async ({ id, body, currentUser }) => {
       nextStep = "DIREKTUR_UTAMA";
       nextApproverId = user?._id;
     }
-  }
-  // 2. Alur Tingkat Manager Bidang
-  else if (role.startsWith("MANAGER")) {
+  } else if (role.startsWith("MANAGER")) {
     if (approval.step === "HANDOVER") {
       const roleDoc = await Role.findOne({ name: "WAKIL_DIREKTUR" });
       const user = await User.findOne({ roleId: roleDoc._id });
@@ -1094,9 +1316,7 @@ export const approveLeaveService = async ({ id, body, currentUser }) => {
       nextStep = "DIREKTUR_UTAMA";
       nextApproverId = user?._id;
     }
-  }
-  // 3. Alur Tingkat Wakil Direktur
-  else if (role === "WAKIL_DIREKTUR") {
+  } else if (role === "WAKIL_DIREKTUR") {
     if (approval.step === "HANDOVER") {
       const roleDoc = await Role.findOne({ name: "DIREKTUR_UTAMA" });
       const user = await User.findOne({ roleId: roleDoc._id });
@@ -1105,7 +1325,6 @@ export const approveLeaveService = async ({ id, body, currentUser }) => {
     }
   }
 
-  // Daftarkan ke tingkat persetujuan berikutnya jika alur belum selesai
   if (nextApproverId) {
     await LeaveApproval.create({
       leaveId: leave._id,
@@ -1114,7 +1333,6 @@ export const approveLeaveService = async ({ id, body, currentUser }) => {
       status: "PENDING",
     });
   } else {
-    // Persetujuan Akhir Mutlak Mutasi Status Dokumen
     leave.status = "APPROVED";
     await leave.save();
 
@@ -1128,10 +1346,64 @@ export const approveLeaveService = async ({ id, body, currentUser }) => {
     }
   }
 
+  // ─── NOTIFIKASI APPROVAL CUTI NORMAL ───
+  try {
+    const approverEmp = await Employee.findOne({ userId: currentUser._id }).lean();
+    const requesterEmp = await Employee.findOne({ userId: requester._id }).lean();
+
+    const handlerName = approverEmp?.fullName || currentUser.username || "Atasan";
+    const requesterName = requesterEmp?.fullName || "Pegawai";
+
+    if (nextApproverId) {
+      // Notif ke pemohon bahwa berkas naik tingkat
+      await notificationService.createNotification({
+        userId: requester._id,
+        senderId: currentUser._id,
+        senderName: handlerName,
+        title: "Cuti Disetujui (Tahap Lanjutan)",
+        text: `Pengajuan cuti Anda disetujui oleh ${handlerName} (Step: ${approval.step}) dan naik ke tingkat ${nextStep}.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+
+      // Notif ke pejabat struktural tingkat atasnya
+      await notificationService.createNotification({
+        userId: nextApproverId,
+        senderId: currentUser._id,
+        senderName: handlerName,
+        title: "Antrean Persetujuan Cuti Baru",
+        text: `Berkas pengajuan cuti ${requesterName} masuk ke dalam antrean kerja peninjauan struktural ${nextStep} Anda.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    } else {
+      // Notif Persetujuan Mutlak/Final
+      await notificationService.createNotification({
+        userId: requester._id,
+        senderId: currentUser._id,
+        senderName: handlerName,
+        title: "Pengajuan Cuti Resmi Disetujui Penuh 🎉",
+        text: `Selamat! Berkas permohonan cuti Anda selama ${leave.totalDays} hari kerja telah disetujui sepenuhnya oleh jajaran struktural tertinggi.`,
+        module: MODULES.LEAVE || "LEAVE",
+        referenceId: leave._id,
+        actionUrl: `/leave/detail/${leave._id}`,
+        type: "LEAVE",
+        category: NOTIF_CATEGORIES.INFO,
+      });
+    }
+  } catch (notifError) {
+    console.error("Gagal mengirimkan notifikasi approval cuti:", notifError.message);
+  }
+
   return { type: "STANDARD", leave };
 };
 
-// ─── SERVICE METHOD 22: REJECT PENGAJUAN SURAT CUTI ──────
 export const rejectLeaveService = async ({ id, body, currentUser }) => {
   const { note } = body;
 
@@ -1152,7 +1424,33 @@ export const rejectLeaveService = async ({ id, body, currentUser }) => {
   approval.actionDate = new Date();
   await approval.save();
 
-  await Leave.findByIdAndUpdate(approval.leaveId, { status: "REJECTED" });
+  const leave = await Leave.findByIdAndUpdate(
+    approval.leaveId,
+    { status: "REJECTED" },
+    { returnDocument: "after" }
+  );
+
+  // ─── NOTIFIKASI PENOLAKAN CUTI ATASAN ───
+  try {
+    const approverEmp = await Employee.findOne({ userId: currentUser._id }).lean();
+    const handlerName = approverEmp?.fullName || currentUser.username || "Atasan";
+
+    await notificationService.createNotification({
+      userId: leave.userId,
+      senderId: currentUser._id,
+      senderName: handlerName,
+      title: "Pengajuan Cuti Ditolak Atasan",
+      text: `Pengajuan cuti Anda resmi ditolak oleh ${handlerName} pada tingkat ${approval.step}. Catatan: "${note || "Tidak ada catatan"}"`,
+      module: MODULES.LEAVE || "LEAVE",
+      referenceId: leave._id,
+      actionUrl: `/leave/detail/${leave._id}`,
+      type: "LEAVE",
+      category: NOTIF_CATEGORIES.INFO,
+    });
+  } catch (notifError) {
+    console.error("Gagal mengirimkan notifikasi reject cuti:", notifError.message);
+  }
+
   return approval;
 };
 

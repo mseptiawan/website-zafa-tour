@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Overtime } from "../../models/Overtime.model.js";
 import User from "../../models/basic/User.model.js";
 import Employee from "../../models/employee/Employee.model.js";
-import { getPayrollPeriod } from "../../utils/payrollPeriod.js"; // <-- Sesuaikan path helper lu
+import { getPayrollPeriod } from "../../utils/payrollPeriod.js";
 
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -21,8 +21,8 @@ const seedOvertimeSpesifik = async () => {
     console.log(`🔍 Memulai seeding Overtime untuk user: ${targetUsernames.join(", ")}...`);
 
     // 2. Rentang waktu dinamis 2 bulan terakhir (Mei - Juli 2026)
-    const startDate = new Date(Date.UTC(2026, 4, 10)); // 10 Mei 2026
-    const endDate = new Date(Date.UTC(2026, 6, 9)); // 9 Juli 2026
+    const startDate = new Date(Date.UTC(2026, 4, 27)); // 10 Mei 2026
+    const endDate = new Date(Date.UTC(2026, 6, 28)); // 9 Juli 2026
 
     const taskDescriptions = [
       "Optimasi query database core system dan penyesuaian index.",
@@ -53,17 +53,13 @@ const seedOvertimeSpesifik = async () => {
         ? employee.careerData[0]
         : employee.careerData;
 
-      // Sekarang bidangId akan mengambil dari data karir asli si karyawan,
-      // dan hanya membuat ObjectId baru jika datanya memang kosong di DB.
       const bidangId = activeCareer?.bidangId || new mongoose.Types.ObjectId();
 
-      // Hapus data lama milik user ini khusus di rentang 2 bulan tersebut agar tidak duplikat
       await Overtime.deleteMany({
         employeeId: objectIdEmployee,
         date: { $gte: startDate, $lte: new Date(Date.UTC(2026, 6, 15)) },
       });
 
-      // Kumpulkan hari kerja (Senin - Jumat)
       let currentDate = new Date(startDate);
       const availableWorkDays = [];
       while (currentDate <= endDate) {
@@ -75,7 +71,6 @@ const seedOvertimeSpesifik = async () => {
       }
 
       shuffleArray(availableWorkDays);
-      // Setiap user diberikan 6-8 hari lembur acak yang tersebar di 2 bulan tersebut
       const targetOvertimeCount = getRandomInt(6, 8);
       const overtimeDays = availableWorkDays.slice(
         0,
@@ -89,7 +84,6 @@ const seedOvertimeSpesifik = async () => {
         const startHour = 17;
         const endHour = startHour + totalHours;
 
-        // Hitung siklus payroll secara dinamis berdasarkan tanggal eksekusi lembur
         const periodInfo = getPayrollPeriod(date);
 
         overtimeData.push({
