@@ -18,18 +18,9 @@ export const checkAndInjectAlphaStatus = async () => {
     const endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
 
-    // Cari hari dalam seminggu (0 = Minggu, 6 = Sabtu)
-    // const dayOfWeek = startOfToday.getDay();
-    // Opsional: Jika Sabtu & Minggu libur instansi, hentikan proses eksekusi otomatis
-    // if (dayOfWeek === 0 || dayOfWeek === 6) {
-    //   console.log("ℹ️ [CRON] Hari Libur Akhir Pekan Terdeteksi. Pemindaian ALPHA dilewati.");
-    //   return;
-    // }
-
-    // 2. Ambil semua karyawan aktif
+  
     const allEmployees = await Employee.find({}).select("_id userId fullName").lean();
 
-    // 3. Ambil semua data absensi, izin, dan cuti yang valid hari ini secara paralel
     const [attendedRecords, permittedRecords, leaveRecords] = await Promise.all([
       Attendance.find({ checkIn: { $gte: startOfToday, $lte: endOfToday } })
         .select("employeeId")

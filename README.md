@@ -1,154 +1,89 @@
-# Sistem Informasi Kepegawaian (SIMPEG)
+# SIMPEG - Sistem Informasi Kepegawaian
 
-Sistem Informasi Kepegawaian (SIMPEG) merupakan aplikasi berbasis web yang dirancang untuk membantu digitalisasi proses administrasi kepegawaian di perusahaan. Sistem ini mengelola berbagai proses operasional seperti manajemen data pegawai, kehadiran, cuti, lembur, hingga dinas luar melalui mekanisme persetujuan bertingkat (_multi-level approval_).
+Sistem Informasi Kepegawaian (SIMPEG) adalah aplikasi berbasis web untuk membantu digitalisasi administrasi kepegawaian perusahaan. Sistem menyediakan pengelolaan data pegawai, kehadiran, cuti, lembur, dinas luar, hingga workflow persetujuan bertingkat (_multi-level approval_).
 
-Proyek ini dikembangkan sebagai bagian dari tugas akhir dan berfokus pada penerapan arsitektur backend yang modular, workflow approval, serta manajemen data menggunakan MongoDB dan Redis.
+Proyek ini dikembangkan sebagai bagian dari tugas akhir dengan fokus pada arsitektur backend modular menggunakan Node.js, Express.js, MongoDB, dan Redis.
 
 ---
 
-# 🚀 Fitur Utama
+# Preview
 
-## 👤 Manajemen Kepegawaian
+## Dashboard
 
-- Manajemen data pegawai
+![Dashboard](docs/images/dashboard.png)
+
+## Payroll
+
+![Payroll](docs/images/payroll.png)
+
+## Riwayat Daily Log
+
+![Daily Log](docs/images/daily-log.png)
+
+## Riwayat Kehadiran
+
+![Attendance](docs/images/attendance-history.png)
+
+## Riwayat Peminjaman Uang
+
+![Loan History](docs/images/loan-history.png)
+
+---
+
+# Fitur
+
+- Authentication berbasis Session
 - Role-Based Access Control (RBAC)
-- Session-based Authentication
-- Manajemen jabatan dan divisi
-- Profil pegawai
-
-## 🕒 Manajemen Kehadiran
-
-- Check In / Check Out
-- Riwayat kehadiran
-- Koreksi absensi 
-- Monitoring kehadiran pegawai
-
-## 🌴 Manajemen Cuti
-
-- Pengajuan cuti
-- Persetujuan bertingkat
-- Perhitungan sisa kuota cuti
-- Riwayat pengajuan cuti
-
-## ⏱️ Manajemen Lembur
-
-- Pengajuan lembur
-- Approval oleh manajer
-- Dokumentasi hasil pekerjaan
-- Riwayat lembur
-
-## ✈️ Manajemen Dinas Luar
-
-- Pengajuan dinas luar
-- Workflow persetujuan multi-level
-- Timeline perjalanan dinas
-- Monitoring anggaran
-- Proses pencairan dana oleh bagian keuangan
+- Manajemen Data Pegawai
+- Manajemen Kehadiran
+- Pengajuan Cuti
+- Pengajuan Lembur
+- Pengajuan Dinas Luar
+- Multi-Level Approval Workflow
+- Dashboard
+- Notification
+- Reporting
+- Payroll _(Development)_
+- Reward & Punishment _(Development)_
 
 ---
 
-# 🛠️ Tech Stack
+# Tech Stack
 
-| Layer                 | Technology                       |
-| --------------------- | -------------------------------- |
-| Backend               | Node.js, Express.js              |
-| Database              | MongoDB                          |
-| Cache & Session Store | Redis                            |
-| ODM                   | Mongoose                         |
-| Template Engine       | EJS                              |
-| CSS Framework         | Tailwind CSS                     |
-| Authentication        | Session-based Authentication     |
-| Authorization         | Role-Based Access Control (RBAC) |
-
----
-
-# ⚡ Infrastruktur
-
-Sistem menggunakan beberapa komponen utama berikut:
-
-- **Node.js** sebagai runtime aplikasi.
-- **Express.js** sebagai framework backend.
-- **MongoDB** sebagai database utama.
-- **Redis** sebagai session store dan cache untuk meningkatkan performa aplikasi.
-- **Mongoose** sebagai Object Data Modeling (ODM).
-- **EJS** sebagai template engine berbasis Server-Side Rendering (SSR).
-- **Tailwind CSS** sebagai framework CSS.
+| Layer           | Technology             |
+| --------------- | ---------------------- |
+| Backend         | Node.js, Express.js    |
+| Database        | MongoDB                |
+| ODM             | Mongoose               |
+| Cache           | Redis                  |
+| Template Engine | EJS                    |
+| CSS             | Tailwind CSS           |
+| Authentication  | Session Authentication |
+| Authorization   | RBAC                   |
 
 ---
 
-# 📁 Struktur Proyek
+# Project Structure
 
 ```text
 src/
-├── config/          # Konfigurasi aplikasi
-├── controllers/     # Request handler
-├── middleware/      # Authentication, Authorization, Validation
-├── models/          # Mongoose Models
-├── routes/          # Express Routes
-├── services/        # Business Logic
-├── utils/           # Helper Functions
-├── views/           # EJS Templates
+├── config/
+├── controllers/
+├── middleware/
+├── models/
+├── routes/
+├── services/
+├── utils/
+├── views/
 ├── app.js
 └── server.js
 ```
 
 ---
 
-# 👥 Role Pengguna
+# Instalasi
 
-| Role     | Deskripsi                                                                        |
-| -------- | -------------------------------------------------------------------------------- |
-| Pegawai  | Mengajukan cuti, lembur, dinas luar, koreksi absensi, serta melihat data pribadi |
-| Manajer  | Melakukan review dan approval pengajuan bawahan                                  |
-| HR       | Mengelola data kepegawaian dan approval sesuai alur bisnis                       |
-| Direktur | Approval tingkat akhir pada workflow tertentu                                    |
-| Keuangan | Mengelola pembayaran dan monitoring anggaran dinas luar                          |
-
----
-
-# 🔄 Workflow Approval
-
-## Cuti
-
-```text
-Pegawai
-    │
-    ▼
-Manajer
-    │
-    ▼
-HR
-```
-
-## Lembur
-
-```text
-Pegawai
-    │
-    ▼
-Manajer
-```
-
-## Dinas Luar
-
-```text
-Pegawai
-    │
-    ▼
-Manajer
-    │
-    ▼
-HR / Direktur
-    │
-    ▼
-Keuangan
-```
-
----
-
-# ⚙️ Instalasi
-
-## 1. Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/mseptiawan/hris-zafa.git
@@ -156,33 +91,23 @@ git clone https://github.com/mseptiawan/hris-zafa.git
 cd hris-zafa
 ```
 
----
-
-## 2. Install Dependency
+## Install Dependency
 
 ```bash
 npm install
 ```
 
----
+## Seed Database
 
-## 📌 Catatan
-
-Sebelum menjalankan aplikasi untuk pertama kali, lakukan proses seeding database agar data awal seperti akun, role, jabatan, divisi, dan data pendukung lainnya tersedia.
-
-Jalankan perintah berikut:
+Seeder digunakan untuk membuat data awal seperti akun, role, divisi, jabatan, dan data pendukung lainnya.
 
 ```bash
 npm run seed
 ```
 
-> **Catatan:** Jalankan seeder hanya saat pertama kali menginisialisasi database atau ketika ingin mengisi ulang data awal. Jika database sudah berisi data, Anda tidak perlu menjalankan seeder kembali.
+## Konfigurasi Environment
 
----
-
-## 3. Konfigurasi Environment
-
-Buat file `.env` pada root project.
+Buat file `.env`
 
 ```env
 PORT=3000
@@ -196,19 +121,15 @@ SESSION_SECRET=your_session_secret
 NODE_ENV=development
 ```
 
----
+## Jalankan Redis
 
-## 4. Jalankan Redis
-
-Pastikan Redis sudah berjalan sebelum menjalankan aplikasi.
-
-### Linux / macOS
+Linux/macOS
 
 ```bash
 redis-server
 ```
 
-### Docker
+atau menggunakan Docker
 
 ```bash
 docker run -d \
@@ -217,33 +138,29 @@ docker run -d \
   redis:7
 ```
 
----
+## Jalankan Aplikasi
 
-## 5. Jalankan Aplikasi
-
-### Development
+Development
 
 ```bash
 npm run dev
 ```
 
-### Production
+Production
 
 ```bash
 npm start
 ```
 
-Aplikasi akan berjalan di:
+Aplikasi akan berjalan di
 
-```text
+```
 http://localhost:3000
 ```
 
 ---
 
-# 📂 Arsitektur
-
-Aplikasi menggunakan arsitektur modular agar setiap layer memiliki tanggung jawab yang jelas.
+# Arsitektur
 
 ```text
 Client
@@ -258,69 +175,28 @@ Controllers
 Services
    │
    ▼
-Models (Mongoose)
+Models
    │
    ▼
 MongoDB
+
+Redis
+├── Session Store
+└── Cache
 ```
 
-Redis digunakan sebagai **Session Store** dan **Cache Layer** untuk meningkatkan performa aplikasi.
-
 ---
 
-# 🔒 Authentication & Authorization
-
-Sistem menggunakan:
-
-- Session-based Authentication
-- Redis Session Store
-- Role-Based Access Control (RBAC)
-- Middleware Authorization
-- Middleware Validation
-
----
-
-# 📌 Modul yang Tersedia
-
-- Authentication
-- Employee Management
-- Attendance Management
-- Leave Management
-- Overtime Management
-- Business Trip Management
-- Multi-Level Approval Workflow
-- Notification
-- Dashboard
-- Reporting
-
----
-
-# 📈 Status Proyek
-
-| Modul                    | Status         |
-| ------------------------ | -------------- |
-| Authentication           | ✅             |
-| Employee Management      | ✅             |
-| Attendance               | ✅             |
-| Leave Management         | ✅             |
-| Overtime Management      | ✅             |
-| Business Trip Management | ✅             |
-| Multi-Level Approval     | ✅             |
-| Payroll                  | 🚧 Development |
-| Reward & Punishment      | 🚧 Development |
-
----
-
-# 📝 Lisensi
-
-Proyek ini dikembangkan sebagai bagian dari penelitian akademik (Tugas Akhir) dan digunakan untuk tujuan edukasi.
-
----
-
-# 👨‍💻 Author
+# Author
 
 **M. Septiawan**
 
 - GitHub: https://github.com/mseptiawan
 - LinkedIn: https://www.linkedin.com/in/mseptiawan/
 - Email: mseptiawan017@gmail.com
+
+---
+
+# License
+
+Proyek ini dikembangkan untuk tujuan akademik sebagai bagian dari penelitian tugas akhir.
