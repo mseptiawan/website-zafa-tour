@@ -97,14 +97,6 @@ cd hris-zafa
 npm install
 ```
 
-## Seed Database
-
-Seeder digunakan untuk membuat data awal seperti akun, role, divisi, jabatan, dan data pendukung lainnya.
-
-```bash
-npm run seed
-```
-
 ## Konfigurasi Environment
 
 Buat file `.env`
@@ -121,6 +113,24 @@ SESSION_SECRET=your_session_secret
 NODE_ENV=development
 ```
 
+## Jalankan MongoDB
+
+Pastikan service MongoDB sudah berjalan.
+
+Linux
+
+```bash
+sudo systemctl start mongod
+```
+
+Cek status:
+
+```bash
+sudo systemctl status mongod
+```
+
+---
+
 ## Jalankan Redis
 
 Linux/macOS
@@ -129,14 +139,45 @@ Linux/macOS
 redis-server
 ```
 
-atau menggunakan Docker
+---
+
+## Seed Database
+
+Seeder digunakan untuk membuat data awal seperti akun, role, divisi, jabatan, dan data pendukung lainnya.
 
 ```bash
-docker run -d \
-  --name redis \
-  -p 6379:6379 \
-  redis:7
+npm run seed
 ```
+
+---
+
+## Akun Login
+
+Setelah menjalankan seeder, akun login dapat dilihat pada file:
+
+```text
+src/database/seeders/userSeeder.js
+```
+
+Silakan gunakan email dan password yang terdapat pada file tersebut untuk login ke aplikasi.
+
+---
+
+## Backup Database
+
+Apabila tidak ingin menjalankan proses seeder, Anda dapat menggunakan database yang telah disediakan.
+
+Backup database dapat diunduh melalui:
+
+https://drive.google.com/file/d/10Na1we4fX7GIOet1IniG2qB06b_s8az5/view?usp=sharing
+
+Restore database menggunakan:
+
+```bash
+mongorestore --drop --db hris_zafa_tour <folder-backup>
+```
+
+---
 
 ## Jalankan Aplikasi
 
@@ -146,13 +187,7 @@ Development
 npm run dev
 ```
 
-Production
-
-```bash
-npm start
-```
-
-Aplikasi akan berjalan di
+Aplikasi akan berjalan pada:
 
 ```
 http://localhost:3000
