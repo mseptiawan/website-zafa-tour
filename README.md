@@ -99,6 +99,8 @@ npm install
 
 ## Konfigurasi Environment
 
+Link file env: https://drive.google.com/file/d/1vdS5E-_L81081M1jLzTDa2EeWb2WjhIo/view?usp=sharing
+
 Buat file `.env`
 
 ```env
